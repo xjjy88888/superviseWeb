@@ -48,8 +48,9 @@ const list = [
 export default class integrat extends PureComponent {
   constructor(props) {
     super(props);
+    console.log(props);
     this.state = {
-      show: true,
+      show: props.show,
       showDetail: false,
       key: "project",
       inputDisabled: true,
@@ -179,11 +180,11 @@ export default class integrat extends PureComponent {
     ];
 
     return (
-      <div className={styles.sidebar} style={{ left: show ? 0 : "-350px" }}>
+      <div className={styles.sidebar} style={{ left: show ? 350 : -350 }}>
         <Icon
           className={styles.icon}
-          type={show ? "left" : "right"}
-          style={{ fontSize: 30 }}
+          type="left"
+          style={{ fontSize: 30, display: show ? "block" : "none" }}
           onClick={this.switchShow}
         />
         <div

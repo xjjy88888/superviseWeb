@@ -2,6 +2,7 @@ import React, { PureComponent } from "react";
 import { Menu, Icon, Button } from "antd";
 import SiderMenu from "../../../components/SiderMenu";
 import Sidebar from "./sidebar";
+import SidebarDetail from "./siderbarDetail";
 import L from "leaflet";
 import styles from "./index.less";
 import "leaflet/dist/leaflet.css";
@@ -44,6 +45,7 @@ export default class integrat extends PureComponent {
       <div className={styles.main}>
         <SiderMenu active="401" />
         <Sidebar />
+        <SidebarDetail show={false} />
         <div id="map" className={styles.map} />
       </div>
     );
