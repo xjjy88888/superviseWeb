@@ -4,7 +4,7 @@ import styles from "./sidebar.less";
 import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
 
-const list = [
+const projectData = [
   {
     title: "新建铁路广州至香港专线",
     owner: "广州铁路局",
@@ -46,11 +46,30 @@ const list = [
     reply: "广州水利局"
   }
 ];
+
+const spotData = [
+  {
+    title: "2017_7897489_49687",
+    project: "新建铁路广州至香港专线",
+    standard: "疑似超出防治责任范围"
+  },
+  {
+    title: "2017_7897489_49687",
+    project: "新建铁路广州至香港专线",
+    standard: "疑似超出防治责任范围"
+  },
+  {
+    title: "2017_7897489_49687",
+    project: "新建铁路广州至香港专线",
+    standard: "疑似超出防治责任范围"
+  }
+];
 export default class integrat extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
       show: true,
+      siderbarDetail: false,
       showDetail: false,
       key: "project",
       inputDisabled: true,
@@ -73,7 +92,7 @@ export default class integrat extends PureComponent {
           value: "search1"
         }
       ],
-      listData: list
+      listData: projectData
     };
     this.map = null;
   }
@@ -82,19 +101,51 @@ export default class integrat extends PureComponent {
     this.setState({ show: !this.state.show, showDetail: false });
   };
 
-  switchShowDetail = () => {
-    this.setState({ showDetail: !this.state.showDetail });
+  close = () => {
+    this.setState({
+      showDetail: false,
+      siderbarDetail: false
+    });
     emitter.emit("showSiderbarDetail", {
       isShow: false,
-      from: "duty"
+      from: "spot"
     });
   };
 
+  switchShowDetail = () => {
+    const { key, siderbarDetail, showDetail } = this.state;
+    if (key === "project") {
+      this.setState({
+        showDetail: !showDetail,
+        siderbarDetail: !siderbarDetail
+      });
+      emitter.emit("showSiderbarDetail", {
+        isShow: siderbarDetail,
+        from: "spot"
+      });
+    } else {
+      this.setState({
+        siderbarDetail: !siderbarDetail
+      });
+      emitter.emit("showSiderbarDetail", {
+        isShow: !siderbarDetail,
+        from: "spot"
+      });
+    }
+  };
+
   switchMenu = e => {
+    this.setState({
+      siderbarDetail: false
+    });
+    emitter.emit("showSiderbarDetail", {
+      isShow: false,
+      from: "spot"
+    });
     if (e.key === "project") {
       this.setState({
         placeholder: "项目",
-        listData: list,
+        listData: projectData,
         sort: [
           {
             title: "名称",
@@ -117,7 +168,7 @@ export default class integrat extends PureComponent {
     } else if (e.key === "spot") {
       this.setState({
         placeholder: "图斑",
-        listData: list.slice(0, 3),
+        listData: spotData,
         sort: [
           {
             title: "编号",
@@ -140,7 +191,7 @@ export default class integrat extends PureComponent {
     } else {
       this.setState({
         placeholder: "标注点",
-        listData: list.slice(0, 1),
+        listData: projectData.slice(0, 1),
         sort: [
           {
             title: "标注点",
@@ -165,7 +216,9 @@ export default class integrat extends PureComponent {
       sort,
       listData,
       showDetail,
-      inputDisabled
+      key,
+      inputDisabled,
+      siderbarDetail
     } = this.state;
 
     const tabs = [
@@ -259,9 +312,24 @@ export default class integrat extends PureComponent {
                   }
                   description={
                     <p>
-                      <span>建设单位：{item.owner}</span>
-                      <br />
-                      <span>批复机构：{item.reply}</span>
+                      <span
+                        style={{
+                          display: key === "project" ? "block" : "none"
+                        }}
+                      >
+                        <span>建设单位：{item.owner}</span>
+                        <br />
+                        <span>批复机构：{item.reply}</span>
+                      </span>
+                      <span
+                        style={{
+                          display: key !== "project" ? "block" : "none"
+                        }}
+                      >
+                        <span>关联项目：{item.project}</span>
+                        <br />
+                        <span>扰动合规性：{item.standard}</span>
+                      </span>
                     </p>
                   }
                   onClick={this.switchShowDetail}
@@ -290,7 +358,7 @@ export default class integrat extends PureComponent {
                 right: -10,
                 top: -10
               }}
-              onClick={this.switchShowDetail}
+              onClick={this.close}
             />
             <List.Item style={{ paddingTop: 30 }}>
               <Input
@@ -320,8 +388,11 @@ export default class integrat extends PureComponent {
                 description={
                   <p
                     onClick={() => {
+                      this.setState({
+                        siderbarDetail: !siderbarDetail
+                      });
                       emitter.emit("showSiderbarDetail", {
-                        isShow: true,
+                        isShow: siderbarDetail,
                         from: "duty"
                       });
                     }}
@@ -350,8 +421,11 @@ export default class integrat extends PureComponent {
                 description={
                   <p
                     onClick={() => {
+                      this.setState({
+                        siderbarDetail: !siderbarDetail
+                      });
                       emitter.emit("showSiderbarDetail", {
-                        isShow: true,
+                        isShow: siderbarDetail,
                         from: "spot"
                       });
                     }}

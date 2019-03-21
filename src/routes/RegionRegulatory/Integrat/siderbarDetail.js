@@ -131,7 +131,9 @@ export default class siderbarDetail extends PureComponent {
                 defaultValue="2017154_14848_4848"
               />
             </List.Item>
-            <List.Item>关联项目：精确上图</List.Item>
+            <List.Item style={{ cursor: "pointer" }}>
+              关联项目：新建铁路广州至香港专线
+            </List.Item>
             <List.Item>扰动类型：其他扰动</List.Item>
             <List.Item>扰动面积：9.48公顷</List.Item>
             <List.Item>扰动超出面积：5.48公顷</List.Item>
