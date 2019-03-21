@@ -84,6 +84,10 @@ export default class integrat extends PureComponent {
 
   switchShowDetail = () => {
     this.setState({ showDetail: !this.state.showDetail });
+    emitter.emit("showSiderbarDetail", {
+      isShow: false,
+      from: "duty"
+    });
   };
 
   switchMenu = e => {
@@ -316,9 +320,12 @@ export default class integrat extends PureComponent {
                 description={
                   <p
                     onClick={() => {
-                      emitter.emit("showSiderbarDetail", true);
+                      emitter.emit("showSiderbarDetail", {
+                        isShow: true,
+                        from: "duty"
+                      });
                     }}
-                    style={{cursor:'pointer'}}
+                    style={{ cursor: "pointer" }}
                   >
                     <span>
                       设计阶段:可研
@@ -343,9 +350,12 @@ export default class integrat extends PureComponent {
                 description={
                   <p
                     onClick={() => {
-                      emitter.emit("showSiderbarDetail", true);
+                      emitter.emit("showSiderbarDetail", {
+                        isShow: true,
+                        from: "spot"
+                      });
                     }}
-                    style={{cursor:'pointer'}}
+                    style={{ cursor: "pointer" }}
                   >
                     <span>
                       2017154_14848_4848
@@ -377,23 +387,23 @@ export default class integrat extends PureComponent {
                 }
               />
             </List.Item>
-            <List.Item>建设单位：广州铁路局</List.Item>
-            <List.Item>监管单位：广州铁路局</List.Item>
-            <List.Item>批复机构：广州铁路局</List.Item>
-            <List.Item>立项级别：广州铁路局</List.Item>
-            <List.Item>批复文号：广州铁路局</List.Item>
-            <List.Item>批复时间：广州铁路局</List.Item>
-            <List.Item>项目类型：广州铁路局</List.Item>
-            <List.Item>项目类别：广州铁路局</List.Item>
-            <List.Item>项目性质：广州铁路局</List.Item>
-            <List.Item>建设状态：广州铁路局</List.Item>
-            <List.Item>项目合规性：广州铁路局</List.Item>
-            <List.Item>涉及县：广州铁路局</List.Item>
+            <List.Item>建设单位：</List.Item>
+            <List.Item>监管单位：</List.Item>
+            <List.Item>批复机构：</List.Item>
+            <List.Item>立项级别：</List.Item>
+            <List.Item>批复文号：</List.Item>
+            <List.Item>批复时间：</List.Item>
+            <List.Item>项目类型：</List.Item>
+            <List.Item>项目类别：</List.Item>
+            <List.Item>项目性质：</List.Item>
+            <List.Item>建设状态：</List.Item>
+            <List.Item>项目合规性：</List.Item>
+            <List.Item>涉及县：</List.Item>
             <List.Item>
               <List.Item.Meta
                 title={
                   <div>
-                    位置：广州铁路局
+                    位置：
                     <Icon
                       type="environment"
                       theme="twoTone"
@@ -403,7 +413,7 @@ export default class integrat extends PureComponent {
                 }
               />
             </List.Item>
-            <List.Item>备注：广州铁路局</List.Item>
+            <List.Item>备注：</List.Item>
             <img
               style={{ width: 90 }}
               src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
