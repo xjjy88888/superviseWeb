@@ -45,7 +45,7 @@ export default class integrat extends PureComponent {
       <div className={styles.main}>
         <SiderMenu active="401" />
         <Sidebar />
-        <SidebarDetail show={false} />
+        <SidebarDetail show={true} />
         <div id="map" className={styles.map} />
       </div>
     );

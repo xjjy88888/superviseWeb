@@ -2,6 +2,7 @@ import React, { PureComponent } from "react";
 import { Menu, Icon, Button, Input, Radio, List, Avatar } from "antd";
 import styles from "./sidebar.less";
 import "leaflet/dist/leaflet.css";
+import emitter from "../../../utils/event";
 
 const list = [
   {
@@ -313,7 +314,12 @@ export default class integrat extends PureComponent {
                   </span>
                 }
                 description={
-                  <p>
+                  <p
+                    onClick={() => {
+                      emitter.emit("showSiderbarDetail", true);
+                    }}
+                    style={{cursor:'pointer'}}
+                  >
                     <span>
                       设计阶段:可研
                       <Icon
@@ -335,7 +341,12 @@ export default class integrat extends PureComponent {
                   </span>
                 }
                 description={
-                  <p>
+                  <p
+                    onClick={() => {
+                      emitter.emit("showSiderbarDetail", true);
+                    }}
+                    style={{cursor:'pointer'}}
+                  >
                     <span>
                       2017154_14848_4848
                       <Icon
