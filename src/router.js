@@ -1,7 +1,7 @@
 import React from "react";
 import { Router, Route, Switch } from "dva/router";
-import IndexPage from "./routes/IndexPage";
-import Home1 from "./routes/Home/Home1";
+// import IndexPage from "./routes/IndexPage";
+import Welcome from "./routes/Home/Welcome";
 import Home2 from "./routes/Home/Home2";
 import Integrat from "./routes/RegionRegulatory/Integrat";
 import RegionRegulatory2 from "./routes/RegionRegulatory/RegionRegulatory2";
@@ -17,8 +17,8 @@ function RouterConfig({ history }) {
   return (
     <Router history={history}>
       <Switch>
-        <Route path="/" exact component={Integrat} />
-        <Route path="/home/home1" exact component={Home1} />
+        <Route path="/" exact component={Welcome} />
+        <Route path="/home/welcome" exact component={Welcome} />
         <Route path="/home/home2" exact component={Home2} />
         <Route path="/regionRegulatory/integrat" exact component={Integrat} />
         <Route path="/regionRegulatory/regionRegulatory2" exact component={RegionRegulatory2} />

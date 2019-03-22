@@ -41,8 +41,8 @@ export default class SiderMenu extends PureComponent {
         icon: "home",
         items: [
           {
-            text: "首页1",
-            path: "/home/home1",
+            text: "产品序列",
+            path: "/home/welcome",
             key: "101"
           },
           {
@@ -125,7 +125,7 @@ export default class SiderMenu extends PureComponent {
       <div className={styles.main}>
         <div className={styles.left}>
           <img src="./img/logo.png" />
-          <Link className={styles.text} to="/regionRegulatory/integrat">
+          <Link className={styles.text} to="/home/welcome">
           生产建设项目水土保持信息化监管系统
           </Link>
         </div>
