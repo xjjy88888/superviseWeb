@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { Menu, Icon, Button, Input, Radio, List, Avatar } from "antd";
+import { Menu, Icon, Button, Input, Radio, List, Avatar ,Carousel} from "antd";
 import emitter from "../../../utils/event";
 import styles from "./sidebar.less";
 import "leaflet/dist/leaflet.css";
@@ -12,7 +12,7 @@ export default class siderbarDetail extends PureComponent {
     };
     this.map = null;
   }
-  
+
   componentDidMount() {
     this.eventEmitter = emitter.addListener("showSiderbarDetail", data => {
       this.setState({
@@ -79,22 +79,13 @@ export default class siderbarDetail extends PureComponent {
             <List.Item>面积：55m2</List.Item>
             <List.Item>组成部分：广州铁路局</List.Item>
             <List.Item>上图单位：广州铁路局</List.Item>
-            <img
-              style={{ width: 300 }}
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-            />
-            <img
-              style={{ width: 300 }}
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-            />
-            <img
-              style={{ width: 300 }}
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-            />
-            <img
-              style={{ width: 300 }}
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-            />
+            <Carousel autoplay>
+              <img src="./img/spot.jpg" />
+              <img src="./img/spot2.jpg" />
+              <img src="./img/spot.jpg" />
+              <img src="./img/spot2.jpg" />
+              <img src="./img/spot.jpg" />
+            </Carousel>
           </List>
         </div>
         <div
@@ -153,14 +144,11 @@ export default class siderbarDetail extends PureComponent {
             <List.Item>问题：</List.Item>
             <List.Item>建议：</List.Item>
             <List.Item>备注：</List.Item>
-            <img
-              style={{ width: 300 }}
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-            />
-            <img
-              style={{ width: 300 }}
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-            />
+            <Carousel autoplay>
+              <img src="./img/spot.jpg" />
+              <img src="./img/spot2.jpg" />
+              <img src="./img/spot.jpg" />
+            </Carousel>
             <Button type="dashed" icon="rollback" style={{ marginTop: 20 }}>
               历史查看
             </Button>
