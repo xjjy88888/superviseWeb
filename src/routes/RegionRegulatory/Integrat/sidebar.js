@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { Menu, Icon, Button, Input, Radio, List, Avatar } from "antd";
+import { Menu, Icon, Button, Input, Radio, List, Avatar, Carousel } from "antd";
 import styles from "./sidebar.less";
 import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
@@ -69,8 +69,7 @@ export default class integrat extends PureComponent {
     super(props);
     this.state = {
       show: true,
-      siderbarDetail: false,
-      showDetail: false,
+      showDetail: true,
       key: "project",
       inputDisabled: true,
       placeholder: "项目",
@@ -97,14 +96,21 @@ export default class integrat extends PureComponent {
     this.map = null;
   }
 
+  componentDidMount() {
+    this.eventEmitter = emitter.addListener("showProjectDetail", data => {
+      this.setState({
+        showDetail: data.isShow
+      });
+    });
+  }
+
   switchShow = () => {
     this.setState({ show: !this.state.show, showDetail: false });
   };
 
   close = () => {
     this.setState({
-      showDetail: false,
-      siderbarDetail: false
+      showDetail: false
     });
     emitter.emit("showSiderbarDetail", {
       isShow: false,
@@ -113,31 +119,17 @@ export default class integrat extends PureComponent {
   };
 
   switchShowDetail = () => {
-    const { key, siderbarDetail, showDetail } = this.state;
-    if (key === "project") {
-      this.setState({
-        showDetail: !showDetail,
-        siderbarDetail: !siderbarDetail
-      });
-      emitter.emit("showSiderbarDetail", {
-        isShow: siderbarDetail,
-        from: "spot"
-      });
-    } else {
-      this.setState({
-        siderbarDetail: !siderbarDetail
-      });
-      emitter.emit("showSiderbarDetail", {
-        isShow: !siderbarDetail,
-        from: "spot"
-      });
-    }
+    const { key, showDetail } = this.state;
+    this.setState({
+      showDetail: key === "project"
+    });
+    emitter.emit("showSiderbarDetail", {
+      isShow: key !== "project",
+      from: "spot"
+    });
   };
 
   switchMenu = e => {
-    this.setState({
-      siderbarDetail: false
-    });
     emitter.emit("showSiderbarDetail", {
       isShow: false,
       from: "spot"
@@ -217,8 +209,7 @@ export default class integrat extends PureComponent {
       listData,
       showDetail,
       key,
-      inputDisabled,
-      siderbarDetail
+      inputDisabled
     } = this.state;
 
     const tabs = [
@@ -388,11 +379,8 @@ export default class integrat extends PureComponent {
                 description={
                   <p
                     onClick={() => {
-                      this.setState({
-                        siderbarDetail: !siderbarDetail
-                      });
                       emitter.emit("showSiderbarDetail", {
-                        isShow: siderbarDetail,
+                        isShow: true,
                         from: "duty"
                       });
                     }}
@@ -421,11 +409,8 @@ export default class integrat extends PureComponent {
                 description={
                   <p
                     onClick={() => {
-                      this.setState({
-                        siderbarDetail: !siderbarDetail
-                      });
                       emitter.emit("showSiderbarDetail", {
-                        isShow: siderbarDetail,
+                        isShow: true,
                         from: "spot"
                       });
                     }}
@@ -488,26 +473,12 @@ export default class integrat extends PureComponent {
               />
             </List.Item>
             <List.Item>备注：</List.Item>
-            <img
-              style={{ width: 90 }}
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-            />
-            <img
-              style={{ width: 90 }}
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-            />
-            <img
-              style={{ width: 90 }}
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-            />
-            <img
-              style={{ width: 90 }}
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-            />
-            <img
-              style={{ width: 90 }}
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-            />
+            <Carousel autoplay>
+              <img src="./img/spot.jpg" />
+              <img src="./img/spot2.jpg" />
+              <img src="./img/spot.jpg" />
+              <img src="./img/spot2.jpg" />
+            </Carousel>
           </List>
         </div>
       </div>

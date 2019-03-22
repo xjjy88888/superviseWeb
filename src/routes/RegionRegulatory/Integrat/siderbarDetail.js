@@ -12,6 +12,7 @@ export default class siderbarDetail extends PureComponent {
     };
     this.map = null;
   }
+  
   componentDidMount() {
     this.eventEmitter = emitter.addListener("showSiderbarDetail", data => {
       this.setState({
@@ -21,9 +22,9 @@ export default class siderbarDetail extends PureComponent {
     });
   }
 
-  componentWillUnmount() {
-    emitter.removeListener(this.eventEmitter);
-  }
+  // componentWillUnmount() {
+  //   emitter.removeListener(this.eventEmitter);
+  // }
 
   switchShow = () => {
     this.setState({ show: !this.state.show, showDetail: false });
@@ -131,7 +132,14 @@ export default class siderbarDetail extends PureComponent {
                 defaultValue="2017154_14848_4848"
               />
             </List.Item>
-            <List.Item style={{ cursor: "pointer" }}>
+            <List.Item
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                emitter.emit("showProjectDetail", {
+                  isShow: true
+                });
+              }}
+            >
               关联项目：新建铁路广州至香港专线
             </List.Item>
             <List.Item>扰动类型：其他扰动</List.Item>
