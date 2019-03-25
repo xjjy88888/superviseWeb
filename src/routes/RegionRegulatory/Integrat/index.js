@@ -3,6 +3,7 @@ import { Menu, Icon, Button } from "antd";
 import SiderMenu from "../../../components/SiderMenu";
 import Sidebar from "./sidebar";
 import SidebarDetail from "./siderbarDetail";
+import Tool from "./tool";
 import L from "leaflet";
 import styles from "./index.less";
 import "leaflet/dist/leaflet.css";
@@ -11,7 +12,8 @@ export default class integrat extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false
+      loading: false,
+      showTool: false
     };
     this.map = null;
   }
@@ -40,12 +42,14 @@ export default class integrat extends PureComponent {
       .addTo(map);
     this.map = map;
   };
+
   render() {
     return (
       <div className={styles.main}>
         <SiderMenu active="401" />
         <Sidebar />
-        <SidebarDetail show={true} />
+        <SidebarDetail />
+        <Tool />
         <div id="map" className={styles.map} />
       </div>
     );

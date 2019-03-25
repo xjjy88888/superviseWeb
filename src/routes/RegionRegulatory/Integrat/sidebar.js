@@ -113,7 +113,7 @@ export default class integrat extends PureComponent {
       showDetail: false
     });
     emitter.emit("showSiderbarDetail", {
-      isShow: false,
+      show: false,
       from: "spot"
     });
   };
@@ -124,14 +124,17 @@ export default class integrat extends PureComponent {
       showDetail: key === "project"
     });
     emitter.emit("showSiderbarDetail", {
-      isShow: key !== "project",
+      show: key !== "project",
       from: "spot"
+    });
+    emitter.emit("showTool", {
+      show: false
     });
   };
 
   switchMenu = e => {
     emitter.emit("showSiderbarDetail", {
-      isShow: false,
+      show: false,
       from: "spot"
     });
     if (e.key === "project") {
@@ -276,10 +279,34 @@ export default class integrat extends PureComponent {
               <p>
                 <span>{`共有${listData.length}条数据`}</span>
                 <span style={{ float: "right", position: "relative", top: -5 }}>
-                  <Button type="dashed" icon="shopping">
+                  <Button
+                    type="dashed"
+                    icon="shopping"
+                    onClick={() => {
+                      emitter.emit("showSiderbarDetail", {
+                        show: false
+                      });
+                      emitter.emit("showTool", {
+                        show: true,
+                        type: "tool"
+                      });
+                    }}
+                  >
                     工具箱
                   </Button>
-                  <Button type="dashed" icon="desktop">
+                  <Button
+                    type="dashed"
+                    icon="desktop"
+                    onClick={() => {
+                      emitter.emit("showSiderbarDetail", {
+                        show: false
+                      });
+                      emitter.emit("showTool", {
+                        show: true,
+                        type: "control"
+                      });
+                    }}
+                  >
                     控制台
                   </Button>
                 </span>
@@ -380,8 +407,11 @@ export default class integrat extends PureComponent {
                   <p
                     onClick={() => {
                       emitter.emit("showSiderbarDetail", {
-                        isShow: true,
+                        show: true,
                         from: "duty"
+                      });
+                      emitter.emit("showTool", {
+                        show: false
                       });
                     }}
                     style={{ cursor: "pointer" }}
@@ -410,8 +440,11 @@ export default class integrat extends PureComponent {
                   <p
                     onClick={() => {
                       emitter.emit("showSiderbarDetail", {
-                        isShow: true,
+                        show: true,
                         from: "spot"
+                      });
+                      emitter.emit("showTool", {
+                        show: false
                       });
                     }}
                     style={{ cursor: "pointer" }}
