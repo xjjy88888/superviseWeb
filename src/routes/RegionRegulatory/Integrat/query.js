@@ -26,12 +26,19 @@ const formItemLayout = {
   labelCol: { span: 6 },
   wrapperCol: { span: 15 }
 };
+const formItemLayoutlong = {
+  labelCol: { span: 6 },
+  wrapperCol: { span: 15 }
+};
 
 @createForm()
 export default class siderbarDetail extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = { show: true, type: "project", dataSource: [] };
+    this.state = { show: false, type: "project", dataSource: [] };
+    this.saveRef = ref => {
+      this.refDom = ref;
+    };
   }
 
   componentDidMount() {
@@ -41,6 +48,8 @@ export default class siderbarDetail extends PureComponent {
         type: data.type
       });
     });
+    const { clientWidth, clientHeight } = this.refDom;
+    console.log(clientWidth, clientHeight, this.refDom);
   }
 
   getRandomInt = (max, min = 0) => {
@@ -153,16 +162,39 @@ export default class siderbarDetail extends PureComponent {
       return item.DictValue;
     });
 
+    const projectCompliantDataSource = [
+      "合规",
+      "疑似未批先建",
+      "未批先建",
+      "疑似超出防治责任范围",
+      "超出防治责任范围",
+      "疑似建设地点变更",
+      "建设地点变更",
+      "已批",
+      "可不编报方案"
+    ];
+
     return (
       <LocaleProvider locale={zhCN}>
-        <div className={styles.sidebar} style={{ left: show ? 350 : -350 }}>
+        <div
+          className={styles.sidebar}
+          style={{ left: show ? 350 : -550 }}
+          ref={this.saveRef}
+        >
           <Icon
             className={styles.icon}
             type="left"
             style={{ fontSize: 30, display: show ? "block" : "none" }}
             onClick={this.switchShow}
           />
-          <div style={{ display: type === "project" ? "block" : "none" }}>
+          <div
+            style={{
+              display: type === "project" ? "block" : "none",
+              padding: "30px 0",
+              overflow: "auto",
+              height: "100%"
+            }}
+          >
             <Form>
               <Form.Item label="建设单位" {...formItemLayout}>
                 <AutoComplete
@@ -178,8 +210,8 @@ export default class siderbarDetail extends PureComponent {
                   optionLabelProp="text"
                 />
               </Form.Item>
-              <Form.Item label="立项级别" {...formItemLayout}>
-                <RadioGroup name="radiogroup" defaultValue={1}>
+              <Form.Item label="立项级别" {...formItemLayoutlong}>
+                <RadioGroup name="radiogroup">
                   <Radio value={1}>部级</Radio>
                   <Radio value={2}>省级</Radio>
                   <Radio value={3}>市级</Radio>
@@ -212,21 +244,21 @@ export default class siderbarDetail extends PureComponent {
                 </AutoComplete>
               </Form.Item>
               <Form.Item label="项目类别" {...formItemLayout}>
-                <RadioGroup name="radiogroup" defaultValue={1}>
+                <RadioGroup name="radiogroup">
                   <Radio value={1}>建设类</Radio>
                   <Radio value={2}>生产类</Radio>
                 </RadioGroup>
               </Form.Item>
-              <Form.Item label="项目性质" {...formItemLayout}>
-                <RadioGroup name="radiogroup" defaultValue={1}>
+              <Form.Item label="项目性质" {...formItemLayoutlong}>
+                <RadioGroup name="radiogroup">
                   <Radio value={1}>新建</Radio>
                   <Radio value={2}>扩建</Radio>
                   <Radio value={3}>续建</Radio>
                   <Radio value={4}>改建</Radio>
                 </RadioGroup>
               </Form.Item>
-              <Form.Item label="建设状态" {...formItemLayout}>
-                <RadioGroup name="radiogroup" defaultValue={1}>
+              <Form.Item label="建设状态" {...formItemLayoutlong}>
+                <RadioGroup name="radiogroup">
                   <Radio value={1}>未开工</Radio>
                   <Radio value={2}>停工</Radio>
                   <Radio value={3}>施工</Radio>
@@ -235,18 +267,26 @@ export default class siderbarDetail extends PureComponent {
                 </RadioGroup>
               </Form.Item>
               <Form.Item label="项目合规性" {...formItemLayout}>
-                <RadioGroup name="radiogroup" defaultValue={1}>
-                  <Radio value={1}>合规</Radio>
-                  <Radio value={2}>疑似未批先建</Radio>
-                  <Radio value={3}>未批先建</Radio>
-                  <Radio value={4}>疑似超出防治责任范围</Radio>
-                  <Radio value={5}>超出防治责任范围</Radio>
-                  <Radio value={7}>疑似建设地点变更</Radio>
-                  <Radio value={8}>建设地点变更</Radio>
-                </RadioGroup>
+                <AutoComplete
+                  dataSource={projectCompliantDataSource}
+                  filterOption={(inputValue, option) =>
+                    option.props.children
+                      .toUpperCase()
+                      .indexOf(inputValue.toUpperCase()) !== -1
+                  }
+                >
+                  <Input allowClear />
+                </AutoComplete>
               </Form.Item>
-              <Form.Item label="矢量化类型" {...formItemLayout}>
-                <RadioGroup name="radiogroup" defaultValue={1}>
+              {/* <Form.Item label="项目合规性" {...formItemLayout}>
+                <RadioGroup name="radiogroup">
+                  {projectCompliantDataSource.map((item, index) => (
+                    <Radio value={index} key={index}>{item}</Radio>
+                  ))}
+                </RadioGroup>
+              </Form.Item> */}
+              <Form.Item label="矢量化类型" {...formItemLayoutlong}>
+                <RadioGroup name="radiogroup">
                   <Radio value={1}>防治责任范围</Radio>
                   <Radio value={2}>示意性范围</Radio>
                 </RadioGroup>

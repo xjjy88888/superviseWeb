@@ -137,6 +137,10 @@ export default class integrat extends PureComponent {
       show: false,
       from: "spot"
     });
+    emitter.emit("showQuery", {
+      show: false,
+      type: 1
+    });
     if (e.key === "project") {
       this.setState({
         placeholder: "项目",
