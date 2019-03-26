@@ -1,5 +1,15 @@
 import React, { PureComponent } from "react";
-import { Menu, Icon, Button, Input, Radio, List, Avatar, Carousel } from "antd";
+import {
+  Menu,
+  Icon,
+  Button,
+  Input,
+  Radio,
+  List,
+  Avatar,
+  Carousel,
+  message
+} from "antd";
 import styles from "./sidebar.less";
 import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
@@ -228,6 +238,9 @@ export default class integrat extends PureComponent {
       key,
       inputDisabled
     } = this.state;
+    console.log(this.state);
+    console.log(this.state.key);
+    console.log(key);
 
     const tabs = [
       {
@@ -265,8 +278,15 @@ export default class integrat extends PureComponent {
             ))}
           </Menu>
           <Input.Search
+            allowClear
             placeholder={`${placeholder}名`}
-            onSearch={value => console.log(value)}
+            onSearch={v => {
+              if (v) {
+                message.success(`查询${v}成功！`);
+              } else {
+                message.warning(`请输入查询信息！`);
+              }
+            }}
             style={{ padding: "20px 20px", width: 300 }}
             enterButton
           />
@@ -299,7 +319,9 @@ export default class integrat extends PureComponent {
               </Radio.Button>
             ))}
           </Radio.Group>
-          <Button onClick={this.query}>筛选</Button>
+          <Button disabled={key === "point"} onClick={this.query}>
+            筛选
+          </Button>
           <List
             style={{
               overflow: "auto",
@@ -310,7 +332,7 @@ export default class integrat extends PureComponent {
             dataSource={listData}
             header={
               <p>
-                <span>{`共有${listData.length}条数据`}</span>
+                <span>{`共有${listData.length}条记录`}</span>
                 <span style={{ float: "right", position: "relative", top: -5 }}>
                   <Button
                     type="dashed"
@@ -414,6 +436,7 @@ export default class integrat extends PureComponent {
               style={{
                 float: "right",
                 position: "absolute",
+                color: "#1890ff",
                 right: -10,
                 top: -10
               }}

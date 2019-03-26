@@ -9,6 +9,11 @@ import {
   Avatar,
   Carousel,
   LocaleProvider,
+  message,
+  notification,
+  Cascader,
+  Slider,
+  Switch,
   Checkbox,
   DatePicker,
   Form,
@@ -35,7 +40,7 @@ const formItemLayoutlong = {
 export default class siderbarDetail extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = { show: false, type: "project", dataSource: [] };
+    this.state = { show: false, type: "spot", dataSource: [] };
     this.saveRef = ref => {
       this.refDom = ref;
     };
@@ -93,10 +98,15 @@ export default class siderbarDetail extends PureComponent {
       </AutoComplete.Option>
     );
   };
+
   handleSearch = value => {
     this.setState({
       dataSource: value ? this.searchResult(value) : []
     });
+  };
+
+  displayRender = label => {
+    return label[label.length - 1];
   };
 
   render() {
@@ -173,12 +183,75 @@ export default class siderbarDetail extends PureComponent {
       "已批",
       "可不编报方案"
     ];
-
+    const marks = {
+      0: "0",
+      200: "200",
+      400: "400",
+      600: "600",
+      800: "800",
+      1000: "1000"
+    };
+    const options = [
+      {
+        value: "zhejiang",
+        label: "广东",
+        children: [
+          {
+            value: "hangzhou",
+            label: "广州",
+            children: [
+              {
+                value: "xihu",
+                label: "天河区"
+              },
+              {
+                value: "xihu1",
+                label: "海珠区"
+              },
+              {
+                value: "xihu2",
+                label: "白云区"
+              }
+            ]
+          },
+          {
+            value: "hangzhou1",
+            label: "中山市",
+            children: [
+              {
+                value: "xihu",
+                label: "东区"
+              },
+              {
+                value: "xihu2",
+                label: "西区"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        value: "jiangsu",
+        label: "北京",
+        children: [
+          {
+            value: "nanjing",
+            label: "北京市",
+            children: [
+              {
+                value: "zhonghuamen",
+                label: "东城区"
+              }
+            ]
+          }
+        ]
+      }
+    ];
     return (
       <LocaleProvider locale={zhCN}>
         <div
           className={styles.sidebar}
-          style={{ left: show ? 350 : -550 }}
+          style={{ left: show ? 350 : -550, borderLeft: "solid 1px #ddd" }}
           ref={this.saveRef}
         >
           <Icon
@@ -186,6 +259,25 @@ export default class siderbarDetail extends PureComponent {
             type="left"
             style={{ fontSize: 30, display: show ? "block" : "none" }}
             onClick={this.switchShow}
+          />
+          <Button
+            type="dashed"
+            icon="check"
+            shape="circle"
+            style={{
+              position: "absolute",
+              color: "#1890ff",
+              right: 20,
+              top: 10
+            }}
+            onClick={() => {
+              message.success(`筛选成功！`);
+              // notification.open({
+              //   message: `筛选成功！`,
+              //   description: ``
+              // });
+              this.setState({ show: false });
+            }}
           />
           <div
             style={{
@@ -196,6 +288,13 @@ export default class siderbarDetail extends PureComponent {
             }}
           >
             <Form>
+              <Form.Item label="所在地区" {...formItemLayout}>
+                <Cascader
+                  options={options}
+                  expandTrigger="hover"
+                  placeholder=""
+                />
+              </Form.Item>
               <Form.Item label="建设单位" {...formItemLayout}>
                 <AutoComplete
                   dataSource={dataSource.map(this.renderOption)}
@@ -291,9 +390,99 @@ export default class siderbarDetail extends PureComponent {
                   <Radio value={2}>示意性范围</Radio>
                 </RadioGroup>
               </Form.Item>
+              <Form.Item label="显示归档数据" {...formItemLayoutlong}>
+                <Switch checkedChildren="是" unCheckedChildren="否" />
+              </Form.Item>
             </Form>
           </div>
-          <div style={{ display: type === "project" ? "none" : "block" }} />
+          <div
+            style={{
+              display: type === "project" ? "none" : "block",
+              padding: "30px 0",
+              overflow: "auto",
+              height: "100%"
+            }}
+          >
+            <Form>
+              <Form.Item label="所在地区" {...formItemLayout}>
+                <Cascader
+                  options={options}
+                  expandTrigger="hover"
+                  placeholder=""
+                />
+              </Form.Item>
+              <Form.Item label="扰动面积" {...formItemLayoutlong}>
+                <Slider
+                  marks={marks}
+                  range
+                  max={1000}
+                  defaultValue={[0, 1000]}
+                />
+              </Form.Item>
+              <Form.Item label="扰动超出面积" {...formItemLayoutlong}>
+                <Slider
+                  marks={marks}
+                  range
+                  max={1000}
+                  defaultValue={[0, 1000]}
+                />
+              </Form.Item>
+              <Form.Item label="扰动类型" {...formItemLayoutlong}>
+                <RadioGroup name="radiogroup">
+                  <Radio value={1}>弃土（渣）场</Radio>
+                  <Radio value={2}>取土（石）场</Radio>
+                  <Radio value={3}>其他扰动</Radio>
+                  <Radio value={4}>非生产建设项目</Radio>
+                </RadioGroup>
+              </Form.Item>
+              <Form.Item label="扰动合规性" {...formItemLayout}>
+                <AutoComplete
+                  dataSource={projectCompliantDataSource}
+                  filterOption={(inputValue, option) =>
+                    option.props.children
+                      .toUpperCase()
+                      .indexOf(inputValue.toUpperCase()) !== -1
+                  }
+                >
+                  <Input allowClear />
+                </AutoComplete>
+              </Form.Item>
+              <Form.Item label="扰动变化类型" {...formItemLayoutlong}>
+                <RadioGroup name="radiogroup">
+                  <Radio value={1}>新增</Radio>
+                  <Radio value={2}>续建（范围扩大）</Radio>
+                  <Radio value={3}>续建（范围缩小）</Radio>
+                  <Radio value={4}>续建（范围不变）</Radio>
+                  <Radio value={5}>完工</Radio>
+                </RadioGroup>
+              </Form.Item>
+              <Form.Item label="建设状态" {...formItemLayoutlong}>
+                <RadioGroup name="radiogroup">
+                  <Radio value={1}>未开工</Radio>
+                  <Radio value={2}>停工</Radio>
+                  <Radio value={3}>施工</Radio>
+                  <Radio value={4}>完工</Radio>
+                  <Radio value={5}>已验收</Radio>
+                </RadioGroup>
+              </Form.Item>
+              <Form.Item label="土壤侵蚀强度" {...formItemLayoutlong}>
+                <RadioGroup name="radiogroup">
+                  <Radio value={1}>微度</Radio>
+                  <Radio value={2}>轻度</Radio>
+                  <Radio value={3}>中度</Radio>
+                  <Radio value={4}>强烈</Radio>
+                  <Radio value={5}>极强烈</Radio>
+                  <Radio value={6}>剧烈</Radio>
+                </RadioGroup>
+              </Form.Item>
+              <Form.Item label="是否重点监管" {...formItemLayoutlong}>
+                <Switch checkedChildren="是" unCheckedChildren="否" />
+              </Form.Item>
+              <Form.Item label="显示归档数据" {...formItemLayoutlong}>
+                <Switch checkedChildren="是" unCheckedChildren="否" />
+              </Form.Item>
+            </Form>
+          </div>
         </div>
       </LocaleProvider>
     );
