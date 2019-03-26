@@ -256,6 +256,16 @@ export default class integrat extends PureComponent {
             style={{ padding: "20px 20px", width: 300 }}
             enterButton
           />
+          <Icon
+            type="plus-circle"
+            theme="twoTone"
+            style={{
+              fontSize: 24,
+              position: "relative",
+              top: 23,
+              cursor: "pointer"
+            }}
+          />
           <Radio.Group
             defaultValue="a"
             buttonStyle="solid"
