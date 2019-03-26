@@ -8,6 +8,7 @@ import Query from "./query";
 import L from "leaflet";
 import styles from "./index.less";
 import "leaflet/dist/leaflet.css";
+import "antd-mobile/dist/antd-mobile.css";
 
 export default class integrat extends PureComponent {
   constructor(props) {

@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "antd": "^3.13.6",
+    "antd-mobile": "^2.2.11",
     "babel-plugin-import": "^1.11.0",
     "dva": "^2.1.0",
     "events": "^3.0.0",
