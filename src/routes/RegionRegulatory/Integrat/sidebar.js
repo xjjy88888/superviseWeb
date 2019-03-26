@@ -85,10 +85,6 @@ export default class integrat extends PureComponent {
         {
           title: "立项级别",
           value: "level"
-        },
-        {
-          title: "筛选",
-          value: "search1"
         }
       ],
       listData: projectData
@@ -130,6 +126,10 @@ export default class integrat extends PureComponent {
     emitter.emit("showTool", {
       show: false
     });
+    emitter.emit("showQuery", {
+      show: false,
+      type: 1
+    });
   };
 
   switchMenu = e => {
@@ -153,10 +153,6 @@ export default class integrat extends PureComponent {
           {
             title: "立项级别",
             value: "level"
-          },
-          {
-            title: "筛选",
-            value: "search1"
           }
         ]
       });
@@ -176,10 +172,6 @@ export default class integrat extends PureComponent {
           {
             title: "复核状态",
             value: "state"
-          },
-          {
-            title: "筛选",
-            value: "search2"
           }
         ]
       });
@@ -191,16 +183,34 @@ export default class integrat extends PureComponent {
           {
             title: "标注点",
             value: "point"
-          },
-          {
-            title: "筛选",
-            value: "search3"
           }
         ]
       });
     }
     this.setState({
       key: e.key
+    });
+  };
+
+  sort = e => {
+    const v = e.target.value;
+    const key = v.slice(0, v.length - 1);
+    const type = v.charAt(v.length - 1);
+    console.log(key, type);
+  };
+
+  query = () => {
+    const { key } = this.state;
+    emitter.emit("showSiderbarDetail", {
+      show: false
+    });
+    emitter.emit("showTool", {
+      show: false,
+      type: "tool"
+    });
+    emitter.emit("showQuery", {
+      show: true,
+      type: key
     });
   };
 
@@ -257,26 +267,35 @@ export default class integrat extends PureComponent {
             enterButton
           />
           <Icon
-            type="plus-circle"
-            theme="twoTone"
+            type="plus"
             style={{
-              fontSize: 24,
+              fontSize: 20,
               position: "relative",
               top: 23,
-              cursor: "pointer"
+              cursor: "pointer",
+              color: "#1890ff"
             }}
           />
+
           <Radio.Group
             defaultValue="a"
             buttonStyle="solid"
             style={{ padding: "0px 20px" }}
+            onClick={this.sort}
           >
             {sort.map((item, index) => (
-              <Radio.Button key={index} value={item.value}>
+              <Radio.Button
+                key={index}
+                value={item.value}
+                focus={() => {
+                  console.log(111);
+                }}
+              >
                 {item.title}
               </Radio.Button>
             ))}
           </Radio.Group>
+          <Button onClick={this.query}>筛选</Button>
           <List
             style={{
               overflow: "auto",
@@ -300,6 +319,10 @@ export default class integrat extends PureComponent {
                         show: true,
                         type: "tool"
                       });
+                      emitter.emit("showQuery", {
+                        show: false,
+                        type: 1
+                      });
                     }}
                   >
                     工具箱
@@ -314,6 +337,10 @@ export default class integrat extends PureComponent {
                       emitter.emit("showTool", {
                         show: true,
                         type: "control"
+                      });
+                      emitter.emit("showQuery", {
+                        show: false,
+                        type: 1
                       });
                     }}
                   >
@@ -334,7 +361,7 @@ export default class integrat extends PureComponent {
                       <Icon
                         type="environment"
                         theme="twoTone"
-                        style={{ float: "right" }}
+                        style={{ float: "right", fontSize: 18 }}
                       />
                     </p>
                   }
@@ -410,7 +437,11 @@ export default class integrat extends PureComponent {
                 title={
                   <span>
                     防治责任范围：1
-                    <Icon type="tags" theme="twoTone" style={{ padding: 10 }} />
+                    <Icon
+                      type="tags"
+                      theme="twoTone"
+                      style={{ padding: 10, fontSize: 18 }}
+                    />
                   </span>
                 }
                 description={
@@ -423,6 +454,10 @@ export default class integrat extends PureComponent {
                       emitter.emit("showTool", {
                         show: false
                       });
+                      emitter.emit("showQuery", {
+                        show: false,
+                        type: 1
+                      });
                     }}
                     style={{ cursor: "pointer" }}
                   >
@@ -431,7 +466,7 @@ export default class integrat extends PureComponent {
                       <Icon
                         type="environment"
                         theme="twoTone"
-                        style={{ float: "right" }}
+                        style={{ float: "right", fontSize: 18 }}
                       />
                     </span>
                   </p>
@@ -443,7 +478,11 @@ export default class integrat extends PureComponent {
                 title={
                   <span>
                     扰动图斑：3
-                    <Icon type="tags" theme="twoTone" style={{ padding: 10 }} />
+                    <Icon
+                      type="tags"
+                      theme="twoTone"
+                      style={{ padding: 10, fontSize: 18 }}
+                    />
                   </span>
                 }
                 description={
@@ -456,6 +495,10 @@ export default class integrat extends PureComponent {
                       emitter.emit("showTool", {
                         show: false
                       });
+                      emitter.emit("showQuery", {
+                        show: false,
+                        type: 1
+                      });
                     }}
                     style={{ cursor: "pointer" }}
                   >
@@ -464,7 +507,7 @@ export default class integrat extends PureComponent {
                       <Icon
                         type="environment"
                         theme="twoTone"
-                        style={{ float: "right" }}
+                        style={{ float: "right", fontSize: 18 }}
                       />
                     </span>
                     <br />
@@ -473,7 +516,7 @@ export default class integrat extends PureComponent {
                       <Icon
                         type="environment"
                         theme="twoTone"
-                        style={{ float: "right" }}
+                        style={{ float: "right", fontSize: 18 }}
                       />
                     </span>
                     <br />
@@ -482,7 +525,7 @@ export default class integrat extends PureComponent {
                       <Icon
                         type="environment"
                         theme="twoTone"
-                        style={{ float: "right" }}
+                        style={{ float: "right", fontSize: 18 }}
                       />
                     </span>
                   </p>
