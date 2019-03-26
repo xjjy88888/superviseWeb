@@ -63,7 +63,7 @@ const optionPie = {
   ]
 };
 
-const optionLine = {
+const optionBar = {
   tooltip: {
     trigger: "axis",
     axisPointer: {
@@ -73,18 +73,16 @@ const optionLine = {
   legend: {
     data: ["2011年", "2012年"]
   },
-  grid: {
-    left: "3%",
-    right: "4%",
-    bottom: "3%",
-    containLabel: true
-  },
   xAxis: {
     type: "value",
     boundaryGap: [0, 0.01]
   },
   yAxis: {
     type: "category",
+    axisLabel: {
+      interval: 0,
+      rotate: 30
+    },
     data: [
       "部级",
       "省级",
@@ -125,14 +123,11 @@ const optionLine = {
           ])
         },
         emphasis: {
-            color: new echarts.graphic.LinearGradient(
-                1, 0, 0, 0,
-                [
-                    {offset: 0, color: '#2378f7'},
-                    {offset: 0.7, color: '#2378f7'},
-                    {offset: 1, color: '#83bff6'}
-                ]
-            )
+          color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+            { offset: 0, color: "#2378f7" },
+            { offset: 0.7, color: "#2378f7" },
+            { offset: 1, color: "#83bff6" }
+          ])
         }
       },
       data: [
@@ -170,7 +165,7 @@ let myChart;
 export default class siderbarDetail extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = { show: false, type: "tool" };
+    this.state = { show: false, type: "control" };
     this.charRef = ref => {
       this.chartDom = ref;
     };
@@ -184,11 +179,11 @@ export default class siderbarDetail extends PureComponent {
       });
     });
     myChart = echarts.init(this.chartDom);
-    myChart.setOption(optionPie);
+    myChart.setOption(optionBar);
   }
 
-  switchShow = () => {
-    this.setState({ show: true });
+  close = () => {
+    this.setState({ show: false });
   };
 
   onChange = checkedValues => {
@@ -295,33 +290,33 @@ export default class siderbarDetail extends PureComponent {
             right: 10,
             top: 10
           }}
-          onClick={this.switchShow}
+          onClick={this.close}
         />
 
         <Radio.Group
           name="radiogroup"
           size="small"
           style={{ position: "relative", left: "47%", margin: 10 }}
-          defaultValue={`pie`}
+          defaultValue={`bar`}
           onChange={e => {
             if (e.target.value === "pie") {
               myChart.setOption(optionPie, true);
             } else {
-              myChart.setOption(optionLine, true);
+              myChart.setOption(optionBar, true);
             }
           }}
         >
           <Radio.Button value={`pie`}>
             <Icon type="pie-chart" />
           </Radio.Button>
-          <Radio.Button value={`line`}>
-            <Icon type="line-chart" />
+          <Radio.Button value={`bar`}>
+            <Icon type="bar-chart" />
           </Radio.Button>
         </Radio.Group>
         <div
           id="chart"
           ref={this.charRef}
-          style={{ width: "50vw", height: "50vh" }}
+          style={{ width: "50vw", height: "70vh" }}
         />
       </div>
     );
