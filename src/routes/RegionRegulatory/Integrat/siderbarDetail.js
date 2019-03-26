@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { Menu, Icon, Button, Input, Radio, List, Avatar ,Carousel} from "antd";
+import { Menu, Icon, Button, Input, Radio, List, Avatar, Carousel } from "antd";
 import emitter from "../../../utils/event";
 import styles from "./sidebar.less";
 import "leaflet/dist/leaflet.css";
@@ -93,7 +93,6 @@ export default class siderbarDetail extends PureComponent {
             display: from === "spot" ? "block" : "none"
           }}
         >
-          {" "}
           <List
             style={{
               padding: 20,
@@ -105,6 +104,15 @@ export default class siderbarDetail extends PureComponent {
           >
             <List.Item>
               <b>扰动图斑</b>
+              <Icon
+                type="plus"
+                style={{
+                  paddingLeft: 10,
+                  fontSize: 18,
+                  cursor: "point",
+                  color: "#1890ff"
+                }}
+              />
             </List.Item>
             <List.Item>
               <Input
@@ -149,8 +157,18 @@ export default class siderbarDetail extends PureComponent {
               <img src="./img/spot2.jpg" />
               <img src="./img/spot.jpg" />
             </Carousel>
-            <Button type="dashed" icon="rollback" style={{ marginTop: 20 }}>
+            <Button type="dashed" icon="swap" style={{ marginTop: 20 }}>
               历史查看
+            </Button>
+            <Button
+              type="dashed"
+              icon="cloud-download"
+              style={{ marginLeft: 20 }}
+            >
+              数据归档
+            </Button>
+            <Button type="dashed" icon="rollback" style={{ marginTop: 20 }}>
+              撤销归档
             </Button>
           </List>
         </div>

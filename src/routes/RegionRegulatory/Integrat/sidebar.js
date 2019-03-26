@@ -8,6 +8,7 @@ import {
   List,
   Avatar,
   Carousel,
+  Switch,
   message
 } from "antd";
 import styles from "./sidebar.less";
@@ -291,7 +292,7 @@ export default class integrat extends PureComponent {
             enterButton
           />
           <Icon
-            type="plus"
+            type={key === "spot" ? "radius-upright" : "plus"}
             style={{
               fontSize: 20,
               position: "relative",
@@ -387,7 +388,11 @@ export default class integrat extends PureComponent {
                       <Icon
                         type="environment"
                         theme="twoTone"
-                        style={{ float: "right", fontSize: 18 }}
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point"
+                        }}
                       />
                     </p>
                   }
@@ -459,15 +464,69 @@ export default class integrat extends PureComponent {
                 defaultValue="新建铁路广州至香港专线"
               />
             </List.Item>
+
+            <List.Item>
+              <List.Item.Meta
+                title={
+                  <div>
+                    建设单位：
+                    <Icon
+                      type="environment"
+                      theme="twoTone"
+                      style={{ float: "right", fontSize: 18, cursor: "point" }}
+                    />
+                  </div>
+                }
+              />
+            </List.Item>
+            <List.Item>监管单位：</List.Item>
+            <List.Item>批复机构：</List.Item>
+            <List.Item>流域管理机构：</List.Item>
+            <List.Item>立项级别：</List.Item>
+            <List.Item>批复文号：</List.Item>
+            <List.Item>批复时间：</List.Item>
+            <List.Item>责任面积：</List.Item>
+            <List.Item>项目类型：</List.Item>
+            <List.Item>项目类别：</List.Item>
+            <List.Item>项目性质：</List.Item>
+            <List.Item>建设状态：</List.Item>
+            <List.Item>项目合规性：</List.Item>
+            <List.Item>涉及县：</List.Item>
+            <List.Item>
+              <List.Item.Meta
+                title={
+                  <div>
+                    位置：
+                    <Icon
+                      type="environment"
+                      theme="twoTone"
+                      style={{ float: "right", fontSize: 18, cursor: "point" }}
+                    />
+                  </div>
+                }
+              />
+            </List.Item>
+            <List.Item>备注：</List.Item>
+            <Carousel autoplay>
+              <img src="./img/spot.jpg" />
+              <img src="./img/spot2.jpg" />
+              <img src="./img/spot.jpg" />
+              <img src="./img/spot2.jpg" />
+            </Carousel>
+            <List.Item>设计阶段：可研</List.Item>
             <List.Item>
               <List.Item.Meta
                 title={
                   <span>
                     防治责任范围：1
                     <Icon
-                      type="tags"
-                      theme="twoTone"
-                      style={{ padding: 10, fontSize: 18 }}
+                      type="plus"
+                      style={{
+                        padding: 10,
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
                     />
                   </span>
                 }
@@ -493,7 +552,11 @@ export default class integrat extends PureComponent {
                       <Icon
                         type="environment"
                         theme="twoTone"
-                        style={{ float: "right", fontSize: 18 }}
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point"
+                        }}
                       />
                     </span>
                   </p>
@@ -506,9 +569,26 @@ export default class integrat extends PureComponent {
                   <span>
                     扰动图斑：3
                     <Icon
-                      type="tags"
-                      theme="twoTone"
-                      style={{ padding: 10, fontSize: 18 }}
+                      type="link"
+                      style={{
+                        padding: 10,
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                    <Icon
+                      type="plus"
+                      style={{
+                        paddingRight: 10,
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                    <Switch
+                      checkedChildren="归档图斑"
+                      unCheckedChildren="非归档图斑"
                     />
                   </span>
                 }
@@ -534,7 +614,11 @@ export default class integrat extends PureComponent {
                       <Icon
                         type="environment"
                         theme="twoTone"
-                        style={{ float: "right", fontSize: 18 }}
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point"
+                        }}
                       />
                     </span>
                     <br />
@@ -543,7 +627,11 @@ export default class integrat extends PureComponent {
                       <Icon
                         type="environment"
                         theme="twoTone"
-                        style={{ float: "right", fontSize: 18 }}
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point"
+                        }}
                       />
                     </span>
                     <br />
@@ -552,46 +640,27 @@ export default class integrat extends PureComponent {
                       <Icon
                         type="environment"
                         theme="twoTone"
-                        style={{ float: "right", fontSize: 18 }}
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point"
+                        }}
                       />
                     </span>
                   </p>
                 }
               />
             </List.Item>
-            <List.Item>建设单位：</List.Item>
-            <List.Item>监管单位：</List.Item>
-            <List.Item>批复机构：</List.Item>
-            <List.Item>立项级别：</List.Item>
-            <List.Item>批复文号：</List.Item>
-            <List.Item>批复时间：</List.Item>
-            <List.Item>项目类型：</List.Item>
-            <List.Item>项目类别：</List.Item>
-            <List.Item>项目性质：</List.Item>
-            <List.Item>建设状态：</List.Item>
-            <List.Item>项目合规性：</List.Item>
-            <List.Item>涉及县：</List.Item>
-            <List.Item>
-              <List.Item.Meta
-                title={
-                  <div>
-                    位置：
-                    <Icon
-                      type="environment"
-                      theme="twoTone"
-                      style={{ float: "right" }}
-                    />
-                  </div>
-                }
-              />
-            </List.Item>
-            <List.Item>备注：</List.Item>
-            <Carousel autoplay>
-              <img src="./img/spot.jpg" />
-              <img src="./img/spot2.jpg" />
-              <img src="./img/spot.jpg" />
-              <img src="./img/spot2.jpg" />
-            </Carousel>
+            <Button
+              type="dashed"
+              icon="cloud-download"
+              style={{ marginTop: 20 }}
+            >
+              项目归档
+            </Button>
+            <Button type="dashed" icon="rollback" style={{ marginLeft: 20 }}>
+              撤销归档
+            </Button>
           </List>
         </div>
       </div>
