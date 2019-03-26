@@ -465,19 +465,6 @@ export default class siderbarDetail extends PureComponent {
                   <Radio value={5}>已验收</Radio>
                 </RadioGroup>
               </Form.Item>
-              <Form.Item label="土壤侵蚀强度" {...formItemLayoutlong}>
-                <RadioGroup name="radiogroup">
-                  <Radio value={1}>微度</Radio>
-                  <Radio value={2}>轻度</Radio>
-                  <Radio value={3}>中度</Radio>
-                  <Radio value={4}>强烈</Radio>
-                  <Radio value={5}>极强烈</Radio>
-                  <Radio value={6}>剧烈</Radio>
-                </RadioGroup>
-              </Form.Item>
-              <Form.Item label="是否重点监管" {...formItemLayoutlong}>
-                <Switch checkedChildren="是" unCheckedChildren="否" />
-              </Form.Item>
               <Form.Item label="显示归档数据" {...formItemLayoutlong}>
                 <Switch checkedChildren="是" unCheckedChildren="否" />
               </Form.Item>

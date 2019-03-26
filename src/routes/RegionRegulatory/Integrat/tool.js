@@ -213,6 +213,10 @@ export default class siderbarDetail extends PureComponent {
         >
           <p className={styles.title}>项目统计</p>
           <CheckboxGroup options={project} onChange={this.onChange} />
+          <Radio.Group buttonStyle="solid">
+            <Radio.Button value={1}>饼图</Radio.Button>
+            <Radio.Button value={2}>柱状图</Radio.Button>
+          </Radio.Group>
           <p className={styles.title}>图斑统计</p>
           <CheckboxGroup options={spot} onChange={this.onChange} />
           <Radio.Group
@@ -223,9 +227,9 @@ export default class siderbarDetail extends PureComponent {
             onChange={e => {
               console.log(e.target.value);
               if (e.target.value === 1) {
-                this.setState({type:'pie'})
-              }else{
-                this.setState({type:'pie'})
+                this.setState({ type: "pie" });
+              } else {
+                this.setState({ type: "pie" });
               }
             }}
           >
