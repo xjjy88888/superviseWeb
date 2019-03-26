@@ -4,6 +4,7 @@ import SiderMenu from "../../../components/SiderMenu";
 import Sidebar from "./sidebar";
 import SidebarDetail from "./siderbarDetail";
 import Tool from "./tool";
+import Chart from "./chart";
 import Query from "./query";
 import L from "leaflet";
 import styles from "./index.less";
@@ -52,6 +53,7 @@ export default class integrat extends PureComponent {
         <Sidebar />
         <SidebarDetail />
         <Tool />
+        <Chart />
         <Query />
         <div id="map" className={styles.map} />
       </div>

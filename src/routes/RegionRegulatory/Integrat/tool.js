@@ -22,7 +22,10 @@ const RadioGroup = Radio.Group;
 export default class siderbarDetail extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = { show: true };
+    this.state = { show: false };
+    this.charRef = ref => {
+      this.chartDom = ref;
+    };
   }
 
   componentDidMount() {
@@ -31,69 +34,7 @@ export default class siderbarDetail extends PureComponent {
         show: data.show,
         type: data.type
       });
-    }); // 基于准备好的dom，初始化echarts实例
-    const myChart = echarts.init(document.getElementById("main"));
-    // const myChart2 = echarts.init(document.getElementById("main2"));
-    // 绘制图表
-    myChart.setOption({
-      tooltip: {
-        trigger: "item",
-        formatter: "{a} <br/>{b}: {c} ({d}%)"
-      },
-      legend: {
-        orient: "vertical",
-        x: "left",
-        data: ["直接访问", "邮件营销", "联盟广告", "视频广告", "搜索引擎"]
-      },
-      series: [
-        {
-          name: "访问来源",
-          type: "pie",
-          radius: ["0%", "70%"],
-          avoidLabelOverlap: false,
-          label: {
-            normal: {
-              show: false,
-              position: "center"
-            },
-            emphasis: {
-              show: false,
-              textStyle: {
-                fontSize: "30",
-                fontWeight: "bold"
-              }
-            }
-          },
-          labelLine: {
-            normal: {
-              show: false
-            }
-          },
-          data: [
-            { value: 335, name: "直接访问" },
-            { value: 310, name: "邮件营销" },
-            { value: 234, name: "联盟广告" },
-            { value: 135, name: "视频广告" },
-            { value: 1548, name: "搜索引擎" }
-          ]
-        }
-      ]
     });
-    // myChart2.setOption({
-    //   title: { text: "ECharts 入门示例" },
-    //   tooltip: {},
-    //   xAxis: {
-    //     data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
-    //   },
-    //   yAxis: {},
-    //   series: [
-    //     {
-    //       name: "销量",
-    //       type: "bar",
-    //       data: [5, 20, 36, 10, 10, 20]
-    //     }
-    //   ]
-    // });
   }
 
   switchShow = () => {
@@ -212,32 +153,21 @@ export default class siderbarDetail extends PureComponent {
           }}
         >
           <p className={styles.title}>项目统计</p>
-          <CheckboxGroup options={project} onChange={this.onChange} />
-          <Radio.Group buttonStyle="solid">
-            <Radio.Button value={1}>饼图</Radio.Button>
-            <Radio.Button value={2}>柱状图</Radio.Button>
+          <Radio.Group buttonStyle="solid" defaultValue={`level`}>
+            {project.map((item, index) => (
+              <Radio.Button key={index} value={item.value}>
+                {item.label}
+              </Radio.Button>
+            ))}
           </Radio.Group>
           <p className={styles.title}>图斑统计</p>
-          <CheckboxGroup options={spot} onChange={this.onChange} />
-          <Radio.Group
-            buttonStyle="solid"
-            name="radiogroup"
-            style={{ marginTop: 30 }}
-            defaultValue={1}
-            onChange={e => {
-              console.log(e.target.value);
-              if (e.target.value === 1) {
-                this.setState({ type: "pie" });
-              } else {
-                this.setState({ type: "pie" });
-              }
-            }}
-          >
-            <Radio.Button value={1}>饼图</Radio.Button>
-            <Radio.Button value={2}>柱状图</Radio.Button>
+          <Radio.Group buttonStyle="solid">
+            {spot.map((item, index) => (
+              <Radio.Button key={index} value={item.value}>
+                {item.label}
+              </Radio.Button>
+            ))}
           </Radio.Group>
-          <div id="main" style={{ width: 300, height: 400, paddingTop: 10 }} />
-          {/* <div id="main2" style={{ width: 400, height: 400 }} /> */}
         </div>
       </div>
     );
