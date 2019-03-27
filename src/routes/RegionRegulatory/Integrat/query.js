@@ -50,6 +50,8 @@ export default class siderbarDetail extends PureComponent {
         type: data.type
       });
     });
+    const { clientWidth, clientHeight } = this.refDom;
+    console.log(clientWidth);
   }
 
   getRandomInt = (max, min = 0) => {

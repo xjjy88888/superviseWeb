@@ -131,6 +131,7 @@ export default class integrat extends PureComponent {
       });
     });
     const { clientWidth, clientHeight } = this.refDom;
+    console.log(clientWidth);
     this.setState({
       clientHeight: clientHeight
     });
@@ -200,6 +201,9 @@ export default class integrat extends PureComponent {
     emitter.emit("showTool", {
       show: false,
       type: "control"
+    });
+    emitter.emit("showChart", {
+      show: false
     });
     if (e.key === "project") {
       this.setState({

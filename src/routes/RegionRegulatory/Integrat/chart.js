@@ -18,6 +18,45 @@ import "echarts";
 const CheckboxGroup = Checkbox.Group;
 const RadioGroup = Radio.Group;
 
+const project = [
+  { TypeName: "项目类型", DictKey: "XMLX-01", DictValue: "公路工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-02", DictValue: "铁路工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-03", DictValue: "涉水交通工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-04", DictValue: "机场工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-05", DictValue: "火电工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-06", DictValue: "核电工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-07", DictValue: "风电工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-08", DictValue: "输变电工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-09", DictValue: "其他电力工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-10", DictValue: "水利枢纽工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-11", DictValue: "灌区工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-12", DictValue: "引调水工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-13", DictValue: "堤防工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-14", DictValue: "蓄滞洪区工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-15", DictValue: "其他小型水利工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-16", DictValue: "水电枢纽工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-17", DictValue: "露天煤矿" },
+  { TypeName: "项目类型", DictKey: "XMLX-18", DictValue: "露天金属矿" },
+  { TypeName: "项目类型", DictKey: "XMLX-19", DictValue: "露天非金属矿" },
+  { TypeName: "项目类型", DictKey: "XMLX-20", DictValue: "井采煤矿" },
+  { TypeName: "项目类型", DictKey: "XMLX-21", DictValue: "井采金属矿" },
+  { TypeName: "项目类型", DictKey: "XMLX-22", DictValue: "井采非金属矿" },
+  { TypeName: "项目类型", DictKey: "XMLX-23", DictValue: "油气开采工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-24", DictValue: "油气管道工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-25", DictValue: "油气储存于加工工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-26", DictValue: "工业园区工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-27", DictValue: "城市轨道交通工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-28", DictValue: "城市管网工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-29", DictValue: "房地产工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-30", DictValue: "其他城建工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-31", DictValue: "林浆纸一体化工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-32", DictValue: "农林开发工程" },
+  { TypeName: "项目类型", DictKey: "XMLX-33", DictValue: "加工制造类项目" },
+  { TypeName: "项目类型", DictKey: "XMLX-34", DictValue: "社会事业类项目" },
+  { TypeName: "项目类型", DictKey: "XMLX-35", DictValue: "信息产业类项目" },
+  { TypeName: "项目类型", DictKey: "XMLX-36", DictValue: "其他行业项目" }
+];
+
 const optionPie = {
   tooltip: {
     trigger: "item",
@@ -87,44 +126,9 @@ const optionBar = {
       interval: 0,
       rotate: 30
     },
-    data: [
-      "1部级ggergerhery",
-      "2省级ggergerhery",
-      "3市级ggergerhery",
-      "4县级ggergerhery",
-      "5部级ggergerhery",
-      "6省级ggergerhery",
-      "7市级ggergerhery",
-      "8县级ggergerhery",
-      "9部级ggergerhery",
-      "10省级ggergerhery",
-      "11市级ggergerhery",
-      "12县级ggergerhery",
-      "13部级ggergerhery",
-      "14省级ggergerhery",
-      "15市级ggergerhery",
-      "16县级ggergerhery",
-      "17部级ggergerhery",
-      "18省级ggergerhery",
-      "19市级ggergerhery",
-      "20县级ggergerhery",
-      "21部级ggergerhery",
-      "22省级ggergerhery",
-      "23市级ggergerhery",
-      "24县级ggergerhery",
-      "25县级ggergerhery",
-      "26县级ggergerhery",
-      "27县级ggergerhery",
-      "28县级ggergerhery",
-      "29县级ggergerhery",
-      "30县级ggergerhery",
-      "31县级ggergerhery",
-      "32县级ggergerhery",
-      "33县级ggergerhery",
-      "34县级ggergerhery",
-      "35县级ggergerhery",
-      "36县级ggergerhery"
-    ]
+    data: project.map(item => {
+      return item.DictValue;
+    })
   },
   series: [
     {
@@ -193,21 +197,38 @@ let myChart;
 export default class siderbarDetail extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = { show: false, type: "control" };
+    this.state = {
+      showTool: false,
+      show: false,
+      type: "control"
+    };
     this.charRef = ref => {
       this.chartDom = ref;
+    };
+    this.saveRef = ref => {
+      this.refDom = ref;
     };
   }
 
   componentDidMount() {
     this.eventEmitter = emitter.addListener("showTool", data => {
       this.setState({
-        show: data.show,
+        showTool: data.show,
         type: data.type
+      });
+    });
+    this.eventEmitter = emitter.addListener("showChart", data => {
+      this.setState({
+        show: data.show
       });
     });
     myChart = echarts.init(this.chartDom);
     myChart.setOption(optionBar);
+    const { clientWidth, clientHeight } = this.refDom;
+    this.setState({
+      clientHeight: clientHeight,
+      clientWidth: clientWidth
+    });
   }
 
   close = () => {
@@ -219,102 +240,24 @@ export default class siderbarDetail extends PureComponent {
   };
 
   render() {
-    const { show, type } = this.state;
-
-    const toolItems = [
-      {
-        title: "导出当前列表数据",
-        icon: "shopping"
-      },
-      {
-        title: "模板下载",
-        icon: "login"
-      },
-      {
-        title: "模板说明",
-        icon: "question-circle"
-      },
-      {
-        title: "批量上传(Shapfile)",
-        icon: "upload"
-      },
-      {
-        title: "批量上传(Excel)",
-        icon: "upload"
-      },
-      {
-        title: "数据归档",
-        icon: "cloud-download"
-      }
-    ];
-
-    const project = [
-      {
-        label: "立项级别",
-        value: "level"
-      },
-      {
-        label: "合规性",
-        value: "compliance"
-      },
-      {
-        label: "项目类型",
-        value: "type"
-      },
-      {
-        label: "项目类别",
-        value: "sort"
-      },
-      {
-        label: "项目性质",
-        value: "nature"
-      },
-      {
-        label: "建设状态",
-        value: "state"
-      },
-      {
-        label: "矢量化类型",
-        value: "vector"
-      }
-    ];
-
-    const spot = [
-      {
-        label: "现场复核",
-        value: "level"
-      },
-      {
-        label: "合规性",
-        value: "compliance"
-      },
-      {
-        label: "扰动类型",
-        value: "type"
-      },
-      {
-        label: "建设状态",
-        value: "nature"
-      },
-      {
-        label: "扰动变化类型",
-        value: "sort"
-      }
-    ];
-
+    const { show, showTool, type, clientWidth, clientHeight } = this.state;
     return (
       <div
+        ref={this.saveRef}
         style={{
-          display: show && type === "control" ? "block" : "none",
-          width: "50vw",
+          display: show && showTool && type === "control" ? "block" : "none",
           backgroundColor: "#fff",
           position: "absolute",
           zIndex: 1000,
-          top: " 50%",
           borderRadius: 10,
-          padding: "10px 10px 30px 20px",
-          transform: "translate(0, -50%)",
-          left: 700
+          padding: "10px 00px 10px 30px",
+          minWidth: 600,
+          minHeight: 500,
+          left: 700,
+          width: `50vw`,
+          height: `80vh`,
+          top: `50%`,
+          transform: `translate(0,-47%)`
         }}
       >
         <Button
@@ -354,7 +297,10 @@ export default class siderbarDetail extends PureComponent {
         <div
           id="chart"
           ref={this.charRef}
-          style={{ width: "50vw", height: "70vh" }}
+          style={{
+            width: `50vw`,
+            height: `75vh`
+          }}
         />
       </div>
     );

@@ -38,7 +38,10 @@ export default class siderbarDetail extends PureComponent {
   }
 
   switchShow = () => {
-    this.setState({ show: true });
+    this.setState({ show: false });
+    emitter.emit("showChart", {
+      show: false
+    });
   };
 
   onChange = checkedValues => {
@@ -205,6 +208,11 @@ export default class siderbarDetail extends PureComponent {
                   <Button
                     style={{ margin: `15px 10px 0 10px` }}
                     icon={item.icon}
+                    onClick={() => {
+                      emitter.emit("showChart", {
+                        show: true
+                      });
+                    }}
                   >
                     {item.label}
                   </Button>
@@ -225,6 +233,11 @@ export default class siderbarDetail extends PureComponent {
                   <Button
                     style={{ margin: `15px 10px 0 10px` }}
                     icon={item.icon}
+                    onClick={() => {
+                      emitter.emit("showChart", {
+                        show: true
+                      });
+                    }}
                   >
                     {item.label}
                   </Button>
