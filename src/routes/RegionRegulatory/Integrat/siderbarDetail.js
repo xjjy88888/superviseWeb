@@ -1,14 +1,41 @@
 import React, { PureComponent } from "react";
-import { Menu, Icon, Button, Input, Radio, List, Avatar, Carousel } from "antd";
+import { createForm } from "rc-form";
+import moment from "moment";
+import {
+  Menu,
+  Icon,
+  Button,
+  Input,
+  Radio,
+  List,
+  Avatar,
+  message,
+  LocaleProvider,
+  Carousel,
+  DatePicker,
+  Form
+} from "antd";
 import emitter from "../../../utils/event";
-import styles from "./sidebar.less";
+import styles from "./siderbarDetail.less";
 import "leaflet/dist/leaflet.css";
+import zhCN from "antd/lib/locale-provider/zh_CN";
+
+const { TextArea } = Input;
+const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
+const dateFormat = "YYYY-MM-DD";
+const formItemLayout = {
+  labelCol: { span: 7 },
+  wrapperCol: { span: 16 }
+};
+
+@createForm()
 export default class siderbarDetail extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      show: false,
-      inputDisabled: true
+      show: true,
+      from: "spot",
+      edit: false
     };
     this.map = null;
   }
@@ -26,59 +53,68 @@ export default class siderbarDetail extends PureComponent {
   //   emitter.removeListener(this.eventEmitter);
   // }
 
+  submit = () => {
+    const { edit } = this.state;
+    this.setState({ edit: !edit });
+    if (edit) {
+      message.success("编辑成功");
+    } else {
+      message.info("开始编辑");
+    }
+  };
+
   switchShow = () => {
     this.setState({ show: !this.state.show, showDetail: false });
   };
 
   render() {
-    const { show, from, inputDisabled } = this.state;
+    const { show, from, edit } = this.state;
+    console.log(this.state);
 
     return (
-      <div className={styles.sidebar} style={{ left: show ? 350 : -350 }}>
+      <div className={styles.sidebar} style={{ left: show ? 350 : -4000 }}>
         <Icon
           className={styles.icon}
           type="left"
           style={{ fontSize: 30, display: show ? "block" : "none" }}
           onClick={this.switchShow}
         />
-        <div
+        <Button
+          type="dashed"
+          icon={edit ? "check" : "edit"}
+          shape="circle"
           style={{
-            display: from === "duty" ? "block" : "none"
+            float: "right",
+            position: "absolute",
+            color: "#1890ff",
+            right: 20,
+            top: 10
           }}
-        >
-          <List
+          onClick={this.submit}
+        />
+        <div style={{ height: "100%", overflow: `auto`, padding: 30 }}>
+          <div
             style={{
-              padding: 20,
-              overflow: "auto",
-              height: "90vh",
-              width: 350,
-              position: "relation"
+              display: from === "duty" ? "block" : "none"
             }}
           >
-            <List.Item>
-              <b>防治责任范围</b>
-            </List.Item>
-            <List.Item>
-              <Input
-                addonAfter={
-                  <Icon
-                    type="edit"
-                    theme="twoTone"
-                    onClick={() => {
-                      this.setState({
-                        inputDisabled: !inputDisabled
-                      });
-                    }}
-                  />
-                }
-                disabled={inputDisabled}
-                defaultValue="设计阶段，可研"
-              />
-            </List.Item>
-            <List.Item>矢量化类型：精确上图</List.Item>
-            <List.Item>面积：55m2</List.Item>
-            <List.Item>组成部分：广州铁路局</List.Item>
-            <List.Item>上图单位：广州铁路局</List.Item>
+            <Form>
+              <p>
+                <b>防治责任范围</b>
+              </p>
+              <Form.Item label="矢量化类型" {...formItemLayout}>
+                <Input defaultValue={`矢量化类型`} disabled={!edit} />
+              </Form.Item>
+              <Form.Item label="面积" {...formItemLayout}>
+                <Input defaultValue={`矢量化类型`} disabled={!edit} />
+              </Form.Item>
+              <Form.Item label="组成部分" {...formItemLayout}>
+                <Input defaultValue={`矢量化类型`} disabled={!edit} />
+              </Form.Item>
+              <Form.Item label="上图单位" {...formItemLayout}>
+                <Input defaultValue={`矢量化类型`} disabled={!edit} />
+              </Form.Item>
+            </Form>
             <Carousel autoplay>
               <img src="./img/spot.jpg" />
               <img src="./img/spot2.jpg" />
@@ -86,72 +122,69 @@ export default class siderbarDetail extends PureComponent {
               <img src="./img/spot2.jpg" />
               <img src="./img/spot.jpg" />
             </Carousel>
-          </List>
-        </div>
-        <div
-          style={{
-            display: from === "spot" ? "block" : "none"
-          }}
-        >
-          <List
+          </div>
+          <div
             style={{
-              padding: 20,
-              overflow: "auto",
-              height: "90vh",
-              width: 350,
-              position: "relation"
+              display: from === "spot" ? "block" : "none"
             }}
           >
-            <List.Item>
-              <b>扰动图斑</b>
-              <Icon
-                type="plus"
-                style={{
-                  paddingLeft: 10,
-                  fontSize: 18,
-                  cursor: "point",
-                  color: "#1890ff"
-                }}
-              />
-            </List.Item>
-            <List.Item>
-              <Input
-                addonAfter={
-                  <Icon
-                    type="edit"
-                    theme="twoTone"
-                    onClick={() => {
-                      this.setState({
-                        inputDisabled: !inputDisabled
-                      });
-                    }}
-                  />
-                }
-                disabled={inputDisabled}
-                defaultValue="2017154_14848_4848"
-              />
-            </List.Item>
-            <List.Item
-              style={{ cursor: "pointer" }}
-              onClick={() => {
-                emitter.emit("showProjectDetail", {
-                  isShow: true
-                });
-              }}
-            >
-              关联项目：新建铁路广州至香港专线
-            </List.Item>
-            <List.Item>扰动类型：其他扰动</List.Item>
-            <List.Item>扰动面积：9.48公顷</List.Item>
-            <List.Item>扰动超出面积：5.48公顷</List.Item>
-            <List.Item>扰动合规性：广州铁路局</List.Item>
-            <List.Item>扰动变化类型：广州铁路局</List.Item>
-            <List.Item>建设状态：广州铁路局</List.Item>
-            <List.Item>复核状态：广州铁路局</List.Item>
-            <List.Item>地址：</List.Item>
-            <List.Item>问题：</List.Item>
-            <List.Item>建议：</List.Item>
-            <List.Item>备注：</List.Item>
+            <Form>
+              <p>
+                <b>扰动图斑</b>
+              </p>
+              <Form.Item label="关联项目" {...formItemLayout}>
+                <TextArea
+                  autosize={true}
+                  defaultValue={`新建广州至香港铁路建设线`}
+                  disabled={!edit}
+                />
+              </Form.Item>
+              <Form.Item label="扰动类型" {...formItemLayout}>
+                <Input defaultValue={`其他扰动`} disabled={!edit} />
+              </Form.Item>
+              <Form.Item label="扰动面积" {...formItemLayout}>
+                <Input defaultValue={`其他扰动`} disabled={!edit} />
+              </Form.Item>
+              <Form.Item label="扰动超出面积" {...formItemLayout}>
+                <Input defaultValue={`其他扰动`} disabled={!edit} />
+              </Form.Item>
+              <Form.Item label="扰动合规性" {...formItemLayout}>
+                <Input defaultValue={`其他扰动`} disabled={!edit} />
+              </Form.Item>
+              <Form.Item label="扰动变化类型" {...formItemLayout}>
+                <Input defaultValue={`其他扰动`} disabled={!edit} />
+              </Form.Item>
+              <Form.Item label="建设状态" {...formItemLayout}>
+                <Input defaultValue={`其他扰动`} disabled={!edit} />
+              </Form.Item>
+              <Form.Item label="复核状态" {...formItemLayout}>
+                <Input defaultValue={`其他扰动`} disabled={!edit} />
+              </Form.Item>
+              <Form.Item label="地址" {...formItemLayout}>
+                <Input defaultValue={`其他扰动`} disabled={!edit} />
+              </Form.Item>
+              <Form.Item label="问题" {...formItemLayout}>
+                <TextArea
+                  autosize={true}
+                  defaultValue={`问题问题问题问题问题问题问题问题问题问题问题问题问题`}
+                  disabled={!edit}
+                />
+              </Form.Item>
+              <Form.Item label="建议" {...formItemLayout}>
+                <TextArea
+                  autosize={true}
+                  defaultValue={`建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议`}
+                  disabled={!edit}
+                />
+              </Form.Item>
+              <Form.Item label="备注" {...formItemLayout}>
+                <TextArea
+                  autosize={true}
+                  defaultValue={`备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注`}
+                  disabled={!edit}
+                />
+              </Form.Item>
+            </Form>
             <Carousel autoplay>
               <img src="./img/spot.jpg" />
               <img src="./img/spot2.jpg" />
@@ -170,77 +203,61 @@ export default class siderbarDetail extends PureComponent {
             <Button type="dashed" icon="rollback" style={{ marginTop: 20 }}>
               撤销归档
             </Button>
-          </List>
-        </div>
-        <div
-          style={{
-            display: from === "point" ? "block" : "none"
-          }}
-        >
-          <List
+          </div>
+          <div
             style={{
-              padding: 20,
-              overflow: "auto",
-              height: "90vh",
-              width: 350,
-              position: "relation"
+              display: from === "point" ? "block" : "none"
             }}
           >
-            <List.Item>
-              <b>标注点</b>
-            </List.Item>
-            <List.Item>
-              <Input
-                addonAfter={
-                  <Icon
-                    type="edit"
-                    theme="twoTone"
-                    onClick={() => {
-                      this.setState({
-                        inputDisabled: !inputDisabled
-                      });
-                    }}
-                  />
-                }
-                disabled={inputDisabled}
-                defaultValue="2018-02-03 08:08"
-              />
-            </List.Item>
-            <List.Item
-              style={{ cursor: "pointer" }}
-              onClick={() => {
-                emitter.emit("showProjectDetail", {
-                  isShow: true
-                });
-              }}
-            >
-              关联项目：广州铁路局
-            </List.Item>
-            <List.Item>描述：广州铁路局</List.Item>
-            <List.Item>
-              <List.Item.Meta
-                title={
-                  <div>
-                    坐标：
+            <Form>
+              <p>
+                <b>标注点</b>
+              </p>
+              <Form.Item label="标注时间" {...formItemLayout}>
+                <RangePicker
+                  disabled={!edit}
+                  defaultValue={[
+                    moment("2015-06-06", dateFormat),
+                    moment("2015-06-06", dateFormat)
+                  ]}
+                />
+              </Form.Item>
+              <Form.Item label="关联项目" {...formItemLayout}>
+                <TextArea
+                  autosize={true}
+                  defaultValue={`新建广州至香港铁路建设线`}
+                  disabled={!edit}
+                />
+              </Form.Item>
+              <Form.Item label="标注描述" {...formItemLayout}>
+                <TextArea
+                  autosize={true}
+                  defaultValue={`新建广州至香港铁路建设线标注描述,新建广州至香港铁路建设线标注描述,新建广州至香港铁路建设线标注描述,新建广州至香港铁路建设线标注描述`}
+                  disabled={!edit}
+                />
+              </Form.Item>
+              <Form.Item label="标注坐标" {...formItemLayout}>
+                <Input
+                  defaultValue={`123.423，29.543`}
+                  disabled={!edit}
+                  addonAfter={
                     <Icon
                       type="compass"
                       style={{
-                        float: "right",
-                        fontSize: 18,
                         cursor: "point",
-                        color: "#1890ff"
+                        color: edit ? "#1890ff" : ""
                       }}
                     />
-                  </div>
-                }
-              />
-            </List.Item>
+                  }
+                />
+              </Form.Item>
+            </Form>
             <Carousel autoplay>
               <img src="./img/spot.jpg" />
               <img src="./img/spot2.jpg" />
               <img src="./img/spot.jpg" />
             </Carousel>
-          </List>
+          </div>
         </div>
       </div>
     );

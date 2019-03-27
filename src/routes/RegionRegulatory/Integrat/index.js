@@ -1,8 +1,10 @@
 import React, { PureComponent } from "react";
-import { Menu, Icon, Button } from "antd";
+import { Menu, Icon, Button, LocaleProvider } from "antd";
+import zhCN from "antd/lib/locale-provider/zh_CN";
 import SiderMenu from "../../../components/SiderMenu";
 import Sidebar from "./sidebar";
 import SidebarDetail from "./siderbarDetail";
+import moment from 'moment';
 import Tool from "./tool";
 import Chart from "./chart";
 import Query from "./query";
@@ -48,15 +50,17 @@ export default class integrat extends PureComponent {
 
   render() {
     return (
-      <div className={styles.main}>
-        <SiderMenu active="401" />
-        <Sidebar />
-        <SidebarDetail />
-        <Tool />
-        <Chart />
-        <Query />
-        <div id="map" className={styles.map} />
-      </div>
+      <LocaleProvider locale={zhCN}>
+        <div className={styles.main}>
+          <SiderMenu active="401" />
+          <Sidebar />
+          <SidebarDetail />
+          <Tool />
+          <Chart />
+          <Query />
+          <div id="map" className={styles.map} />
+        </div>
+      </LocaleProvider>
     );
   }
 }

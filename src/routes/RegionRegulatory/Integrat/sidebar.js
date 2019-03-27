@@ -488,17 +488,13 @@ export default class integrat extends PureComponent {
           >
             <Button
               type="dashed"
-              icon="close"
-              shape="circle"
               style={{
-                float: "right",
-                position: "absolute",
-                color: "#1890ff",
-                right: -10,
-                top: -10
+                float: "right"
               }}
               onClick={this.close}
-            />
+            >
+              返回
+            </Button>
             <List.Item style={{ paddingTop: 30 }}>
               <Input
                 addonAfter={

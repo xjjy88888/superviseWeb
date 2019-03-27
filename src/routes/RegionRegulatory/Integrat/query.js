@@ -8,7 +8,6 @@ import {
   Radio,
   Avatar,
   Carousel,
-  LocaleProvider,
   message,
   notification,
   Cascader,
@@ -19,7 +18,6 @@ import {
   Form,
   AutoComplete
 } from "antd";
-import zhCN from "antd/lib/locale-provider/zh_CN";
 import emitter from "../../../utils/event";
 import styles from "./query.less";
 import "leaflet/dist/leaflet.css";
@@ -248,230 +246,218 @@ export default class siderbarDetail extends PureComponent {
       }
     ];
     return (
-      <LocaleProvider locale={zhCN}>
+      <div
+        className={styles.sidebar}
+        style={{ left: show ? 350 : -550, borderLeft: "solid 1px #ddd" }}
+        ref={this.saveRef}
+      >
+        <Icon
+          className={styles.icon}
+          type="left"
+          style={{ fontSize: 30, display: show ? "block" : "none" }}
+          onClick={this.switchShow}
+        />
+        <Button
+          type="dashed"
+          icon="check"
+          shape="circle"
+          style={{
+            position: "absolute",
+            color: "#1890ff",
+            right: 20,
+            top: 10
+          }}
+          onClick={() => {
+            message.success(`筛选成功！`);
+            // notification.open({
+            //   message: `筛选成功！`,
+            //   description: ``
+            // });
+            this.setState({ show: false });
+          }}
+        />
         <div
-          className={styles.sidebar}
-          style={{ left: show ? 350 : -550, borderLeft: "solid 1px #ddd" }}
-          ref={this.saveRef}
+          style={{
+            display: type === "project" ? "block" : "none",
+            padding: "30px 0",
+            overflow: "auto",
+            height: "100%"
+          }}
         >
-          <Icon
-            className={styles.icon}
-            type="left"
-            style={{ fontSize: 30, display: show ? "block" : "none" }}
-            onClick={this.switchShow}
-          />
-          <Button
-            type="dashed"
-            icon="check"
-            shape="circle"
-            style={{
-              position: "absolute",
-              color: "#1890ff",
-              right: 20,
-              top: 10
-            }}
-            onClick={() => {
-              message.success(`筛选成功！`);
-              // notification.open({
-              //   message: `筛选成功！`,
-              //   description: ``
-              // });
-              this.setState({ show: false });
-            }}
-          />
-          <div
-            style={{
-              display: type === "project" ? "block" : "none",
-              padding: "30px 0",
-              overflow: "auto",
-              height: "100%"
-            }}
-          >
-            <Form>
-              <Form.Item label="所在地区" {...formItemLayout}>
-                <Cascader
-                  options={options}
-                  expandTrigger="hover"
-                  placeholder=""
-                />
-              </Form.Item>
-              <Form.Item label="建设单位" {...formItemLayout}>
-                <AutoComplete
-                  dataSource={dataSource.map(this.renderOption)}
-                  onSearch={this.handleSearch}
-                  optionLabelProp="text"
-                />
-              </Form.Item>
-              <Form.Item label="监管单位" {...formItemLayout}>
-                <AutoComplete
-                  dataSource={dataSource.map(this.renderOption)}
-                  onSearch={this.handleSearch}
-                  optionLabelProp="text"
-                />
-              </Form.Item>
-              <Form.Item label="立项级别" {...formItemLayoutlong}>
-                <RadioGroup name="radiogroup">
-                  <Radio value={1}>部级</Radio>
-                  <Radio value={2}>省级</Radio>
-                  <Radio value={3}>市级</Radio>
-                  <Radio value={4}>县级</Radio>
-                </RadioGroup>
-              </Form.Item>
-              <Form.Item label="批复机构" {...formItemLayout}>
-                <AutoComplete
-                  dataSource={dataSource.map(this.renderOption)}
-                  onSearch={this.handleSearch}
-                  optionLabelProp="text"
-                />
-              </Form.Item>
-              <Form.Item label="批复文号" {...formItemLayout}>
-                <Input />
-              </Form.Item>
-              <Form.Item label="批复时间" {...formItemLayout}>
-                <RangePicker onChange={this.dateOnChange} />
-              </Form.Item>
-              <Form.Item label="项目类型" {...formItemLayout}>
-                <AutoComplete
-                  dataSource={projectTypeDataSource}
-                  filterOption={(inputValue, option) =>
-                    option.props.children
-                      .toUpperCase()
-                      .indexOf(inputValue.toUpperCase()) !== -1
-                  }
-                >
-                  <Input allowClear />
-                </AutoComplete>
-              </Form.Item>
-              <Form.Item label="项目类别" {...formItemLayout}>
-                <RadioGroup name="radiogroup">
-                  <Radio value={1}>建设类</Radio>
-                  <Radio value={2}>生产类</Radio>
-                </RadioGroup>
-              </Form.Item>
-              <Form.Item label="项目性质" {...formItemLayoutlong}>
-                <RadioGroup name="radiogroup">
-                  <Radio value={1}>新建</Radio>
-                  <Radio value={2}>扩建</Radio>
-                  <Radio value={3}>续建</Radio>
-                  <Radio value={4}>改建</Radio>
-                </RadioGroup>
-              </Form.Item>
-              <Form.Item label="建设状态" {...formItemLayoutlong}>
-                <RadioGroup name="radiogroup">
-                  <Radio value={1}>未开工</Radio>
-                  <Radio value={2}>停工</Radio>
-                  <Radio value={3}>施工</Radio>
-                  <Radio value={4}>完工</Radio>
-                  <Radio value={5}>已验收</Radio>
-                </RadioGroup>
-              </Form.Item>
-              <Form.Item label="项目合规性" {...formItemLayout}>
-                <AutoComplete
-                  dataSource={projectCompliantDataSource}
-                  filterOption={(inputValue, option) =>
-                    option.props.children
-                      .toUpperCase()
-                      .indexOf(inputValue.toUpperCase()) !== -1
-                  }
-                >
-                  <Input allowClear />
-                </AutoComplete>
-              </Form.Item>
-              {/* <Form.Item label="项目合规性" {...formItemLayout}>
+          <Form>
+            <Form.Item label="所在地区" {...formItemLayout}>
+              <Cascader
+                options={options}
+                expandTrigger="hover"
+                placeholder=""
+              />
+            </Form.Item>
+            <Form.Item label="建设单位" {...formItemLayout}>
+              <AutoComplete
+                dataSource={dataSource.map(this.renderOption)}
+                onSearch={this.handleSearch}
+                optionLabelProp="text"
+              />
+            </Form.Item>
+            <Form.Item label="监管单位" {...formItemLayout}>
+              <AutoComplete
+                dataSource={dataSource.map(this.renderOption)}
+                onSearch={this.handleSearch}
+                optionLabelProp="text"
+              />
+            </Form.Item>
+            <Form.Item label="立项级别" {...formItemLayoutlong}>
+              <RadioGroup name="radiogroup">
+                <Radio value={1}>部级</Radio>
+                <Radio value={2}>省级</Radio>
+                <Radio value={3}>市级</Radio>
+                <Radio value={4}>县级</Radio>
+              </RadioGroup>
+            </Form.Item>
+            <Form.Item label="批复机构" {...formItemLayout}>
+              <AutoComplete
+                dataSource={dataSource.map(this.renderOption)}
+                onSearch={this.handleSearch}
+                optionLabelProp="text"
+              />
+            </Form.Item>
+            <Form.Item label="批复文号" {...formItemLayout}>
+              <Input />
+            </Form.Item>
+            <Form.Item label="批复时间" {...formItemLayout}>
+              <RangePicker onChange={this.dateOnChange} />
+            </Form.Item>
+            <Form.Item label="项目类型" {...formItemLayout}>
+              <AutoComplete
+                dataSource={projectTypeDataSource}
+                filterOption={(inputValue, option) =>
+                  option.props.children
+                    .toUpperCase()
+                    .indexOf(inputValue.toUpperCase()) !== -1
+                }
+              >
+                <Input allowClear />
+              </AutoComplete>
+            </Form.Item>
+            <Form.Item label="项目类别" {...formItemLayout}>
+              <RadioGroup name="radiogroup">
+                <Radio value={1}>建设类</Radio>
+                <Radio value={2}>生产类</Radio>
+              </RadioGroup>
+            </Form.Item>
+            <Form.Item label="项目性质" {...formItemLayoutlong}>
+              <RadioGroup name="radiogroup">
+                <Radio value={1}>新建</Radio>
+                <Radio value={2}>扩建</Radio>
+                <Radio value={3}>续建</Radio>
+                <Radio value={4}>改建</Radio>
+              </RadioGroup>
+            </Form.Item>
+            <Form.Item label="建设状态" {...formItemLayoutlong}>
+              <RadioGroup name="radiogroup">
+                <Radio value={1}>未开工</Radio>
+                <Radio value={2}>停工</Radio>
+                <Radio value={3}>施工</Radio>
+                <Radio value={4}>完工</Radio>
+                <Radio value={5}>已验收</Radio>
+              </RadioGroup>
+            </Form.Item>
+            <Form.Item label="项目合规性" {...formItemLayout}>
+              <AutoComplete
+                dataSource={projectCompliantDataSource}
+                filterOption={(inputValue, option) =>
+                  option.props.children
+                    .toUpperCase()
+                    .indexOf(inputValue.toUpperCase()) !== -1
+                }
+              >
+                <Input allowClear />
+              </AutoComplete>
+            </Form.Item>
+            {/* <Form.Item label="项目合规性" {...formItemLayout}>
                 <RadioGroup name="radiogroup">
                   {projectCompliantDataSource.map((item, index) => (
                     <Radio value={index} key={index}>{item}</Radio>
                   ))}
                 </RadioGroup>
               </Form.Item> */}
-              <Form.Item label="矢量化类型" {...formItemLayoutlong}>
-                <RadioGroup name="radiogroup">
-                  <Radio value={1}>防治责任范围</Radio>
-                  <Radio value={2}>示意性范围</Radio>
-                </RadioGroup>
-              </Form.Item>
-              <Form.Item label="显示归档数据" {...formItemLayoutlong}>
-                <Switch checkedChildren="是" unCheckedChildren="否" />
-              </Form.Item>
-            </Form>
-          </div>
-          <div
-            style={{
-              display: type === "project" ? "none" : "block",
-              padding: "30px 0",
-              overflow: "auto",
-              height: "100%"
-            }}
-          >
-            <Form>
-              <Form.Item label="所在地区" {...formItemLayout}>
-                <Cascader
-                  options={options}
-                  expandTrigger="hover"
-                  placeholder=""
-                />
-              </Form.Item>
-              <Form.Item label="扰动面积" {...formItemLayoutlong}>
-                <Slider
-                  marks={marks}
-                  range
-                  max={1000}
-                  defaultValue={[0, 1000]}
-                />
-              </Form.Item>
-              <Form.Item label="扰动超出面积" {...formItemLayoutlong}>
-                <Slider
-                  marks={marks}
-                  range
-                  max={1000}
-                  defaultValue={[0, 1000]}
-                />
-              </Form.Item>
-              <Form.Item label="扰动类型" {...formItemLayoutlong}>
-                <RadioGroup name="radiogroup">
-                  <Radio value={1}>弃土（渣）场</Radio>
-                  <Radio value={2}>取土（石）场</Radio>
-                  <Radio value={3}>其他扰动</Radio>
-                  <Radio value={4}>非生产建设项目</Radio>
-                </RadioGroup>
-              </Form.Item>
-              <Form.Item label="扰动合规性" {...formItemLayout}>
-                <AutoComplete
-                  dataSource={projectCompliantDataSource}
-                  filterOption={(inputValue, option) =>
-                    option.props.children
-                      .toUpperCase()
-                      .indexOf(inputValue.toUpperCase()) !== -1
-                  }
-                >
-                  <Input allowClear />
-                </AutoComplete>
-              </Form.Item>
-              <Form.Item label="扰动变化类型" {...formItemLayoutlong}>
-                <RadioGroup name="radiogroup">
-                  <Radio value={1}>新增</Radio>
-                  <Radio value={2}>续建（范围扩大）</Radio>
-                  <Radio value={3}>续建（范围缩小）</Radio>
-                  <Radio value={4}>续建（范围不变）</Radio>
-                  <Radio value={5}>完工</Radio>
-                </RadioGroup>
-              </Form.Item>
-              <Form.Item label="建设状态" {...formItemLayoutlong}>
-                <RadioGroup name="radiogroup">
-                  <Radio value={1}>未开工</Radio>
-                  <Radio value={2}>停工</Radio>
-                  <Radio value={3}>施工</Radio>
-                  <Radio value={4}>完工</Radio>
-                  <Radio value={5}>已验收</Radio>
-                </RadioGroup>
-              </Form.Item>
-              <Form.Item label="显示归档数据" {...formItemLayoutlong}>
-                <Switch checkedChildren="是" unCheckedChildren="否" />
-              </Form.Item>
-            </Form>
-          </div>
+            <Form.Item label="矢量化类型" {...formItemLayoutlong}>
+              <RadioGroup name="radiogroup">
+                <Radio value={1}>防治责任范围</Radio>
+                <Radio value={2}>示意性范围</Radio>
+              </RadioGroup>
+            </Form.Item>
+            <Form.Item label="显示归档数据" {...formItemLayoutlong}>
+              <Switch checkedChildren="是" unCheckedChildren="否" />
+            </Form.Item>
+          </Form>
         </div>
-      </LocaleProvider>
+        <div
+          style={{
+            display: type === "project" ? "none" : "block",
+            padding: "30px 0",
+            overflow: "auto",
+            height: "100%"
+          }}
+        >
+          <Form>
+            <Form.Item label="所在地区" {...formItemLayout}>
+              <Cascader
+                options={options}
+                expandTrigger="hover"
+                placeholder=""
+              />
+            </Form.Item>
+            <Form.Item label="扰动面积" {...formItemLayoutlong}>
+              <Slider marks={marks} range max={1000} defaultValue={[0, 1000]} />
+            </Form.Item>
+            <Form.Item label="扰动超出面积" {...formItemLayoutlong}>
+              <Slider marks={marks} range max={1000} defaultValue={[0, 1000]} />
+            </Form.Item>
+            <Form.Item label="扰动类型" {...formItemLayoutlong}>
+              <RadioGroup name="radiogroup">
+                <Radio value={1}>弃土（渣）场</Radio>
+                <Radio value={2}>取土（石）场</Radio>
+                <Radio value={3}>其他扰动</Radio>
+                <Radio value={4}>非生产建设项目</Radio>
+              </RadioGroup>
+            </Form.Item>
+            <Form.Item label="扰动合规性" {...formItemLayout}>
+              <AutoComplete
+                dataSource={projectCompliantDataSource}
+                filterOption={(inputValue, option) =>
+                  option.props.children
+                    .toUpperCase()
+                    .indexOf(inputValue.toUpperCase()) !== -1
+                }
+              >
+                <Input allowClear />
+              </AutoComplete>
+            </Form.Item>
+            <Form.Item label="扰动变化类型" {...formItemLayoutlong}>
+              <RadioGroup name="radiogroup">
+                <Radio value={1}>新增</Radio>
+                <Radio value={2}>续建（范围扩大）</Radio>
+                <Radio value={3}>续建（范围缩小）</Radio>
+                <Radio value={4}>续建（范围不变）</Radio>
+                <Radio value={5}>完工</Radio>
+              </RadioGroup>
+            </Form.Item>
+            <Form.Item label="建设状态" {...formItemLayoutlong}>
+              <RadioGroup name="radiogroup">
+                <Radio value={1}>未开工</Radio>
+                <Radio value={2}>停工</Radio>
+                <Radio value={3}>施工</Radio>
+                <Radio value={4}>完工</Radio>
+                <Radio value={5}>已验收</Radio>
+              </RadioGroup>
+            </Form.Item>
+            <Form.Item label="显示归档数据" {...formItemLayoutlong}>
+              <Switch checkedChildren="是" unCheckedChildren="否" />
+            </Form.Item>
+          </Form>
+        </div>
+      </div>
     );
   }
 }
