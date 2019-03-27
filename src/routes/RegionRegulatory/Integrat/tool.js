@@ -14,6 +14,7 @@ import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
 import echarts from "echarts/lib/echarts";
 import "echarts";
+import config from "../../../config";
 
 const CheckboxGroup = Checkbox.Group;
 const RadioGroup = Radio.Group;
@@ -51,105 +52,6 @@ export default class siderbarDetail extends PureComponent {
   render() {
     const { show, type, typeChild } = this.state;
 
-    const toolItems = [
-      {
-        label: "导出当前列表数据",
-        value: "shopping",
-        icon: "shopping"
-      },
-      {
-        label: "模板下载",
-        value: "login",
-        icon: "login"
-      },
-      {
-        label: "模板说明",
-        value: "question-circle",
-        icon: "question-circle"
-      },
-      {
-        label: "批量上传(Shapfile)",
-        value: "upload",
-        icon: "upload"
-      },
-      {
-        label: "批量上传(Excel)",
-        value: "upload",
-        icon: "upload"
-      },
-      {
-        label: "数据归档",
-        value: "cloud-download",
-        icon: "cloud-download"
-      }
-    ];
-
-    const project = [
-      {
-        label: "立项级别",
-        value: "level",
-        icon: "schedule"
-      },
-      {
-        label: "合规性",
-        value: "compliance",
-        icon: "info-circle"
-      },
-      {
-        label: "项目类型",
-        value: "type",
-        icon: "appstore"
-      },
-      {
-        label: "项目类别",
-        value: "sort",
-        icon: "ant-design"
-      },
-      {
-        label: "项目性质",
-        value: "nature",
-        icon: "project"
-      },
-      {
-        label: "建设状态",
-        value: "state",
-        icon: "thunderbolt"
-      },
-      {
-        label: "矢量化类型",
-        value: "vector",
-        icon: "profile"
-      }
-    ];
-
-    const spot = [
-      {
-        label: "现场复核",
-        value: "level",
-        icon: "edit"
-      },
-      {
-        label: "合规性",
-        value: "compliance",
-        icon: "info-circle"
-      },
-      {
-        label: "扰动类型",
-        value: "type",
-        icon: "appstore"
-      },
-      {
-        label: "建设状态",
-        value: "nature",
-        icon: "thunderbolt"
-      },
-      {
-        label: "扰动变化类型",
-        value: "sort",
-        icon: "border-inner"
-      }
-    ];
-
     return (
       <div
         style={{
@@ -182,7 +84,7 @@ export default class siderbarDetail extends PureComponent {
         />
         <div style={{ display: type === "tool" ? "block" : "none" }}>
           <p style={{ margin: `20px 0 10px 0` }}>工具箱</p>
-          {toolItems.map((item, index) => (
+          {config.toolbox.map((item, index) => (
             <div key={index}>
               <Button style={{ margin: `15px 10px 0 10px` }} icon={item.icon}>
                 {item.label}
@@ -203,7 +105,7 @@ export default class siderbarDetail extends PureComponent {
           >
             <p style={{ margin: `20px 0 10px 0` }}>控制台 - 项目统计</p>
             <Radio.Group buttonStyle="solid" defaultValue={`level`}>
-              {project.map((item, index) => (
+              {config.console_project.map((item, index) => (
                 <div key={index}>
                   <Button
                     style={{ margin: `15px 10px 0 10px` }}
@@ -228,7 +130,7 @@ export default class siderbarDetail extends PureComponent {
           >
             <p style={{ margin: `20px 0 10px 0` }}>控制台 - 图斑统计</p>
             <Radio.Group buttonStyle="solid">
-              {spot.map((item, index) => (
+              {config.console_spot.map((item, index) => (
                 <div key={index}>
                   <Button
                     style={{ margin: `15px 10px 0 10px` }}

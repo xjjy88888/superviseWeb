@@ -20,6 +20,7 @@ import {
 } from "antd";
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
+import config from "../../../config";
 
 const CheckboxGroup = Checkbox.Group;
 const RadioGroup = Radio.Group;
@@ -32,60 +33,7 @@ const formItemLayoutlong = {
   labelCol: { span: 6 },
   wrapperCol: { span: 15 }
 };
-const projectTypeData = [
-  { TypeName: "项目类型", DictKey: "XMLX-01", DictValue: "公路工程" },
-  { TypeName: "项目类型", DictKey: "XMLX-02", DictValue: "铁路工程" },
-  { TypeName: "项目类型", DictKey: "XMLX-03", DictValue: "涉水交通工程" },
-  { TypeName: "项目类型", DictKey: "XMLX-04", DictValue: "机场工程" },
-  { TypeName: "项目类型", DictKey: "XMLX-05", DictValue: "火电工程" },
-  { TypeName: "项目类型", DictKey: "XMLX-06", DictValue: "核电工程" },
-  { TypeName: "项目类型", DictKey: "XMLX-07", DictValue: "风电工程" },
-  { TypeName: "项目类型", DictKey: "XMLX-08", DictValue: "输变电工程" },
-  { TypeName: "项目类型", DictKey: "XMLX-09", DictValue: "其他电力工程" },
-  { TypeName: "项目类型", DictKey: "XMLX-10", DictValue: "水利枢纽工程" },
-  { TypeName: "项目类型", DictKey: "XMLX-11", DictValue: "灌区工程" },
-  { TypeName: "项目类型", DictKey: "XMLX-12", DictValue: "引调水工程" },
-  { TypeName: "项目类型", DictKey: "XMLX-13", DictValue: "堤防工程" },
-  { TypeName: "项目类型", DictKey: "XMLX-14", DictValue: "蓄滞洪区工程" },
-  {
-    TypeName: "项目类型",
-    DictKey: "XMLX-15",
-    DictValue: "其他小型水利工程"
-  },
-  { TypeName: "项目类型", DictKey: "XMLX-16", DictValue: "水电枢纽工程" },
-  { TypeName: "项目类型", DictKey: "XMLX-17", DictValue: "露天煤矿" },
-  { TypeName: "项目类型", DictKey: "XMLX-18", DictValue: "露天金属矿" },
-  { TypeName: "项目类型", DictKey: "XMLX-19", DictValue: "露天非金属矿" },
-  { TypeName: "项目类型", DictKey: "XMLX-20", DictValue: "井采煤矿" },
-  { TypeName: "项目类型", DictKey: "XMLX-21", DictValue: "井采金属矿" },
-  { TypeName: "项目类型", DictKey: "XMLX-22", DictValue: "井采非金属矿" },
-  { TypeName: "项目类型", DictKey: "XMLX-23", DictValue: "油气开采工程" },
-  { TypeName: "项目类型", DictKey: "XMLX-24", DictValue: "油气管道工程" },
-  {
-    TypeName: "项目类型",
-    DictKey: "XMLX-25",
-    DictValue: "油气储存于加工工程"
-  },
-  { TypeName: "项目类型", DictKey: "XMLX-26", DictValue: "工业园区工程" },
-  {
-    TypeName: "项目类型",
-    DictKey: "XMLX-27",
-    DictValue: "城市轨道交通工程"
-  },
-  { TypeName: "项目类型", DictKey: "XMLX-28", DictValue: "城市管网工程" },
-  { TypeName: "项目类型", DictKey: "XMLX-29", DictValue: "房地产工程" },
-  { TypeName: "项目类型", DictKey: "XMLX-30", DictValue: "其他城建工程" },
-  {
-    TypeName: "项目类型",
-    DictKey: "XMLX-31",
-    DictValue: "林浆纸一体化工程"
-  },
-  { TypeName: "项目类型", DictKey: "XMLX-32", DictValue: "农林开发工程" },
-  { TypeName: "项目类型", DictKey: "XMLX-33", DictValue: "加工制造类项目" },
-  { TypeName: "项目类型", DictKey: "XMLX-34", DictValue: "社会事业类项目" },
-  { TypeName: "项目类型", DictKey: "XMLX-35", DictValue: "信息产业类项目" },
-  { TypeName: "项目类型", DictKey: "XMLX-36", DictValue: "其他行业项目" }
-];
+
 const marks = {
   0: "0",
   200: "200",
@@ -94,73 +42,7 @@ const marks = {
   800: "800",
   1000: "1000"
 };
-const options = [
-  {
-    value: "zhejiang",
-    label: "广东",
-    children: [
-      {
-        value: "hangzhou",
-        label: "广州",
-        children: [
-          {
-            value: "xihu",
-            label: "天河区"
-          },
-          {
-            value: "xihu1",
-            label: "海珠区"
-          },
-          {
-            value: "xihu2",
-            label: "白云区"
-          }
-        ]
-      },
-      {
-        value: "hangzhou1",
-        label: "中山市",
-        children: [
-          {
-            value: "xihu",
-            label: "东区"
-          },
-          {
-            value: "xihu2",
-            label: "西区"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    value: "jiangsu",
-    label: "北京",
-    children: [
-      {
-        value: "nanjing",
-        label: "北京市",
-        children: [
-          {
-            value: "zhonghuamen",
-            label: "东城区"
-          }
-        ]
-      }
-    ]
-  }
-];
-const projectCompliantDataSource = [
-  "合规",
-  "疑似未批先建",
-  "未批先建",
-  "疑似超出防治责任范围",
-  "超出防治责任范围",
-  "疑似建设地点变更",
-  "建设地点变更",
-  "已批",
-  "可不编报方案"
-];
+
 @createForm()
 export default class siderbarDetail extends PureComponent {
   constructor(props) {
@@ -231,10 +113,6 @@ export default class siderbarDetail extends PureComponent {
     const { show, type, dataSource } = this.state;
     const { getFieldDecorator } = this.props.form;
 
-    const projectTypeDataSource = projectTypeData.map(item => {
-      return item.DictValue;
-    });
-
     return (
       <div
         style={{
@@ -289,7 +167,7 @@ export default class siderbarDetail extends PureComponent {
           <Form>
             <Form.Item label="所在地区" {...formItemLayout}>
               <Cascader
-                options={options}
+                options={config.demo_location}
                 expandTrigger="hover"
                 placeholder="请选择所在地区"
               />
@@ -309,7 +187,7 @@ export default class siderbarDetail extends PureComponent {
               />
             </Form.Item>
             <Form.Item label="立项级别" {...formItemLayoutlong}>
-              <CheckboxGroup options={["部级", "省级", "市级", "县级"]} />
+              <CheckboxGroup options={config.approval_level} />
             </Form.Item>
             <Form.Item label="批复机构" {...formItemLayout}>
               <AutoComplete
@@ -327,7 +205,7 @@ export default class siderbarDetail extends PureComponent {
             <Form.Item label="项目类型" {...formItemLayout}>
               <AutoComplete
                 placeholder={`请选择项目类型`}
-                dataSource={projectTypeDataSource}
+                dataSource={config.project_type}
                 filterOption={(inputValue, option) =>
                   option.props.children
                     .toUpperCase()
@@ -338,20 +216,18 @@ export default class siderbarDetail extends PureComponent {
               </AutoComplete>
             </Form.Item>
             <Form.Item label="项目类别" {...formItemLayout}>
-              <CheckboxGroup options={["建设类", "生产类"]} />
+              <CheckboxGroup options={config.project_category} />
             </Form.Item>
             <Form.Item label="项目性质" {...formItemLayoutlong}>
-              <CheckboxGroup options={["新建", "扩建", "续建", "改建"]} />
+              <CheckboxGroup options={config.project_nature} />
             </Form.Item>
             <Form.Item label="建设状态" {...formItemLayoutlong}>
-              <CheckboxGroup
-                options={["未开工", "停工", "施工", "完工", "已验收"]}
-              />
+              <CheckboxGroup options={config.construct_state} />
             </Form.Item>
             <Form.Item label="项目合规性" {...formItemLayout}>
               <AutoComplete
                 placeholder="请选择项目合规性"
-                dataSource={projectCompliantDataSource}
+                dataSource={config.compliance}
                 filterOption={(inputValue, option) =>
                   option.props.children
                     .toUpperCase()
@@ -361,15 +237,8 @@ export default class siderbarDetail extends PureComponent {
                 <Input allowClear />
               </AutoComplete>
             </Form.Item>
-            {/* <Form.Item label="项目合规性" {...formItemLayout}>
-                <RadioGroup name="radiogroup">
-                  {projectCompliantDataSource.map((item, index) => (
-                    <Radio value={index} key={index}>{item}</Radio>
-                  ))}
-                </RadioGroup>
-              </Form.Item> */}
             <Form.Item label="矢量化类型" {...formItemLayoutlong}>
-              <CheckboxGroup options={["防治责任范围", "示意性范围"]} />
+              <CheckboxGroup options={config.vectorization_type} />
             </Form.Item>
             <Form.Item label="显示归档数据" {...formItemLayoutlong}>
               <Switch checkedChildren="是" unCheckedChildren="否" />
@@ -388,7 +257,7 @@ export default class siderbarDetail extends PureComponent {
             <Form.Item label="所在地区" {...formItemLayout}>
               <Cascader
                 placeholder="请选择所在地区"
-                options={options}
+                options={config.demo_location}
                 expandTrigger="hover"
               />
             </Form.Item>
@@ -399,19 +268,12 @@ export default class siderbarDetail extends PureComponent {
               <Slider marks={marks} range max={1000} defaultValue={[0, 1000]} />
             </Form.Item>
             <Form.Item label="扰动类型" {...formItemLayoutlong}>
-              <CheckboxGroup
-                options={[
-                  "弃土（渣）场",
-                  "取土（石）场",
-                  "其他扰动",
-                  "非生产建设项目"
-                ]}
-              />
+              <CheckboxGroup options={config.disturb_type} />
             </Form.Item>
             <Form.Item label="扰动合规性" {...formItemLayout}>
               <AutoComplete
                 placeholder="请选择扰动合规性"
-                dataSource={projectCompliantDataSource}
+                dataSource={config.compliance}
                 filterOption={(inputValue, option) =>
                   option.props.children
                     .toUpperCase()
@@ -422,20 +284,10 @@ export default class siderbarDetail extends PureComponent {
               </AutoComplete>
             </Form.Item>
             <Form.Item label="扰动变化类型" {...formItemLayoutlong}>
-              <CheckboxGroup
-                options={[
-                  "新增",
-                  "续建（范围扩大）",
-                  "续建（范围缩小）",
-                  "续建（范围不变）",
-                  "完工"
-                ]}
-              />
+              <CheckboxGroup options={config.disturb_change_type} />
             </Form.Item>
             <Form.Item label="建设状态" {...formItemLayoutlong}>
-              <CheckboxGroup
-                options={["未开工", "停工", "施工", "完工", "已验收"]}
-              />
+              <CheckboxGroup options={config.construct_state} />
             </Form.Item>
             <Form.Item label="显示归档数据" {...formItemLayoutlong}>
               <Switch checkedChildren="是" unCheckedChildren="否" />

@@ -7,9 +7,11 @@ import {
   Button,
   Input,
   Radio,
+  Cascader,
   List,
   Avatar,
   message,
+  AutoComplete,
   LocaleProvider,
   Carousel,
   DatePicker,
@@ -18,6 +20,7 @@ import {
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
 import zhCN from "antd/lib/locale-provider/zh_CN";
+import config from "../../../config";
 
 const { TextArea } = Input;
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
@@ -186,37 +189,76 @@ export default class siderbarDetail extends PureComponent {
                   }
                 />
               </Form.Item>
-              <Form.Item label="扰动类型" {...formItemLayout}>
-                <Input defaultValue={`其他扰动`} disabled={!edit} />
+              <Form.Item label="扰动类型" {...formItemLayout}> <AutoComplete
+                  placeholder="请选择扰动类型"
+                  disabled={!edit}
+                  dataSource={config.disturb_type}
+                  filterOption={(inputValue, option) =>
+                    option.props.children
+                      .toUpperCase()
+                      .indexOf(inputValue.toUpperCase()) !== -1
+                  }
+                />
               </Form.Item>
               <Form.Item label="扰动面积" {...formItemLayout}>
                 <Input
-                  defaultValue={`其他扰动`}
+                  defaultValue={`22`}
                   disabled={!edit}
                   addonAfter={`公顷`}
                 />
               </Form.Item>
               <Form.Item label="扰动超出面积" {...formItemLayout}>
                 <Input
-                  defaultValue={`其他扰动`}
+                  defaultValue={`11`}
                   disabled={!edit}
                   addonAfter={`公顷`}
                 />
               </Form.Item>
               <Form.Item label="扰动合规性" {...formItemLayout}>
-                <Input defaultValue={`其他扰动`} disabled={!edit} />
+                <AutoComplete
+                  placeholder="请选择扰动合规性"
+                  disabled={!edit}
+                  dataSource={config.compliance}
+                  filterOption={(inputValue, option) =>
+                    option.props.children
+                      .toUpperCase()
+                      .indexOf(inputValue.toUpperCase()) !== -1
+                  }
+                />
               </Form.Item>
               <Form.Item label="扰动变化类型" {...formItemLayout}>
-                <Input defaultValue={`其他扰动`} disabled={!edit} />
+                <AutoComplete
+                  placeholder="请选择扰动变化类型"
+                  disabled={!edit}
+                  dataSource={config.disturb_change_type}
+                  filterOption={(inputValue, option) =>
+                    option.props.children
+                      .toUpperCase()
+                      .indexOf(inputValue.toUpperCase()) !== -1
+                  }
+                />
               </Form.Item>
               <Form.Item label="建设状态" {...formItemLayout}>
-                <Input defaultValue={`其他扰动`} disabled={!edit} />
+                <AutoComplete
+                  placeholder="请选择建设状态"
+                  disabled={!edit}
+                  dataSource={config.construct_state}
+                  filterOption={(inputValue, option) =>
+                    option.props.children
+                      .toUpperCase()
+                      .indexOf(inputValue.toUpperCase()) !== -1
+                  }
+                />
               </Form.Item>
               <Form.Item label="复核状态" {...formItemLayout}>
-                <Input defaultValue={`其他扰动`} disabled={!edit} />
+                <Input defaultValue={`复核状态`} disabled={!edit} />
               </Form.Item>
               <Form.Item label="地址" {...formItemLayout}>
-                <Input defaultValue={`其他扰动`} disabled={!edit} />
+              <Cascader
+                placeholder="请选择所在地区"
+                options={config.demo_location}
+                expandTrigger="hover"
+              />
               </Form.Item>
               <Form.Item label="问题" {...formItemLayout}>
                 <TextArea
@@ -293,14 +335,14 @@ export default class siderbarDetail extends PureComponent {
                   }
                 />
               </Form.Item>
-              <Form.Item label="标注描述" {...formItemLayout}>
+              <Form.Item label="描述" {...formItemLayout}>
                 <TextArea
                   autosize={true}
                   defaultValue={`新建广州至香港铁路建设线标注描述,新建广州至香港铁路建设线标注描述,新建广州至香港铁路建设线标注描述,新建广州至香港铁路建设线标注描述`}
                   disabled={!edit}
                 />
               </Form.Item>
-              <Form.Item label="标注坐标" {...formItemLayout}>
+              <Form.Item label="坐标" {...formItemLayout}>
                 <Input
                   defaultValue={`123.423，29.543`}
                   disabled={!edit}
@@ -309,7 +351,14 @@ export default class siderbarDetail extends PureComponent {
                       type="compass"
                       style={{
                         cursor: "point",
-                        color: "#1890ff"
+                        color: edit ? "#1890ff" : ""
+                      }}
+                      onClick={() => {
+                        if (edit) {
+                          message.success("更新坐标成功");
+                        } else {
+                          message.info("请先开始编辑");
+                        }
                       }}
                     />
                   }

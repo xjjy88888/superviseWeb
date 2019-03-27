@@ -8,21 +8,26 @@ import {
   List,
   Avatar,
   Carousel,
+  Checkbox,
   Form,
   Switch,
   DatePicker,
+  AutoComplete,
   message
 } from "antd";
 import moment from "moment";
 import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
+import config from "../../../config";
 
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 const dateFormat = "YYYY-MM-DD";
+const CheckboxGroup = Checkbox.Group;
 const formItemLayout = {
   labelCol: { span: 7 },
   wrapperCol: { span: 16 }
 };
+
 const projectData = [
   {
     title: "新建铁路广州至香港专线",
@@ -156,7 +161,7 @@ export default class integrat extends PureComponent {
       show: false
     });
     emitter.emit("showQuery", {
-      show: false,
+      show: false
     });
   };
 
@@ -187,7 +192,7 @@ export default class integrat extends PureComponent {
       show: false
     });
     emitter.emit("showQuery", {
-      show: false,
+      show: false
     });
   };
 
@@ -207,7 +212,7 @@ export default class integrat extends PureComponent {
       from: "spot"
     });
     emitter.emit("showQuery", {
-      show: false,
+      show: false
     });
     emitter.emit("showTool", {
       show: false,
@@ -441,7 +446,7 @@ export default class integrat extends PureComponent {
                     type: "tool"
                   });
                   emitter.emit("showQuery", {
-                    show: false,
+                    show: false
                   });
                 }}
               >
@@ -460,7 +465,7 @@ export default class integrat extends PureComponent {
                     typeChild: key
                   });
                   emitter.emit("showQuery", {
-                    show: false,
+                    show: false
                   });
                 }}
               >
@@ -581,6 +586,9 @@ export default class integrat extends PureComponent {
               zIndex: 1,
               top: 10
             }}
+            onClick={() => {
+              message.success("定位成功");
+            }}
           />
           <Form>
             <p>
@@ -602,7 +610,17 @@ export default class integrat extends PureComponent {
               <Input defaultValue={`矢量化类型`} disabled={!edit} />
             </Form.Item>
             <Form.Item label="立项级别" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+              <AutoComplete
+                placeholder="请选择立项级别"
+                defaultValue={`省级`}
+                disabled={!edit}
+                dataSource={config.approval_level}
+                filterOption={(inputValue, option) =>
+                  option.props.children
+                    .toUpperCase()
+                    .indexOf(inputValue.toUpperCase()) !== -1
+                }
+              />
             </Form.Item>
             <Form.Item label="批复文号" {...formItemLayout}>
               <Input defaultValue={`矢量化类型`} disabled={!edit} />
@@ -618,31 +636,93 @@ export default class integrat extends PureComponent {
             </Form.Item>
             <Form.Item label="责任面积" {...formItemLayout}>
               <Input
-                defaultValue={`矢量化类型`}
+                defaultValue={`123`}
                 disabled={!edit}
                 addonAfter={`公顷`}
               />
             </Form.Item>
             <Form.Item label="项目类型" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+              <AutoComplete
+                placeholder="请选择项目类型"
+                defaultValue={`公路工程`}
+                disabled={!edit}
+                dataSource={config.project_type}
+                filterOption={(inputValue, option) =>
+                  option.props.children
+                    .toUpperCase()
+                    .indexOf(inputValue.toUpperCase()) !== -1
+                }
+              />
             </Form.Item>
             <Form.Item label="项目类别" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+              <AutoComplete
+                placeholder="请选择项目类别"
+                defaultValue={`建设类`}
+                disabled={!edit}
+                dataSource={config.project_category}
+                filterOption={(inputValue, option) =>
+                  option.props.children
+                    .toUpperCase()
+                    .indexOf(inputValue.toUpperCase()) !== -1
+                }
+              />
             </Form.Item>
             <Form.Item label="项目性质" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+              <AutoComplete
+                placeholder="请选择项目性质"
+                defaultValue={`新建`}
+                disabled={!edit}
+                dataSource={config.project_nature}
+                filterOption={(inputValue, option) =>
+                  option.props.children
+                    .toUpperCase()
+                    .indexOf(inputValue.toUpperCase()) !== -1
+                }
+              />
             </Form.Item>
             <Form.Item label="建设状态" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+              <AutoComplete
+                placeholder="请选择建设状态"
+                defaultValue={`未开工`}
+                disabled={!edit}
+                dataSource={config.construct_state}
+                filterOption={(inputValue, option) =>
+                  option.props.children
+                    .toUpperCase()
+                    .indexOf(inputValue.toUpperCase()) !== -1
+                }
+              />
             </Form.Item>
             <Form.Item label="项目合规性" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+              <AutoComplete
+                placeholder="请选择项目合规性"
+                defaultValue={`疑似未批先建`}
+                disabled={!edit}
+                dataSource={config.compliance}
+                filterOption={(inputValue, option) =>
+                  option.props.children
+                    .toUpperCase()
+                    .indexOf(inputValue.toUpperCase()) !== -1
+                }
+              />
             </Form.Item>
             <Form.Item label="涉及县" {...formItemLayout}>
               <Input defaultValue={`矢量化类型`} disabled={!edit} />
             </Form.Item>
             <Form.Item label="位置" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+              <Input
+                defaultValue={`123.423，29.543`}
+                disabled={!edit}
+                addonAfter={
+                  <Icon
+                    type="compass"
+                    style={{
+                      cursor: "point",
+                      color: "#1890ff"
+                    }}
+                  />
+                }
+              />
             </Form.Item>
             <Form.Item label="备注" {...formItemLayout}>
               <Input defaultValue={`矢量化类型`} disabled={!edit} />
