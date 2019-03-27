@@ -192,37 +192,37 @@ const config = {
   //所在地区
   demo_location: [
     {
-      value: "zhejiang",
+      value: "guangdong",
       label: "广东",
       children: [
         {
-          value: "hangzhou",
+          value: "gaungzhou",
           label: "广州",
           children: [
             {
-              value: "xihu",
+              value: "tianhe",
               label: "天河区"
             },
             {
-              value: "xihu",
+              value: "haizhu",
               label: "海珠区"
             },
             {
-              value: "xihu2",
+              value: "baiyun",
               label: "白云区"
             }
           ]
         },
         {
-          value: "hangzhou",
+          value: "zhongshan",
           label: "中山市",
           children: [
             {
-              value: "xihu",
+              value: "dongqu",
               label: "东区"
             },
             {
-              value: "xihu2",
+              value: "xiqu",
               label: "西区"
             }
           ]

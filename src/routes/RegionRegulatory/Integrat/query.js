@@ -168,7 +168,7 @@ export default class siderbarDetail extends PureComponent {
             <Form.Item label="所在地区" {...formItemLayout}>
               <Cascader
                 options={config.demo_location}
-                expandTrigger="hover"
+                changeOnSelect
                 placeholder="请选择所在地区"
               />
             </Form.Item>
@@ -177,6 +177,7 @@ export default class siderbarDetail extends PureComponent {
                 dataSource={dataSource.map(this.renderOption)}
                 onSearch={this.handleSearch}
                 optionLabelProp="text"
+                placeholder="请填写建设单位"
               />
             </Form.Item>
             <Form.Item label="监管单位" {...formItemLayout}>
@@ -184,6 +185,7 @@ export default class siderbarDetail extends PureComponent {
                 dataSource={dataSource.map(this.renderOption)}
                 onSearch={this.handleSearch}
                 optionLabelProp="text"
+                placeholder="请填写监管单位"
               />
             </Form.Item>
             <Form.Item label="立项级别" {...formItemLayoutlong}>
@@ -194,13 +196,17 @@ export default class siderbarDetail extends PureComponent {
                 dataSource={dataSource.map(this.renderOption)}
                 onSearch={this.handleSearch}
                 optionLabelProp="text"
+                placeholder="请填写批复机构"
               />
             </Form.Item>
             <Form.Item label="批复文号" {...formItemLayout}>
-              <Input />
+              <Input placeholder="请填写批复文号" />
             </Form.Item>
             <Form.Item label="批复时间" {...formItemLayout}>
-              <DatePicker />
+              <DatePicker
+                style={{ width: "100%" }}
+                placeholder={`请选择批复时间`}
+              />
             </Form.Item>
             <Form.Item label="项目类型" {...formItemLayout}>
               <AutoComplete
@@ -258,7 +264,7 @@ export default class siderbarDetail extends PureComponent {
               <Cascader
                 placeholder="请选择所在地区"
                 options={config.demo_location}
-                expandTrigger="hover"
+                changeOnSelect
               />
             </Form.Item>
             <Form.Item label="扰动面积" {...formItemLayoutlong}>

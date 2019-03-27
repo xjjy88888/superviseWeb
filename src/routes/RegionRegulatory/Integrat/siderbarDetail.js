@@ -13,6 +13,7 @@ import {
   message,
   AutoComplete,
   LocaleProvider,
+  InputNumber,
   Carousel,
   DatePicker,
   Form
@@ -140,10 +141,11 @@ export default class siderbarDetail extends PureComponent {
                 <Input defaultValue={`矢量化类型`} disabled={!edit} />
               </Form.Item>
               <Form.Item label="面积" {...formItemLayout}>
-                <Input
-                  defaultValue={`矢量化类型`}
+                <InputNumber
+                  defaultValue={`68`}
                   disabled={!edit}
-                  addonAfter={`公顷`}
+                  formatter={value => `${value}公顷`}
+                  style={{ width: `100%` }}
                 />
               </Form.Item>
               <Form.Item label="组成部分" {...formItemLayout}>
@@ -189,7 +191,9 @@ export default class siderbarDetail extends PureComponent {
                   }
                 />
               </Form.Item>
-              <Form.Item label="扰动类型" {...formItemLayout}> <AutoComplete
+              <Form.Item label="扰动类型" {...formItemLayout}>
+                {" "}
+                <AutoComplete
                   placeholder="请选择扰动类型"
                   disabled={!edit}
                   dataSource={config.disturb_type}
@@ -201,17 +205,19 @@ export default class siderbarDetail extends PureComponent {
                 />
               </Form.Item>
               <Form.Item label="扰动面积" {...formItemLayout}>
-                <Input
-                  defaultValue={`22`}
+                <InputNumber
+                  defaultValue={`68`}
                   disabled={!edit}
-                  addonAfter={`公顷`}
+                  formatter={value => `${value}公顷`}
+                  style={{ width: `100%` }}
                 />
               </Form.Item>
               <Form.Item label="扰动超出面积" {...formItemLayout}>
-                <Input
-                  defaultValue={`11`}
+                <InputNumber
+                  defaultValue={`68`}
                   disabled={!edit}
-                  addonAfter={`公顷`}
+                  formatter={value => `${value}公顷`}
+                  style={{ width: `100%` }}
                 />
               </Form.Item>
               <Form.Item label="扰动合规性" {...formItemLayout}>
@@ -254,11 +260,12 @@ export default class siderbarDetail extends PureComponent {
                 <Input defaultValue={`复核状态`} disabled={!edit} />
               </Form.Item>
               <Form.Item label="地址" {...formItemLayout}>
-              <Cascader
-                placeholder="请选择所在地区"
-                options={config.demo_location}
-                expandTrigger="hover"
-              />
+                <Cascader
+                  disabled={!edit}
+                  placeholder="请选择所在地区"
+                  options={config.demo_location}
+                  changeOnSelect
+                />
               </Form.Item>
               <Form.Item label="问题" {...formItemLayout}>
                 <TextArea

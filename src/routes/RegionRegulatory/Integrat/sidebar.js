@@ -261,7 +261,7 @@ export default class integrat extends PureComponent {
       });
     } else {
       this.setState({
-        placeholder: "标注点",
+        placeholder: "关联项目",
         listData: pointData,
         sort: [
           {
