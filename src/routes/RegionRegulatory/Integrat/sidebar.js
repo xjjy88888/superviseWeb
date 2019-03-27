@@ -8,13 +8,21 @@ import {
   List,
   Avatar,
   Carousel,
+  Form,
   Switch,
+  DatePicker,
   message
 } from "antd";
-import styles from "./sidebar.less";
+import moment from "moment";
 import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
 
+const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
+const dateFormat = "YYYY-MM-DD";
+const formItemLayout = {
+  labelCol: { span: 7 },
+  wrapperCol: { span: 16 }
+};
 const projectData = [
   {
     title: "新建铁路广州至香港专线",
@@ -90,6 +98,7 @@ export default class integrat extends PureComponent {
     this.state = {
       show: true,
       showDetail: false,
+      edit: false,
       key: "project",
       inputDisabled: true,
       placeholder: "项目",
@@ -110,6 +119,9 @@ export default class integrat extends PureComponent {
       listData: projectData
     };
     this.map = null;
+    this.saveRef = ref => {
+      this.refDom = ref;
+    };
   }
 
   componentDidMount() {
@@ -118,7 +130,21 @@ export default class integrat extends PureComponent {
         showDetail: data.isShow
       });
     });
+    const { clientWidth, clientHeight } = this.refDom;
+    this.setState({
+      clientHeight: clientHeight
+    });
   }
+
+  submit = () => {
+    const { edit } = this.state;
+    this.setState({ edit: !edit });
+    if (edit) {
+      message.success("编辑成功");
+    } else {
+      message.info("开始编辑");
+    }
+  };
 
   switchShow = () => {
     this.setState({ show: !this.state.show, showDetail: false });
@@ -268,6 +294,8 @@ export default class integrat extends PureComponent {
       listData,
       showDetail,
       key,
+      edit,
+      clientHeight,
       inputDisabled
     } = this.state;
 
@@ -289,11 +317,29 @@ export default class integrat extends PureComponent {
     ];
 
     return (
-      <div className={styles.sidebar} style={{ left: show ? 0 : "-350px" }}>
+      <div
+        style={{
+          left: show ? 0 : "-400px",
+          width: 400,
+          backgroundColor: "#fff",
+          position: "absolute",
+          zIndex: 1000,
+          height: "95vh"
+        }}
+        ref={this.saveRef}
+      >
         <Icon
-          className={styles.icon}
           type={show ? "left" : "right"}
-          style={{ fontSize: 30 }}
+          style={{
+            fontSize: 30,
+            position: "absolute",
+            right: -50,
+            top: "48%",
+            backgroundColor: "rgba(0, 0, 0, 0.3)",
+            borderRadius: "50%",
+            padding: 10,
+            cursor: "pointer"
+          }}
           onClick={this.switchShow}
         />
         <div
@@ -358,67 +404,65 @@ export default class integrat extends PureComponent {
           >
             筛选
           </Button>
+          <p style={{ padding: "20px 40px 0 20px" }}>
+            <span>{`共有${listData.length}条记录`}</span>
+            <span
+              style={{
+                float: "right",
+                position: "relative",
+                top: -5,
+                display: showPoint ? "none" : "inline"
+              }}
+            >
+              <Button
+                type="dashed"
+                icon="shopping"
+                onClick={() => {
+                  emitter.emit("showSiderbarDetail", {
+                    show: false
+                  });
+                  emitter.emit("showTool", {
+                    show: true,
+                    type: "tool"
+                  });
+                  emitter.emit("showQuery", {
+                    show: false,
+                    type: 1
+                  });
+                }}
+              >
+                工具箱
+              </Button>
+              <Button
+                type="dashed"
+                icon="desktop"
+                onClick={() => {
+                  emitter.emit("showSiderbarDetail", {
+                    show: false
+                  });
+                  emitter.emit("showTool", {
+                    show: true,
+                    type: "control",
+                    typeChild: key
+                  });
+                  emitter.emit("showQuery", {
+                    show: false,
+                    type: 1
+                  });
+                }}
+              >
+                控制台
+              </Button>
+            </span>
+          </p>
           <List
             style={{
               overflow: "auto",
-              height: "75vh",
-              padding: "20px 20px 10px 20px"
+              height: clientHeight ? clientHeight - 207 : 500,
+              padding: "10px 20px 10px 20px"
             }}
             itemLayout="horizontal"
             dataSource={listData}
-            header={
-              <span>
-                <span>{`共有${listData.length}条记录`}</span>
-                <span
-                  style={{
-                    float: "right",
-                    position: "relative",
-                    top: -5,
-                    display: showPoint ? "none" : "inline"
-                  }}
-                >
-                  <Button
-                    type="dashed"
-                    icon="shopping"
-                    onClick={() => {
-                      emitter.emit("showSiderbarDetail", {
-                        show: false
-                      });
-                      emitter.emit("showTool", {
-                        show: true,
-                        type: "tool"
-                      });
-                      emitter.emit("showQuery", {
-                        show: false,
-                        type: 1
-                      });
-                    }}
-                  >
-                    工具箱
-                  </Button>
-                  <Button
-                    type="dashed"
-                    icon="desktop"
-                    onClick={() => {
-                      emitter.emit("showSiderbarDetail", {
-                        show: false
-                      });
-                      emitter.emit("showTool", {
-                        show: true,
-                        type: "control",
-                        typeChild: key
-                      });
-                      emitter.emit("showQuery", {
-                        show: false,
-                        type: 1
-                      });
-                    }}
-                  >
-                    控制台
-                  </Button>
-                </span>
-              </span>
-            }
             renderItem={item => (
               <List.Item>
                 <List.Item.Meta
@@ -476,100 +520,131 @@ export default class integrat extends PureComponent {
             )}
           />
         </div>
-        <div style={{ display: showDetail ? "block" : "none" }}>
+        <div
+          style={{
+            display: showDetail ? "block" : "none",
+            height: "95vh",
+            overflow: "auto",
+            padding: 30
+          }}
+        >
+          <Button
+            type="dashed"
+            icon="rollback"
+            shape="circle"
+            style={{
+              float: "right",
+              position: "absolute",
+              color: "#1890ff",
+              right: 20,
+              zIndex: 1,
+              top: 10
+            }}
+            onClick={this.close}
+          />
+          <Button
+            type="dashed"
+            icon={edit ? "check" : "edit"}
+            shape="circle"
+            style={{
+              float: "right",
+              position: "absolute",
+              color: "#1890ff",
+              right: 55,
+              zIndex: 1,
+              top: 10
+            }}
+            onClick={this.submit}
+          />
+          <Button
+            type="dashed"
+            icon="environment"
+            shape="circle"
+            style={{
+              float: "right",
+              position: "absolute",
+              color: "#1890ff",
+              right: 90,
+              zIndex: 1,
+              top: 10
+            }}
+          />
+          <Form>
+            <p>
+              <b>项目详情</b>
+            </p>
+            <Form.Item label="项目名" {...formItemLayout}>
+              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+            </Form.Item>
+            <Form.Item label="建设单位" {...formItemLayout}>
+              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+            </Form.Item>
+            <Form.Item label="监管单位" {...formItemLayout}>
+              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+            </Form.Item>
+            <Form.Item label="批复机构" {...formItemLayout}>
+              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+            </Form.Item>
+            <Form.Item label="管理机构" {...formItemLayout}>
+              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+            </Form.Item>
+            <Form.Item label="立项级别" {...formItemLayout}>
+              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+            </Form.Item>
+            <Form.Item label="批复文号" {...formItemLayout}>
+              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+            </Form.Item>
+            <Form.Item label="批复机构" {...formItemLayout}>
+              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+            </Form.Item>
+            <Form.Item label="批复时间" {...formItemLayout}>
+              <DatePicker
+                disabled={!edit}
+                defaultValue={moment("2019/01/01", dateFormat)}
+              />
+            </Form.Item>
+            <Form.Item label="责任面积" {...formItemLayout}>
+              <Input
+                defaultValue={`矢量化类型`}
+                disabled={!edit}
+                addonAfter={`公顷`}
+              />
+            </Form.Item>
+            <Form.Item label="项目类型" {...formItemLayout}>
+              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+            </Form.Item>
+            <Form.Item label="项目类别" {...formItemLayout}>
+              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+            </Form.Item>
+            <Form.Item label="项目性质" {...formItemLayout}>
+              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+            </Form.Item>
+            <Form.Item label="建设状态" {...formItemLayout}>
+              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+            </Form.Item>
+            <Form.Item label="项目合规性" {...formItemLayout}>
+              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+            </Form.Item>
+            <Form.Item label="涉及县" {...formItemLayout}>
+              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+            </Form.Item>
+            <Form.Item label="位置" {...formItemLayout}>
+              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+            </Form.Item>
+            <Form.Item label="备注" {...formItemLayout}>
+              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+            </Form.Item>
+            <Form.Item label="设计阶段" {...formItemLayout}>
+              <Input defaultValue={`可研`} disabled={!edit} />
+            </Form.Item>
+          </Form>
           <List
             style={{
-              padding: 20,
-              overflow: "auto",
-              height: "90vh",
               width: 350,
-              position: "relation"
+              position: "relation",
+              padding: "0 20px"
             }}
           >
-            <Button
-              type="dashed"
-              style={{
-                float: "right"
-              }}
-              onClick={this.close}
-            >
-              返回
-            </Button>
-            <List.Item style={{ paddingTop: 30 }}>
-              <Input
-                addonAfter={
-                  <Icon
-                    type="edit"
-                    theme="twoTone"
-                    onClick={() => {
-                      this.setState({
-                        inputDisabled: !inputDisabled
-                      });
-                    }}
-                  />
-                }
-                disabled={inputDisabled}
-                defaultValue="新建铁路广州至香港专线"
-              />
-            </List.Item>
-
-            <List.Item>
-              <List.Item.Meta
-                title={
-                  <div>
-                    建设单位：
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </div>
-                }
-              />
-            </List.Item>
-            <List.Item>监管单位：</List.Item>
-            <List.Item>批复机构：</List.Item>
-            <List.Item>流域管理机构：</List.Item>
-            <List.Item>立项级别：</List.Item>
-            <List.Item>批复文号：</List.Item>
-            <List.Item>批复时间：</List.Item>
-            <List.Item>责任面积：</List.Item>
-            <List.Item>项目类型：</List.Item>
-            <List.Item>项目类别：</List.Item>
-            <List.Item>项目性质：</List.Item>
-            <List.Item>建设状态：</List.Item>
-            <List.Item>项目合规性：</List.Item>
-            <List.Item>涉及县：</List.Item>
-            <List.Item>
-              <List.Item.Meta
-                title={
-                  <div>
-                    位置：
-                    <Icon
-                      type="compass"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </div>
-                }
-              />
-            </List.Item>
-            <List.Item>备注：</List.Item>
-            <Carousel autoplay>
-              <img src="./img/spot.jpg" />
-              <img src="./img/spot2.jpg" />
-              <img src="./img/spot.jpg" />
-              <img src="./img/spot2.jpg" />
-            </Carousel>
-            <List.Item>设计阶段：可研</List.Item>
             <List.Item>
               <List.Item.Meta
                 title={
@@ -587,22 +662,7 @@ export default class integrat extends PureComponent {
                   </span>
                 }
                 description={
-                  <p
-                    onClick={() => {
-                      emitter.emit("showSiderbarDetail", {
-                        show: true,
-                        from: "duty"
-                      });
-                      emitter.emit("showTool", {
-                        show: false
-                      });
-                      emitter.emit("showQuery", {
-                        show: false,
-                        type: 1
-                      });
-                    }}
-                    style={{ cursor: "pointer" }}
-                  >
+                  <p onClick={() => {}} style={{ cursor: "pointer" }}>
                     <span>
                       设计阶段:可研
                       <Icon
@@ -707,6 +767,12 @@ export default class integrat extends PureComponent {
                 }
               />
             </List.Item>
+            <Carousel autoplay>
+              <img src="./img/spot.jpg" />
+              <img src="./img/spot2.jpg" />
+              <img src="./img/spot.jpg" />
+              <img src="./img/spot2.jpg" />
+            </Carousel>
             <Button
               type="dashed"
               icon="cloud-download"

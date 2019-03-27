@@ -11,7 +11,6 @@ import {
   Checkbox
 } from "antd";
 import emitter from "../../../utils/event";
-import styles from "./chart.less";
 import "leaflet/dist/leaflet.css";
 import echarts from "echarts/lib/echarts";
 import "echarts";
@@ -27,7 +26,12 @@ const optionPie = {
   legend: {
     orient: "vertical",
     x: "left",
-    data: ["部级", "省级", "市级", "县级"]
+    data: [
+      "部级ggergerhery",
+      "省级ggergerhery",
+      "市级ggergerhery",
+      "县级ggergerhery"
+    ]
   },
   series: [
     {
@@ -54,10 +58,10 @@ const optionPie = {
         }
       },
       data: [
-        { value: 35, name: "部级" },
-        { value: 234, name: "省级" },
-        { value: 310, name: "市级" },
-        { value: 435, name: "县级" }
+        { value: 35, name: "部级ggergerhery" },
+        { value: 234, name: "省级ggergerhery" },
+        { value: 310, name: "市级ggergerhery" },
+        { value: 435, name: "县级ggergerhery" }
       ]
     }
   ]
@@ -84,30 +88,42 @@ const optionBar = {
       rotate: 30
     },
     data: [
-      "部级",
-      "省级",
-      "市级",
-      "县级",
-      "部级",
-      "省级",
-      "市级",
-      "县级",
-      "部级",
-      "省级",
-      "市级",
-      "县级",
-      "部级",
-      "省级",
-      "市级",
-      "县级",
-      "部级",
-      "省级",
-      "市级",
-      "县级",
-      "部级",
-      "省级",
-      "市级",
-      "县级"
+      "1部级ggergerhery",
+      "2省级ggergerhery",
+      "3市级ggergerhery",
+      "4县级ggergerhery",
+      "5部级ggergerhery",
+      "6省级ggergerhery",
+      "7市级ggergerhery",
+      "8县级ggergerhery",
+      "9部级ggergerhery",
+      "10省级ggergerhery",
+      "11市级ggergerhery",
+      "12县级ggergerhery",
+      "13部级ggergerhery",
+      "14省级ggergerhery",
+      "15市级ggergerhery",
+      "16县级ggergerhery",
+      "17部级ggergerhery",
+      "18省级ggergerhery",
+      "19市级ggergerhery",
+      "20县级ggergerhery",
+      "21部级ggergerhery",
+      "22省级ggergerhery",
+      "23市级ggergerhery",
+      "24县级ggergerhery",
+      "25县级ggergerhery",
+      "26县级ggergerhery",
+      "27县级ggergerhery",
+      "28县级ggergerhery",
+      "29县级ggergerhery",
+      "30县级ggergerhery",
+      "31县级ggergerhery",
+      "32县级ggergerhery",
+      "33县级ggergerhery",
+      "34县级ggergerhery",
+      "35县级ggergerhery",
+      "36县级ggergerhery"
     ]
   },
   series: [
@@ -131,6 +147,18 @@ const optionBar = {
         }
       },
       data: [
+        35,
+        234,
+        310,
+        435,
+        35,
+        234,
+        310,
+        435,
+        35,
+        234,
+        310,
+        435,
         35,
         234,
         310,
@@ -276,8 +304,18 @@ export default class siderbarDetail extends PureComponent {
 
     return (
       <div
-        className={styles.sidebar}
-        style={{ display: show && type === "control" ? "block" : "none" }}
+        style={{
+          display: show && type === "control" ? "block" : "none",
+          width: "50vw",
+          backgroundColor: "#fff",
+          position: "absolute",
+          zIndex: 1000,
+          top: " 50%",
+          borderRadius: 10,
+          padding: "10px 10px 30px 20px",
+          transform: "translate(0, -50%)",
+          left: 700
+        }}
       >
         <Button
           type="dashed"

@@ -11,7 +11,6 @@ import {
   Checkbox
 } from "antd";
 import emitter from "../../../utils/event";
-import styles from "./tool.less";
 import "leaflet/dist/leaflet.css";
 import echarts from "echarts/lib/echarts";
 import "echarts";
@@ -149,18 +148,40 @@ export default class siderbarDetail extends PureComponent {
     ];
 
     return (
-      <div className={styles.sidebar} style={{ left: show ? 350 : -350 }}>
+      <div
+        style={{
+          left: show ? 400 : -350,
+          width: 240,
+          backgroundColor: `#fff`,
+          position: `absolute`,
+          zIndex: 1000,
+          top: 410,
+          borderRadius: `0px 10px 10px 0`,
+          padding: `10px 10px 30px 20px`,
+          transform: `translate(0, -50%)`,
+          borderLeft: `solid 1px #ddd`
+        }}
+      >
         <Icon
-          className={styles.icon}
           type="left"
-          style={{ fontSize: 30, display: show ? "block" : "none" }}
+          style={{
+            fontSize: 30,
+            display: show ? "block" : "none",
+            position: `absolute`,
+            right: -50,
+            top: `48%`,
+            backgroundColor: ` rgba(0, 0, 0, 0.3)`,
+            borderRadius: ` 50%`,
+            padding: 10,
+            cursor: `pointer`
+          }}
           onClick={this.switchShow}
         />
         <div style={{ display: type === "tool" ? "block" : "none" }}>
-          <p className={styles.title}>工具箱</p>
+          <p style={{ margin: `20px 0 10px 0` }}>工具箱</p>
           {toolItems.map((item, index) => (
             <div key={index}>
-              <Button className={styles.button} icon={item.icon}>
+              <Button style={{ margin: `15px 10px 0 10px` }} icon={item.icon}>
                 {item.label}
               </Button>
               <br />
@@ -177,11 +198,14 @@ export default class siderbarDetail extends PureComponent {
               display: typeChild === "project" ? "block" : "none"
             }}
           >
-            <p className={styles.title}>控制台 - 项目统计</p>
+            <p style={{ margin: `20px 0 10px 0` }}>控制台 - 项目统计</p>
             <Radio.Group buttonStyle="solid" defaultValue={`level`}>
               {project.map((item, index) => (
                 <div key={index}>
-                  <Button className={styles.button} icon={item.icon}>
+                  <Button
+                    style={{ margin: `15px 10px 0 10px` }}
+                    icon={item.icon}
+                  >
                     {item.label}
                   </Button>
                   <br />
@@ -194,11 +218,14 @@ export default class siderbarDetail extends PureComponent {
               display: typeChild === "project" ? "none" : "block"
             }}
           >
-            <p className={styles.title}>控制台 - 图斑统计</p>
+            <p style={{ margin: `20px 0 10px 0` }}>控制台 - 图斑统计</p>
             <Radio.Group buttonStyle="solid">
               {spot.map((item, index) => (
                 <div key={index}>
-                  <Button className={styles.button} icon={item.icon}>
+                  <Button
+                    style={{ margin: `15px 10px 0 10px` }}
+                    icon={item.icon}
+                  >
                     {item.label}
                   </Button>
                   <br />

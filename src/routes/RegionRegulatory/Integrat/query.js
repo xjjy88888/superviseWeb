@@ -19,7 +19,6 @@ import {
   AutoComplete
 } from "antd";
 import emitter from "../../../utils/event";
-import styles from "./query.less";
 import "leaflet/dist/leaflet.css";
 
 const CheckboxGroup = Checkbox.Group;
@@ -51,8 +50,6 @@ export default class siderbarDetail extends PureComponent {
         type: data.type
       });
     });
-    const { clientWidth, clientHeight } = this.refDom;
-    console.log(clientWidth, clientHeight, this.refDom);
   }
 
   getRandomInt = (max, min = 0) => {
@@ -247,14 +244,30 @@ export default class siderbarDetail extends PureComponent {
     ];
     return (
       <div
-        className={styles.sidebar}
-        style={{ left: show ? 350 : -550, borderLeft: "solid 1px #ddd" }}
+        style={{
+          left: show ? 350 : -550,
+          borderLeft: "solid 1px #ddd",
+          width: 450,
+          backgroundColor: `#fff`,
+          position: `absolute`,
+          zIndex: 1000,
+          height: `95vh`
+        }}
         ref={this.saveRef}
       >
         <Icon
-          className={styles.icon}
           type="left"
-          style={{ fontSize: 30, display: show ? "block" : "none" }}
+          style={{
+            fontSize: 30,
+            display: show ? "block" : "none",
+            position: `absolute`,
+            right: -50,
+            top: `48%`,
+            backgroundColor: `rgba(0, 0, 0, 0.3)`,
+            borderRadius: `50%`,
+            padding: 10,
+            cursor: `pointer`
+          }}
           onClick={this.switchShow}
         />
         <Button

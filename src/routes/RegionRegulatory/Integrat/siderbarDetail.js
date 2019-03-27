@@ -16,7 +16,6 @@ import {
   Form
 } from "antd";
 import emitter from "../../../utils/event";
-import styles from "./siderbarDetail.less";
 import "leaflet/dist/leaflet.css";
 import zhCN from "antd/lib/locale-provider/zh_CN";
 
@@ -33,7 +32,7 @@ export default class siderbarDetail extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      show: true,
+      show: false,
       from: "spot",
       edit: false
     };
@@ -63,20 +62,52 @@ export default class siderbarDetail extends PureComponent {
     }
   };
 
+  goDuty = () => {
+    emitter.emit("showSiderbarDetail", {
+      show: true,
+      from: "duty"
+    });
+    emitter.emit("showTool", {
+      show: false
+    });
+    emitter.emit("showQuery", {
+      show: false,
+      type: 1
+    });
+  };
+
   switchShow = () => {
     this.setState({ show: !this.state.show, showDetail: false });
   };
 
   render() {
     const { show, from, edit } = this.state;
-    console.log(this.state);
 
     return (
-      <div className={styles.sidebar} style={{ left: show ? 350 : -4000 }}>
+      <div
+        style={{
+          left: show ? 400 : -4000,
+          width: 400,
+          backgroundColor: `#fff`,
+          position: `absolute`,
+          zIndex: 1000,
+          height: `95vh`,
+          borderLeft: `solid 1px #ddd`
+        }}
+      >
         <Icon
-          className={styles.icon}
           type="left"
-          style={{ fontSize: 30, display: show ? "block" : "none" }}
+          style={{
+            fontSize: 30,
+            display: show ? "block" : "none",
+            position: `absolute`,
+            right: -50,
+            top: `48%`,
+            backgroundColor: `rgba(0, 0, 0, 0.3)`,
+            borderRadius: `50%`,
+            padding: 10,
+            cursor: `pointer`
+          }}
           onClick={this.switchShow}
         />
         <Button
@@ -106,7 +137,11 @@ export default class siderbarDetail extends PureComponent {
                 <Input defaultValue={`矢量化类型`} disabled={!edit} />
               </Form.Item>
               <Form.Item label="面积" {...formItemLayout}>
-                <Input defaultValue={`矢量化类型`} disabled={!edit} />
+                <Input
+                  defaultValue={`矢量化类型`}
+                  disabled={!edit}
+                  addonAfter={`公顷`}
+                />
               </Form.Item>
               <Form.Item label="组成部分" {...formItemLayout}>
                 <Input defaultValue={`矢量化类型`} disabled={!edit} />
@@ -143,10 +178,18 @@ export default class siderbarDetail extends PureComponent {
                 <Input defaultValue={`其他扰动`} disabled={!edit} />
               </Form.Item>
               <Form.Item label="扰动面积" {...formItemLayout}>
-                <Input defaultValue={`其他扰动`} disabled={!edit} />
+                <Input
+                  defaultValue={`其他扰动`}
+                  disabled={!edit}
+                  addonAfter={`公顷`}
+                />
               </Form.Item>
               <Form.Item label="扰动超出面积" {...formItemLayout}>
-                <Input defaultValue={`其他扰动`} disabled={!edit} />
+                <Input
+                  defaultValue={`其他扰动`}
+                  disabled={!edit}
+                  addonAfter={`公顷`}
+                />
               </Form.Item>
               <Form.Item label="扰动合规性" {...formItemLayout}>
                 <Input defaultValue={`其他扰动`} disabled={!edit} />
@@ -214,12 +257,9 @@ export default class siderbarDetail extends PureComponent {
                 <b>标注点</b>
               </p>
               <Form.Item label="标注时间" {...formItemLayout}>
-                <RangePicker
+                <DatePicker
                   disabled={!edit}
-                  defaultValue={[
-                    moment("2015-06-06", dateFormat),
-                    moment("2015-06-06", dateFormat)
-                  ]}
+                  defaultValue={moment("2015/01/01", dateFormat)}
                 />
               </Form.Item>
               <Form.Item label="关联项目" {...formItemLayout}>

@@ -4,12 +4,11 @@ import zhCN from "antd/lib/locale-provider/zh_CN";
 import SiderMenu from "../../../components/SiderMenu";
 import Sidebar from "./sidebar";
 import SidebarDetail from "./siderbarDetail";
-import moment from 'moment';
+import moment from "moment";
 import Tool from "./tool";
 import Chart from "./chart";
 import Query from "./query";
 import L from "leaflet";
-import styles from "./index.less";
 import "leaflet/dist/leaflet.css";
 import "antd-mobile/dist/antd-mobile.css";
 
@@ -51,14 +50,14 @@ export default class integrat extends PureComponent {
   render() {
     return (
       <LocaleProvider locale={zhCN}>
-        <div className={styles.main}>
+        <div>
           <SiderMenu active="401" />
           <Sidebar />
           <SidebarDetail />
           <Tool />
           <Chart />
           <Query />
-          <div id="map" className={styles.map} />
+          <div id="map" style={{ height: "95vh" }} />
         </div>
       </LocaleProvider>
     );
