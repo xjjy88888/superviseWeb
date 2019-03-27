@@ -75,6 +75,15 @@ const spotData = [
     standard: "疑似超出防治责任范围"
   }
 ];
+
+const pointData = [
+  {
+    title: "2018-02-03 08:00",
+    project: "新建铁路广州至香港专线",
+    desc: "该处存在明显水土流失"
+  }
+];
+
 export default class integrat extends PureComponent {
   constructor(props) {
     super(props);
@@ -132,7 +141,7 @@ export default class integrat extends PureComponent {
     });
     emitter.emit("showSiderbarDetail", {
       show: key !== "project",
-      from: "spot"
+      from: key
     });
     emitter.emit("showTool", {
       show: false
@@ -143,6 +152,16 @@ export default class integrat extends PureComponent {
     });
   };
 
+  getIconByType = key => {
+    if (key === "project") {
+      return "plus";
+    } else if (key === "spot") {
+      return "radius-upright";
+    } else {
+      return "compass";
+    }
+  };
+
   switchMenu = e => {
     emitter.emit("showSiderbarDetail", {
       show: false,
@@ -151,6 +170,10 @@ export default class integrat extends PureComponent {
     emitter.emit("showQuery", {
       show: false,
       type: 1
+    });
+    emitter.emit("showTool", {
+      show: false,
+      type: "control"
     });
     if (e.key === "project") {
       this.setState({
@@ -163,7 +186,7 @@ export default class integrat extends PureComponent {
           },
           {
             title: "操作时间",
-            value: "time1"
+            value: "time"
           },
           {
             title: "立项级别",
@@ -178,11 +201,11 @@ export default class integrat extends PureComponent {
         sort: [
           {
             title: "编号",
-            value: "number"
+            value: "numb"
           },
           {
             title: "操作时间",
-            value: "time2"
+            value: "time"
           },
           {
             title: "复核状态",
@@ -193,11 +216,19 @@ export default class integrat extends PureComponent {
     } else {
       this.setState({
         placeholder: "标注点",
-        listData: projectData.slice(0, 1),
+        listData: pointData,
         sort: [
           {
-            title: "标注点",
-            value: "point"
+            title: "描述",
+            value: "desc"
+          },
+          {
+            title: "标注时间",
+            value: "time"
+          },
+          {
+            title: "关联项目",
+            value: "proj"
           }
         ]
       });
@@ -239,9 +270,8 @@ export default class integrat extends PureComponent {
       key,
       inputDisabled
     } = this.state;
-    console.log(this.state);
-    console.log(this.state.key);
-    console.log(key);
+
+    const showPoint = key === "point";
 
     const tabs = [
       {
@@ -292,7 +322,7 @@ export default class integrat extends PureComponent {
             enterButton
           />
           <Icon
-            type={key === "spot" ? "radius-upright" : "plus"}
+            type={this.getIconByType(key)}
             style={{
               fontSize: 20,
               position: "relative",
@@ -320,7 +350,12 @@ export default class integrat extends PureComponent {
               </Radio.Button>
             ))}
           </Radio.Group>
-          <Button disabled={key === "point"} onClick={this.query}>
+          <Button
+            style={{
+              display: showPoint ? "none" : "inline"
+            }}
+            onClick={this.query}
+          >
             筛选
           </Button>
           <List
@@ -332,9 +367,16 @@ export default class integrat extends PureComponent {
             itemLayout="horizontal"
             dataSource={listData}
             header={
-              <p>
+              <span>
                 <span>{`共有${listData.length}条记录`}</span>
-                <span style={{ float: "right", position: "relative", top: -5 }}>
+                <span
+                  style={{
+                    float: "right",
+                    position: "relative",
+                    top: -5,
+                    display: showPoint ? "none" : "inline"
+                  }}
+                >
                   <Button
                     type="dashed"
                     icon="shopping"
@@ -363,7 +405,8 @@ export default class integrat extends PureComponent {
                       });
                       emitter.emit("showTool", {
                         show: true,
-                        type: "control"
+                        type: "control",
+                        typeChild: key
                       });
                       emitter.emit("showQuery", {
                         show: false,
@@ -374,7 +417,7 @@ export default class integrat extends PureComponent {
                     控制台
                   </Button>
                 </span>
-              </p>
+              </span>
             }
             renderItem={item => (
               <List.Item>
@@ -387,11 +430,11 @@ export default class integrat extends PureComponent {
                       <span>{item.title}</span>
                       <Icon
                         type="environment"
-                        theme="twoTone"
                         style={{
                           float: "right",
                           fontSize: 18,
-                          cursor: "point"
+                          cursor: "point",
+                          color: "#1890ff"
                         }}
                       />
                     </p>
@@ -409,12 +452,21 @@ export default class integrat extends PureComponent {
                       </span>
                       <span
                         style={{
-                          display: key !== "project" ? "block" : "none"
+                          display: key === "spot" ? "block" : "none"
                         }}
                       >
                         <span>关联项目：{item.project}</span>
                         <br />
                         <span>扰动合规性：{item.standard}</span>
+                      </span>
+                      <span
+                        style={{
+                          display: key === "point" ? "block" : "none"
+                        }}
+                      >
+                        <span>关联项目：{item.project}</span>
+                        <br />
+                        <span>描述：{item.desc}</span>
                       </span>
                     </p>
                   }
@@ -472,8 +524,12 @@ export default class integrat extends PureComponent {
                     建设单位：
                     <Icon
                       type="environment"
-                      theme="twoTone"
-                      style={{ float: "right", fontSize: 18, cursor: "point" }}
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
                     />
                   </div>
                 }
@@ -498,9 +554,13 @@ export default class integrat extends PureComponent {
                   <div>
                     位置：
                     <Icon
-                      type="environment"
-                      theme="twoTone"
-                      style={{ float: "right", fontSize: 18, cursor: "point" }}
+                      type="compass"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
                     />
                   </div>
                 }
@@ -551,11 +611,11 @@ export default class integrat extends PureComponent {
                       设计阶段:可研
                       <Icon
                         type="environment"
-                        theme="twoTone"
                         style={{
                           float: "right",
                           fontSize: 18,
-                          cursor: "point"
+                          cursor: "point",
+                          color: "#1890ff"
                         }}
                       />
                     </span>
@@ -613,11 +673,11 @@ export default class integrat extends PureComponent {
                       2017154_14848_4848
                       <Icon
                         type="environment"
-                        theme="twoTone"
                         style={{
                           float: "right",
                           fontSize: 18,
-                          cursor: "point"
+                          cursor: "point",
+                          color: "#1890ff"
                         }}
                       />
                     </span>
@@ -626,11 +686,11 @@ export default class integrat extends PureComponent {
                       2017154_14848_4848
                       <Icon
                         type="environment"
-                        theme="twoTone"
                         style={{
                           float: "right",
                           fontSize: 18,
-                          cursor: "point"
+                          cursor: "point",
+                          color: "#1890ff"
                         }}
                       />
                     </span>
@@ -639,11 +699,11 @@ export default class integrat extends PureComponent {
                       2017154_14848_4848
                       <Icon
                         type="environment"
-                        theme="twoTone"
                         style={{
                           float: "right",
                           fontSize: 18,
-                          cursor: "point"
+                          cursor: "point",
+                          color: "#1890ff"
                         }}
                       />
                     </span>

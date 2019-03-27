@@ -172,6 +172,76 @@ export default class siderbarDetail extends PureComponent {
             </Button>
           </List>
         </div>
+        <div
+          style={{
+            display: from === "point" ? "block" : "none"
+          }}
+        >
+          <List
+            style={{
+              padding: 20,
+              overflow: "auto",
+              height: "90vh",
+              width: 350,
+              position: "relation"
+            }}
+          >
+            <List.Item>
+              <b>标注点</b>
+            </List.Item>
+            <List.Item>
+              <Input
+                addonAfter={
+                  <Icon
+                    type="edit"
+                    theme="twoTone"
+                    onClick={() => {
+                      this.setState({
+                        inputDisabled: !inputDisabled
+                      });
+                    }}
+                  />
+                }
+                disabled={inputDisabled}
+                defaultValue="2018-02-03 08:08"
+              />
+            </List.Item>
+            <List.Item
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                emitter.emit("showProjectDetail", {
+                  isShow: true
+                });
+              }}
+            >
+              关联项目：广州铁路局
+            </List.Item>
+            <List.Item>描述：广州铁路局</List.Item>
+            <List.Item>
+              <List.Item.Meta
+                title={
+                  <div>
+                    坐标：
+                    <Icon
+                      type="compass"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </div>
+                }
+              />
+            </List.Item>
+            <Carousel autoplay>
+              <img src="./img/spot.jpg" />
+              <img src="./img/spot2.jpg" />
+              <img src="./img/spot.jpg" />
+            </Carousel>
+          </List>
+        </div>
       </div>
     );
   }

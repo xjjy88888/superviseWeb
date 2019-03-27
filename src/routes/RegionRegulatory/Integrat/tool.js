@@ -32,7 +32,8 @@ export default class siderbarDetail extends PureComponent {
     this.eventEmitter = emitter.addListener("showTool", data => {
       this.setState({
         show: data.show,
-        type: data.type
+        type: data.type,
+        typeChild: data.typeChild
       });
     });
   }
@@ -46,31 +47,37 @@ export default class siderbarDetail extends PureComponent {
   };
 
   render() {
-    const { show, type } = this.state;
+    const { show, type, typeChild } = this.state;
 
     const toolItems = [
       {
-        title: "导出当前列表数据",
+        label: "导出当前列表数据",
+        value: "shopping",
         icon: "shopping"
       },
       {
-        title: "模板下载",
+        label: "模板下载",
+        value: "login",
         icon: "login"
       },
       {
-        title: "模板说明",
+        label: "模板说明",
+        value: "question-circle",
         icon: "question-circle"
       },
       {
-        title: "批量上传(Shapfile)",
+        label: "批量上传(Shapfile)",
+        value: "upload",
         icon: "upload"
       },
       {
-        title: "批量上传(Excel)",
+        label: "批量上传(Excel)",
+        value: "upload",
         icon: "upload"
       },
       {
-        title: "数据归档",
+        label: "数据归档",
+        value: "cloud-download",
         icon: "cloud-download"
       }
     ];
@@ -78,54 +85,66 @@ export default class siderbarDetail extends PureComponent {
     const project = [
       {
         label: "立项级别",
-        value: "level"
+        value: "level",
+        icon: "schedule"
       },
       {
         label: "合规性",
-        value: "compliance"
+        value: "compliance",
+        icon: "info-circle"
       },
       {
         label: "项目类型",
-        value: "type"
+        value: "type",
+        icon: "appstore"
       },
       {
         label: "项目类别",
-        value: "sort"
+        value: "sort",
+        icon: "ant-design"
       },
       {
         label: "项目性质",
-        value: "nature"
+        value: "nature",
+        icon: "project"
       },
       {
         label: "建设状态",
-        value: "state"
+        value: "state",
+        icon: "thunderbolt"
       },
       {
         label: "矢量化类型",
-        value: "vector"
+        value: "vector",
+        icon: "profile"
       }
     ];
 
     const spot = [
       {
         label: "现场复核",
-        value: "level"
+        value: "level",
+        icon: "edit"
       },
       {
         label: "合规性",
-        value: "compliance"
+        value: "compliance",
+        icon: "info-circle"
       },
       {
         label: "扰动类型",
-        value: "type"
+        value: "type",
+        icon: "appstore"
       },
       {
         label: "建设状态",
-        value: "nature"
+        value: "nature",
+        icon: "thunderbolt"
       },
       {
         label: "扰动变化类型",
-        value: "sort"
+        value: "sort",
+        icon: "border-inner"
       }
     ];
 
@@ -138,10 +157,11 @@ export default class siderbarDetail extends PureComponent {
           onClick={this.switchShow}
         />
         <div style={{ display: type === "tool" ? "block" : "none" }}>
+          <p className={styles.title}>工具箱</p>
           {toolItems.map((item, index) => (
             <div key={index}>
               <Button className={styles.button} icon={item.icon}>
-                {item.title}
+                {item.label}
               </Button>
               <br />
             </div>
@@ -152,22 +172,40 @@ export default class siderbarDetail extends PureComponent {
             display: type === "tool" ? "none" : "block"
           }}
         >
-          <p className={styles.title}>项目统计</p>
-          <Radio.Group buttonStyle="solid" defaultValue={`level`}>
-            {project.map((item, index) => (
-              <Radio.Button key={index} value={item.value}>
-                {item.label}
-              </Radio.Button>
-            ))}
-          </Radio.Group>
-          <p className={styles.title}>图斑统计</p>
-          <Radio.Group buttonStyle="solid">
-            {spot.map((item, index) => (
-              <Radio.Button key={index} value={item.value}>
-                {item.label}
-              </Radio.Button>
-            ))}
-          </Radio.Group>
+          <div
+            style={{
+              display: typeChild === "project" ? "block" : "none"
+            }}
+          >
+            <p className={styles.title}>控制台 - 项目统计</p>
+            <Radio.Group buttonStyle="solid" defaultValue={`level`}>
+              {project.map((item, index) => (
+                <div key={index}>
+                  <Button className={styles.button} icon={item.icon}>
+                    {item.label}
+                  </Button>
+                  <br />
+                </div>
+              ))}
+            </Radio.Group>
+          </div>
+          <div
+            style={{
+              display: typeChild === "project" ? "none" : "block"
+            }}
+          >
+            <p className={styles.title}>控制台 - 图斑统计</p>
+            <Radio.Group buttonStyle="solid">
+              {spot.map((item, index) => (
+                <div key={index}>
+                  <Button className={styles.button} icon={item.icon}>
+                    {item.label}
+                  </Button>
+                  <br />
+                </div>
+              ))}
+            </Radio.Group>
+          </div>
         </div>
       </div>
     );
