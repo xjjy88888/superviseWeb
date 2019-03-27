@@ -165,13 +165,25 @@ export default class siderbarDetail extends PureComponent {
           >
             <Form>
               <p>
-                <b>扰动图斑</b>
+                <b>扰动图斑详情</b>
               </p>
               <Form.Item label="关联项目" {...formItemLayout}>
-                <TextArea
-                  autosize={true}
-                  defaultValue={`新建广州至香港铁路建设线`}
+                <Input
+                  defaultValue={`其他扰动`}
                   disabled={!edit}
+                  addonAfter={
+                    <Icon
+                      type="link"
+                      style={{
+                        color: "#1890ff"
+                      }}
+                      onClick={() => {
+                        emitter.emit("showProjectDetail", {
+                          show: true
+                        });
+                      }}
+                    />
+                  }
                 />
               </Form.Item>
               <Form.Item label="扰动类型" {...formItemLayout}>
@@ -254,7 +266,7 @@ export default class siderbarDetail extends PureComponent {
           >
             <Form>
               <p>
-                <b>标注点</b>
+                <b>标注点详情</b>
               </p>
               <Form.Item label="标注时间" {...formItemLayout}>
                 <DatePicker
@@ -263,10 +275,22 @@ export default class siderbarDetail extends PureComponent {
                 />
               </Form.Item>
               <Form.Item label="关联项目" {...formItemLayout}>
-                <TextArea
-                  autosize={true}
-                  defaultValue={`新建广州至香港铁路建设线`}
+                <Input
+                  defaultValue={`其他扰动`}
                   disabled={!edit}
+                  addonAfter={
+                    <Icon
+                      type="link"
+                      style={{
+                        color: "#1890ff"
+                      }}
+                      onClick={() => {
+                        emitter.emit("showProjectDetail", {
+                          show: true
+                        });
+                      }}
+                    />
+                  }
                 />
               </Form.Item>
               <Form.Item label="标注描述" {...formItemLayout}>
@@ -285,7 +309,7 @@ export default class siderbarDetail extends PureComponent {
                       type="compass"
                       style={{
                         cursor: "point",
-                        color: edit ? "#1890ff" : ""
+                        color: "#1890ff"
                       }}
                     />
                   }

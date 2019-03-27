@@ -127,7 +127,7 @@ export default class integrat extends PureComponent {
   componentDidMount() {
     this.eventEmitter = emitter.addListener("showProjectDetail", data => {
       this.setState({
-        showDetail: data.isShow
+        showDetail: data.show
       });
     });
     const { clientWidth, clientHeight } = this.refDom;
@@ -145,6 +145,19 @@ export default class integrat extends PureComponent {
     } else {
       message.info("开始编辑");
     }
+  };
+
+  goSiderbarDetail = from => {
+    emitter.emit("showSiderbarDetail", {
+      show: true,
+      from: from
+    });
+    emitter.emit("showTool", {
+      show: false
+    });
+    emitter.emit("showQuery", {
+      show: false,
+    });
   };
 
   switchShow = () => {
@@ -175,7 +188,6 @@ export default class integrat extends PureComponent {
     });
     emitter.emit("showQuery", {
       show: false,
-      type: 1
     });
   };
 
@@ -196,7 +208,6 @@ export default class integrat extends PureComponent {
     });
     emitter.emit("showQuery", {
       show: false,
-      type: 1
     });
     emitter.emit("showTool", {
       show: false,
@@ -431,7 +442,6 @@ export default class integrat extends PureComponent {
                   });
                   emitter.emit("showQuery", {
                     show: false,
-                    type: 1
                   });
                 }}
               >
@@ -451,7 +461,6 @@ export default class integrat extends PureComponent {
                   });
                   emitter.emit("showQuery", {
                     show: false,
-                    type: 1
                   });
                 }}
               >
@@ -666,9 +675,14 @@ export default class integrat extends PureComponent {
                   </span>
                 }
                 description={
-                  <p onClick={() => {}} style={{ cursor: "pointer" }}>
+                  <p
+                    onClick={() => {
+                      this.goSiderbarDetail("duty");
+                    }}
+                    style={{ cursor: "pointer" }}
+                  >
                     <span>
-                      设计阶段:可研
+                      道路主题红线
                       <Icon
                         type="environment"
                         style={{
@@ -715,17 +729,7 @@ export default class integrat extends PureComponent {
                 description={
                   <p
                     onClick={() => {
-                      emitter.emit("showSiderbarDetail", {
-                        show: true,
-                        from: "spot"
-                      });
-                      emitter.emit("showTool", {
-                        show: false
-                      });
-                      emitter.emit("showQuery", {
-                        show: false,
-                        type: 1
-                      });
+                      this.goSiderbarDetail("spot");
                     }}
                     style={{ cursor: "pointer" }}
                   >
