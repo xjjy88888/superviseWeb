@@ -5,6 +5,7 @@ import SiderMenu from "../../../components/SiderMenu";
 import Highlighter from "react-highlight-words";
 import styles from "./index.less";
 import config from "../../../config";
+import moment from "moment";
 
 export default class projectRegulatory extends PureComponent {
   state = {
@@ -114,7 +115,17 @@ export default class projectRegulatory extends PureComponent {
     const rowSelection = {};
     const data = [
       {
-        r_name: "111",
+        entry_name: "广东",
+        construction_unit: "广州建设单位",
+        approval_number: "423",
+        approval_organ: "广州批复机构",
+        supervision_unit: "广州监管单位",
+        red_line: "666",
+        perturbation_plot: "666",
+        related_counties: "666",
+        address: "666",
+        coordinate: "666",
+        approval_time: "534654326",
         status: "已提交",
         approval_level: "部级",
         project_type: "公路工程",
@@ -124,7 +135,17 @@ export default class projectRegulatory extends PureComponent {
         compliance: "合规"
       },
       {
-        r_name: "111",
+        entry_name: "北京",
+        construction_unit: "广州建设单位",
+        approval_number: "41234",
+        approval_time: "42315235",
+        approval_organ: "广州批复机构",
+        supervision_unit: "广州监管单位",
+        red_line: "666",
+        perturbation_plot: "666",
+        related_counties: "666",
+        address: "666",
+        coordinate: "666",
         status: "已提交",
         approval_level: "省级",
         project_type: "铁路工程",
@@ -134,7 +155,17 @@ export default class projectRegulatory extends PureComponent {
         compliance: "疑似未批先建"
       },
       {
-        r_name: "111",
+        entry_name: "上海",
+        construction_unit: "广州建设单位",
+        approval_number: "976",
+        approval_time: "2015325320",
+        approval_organ: "海外批复机构",
+        supervision_unit: "海外监管单位",
+        red_line: "666",
+        perturbation_plot: "666",
+        related_counties: "666",
+        address: "666",
+        coordinate: "666",
         status: "已提交",
         approval_level: "市级",
         project_type: "涉水交通工程",
@@ -144,7 +175,17 @@ export default class projectRegulatory extends PureComponent {
         compliance: "未批先建"
       },
       {
-        r_name: "111",
+        entry_name: "新建铁路广州至香港专线",
+        construction_unit: "广州建设单位",
+        approval_number: "643576",
+        approval_time: "201921",
+        approval_organ: "上海批复机构",
+        supervision_unit: "上海监管单位",
+        red_line: "666",
+        perturbation_plot: "666",
+        related_counties: "666",
+        address: "666",
+        coordinate: "666",
         status: "已提交",
         approval_level: "县级",
         project_type: "机场工程",
@@ -154,7 +195,17 @@ export default class projectRegulatory extends PureComponent {
         compliance: "疑似超出防治责任范围"
       },
       {
-        r_name: "111",
+        entry_name: "111",
+        construction_unit: "广州建设单位",
+        approval_number: "5436",
+        approval_time: "2019501",
+        approval_organ: "北京批复机构",
+        supervision_unit: "北京监管单位",
+        red_line: "666",
+        perturbation_plot: "666",
+        related_counties: "666",
+        address: "666",
+        coordinate: "666",
         status: "已提交",
         approval_level: "部级",
         project_type: "火电工程",
@@ -162,46 +213,46 @@ export default class projectRegulatory extends PureComponent {
         project_nature: "新建",
         construct_state: "已验收",
         compliance: "超出防治责任范围"
-      },
+      }
     ];
     const columns = [
       {
         title: "项目名称",
-        dataIndex: "r_name",
-        key: "r_name",
+        dataIndex: "entry_name",
+        key: "entry_name",
         fixed: "left",
         width: 120,
-        ...this.getColumnSearchProps("r_name")
+        ...this.getColumnSearchProps("entry_name")
       },
       {
         title: "建设单位",
-        dataIndex: "r_name",
-        key: "r_name",
+        dataIndex: "construction_unit",
+        key: "construction_unit",
         fixed: "left",
         width: 120,
-        ...this.getColumnSearchProps("r_name")
+        ...this.getColumnSearchProps("construction_unit")
       },
       {
         title: "批复机构",
-        dataIndex: "r_name",
-        key: "r_name",
+        dataIndex: "approval_organ",
+        key: "approval_organ",
         fixed: "left",
         width: 120,
-        ...this.getColumnSearchProps("r_name")
+        ...this.getColumnSearchProps("approval_organ")
       },
       {
         title: "操作",
-        dataIndex: "r_name",
-        key: "r_name",
+        dataIndex: "entry_name",
+        key: "entry_name",
         fixed: "left",
         width: 120
       },
       {
         title: "监管单位",
-        dataIndex: "r_name",
-        key: "r_name",
+        dataIndex: "supervision_unit",
+        key: "supervision_unit",
         width: 120,
-        ...this.getColumnSearchProps("r_name")
+        ...this.getColumnSearchProps("supervision_unit")
       },
       {
         title: "立项级别",
@@ -217,17 +268,17 @@ export default class projectRegulatory extends PureComponent {
       },
       {
         title: "批复文号",
-        dataIndex: "name",
-        key: "name",
+        dataIndex: "approval_number",
+        key: "approval_number",
         width: 120,
-        sorter: (a, b) => a.name.length - b.name.length
+        sorter: (a, b) => a.approval_number.length - b.approval_number.length
       },
       {
         title: "批复时间",
-        dataIndex: "r_munit",
-        key: "r_munit",
+        dataIndex: "approval_time",
+        key: "approval_time",
         width: 120,
-        sorter: (a, b) => a.name.length - b.name.length
+        sorter: (a, b) => a.approval_time.length - b.approval_time.length
       },
       {
         title: "项目合规性",
@@ -266,7 +317,8 @@ export default class projectRegulatory extends PureComponent {
             value: item
           };
         }),
-        onFilter: (value, record) => record.project_category.indexOf(value) === 0
+        onFilter: (value, record) =>
+          record.project_category.indexOf(value) === 0
       },
       {
         title: "项目性质",
@@ -296,38 +348,39 @@ export default class projectRegulatory extends PureComponent {
       },
       {
         title: "红线数据",
-        dataIndex: "r_munit",
-        key: "r_munit",
+        dataIndex: "red_line",
+        key: "red_line",
         width: 120,
-        sorter: (a, b) => a.name.length - b.name.length
+        sorter: (a, b) => a.red_line.length - b.red_line.length
       },
       {
         title: "扰动图斑",
-        dataIndex: "r_munit",
-        key: "r_munit",
+        dataIndex: "perturbation_plot",
+        key: "perturbation_plot",
         width: 120,
-        sorter: (a, b) => a.name.length - b.name.length
+        sorter: (a, b) =>
+          a.perturbation_plot.length - b.perturbation_plot.length
       },
       {
         title: "涉及县",
-        dataIndex: "r_munit",
-        key: "r_munit",
+        dataIndex: "related_counties",
+        key: "related_counties",
         width: 120,
-        sorter: (a, b) => a.name.length - b.name.length
+        sorter: (a, b) => a.related_counties.length - b.related_counties.length
       },
       {
         title: "地址",
-        dataIndex: "r_munit",
-        key: "r_munit",
+        dataIndex: "address",
+        key: "address",
         width: 120,
-        sorter: (a, b) => a.name.length - b.name.length
+        sorter: (a, b) => a.address.length - b.address.length
       },
       {
         title: "坐标",
-        dataIndex: "r_munit",
-        key: "r_munit",
+        dataIndex: "coordinate",
+        key: "coordinate",
         width: 120,
-        sorter: (a, b) => a.name.length - b.name.length
+        sorter: (a, b) => a.coordinate.length - b.coordinate.length
       }
     ];
 
