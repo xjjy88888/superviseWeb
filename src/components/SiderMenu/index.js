@@ -75,7 +75,7 @@ export default class SiderMenu extends PureComponent {
         icon: "book",
         items: [
           {
-            text: "项目监管1",
+            text: "项目监管",
             path: "/projectRegulatory/projectRegulatory1",
             key: "301"
           },
@@ -125,7 +125,7 @@ export default class SiderMenu extends PureComponent {
       <div className={styles.main}>
         <div className={styles.left}>
           <img src="./img/logo.png" />
-          <Link className={styles.text} to="/regionRegulatory/integrat">
+          <Link className={styles.text} to="/projectRegulatory/projectRegulatory1">
           生产建设项目水土保持信息化监管系统
           </Link>
         </div>
