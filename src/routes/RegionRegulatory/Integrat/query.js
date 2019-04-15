@@ -203,9 +203,8 @@ export default class siderbarDetail extends PureComponent {
               <Input placeholder="请填写批复文号" />
             </Form.Item>
             <Form.Item label="批复时间" {...formItemLayout}>
-              <DatePicker
+              <RangePicker
                 style={{ width: "100%" }}
-                placeholder={`请选择批复时间`}
               />
             </Form.Item>
             <Form.Item label="项目类型" {...formItemLayout}>

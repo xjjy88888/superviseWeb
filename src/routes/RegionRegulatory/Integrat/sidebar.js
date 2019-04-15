@@ -7,11 +7,14 @@ import {
   Radio,
   List,
   Avatar,
+  TreeSelect,
+  Cascader,
   Carousel,
   Checkbox,
   Form,
   Switch,
   DatePicker,
+  InputNumber,
   AutoComplete,
   message
 } from "antd";
@@ -22,6 +25,7 @@ import config from "../../../config";
 
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 const dateFormat = "YYYY-MM-DD";
+const TreeNode = TreeSelect.TreeNode;
 const CheckboxGroup = Checkbox.Group;
 const formItemLayout = {
   labelCol: { span: 7 },
@@ -102,6 +106,7 @@ export default class integrat extends PureComponent {
     super(props);
     this.state = {
       show: true,
+      value: undefined,
       showDetail: false,
       edit: false,
       key: "project",
@@ -141,6 +146,11 @@ export default class integrat extends PureComponent {
       clientHeight: clientHeight
     });
   }
+
+  onTreeSelectChange = value => {
+    console.log(value);
+    this.setState({ value });
+  };
 
   submit = () => {
     const { edit } = this.state;
@@ -590,7 +600,7 @@ export default class integrat extends PureComponent {
               message.success("定位成功");
             }}
           />
-          <Form>
+          <Form verticalGap={100}>
             <p>
               <b>项目详情</b>
             </p>
@@ -632,13 +642,15 @@ export default class integrat extends PureComponent {
               <DatePicker
                 disabled={!edit}
                 defaultValue={moment("2019/01/01", dateFormat)}
+                style={{ width: `100%` }}
               />
             </Form.Item>
             <Form.Item label="责任面积" {...formItemLayout}>
-              <Input
+              <InputNumber
                 defaultValue={`123`}
                 disabled={!edit}
-                addonAfter={`公顷`}
+                formatter={value => `${value}平方米`}
+                style={{ width: `100%` }}
               />
             </Form.Item>
             <Form.Item label="项目类型" {...formItemLayout}>
@@ -707,9 +719,41 @@ export default class integrat extends PureComponent {
               />
             </Form.Item>
             <Form.Item label="涉及县" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+              <TreeSelect
+                showSearch
+                disabled={!edit}
+                style={{ width: "100%" }}
+                value={this.state.value}
+                dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
+                placeholder="请选择涉及县"
+                allowClear
+                multiple
+                treeDefaultExpandAll
+                onChange={this.onTreeSelectChange}
+              >
+                <TreeNode value="中国" title="中国" key="0-1">
+                  <TreeNode value="广东" title="广东" key="0-1-1">
+                    <TreeNode value="广州" title="广州" key="random" />
+                    <TreeNode value="中山" title="中山" key="random1" />
+                  </TreeNode>
+                  <TreeNode value="广西" title="广西" key="random2">
+                    <TreeNode value="南宁" title="南宁" key="random3" />
+                  </TreeNode>
+                </TreeNode>
+              </TreeSelect>
             </Form.Item>
-            <Form.Item label="位置" {...formItemLayout}>
+            <Form.Item label="所在地区" {...formItemLayout}>
+              <Cascader
+                disabled={!edit}
+                placeholder="请选择所在地区"
+                options={config.demo_location}
+                changeOnSelect
+              />
+            </Form.Item>
+            <Form.Item label="详细地址" {...formItemLayout}>
+              <Input placeholder="请填写详细地址" disabled={!edit} />
+            </Form.Item>
+            <Form.Item label="坐标" {...formItemLayout}>
               <Input
                 defaultValue={`123.423，29.543`}
                 disabled={!edit}
@@ -720,15 +764,23 @@ export default class integrat extends PureComponent {
                       cursor: "point",
                       color: "#1890ff"
                     }}
+                    onClick={() => {
+                      if (edit) {
+                        message.success("更新成功");
+                      } else {
+                        message.info("请先开始编辑");
+                      }
+                    }}
                   />
                 }
               />
             </Form.Item>
             <Form.Item label="备注" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
-            </Form.Item>
-            <Form.Item label="设计阶段" {...formItemLayout}>
-              <Input defaultValue={`可研`} disabled={!edit} />
+              <Input.TextArea
+                autosize={true}
+                defaultValue={`备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注`}
+                disabled={!edit}
+              />
             </Form.Item>
           </Form>
           <List
@@ -742,7 +794,9 @@ export default class integrat extends PureComponent {
               <List.Item.Meta
                 title={
                   <span>
-                    防治责任范围：1
+                    <span>设计阶段：可研</span>
+                    <br />
+                    <span> 防治责任范围：1</span>
                     <Icon
                       type="plus"
                       style={{
