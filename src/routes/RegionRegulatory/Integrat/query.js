@@ -4,6 +4,7 @@ import {
   Menu,
   Icon,
   Button,
+  Select,
   Input,
   Radio,
   Avatar,
@@ -205,17 +206,16 @@ export default class siderbarDetail extends PureComponent {
               <RangePicker style={{ width: "100%" }} />
             </Form.Item>
             <Form.Item label="项目类型" {...formItemLayout}>
-              <AutoComplete
-                placeholder={`请选择项目类型`}
-                dataSource={config.project_type}
-                filterOption={(inputValue, option) =>
-                  option.props.children
-                    .toUpperCase()
-                    .indexOf(inputValue.toUpperCase()) !== -1
-                }
+              <Select
+                mode="multiple"
+                style={{ width: "100%" }}
+                placeholder="请选择项目类型"
+                onChange={() => {}}
               >
-                <Input allowClear />
-              </AutoComplete>
+                {config.project_type.map(item => (
+                  <Select.Option key={item}>{item}</Select.Option>
+                ))}
+              </Select>
             </Form.Item>
             <Form.Item label="项目类别" {...formItemLayout}>
               <CheckboxGroup options={config.project_category} />
@@ -226,8 +226,17 @@ export default class siderbarDetail extends PureComponent {
             <Form.Item label="建设状态" {...formItemLayoutlong}>
               <CheckboxGroup options={config.construct_state} />
             </Form.Item>
-            <Form.Item label="项目合规性" {...formItemLayoutlong}>
-              <CheckboxGroup options={config.compliance} />
+            <Form.Item label="项目合规性" {...formItemLayout}>
+              <Select
+                mode="multiple"
+                style={{ width: "100%" }}
+                placeholder="请选择项目合规性"
+                onChange={() => {}}
+              >
+                {config.compliance.map(item => (
+                  <Select.Option key={item}>{item}</Select.Option>
+                ))}
+              </Select>
             </Form.Item>
             <Form.Item label="矢量化类型" {...formItemLayoutlong}>
               <CheckboxGroup options={config.vectorization_type} />
@@ -262,8 +271,17 @@ export default class siderbarDetail extends PureComponent {
             <Form.Item label="扰动类型" {...formItemLayoutlong}>
               <CheckboxGroup options={config.disturb_type} />
             </Form.Item>
-            <Form.Item label="扰动合规性" {...formItemLayoutlong}>
-              <CheckboxGroup options={config.compliance} />
+            <Form.Item label="扰动合规性" {...formItemLayout}>
+              <Select
+                mode="multiple"
+                style={{ width: "100%" }}
+                placeholder="请选择扰动合规性"
+                onChange={() => {}}
+              >
+                {config.compliance.map(item => (
+                  <Select.Option key={item}>{item}</Select.Option>
+                ))}
+              </Select>
             </Form.Item>
             <Form.Item label="扰动变化类型" {...formItemLayoutlong}>
               <CheckboxGroup options={config.disturb_change_type} />
