@@ -12,12 +12,13 @@ import Accountability2 from "./routes/Accountability/Accountability2";
 import Assess1 from "./routes/Assess/Assess1";
 import Assess2 from "./routes/Assess/Assess2";
 import User1 from "./routes/User/User1";
+import Login from "./routes/User/Login";
 
 function RouterConfig({ history }) {
   return (
     <Router history={history}>
       <Switch>
-        <Route path="/" exact component={Integrat} />
+        <Route path="/" exact component={Login} />
         <Route path="/home/welcome" exact component={Welcome} />
         <Route path="/home/home2" exact component={Home2} />
         <Route path="/regionRegulatory/integrat" exact component={Integrat} />
@@ -28,7 +29,7 @@ function RouterConfig({ history }) {
         <Route path="/accountability/accountability2" exact component={Accountability2} />
         <Route path="/assess/assess1" exact component={Assess1} />
         <Route path="/assess/assess2" exact component={Assess2} />
-        <Route path="/user/user1" exact component={User1} />
+        <Route path="/user/login" exact component={Login} />
       </Switch>
     </Router>
   );

@@ -1,4 +1,5 @@
 import React, { PureComponent } from "react";
+import { connect } from "dva";
 import { Menu, Icon, Button, LocaleProvider } from "antd";
 import zhCN from "antd/lib/locale-provider/zh_CN";
 import SiderMenu from "../../../components/SiderMenu";
@@ -11,7 +12,11 @@ import Query from "./query";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "antd-mobile/dist/antd-mobile.css";
+import config from "../../../config";
 
+@connect(({ user }) => ({
+  user
+}))
 export default class integrat extends PureComponent {
   constructor(props) {
     super(props);
@@ -29,25 +34,73 @@ export default class integrat extends PureComponent {
   // 创建地图
   createMap = () => {
     const map = L.map("map", {
-      zoomControl: false
-    }).setView([23.1441, 113.3693], 13);
+      zoomControl: false,
+      attributionControl: false
+    }).setView(config.mapInitParams.center, config.mapInitParams.zoom);
 
-    L.tileLayer(
-      "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw",
-      {
-        maxZoom: 18,
-        attribution: "生产建设项目水土保持信息化监管系统",
-        id: "mapbox.streets"
-      }
-    ).addTo(map);
-    // map.zoomControl.setPosition("topright");
     L.control
       .zoom({ zoomInTitle: "放大", zoomOutTitle: "缩小", position: "topright" })
       .addTo(map);
-    this.map = map;
+
+    map.createPane("tileLayerZIndex");
+    map.getPane("tileLayerZIndex").style.zIndex = 0;
+    const baseLayer = L.tileLayer(config.baseMaps[0].Url, {
+      pane: "tileLayerZIndex"
+    });
+
+    const baseLayer1 = L.tileLayer(config.baseMaps[1].Url, {
+      pane: "tileLayerZIndex"
+    });
+    map.addLayer(baseLayer1);
+
+    const baseLayer2 = L.tileLayer(config.baseMaps[2].Url, {
+      pane: "tileLayerZIndex"
+    });
+
+    const baseLayers = {
+      监管影像: baseLayer2,
+      街道图: baseLayer,
+      影像图: baseLayer1
+    };
+
+    //var bounds = geoJsonLayer.getBounds();
+    //map.setMaxBounds(bounds);
+    //map.setMinZoom(config.zoom);
+    const projectlayerGroup = L.layerGroup();
+    const spotlayerGroup = L.layerGroup();
+    //加载项目红线图层wms
+    const project_wmsLayer = L.tileLayer
+      .wms("http://localhost:8080/geoserver/ZKYGIS/wms?", {
+        layers: "ZKYGIS:project_scope", //需要加载的图层
+        format: "image/png", //返回的数据格式
+        transparent: true
+      })
+      .addTo(projectlayerGroup);
+    //加载图斑图层wms
+    const spot_wmsLayer = L.tileLayer
+      .wms("http://localhost:8080/geoserver/ZKYGIS/wms?", {
+        layers: "ZKYGIS:spot", //需要加载的图层
+        format: "image/png", //返回的数据格式
+        transparent: true
+      })
+      .addTo(spotlayerGroup);
+
+    map.addLayer(projectlayerGroup);
+    map.addLayer(spotlayerGroup);
+    const overlays = {
+      项目红线: projectlayerGroup,
+      扰动图斑: spotlayerGroup
+    };
+    L.control.layers(baseLayers, overlays).addTo(map);
+
   };
 
   render() {
+    const {
+      user: { current_user }
+    } = this.props;
+    console.log(current_user);
+    const username = current_user ? current_user[0].us_name : "";
     return (
       <LocaleProvider locale={zhCN}>
         <div>

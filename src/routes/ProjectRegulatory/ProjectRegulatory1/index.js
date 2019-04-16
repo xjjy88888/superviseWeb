@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { Table, Button, Input, Icon, LocaleProvider } from "antd";
+import { Table, Button, Input, Icon, LocaleProvider, Switch } from "antd";
 import zhCN from "antd/lib/locale-provider/zh_CN";
 import SiderMenu from "../../../components/SiderMenu";
 import Highlighter from "react-highlight-words";
@@ -389,6 +389,16 @@ export default class projectRegulatory extends PureComponent {
         <SiderMenu active="301" />
         <LocaleProvider locale={zhCN}>
           <div aaa="111" style={{ padding: 30 }}>
+            <div style={{ textAlign: "right", padding: "15px 25px" }}>
+              <Switch checkedChildren="当前项目" unCheckedChildren="归档项目" />
+              <Button style={{ marginLeft: 20 }}>重置</Button>
+              <Button icon="shopping" style={{ marginLeft: 20 }}>
+                工具箱
+              </Button>
+              <Button icon="desktop" style={{ marginLeft: 20 }}>
+                控制台
+              </Button>
+            </div>
             <Table
               rowSelection={rowSelection}
               columns={columns}

@@ -1,8 +1,8 @@
-const domain = "http://aj.zkygis.cn";
+const domain = "http://aj.zkygis.cn/dutySys";
 
 const config = {
   url: {
-    getUserInfoLis: `${domain}/api/account/getUserInfoList`
+    login: `${domain}/api/account/GetUserPassWord`
   },
 
   //扰动类型
@@ -245,7 +245,34 @@ const config = {
         }
       ]
     }
-  ]
+  ],
+  /*----------------------------------地图配置部分-------------------------------------*/
+  mapInitParams: {
+    center: [23.1441, 113.3693],
+    zoom: 13
+  },
+  baseMaps: [
+    {
+      label: "街道图",
+      className: "vecType",
+      Url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    },
+    {
+      label: "影像图",
+      className: "imgType",
+      Url:
+        "https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+    },
+    {
+      label: "监管影像",
+      className: "imgType",
+      Url:
+        "http://www.stbcjg.cn/BasemapService/rest/image/latest/tile/{z}/{y}/{x}"
+    }
+  ],
+  mapurl: {
+    mapurl: `../../../assets/mapfile/`
+  },
 };
 
 export default config;

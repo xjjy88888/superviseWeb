@@ -1,11 +1,15 @@
 import React, { PureComponent } from "react";
-import { Menu, Icon, Button } from "antd";
+import { Menu, Icon, Button, Popover } from "antd";
+import { connect } from "dva";
 import { withRouter, Link } from "dva/router";
 import styles from "./index.less";
 
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 
+@connect(({ user }) => ({
+  user
+}))
 export default class SiderMenu extends PureComponent {
   constructor(props) {
     super(props);
@@ -34,6 +38,26 @@ export default class SiderMenu extends PureComponent {
   };
 
   render() {
+    const content = (
+      <div>
+        <p
+          style={{ cursor: "pointer" }}
+          onClick={() => {
+            this.props.dispatch({
+              type: "user/loginOut"
+            });
+          }}
+        >
+          退出登录
+        </p>
+      </div>
+    );
+    const {
+      user: { current_user }
+    } = this.props;
+    console.log(current_user);
+    const username = current_user ? current_user[0].us_name : "登录";
+    console.log(username);
     const tabs = [
       {
         title: "首页",
@@ -125,8 +149,11 @@ export default class SiderMenu extends PureComponent {
       <div className={styles.main}>
         <div className={styles.left}>
           <img src="./img/logo.png" />
-          <Link className={styles.text} to="/projectRegulatory/projectRegulatory1">
-          生产建设项目水土保持信息化监管系统
+          <Link
+            className={styles.text}
+            to="/projectRegulatory/projectRegulatory1"
+          >
+            生产建设项目水土保持信息化监管系统
           </Link>
         </div>
         <Menu
@@ -155,11 +182,11 @@ export default class SiderMenu extends PureComponent {
             </SubMenu>
           ))}
         </Menu>
-        <div className={styles.right}>
-          <Icon type="user" />
-          <Link className={styles.text} to="/user/user1">
-            Admin
-          </Link>
+        <div className={styles.right} style={{ margin: "0 20px" }} >
+          <Icon type="user" style={{ margin: "0 10px" }} />
+          <Popover content={content} title="">
+            {current_user ? username : "请登录"}
+          </Popover>
         </div>
       </div>
     );
