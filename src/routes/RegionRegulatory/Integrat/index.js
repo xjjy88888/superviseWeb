@@ -33,6 +33,8 @@ export default class integrat extends PureComponent {
   }
   // 创建地图
   createMap = () => {
+    const user = JSON.parse(sessionStorage.getItem("user"));
+    console.log(user);
     const map = L.map("map", {
       zoomControl: false,
       attributionControl: false
@@ -92,15 +94,9 @@ export default class integrat extends PureComponent {
       扰动图斑: spotlayerGroup
     };
     L.control.layers(baseLayers, overlays).addTo(map);
-
   };
 
   render() {
-    const {
-      user: { current_user }
-    } = this.props;
-    console.log(current_user);
-    const username = current_user ? current_user[0].us_name : "";
     return (
       <LocaleProvider locale={zhCN}>
         <div>

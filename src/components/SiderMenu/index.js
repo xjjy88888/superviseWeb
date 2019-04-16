@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { Menu, Icon, Button, Popover } from "antd";
+import { Menu, Icon, Button, Popover, Dropdown } from "antd";
 import { connect } from "dva";
 import { withRouter, Link } from "dva/router";
 import styles from "./index.less";
@@ -38,26 +38,31 @@ export default class SiderMenu extends PureComponent {
   };
 
   render() {
-    const content = (
-      <div>
-        <p
-          style={{ cursor: "pointer" }}
+    const menu = (
+      <Menu>
+        <Menu.Item>
+          <Icon type="user" />
+          个人中心
+        </Menu.Item>
+        <Menu.Item>
+          <Icon type="setting" />
+          个人设置
+        </Menu.Item>
+        <Menu.Item
           onClick={() => {
             this.props.dispatch({
               type: "user/loginOut"
             });
           }}
         >
+          <Icon type="logout" />
           退出登录
-        </p>
-      </div>
+        </Menu.Item>
+      </Menu>
     );
-    const {
-      user: { current_user }
-    } = this.props;
-    console.log(current_user);
-    const username = current_user ? current_user[0].us_name : "登录";
-    console.log(username);
+    const user = JSON.parse(sessionStorage.getItem("user"));
+    console.log(user);
+    const username = user ? user.us_name : "请登录";
     const tabs = [
       {
         title: "首页",
@@ -182,11 +187,11 @@ export default class SiderMenu extends PureComponent {
             </SubMenu>
           ))}
         </Menu>
-        <div className={styles.right} style={{ margin: "0 20px" }} >
+        <div className={styles.right} style={{ margin: "0 20px" }}>
           <Icon type="user" style={{ margin: "0 10px" }} />
-          <Popover content={content} title="">
-            {current_user ? username : "请登录"}
-          </Popover>
+          <Dropdown overlay={menu}>
+            <span> {user ? username : "请登录"}</span>
+          </Dropdown>
         </div>
       </div>
     );

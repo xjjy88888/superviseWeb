@@ -28,6 +28,7 @@ export default {
         message.error("账号密码错误");
       } else {
         message.success("登录成功");
+        sessionStorage.setItem("user", JSON.stringify(current_user[0]));
         yield put({
           type: "save",
           payload: { current_user }

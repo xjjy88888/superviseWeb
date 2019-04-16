@@ -61,7 +61,6 @@ export default class siderbarDetail extends PureComponent {
       });
     });
     const { clientWidth, clientHeight } = this.refDom;
-    console.log(clientWidth);
   }
 
   getRandomInt = (max, min = 0) => {
@@ -203,9 +202,7 @@ export default class siderbarDetail extends PureComponent {
               <Input placeholder="请填写批复文号" />
             </Form.Item>
             <Form.Item label="批复时间" {...formItemLayout}>
-              <RangePicker
-                style={{ width: "100%" }}
-              />
+              <RangePicker style={{ width: "100%" }} />
             </Form.Item>
             <Form.Item label="项目类型" {...formItemLayout}>
               <AutoComplete
@@ -229,18 +226,8 @@ export default class siderbarDetail extends PureComponent {
             <Form.Item label="建设状态" {...formItemLayoutlong}>
               <CheckboxGroup options={config.construct_state} />
             </Form.Item>
-            <Form.Item label="项目合规性" {...formItemLayout}>
-              <AutoComplete
-                placeholder="请选择项目合规性"
-                dataSource={config.compliance}
-                filterOption={(inputValue, option) =>
-                  option.props.children
-                    .toUpperCase()
-                    .indexOf(inputValue.toUpperCase()) !== -1
-                }
-              >
-                <Input allowClear />
-              </AutoComplete>
+            <Form.Item label="项目合规性" {...formItemLayoutlong}>
+              <CheckboxGroup options={config.compliance} />
             </Form.Item>
             <Form.Item label="矢量化类型" {...formItemLayoutlong}>
               <CheckboxGroup options={config.vectorization_type} />
@@ -275,18 +262,8 @@ export default class siderbarDetail extends PureComponent {
             <Form.Item label="扰动类型" {...formItemLayoutlong}>
               <CheckboxGroup options={config.disturb_type} />
             </Form.Item>
-            <Form.Item label="扰动合规性" {...formItemLayout}>
-              <AutoComplete
-                placeholder="请选择扰动合规性"
-                dataSource={config.compliance}
-                filterOption={(inputValue, option) =>
-                  option.props.children
-                    .toUpperCase()
-                    .indexOf(inputValue.toUpperCase()) !== -1
-                }
-              >
-                <Input allowClear />
-              </AutoComplete>
+            <Form.Item label="扰动合规性" {...formItemLayoutlong}>
+              <CheckboxGroup options={config.compliance} />
             </Form.Item>
             <Form.Item label="扰动变化类型" {...formItemLayoutlong}>
               <CheckboxGroup options={config.disturb_change_type} />

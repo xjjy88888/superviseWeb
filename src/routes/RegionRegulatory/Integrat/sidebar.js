@@ -141,7 +141,6 @@ export default class integrat extends PureComponent {
       });
     });
     const { clientWidth, clientHeight } = this.refDom;
-    console.log(clientWidth);
     this.setState({
       clientHeight: clientHeight
     });

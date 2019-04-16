@@ -18,7 +18,6 @@ export default class login extends PureComponent {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        console.log(values);
         let lastLogin;
         if (values.remember) {
           lastLogin = {
