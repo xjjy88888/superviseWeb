@@ -10,6 +10,7 @@ import Tool from "./tool";
 import Sparse from "./sparse";
 import Chart from "./chart";
 import Query from "./query";
+import ProjectEdit from "./projectEdit";
 import L from "leaflet";
 import "proj4";
 import "proj4leaflet";
@@ -117,7 +118,7 @@ export default class integrat extends PureComponent {
     filter += "</gml:Point>";
     filter += "</Intersects>";
     filter += "</Filter>";
-    let urlString = config.mapUrl.geoserverUrl;
+    let urlString = config.mapUrl.geoserverUrl+"/ows";
     let param = {
       service: "WFS",
       version: "1.0.0",
@@ -285,16 +286,14 @@ export default class integrat extends PureComponent {
     const projectlayerGroup = L.layerGroup();
     const spotlayerGroup = L.layerGroup();
     //加载项目红线图层wms
-    L.tileLayer
-      .wms("http://localhost:8080/geoserver/ZKYGIS/wms?", {
+    L.tileLayer.wms(config.mapUrl.geoserverUrl+"/wms?", {
         layers: "ZKYGIS:project_scope", //需要加载的图层
         format: "image/png", //返回的数据格式
         transparent: true
       })
       .addTo(projectlayerGroup);
     //加载图斑图层wms
-    L.tileLayer
-      .wms("http://localhost:8080/geoserver/ZKYGIS/wms?", {
+    L.tileLayer.wms(config.mapUrl.geoserverUrl+"/wms?", {
         layers: "ZKYGIS:spot", //需要加载的图层
         format: "image/png", //返回的数据格式
         transparent: true
@@ -322,6 +321,7 @@ export default class integrat extends PureComponent {
           <Chart />
           <Query />
           <Sparse />
+          {/* <ProjectEdit /> */}
           <div id="map" style={{ height: "95vh" }} />
         </div>
       </LocaleProvider>

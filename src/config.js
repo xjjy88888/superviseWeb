@@ -279,7 +279,7 @@ const config = {
     //SHP: `${domain}/WebPage/SHP/`
     SHP: `http://aj.zkygis.cn/stbcSys/mapfile/SHP/`,
     mapshaper: `http://aj.zkygis.cn/stbcSys/mapshaper/index.html`,
-    geoserverUrl: "http://localhost:8080/geoserver/ZKYGIS/ows"
+    geoserverUrl: "http://rs.stbcjg.cn:8080/geoserver/ZKYGIS"
   },
   /*配置气泡窗口模板匹配字段信息*/
   mapFields: {

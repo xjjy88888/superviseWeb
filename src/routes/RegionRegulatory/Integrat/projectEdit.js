@@ -5,10 +5,13 @@ import {
   Button,
   Input,
   Radio,
+  Upload,
+  Modal,
   List,
   Avatar,
   TreeSelect,
   Cascader,
+  Affix,
   Carousel,
   Checkbox,
   Form,
@@ -28,8 +31,8 @@ const dateFormat = "YYYY-MM-DD";
 const TreeNode = TreeSelect.TreeNode;
 const CheckboxGroup = Checkbox.Group;
 const formItemLayout = {
-  labelCol: { span: 7 },
-  wrapperCol: { span: 16 }
+  labelCol: { span: 8 },
+  wrapperCol: { span: 12 }
 };
 
 const projectData = [
@@ -112,21 +115,18 @@ export default class integrat extends PureComponent {
       key: "project",
       inputDisabled: true,
       placeholder: "项目",
-      sort: [
+      listData: projectData,
+      previewVisible: false,
+      previewImage: "",
+      fileList: [
         {
-          title: "名称",
-          value: "name"
-        },
-        {
-          title: "操作时间",
-          value: "time1"
-        },
-        {
-          title: "立项级别",
-          value: "level"
+          uid: "-1",
+          name: "xxx.png",
+          status: "done",
+          url:
+            "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
         }
-      ],
-      listData: projectData
+      ]
     };
     this.map = null;
     this.saveRef = ref => {
@@ -146,6 +146,16 @@ export default class integrat extends PureComponent {
     });
   }
 
+  handleCancel = () => this.setState({ previewVisible: false });
+
+  handlePreview = file => {
+    this.setState({
+      previewImage: file.url || file.thumbUrl,
+      previewVisible: true
+    });
+  };
+
+  handleChange = ({ fileList }) => this.setState({ fileList });
   onTreeSelectChange = value => {
     console.log(value);
     this.setState({ value });
@@ -325,7 +335,10 @@ export default class integrat extends PureComponent {
       key,
       edit,
       clientHeight,
-      inputDisabled
+      inputDisabled,
+      previewVisible,
+      previewImage,
+      fileList
     } = this.state;
 
     const showPoint = key === "point";
@@ -360,6 +373,19 @@ export default class integrat extends PureComponent {
         }}
         ref={this.saveRef}
       >
+        <Icon
+          type="close"
+          style={{
+            position: "fixed",
+            top: "11vh",
+            right: "12vw",
+            fontSize: 30,
+            zIndex: 1
+          }}
+          onClick={() => {
+            this.setState({ show: false });
+          }}
+        />
         <div
           style={{
             height: "80vh",
@@ -372,77 +398,39 @@ export default class integrat extends PureComponent {
             background: "#fff",
             backgroundColor: "#fff",
             borderRadius: 5,
-            padding: 30
+            padding: 30,
+            textalign: "center"
           }}
         >
-          <Button
-            type="dashed"
-            icon="rollback"
-            shape="circle"
-            style={{
-              float: "right",
-              position: "absolute",
-              color: "#1890ff",
-              right: 20,
-              zIndex: 1,
-              top: 10
-            }}
-            onClick={this.close}
-          />
-          <Button
-            type="dashed"
-            icon={edit ? "check" : "edit"}
-            shape="circle"
-            style={{
-              float: "right",
-              position: "absolute",
-              color: "#1890ff",
-              right: 55,
-              zIndex: 1,
-              top: 10
-            }}
-            onClick={this.submit}
-          />
-          <Button
-            type="dashed"
-            icon="environment"
-            shape="circle"
-            style={{
-              float: "right",
-              position: "absolute",
-              color: "#1890ff",
-              right: 90,
-              zIndex: 1,
-              top: 10
-            }}
-            onClick={() => {
-              message.success("定位成功");
-            }}
-          />
           <Form verticalGap={100}>
-            <p>
-              <b>项目详情</b>
-            </p>
             <Form.Item label="项目名" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+              <Input.TextArea
+                autosize={true}
+                defaultValue={`金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目`}
+              />
             </Form.Item>
             <Form.Item label="建设单位" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+              <Input
+                defaultValue={`东莞市清溪房地产开发公司、东莞市荔园实业投资有限公司`}
+              />
             </Form.Item>
             <Form.Item label="监管单位" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+              <Input
+                defaultValue={`东莞市清溪房地产开发公司、东莞市荔园实业投资有限公司`}
+              />
             </Form.Item>
             <Form.Item label="批复机构" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+              <Input
+                defaultValue={`广东省南粤交通云湛高速公路管理中心新阳管理处`}
+              />
             </Form.Item>
             <Form.Item label="管理机构" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+              <Input defaultValue={`矢量化类型`} />
             </Form.Item>
             <Form.Item label="立项级别" {...formItemLayout}>
               <AutoComplete
                 placeholder="请选择立项级别"
                 defaultValue={`省级`}
-                disabled={!edit}
                 dataSource={config.approval_level}
                 filterOption={(inputValue, option) =>
                   option.props.children
@@ -452,14 +440,13 @@ export default class integrat extends PureComponent {
               />
             </Form.Item>
             <Form.Item label="批复文号" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+              <Input defaultValue={`矢量化类型`} />
             </Form.Item>
             <Form.Item label="批复机构" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
+              <Input defaultValue={`矢量化类型`} />
             </Form.Item>
             <Form.Item label="批复时间" {...formItemLayout}>
               <DatePicker
-                disabled={!edit}
                 defaultValue={moment("2019/01/01", dateFormat)}
                 style={{ width: `100%` }}
               />
@@ -467,7 +454,6 @@ export default class integrat extends PureComponent {
             <Form.Item label="责任面积" {...formItemLayout}>
               <InputNumber
                 defaultValue={`123`}
-                disabled={!edit}
                 formatter={value => `${value}平方米`}
                 style={{ width: `100%` }}
               />
@@ -476,7 +462,6 @@ export default class integrat extends PureComponent {
               <AutoComplete
                 placeholder="请选择项目类型"
                 defaultValue={`公路工程`}
-                disabled={!edit}
                 dataSource={config.project_type}
                 filterOption={(inputValue, option) =>
                   option.props.children
@@ -489,7 +474,6 @@ export default class integrat extends PureComponent {
               <AutoComplete
                 placeholder="请选择项目类别"
                 defaultValue={`建设类`}
-                disabled={!edit}
                 dataSource={config.project_category}
                 filterOption={(inputValue, option) =>
                   option.props.children
@@ -502,7 +486,6 @@ export default class integrat extends PureComponent {
               <AutoComplete
                 placeholder="请选择项目性质"
                 defaultValue={`新建`}
-                disabled={!edit}
                 dataSource={config.project_nature}
                 filterOption={(inputValue, option) =>
                   option.props.children
@@ -515,7 +498,6 @@ export default class integrat extends PureComponent {
               <AutoComplete
                 placeholder="请选择建设状态"
                 defaultValue={`未开工`}
-                disabled={!edit}
                 dataSource={config.construct_state}
                 filterOption={(inputValue, option) =>
                   option.props.children
@@ -528,7 +510,6 @@ export default class integrat extends PureComponent {
               <AutoComplete
                 placeholder="请选择项目合规性"
                 defaultValue={`疑似未批先建`}
-                disabled={!edit}
                 dataSource={config.compliance}
                 filterOption={(inputValue, option) =>
                   option.props.children
@@ -540,7 +521,6 @@ export default class integrat extends PureComponent {
             <Form.Item label="涉及县" {...formItemLayout}>
               <TreeSelect
                 showSearch
-                disabled={!edit}
                 style={{ width: "100%" }}
                 value={this.state.value}
                 dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
@@ -563,19 +543,17 @@ export default class integrat extends PureComponent {
             </Form.Item>
             <Form.Item label="所在地区" {...formItemLayout}>
               <Cascader
-                disabled={!edit}
                 placeholder="请选择所在地区"
                 options={config.demo_location}
                 changeOnSelect
               />
             </Form.Item>
             <Form.Item label="详细地址" {...formItemLayout}>
-              <Input placeholder="请填写详细地址" disabled={!edit} />
+              <Input placeholder="请填写详细地址" />
             </Form.Item>
             <Form.Item label="坐标" {...formItemLayout}>
               <Input
                 defaultValue={`123.423，29.543`}
-                disabled={!edit}
                 addonAfter={
                   <Icon
                     type="compass"
@@ -598,15 +576,14 @@ export default class integrat extends PureComponent {
               <Input.TextArea
                 autosize={true}
                 defaultValue={`备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注`}
-                disabled={!edit}
               />
             </Form.Item>
           </Form>
           <List
             style={{
-              width: 350,
-              position: "relation",
-              padding: "0 20px"
+              width: 500,
+              padding: "0 20px",
+              margin: "0 auto"
             }}
           >
             <List.Item>
@@ -728,12 +705,31 @@ export default class integrat extends PureComponent {
                 }
               />
             </List.Item>
-            <Carousel autoplay>
-              <img src="./img/spot.jpg" />
-              <img src="./img/spot2.jpg" />
-              <img src="./img/spot.jpg" />
-              <img src="./img/spot2.jpg" />
-            </Carousel>
+            <div className="clearfix">
+              <Upload
+                action="//jsonplaceholder.typicode.com/posts/"
+                listType="picture-card"
+                fileList={fileList}
+                onPreview={this.handlePreview}
+                onChange={this.handleChange}
+              >
+                <div>
+                  <Icon type="plus" />
+                  <div style={{ margintop: 8, color: "#666" }}>Upload</div>
+                </div>
+              </Upload>
+              <Modal
+                visible={previewVisible}
+                footer={null}
+                onCancel={this.handleCancel}
+              >
+                <img
+                  alt="example"
+                  style={{ width: "100%" }}
+                  src={previewImage}
+                />
+              </Modal>
+            </div>
             <Button
               type="dashed"
               icon="cloud-download"
