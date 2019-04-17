@@ -10,7 +10,7 @@ import Tool from "./tool";
 import Sparse from "./sparse";
 import Chart from "./chart";
 import Query from "./query";
-import ProjectEdit from "./projectEdit";
+import ProjectDetail from "./projectDetail";
 import L from "leaflet";
 import "proj4";
 import "proj4leaflet";
@@ -321,7 +321,7 @@ export default class integrat extends PureComponent {
           <Chart />
           <Query />
           <Sparse />
-          {/* <ProjectEdit /> */}
+          {/* <ProjectDetail /> */}
           <div id="map" style={{ height: "95vh" }} />
         </div>
       </LocaleProvider>

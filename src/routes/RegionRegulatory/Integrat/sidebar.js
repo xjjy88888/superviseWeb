@@ -1017,168 +1017,41 @@ export default class integrat extends PureComponent {
                 />
               </Form.Item>
             </Form>
-            <List
-              style={{
-                width: 310,
-                paddingRight: 30,
-                margin: "0 auto"
-              }}
-            >
-              <List.Item>
-                <List.Item.Meta
-                  title={
-                    <span>
-                      <span>设计阶段：可研</span>
-                      <br />
-                      <span> 防治责任范围：1</span>
-                      <Icon
-                        type="plus"
-                        style={{
-                          padding: 10,
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </span>
-                  }
-                  description={
-                    <p
-                      onClick={() => {
-                        this.goSiderbarDetail("duty");
-                      }}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <span>
-                        道路主题红线
-                        <Icon
-                          type="environment"
-                          style={{
-                            float: "right",
-                            fontSize: 18,
-                            cursor: "point",
-                            color: "#1890ff"
-                          }}
-                        />
-                      </span>
-                    </p>
-                  }
-                />
-              </List.Item>
-              <List.Item>
-                <List.Item.Meta
-                  title={
-                    <span>
-                      扰动图斑：3
-                      <Icon
-                        type="link"
-                        style={{
-                          padding: 10,
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                      <Icon
-                        type="plus"
-                        style={{
-                          paddingRight: 10,
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                      <Switch
-                        checkedChildren="归档图斑"
-                        unCheckedChildren="非归档图斑"
-                      />
-                    </span>
-                  }
-                  description={
-                    <p
-                      onClick={() => {
-                        this.goSiderbarDetail("spot");
-                      }}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <span>
-                        2017154_14848_4848
-                        <Icon
-                          type="environment"
-                          style={{
-                            float: "right",
-                            fontSize: 18,
-                            cursor: "point",
-                            color: "#1890ff"
-                          }}
-                        />
-                      </span>
-                      <br />
-                      <span>
-                        2017154_14848_4848
-                        <Icon
-                          type="environment"
-                          style={{
-                            float: "right",
-                            fontSize: 18,
-                            cursor: "point",
-                            color: "#1890ff"
-                          }}
-                        />
-                      </span>
-                      <br />
-                      <span>
-                        2017154_14848_4848
-                        <Icon
-                          type="environment"
-                          style={{
-                            float: "right",
-                            fontSize: 18,
-                            cursor: "point",
-                            color: "#1890ff"
-                          }}
-                        />
-                      </span>
-                    </p>
-                  }
-                />
-              </List.Item>
-              <div className="clearfix">
-                <Upload
-                  action="//jsonplaceholder.typicode.com/posts/"
-                  listType="picture-card"
-                  fileList={fileList}
-                  onPreview={this.handlePreview}
-                  onChange={this.handleChange}
-                >
-                  <div>
-                    <Icon type="plus" />
-                    <div style={{ margintop: 8, color: "#666" }}>Upload</div>
-                  </div>
-                </Upload>
-                <Modal
-                  visible={previewVisible}
-                  footer={null}
-                  onCancel={this.handleCancel}
-                >
-                  <img
-                    alt="example"
-                    style={{ width: "100%" }}
-                    src={previewImage}
-                  />
-                </Modal>
-              </div>
-              <Button
-                type="dashed"
-                icon="cloud-download"
-                style={{ marginTop: 20 }}
+            <div className="clearfix">
+              <Upload
+                action="//jsonplaceholder.typicode.com/posts/"
+                listType="picture-card"
+                fileList={fileList}
+                onPreview={this.handlePreview}
+                onChange={this.handleChange}
               >
-                项目归档
-              </Button>
-              <Button type="dashed" icon="rollback" style={{ marginLeft: 20 }}>
-                撤销归档
-              </Button>
-            </List>
+                <div>
+                  <Icon type="plus" />
+                  <div style={{ margintop: 8, color: "#666" }}>Upload</div>
+                </div>
+              </Upload>
+              <Modal
+                visible={previewVisible}
+                footer={null}
+                onCancel={this.handleCancel}
+              >
+                <img
+                  alt="example"
+                  style={{ width: "100%" }}
+                  src={previewImage}
+                />
+              </Modal>
+            </div>
+            <Button
+              type="dashed"
+              icon="cloud-download"
+              style={{ marginTop: 20 }}
+            >
+              项目归档
+            </Button>
+            <Button type="dashed" icon="rollback" style={{ marginLeft: 20 }}>
+              撤销归档
+            </Button>
           </div>
         </div>
       </div>

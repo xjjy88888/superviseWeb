@@ -192,7 +192,6 @@ export default class siderbarDetail extends PureComponent {
                 />
               </Form.Item>
               <Form.Item label="扰动类型" {...formItemLayout}>
-                {" "}
                 <AutoComplete
                   placeholder="请选择扰动类型"
                   disabled={!edit}
