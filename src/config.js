@@ -116,6 +116,11 @@ const config = {
       label: "数据归档",
       value: "cloud-download",
       icon: "cloud-download"
+    },
+    {
+      label: "数据抽稀",
+      value: "font-size",
+      icon: "font-size"
     }
   ],
 
@@ -273,30 +278,30 @@ const config = {
   mapUrl: {
     //SHP: `${domain}/WebPage/SHP/`
     SHP: `http://aj.zkygis.cn/stbcSys/mapfile/SHP/`,
-    geoserverUrl:'http://localhost:8080/geoserver/ZKYGIS/ows'
+    mapshaper: `http://aj.zkygis.cn/stbcSys/mapshaper/index.html`,
+    geoserverUrl: "http://localhost:8080/geoserver/ZKYGIS/ows"
   },
   /*配置气泡窗口模板匹配字段信息*/
-  mapFields:{
-    "spot": {
-        simple: [
-                { field: "spot_tbid", alias: "图斑编号" },
-                { field: "project_id", alias: "所属项目ID" },
-                { field: "qtype", alias: "扰动类型" },
-                { field: "qarea", alias: "扰动面积" },
-                { field: "earea", alias: "超出防治责任范围面积" },
-                { field: "qdcs", alias: "建设状态" },
-                { field: "qdtype", alias: "扰动变化类型" },
-                { field: "byd", alias: "扰动合规性" },
-                { field: "isreview", alias: "复核状态" },
-                { field: "c_time", alias: "创建时间" },
-                { field: "file_time", alias: "归档时间" },
-                { field: "m_time", alias: "修改时间" },
-                { field: "interpretation_unitid", alias: "解译单位ID" }
-        ]
+  mapFields: {
+    spot: {
+      simple: [
+        { field: "spot_tbid", alias: "图斑编号" },
+        { field: "project_id", alias: "所属项目ID" },
+        { field: "qtype", alias: "扰动类型" },
+        { field: "qarea", alias: "扰动面积" },
+        { field: "earea", alias: "超出防治责任范围面积" },
+        { field: "qdcs", alias: "建设状态" },
+        { field: "qdtype", alias: "扰动变化类型" },
+        { field: "byd", alias: "扰动合规性" },
+        { field: "isreview", alias: "复核状态" },
+        { field: "c_time", alias: "创建时间" },
+        { field: "file_time", alias: "归档时间" },
+        { field: "m_time", alias: "修改时间" },
+        { field: "interpretation_unitid", alias: "解译单位ID" }
+      ]
     }
   },
-  mapLayersName:'ZKYGIS:project_scope,ZKYGIS:spot'
-
+  mapLayersName: "ZKYGIS:project_scope,ZKYGIS:spot"
 };
 
 export default config;

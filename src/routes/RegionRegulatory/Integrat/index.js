@@ -4,10 +4,10 @@ import { Menu, Icon, Button, LocaleProvider } from "antd";
 import zhCN from "antd/lib/locale-provider/zh_CN";
 import SiderMenu from "../../../components/SiderMenu";
 import Sidebar from "./sidebar";
-import ProjectEdit from "./projectEdit";
 import SidebarDetail from "./siderbarDetail";
 import moment from "moment";
 import Tool from "./tool";
+import Sparse from "./sparse";
 import Chart from "./chart";
 import Query from "./query";
 import L from "leaflet";
@@ -105,8 +105,8 @@ export default class integrat extends PureComponent {
    *@return null
    */
 
-<<<<<<< .mine
   queryWFSServiceByPoint = (point, typeName) => {
+    const me = this;
     point = point.x + "," + point.y;
     let filter =
       '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
@@ -117,26 +117,6 @@ export default class integrat extends PureComponent {
     filter += "</gml:Point>";
     filter += "</Intersects>";
     filter += "</Filter>";
-=======
-  }
-/*点选查询图层
-*@method queryWFSServiceByPoint
-*@param point 坐标点
-*@param typeName 图层名称
-*@return null
-*/ 
-queryWFSServiceByPoint = (point, typeName) =>{
-    const me = this;
-    point = point.x + ','+ point.y;
-    let filter = '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
-    filter += '<Intersects>';
-    filter += '<PropertyName>geom</PropertyName>';
-    filter += '<gml:Point>';
-    filter += '<gml:coordinates>' + point + '</gml:coordinates>';
-    filter += '</gml:Point>';
-    filter += '</Intersects>';
-    filter += '</Filter>';
->>>>>>> .r250
     let urlString = config.mapUrl.geoserverUrl;
     let param = {
       service: "WFS",
@@ -149,57 +129,39 @@ queryWFSServiceByPoint = (point, typeName) =>{
       //srsName: epsg
     };
     let geojsonUrl = urlString + L.Util.getParamString(param, urlString);
-<<<<<<< .mine
-    /*$.ajax({
-        type: "get",
-        url: geojsonUrl,
-        dataType: 'json',
-        success: loadWfsHandler,
-
-    });*/
-    console.log(this.props);
-    this.props.dispatch({
-      type: "mapdata/queryWFSServiceByPoint",
-      payload: { geojsonUrl: geojsonUrl }
-=======
     me.props.dispatch({
       type: "mapdata/queryWFSLayer",
-      payload:{geojsonUrl},
-      callback:(data) =>{
+      payload: { geojsonUrl },
+      callback: data => {
         me.clearGeojsonLayer();
         let style = {
-            "color": "#33CCFF",//#33CCFF #e60000
-            "weight": 3,
-            "opacity": 1,
-            "fillColor": "#e6d933",//#33CCFF #e6d933
-            "fillOpacity": 0.1
+          color: "#33CCFF", //#33CCFF #e60000
+          weight: 3,
+          opacity: 1,
+          fillColor: "#e6d933", //#33CCFF #e6d933
+          fillOpacity: 0.1
         };
         me.loadGeojsonLayer(data, style);
         if (data.features.length > 0) {
-            let content = "";
-            for (let i = 0; i < data.features.length; i++) {
-                let feature = data.features[i];
-                //content += getWinContent(feature.properties) + "<br><br>";
-            }
-            map.openPopup(content, userconfig.mapPoint);
+          let content = "";
+          for (let i = 0; i < data.features.length; i++) {
+            let feature = data.features[i];
+            //content += getWinContent(feature.properties) + "<br><br>";
+          }
+          map.openPopup(content, userconfig.mapPoint);
         }
       }
->>>>>>> .r250
     });
-<<<<<<< .mine
-  };
-=======
     //console.log(this.props);
-
-}
-/*
- * 绘制图形函数
-*/
-loadGeojsonLayer = (geojson, style) =>{
-  //map.createPane('ProjectVectorLayer');
-  //map.getPane('ProjectVectorLayer').style.zIndex = 2;
-  userconfig.projectgeojsonLayer = L.Proj.geoJson(geojson, {
-      style: style,
+  };
+  /*
+   * 绘制图形函数
+   */
+  loadGeojsonLayer = (geojson, style) => {
+    //map.createPane('ProjectVectorLayer');
+    //map.getPane('ProjectVectorLayer').style.zIndex = 2;
+    userconfig.projectgeojsonLayer = L.Proj.geoJson(geojson, {
+      style: style
       //pane: 'ProjectVectorLayer'
       /*filter: function (geoJsonFeature) {
           return true;
@@ -207,19 +169,18 @@ loadGeojsonLayer = (geojson, style) =>{
       onEachFeature: function (feature, layer) {
           var e = feature;
       }*/
-  }).addTo(map);  
-}
-/*
- * 清空绘制图形函数
-*/
-clearGeojsonLayer = () =>{
-  if (userconfig.projectgeojsonLayer) {
-    userconfig.projectgeojsonLayer.clearLayers();
-    map.removeLayer(userconfig.projectgeojsonLayer);
-    userconfig.projectgeojsonLayer = null;
-  }
->>>>>>> .r250
-}
+    }).addTo(map);
+  };
+  /*
+   * 清空绘制图形函数
+   */
+  clearGeojsonLayer = () => {
+    if (userconfig.projectgeojsonLayer) {
+      userconfig.projectgeojsonLayer.clearLayers();
+      map.removeLayer(userconfig.projectgeojsonLayer);
+      userconfig.projectgeojsonLayer = null;
+    }
+  };
   /*
    *获取项目区域范围
    */
@@ -360,7 +321,7 @@ clearGeojsonLayer = () =>{
           <Tool />
           <Chart />
           <Query />
-          {/* <ProjectEdit /> */}
+          <Sparse />
           <div id="map" style={{ height: "95vh" }} />
         </div>
       </LocaleProvider>

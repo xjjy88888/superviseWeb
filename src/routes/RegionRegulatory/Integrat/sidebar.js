@@ -119,7 +119,7 @@ export default class integrat extends PureComponent {
     this.state = {
       show: true,
       value: undefined,
-      showDetail: true,
+      showDetail: false,
       edit: false,
       key: "project",
       inputDisabled: true,

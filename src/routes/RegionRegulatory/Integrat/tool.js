@@ -55,7 +55,7 @@ export default class siderbarDetail extends PureComponent {
     return (
       <div
         style={{
-          left: show ? 400 : -350,
+          left: show ? 350 : -350,
           width: 240,
           backgroundColor: `#fff`,
           position: `absolute`,
@@ -86,7 +86,17 @@ export default class siderbarDetail extends PureComponent {
           <p style={{ margin: `20px 0 10px 0` }}>工具箱</p>
           {config.toolbox.map((item, index) => (
             <div key={index}>
-              <Button style={{ margin: `15px 10px 0 10px` }} icon={item.icon}>
+              <Button
+                style={{ margin: `15px 10px 0 10px` }}
+                icon={item.icon}
+                onClick={() => {
+                  if (item.label === "数据抽稀") {
+                    emitter.emit("showSparse", {
+                      show: true
+                    });
+                  }
+                }}
+              >
                 {item.label}
               </Button>
               <br />
