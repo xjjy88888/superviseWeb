@@ -170,16 +170,24 @@ export default class integrat extends PureComponent {
         showDetail: data.show
       });
     });
+    this.eventEmitter = emitter.addListener("polygon", data => {
+      //console.log(data);
+      this.props.dispatch({
+        type: "project/queryProject",
+        payload: {
+          polygon: data.polygon
+        }
+      });
+      this.props.dispatch({
+        type: "project/querySpot",
+        payload: {
+          polygon: data.polygon
+        }
+      });
+    });
     const { clientWidth, clientHeight } = this.refDom;
     this.setState({
       clientHeight: clientHeight
-    });
-
-    this.props.dispatch({
-      type: "project/queryProject"
-    });
-    this.props.dispatch({
-      type: "project/querySpot"
     });
   }
   handleCancel = () => this.setState({ previewVisible: false });
@@ -206,8 +214,16 @@ export default class integrat extends PureComponent {
     this.setState({ showProjectEdit: !showProjectEdit });
     if (showProjectEdit) {
       message.success("编辑成功");
+      emitter.emit("showEdit", {
+        show: true,
+        edit: false
+      });
     } else {
       message.info("开始编辑");
+      emitter.emit("showEdit", {
+        show: true,
+        edit: true
+      });
     }
   };
 
@@ -235,6 +251,10 @@ export default class integrat extends PureComponent {
     emitter.emit("showSiderbarDetail", {
       show: false,
       from: "spot"
+    });
+    emitter.emit("showEdit", {
+      show: false,
+      edit: false
     });
   };
 
@@ -383,7 +403,6 @@ export default class integrat extends PureComponent {
     const {
       project: { projectList, spotList }
     } = this.props;
-    console.log(projectList.rows);
 
     const showPoint = key === "point";
 
@@ -492,7 +511,7 @@ export default class integrat extends PureComponent {
           </Button>
           <p style={{ padding: "20px 20px 0 20px" }}>
             <span>{`共有${
-              key === "project" ? projectList.rows.length : spotList.rows.length
+              key === "project" ? projectList.length : spotList.length
             }条记录`}</span>
             <span
               style={{
@@ -549,7 +568,7 @@ export default class integrat extends PureComponent {
               padding: "10px 20px 10px 20px"
             }}
             itemLayout="horizontal"
-            dataSource={key === "project" ? projectList.rows : spotList.rows}
+            dataSource={key === "project" ? projectList : spotList}
             renderItem={item => (
               <List.Item>
                 <List.Item.Meta
@@ -579,6 +598,13 @@ export default class integrat extends PureComponent {
                           fontSize: 18,
                           cursor: "point",
                           color: "#1890ff"
+                        }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          console.log(item.project_id);
+                          emitter.emit("mapLocation", {
+                            project_id: item.project_id
+                          });
                         }}
                       />
                     </p>

@@ -43,8 +43,8 @@ export default class integrat extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      show: true,
-      edit: true
+      show: false,
+      edit: false
     };
     this.map = null;
     this.saveRef = ref => {
@@ -53,16 +53,19 @@ export default class integrat extends PureComponent {
   }
 
   componentDidMount() {
-    this.eventEmitter = emitter.addListener("showProjectDetail", data => {
+    this.eventEmitter = emitter.addListener("showEdit", data => {
       this.setState({
-        showDetail: data.show
+        show: data.show,
+        edit: data.edit
       });
     });
-    const { clientWidth, clientHeight } = this.refDom;
-    this.setState({
-      clientHeight: clientHeight
-    });
   }
+
+  close = () => {
+    this.setState({
+      show: false
+    });
+  };
 
   getFields() {
     const count = this.state.expand ? 10 : 6;
@@ -79,7 +82,7 @@ export default class integrat extends PureComponent {
                   message: "Input something!"
                 }
               ]
-            })(<Input placeholder="placeholder" />)}
+            })(<Input />)}
           </Form.Item>
         </Col>
       );
@@ -98,8 +101,7 @@ export default class integrat extends PureComponent {
           position: `absolute`,
           zIndex: 1000,
           height: `95vh`,
-          borderLeft: `solid 1px #ddd`,
-          padding: 30
+          borderLeft: `solid 1px #ddd`
           // overflow: "auto"
         }}
         ref={this.saveRef}
@@ -117,10 +119,11 @@ export default class integrat extends PureComponent {
             padding: 10,
             cursor: `pointer`
           }}
-          onClick={this.switchShow}
+          onClick={this.close}
         />
         <div
           style={{
+            padding: 50,
             display: edit ? "none" : "block"
           }}
         >
@@ -351,7 +354,10 @@ export default class integrat extends PureComponent {
         </div>
         <div
           style={{
-            display: edit ? "block" : "none"
+            display: edit ? "block" : "none",
+            height: `95vh`,
+            padding: 30,
+            overflow: "auto"
           }}
         >
           <Form
@@ -359,29 +365,249 @@ export default class integrat extends PureComponent {
             onSubmit={this.handleSearch}
           >
             <Row gutter={24}>
-              <Col span={4}>
-                <Form.Item label={`Field1`}>
-                  <Input placeholder="placeholder" />
+              <Col span={6}>
+                <Form.Item label="防治标准（一级/二级/三级）">
+                  <Input />
                 </Form.Item>
               </Col>
-              <Col span={4}>
-                <Form.Item label={`Field1`}>
-                  <Input placeholder="placeholder" />
+              <Col span={6}>
+                <Form.Item label="总投资">
+                  <Input />
                 </Form.Item>
               </Col>
-              <Col span={4}>
-                <Form.Item label={`Field1`}>
-                  <Input placeholder="placeholder" />
+              <Col span={6}>
+                <Form.Item label="土建投资">
+                  <Input />
                 </Form.Item>
               </Col>
-              <Col span={4}>
-                <Form.Item label={`Field1`}>
-                  <Input placeholder="placeholder" />
+              <Col span={6}>
+                <Form.Item label="项目规模（长度或面积）">
+                  <Input />
                 </Form.Item>
               </Col>
-              <Col span={4}>
-                <Form.Item label={`Field1`}>
-                  <Input placeholder="placeholder" />
+              <Col span={6}>
+                <Form.Item label="设计动工时间">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="设计完工时间">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="实际开工时间">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="实际完工时间">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="设计水平年">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="防治区类型（枚举）">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="防治区级别（国家/省级）">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="地貌类型（枚举）">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="土壤类型">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="植被类型">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="项目建设区面积">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="直接影响区面积">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="扰动地表面积">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="损坏水土保持设施面积">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="原地貌土壤侵蚀模数（t/km2*a)">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="土壤容许流失量（t/km2*a)">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="水土流失预测总量（t）">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="新增水土流失量">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="新增水土流失主要区域">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="扰动土地整治率（%）">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="水土流失总治理度">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="土壤流失控制比">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="拦渣率">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="植被恢复系数">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="林草覆盖率">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="水土保持总投资（万元）">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="独立费用">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="水土保持监理费">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="水土保持监测费">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="水土保持补偿费">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="工程措施设计投资">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="职位措施设计投资">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="临时措施设计投资">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="附件">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="方案编制单位ID">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="监测单位ID">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="监理单位ID">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="设计单位ID">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="施工单位ID">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="验收报告编制单位ID">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="项目变更信息">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="变更原因">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="变更时间">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="原项目名称">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="附件">
+                  <Input />
                 </Form.Item>
               </Col>
             </Row>

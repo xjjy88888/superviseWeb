@@ -17,18 +17,27 @@ export async function login(params) {
 }
 
 // 项目列表
-export async function getProjectUnionScopeList() {
-  return request(`${config.url.getProjectUnionScopeList}`, {
-    method: "GET"
+export async function projectScopeGetIntersects(params) {
+  return request(`${config.url.projectScopeGetIntersects}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+    },
+    body: JSON.stringify(params.polygon),
   });
 }
 
 // 图斑列表
-export async function getSpotList() {
-  return request(`${config.url.getSpotList}`, {
-    method: "GET"
+export async function spotGetIntersects(params) {
+  return request(`${config.url.spotGetIntersects}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+    },
+    body: JSON.stringify(params.polygon),
   });
 }
+
 
 //地图WFS请求图层数据源
 export async function queryWFSLayer(params) {

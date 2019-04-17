@@ -6,10 +6,12 @@ const config = {
     GetUserPassWord: `${domain}/api/account/GetUserPassWord`,
 
     //项目列表
-    getProjectUnionScopeList: `${domain}/api/app/getProjectUnionScopeList`,
+    projectScopeGetIntersects: `${domain}/api/app/projectScopeGetIntersects`,
+    //projectScopeGetIntersects: `http://10.7.23.81:8090/stbcSys/api/app/projectScopeGetIntersects`,
 
     //图斑列表
-    getSpotList: `${domain}/api/app/getSpotList`
+    spotGetIntersects: `${domain}/api/app/spotGetIntersects`
+    //spotGetIntersects: `http://10.7.23.81:8090/stbcSys/api/app/spotGetIntersects`
   },
 
   //扰动类型

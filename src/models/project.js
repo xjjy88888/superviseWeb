@@ -1,12 +1,12 @@
 import { routerRedux } from "dva/router";
-import { getProjectUnionScopeList, getSpotList } from "../services/httpApi";
+import { projectScopeGetIntersects, spotGetIntersects } from "../services/httpApi";
 
 export default {
   namespace: "project",
 
   state: {
-    projectList: { rows: [], total: 0 },
-    spotList: { rows: [], total: 0 },
+    projectList: [],
+    spotList: []
   },
 
   subscriptions: {
@@ -15,11 +15,12 @@ export default {
 
   effects: {
     *queryProject({ payload }, { call, put }) {
-      const { data: projectList } = yield call(getProjectUnionScopeList);
+      const { data: projectList } = yield call(projectScopeGetIntersects, payload);
       yield put({ type: "save", payload: { projectList } });
     },
     *querySpot({ payload }, { call, put }) {
-      const { data: spotList } = yield call(getSpotList);
+      console.log(payload)
+      const { data: spotList } = yield call(spotGetIntersects, payload);
       yield put({ type: "save", payload: { spotList } });
     }
   },

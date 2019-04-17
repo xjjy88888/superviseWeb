@@ -20,6 +20,7 @@ import * as turf from "@turf/turf";
 import "leaflet/dist/leaflet.css";
 import "antd-mobile/dist/antd-mobile.css";
 import config from "../../../config";
+import emitter from "../../../utils/event";
 
 let userconfig = {};
 let map;
@@ -42,6 +43,13 @@ export default class integrat extends PureComponent {
     me.initUrlParams();
     // 创建地图
     me.createMap();
+    // 组件通信
+    this.eventEmitter = emitter.addListener("mapLocation", data => {
+      this.setState({
+        project_id: data.project_id
+      });
+      console.log(data)
+    });
   }
   /*
    * 获取url参数
@@ -147,7 +155,12 @@ export default class integrat extends PureComponent {
           let content = "";
           for (let i = 0; i < data.features.length; i++) {
             let feature = data.features[i];
-            content += me.getWinContent(feature.properties) + "<br><br>";
+            if(i === data.features.length-1){
+              content += me.getWinContent(feature.properties);
+            }
+            else{
+              content += me.getWinContent(feature.properties) + "<br>";
+            }
           }
           map.openPopup(content, userconfig.mapPoint);
         }
@@ -163,7 +176,9 @@ export default class integrat extends PureComponent {
     //判断点击哪个图层
     if (properties.spot_tbid) {//扰动图斑
         content = "图斑编号:" + properties.spot_tbid + "</br>";
-        content += '<a onclick="DCI.Poi.toLocationPOI(\'' + properties.spot_tbid+ '\')">详情</a><br/>';
+        content += '<a onclick="locateMap(\'' + properties.spot_tbid+ '\')">详情</a>&nbsp;&nbsp;&nbsp;';
+        content += '<a onclick="locateMap(\'' + properties.spot_tbid+ '\')">编辑</a>&nbsp;&nbsp;&nbsp;';
+        content += '<a onclick="locateMap(\'' + properties.spot_tbid+ '\')">定位</a></br>';
         //content += "项目ID:" + properties.project_id + "</br>";
         //content += "复核状态:" + properties.isreview + "</br>";
         //content += "扰动类型:" + properties.qtype + "</br>";
@@ -174,12 +189,21 @@ export default class integrat extends PureComponent {
     }
     else if (properties.project_id) {//项目红线
         content = "项目ID:" + properties.project_id + "</br>";
+        content += '<a onclick="locateMap(\'' + properties.project_id+ '\')">详情</a>&nbsp;&nbsp;&nbsp;';
+        content += '<a onclick="locateMap(\'' + properties.project_id+ '\')">编辑</a>&nbsp;&nbsp;&nbsp;';
+        content += '<a onclick="locateMap(\'' + properties.spot_tbid+ '\')">定位</a></br>';
         //content += "上图单元ID:" + properties.sup_unit + "</br>";
         //content += "矢量化类型:" + properties.vectype + "</br>";
         //content += "设计阶段:" + properties.design_stage + "</br>";
         //content += "面积:" + properties.area;
     }
     return content;
+  }
+ /*
+  * 定位地图并且高亮显示
+  */ 
+  locateMap = (id) =>{
+
   }
   /*
    * 绘制图形函数
@@ -293,8 +317,35 @@ export default class integrat extends PureComponent {
               //加载geoserver发布的WMS地图服务
               me.overlayWMSLayers();
               //当前用户区域范围过滤空间数据
-              //扰动图斑数据
-              //let spotpolygon = spotGetIntersects();
+              let polygon = "";
+              if (userconfig.geojson) {
+                if (userconfig.geojson.features.length > 0) {
+                    if (userconfig.geojson.features[0].geometry.coordinates.length > 0) {
+                        //var polygon = "polygon((103.661122555 24.288901115,103.661122555 29.352674495,110.942772097 29.352674495,110.942772097 24.288901115,103.661122555 24.288901115))";
+                        polygon = "polygon((";
+                        let coordinates = userconfig.geojson.features[0].geometry.coordinates;
+                        for (let i = 0; i < coordinates.length; i++) {
+                          let coordinate = coordinates[i];
+                            for (let j = 0; j < coordinate.length; j++) {
+                              let xy = coordinate[j];
+                                if (j === coordinate.length - 1) {
+                                    polygon += xy[0] + " " + xy[1];
+                                }
+                                else {
+                                    polygon += xy[0] + " " + xy[1] + ",";
+                                }
+        
+                            }
+                        }
+                        polygon += "))";
+                    }
+                }
+              }
+              //console.log(polygon);
+              //let polygon = '123';
+              emitter.emit("polygon", {
+                polygon: polygon
+              });
               break;
             }
           }
@@ -347,7 +398,7 @@ export default class integrat extends PureComponent {
           <Chart />
           <Query />
           <Sparse />
-          {/* <ProjectDetail /> */}
+          <ProjectDetail />
           <div id="map" style={{ height: "95vh" }} />
         </div>
       </LocaleProvider>
