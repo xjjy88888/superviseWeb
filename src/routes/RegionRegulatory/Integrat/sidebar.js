@@ -1,4 +1,6 @@
 import React, { PureComponent } from "react";
+import { connect } from "dva";
+import { createForm } from "rc-form";
 import {
   Menu,
   Icon,
@@ -115,13 +117,16 @@ const pointData = [
   }
 ];
 
+@connect(({ project }) => ({
+  project
+}))
 export default class integrat extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
       show: true,
       value: undefined,
-      showDetail: true,
+      showDetail: false,
       showProjectEdit: false,
       key: "project",
       inputDisabled: true,
@@ -168,6 +173,13 @@ export default class integrat extends PureComponent {
     const { clientWidth, clientHeight } = this.refDom;
     this.setState({
       clientHeight: clientHeight
+    });
+
+    this.props.dispatch({
+      type: "project/queryProject"
+    });
+    this.props.dispatch({
+      type: "project/querySpot"
     });
   }
   handleCancel = () => this.setState({ previewVisible: false });
@@ -368,6 +380,10 @@ export default class integrat extends PureComponent {
       previewImage,
       fileList
     } = this.state;
+    const {
+      project: { projectList, spotList }
+    } = this.props;
+    console.log(projectList.rows);
 
     const showPoint = key === "point";
 
@@ -474,8 +490,10 @@ export default class integrat extends PureComponent {
           >
             筛选
           </Button>
-          <p style={{ padding: "20px 40px 0 20px" }}>
-            <span>{`共有${listData.length}条记录`}</span>
+          <p style={{ padding: "20px 20px 0 20px" }}>
+            <span>{`共有${
+              key === "project" ? projectList.rows.length : spotList.rows.length
+            }条记录`}</span>
             <span
               style={{
                 float: "right",
@@ -527,10 +545,11 @@ export default class integrat extends PureComponent {
             style={{
               overflow: "auto",
               height: clientHeight ? clientHeight - 207 : 500,
+              width: 350,
               padding: "10px 20px 10px 20px"
             }}
             itemLayout="horizontal"
-            dataSource={listData}
+            dataSource={key === "project" ? projectList.rows : spotList.rows}
             renderItem={item => (
               <List.Item>
                 <List.Item.Meta
@@ -539,7 +558,20 @@ export default class integrat extends PureComponent {
                   }}
                   title={
                     <p style={{ textAlign: "justify" }}>
-                      <span>{item.title}</span>
+                      <span
+                        style={{
+                          display: key === "project" ? "block" : "none"
+                        }}
+                      >
+                        {item.project_name}
+                      </span>
+                      <span
+                        style={{
+                          display: key === "spot" ? "block" : "none"
+                        }}
+                      >
+                        {item.spot_tbid}
+                      </span>
                       <Icon
                         type="environment"
                         style={{
@@ -558,27 +590,39 @@ export default class integrat extends PureComponent {
                           display: key === "project" ? "block" : "none"
                         }}
                       >
-                        <span>建设单位：{item.owner}</span>
+                        <span style={{ wordBreak: "break-all" }}>
+                          建设单位：{item.product_department_id}
+                        </span>
                         <br />
-                        <span>批复机构：{item.reply}</span>
+                        <span style={{ wordBreak: "break-all" }}>
+                          批复机构：{item.project_rp_id}
+                        </span>
                       </span>
                       <span
                         style={{
                           display: key === "spot" ? "block" : "none"
                         }}
                       >
-                        <span>关联项目：{item.project}</span>
+                        <span style={{ wordBreak: "break-all" }}>
+                          关联项目：{item.project_id}
+                        </span>
                         <br />
-                        <span>扰动合规性：{item.standard}</span>
+                        <span style={{ wordBreak: "break-all" }}>
+                          扰动合规性：{item.byd}
+                        </span>
                       </span>
                       <span
                         style={{
                           display: key === "point" ? "block" : "none"
                         }}
                       >
-                        <span>关联项目：{item.project}</span>
+                        <span style={{ wordBreak: "break-all" }}>
+                          关联项目：{item.project}
+                        </span>
                         <br />
-                        <span>描述：{item.desc}</span>
+                        <span style={{ wordBreak: "break-all" }}>
+                          描述：{item.desc}
+                        </span>
                       </span>
                     </p>
                   }
@@ -861,7 +905,7 @@ export default class integrat extends PureComponent {
               display: showProjectEdit ? "block" : "none"
             }}
           >
-            <Form verticalGap={100}>
+            <Form>
               <Form.Item label="项目名" {...formItemLayout}>
                 <Input.TextArea
                   autosize={true}

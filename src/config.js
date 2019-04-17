@@ -2,7 +2,14 @@ const domain = "http://aj.zkygis.cn/dutySys";
 
 const config = {
   url: {
-    login: `${domain}/api/account/GetUserPassWord`
+    //登录
+    GetUserPassWord: `${domain}/api/account/GetUserPassWord`,
+
+    //项目列表
+    getProjectUnionScopeList: `${domain}/api/app/getProjectUnionScopeList`,
+
+    //图斑列表
+    getSpotList: `${domain}/api/app/getSpotList`
   },
 
   //扰动类型

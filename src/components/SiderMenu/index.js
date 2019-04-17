@@ -61,7 +61,6 @@ export default class SiderMenu extends PureComponent {
       </Menu>
     );
     const user = JSON.parse(sessionStorage.getItem("user"));
-    console.log(user);
     const username = user ? user.us_name : "请登录";
     const tabs = [
       {

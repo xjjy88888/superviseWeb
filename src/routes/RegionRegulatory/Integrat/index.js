@@ -147,7 +147,7 @@ export default class integrat extends PureComponent {
           let content = "";
           for (let i = 0; i < data.features.length; i++) {
             let feature = data.features[i];
-            //content += getWinContent(feature.properties) + "<br><br>";
+            content += me.getWinContent(feature.properties) + "<br><br>";
           }
           map.openPopup(content, userconfig.mapPoint);
         }
@@ -155,9 +155,35 @@ export default class integrat extends PureComponent {
     });
     //console.log(this.props);
   };
+   /*
+   * 匹配气泡窗口信息模版函数
+   */ 
+  getWinContent = (properties) =>{
+    let content = "";
+    //判断点击哪个图层
+    if (properties.spot_tbid) {//扰动图斑
+        content = "图斑编号:" + properties.spot_tbid + "</br>";
+        content += '<a onclick="DCI.Poi.toLocationPOI(\'' + properties.spot_tbid+ '\')">详情</a><br/>';
+        //content += "项目ID:" + properties.project_id + "</br>";
+        //content += "复核状态:" + properties.isreview + "</br>";
+        //content += "扰动类型:" + properties.qtype + "</br>";
+        //content += "扰动面积:" + properties.qarea + "</br>";
+        //content += "建设状态:" + properties.qdcs + "</br>";
+        //content += "扰动变化类型:" + properties.qdtype + "</br>";
+        //content += "超出防治责任范围面积:" + properties.earea;
+    }
+    else if (properties.project_id) {//项目红线
+        content = "项目ID:" + properties.project_id + "</br>";
+        //content += "上图单元ID:" + properties.sup_unit + "</br>";
+        //content += "矢量化类型:" + properties.vectype + "</br>";
+        //content += "设计阶段:" + properties.design_stage + "</br>";
+        //content += "面积:" + properties.area;
+    }
+    return content;
+  }
   /*
    * 绘制图形函数
-   */
+  */
   loadGeojsonLayer = (geojson, style) => {
     //map.createPane('ProjectVectorLayer');
     //map.getPane('ProjectVectorLayer').style.zIndex = 2;
