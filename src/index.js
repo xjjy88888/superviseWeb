@@ -11,6 +11,7 @@ const app = dva({});
 app.model(require("./models/inspect").default);
 app.model(require("./models/settings").default);
 app.model(require("./models/user").default);
+app.model(require("./models/mapdata").default);
 
 // 4. Router
 app.router(require("./router").default);

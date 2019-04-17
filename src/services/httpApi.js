@@ -13,3 +13,15 @@ export async function login(params) {
     }
   );
 }
+
+//地图WFS请求图层数据源
+export async function queryWFSLayer(params) {
+  //console.log(params);
+  return request(
+    params.geojsonUrl,
+    {
+      method: "GET",
+      dataType: 'json'
+    }
+  );
+}

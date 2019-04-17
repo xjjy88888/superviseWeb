@@ -57,10 +57,19 @@ export default class login extends PureComponent {
     } = this.props.form;
     const lastLogin = JSON.parse(localStorage.getItem("lastLogin"));
     return (
-      <div style={{ padding: 200 }}>
+      <div
+        style={{
+          position: 'absolute',
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%,-50%)",background: '#fff',
+          padding: 50,
+          borderRadius: 10
+        }}
+      >
         <Form
           onSubmit={this.handleSubmit}
-          style={{ maxWidth: 300, margin: "0 auto" }}
+          style={{ maxWidth: 300}}
         >
           <Form.Item>
             <img

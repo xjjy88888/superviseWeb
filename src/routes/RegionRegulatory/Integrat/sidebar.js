@@ -34,61 +34,72 @@ const formItemLayout = {
 
 const projectData = [
   {
-    title: "1新建铁路广州至香港专线",
-    owner: "广州铁路局",
-    reply: "广州水利局"
+    title:
+      "1金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
+    owner: "东莞市清溪房地产开发公司、东莞市荔园实业投资有限公司",
+    reply: "广东省南粤交通云湛高速公路管理中心新阳管理处"
   },
   {
-    title: "新建铁路广州至香港专线",
-    owner: "广州铁路局",
-    reply: "广州水利局"
+    title:
+      "12金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
+    owner: "东莞市清溪房地产开发公司、东莞市荔园实业投资有限公司",
+    reply: "广东省南粤交通云湛高速公路管理中心新阳管理处"
   },
   {
-    title: "新建铁路广州至香港专线",
-    owner: "广州铁路局",
-    reply: "广州水利局"
+    title:
+      "123金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
+    owner: "东莞市清溪房地产开发公司、东莞市荔园实业投资有限公司",
+    reply: "广东省南粤交通云湛高速公路管理中心新阳管理处"
   },
   {
-    title: "新建铁路广州至香港专线",
-    owner: "广州铁路局",
-    reply: "广州水利局"
+    title:
+      "1234金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
+    owner: "东莞市清溪房地产开发公司、东莞市荔园实业投资有限公司",
+    reply: "广东省南粤交通云湛高速公路管理中心新阳管理处"
   },
   {
-    title: "新建铁路广州至香港专线",
-    owner: "广州铁路局",
-    reply: "广州水利局"
+    title:
+      "金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
+    owner: "东莞市清溪房地产开发公司、东莞市荔园实业投资有限公司",
+    reply: "广东省南粤交通云湛高速公路管理中心新阳管理处"
   },
   {
-    title: "新建铁路广州至香港专线",
-    owner: "广州铁路局",
-    reply: "广州水利局"
+    title:
+      "金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
+    owner: "东莞市清溪房地产开发公司、东莞市荔园实业投资有限公司",
+    reply: "广东省南粤交通云湛高速公路管理中心新阳管理处"
   },
   {
-    title: "新建铁路广州至香港专线",
-    owner: "广州铁路局",
-    reply: "广州水利局"
+    title:
+      "金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
+    owner: "东莞市清溪房地产开发公司、东莞市荔园实业投资有限公司",
+    reply: "广东省南粤交通云湛高速公路管理中心新阳管理处"
   },
   {
-    title: "新建铁路广州至香港专线",
-    owner: "广州铁路局",
-    reply: "广州水利局"
+    title:
+      "金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
+    owner: "东莞市清溪房地产开发公司、东莞市荔园实业投资有限公司",
+    reply: "广东省南粤交通云湛高速公路管理中心新阳管理处"
   }
 ];
 
 const spotData = [
   {
     title: "2017_7897489_49687",
-    project: "新建铁路广州至香港专线",
+    project:
+      "金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
     standard: "疑似超出防治责任范围"
   },
   {
     title: "2017_7897489_49687",
-    project: "新建铁路广州至香港专线",
+    project:
+      "金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
     standard: "疑似超出防治责任范围"
   },
   {
     title: "2017_7897489_49687",
-    project: "新建铁路广州至香港专线",
+    project:
+      "金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
     standard: "疑似超出防治责任范围"
   }
 ];
@@ -96,7 +107,8 @@ const spotData = [
 const pointData = [
   {
     title: "2018-02-03 08:00",
-    project: "新建铁路广州至香港专线",
+    project:
+      "金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
     desc: "该处存在明显水土流失"
   }
 ];
@@ -107,7 +119,7 @@ export default class integrat extends PureComponent {
     this.state = {
       show: true,
       value: undefined,
-      showDetail: false,
+      showDetail: true,
       edit: false,
       key: "project",
       inputDisabled: true,
@@ -348,8 +360,8 @@ export default class integrat extends PureComponent {
     return (
       <div
         style={{
-          left: show ? 0 : "-400px",
-          width: 400,
+          left: show ? 0 : "-350px",
+          width: 350,
           backgroundColor: "#fff",
           position: "absolute",
           zIndex: 1000,
@@ -497,7 +509,7 @@ export default class integrat extends PureComponent {
                     cursor: "pointer"
                   }}
                   title={
-                    <p>
+                    <p style={{ textAlign: "justify" }}>
                       <span>{item.title}</span>
                       <Icon
                         type="environment"
@@ -569,267 +581,106 @@ export default class integrat extends PureComponent {
             }}
             onClick={this.close}
           />
-          <Button
-            type="dashed"
-            icon={edit ? "check" : "edit"}
-            shape="circle"
-            style={{
-              float: "right",
-              position: "absolute",
-              color: "#1890ff",
-              right: 55,
-              zIndex: 1,
-              top: 10
-            }}
-            onClick={this.submit}
-          />
-          <Button
-            type="dashed"
-            icon="environment"
-            shape="circle"
-            style={{
-              float: "right",
-              position: "absolute",
-              color: "#1890ff",
-              right: 90,
-              zIndex: 1,
-              top: 10
-            }}
-            onClick={() => {
-              message.success("定位成功");
-            }}
-          />
-          <Form verticalGap={100}>
-            <p>
-              <b>项目详情</b>
+          <p style={{ marginTop: 10 }}>
+            <b>
+              金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目
+            </b>
+            <Icon
+              type="edit"
+              theme="twoTone"
+              style={{
+                float: "right",
+                color: "#1890ff",
+                fontSize: 18,
+                zIndex: 1
+              }}
+              onClick={this.submit}
+            />
+          </p>
+          <p style={{ borderBottom: "solid 1px #dedede", paddingBottom: 10 }}>
+            <span>广东省广州市天河区林和街道天寿路105号天寿大厦1001</span>
+            <Icon
+              type="compass"
+              theme="twoTone"
+              style={{
+                float: "right",
+                color: "#1890ff",
+                fontSize: 18,
+                zIndex: 1
+              }}
+              onClick={() => {
+                message.success("定位成功");
+              }}
+            />
+          </p>
+          <div style={{ position: "relative" }}>
+            <a style={{ position: "absolute", right: 0, top: 0 }}>详情</a>
+            <p style={{ margin: 0, width: 240, textAlign: "justify" }}>
+              <span>建设单位：</span>
+              <span>
+                东莞市清溪房地产开发公司、东莞市荔园实业投资有限公司(集团)
+              </span>
             </p>
-            <Form.Item label="项目名" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
-            </Form.Item>
-            <Form.Item label="建设单位" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
-            </Form.Item>
-            <Form.Item label="监管单位" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
-            </Form.Item>
-            <Form.Item label="批复机构" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
-            </Form.Item>
-            <Form.Item label="管理机构" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
-            </Form.Item>
-            <Form.Item label="立项级别" {...formItemLayout}>
-              <AutoComplete
-                placeholder="请选择立项级别"
-                defaultValue={`省级`}
-                disabled={!edit}
-                dataSource={config.approval_level}
-                filterOption={(inputValue, option) =>
-                  option.props.children
-                    .toUpperCase()
-                    .indexOf(inputValue.toUpperCase()) !== -1
-                }
-              />
-            </Form.Item>
-            <Form.Item label="批复文号" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
-            </Form.Item>
-            <Form.Item label="批复机构" {...formItemLayout}>
-              <Input defaultValue={`矢量化类型`} disabled={!edit} />
-            </Form.Item>
-            <Form.Item label="批复时间" {...formItemLayout}>
-              <DatePicker
-                disabled={!edit}
-                defaultValue={moment("2019/01/01", dateFormat)}
-                style={{ width: `100%` }}
-              />
-            </Form.Item>
-            <Form.Item label="责任面积" {...formItemLayout}>
-              <InputNumber
-                defaultValue={`123`}
-                disabled={!edit}
-                formatter={value => `${value}平方米`}
-                style={{ width: `100%` }}
-              />
-            </Form.Item>
-            <Form.Item label="项目类型" {...formItemLayout}>
-              <AutoComplete
-                placeholder="请选择项目类型"
-                defaultValue={`公路工程`}
-                disabled={!edit}
-                dataSource={config.project_type}
-                filterOption={(inputValue, option) =>
-                  option.props.children
-                    .toUpperCase()
-                    .indexOf(inputValue.toUpperCase()) !== -1
-                }
-              />
-            </Form.Item>
-            <Form.Item label="项目类别" {...formItemLayout}>
-              <AutoComplete
-                placeholder="请选择项目类别"
-                defaultValue={`建设类`}
-                disabled={!edit}
-                dataSource={config.project_category}
-                filterOption={(inputValue, option) =>
-                  option.props.children
-                    .toUpperCase()
-                    .indexOf(inputValue.toUpperCase()) !== -1
-                }
-              />
-            </Form.Item>
-            <Form.Item label="项目性质" {...formItemLayout}>
-              <AutoComplete
-                placeholder="请选择项目性质"
-                defaultValue={`新建`}
-                disabled={!edit}
-                dataSource={config.project_nature}
-                filterOption={(inputValue, option) =>
-                  option.props.children
-                    .toUpperCase()
-                    .indexOf(inputValue.toUpperCase()) !== -1
-                }
-              />
-            </Form.Item>
-            <Form.Item label="建设状态" {...formItemLayout}>
-              <AutoComplete
-                placeholder="请选择建设状态"
-                defaultValue={`未开工`}
-                disabled={!edit}
-                dataSource={config.construct_state}
-                filterOption={(inputValue, option) =>
-                  option.props.children
-                    .toUpperCase()
-                    .indexOf(inputValue.toUpperCase()) !== -1
-                }
-              />
-            </Form.Item>
-            <Form.Item label="项目合规性" {...formItemLayout}>
-              <AutoComplete
-                placeholder="请选择项目合规性"
-                defaultValue={`疑似未批先建`}
-                disabled={!edit}
-                dataSource={config.compliance}
-                filterOption={(inputValue, option) =>
-                  option.props.children
-                    .toUpperCase()
-                    .indexOf(inputValue.toUpperCase()) !== -1
-                }
-              />
-            </Form.Item>
-            <Form.Item label="涉及县" {...formItemLayout}>
-              <TreeSelect
-                showSearch
-                disabled={!edit}
-                style={{ width: "100%" }}
-                value={this.state.value}
-                dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
-                placeholder="请选择涉及县"
-                allowClear
-                multiple
-                treeDefaultExpandAll
-                onChange={this.onTreeSelectChange}
-              >
-                <TreeNode value="中国" title="中国" key="0-1">
-                  <TreeNode value="广东" title="广东" key="0-1-1">
-                    <TreeNode value="广州" title="广州" key="random" />
-                    <TreeNode value="中山" title="中山" key="random1" />
-                  </TreeNode>
-                  <TreeNode value="广西" title="广西" key="random2">
-                    <TreeNode value="南宁" title="南宁" key="random3" />
-                  </TreeNode>
-                </TreeNode>
-              </TreeSelect>
-            </Form.Item>
-            <Form.Item label="所在地区" {...formItemLayout}>
-              <Cascader
-                disabled={!edit}
-                placeholder="请选择所在地区"
-                options={config.demo_location}
-                changeOnSelect
-              />
-            </Form.Item>
-            <Form.Item label="详细地址" {...formItemLayout}>
-              <Input placeholder="请填写详细地址" disabled={!edit} />
-            </Form.Item>
-            <Form.Item label="坐标" {...formItemLayout}>
-              <Input
-                defaultValue={`123.423，29.543`}
-                disabled={!edit}
-                addonAfter={
-                  <Icon
-                    type="compass"
-                    style={{
-                      cursor: "point",
-                      color: "#1890ff"
-                    }}
-                    onClick={() => {
-                      if (edit) {
-                        message.success("更新成功");
-                      } else {
-                        message.info("请先开始编辑");
-                      }
-                    }}
-                  />
-                }
-              />
-            </Form.Item>
-            <Form.Item label="备注" {...formItemLayout}>
-              <Input.TextArea
-                autosize={true}
-                defaultValue={`备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注`}
-                disabled={!edit}
-              />
-            </Form.Item>
-          </Form>
+            <p style={{ margin: 0 }}>
+              <span>监管单位：</span>
+              <span>广东省南粤交通云湛高速公路管理中心新阳管理处</span>
+            </p>
+            <p style={{ margin: 0 }}>
+              <span>流域管理机构：</span>
+              <span>珠江水利委员会</span>
+            </p>
+            <p style={{ margin: 0 }}>
+              <span>立项级别：</span>
+              <span>省级</span>
+            </p>
+            <p style={{ margin: 0 }}>
+              <span>批复文号：</span>
+              <span>粤水水保[2017]6号</span>
+            </p>
+            <p style={{ margin: 0 }}>
+              <span>批复时间：</span>
+              <span>2017-01-25</span>
+            </p>
+            <p style={{ margin: 0 }}>
+              <span>责任面积：</span>
+              <span>123509平方米</span>
+            </p>
+            <p style={{ margin: 0 }}>
+              <span>项目类型：</span>
+              <span>铁路工程</span>
+            </p>
+            <p style={{ margin: 0 }}>
+              <span>项目类别：</span>
+              <span>建设类</span>
+            </p>
+            <p style={{ margin: 0 }}>
+              <span>项目性质：</span>
+              <span>新建</span>
+            </p>
+            <p style={{ margin: 0 }}>
+              <span>建设状态：</span>
+              <span>在建</span>
+            </p>
+            <p style={{ margin: 0 }}>
+              <span>项目合规性：</span>
+              <span>合规</span>
+            </p>
+            <p style={{ margin: 0 }}>
+              <span>涉及县：</span>
+              <span>增城区，惠城区，惠阳区，博罗县，天河区</span>
+            </p>
+            <p style={{ margin: 0 }}>
+              <span>备注：</span>
+              <span />
+            </p>
+          </div>
           <List
             style={{
               width: 350,
               position: "relation",
-              padding: "0 20px"
+              paddingRight: 20
             }}
           >
-            <List.Item>
-              <List.Item.Meta
-                title={
-                  <span>
-                    <span>设计阶段：可研</span>
-                    <br />
-                    <span> 防治责任范围：1</span>
-                    <Icon
-                      type="plus"
-                      style={{
-                        padding: 10,
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </span>
-                }
-                description={
-                  <p
-                    onClick={() => {
-                      this.goSiderbarDetail("duty");
-                    }}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <span>
-                      道路主题红线
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </span>
-                  </p>
-                }
-              />
-            </List.Item>
             <List.Item>
               <List.Item.Meta
                 title={
@@ -894,6 +745,47 @@ export default class integrat extends PureComponent {
                     <br />
                     <span>
                       2017154_14848_4848
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </span>
+                  </p>
+                }
+              />
+            </List.Item>
+            <List.Item>
+              <List.Item.Meta
+                title={
+                  <span>
+                    <span>设计阶段：可研</span>
+                    <br />
+                    <span> 防治责任范围：1</span>
+                    <Icon
+                      type="plus"
+                      style={{
+                        padding: 10,
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </span>
+                }
+                description={
+                  <p
+                    onClick={() => {
+                      this.goSiderbarDetail("duty");
+                    }}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <span>
+                      道路主题红线
                       <Icon
                         type="environment"
                         style={{
