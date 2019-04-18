@@ -9,6 +9,7 @@ import {
   Upload,
   Modal,
   List,
+  Divider,
   Avatar,
   TreeSelect,
   Cascader,
@@ -28,6 +29,7 @@ import moment from "moment";
 import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
 import config from "../../../config";
+import styles from "./index.less";
 
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 const dateFormat = "YYYY-MM-DD";
@@ -43,7 +45,7 @@ export default class integrat extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      show: false,
+      show: true,
       edit: false
     };
     this.map = null;
@@ -91,12 +93,18 @@ export default class integrat extends PureComponent {
   }
   render() {
     const { show, edit } = this.state;
+    const {
+      getFieldDecorator,
+      getFieldsError,
+      getFieldError,
+      isFieldTouched
+    } = this.props.form;
 
     return (
       <div
         style={{
           left: show ? 350 : -4000,
-          width: 1000,
+          width: 800,
           backgroundColor: `#fff`,
           position: `absolute`,
           zIndex: 1000,
@@ -123,11 +131,11 @@ export default class integrat extends PureComponent {
         />
         <div
           style={{
-            padding: 50,
+            padding: 30,
             display: edit ? "none" : "block"
           }}
         >
-          <div style={{ float: "left", width: 400 }}>
+          <div style={{ float: "left", width: 350 }}>
             <p style={{ margin: 0 }}>
               <span>防治标准（一级/二级/三级）：</span>
               <span>一级</span>
@@ -233,7 +241,7 @@ export default class integrat extends PureComponent {
               <span>——</span>
             </p>
           </div>
-          <div style={{ float: "left", width: 400 }}>
+          <div style={{ float: "left", width: 350 }}>
             <p style={{ margin: 0 }}>
               <span>扰动土地整治率（%）：</span>
               <span>一级</span>
@@ -361,253 +369,294 @@ export default class integrat extends PureComponent {
           }}
         >
           <Form
+            layout="inline"
             className="ant-advanced-search-form"
             onSubmit={this.handleSearch}
           >
             <Row gutter={24}>
-              <Col span={6}>
-                <Form.Item label="防治标准（一级/二级/三级）">
-                  <Input />
+              <Col span={12}>
+                <Form.Item label="防治标准">
+                  <Radio.Group
+                    onChange={e => {
+                      this.setState({
+                        value: e.target.control_standard
+                      });
+                    }}
+                    value={this.state.control_standard}
+                  >
+                    <Radio value={1}>一级</Radio>
+                    <Radio value={2}>二级</Radio>
+                    <Radio value={3}>三级</Radio>
+                  </Radio.Group>
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="总投资">
-                  <Input />
+                  <Input addonAfter="万元" style={{ width: 150 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="土建投资">
-                  <Input />
+                  <Input addonAfter="万元" style={{ width: 150 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
-                <Form.Item label="项目规模（长度或面积）">
-                  <Input />
+              <Col span={12}>
+                <Form.Item label="项目规模">
+                  <Input addonAfter="m或m2" style={{ width: 150 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="设计动工时间">
-                  <Input />
+                  <DatePicker placeholder="" style={{ width: 130 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="设计完工时间">
-                  <Input />
+                  <DatePicker placeholder="" style={{ width: 130 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="实际开工时间">
-                  <Input />
+                  <DatePicker placeholder="" style={{ width: 130 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="实际完工时间">
-                  <Input />
+                  <DatePicker placeholder="" style={{ width: 130 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="设计水平年">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="防治区类型（枚举）">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
-                <Form.Item label="防治区级别（国家/省级）">
-                  <Input />
+              <Col span={12}>
+                <Form.Item label="防治区级别">
+                  <Radio.Group
+                    onChange={e => {
+                      this.setState({
+                        value: e.target.control_zone_level
+                      });
+                    }}
+                    value={this.state.control_zone_level}
+                  >
+                    <Radio value={1}>国家</Radio>
+                    <Radio value={2}>省级</Radio>
+                  </Radio.Group>
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="地貌类型（枚举）">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="土壤类型">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="植被类型">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Divider />
+              <Col span={12}>
                 <Form.Item label="项目建设区面积">
-                  <Input />
+                  <Input addonAfter="m2" style={{ width: 150 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="直接影响区面积">
-                  <Input />
+                  <Input addonAfter="m2" style={{ width: 150 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="扰动地表面积">
-                  <Input />
+                  <Input addonAfter="m2" style={{ width: 150 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="损坏水土保持设施面积">
-                  <Input />
+                  <Input addonAfter="m2" style={{ width: 150 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
-                <Form.Item label="原地貌土壤侵蚀模数（t/km2*a)">
-                  <Input />
+              <Divider />
+              <Col span={12}>
+                <Form.Item label="原地貌土壤侵蚀模数">
+                  <Input addonAfter="t/km2*a" style={{ width: 150 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
-                <Form.Item label="土壤容许流失量（t/km2*a)">
-                  <Input />
+              <Col span={12}>
+                <Form.Item label="土壤容许流失量">
+                  <Input addonAfter="t/km2*a" style={{ width: 150 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
-                <Form.Item label="水土流失预测总量（t）">
-                  <Input />
+              <Col span={12}>
+                <Form.Item label="水土流失预测总量">
+                  <Input addonAfter="t" style={{ width: 150 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="新增水土流失量">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="新增水土流失主要区域">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
-                <Form.Item label="扰动土地整治率（%）">
-                  <Input />
+              <Divider />
+              <Col span={12}>
+                <Form.Item label="扰动土地整治率">
+                  <Input addonAfter="%" style={{ width: 150 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="水土流失总治理度">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="土壤流失控制比">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="拦渣率">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="植被恢复系数">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="林草覆盖率">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
-                <Form.Item label="水土保持总投资（万元）">
-                  <Input />
+              <Divider />
+              <Col span={12}>
+                <Form.Item label="水土保持总投资">
+                  <Input addonAfter="万元" style={{ width: 150 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="独立费用">
-                  <Input />
+                  <Input addonAfter="万元" style={{ width: 150 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="水土保持监理费">
-                  <Input />
+                  <Input addonAfter="万元" style={{ width: 150 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="水土保持监测费">
-                  <Input />
+                  <Input addonAfter="万元" style={{ width: 150 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="水土保持补偿费">
-                  <Input />
+                  <Input addonAfter="万元" style={{ width: 150 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="工程措施设计投资">
-                  <Input />
+                  <Input addonAfter="万元" style={{ width: 150 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="职位措施设计投资">
-                  <Input />
+                  <Input addonAfter="万元" style={{ width: 150 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="临时措施设计投资">
-                  <Input />
+                  <Input addonAfter="万元" style={{ width: 150 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="附件">
-                  <Input />
+                  <Upload
+                    listType="picture"
+                    className={styles.upload_list_inline}
+                  >
+                    <Button>
+                      <Icon type="upload" />
+                      上传
+                    </Button>
+                  </Upload>
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Divider />
+              <Col span={12}>
                 <Form.Item label="方案编制单位ID">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="监测单位ID">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="监理单位ID">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="设计单位ID">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="施工单位ID">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="验收报告编制单位ID">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Divider />
+              <Col span={12}>
                 <Form.Item label="项目变更信息">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="变更原因">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="变更时间">
-                  <Input />
+                  <DatePicker placeholder="" style={{ width: 130 }} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="原项目名称">
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <Form.Item label="附件">
-                  <Input />
+                  <Upload listType="picture">
+                    <Button>
+                      <Icon type="upload" />
+                      上传
+                    </Button>
+                  </Upload>
                 </Form.Item>
               </Col>
             </Row>

@@ -20,6 +20,7 @@ import {
   DatePicker,
   InputNumber,
   AutoComplete,
+  Collapse,
   message
 } from "antd";
 import moment from "moment";
@@ -36,87 +37,6 @@ const formItemLayout = {
   wrapperCol: { span: 16 }
 };
 
-const projectData = [
-  {
-    title:
-      "1金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
-    owner: "东莞市清溪房地产开发公司、东莞市荔园实业投资有限公司",
-    reply: "广东省南粤交通云湛高速公路管理中心新阳管理处"
-  },
-  {
-    title:
-      "12金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
-    owner: "东莞市清溪房地产开发公司、东莞市荔园实业投资有限公司",
-    reply: "广东省南粤交通云湛高速公路管理中心新阳管理处"
-  },
-  {
-    title:
-      "123金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
-    owner: "东莞市清溪房地产开发公司、东莞市荔园实业投资有限公司",
-    reply: "广东省南粤交通云湛高速公路管理中心新阳管理处"
-  },
-  {
-    title:
-      "1234金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
-    owner: "东莞市清溪房地产开发公司、东莞市荔园实业投资有限公司",
-    reply: "广东省南粤交通云湛高速公路管理中心新阳管理处"
-  },
-  {
-    title:
-      "金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
-    owner: "东莞市清溪房地产开发公司、东莞市荔园实业投资有限公司",
-    reply: "广东省南粤交通云湛高速公路管理中心新阳管理处"
-  },
-  {
-    title:
-      "金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
-    owner: "东莞市清溪房地产开发公司、东莞市荔园实业投资有限公司",
-    reply: "广东省南粤交通云湛高速公路管理中心新阳管理处"
-  },
-  {
-    title:
-      "金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
-    owner: "东莞市清溪房地产开发公司、东莞市荔园实业投资有限公司",
-    reply: "广东省南粤交通云湛高速公路管理中心新阳管理处"
-  },
-  {
-    title:
-      "金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
-    owner: "东莞市清溪房地产开发公司、东莞市荔园实业投资有限公司",
-    reply: "广东省南粤交通云湛高速公路管理中心新阳管理处"
-  }
-];
-
-const spotData = [
-  {
-    title: "2017_7897489_49687",
-    project:
-      "金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
-    standard: "疑似超出防治责任范围"
-  },
-  {
-    title: "2017_7897489_49687",
-    project:
-      "金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
-    standard: "疑似超出防治责任范围"
-  },
-  {
-    title: "2017_7897489_49687",
-    project:
-      "金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
-    standard: "疑似超出防治责任范围"
-  }
-];
-
-const pointData = [
-  {
-    title: "2018-02-03 08:00",
-    project:
-      "金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目",
-    desc: "该处存在明显水土流失"
-  }
-];
-
 @connect(({ project }) => ({
   project
 }))
@@ -126,7 +46,7 @@ export default class integrat extends PureComponent {
     this.state = {
       show: true,
       value: undefined,
-      showDetail: false,
+      showDetail: true,
       showProjectEdit: false,
       key: "project",
       inputDisabled: true,
@@ -145,7 +65,7 @@ export default class integrat extends PureComponent {
           value: "level"
         }
       ],
-      listData: projectData,
+      listData: [],
       previewVisible: false,
       previewImage: "",
       fileList: [
@@ -303,7 +223,6 @@ export default class integrat extends PureComponent {
     if (e.key === "project") {
       this.setState({
         placeholder: "项目",
-        listData: projectData,
         sort: [
           {
             title: "名称",
@@ -322,7 +241,6 @@ export default class integrat extends PureComponent {
     } else if (e.key === "spot") {
       this.setState({
         placeholder: "图斑",
-        listData: spotData,
         sort: [
           {
             title: "编号",
@@ -341,7 +259,6 @@ export default class integrat extends PureComponent {
     } else {
       this.setState({
         placeholder: "关联项目",
-        listData: pointData,
         sort: [
           {
             title: "描述",
@@ -713,75 +630,20 @@ export default class integrat extends PureComponent {
                 金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目
               </b>
             </p>
-            <p style={{ borderBottom: "solid 1px #dedede", paddingBottom: 10 }}>
+            <p
+              style={
+                {
+                  // borderBottom: "solid 1px #dedede",
+                  // paddingBottom: 10
+                }
+              }
+            >
               <span>位置：</span>
               <span>
                 新疆维吾尔自治区克孜勒苏柯尔克孜自治州阿图什市某某路##号某某大厦1901
               </span>
             </p>
-            <div
-              style={{
-                borderBottom: "solid 1px #dedede",
-                paddingBottom: 10,
-                position: "relative"
-              }}
-            >
-              <p style={{ margin: 0 }}>
-                <span>建设单位：</span>
-                <span>广东省南粤交通云湛高速公路管理中心新阳管理处</span>
-              </p>
-              <p style={{ margin: 0 }}>
-                <span>监管单位：</span>
-                <span>湛江市经济技术开发区农业事务管理局</span>
-              </p>
-              <p style={{ margin: 0 }}>
-                <span>批复机构：</span>
-                <span>湛江市经济技术开发区农业事务管理局</span>
-              </p>
-              <p style={{ margin: 0 }}>
-                <span>流域管理机构：</span>
-                <span>珠江水利委员会</span>
-              </p>
-              <p style={{ margin: 0 }}>
-                <span>批复文号：</span>
-                <span>粤水水保[2017]6号</span>
-              </p>
-              <p style={{ margin: 0 }}>
-                <span>批复时间：</span>
-                <span>2017/01/25</span>
-                <span style={{ float: "right" }}>123509m2</span>
-                <span style={{ float: "right" }}>责任面积：</span>
-              </p>
-              <p style={{ margin: 0 }}>
-                <span>立项级别：</span>
-                <span>省级</span>
-                <span style={{ float: "right" }}>疑似未批先建</span>
-                <span style={{ float: "right" }}>项目合规性：</span>
-              </p>
-              <p style={{ margin: 0 }}>
-                <span>项目类别：</span>
-                <span>建设类</span>
-                <span style={{ float: "right" }}>铁路工程</span>
-                <span style={{ float: "right" }}>项目类型：</span>
-              </p>
-              <p style={{ margin: 0 }}>
-                <span>建设状态：</span>
-                <span>在建</span>
-                <span style={{ float: "right" }}>新建</span>
-                <span style={{ float: "right" }}>项目性质：</span>
-              </p>
-              <p style={{ margin: 0 }}>
-                <span>涉及县：</span>
-                <span>增城区，惠城区，惠阳区，博罗县，天河区</span>
-              </p>
-              <p style={{ margin: 0, textAlign: "justify" }}>
-                <span>备注：</span>
-                <span>
-                  东莞市清溪房地产开发公司、
-                  <a style={{ float: "right" }}>详情</a>
-                </span>
-              </p>
-            </div>
+
             <List
               style={{
                 width: 310,
@@ -789,7 +651,502 @@ export default class integrat extends PureComponent {
                 paddingRight: 30
               }}
             >
-              <List.Item>
+              <Collapse defaultActiveKey={["0"]}>
+                <Collapse.Panel header="基本信息" key="0">
+                  <div
+                    style={{
+                      // borderBottom: "solid 1px #dedede",
+                      paddingBottom: 10,
+                      position: "relative"
+                    }}
+                  >
+                    <p style={{ margin: 0 }}>
+                      <span>建设单位：</span>
+                      <span>广东省南粤交通云湛高速公路管理中心新阳管理处</span>
+                    </p>
+                    <p style={{ margin: 0 }}>
+                      <span>监管单位：</span>
+                      <span>湛江市经济技术开发区农业事务管理局</span>
+                    </p>
+                    <p style={{ margin: 0 }}>
+                      <span>批复机构：</span>
+                      <span>湛江市经济技术开发区农业事务管理局</span>
+                    </p>
+                    <p style={{ margin: 0 }}>
+                      <span>流域管理机构：</span>
+                      <span>珠江水利委员会</span>
+                    </p>
+                    <p style={{ margin: 0 }}>
+                      <span>批复文号：</span>
+                      <span>粤水水保[2017]6号</span>
+                    </p>
+                    <p style={{ margin: 0 }}>
+                      <span>批复时间：</span>
+                      <span>2017/01/25</span>
+                    </p>
+                    <p style={{ margin: 0 }}>
+                      <span>责任面积：</span>
+                      <span>123509m2</span>
+                    </p>
+                    <p style={{ margin: 0 }}>
+                      <span>立项级别：</span>
+                      <span>省级</span>
+                    </p>
+                    <p style={{ margin: 0 }}>
+                      <span>项目合规性：</span>
+                      <span>疑似未批先建</span>
+                    </p>
+                    <p style={{ margin: 0 }}>
+                      <span>项目类别：</span>
+                      <span>建设类</span>
+                    </p>
+                    <p style={{ margin: 0 }}>
+                      <span>项目类型：</span>
+                      <span>铁路工程</span>
+                    </p>
+                    <p style={{ margin: 0 }}>
+                      <span>建设状态：</span>
+                      <span>在建</span>
+                    </p>
+                    <p style={{ margin: 0 }}>
+                      <span>项目性质：</span>
+                      <span>新建</span>
+                    </p>
+                    <p style={{ margin: 0 }}>
+                      <span>涉及县：</span>
+                      <span>增城区，惠城区，惠阳区，博罗县，天河区</span>
+                    </p>
+                    <p style={{ margin: 0, textAlign: "justify" }}>
+                      <span>备注：</span>
+                      <span>东莞市清溪房地产公司</span>
+                    </p>
+                    <a
+                      style={{ position: "absolute", right: 0, bottom: 0 }}
+                      onClick={() => {
+                        emitter.emit("showEdit", {
+                          show: true,
+                          edit: false
+                        });
+                      }}
+                    >
+                      详情
+                    </a>
+                  </div>
+                </Collapse.Panel>
+                <Collapse.Panel header="监督执法记录：2" key="1">
+                  <p>
+                    2019/3/22 检查记录
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    2019/3/22 检查记录
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                </Collapse.Panel>
+                <Collapse.Panel header="扰动图斑：5" key="2">
+                  <p>
+                    2017154_14848_4848
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    2017154_14848_4848
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    2017154_14848_4848
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    2017154_14848_4848
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                </Collapse.Panel>
+                <Collapse.Panel header="防治责任范围：2" key="3">
+                  <p>
+                    红线第一部分
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    红线第二部分
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                </Collapse.Panel>
+                <Collapse.Panel header="设计分区：5" key="4">
+                  <p>
+                    主体功能区
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    生产生活区
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    连接道路区
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    弃渣场
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    取土场
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                </Collapse.Panel>
+                <Collapse.Panel header="设计措施：5" key="5">
+                  <p>
+                    截排水沟
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    沉沙池
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    植树
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    种草
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    浆砌石拦挡
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                </Collapse.Panel>
+                <Collapse.Panel header="责任点：5" key="6">
+                  <p>
+                    某渣场坡面
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    某大型坡面
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    施工区东北侧
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    临时道路
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    隧道出口
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                </Collapse.Panel>
+                <Collapse.Panel header="实施措施：5" key="7">
+                  <p>
+                    截排水沟
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    沉沙池
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    植树
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    种草
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    浆砌石拦挡
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                </Collapse.Panel>
+                <Collapse.Panel header="问题地块：5" key="8">
+                  <p>
+                    某渣场坡面
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    某大型坡面
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    施工区东北侧
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    临时道路
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                  <p>
+                    隧道出口
+                    <Icon
+                      type="environment"
+                      style={{
+                        float: "right",
+                        fontSize: 18,
+                        cursor: "point",
+                        color: "#1890ff"
+                      }}
+                    />
+                  </p>
+                </Collapse.Panel>
+              </Collapse>
+              {/* <List.Item>
                 <List.Item.Meta
                   title={
                     <span>
@@ -907,7 +1264,7 @@ export default class integrat extends PureComponent {
                     </p>
                   }
                 />
-              </List.Item>
+              </List.Item> */}
               <Carousel autoplay>
                 <img src="./img/spot.jpg" />
                 <img src="./img/spot2.jpg" />
@@ -931,7 +1288,7 @@ export default class integrat extends PureComponent {
               display: showProjectEdit ? "block" : "none"
             }}
           >
-            <Form>
+            <Form style={{ position: "relative", paddingBottom: 10 }}>
               <Form.Item label="项目名" {...formItemLayout}>
                 <Input.TextArea
                   autosize={true}
@@ -1086,31 +1443,25 @@ export default class integrat extends PureComponent {
                   defaultValue={`东莞市清溪房地产开发公司、`}
                 />
               </Form.Item>
+              <a
+                style={{ position: "absolute", right: 0, bottom: 0 }}
+                onClick={() => {
+                  emitter.emit("showEdit", {
+                    show: true,
+                    edit: true
+                  });
+                }}
+              >
+                详情
+              </a>
             </Form>
             <div className="clearfix">
-              <Upload
-                action="//jsonplaceholder.typicode.com/posts/"
-                listType="picture-card"
-                fileList={fileList}
-                onPreview={this.handlePreview}
-                onChange={this.handleChange}
-              >
-                <div>
-                  <Icon type="plus" />
-                  <div style={{ margintop: 8, color: "#666" }}>Upload</div>
-                </div>
+              <Upload listType="picture">
+                <Button>
+                  <Icon type="upload" />
+                  上传附件
+                </Button>
               </Upload>
-              <Modal
-                visible={previewVisible}
-                footer={null}
-                onCancel={this.handleCancel}
-              >
-                <img
-                  alt="example"
-                  style={{ width: "100%" }}
-                  src={previewImage}
-                />
-              </Modal>
             </div>
             <Button
               type="dashed"

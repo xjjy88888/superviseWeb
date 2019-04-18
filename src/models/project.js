@@ -1,11 +1,14 @@
 import { routerRedux } from "dva/router";
-import { projectScopeGetIntersects, spotGetIntersects } from "../services/httpApi";
+import {
+  projectScopeGetIntersects,
+  spotGetIntersects
+} from "../services/httpApi";
 
 export default {
   namespace: "project",
 
   state: {
-    projectList: [],
+    projectList: [{ project_name: "abc" }],
     spotList: []
   },
 
@@ -15,11 +18,14 @@ export default {
 
   effects: {
     *queryProject({ payload }, { call, put }) {
-      const { data: projectList } = yield call(projectScopeGetIntersects, payload);
+      const { data: projectList } = yield call(
+        projectScopeGetIntersects,
+        payload
+      );
       yield put({ type: "save", payload: { projectList } });
     },
     *querySpot({ payload }, { call, put }) {
-      console.log(payload)
+      console.log(payload);
       const { data: spotList } = yield call(spotGetIntersects, payload);
       yield put({ type: "save", payload: { spotList } });
     }
