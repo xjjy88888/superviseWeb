@@ -8,7 +8,7 @@ export default {
   namespace: "project",
 
   state: {
-    projectList: [{ project_name: "abc" }],
+    projectList: [],
     spotList: []
   },
 

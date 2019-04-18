@@ -8,6 +8,8 @@ import {
   Input,
   Radio,
   List,
+  Skeleton,
+  Spin,
   Avatar,
   Upload,
   Modal,
@@ -46,7 +48,7 @@ export default class integrat extends PureComponent {
     this.state = {
       show: true,
       value: undefined,
-      showDetail: true,
+      showDetail: false,
       showProjectEdit: false,
       key: "project",
       inputDisabled: true,
@@ -477,6 +479,15 @@ export default class integrat extends PureComponent {
               </Button>
             </span>
           </p>
+          <Spin
+            style={{
+              display: projectList.length <= 1 ? "block" : "none",
+              padding: 100,
+              position: "absolute",
+              top: 300,
+              left: 60
+            }}
+          />
           <List
             style={{
               overflow: "auto",

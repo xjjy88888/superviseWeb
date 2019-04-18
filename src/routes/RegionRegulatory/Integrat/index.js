@@ -48,7 +48,8 @@ export default class integrat extends PureComponent {
       this.setState({
         project_id: data.project_id
       });
-      console.log(data)
+      
+      //console.log(data)
     });
   }
   /*
@@ -203,7 +204,7 @@ export default class integrat extends PureComponent {
   * 定位地图并且高亮显示
   */ 
   locateMap = (id) =>{
-
+     
   }
   /*
    * 绘制图形函数
