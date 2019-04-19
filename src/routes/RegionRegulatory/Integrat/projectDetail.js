@@ -633,12 +633,12 @@ export default class integrat extends PureComponent {
               <Divider />
               <Col span={12}>
                 <Form.Item label="项目变更信息">
-                  <Input />
+                  <Input.TextArea autosize/>
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="变更原因">
-                  <Input />
+                  <Input.TextArea autosize/>
                 </Form.Item>
               </Col>
               <Col span={12}>

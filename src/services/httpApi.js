@@ -27,7 +27,7 @@ export async function projectScopeGetIntersects(params) {
   });
 }
 
-// 根据项目id获取对应的项目信息
+// 项目id查询项目信息
 export async function projectById(id) {
   return request(`${config.url.projectById}?project_id=${id}`, {
     method: "GET"
@@ -42,6 +42,13 @@ export async function spotGetIntersects(params) {
       "Content-Type": "application/json; charset=utf-8"
     },
     body: JSON.stringify(params.polygon)
+  });
+}
+
+// 图斑id查询图斑信息
+export async function spotById(id) {
+  return request(`${config.url.spotBytbId}?spot_tbid=${id}`, {
+    method: "GET"
   });
 }
 

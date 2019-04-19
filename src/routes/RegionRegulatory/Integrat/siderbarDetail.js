@@ -1,5 +1,6 @@
 import React, { PureComponent } from "react";
 import { createForm } from "rc-form";
+import { connect } from "dva";
 import moment from "moment";
 import {
   Menu,
@@ -8,6 +9,7 @@ import {
   Input,
   Radio,
   Cascader,
+  notification,
   List,
   Avatar,
   message,
@@ -31,6 +33,9 @@ const formItemLayout = {
   wrapperCol: { span: 16 }
 };
 
+@connect(({ project }) => ({
+  project
+}))
 @createForm()
 export default class siderbarDetail extends PureComponent {
   constructor(props) {
@@ -51,20 +56,39 @@ export default class siderbarDetail extends PureComponent {
         from: data.from,
         item: data.item
       });
+      if (data.from === "spot" && data.show) {
+        this.querySpotById(data.id);
+      }
+    });
+    this.eventEmitter = emitter.addListener("showProjectSpotInfo", data => {
+      if (data.from === "spot") {
+        this.setState({
+          show: data.show,
+          edit: data.edit
+        });
+        this.querySpotById(data.id);
+      }
     });
   }
 
-  // componentWillUnmount() {
-  //   emitter.removeListener(this.eventEmitter);
-  // }
+  querySpotById = id => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "project/querySpotById",
+      payload: {
+        id: id
+      }
+    });
+  };
 
   submit = () => {
     const { edit } = this.state;
     this.setState({ edit: !edit });
     if (edit) {
-      message.success("编辑成功");
+      notification["success"]({
+        message: "编辑成功"
+      });
     } else {
-      message.info("开始编辑");
     }
   };
 
@@ -87,14 +111,19 @@ export default class siderbarDetail extends PureComponent {
   };
 
   render() {
-    const { show, from, edit, item } = this.state;
     const {
-      getFieldProps,
-      getFieldError,
-      validateFields,
-      setFieldsValue,
-      setFields
-    } = this.props.form;
+      dispatch,
+      form: {
+        getFieldProps,
+        getFieldDecorator,
+        getFieldError,
+        validateFields,
+        setFieldsValue,
+        setFields
+      },
+      project: { spotItem }
+    } = this.props;
+    const { show, from, edit, item } = this.state;
     return (
       <div
         style={{
@@ -177,104 +206,141 @@ export default class siderbarDetail extends PureComponent {
             }}
           >
             <Form>
-              <p>
-                <b>扰动图斑详情</b>
-              </p>
+              <Form.Item label="扰动图斑" {...formItemLayout}>
+                {getFieldDecorator("spot_tbid", {
+                  initialValue: spotItem.spot_tbid
+                })(<Input disabled={!edit} />)}
+              </Form.Item>
               <Form.Item label="关联项目" {...formItemLayout}>
-                <Input
-                  disabled={!edit}
-                  {...getFieldProps("r_name", {
-                    rules: [{ required: false, message: "名称不能为空！" }],
-                    initialValue: item ? item.project_id : ""
-                  })}
-                  addonAfter={
-                    <Icon
-                      type="link"
-                      style={{
-                        color: "#1890ff"
-                      }}
-                      onClick={() => {
-                        emitter.emit("showProjectDetail", {
-                          show: true
-                        });
-                      }}
-                    />
-                  }
-                />
+                {getFieldDecorator("project_id", {
+                  initialValue: spotItem.project_id
+                })(
+                  <Input
+                    disabled={!edit}
+                    addonAfter={
+                      <Icon
+                        type="link"
+                        style={{
+                          color: "#1890ff"
+                        }}
+                        onClick={() => {
+                          emitter.emit("showProjectDetail", {
+                            show: true,
+                            id: spotItem.project_id
+                          });
+                        }}
+                      />
+                    }
+                  />
+                )}
               </Form.Item>
               <Form.Item label="扰动类型" {...formItemLayout}>
-                <AutoComplete
-                  placeholder="请选择扰动类型"
-                  disabled={!edit}
-                  dataSource={config.disturb_type}
-                  filterOption={(inputValue, option) =>
-                    option.props.children
-                      .toUpperCase()
-                      .indexOf(inputValue.toUpperCase()) !== -1
-                  }
-                />
+                {getFieldDecorator("qtype", {
+                  initialValue: spotItem.qtype
+                })(
+                  <AutoComplete
+                    placeholder="请选择扰动类型"
+                    disabled={!edit}
+                    dataSource={config.disturb_type}
+                    filterOption={(inputValue, option) =>
+                      option.props.children
+                        .toUpperCase()
+                        .indexOf(inputValue.toUpperCase()) !== -1
+                    }
+                  />
+                )}
               </Form.Item>
               <Form.Item label="扰动面积" {...formItemLayout}>
-                <Input disabled={!edit} addonAfter="公顷" />
+                {getFieldDecorator("qarea", {
+                  initialValue: spotItem.qarea
+                })(<Input disabled={!edit} addonAfter="公顷" />)}
               </Form.Item>
               <Form.Item label="扰动超出面积" {...formItemLayout}>
-                <Input disabled={!edit} addonAfter="公顷" />
+                {getFieldDecorator("earea", {
+                  initialValue: spotItem.earea
+                })(<Input disabled={!edit} addonAfter="公顷" />)}
               </Form.Item>
               <Form.Item label="扰动合规性" {...formItemLayout}>
-                <AutoComplete
-                  placeholder="请选择扰动合规性"
-                  disabled={!edit}
-                  dataSource={config.compliance}
-                  filterOption={(inputValue, option) =>
-                    option.props.children
-                      .toUpperCase()
-                      .indexOf(inputValue.toUpperCase()) !== -1
-                  }
-                />
+                {getFieldDecorator("byd", {
+                  initialValue: spotItem.byd
+                })(
+                  <AutoComplete
+                    placeholder="请选择扰动合规性"
+                    disabled={!edit}
+                    dataSource={config.compliance}
+                    filterOption={(inputValue, option) =>
+                      option.props.children
+                        .toUpperCase()
+                        .indexOf(inputValue.toUpperCase()) !== -1
+                    }
+                  />
+                )}
               </Form.Item>
               <Form.Item label="扰动变化类型" {...formItemLayout}>
-                <AutoComplete
-                  placeholder="请选择扰动变化类型"
-                  disabled={!edit}
-                  dataSource={config.disturb_change_type}
-                  filterOption={(inputValue, option) =>
-                    option.props.children
-                      .toUpperCase()
-                      .indexOf(inputValue.toUpperCase()) !== -1
-                  }
-                />
+                {getFieldDecorator("qdtype", {
+                  initialValue: spotItem.qdtype
+                })(
+                  <AutoComplete
+                    placeholder="请选择扰动变化类型"
+                    disabled={!edit}
+                    dataSource={config.disturb_change_type}
+                    filterOption={(inputValue, option) =>
+                      option.props.children
+                        .toUpperCase()
+                        .indexOf(inputValue.toUpperCase()) !== -1
+                    }
+                  />
+                )}
               </Form.Item>
               <Form.Item label="建设状态" {...formItemLayout}>
-                <AutoComplete
-                  placeholder="请选择建设状态"
-                  disabled={!edit}
-                  dataSource={config.construct_state}
-                  filterOption={(inputValue, option) =>
-                    option.props.children
-                      .toUpperCase()
-                      .indexOf(inputValue.toUpperCase()) !== -1
-                  }
-                />
+                {getFieldDecorator("qdcs", {
+                  initialValue: spotItem.qdcs
+                })(
+                  <AutoComplete
+                    placeholder="请选择建设状态"
+                    disabled={!edit}
+                    dataSource={config.construct_state}
+                    filterOption={(inputValue, option) =>
+                      option.props.children
+                        .toUpperCase()
+                        .indexOf(inputValue.toUpperCase()) !== -1
+                    }
+                  />
+                )}
               </Form.Item>
               <Form.Item label="复核状态" {...formItemLayout}>
-                <Input defaultValue={``} disabled={!edit} />
+                {getFieldDecorator("isreview", {
+                  initialValue: spotItem.isreview
+                })(<Input disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="地址" {...formItemLayout}>
                 <Cascader
                   disabled={!edit}
-                  placeholder="请选择所在地区"
+                  placeholder="----"
                   options={config.demo_location}
                   changeOnSelect
                 />
               </Form.Item>
               <Form.Item label="问题" {...formItemLayout}>
-                <TextArea autosize={true} defaultValue={``} disabled={!edit} />
+                <TextArea
+                  autosize={true}
+                  defaultValue={`----`}
+                  disabled={!edit}
+                />
               </Form.Item>
               <Form.Item label="建议" {...formItemLayout}>
-                <TextArea autosize={true} defaultValue={``} disabled={!edit} />
+                <TextArea
+                  autosize={true}
+                  defaultValue={`----`}
+                  disabled={!edit}
+                />
               </Form.Item>
               <Form.Item label="备注" {...formItemLayout}>
-                <TextArea autosize={true} defaultValue={``} disabled={!edit} />
+                <TextArea
+                  autosize={true}
+                  defaultValue={`----`}
+                  disabled={!edit}
+                />
               </Form.Item>
             </Form>
             <Carousel autoplay>
@@ -350,9 +416,13 @@ export default class siderbarDetail extends PureComponent {
                       }}
                       onClick={() => {
                         if (edit) {
-                          message.success("更新坐标成功");
+                          notification["success"]({
+                            message: "更新坐标成功"
+                          });
                         } else {
-                          message.info("请先开始编辑");
+                          notification["info"]({
+                            message: "请先开始编辑"
+                          });
                         }
                       }}
                     />

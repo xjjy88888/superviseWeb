@@ -1,8 +1,10 @@
 import { routerRedux } from "dva/router";
+import { Button, notification } from "antd";
 import {
   projectScopeGetIntersects,
   projectById,
-  spotGetIntersects
+  spotGetIntersects,
+  spotById
 } from "../services/httpApi";
 
 export default {
@@ -11,7 +13,8 @@ export default {
   state: {
     projectList: [],
     spotList: [],
-    projectItem: {}
+    projectItem: {},
+    spotItem: {}
   },
 
   subscriptions: {
@@ -26,14 +29,32 @@ export default {
       );
       yield put({ type: "save", payload: { projectList } });
     },
-    *queryProjectById({ payload }, { call, put }) {
-      const { data: projectItem } = yield call(projectById, payload.project_id);
-      yield put({ type: "save", payload: { projectItem: projectItem[0] } });
+    *queryProjectById({ payload, callback }, { call, put }) {
+      const { data: projectItem } = yield call(projectById, payload.id);
+      notification[projectItem.length ? "success" : "error"]({
+        message: projectItem.length ? "查询项目成功" : "查询项目失败"
+      });
+      if (projectItem.length) {
+        yield put({ type: "save", payload: { projectItem: projectItem[0] } });
+      }
+      if (callback) callback(projectItem);
     },
     *querySpot({ payload }, { call, put }) {
-      //console.log(payload);
       const { data: spotList } = yield call(spotGetIntersects, payload);
       yield put({ type: "save", payload: { spotList } });
+    },
+    *querySpotById({ payload, callback }, { call, put }) {
+      const { data: spotItem } = yield call(spotById, payload.id);
+      notification[spotItem.length ? "success" : "error"]({
+        message: spotItem.length ? "查询图斑成功" : "查询图斑失败"
+      });
+      if (spotItem.length) {
+        yield put({
+          type: "save",
+          payload: { spotItem: spotItem[0] }
+        });
+      }
+      if (callback) callback(spotItem);
     }
   },
 

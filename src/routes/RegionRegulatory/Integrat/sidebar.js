@@ -5,6 +5,7 @@ import {
   Menu,
   Icon,
   Button,
+  notification,
   Input,
   Radio,
   List,
@@ -49,7 +50,7 @@ export default class integrat extends PureComponent {
     this.state = {
       show: true,
       value: undefined,
-      showDetail: false,
+      showProjectDetail: false,
       projectEdit: false,
       key: "project",
       inputDisabled: true,
@@ -90,13 +91,14 @@ export default class integrat extends PureComponent {
   componentDidMount() {
     this.eventEmitter = emitter.addListener("showProjectDetail", data => {
       this.setState({
-        showDetail: data.show
+        showProjectDetail: data.show
       });
+      this.queryProjectById(data.id);
     });
     this.eventEmitter = emitter.addListener("showProjectSpotInfo", data => {
       if (data.from === "project") {
         this.setState({
-          showDetail: data.show,
+          showProjectDetail: data.show,
           projectEdit: data.edit
         });
         this.queryProjectById(data.id);
@@ -128,8 +130,8 @@ export default class integrat extends PureComponent {
     dispatch({
       type: "project/queryProjectById",
       payload: {
-        project_id: id
-      }
+        id: id
+      },
     });
   };
 
@@ -161,13 +163,14 @@ export default class integrat extends PureComponent {
           console.log(values);
         }
       });
-      message.success("编辑成功");
+      notification["success"]({
+        message: "编辑成功"
+      });
       emitter.emit("showEdit", {
         show: true,
         edit: false
       });
     } else {
-      message.info("开始编辑");
       emitter.emit("showEdit", {
         show: true,
         edit: true
@@ -175,35 +178,34 @@ export default class integrat extends PureComponent {
     }
   };
 
-  goSiderbarDetail = from => {
-    emitter.emit("showSiderbarDetail", {
-      show: true,
-      from: from
-    });
-    emitter.emit("showTool", {
-      show: false
-    });
-    emitter.emit("showQuery", {
-      show: false
-    });
-  };
-
   switchShow = () => {
-    this.setState({ show: !this.state.show, showDetail: false });
+    this.setState({ show: !this.state.show, showProjectDetail: false });
   };
 
   close = () => {
-    this.setState({
-      showDetail: false
-    });
-    emitter.emit("showSiderbarDetail", {
-      show: false,
-      from: "spot"
-    });
-    emitter.emit("showEdit", {
-      show: false,
-      edit: false
-    });
+    const { showProjectDetail, projectEdit } = this.state;
+    if (projectEdit) {
+      this.setState({
+        projectEdit: false
+      });
+      emitter.emit("showEdit", {
+        show: true,
+        edit: false
+      });
+    } else {
+      this.setState({
+        showProjectDetail: false,
+        projectEdit: false
+      });
+      emitter.emit("showSiderbarDetail", {
+        show: false,
+        from: "spot"
+      });
+      emitter.emit("showEdit", {
+        show: false,
+        edit: false
+      });
+    }
   };
 
   getIconByType = key => {
@@ -319,7 +321,7 @@ export default class integrat extends PureComponent {
       placeholder,
       sort,
       listData,
-      showDetail,
+      showProjectDetail,
       key,
       projectEdit,
       clientHeight,
@@ -379,7 +381,7 @@ export default class integrat extends PureComponent {
         />
         <div
           style={{
-            display: showDetail ? "none" : "block"
+            display: showProjectDetail ? "none" : "block"
           }}
         >
           <Menu mode="horizontal" defaultSelectedKeys={["project"]}>
@@ -394,9 +396,13 @@ export default class integrat extends PureComponent {
             placeholder={`${placeholder}名`}
             onSearch={v => {
               if (v) {
-                message.success(`查询${v}成功！`);
+                notification["success"]({
+                  message: `查询${v}成功！`
+                });
               } else {
-                message.warning(`请输入查询信息！`);
+                notification["warning"]({
+                  message: "请输入查询信息！"
+                });
               }
             }}
             style={{ padding: "20px 20px", width: 300 }}
@@ -592,15 +598,18 @@ export default class integrat extends PureComponent {
                     </p>
                   }
                   onClick={() => {
-                    this.setState({
-                      showDetail: key === "project"
-                    });
-                    this.queryProjectById(item.project_id);
-                    emitter.emit("showSiderbarDetail", {
-                      show: key !== "project",
-                      from: key,
-                      id: key === "project" ? item.project_id : item.spot_tbid
-                    });
+                    if (key === "project") {
+                      this.setState({
+                        showProjectDetail: true
+                      });
+                      this.queryProjectById(item.project_id);
+                    } else if (key === "spot") {
+                      emitter.emit("showSiderbarDetail", {
+                        show: key === "spot",
+                        from: key,
+                        id: key === "project" ? item.project_id : item.spot_tbid
+                      });
+                    }
                     emitter.emit("showTool", {
                       show: false
                     });
@@ -615,13 +624,14 @@ export default class integrat extends PureComponent {
         </div>
         <div
           style={{
-            display: showDetail ? "block" : "none",
+            display: showProjectDetail ? "block" : "none",
             height: "95vh",
             overflow: "auto",
             padding: 20
           }}
         >
           <p>
+            {/* 返回 */}
             <Button
               icon="rollback"
               shape="circle"
@@ -643,7 +653,9 @@ export default class integrat extends PureComponent {
                 zIndex: 1
               }}
               onClick={() => {
-                message.success("定位成功");
+                notification["success"]({
+                  message: "定位成功"
+                });
               }}
             />
             <Button
