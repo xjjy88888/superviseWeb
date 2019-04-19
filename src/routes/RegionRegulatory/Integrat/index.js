@@ -21,12 +21,14 @@ import "leaflet/dist/leaflet.css";
 import "antd-mobile/dist/antd-mobile.css";
 import config from "../../../config";
 import emitter from "../../../utils/event";
+import jQuery from "jquery";
 
 let userconfig = {};
 let map;
-@connect(({ user, mapdata }) => ({
+@connect(({ user, mapdata, project }) => ({
   user,
-  mapdata
+  mapdata,
+  project
 }))
 export default class integrat extends PureComponent {
   constructor(props) {
@@ -45,10 +47,22 @@ export default class integrat extends PureComponent {
     me.createMap();
     // 组件通信
     this.eventEmitter = emitter.addListener("mapLocation", data => {
-      this.setState({
-        project_id: data.project_id
-      });
-      
+      /*this.setState({
+        item: data.item
+      });*/
+      if (data.key === "project") {
+        this.queryWFSServiceByProperty(
+          data.item.project_id,
+          "project_id",
+          config.mapProjectLayerName
+        );
+      } else if (data.key === "spot") {
+        this.queryWFSServiceByProperty(
+          data.item.spot_tbid,
+          "spot_tbid",
+          config.mapSpotLayerName
+        );
+      }
       //console.log(data)
     });
   }
@@ -108,13 +122,73 @@ export default class integrat extends PureComponent {
     //获取项目区域范围
     me.getRegionGeometry();
   };
+  /*属性查询图层
+   *@method queryWFSServiceByProperty
+   *@param propertyValue 属性值
+   *@param propertyName 属性名称
+   *@param typeName 图层名称
+   *@return null
+   */
+  queryWFSServiceByProperty = (propertyValue, propertyName, typeName) => {
+    const me = this;
+    let filter =
+      '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
+    filter += "<PropertyIsEqualTo>";
+    filter += "<PropertyName>" + propertyName + "</PropertyName>";
+    filter += "<Literal>" + propertyValue + "</Literal>";
+    filter += "</PropertyIsEqualTo>";
+    filter += "</Filter>";
+    let urlString = config.mapUrl.geoserverUrl + "/ows";
+    let param = {
+      service: "WFS",
+      version: "1.0.0",
+      request: "GetFeature",
+      typeName: typeName,
+      outputFormat: "application/json",
+      filter: filter
+    };
+    let geojsonUrl = urlString + L.Util.getParamString(param, urlString);
+    me.props.dispatch({
+      type: "mapdata/queryWFSLayer",
+      payload: { geojsonUrl },
+      callback: data => {
+        me.clearGeojsonLayer();
+        let style = {
+          color: "#33CCFF", //#33CCFF #e60000
+          weight: 3,
+          opacity: 1,
+          fillColor: "#e6d933", //#33CCFF #e6d933
+          fillOpacity: 0.1
+        };
+        me.loadGeojsonLayer(data, style);
+        map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
+          maxZoom: 16
+        });
+        if (data.features.length > 0) {
+          let content = "";
+          for (let i = 0; i < data.features.length; i++) {
+            let feature = data.features[i];
+            if (i === data.features.length - 1) {
+              content += me.getWinContent(feature.properties);
+            } else {
+              content += me.getWinContent(feature.properties) + "<br>";
+            }
+          }
+          map.openPopup(
+            content,
+            userconfig.projectgeojsonLayer.getBounds().getCenter()
+          );
+        }
+      }
+    });
+    //console.log(this.props);
+  };
   /*点选查询图层
    *@method queryWFSServiceByPoint
    *@param point 坐标点
    *@param typeName 图层名称
    *@return null
    */
-
   queryWFSServiceByPoint = (point, typeName) => {
     const me = this;
     point = point.x + "," + point.y;
@@ -127,7 +201,7 @@ export default class integrat extends PureComponent {
     filter += "</gml:Point>";
     filter += "</Intersects>";
     filter += "</Filter>";
-    let urlString = config.mapUrl.geoserverUrl+"/ows";
+    let urlString = config.mapUrl.geoserverUrl + "/ows";
     let param = {
       service: "WFS",
       version: "1.0.0",
@@ -153,62 +227,87 @@ export default class integrat extends PureComponent {
         };
         me.loadGeojsonLayer(data, style);
         if (data.features.length > 0) {
-          let content = "";
+          let content;
           for (let i = 0; i < data.features.length; i++) {
             let feature = data.features[i];
-            if(i === data.features.length-1){
-              content += me.getWinContent(feature.properties);
-            }
-            else{
-              content += me.getWinContent(feature.properties) + "<br>";
+            if (i === data.features.length - 1) {
+              content = me.getWinContent(feature.properties);
+            } else {
+              content = me.getWinContent(feature.properties) + "<br>";
             }
           }
-          map.openPopup(content, userconfig.mapPoint);
+          console.log();
+          map.openPopup(content[0], userconfig.mapPoint);
+
+          // feature.bindPopup(elements[0]).addTo(layer);
         }
       }
     });
     //console.log(this.props);
   };
-   /*
+  /*
    * 匹配气泡窗口信息模版函数
-   */ 
-  getWinContent = (properties) =>{
-    let content = "";
-    //判断点击哪个图层
-    if (properties.spot_tbid) {//扰动图斑
-        content = "图斑编号:" + properties.spot_tbid + "</br>";
-        content += '<a onclick="locateMap(\'' + properties.spot_tbid+ '\')">详情</a>&nbsp;&nbsp;&nbsp;';
-        content += '<a onclick="locateMap(\'' + properties.spot_tbid+ '\')">编辑</a>&nbsp;&nbsp;&nbsp;';
-        content += '<a onclick="locateMap(\'' + properties.spot_tbid+ '\')">定位</a></br>';
-        //content += "项目ID:" + properties.project_id + "</br>";
-        //content += "复核状态:" + properties.isreview + "</br>";
-        //content += "扰动类型:" + properties.qtype + "</br>";
-        //content += "扰动面积:" + properties.qarea + "</br>";
-        //content += "建设状态:" + properties.qdcs + "</br>";
-        //content += "扰动变化类型:" + properties.qdtype + "</br>";
-        //content += "超出防治责任范围面积:" + properties.earea;
-    }
-    else if (properties.project_id) {//项目红线
-        content = "项目ID:" + properties.project_id + "</br>";
-        content += '<a onclick="locateMap(\'' + properties.project_id+ '\')">详情</a>&nbsp;&nbsp;&nbsp;';
-        content += '<a onclick="locateMap(\'' + properties.project_id+ '\')">编辑</a>&nbsp;&nbsp;&nbsp;';
-        content += '<a onclick="locateMap(\'' + properties.spot_tbid+ '\')">定位</a></br>';
-        //content += "上图单元ID:" + properties.sup_unit + "</br>";
-        //content += "矢量化类型:" + properties.vectype + "</br>";
-        //content += "设计阶段:" + properties.design_stage + "</br>";
-        //content += "面积:" + properties.area;
-    }
-    return content;
-  }
- /*
-  * 定位地图并且高亮显示
-  */ 
-  locateMap = (id) =>{
-     
-  }
+   */
+
+  getWinContent = properties => {
+    let elements;
+    elements = properties.spot_tbid
+      ? jQuery(
+          `<div>图斑编号:${properties.spot_tbid}</br>
+        ${
+          properties.project_id
+            ? "关联项目:" + properties.project_id + "</br>"
+            : ""
+        }${
+            properties.byd ? "扰动范围:" + properties.byd + "</br>" : ""
+          }<a class="look">详情</a>    <a class="edit">编辑</a></div>`
+        )
+      : jQuery(
+          `<div>项目ID:${properties.project_id}</br>
+          <a class="look">详情</a>    <a class="edit">编辑</a></div>`
+        );
+    elements.find(".look").on("click", () => {
+      emitter.emit("showProjectSpotInfo", {
+        show: true,
+        edit: false,
+        id: properties.spot_tbid || properties.project_id,
+        from: properties.spot_tbid ? "spot" : "project"
+      });
+    });
+    elements.find(".edit").on("click", () => {
+      emitter.emit("showProjectSpotInfo", {
+        show: true,
+        edit: true,
+        id: properties.spot_tbid || properties.project_id,
+        from: properties.spot_tbid ? "spot" : "project"
+      });
+    });
+    return elements;
+  };
+
+  /*
+   * 显示详情信息
+   */
+
+  showInfo = id => {
+    console.log(id);
+    this.props.dispatch({
+      type: "project/queryProjectById",
+      payload: {
+        project_id: id
+      }
+    });
+  };
+  /*
+   * 显示编辑信息
+   */
+
+  showEdit = id => {
+    console.log(id);
+  };
   /*
    * 绘制图形函数
-  */
+   */
   loadGeojsonLayer = (geojson, style) => {
     //map.createPane('ProjectVectorLayer');
     //map.getPane('ProjectVectorLayer').style.zIndex = 2;
@@ -321,25 +420,27 @@ export default class integrat extends PureComponent {
               let polygon = "";
               if (userconfig.geojson) {
                 if (userconfig.geojson.features.length > 0) {
-                    if (userconfig.geojson.features[0].geometry.coordinates.length > 0) {
-                        //var polygon = "polygon((103.661122555 24.288901115,103.661122555 29.352674495,110.942772097 29.352674495,110.942772097 24.288901115,103.661122555 24.288901115))";
-                        polygon = "polygon((";
-                        let coordinates = userconfig.geojson.features[0].geometry.coordinates;
-                        for (let i = 0; i < coordinates.length; i++) {
-                          let coordinate = coordinates[i];
-                            for (let j = 0; j < coordinate.length; j++) {
-                              let xy = coordinate[j];
-                                if (j === coordinate.length - 1) {
-                                    polygon += xy[0] + " " + xy[1];
-                                }
-                                else {
-                                    polygon += xy[0] + " " + xy[1] + ",";
-                                }
-        
-                            }
+                  if (
+                    userconfig.geojson.features[0].geometry.coordinates.length >
+                    0
+                  ) {
+                    //var polygon = "polygon((103.661122555 24.288901115,103.661122555 29.352674495,110.942772097 29.352674495,110.942772097 24.288901115,103.661122555 24.288901115))";
+                    polygon = "polygon((";
+                    let coordinates =
+                      userconfig.geojson.features[0].geometry.coordinates;
+                    for (let i = 0; i < coordinates.length; i++) {
+                      let coordinate = coordinates[i];
+                      for (let j = 0; j < coordinate.length; j++) {
+                        let xy = coordinate[j];
+                        if (j === coordinate.length - 1) {
+                          polygon += xy[0] + " " + xy[1];
+                        } else {
+                          polygon += xy[0] + " " + xy[1] + ",";
                         }
-                        polygon += "))";
+                      }
                     }
+                    polygon += "))";
+                  }
                 }
               }
               //console.log(polygon);
@@ -364,14 +465,16 @@ export default class integrat extends PureComponent {
     const projectlayerGroup = L.layerGroup();
     const spotlayerGroup = L.layerGroup();
     //加载项目红线图层wms
-    L.tileLayer.wms(config.mapUrl.geoserverUrl+"/wms?", {
+    L.tileLayer
+      .wms(config.mapUrl.geoserverUrl + "/wms?", {
         layers: "ZKYGIS:project_scope", //需要加载的图层
         format: "image/png", //返回的数据格式
         transparent: true
       })
       .addTo(projectlayerGroup);
     //加载图斑图层wms
-    L.tileLayer.wms(config.mapUrl.geoserverUrl+"/wms?", {
+    L.tileLayer
+      .wms(config.mapUrl.geoserverUrl + "/wms?", {
         layers: "ZKYGIS:spot", //需要加载的图层
         format: "image/png", //返回的数据格式
         transparent: true

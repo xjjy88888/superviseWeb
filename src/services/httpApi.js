@@ -19,25 +19,31 @@ export async function login(params) {
 // 项目列表
 export async function projectScopeGetIntersects(params) {
   return request(`${config.url.projectScopeGetIntersects}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json; charset=utf-8',
+      "Content-Type": "application/json; charset=utf-8"
     },
-    body: JSON.stringify(params.polygon),
+    body: JSON.stringify(params.polygon)
+  });
+}
+
+// 根据项目id获取对应的项目信息
+export async function projectById(id) {
+  return request(`${config.url.projectById}?project_id=${id}`, {
+    method: "GET"
   });
 }
 
 // 图斑列表
 export async function spotGetIntersects(params) {
   return request(`${config.url.spotGetIntersects}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json; charset=utf-8',
+      "Content-Type": "application/json; charset=utf-8"
     },
-    body: JSON.stringify(params.polygon),
+    body: JSON.stringify(params.polygon)
   });
 }
-
 
 //地图WFS请求图层数据源
 export async function queryWFSLayer(params) {

@@ -38,7 +38,8 @@ export default class siderbarDetail extends PureComponent {
     this.state = {
       show: false,
       from: "spot",
-      edit: false
+      edit: false,
+      item: { project_id: "" }
     };
     this.map = null;
   }
@@ -47,7 +48,8 @@ export default class siderbarDetail extends PureComponent {
     this.eventEmitter = emitter.addListener("showSiderbarDetail", data => {
       this.setState({
         show: data.show,
-        from: data.from
+        from: data.from,
+        item: data.item
       });
     });
   }
@@ -85,8 +87,14 @@ export default class siderbarDetail extends PureComponent {
   };
 
   render() {
-    const { show, from, edit } = this.state;
-
+    const { show, from, edit, item } = this.state;
+    const {
+      getFieldProps,
+      getFieldError,
+      validateFields,
+      setFieldsValue,
+      setFields
+    } = this.props.form;
     return (
       <div
         style={{
@@ -174,8 +182,11 @@ export default class siderbarDetail extends PureComponent {
               </p>
               <Form.Item label="关联项目" {...formItemLayout}>
                 <Input
-                  defaultValue={`其他扰动`}
                   disabled={!edit}
+                  {...getFieldProps("r_name", {
+                    rules: [{ required: false, message: "名称不能为空！" }],
+                    initialValue: item ? item.project_id : ""
+                  })}
                   addonAfter={
                     <Icon
                       type="link"
@@ -204,20 +215,10 @@ export default class siderbarDetail extends PureComponent {
                 />
               </Form.Item>
               <Form.Item label="扰动面积" {...formItemLayout}>
-                <InputNumber
-                  defaultValue={`68`}
-                  disabled={!edit}
-                  formatter={value => `${value}公顷`}
-                  style={{ width: `100%` }}
-                />
+                <Input disabled={!edit} addonAfter="公顷" />
               </Form.Item>
               <Form.Item label="扰动超出面积" {...formItemLayout}>
-                <InputNumber
-                  defaultValue={`68`}
-                  disabled={!edit}
-                  formatter={value => `${value}公顷`}
-                  style={{ width: `100%` }}
-                />
+                <Input disabled={!edit} addonAfter="公顷" />
               </Form.Item>
               <Form.Item label="扰动合规性" {...formItemLayout}>
                 <AutoComplete
@@ -256,7 +257,7 @@ export default class siderbarDetail extends PureComponent {
                 />
               </Form.Item>
               <Form.Item label="复核状态" {...formItemLayout}>
-                <Input defaultValue={`复核状态`} disabled={!edit} />
+                <Input defaultValue={``} disabled={!edit} />
               </Form.Item>
               <Form.Item label="地址" {...formItemLayout}>
                 <Cascader
@@ -267,25 +268,13 @@ export default class siderbarDetail extends PureComponent {
                 />
               </Form.Item>
               <Form.Item label="问题" {...formItemLayout}>
-                <TextArea
-                  autosize={true}
-                  defaultValue={`问题问题问题问题问题问题问题问题问题问题问题问题问题`}
-                  disabled={!edit}
-                />
+                <TextArea autosize={true} defaultValue={``} disabled={!edit} />
               </Form.Item>
               <Form.Item label="建议" {...formItemLayout}>
-                <TextArea
-                  autosize={true}
-                  defaultValue={`建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议建议`}
-                  disabled={!edit}
-                />
+                <TextArea autosize={true} defaultValue={``} disabled={!edit} />
               </Form.Item>
               <Form.Item label="备注" {...formItemLayout}>
-                <TextArea
-                  autosize={true}
-                  defaultValue={`备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注`}
-                  disabled={!edit}
-                />
+                <TextArea autosize={true} defaultValue={``} disabled={!edit} />
               </Form.Item>
             </Form>
             <Carousel autoplay>

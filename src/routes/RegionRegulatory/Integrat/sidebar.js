@@ -42,6 +42,7 @@ const formItemLayout = {
 @connect(({ project }) => ({
   project
 }))
+@createForm()
 export default class integrat extends PureComponent {
   constructor(props) {
     super(props);
@@ -49,7 +50,7 @@ export default class integrat extends PureComponent {
       show: true,
       value: undefined,
       showDetail: false,
-      showProjectEdit: false,
+      projectEdit: false,
       key: "project",
       inputDisabled: true,
       placeholder: "项目",
@@ -92,6 +93,15 @@ export default class integrat extends PureComponent {
         showDetail: data.show
       });
     });
+    this.eventEmitter = emitter.addListener("showProjectSpotInfo", data => {
+      if (data.from === "project") {
+        this.setState({
+          showDetail: data.show,
+          projectEdit: data.edit
+        });
+        this.queryProjectById(data.id);
+      }
+    });
     this.eventEmitter = emitter.addListener("polygon", data => {
       //console.log(data);
       this.props.dispatch({
@@ -112,6 +122,17 @@ export default class integrat extends PureComponent {
       clientHeight: clientHeight
     });
   }
+
+  queryProjectById = id => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "project/queryProjectById",
+      payload: {
+        project_id: id
+      }
+    });
+  };
+
   handleCancel = () => this.setState({ previewVisible: false });
 
   handlePreview = file => {
@@ -131,10 +152,15 @@ export default class integrat extends PureComponent {
     this.setState({ value });
   };
 
-  submit = () => {
-    const { showProjectEdit } = this.state;
-    this.setState({ showProjectEdit: !showProjectEdit });
-    if (showProjectEdit) {
+  submit_project = () => {
+    const { projectEdit } = this.state;
+    this.setState({ projectEdit: !projectEdit });
+    if (projectEdit) {
+      this.props.form.validateFields((err, values) => {
+        if (!err) {
+          console.log(values);
+        }
+      });
       message.success("编辑成功");
       emitter.emit("showEdit", {
         show: true,
@@ -177,23 +203,6 @@ export default class integrat extends PureComponent {
     emitter.emit("showEdit", {
       show: false,
       edit: false
-    });
-  };
-
-  switchShowDetail = () => {
-    const { key, showDetail } = this.state;
-    this.setState({
-      showDetail: key === "project"
-    });
-    emitter.emit("showSiderbarDetail", {
-      show: key !== "project",
-      from: key
-    });
-    emitter.emit("showTool", {
-      show: false
-    });
-    emitter.emit("showQuery", {
-      show: false
     });
   };
 
@@ -312,7 +321,7 @@ export default class integrat extends PureComponent {
       listData,
       showDetail,
       key,
-      showProjectEdit,
+      projectEdit,
       clientHeight,
       inputDisabled,
       previewVisible,
@@ -320,8 +329,10 @@ export default class integrat extends PureComponent {
       fileList
     } = this.state;
     const {
-      project: { projectList, spotList }
+      dispatch,
+      project: { projectList, spotList, projectItem }
     } = this.props;
+    const { getFieldDecorator } = this.props.form;
 
     const showPoint = key === "point";
 
@@ -580,7 +591,23 @@ export default class integrat extends PureComponent {
                       </span>
                     </p>
                   }
-                  onClick={this.switchShowDetail}
+                  onClick={() => {
+                    this.setState({
+                      showDetail: key === "project"
+                    });
+                    this.queryProjectById(item.project_id);
+                    emitter.emit("showSiderbarDetail", {
+                      show: key !== "project",
+                      from: key,
+                      id: key === "project" ? item.project_id : item.spot_tbid
+                    });
+                    emitter.emit("showTool", {
+                      show: false
+                    });
+                    emitter.emit("showQuery", {
+                      show: false
+                    });
+                  }}
                 />
               </List.Item>
             )}
@@ -620,26 +647,25 @@ export default class integrat extends PureComponent {
               }}
             />
             <Button
-              icon={showProjectEdit ? "check" : "edit"}
+              icon={projectEdit ? "check" : "edit"}
               shape="circle"
+              htmlType="submit"
               style={{
                 float: "right",
                 color: "#1890ff",
                 fontSize: 18,
                 zIndex: 1
               }}
-              onClick={this.submit}
+              onClick={this.submit_project}
             />
           </p>
           <div
             style={{
-              display: showProjectEdit ? "none" : "block"
+              display: projectEdit ? "none" : "block"
             }}
           >
             <p>
-              <b>
-                金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目
-              </b>
+              <b>{projectItem.project_name}</b>
             </p>
             <p
               style={
@@ -651,7 +677,11 @@ export default class integrat extends PureComponent {
             >
               <span>位置：</span>
               <span>
-                新疆维吾尔自治区克孜勒苏柯尔克孜自治州阿图什市某某路##号某某大厦1901
+                {projectItem.project_province}
+                {projectItem.project_city}
+                {projectItem.project_district}
+                {projectItem.project_town}
+                {projectItem.project_village}
               </span>
             </p>
 
@@ -671,65 +701,65 @@ export default class integrat extends PureComponent {
                       position: "relative"
                     }}
                   >
-                    <p style={{ margin: 0 }}>
+                    <p style={{ margin: 10 }}>
                       <span>建设单位：</span>
-                      <span>广东省南粤交通云湛高速公路管理中心新阳管理处</span>
+                      <span>{projectItem.product_department_id}</span>
                     </p>
-                    <p style={{ margin: 0 }}>
+                    <p style={{ margin: 10 }}>
                       <span>监管单位：</span>
-                      <span>湛江市经济技术开发区农业事务管理局</span>
+                      <span>{projectItem.project_sup_id}</span>
                     </p>
-                    <p style={{ margin: 0 }}>
+                    <p style={{ margin: 10 }}>
                       <span>批复机构：</span>
-                      <span>湛江市经济技术开发区农业事务管理局</span>
+                      <span>{projectItem.project_rp_id}</span>
                     </p>
-                    <p style={{ margin: 0 }}>
+                    <p style={{ margin: 10 }}>
                       <span>流域管理机构：</span>
-                      <span>珠江水利委员会</span>
+                      <span>{projectItem.ctn_code}</span>
                     </p>
-                    <p style={{ margin: 0 }}>
+                    <p style={{ margin: 10 }}>
                       <span>批复文号：</span>
-                      <span>粤水水保[2017]6号</span>
+                      <span>{projectItem.project_rp_num}</span>
                     </p>
-                    <p style={{ margin: 0 }}>
+                    <p style={{ margin: 10 }}>
                       <span>批复时间：</span>
-                      <span>2017/01/25</span>
+                      <span>{projectItem.project_rp_time}</span>
                     </p>
-                    <p style={{ margin: 0 }}>
+                    <p style={{ margin: 10 }}>
                       <span>责任面积：</span>
-                      <span>123509m2</span>
+                      <span>{projectItem.area}m2</span>
                     </p>
-                    <p style={{ margin: 0 }}>
+                    <p style={{ margin: 10 }}>
                       <span>立项级别：</span>
-                      <span>省级</span>
+                      <span>{projectItem.project_level}</span>
                     </p>
-                    <p style={{ margin: 0 }}>
+                    <p style={{ margin: 10 }}>
                       <span>项目合规性：</span>
-                      <span>疑似未批先建</span>
+                      <span>----</span>
                     </p>
-                    <p style={{ margin: 0 }}>
+                    <p style={{ margin: 10 }}>
                       <span>项目类别：</span>
-                      <span>建设类</span>
+                      <span>----</span>
                     </p>
-                    <p style={{ margin: 0 }}>
+                    <p style={{ margin: 10 }}>
                       <span>项目类型：</span>
-                      <span>铁路工程</span>
+                      <span>----</span>
                     </p>
-                    <p style={{ margin: 0 }}>
+                    <p style={{ margin: 10 }}>
                       <span>建设状态：</span>
-                      <span>在建</span>
+                      <span>----</span>
                     </p>
-                    <p style={{ margin: 0 }}>
+                    <p style={{ margin: 10 }}>
                       <span>项目性质：</span>
-                      <span>新建</span>
+                      <span>----</span>
                     </p>
-                    <p style={{ margin: 0 }}>
+                    <p style={{ margin: 10 }}>
                       <span>涉及县：</span>
-                      <span>增城区，惠城区，惠阳区，博罗县，天河区</span>
+                      <span>----</span>
                     </p>
-                    <p style={{ margin: 0, textAlign: "justify" }}>
+                    <p style={{ margin: 10, textAlign: "justify" }}>
                       <span>备注：</span>
-                      <span>东莞市清溪房地产公司</span>
+                      <span>----</span>
                     </p>
                     <a
                       style={{ position: "absolute", right: 0, bottom: 0 }}
@@ -1296,74 +1326,72 @@ export default class integrat extends PureComponent {
           </div>
           <div
             style={{
-              display: showProjectEdit ? "block" : "none"
+              display: projectEdit ? "block" : "none"
             }}
           >
             <Form style={{ position: "relative", paddingBottom: 10 }}>
               <Form.Item label="项目名" {...formItemLayout}>
-                <Input.TextArea
-                  autosize={true}
-                  defaultValue={`金秀瑶族自治县2018年第二批农网改造升级工程头排镇夏塘村古灯配电台区工程等12个项目`}
-                />
+                {getFieldDecorator("project_name", {
+                  initialValue: projectItem.project_name
+                })(<Input.TextArea autosize />)}
               </Form.Item>
-              <Form.Item label="位置" {...formItemLayout}>
+              <Form.Item label="所在地区" {...formItemLayout}>
                 <Cascader
                   placeholder="请选择所在地区"
                   options={config.demo_location}
                   changeOnSelect
                 />
               </Form.Item>
+              <Form.Item label="详细地址" {...formItemLayout}>
+                {getFieldDecorator("product_department_id1", {
+                  initialValue: projectItem.product_department_id1
+                })(<Input />)}
+              </Form.Item>
               <Form.Item label="建设单位" {...formItemLayout}>
-                <Input.TextArea
-                  autosize={true}
-                  defaultValue={`东莞市清溪房地产开发公司、东莞市荔园实业投资有限公司`}
-                />
+                {getFieldDecorator("product_department_id", {
+                  initialValue: projectItem.product_department_id
+                })(<Input.TextArea autosize />)}
               </Form.Item>
               <Form.Item label="监管单位" {...formItemLayout}>
-                <Input.TextArea
-                  autosize={true}
-                  defaultValue={`湛江市经济技术开发区农业事务管理局`}
-                />
+                {getFieldDecorator("project_sup_id", {
+                  initialValue: projectItem.project_sup_id
+                })(<Input.TextArea autosize />)}
               </Form.Item>
               <Form.Item label="批复机构" {...formItemLayout}>
-                <Input.TextArea
-                  autosize={true}
-                  defaultValue={`湛江市经济技术开发区农业事务管理局`}
-                />
+                {getFieldDecorator("project_rp_id", {
+                  initialValue: projectItem.project_rp_id
+                })(<Input.TextArea autosize />)}
               </Form.Item>
               <Form.Item label="流域管理机构" {...formItemLayout}>
-                <Input.TextArea
-                  autosize={true}
-                  defaultValue={`珠江水利委员会`}
-                />
+                {getFieldDecorator("ctn_code", {
+                  initialValue: projectItem.ctn_code
+                })(<Input.TextArea autosize />)}
               </Form.Item>
               <Form.Item label="批复文号" {...formItemLayout}>
-                <Input defaultValue={`粤水水保[2017]6号`} />
+                {getFieldDecorator("project_rp_num", {
+                  initialValue: projectItem.project_rp_num
+                })(<Input />)}
               </Form.Item>
               <Form.Item label="批复时间" {...formItemLayout}>
-                <DatePicker
-                  defaultValue={moment("2017/01/25", dateFormat)}
-                  style={{ width: `100%` }}
-                />
+                {getFieldDecorator("project_rp_time", {})(<DatePicker />)}
               </Form.Item>
               <Form.Item label="责任面积" {...formItemLayout}>
-                <InputNumber
-                  defaultValue={`123509`}
-                  formatter={value => `${value}m2`}
-                  style={{ width: `100%` }}
-                />
+                {getFieldDecorator("area", {
+                  initialValue: projectItem.area
+                })(<Input addonAfter="m2" />)}
               </Form.Item>
               <Form.Item label="立项级别" {...formItemLayout}>
-                <AutoComplete
-                  placeholder="请选择立项级别"
-                  defaultValue={`省级`}
-                  dataSource={config.approval_level}
-                  filterOption={(inputValue, option) =>
-                    option.props.children
-                      .toUpperCase()
-                      .indexOf(inputValue.toUpperCase()) !== -1
-                  }
-                />
+                {getFieldDecorator("project_level", {})(
+                  <AutoComplete
+                    placeholder="请选择立项级别"
+                    dataSource={config.approval_level}
+                    filterOption={(inputValue, option) =>
+                      option.props.children
+                        .toUpperCase()
+                        .indexOf(inputValue.toUpperCase()) !== -1
+                    }
+                  />
+                )}
               </Form.Item>
               <Form.Item label="项目合规性" {...formItemLayout}>
                 <AutoComplete
@@ -1450,8 +1478,8 @@ export default class integrat extends PureComponent {
               </Form.Item>
               <Form.Item label="备注" {...formItemLayout}>
                 <Input.TextArea
-                  autosize={true}
                   defaultValue={`东莞市清溪房地产开发公司、`}
+                  autosize
                 />
               </Form.Item>
               <a

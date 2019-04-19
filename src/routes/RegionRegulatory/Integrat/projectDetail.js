@@ -132,229 +132,231 @@ export default class integrat extends PureComponent {
         <div
           style={{
             padding: 30,
-            display: edit ? "none" : "block"
+            display: edit ? "none" : "block",
+            overflow: "auto",
+            height: "95vh"
           }}
         >
-          <div style={{ float: "left", width: 350 }}>
-            <p style={{ margin: 0 }}>
+          <div style={{ float: "left", width: 350, padding: "0 30px" }}>
+            <p style={{ margin: 10 }}>
               <span>防治标准（一级/二级/三级）：</span>
               <span>一级</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>总投资：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>土建投资：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>项目规模（长度或面积）：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>设计动工时间：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>设计完工时间：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>实际开工时间：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>实际完工时间：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>设计水平年：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>防治区类型（枚举）：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>防治区级别（国家/省级）：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>地貌类型（枚举）：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>土壤类型：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>植被类型：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>——</span>
               <span>——</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>项目建设区面积：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>直接影响区面积：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>扰动地表面积：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>损坏水土保持设施面积：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>——</span>
               <span>——</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>原地貌土壤侵蚀模数（t/km2*a)：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>土壤容许流失量（t/km2*a)：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>水土流失预测总量（t）：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>新增水土流失量：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>新增水土流失主要区域：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>——</span>
               <span>——</span>
             </p>
           </div>
-          <div style={{ float: "left", width: 350 }}>
-            <p style={{ margin: 0 }}>
+          <div style={{ float: "left", width: 350, padding: "0 60px" }}>
+            <p style={{ margin: 10 }}>
               <span>扰动土地整治率（%）：</span>
               <span>一级</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>水土流失总治理度：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>土壤流失控制比：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>拦渣率：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>植被恢复系数：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>林草覆盖率：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>——</span>
               <span>——</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>水土保持总投资（万元）：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>独立费用：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>水土保持监理费：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>水土保持监测费：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>水土保持补偿费：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>工程措施设计投资：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>职位措施设计投资：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>临时措施设计投资：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>附件：</span>
               <span>水保方案</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>——</span>
               <span>——</span>
             </p>
-            <p style={{ margin: 0 }}>
-              <span>方案编制单位ID：</span>
+            <p style={{ margin: 10 }}>
+              <span>方案编制单位：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
-              <span>监测单位ID：</span>
+            <p style={{ margin: 10 }}>
+              <span>监测单位：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
-              <span>监理单位ID：</span>
+            <p style={{ margin: 10 }}>
+              <span>监理单位：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
-              <span>设计单位ID：</span>
+            <p style={{ margin: 10 }}>
+              <span>设计单位：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
-              <span>施工单位ID：</span>
+            <p style={{ margin: 10 }}>
+              <span>施工单位：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
-              <span>验收报告编制单位ID：</span>
+            <p style={{ margin: 10 }}>
+              <span>验收报告编制单位：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>——</span>
               <span>——</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>项目变更信息：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>变更原因：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>变更时间：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>原项目名称：</span>
               <span>123</span>
             </p>
-            <p style={{ margin: 0 }}>
+            <p style={{ margin: 10 }}>
               <span>附件：</span>
               <span>123</span>
             </p>
@@ -504,7 +506,7 @@ export default class integrat extends PureComponent {
               </Col>
               <Col span={12}>
                 <Form.Item label="新增水土流失量">
-                  <Input />
+                  <Input addonAfter="t" style={{ width: 150 }} />
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -515,32 +517,32 @@ export default class integrat extends PureComponent {
               <Divider />
               <Col span={12}>
                 <Form.Item label="扰动土地整治率">
-                  <Input addonAfter="%" style={{ width: 150 }} />
+                  <Input addonAfter="%" style={{ width: 100 }} />
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="水土流失总治理度">
-                  <Input />
+                  <Input addonAfter="%" style={{ width: 100 }} />
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="土壤流失控制比">
-                  <Input />
+                  <Input addonAfter="%" style={{ width: 100 }} />
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="拦渣率">
-                  <Input />
+                  <Input addonAfter="%" style={{ width: 100 }} />
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="植被恢复系数">
-                  <Input />
+                  <Input addonAfter="%" style={{ width: 100 }} />
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="林草覆盖率">
-                  <Input />
+                  <Input addonAfter="%" style={{ width: 100 }} />
                 </Form.Item>
               </Col>
               <Divider />
@@ -599,32 +601,32 @@ export default class integrat extends PureComponent {
               </Col>
               <Divider />
               <Col span={12}>
-                <Form.Item label="方案编制单位ID">
+                <Form.Item label="方案编制单位">
                   <Input />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="监测单位ID">
+                <Form.Item label="监测单位">
                   <Input />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="监理单位ID">
+                <Form.Item label="监理单位">
                   <Input />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="设计单位ID">
+                <Form.Item label="设计单位">
                   <Input />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="施工单位ID">
+                <Form.Item label="施工单位">
                   <Input />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="验收报告编制单位ID">
+                <Form.Item label="验收报告编制单位">
                   <Input />
                 </Form.Item>
               </Col>

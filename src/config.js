@@ -7,10 +7,16 @@ const config = {
 
     //项目列表
     projectScopeGetIntersects: `${domain}/api/app/projectScopeGetIntersects`,
+    
+    //根据项目id获取对应的项目信息
+    projectById: `${domain}/api/app/projectById`,
     //projectScopeGetIntersects: `http://10.7.23.81:8090/stbcSys/api/app/projectScopeGetIntersects`,
 
     //图斑列表
-    spotGetIntersects: `${domain}/api/app/spotGetIntersects`
+    spotGetIntersects: `${domain}/api/app/spotGetIntersects`,
+   
+    //根据扰动图斑id获取对应的扰动图斑信息
+    spotBytbId: `${domain}/api/app/spotBytbId`,
     //spotGetIntersects: `http://10.7.23.81:8090/stbcSys/api/app/spotGetIntersects`
   },
 
@@ -310,7 +316,10 @@ const config = {
       ]
     }
   },
-  mapLayersName: "ZKYGIS:project_scope,ZKYGIS:spot"
+  mapLayersName: "ZKYGIS:project_scope,ZKYGIS:spot",
+  mapProjectLayerName: "ZKYGIS:project_scope",
+  mapSpotLayerName: "ZKYGIS:spot"
+
 };
 
 export default config;
