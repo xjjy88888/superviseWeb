@@ -53,13 +53,13 @@ export default class integrat extends PureComponent {
     this.state = {
       show: true,
       value: undefined,
-      showProjectDetail: true,
+      showProjectDetail: false,
       projectEdit: false,
       showCompany: false,
       showProblem: false,
       key: "project",
       inputDisabled: true,
-      problem: [],
+      problem: { title: "", records: [] },
       placeholder: "项目",
       sort: [
         {
@@ -318,11 +318,14 @@ export default class integrat extends PureComponent {
   };
 
   TreeOnSelect = e => {
-    this.setState({ showProblem: true });
     if (e.length) {
-      const item = data[e[0].slice(0, 1)].data[e[0].slice(1, 2)];
-      console.log("selected", e, item);
-      this.setState({ problem: item.records });
+      const isRoot = isNaN(e[0].slice(0, 1));
+      this.setState({ showProblem: true });
+      if (!isRoot) {
+        const item = data[e[0].slice(0, 1)].data[e[0].slice(1, 2)];
+        console.log("selected", e, item);
+        this.setState({ problem: item });
+      }
     }
   };
 
@@ -669,9 +672,34 @@ export default class integrat extends PureComponent {
                 this.setState({ showCompany: false });
               }}
             />
+            <Button
+              icon="check"
+              shape="circle"
+              style={{
+                float: "right",
+                color: "#1890ff",
+                fontSize: 18,
+                zIndex: 1
+              }}
+              onClick={() => {
+                this.setState({ showProblem: false });
+                notification["success"]({
+                  message: "编辑成功"
+                });
+              }}
+            />
             <Tree defaultExpandAll onSelect={this.TreeOnSelect}>
               {data.map((item, index) => (
-                <TreeNode title={item.title} key={item.key}>
+                <TreeNode
+                  title={
+                    item.title !== "八、措施缺陷" ? (
+                      <span>{item.title}</span>
+                    ) : (
+                      <span style={{ color: "red" }}>{item.title}</span>
+                    )
+                  }
+                  key={item.key}
+                >
                   {item.data.map((ite, idx) => (
                     <TreeNode
                       title={ite.title}
@@ -712,7 +740,7 @@ export default class integrat extends PureComponent {
                 }}
               />
               <Button
-                icon="close"
+                icon="check"
                 shape="circle"
                 style={{
                   color: "#1890ff",
@@ -723,6 +751,9 @@ export default class integrat extends PureComponent {
                 }}
                 onClick={() => {
                   this.setState({ showProblem: false });
+                  notification["success"]({
+                    message: "编辑成功"
+                  });
                 }}
               />
               <div
@@ -732,8 +763,9 @@ export default class integrat extends PureComponent {
                   height: "100%"
                 }}
               >
-                {problem.map((item, index) => (
-                  <div style={{ padding: 5 }}>
+                <p>{problem.title}</p>
+                {problem.records.map((item, index) => (
+                  <div style={{ padding: 5 }} key={index}>
                     <p>
                       <Tag color={this.toColor(item.sort)}>{item.sort}</Tag>
                       {item.record}

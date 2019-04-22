@@ -1,7 +1,7 @@
 const data = [
   //1 建设单位
   {
-    title: "一、建设单位",
+    title: "一、建设单位（管理问题）",
     key: "owner",
     data: [
       {
@@ -320,7 +320,7 @@ const data = [
   },
   //2 方案单位
   {
-    title: "二、方案单位",
+    title: "二、方案单位（管理问题）",
     key: "plan",
     data: [
       {
@@ -401,7 +401,7 @@ const data = [
   },
   //3 设计单位
   {
-    title: "三、设计单位",
+    title: "三、设计单位（管理问题）",
     key: "design",
     data: [
       {
@@ -460,7 +460,7 @@ const data = [
   },
   //4 施工单位
   {
-    title: "四、施工单位",
+    title: "四、施工单位（管理问题）",
     key: "build",
     data: [
       {
@@ -675,7 +675,7 @@ const data = [
   },
   //5 监测单位
   {
-    title: "五、监测单位",
+    title: "五、监测单位（管理问题）",
     key: "meter",
     data: [
       {
@@ -946,7 +946,7 @@ const data = [
   },
   //6监理单位
   {
-    title: "六、监理单位",
+    title: "六、监理单位（管理问题）",
     key: "supervis",
     data: [
       {
@@ -1179,7 +1179,7 @@ const data = [
   },
   //7 验收单位
   {
-    title: "七、验收单位",
+    title: "七、验收单位（管理问题）",
     key: "accept",
     data: [
       {

@@ -18,6 +18,8 @@ import 'leaflet.pm/dist/leaflet.pm.css';
 import 'leaflet.pm';
 import shp from "shpjs";
 import * as turf from "@turf/turf";
+//import '@h21-map/leaflet-path-drag';
+//import 'leaflet-editable';
 //import { greatCircle, point, circle } from '@turf/turf';
 import "leaflet/dist/leaflet.css";
 import "antd-mobile/dist/antd-mobile.css";
@@ -91,6 +93,7 @@ export default class integrat extends PureComponent {
     const me = this;
     map = L.map("map", {
       zoomControl: false,
+      //editable: true,
       attributionControl: false
     }).setView(config.mapInitParams.center, config.mapInitParams.zoom);
     /*map = L.map('map',{
@@ -126,31 +129,21 @@ export default class integrat extends PureComponent {
     //获取项目区域范围
     me.getRegionGeometry();
     //编辑图形工具
-    /*map.pm.addControls({
-      position: 'topright',
-      drawMarker: false,
-      drawPolygon: true,
-      editPolygon: true,
-      drawPolyline: false,
-      deleteLayer: true,
-    });*/
     // 定义图层绘制控件选择项
     const options = {
       position: 'topright', // toolbar position, options are 'topleft', 'topright', 'bottomleft', 'bottomright'
       drawMarker: false, // adds button to draw markers
       drawPolyline: false, // adds button to draw a polyline
       drawRectangle: false, // adds button to draw a rectangle
-      drawPolygon: true, // adds button to draw a polygon
+      drawPolygon: false, // adds button to draw a polygon
       drawCircle: false, // adds button to draw a cricle
       cutPolygon: false, // adds button to cut a hole in a polygon
-      editMode: true, // adds button to toggle edit mode for all layers
+      editMode: false, // adds button to toggle edit mode for all layers
       dragMode:true,//adds button to toggle drag mode for all layers
       removalMode: true, // adds a button to remove layers
     };
     // 将图层绘制控件添加的地图页面上
-    map.pm.addControls();
-    //map.pm.enableDraw('Poly', { allowSelfIntersection: false });
-    //map.pm.disableDraw('Poly');
+    map.pm.addControls(options);
 
   };
   /*属性查询图层
@@ -195,21 +188,6 @@ export default class integrat extends PureComponent {
         map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
           maxZoom: 16
         });
-        /*if (data.features.length > 0) {
-          let content = "";
-          for (let i = 0; i < data.features.length; i++) {
-            let feature = data.features[i];
-            if (i === data.features.length - 1) {
-              content += me.getWinContent(feature.properties);
-            } else {
-              content += me.getWinContent(feature.properties) + "<br>";
-            }
-          }
-          map.openPopup(
-            content,
-            userconfig.projectgeojsonLayer.getBounds().getCenter()
-          );
-        }*/
         if (data.features.length > 0) {
           let content = "";
           for (let i = 0; i < data.features.length; i++) {
@@ -282,6 +260,11 @@ export default class integrat extends PureComponent {
             }
           }
           map.openPopup(content, userconfig.mapPoint);
+          //编辑图形测试
+          userconfig.projectgeojsonLayer.pm.enable({
+            allowSelfIntersection: false,
+          });
+
         }
       }
     });
