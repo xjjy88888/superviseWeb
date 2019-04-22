@@ -14,6 +14,8 @@ import ProjectDetail from "./projectDetail";
 import L from "leaflet";
 import "proj4";
 import "proj4leaflet";
+import 'leaflet.pm/dist/leaflet.pm.css';
+import 'leaflet.pm';
 import shp from "shpjs";
 import * as turf from "@turf/turf";
 //import { greatCircle, point, circle } from '@turf/turf';
@@ -41,6 +43,7 @@ export default class integrat extends PureComponent {
   }
   componentDidMount() {
     window.goDetail = obj => {
+      //console.log("goDetail", obj);
       emitter.emit("showProjectSpotInfo", obj);
     };
     const me = this;
@@ -122,6 +125,33 @@ export default class integrat extends PureComponent {
     });
     //获取项目区域范围
     me.getRegionGeometry();
+    //编辑图形工具
+    /*map.pm.addControls({
+      position: 'topright',
+      drawMarker: false,
+      drawPolygon: true,
+      editPolygon: true,
+      drawPolyline: false,
+      deleteLayer: true,
+    });*/
+    // 定义图层绘制控件选择项
+    const options = {
+      position: 'topright', // toolbar position, options are 'topleft', 'topright', 'bottomleft', 'bottomright'
+      drawMarker: false, // adds button to draw markers
+      drawPolyline: false, // adds button to draw a polyline
+      drawRectangle: false, // adds button to draw a rectangle
+      drawPolygon: true, // adds button to draw a polygon
+      drawCircle: false, // adds button to draw a cricle
+      cutPolygon: false, // adds button to cut a hole in a polygon
+      editMode: true, // adds button to toggle edit mode for all layers
+      dragMode:true,//adds button to toggle drag mode for all layers
+      removalMode: true, // adds a button to remove layers
+    };
+    // 将图层绘制控件添加的地图页面上
+    map.pm.addControls();
+    //map.pm.enableDraw('Poly', { allowSelfIntersection: false });
+    //map.pm.disableDraw('Poly');
+
   };
   /*属性查询图层
    *@method queryWFSServiceByProperty
@@ -165,7 +195,7 @@ export default class integrat extends PureComponent {
         map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
           maxZoom: 16
         });
-        if (data.features.length > 0) {
+        /*if (data.features.length > 0) {
           let content = "";
           for (let i = 0; i < data.features.length; i++) {
             let feature = data.features[i];
@@ -179,7 +209,21 @@ export default class integrat extends PureComponent {
             content,
             userconfig.projectgeojsonLayer.getBounds().getCenter()
           );
+        }*/
+        if (data.features.length > 0) {
+          let content = "";
+          for (let i = 0; i < data.features.length; i++) {
+            let feature = data.features[i];
+            if (i === data.features.length - 1) {
+              content += me.getWinContent(feature.properties)[0].innerHTML;
+            } else {
+              content += me.getWinContent(feature.properties)[0].innerHTML + "<br><br>";
+            }
+          }
+          map.openPopup(content, userconfig.projectgeojsonLayer.getBounds().getCenter());
         }
+
+
       }
     });
   };
@@ -228,21 +272,16 @@ export default class integrat extends PureComponent {
         me.loadGeojsonLayer(data, style);
         if (data.features.length > 0) {
           let content = "";
-          let content_;
           for (let i = 0; i < data.features.length; i++) {
             let feature = data.features[i];
             if (i === data.features.length - 1) {
               content += me.getWinContent(feature.properties)[0].innerHTML;
-              content_ = me.getWinContent(feature.properties);
             } else {
               content +=
                 me.getWinContent(feature.properties)[0].innerHTML + "<br><br>";
-              content_ = me.getWinContent(feature.properties) + "<br><br>";
             }
           }
           map.openPopup(content, userconfig.mapPoint);
-
-          // feature.bindPopup(elements[0]).addTo(layer);
         }
       }
     });

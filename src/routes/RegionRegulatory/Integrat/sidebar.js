@@ -4,6 +4,8 @@ import { createForm } from "rc-form";
 import {
   Menu,
   Icon,
+  Tag,
+  Tree,
   Button,
   notification,
   Input,
@@ -30,10 +32,11 @@ import moment from "moment";
 import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
 import config from "../../../config";
+import data from "../../../data";
 
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 const dateFormat = "YYYY-MM-DD";
-const TreeNode = TreeSelect.TreeNode;
+const { TreeNode } = Tree;
 const CheckboxGroup = Checkbox.Group;
 const formItemLayout = {
   labelCol: { span: 7 },
@@ -50,10 +53,13 @@ export default class integrat extends PureComponent {
     this.state = {
       show: true,
       value: undefined,
-      showProjectDetail: false,
+      showProjectDetail: true,
       projectEdit: false,
+      showCompany: false,
+      showProblem: false,
       key: "project",
       inputDisabled: true,
+      problem: [],
       placeholder: "项目",
       sort: [
         {
@@ -311,9 +317,29 @@ export default class integrat extends PureComponent {
     });
   };
 
+  TreeOnSelect = e => {
+    this.setState({ showProblem: true });
+    if (e.length) {
+      const item = data[e[0].slice(0, 1)].data[e[0].slice(1, 2)];
+      console.log("selected", e, item);
+      this.setState({ problem: item.records });
+    }
+  };
+
+  toColor = v => {
+    if (v === "一般") {
+      return "green";
+    } else if (v === "较重") {
+      return "orange";
+    } else {
+      return "magenta";
+    }
+  };
+
   render() {
     const {
       show,
+      showCompany,
       placeholder,
       sort,
       listData,
@@ -324,7 +350,9 @@ export default class integrat extends PureComponent {
       inputDisabled,
       previewVisible,
       previewImage,
-      fileList
+      showProblem,
+      fileList,
+      problem
     } = this.state;
     const {
       dispatch,
@@ -424,12 +452,7 @@ export default class integrat extends PureComponent {
             onClick={this.sort}
           >
             {sort.map((item, index) => (
-              <Radio.Button
-                key={index}
-                value={item.value}
-                focus={() => {
-                }}
-              >
+              <Radio.Button key={index} value={item.value} focus={() => {}}>
                 {item.title}
               </Radio.Button>
             ))}
@@ -627,21 +650,14 @@ export default class integrat extends PureComponent {
             height: "100%"
           }}
         >
-          <p>
-            {/* 返回 */}
+          <div
+            style={{
+              display: showCompany ? "block" : "none",
+              position: "relation"
+            }}
+          >
             <Button
-              icon="rollback"
-              shape="circle"
-              style={{
-                float: "right",
-                color: "#1890ff",
-                fontSize: 18,
-                zIndex: 1
-              }}
-              onClick={this.close}
-            />
-            <Button
-              icon="environment"
+              icon="close"
               shape="circle"
               style={{
                 float: "right",
@@ -650,553 +666,674 @@ export default class integrat extends PureComponent {
                 zIndex: 1
               }}
               onClick={() => {
-                notification["success"]({
-                  message: "定位成功"
-                });
+                this.setState({ showCompany: false });
               }}
             />
-            <Button
-              icon={projectEdit ? "check" : "edit"}
-              shape="circle"
-              htmlType="submit"
+            <Tree defaultExpandAll onSelect={this.TreeOnSelect}>
+              {data.map((item, index) => (
+                <TreeNode title={item.title} key={item.key}>
+                  {item.data.map((ite, idx) => (
+                    <TreeNode
+                      title={ite.title}
+                      key={`${index}${idx}`}
+                      onClick={() => {
+                        console.log(`onClick`);
+                      }}
+                    />
+                  ))}
+                </TreeNode>
+              ))}
+            </Tree>
+            <div
               style={{
-                float: "right",
-                color: "#1890ff",
-                fontSize: 18,
-                zIndex: 1
+                display: showProblem ? "block" : "none",
+                position: "absolute",
+                top: 48,
+                left: 350,
+                width: 400,
+                bottom: 0,
+                background: "#fff"
               }}
-              onClick={this.submit_project}
-            />
-          </p>
+            >
+              <Icon
+                type={"left"}
+                style={{
+                  fontSize: 30,
+                  position: "absolute",
+                  right: -50,
+                  top: "48%",
+                  backgroundColor: "rgba(0, 0, 0, 0.3)",
+                  borderRadius: "50%",
+                  padding: 10,
+                  cursor: "pointer"
+                }}
+                onClick={() => {
+                  this.setState({ showProblem: false });
+                }}
+              />
+              <Button
+                icon="close"
+                shape="circle"
+                style={{
+                  color: "#1890ff",
+                  fontSize: 18,
+                  position: "absolute",
+                  right: 30,
+                  top: 20
+                }}
+                onClick={() => {
+                  this.setState({ showProblem: false });
+                }}
+              />
+              <div
+                style={{
+                  overflow: "auto",
+                  padding: 20,
+                  height: "100%"
+                }}
+              >
+                {problem.map((item, index) => (
+                  <div style={{ padding: 5 }}>
+                    <p>
+                      <Tag color={this.toColor(item.sort)}>{item.sort}</Tag>
+                      {item.record}
+                    </p>
+                    <p>
+                      <Radio.Group name="radiogroup">
+                        <Radio value={1}>是</Radio>
+                        <Radio value={0}>否</Radio>
+                      </Radio.Group>
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
           <div
             style={{
-              display: projectEdit ? "none" : "block"
+              display: showCompany ? "none" : "block"
             }}
           >
             <p>
-              <b>{projectItem.project_name}</b>
+              {/* 返回 */}
+              <Button
+                icon="rollback"
+                shape="circle"
+                style={{
+                  float: "right",
+                  color: "#1890ff",
+                  fontSize: 18,
+                  zIndex: 1
+                }}
+                onClick={this.close}
+              />
+              <Button
+                icon="environment"
+                shape="circle"
+                style={{
+                  float: "right",
+                  color: "#1890ff",
+                  fontSize: 18,
+                  zIndex: 1
+                }}
+                onClick={() => {
+                  notification["success"]({
+                    message: "定位成功"
+                  });
+                }}
+              />
+              <Button
+                icon={projectEdit ? "check" : "edit"}
+                shape="circle"
+                htmlType="submit"
+                style={{
+                  float: "right",
+                  color: "#1890ff",
+                  fontSize: 18,
+                  zIndex: 1
+                }}
+                onClick={this.submit_project}
+              />
             </p>
-            <p
-              style={
-                {
-                  // borderBottom: "solid 1px #dedede",
-                  // paddingBottom: 10
-                }
-              }
-            >
-              <span>位置：</span>
-              <span>
-                {projectItem.project_province}
-                {projectItem.project_city}
-                {projectItem.project_district}
-                {projectItem.project_town}
-                {projectItem.project_village}
-              </span>
-            </p>
-
-            <List
+            <div
               style={{
-                width: 310,
-                position: "relation",
-                paddingRight: 30
+                display: projectEdit ? "none" : "block"
               }}
             >
-              <Collapse defaultActiveKey={["0"]}>
-                <Collapse.Panel header="基本信息" key="0">
-                  <div
-                    style={{
-                      // borderBottom: "solid 1px #dedede",
-                      paddingBottom: 10,
-                      position: "relative"
-                    }}
-                  >
-                    <p style={{ margin: 10 }}>
-                      <span>建设单位：</span>
-                      <span>{projectItem.product_department_id}</span>
-                    </p>
-                    <p style={{ margin: 10 }}>
-                      <span>监管单位：</span>
-                      <span>{projectItem.project_sup_id}</span>
-                    </p>
-                    <p style={{ margin: 10 }}>
-                      <span>批复机构：</span>
-                      <span>{projectItem.project_rp_id}</span>
-                    </p>
-                    <p style={{ margin: 10 }}>
-                      <span>流域管理机构：</span>
-                      <span>{projectItem.ctn_code}</span>
-                    </p>
-                    <p style={{ margin: 10 }}>
-                      <span>批复文号：</span>
-                      <span>{projectItem.project_rp_num}</span>
-                    </p>
-                    <p style={{ margin: 10 }}>
-                      <span>批复时间：</span>
-                      <span>{projectItem.project_rp_time}</span>
-                    </p>
-                    <p style={{ margin: 10 }}>
-                      <span>责任面积：</span>
-                      <span>{projectItem.area}m2</span>
-                    </p>
-                    <p style={{ margin: 10 }}>
-                      <span>立项级别：</span>
-                      <span>{projectItem.project_level}</span>
-                    </p>
-                    <p style={{ margin: 10 }}>
-                      <span>项目合规性：</span>
-                      <span>----</span>
-                    </p>
-                    <p style={{ margin: 10 }}>
-                      <span>项目类别：</span>
-                      <span>----</span>
-                    </p>
-                    <p style={{ margin: 10 }}>
-                      <span>项目类型：</span>
-                      <span>----</span>
-                    </p>
-                    <p style={{ margin: 10 }}>
-                      <span>建设状态：</span>
-                      <span>----</span>
-                    </p>
-                    <p style={{ margin: 10 }}>
-                      <span>项目性质：</span>
-                      <span>----</span>
-                    </p>
-                    <p style={{ margin: 10 }}>
-                      <span>涉及县：</span>
-                      <span>----</span>
-                    </p>
-                    <p style={{ margin: 10, textAlign: "justify" }}>
-                      <span>备注：</span>
-                      <span>----</span>
-                    </p>
-                    <a
-                      style={{ position: "absolute", right: 0, bottom: 0 }}
-                      onClick={() => {
-                        emitter.emit("showEdit", {
-                          show: true,
-                          edit: false
-                        });
+              <p>
+                <b>{projectItem.project_name}</b>
+              </p>
+              <p
+                style={
+                  {
+                    // borderBottom: "solid 1px #dedede",
+                    // paddingBottom: 10
+                  }
+                }
+              >
+                <span>位置：</span>
+                <span>
+                  {projectItem.project_province}
+                  {projectItem.project_city}
+                  {projectItem.project_district}
+                  {projectItem.project_town}
+                  {projectItem.project_village}
+                </span>
+              </p>
+
+              <List
+                style={{
+                  width: 310,
+                  position: "relation",
+                  paddingRight: 30
+                }}
+              >
+                <Collapse defaultActiveKey={["0", "1"]}>
+                  <Collapse.Panel header="基本信息" key="0">
+                    <div
+                      style={{
+                        // borderBottom: "solid 1px #dedede",
+                        paddingBottom: 10,
+                        position: "relative"
                       }}
                     >
-                      详情
-                    </a>
-                  </div>
-                </Collapse.Panel>
-                <Collapse.Panel header="监督执法记录：2" key="1">
-                  <p>
-                    2019/3/22 检查记录
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
+                      <p style={{ margin: 10 }}>
+                        <span>建设单位：</span>
+                        <span>{projectItem.product_department_id}</span>
+                      </p>
+                      <p style={{ margin: 10 }}>
+                        <span>监管单位：</span>
+                        <span>{projectItem.project_sup_id}</span>
+                      </p>
+                      <p style={{ margin: 10 }}>
+                        <span>批复机构：</span>
+                        <span>{projectItem.project_rp_id}</span>
+                      </p>
+                      <p style={{ margin: 10 }}>
+                        <span>流域管理机构：</span>
+                        <span>{projectItem.ctn_code}</span>
+                      </p>
+                      <p style={{ margin: 10 }}>
+                        <span>批复文号：</span>
+                        <span>{projectItem.project_rp_num}</span>
+                      </p>
+                      <p style={{ margin: 10 }}>
+                        <span>批复时间：</span>
+                        <span>{projectItem.project_rp_time}</span>
+                      </p>
+                      <p style={{ margin: 10 }}>
+                        <span>责任面积：</span>
+                        <span>{projectItem.area}m2</span>
+                      </p>
+                      <p style={{ margin: 10 }}>
+                        <span>立项级别：</span>
+                        <span>{projectItem.project_level}</span>
+                      </p>
+                      <p style={{ margin: 10 }}>
+                        <span>项目合规性：</span>
+                        <span>----</span>
+                      </p>
+                      <p style={{ margin: 10 }}>
+                        <span>项目类别：</span>
+                        <span>----</span>
+                      </p>
+                      <p style={{ margin: 10 }}>
+                        <span>项目类型：</span>
+                        <span>----</span>
+                      </p>
+                      <p style={{ margin: 10 }}>
+                        <span>建设状态：</span>
+                        <span>----</span>
+                      </p>
+                      <p style={{ margin: 10 }}>
+                        <span>项目性质：</span>
+                        <span>----</span>
+                      </p>
+                      <p style={{ margin: 10 }}>
+                        <span>涉及县：</span>
+                        <span>----</span>
+                      </p>
+                      <p style={{ margin: 10, textAlign: "justify" }}>
+                        <span>备注：</span>
+                        <span>----</span>
+                      </p>
+                      <a
+                        style={{ position: "absolute", right: 0, bottom: 0 }}
+                        onClick={() => {
+                          emitter.emit("showEdit", {
+                            show: true,
+                            edit: false
+                          });
+                        }}
+                      >
+                        详情
+                      </a>
+                    </div>
+                  </Collapse.Panel>
+                  <Collapse.Panel header="监督执法记录：2" key="1">
+                    <p
+                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        this.setState({ showCompany: true });
                       }}
-                    />
-                  </p>
-                  <p>
-                    2019/3/22 检查记录
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
+                    >
+                      2019/3/22 检查记录
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p
+                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        this.setState({ showCompany: true });
                       }}
-                    />
-                  </p>
-                </Collapse.Panel>
-                <Collapse.Panel header="扰动图斑：5" key="2">
-                  <p>
-                    2017154_14848_4848
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    2017154_14848_4848
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    2017154_14848_4848
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    2017154_14848_4848
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                </Collapse.Panel>
-                <Collapse.Panel header="防治责任范围：2" key="3">
-                  <p>
-                    红线第一部分
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    红线第二部分
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                </Collapse.Panel>
-                <Collapse.Panel header="设计分区：5" key="4">
-                  <p>
-                    主体功能区
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    生产生活区
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    连接道路区
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    弃渣场
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    取土场
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                </Collapse.Panel>
-                <Collapse.Panel header="设计措施：5" key="5">
-                  <p>
-                    截排水沟
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    沉沙池
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    植树
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    种草
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    浆砌石拦挡
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                </Collapse.Panel>
-                <Collapse.Panel header="责任点：5" key="6">
-                  <p>
-                    某渣场坡面
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    某大型坡面
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    施工区东北侧
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    临时道路
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    隧道出口
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                </Collapse.Panel>
-                <Collapse.Panel header="实施措施：5" key="7">
-                  <p>
-                    截排水沟
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    沉沙池
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    植树
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    种草
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    浆砌石拦挡
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                </Collapse.Panel>
-                <Collapse.Panel header="问题地块：5" key="8">
-                  <p>
-                    某渣场坡面
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    某大型坡面
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    施工区东北侧
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    临时道路
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                  <p>
-                    隧道出口
-                    <Icon
-                      type="environment"
-                      style={{
-                        float: "right",
-                        fontSize: 18,
-                        cursor: "point",
-                        color: "#1890ff"
-                      }}
-                    />
-                  </p>
-                </Collapse.Panel>
-              </Collapse>
-              {/* <List.Item>
+                    >
+                      2019/3/22 检查记录
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                  </Collapse.Panel>
+                  <Collapse.Panel header="扰动图斑：5" key="2">
+                    <p>
+                      2017154_14848_4848
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      2017154_14848_4848
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      2017154_14848_4848
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      2017154_14848_4848
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                  </Collapse.Panel>
+                  <Collapse.Panel header="防治责任范围：2" key="3">
+                    <p>
+                      红线第一部分
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      红线第二部分
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                  </Collapse.Panel>
+                  <Collapse.Panel header="设计分区：5" key="4">
+                    <p>
+                      主体功能区
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      生产生活区
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      连接道路区
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      弃渣场
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      取土场
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                  </Collapse.Panel>
+                  <Collapse.Panel header="设计措施：5" key="5">
+                    <p>
+                      截排水沟
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      沉沙池
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      植树
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      种草
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      浆砌石拦挡
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                  </Collapse.Panel>
+                  <Collapse.Panel header="责任点：5" key="6">
+                    <p>
+                      某渣场坡面
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      某大型坡面
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      施工区东北侧
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      临时道路
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      隧道出口
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                  </Collapse.Panel>
+                  <Collapse.Panel header="实施措施：5" key="7">
+                    <p>
+                      截排水沟
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      沉沙池
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      植树
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      种草
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      浆砌石拦挡
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                  </Collapse.Panel>
+                  <Collapse.Panel header="问题地块：5" key="8">
+                    <p>
+                      某渣场坡面
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      某大型坡面
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      施工区东北侧
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      临时道路
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      隧道出口
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                  </Collapse.Panel>
+                </Collapse>
+                {/* <List.Item>
                 <List.Item.Meta
                   title={
                     <span>
@@ -1315,12 +1452,226 @@ export default class integrat extends PureComponent {
                   }
                 />
               </List.Item> */}
-              <Carousel autoplay>
-                <img src="./img/spot.jpg" />
-                <img src="./img/spot2.jpg" />
-                <img src="./img/spot.jpg" />
-                <img src="./img/spot2.jpg" />
-              </Carousel>
+                <Carousel autoplay>
+                  <img src="./img/spot.jpg" />
+                  <img src="./img/spot2.jpg" />
+                  <img src="./img/spot.jpg" />
+                  <img src="./img/spot2.jpg" />
+                </Carousel>
+                <Button
+                  type="dashed"
+                  icon="cloud-download"
+                  style={{ marginTop: 20 }}
+                >
+                  项目归档
+                </Button>
+                <Button
+                  type="dashed"
+                  icon="rollback"
+                  style={{ marginLeft: 20 }}
+                >
+                  撤销归档
+                </Button>
+              </List>
+            </div>
+            <div
+              style={{
+                display: projectEdit ? "block" : "none"
+              }}
+            >
+              <Form style={{ position: "relative", paddingBottom: 10 }}>
+                <Form.Item label="项目名" {...formItemLayout}>
+                  {getFieldDecorator("project_name", {
+                    initialValue: projectItem.project_name
+                  })(<Input.TextArea autosize />)}
+                </Form.Item>
+                <Form.Item label="所在地区" {...formItemLayout}>
+                  <Cascader
+                    placeholder="请选择所在地区"
+                    options={config.demo_location}
+                    changeOnSelect
+                  />
+                </Form.Item>
+                <Form.Item label="详细地址" {...formItemLayout}>
+                  {getFieldDecorator("product_department_id1", {
+                    initialValue: projectItem.product_department_id1
+                  })(<Input />)}
+                </Form.Item>
+                <Form.Item label="建设单位" {...formItemLayout}>
+                  {getFieldDecorator("product_department_id", {
+                    initialValue: projectItem.product_department_id
+                  })(<Input.TextArea autosize />)}
+                </Form.Item>
+                <Form.Item label="监管单位" {...formItemLayout}>
+                  {getFieldDecorator("project_sup_id", {
+                    initialValue: projectItem.project_sup_id
+                  })(<Input.TextArea autosize />)}
+                </Form.Item>
+                <Form.Item label="批复机构" {...formItemLayout}>
+                  {getFieldDecorator("project_rp_id", {
+                    initialValue: projectItem.project_rp_id
+                  })(<Input.TextArea autosize />)}
+                </Form.Item>
+                <Form.Item label="流域管理机构" {...formItemLayout}>
+                  {getFieldDecorator("ctn_code", {
+                    initialValue: projectItem.ctn_code
+                  })(<Input.TextArea autosize />)}
+                </Form.Item>
+                <Form.Item label="批复文号" {...formItemLayout}>
+                  {getFieldDecorator("project_rp_num", {
+                    initialValue: projectItem.project_rp_num
+                  })(<Input />)}
+                </Form.Item>
+                <Form.Item label="批复时间" {...formItemLayout}>
+                  {getFieldDecorator("project_rp_time", {})(<DatePicker />)}
+                </Form.Item>
+                <Form.Item label="责任面积" {...formItemLayout}>
+                  {getFieldDecorator("area", {
+                    initialValue: projectItem.area
+                  })(<Input addonAfter="m2" />)}
+                </Form.Item>
+                <Form.Item label="立项级别" {...formItemLayout}>
+                  {getFieldDecorator("project_level", {})(
+                    <AutoComplete
+                      placeholder="请选择立项级别"
+                      dataSource={config.approval_level}
+                      filterOption={(inputValue, option) =>
+                        option.props.children
+                          .toUpperCase()
+                          .indexOf(inputValue.toUpperCase()) !== -1
+                      }
+                    />
+                  )}
+                </Form.Item>
+                <Form.Item label="项目合规性" {...formItemLayout}>
+                  <AutoComplete
+                    placeholder="请选择项目合规性"
+                    defaultValue={`疑似未批先建`}
+                    dataSource={config.compliance}
+                    filterOption={(inputValue, option) =>
+                      option.props.children
+                        .toUpperCase()
+                        .indexOf(inputValue.toUpperCase()) !== -1
+                    }
+                  />
+                </Form.Item>
+                <Form.Item label="项目类别" {...formItemLayout}>
+                  <AutoComplete
+                    placeholder="请选择项目类别"
+                    defaultValue={`建设类`}
+                    dataSource={config.project_category}
+                    filterOption={(inputValue, option) =>
+                      option.props.children
+                        .toUpperCase()
+                        .indexOf(inputValue.toUpperCase()) !== -1
+                    }
+                  />
+                </Form.Item>
+                <Form.Item label="项目类型" {...formItemLayout}>
+                  <AutoComplete
+                    placeholder="请选择项目类型"
+                    defaultValue={`铁路工程`}
+                    dataSource={config.project_type}
+                    filterOption={(inputValue, option) =>
+                      option.props.children
+                        .toUpperCase()
+                        .indexOf(inputValue.toUpperCase()) !== -1
+                    }
+                  />
+                </Form.Item>
+                <Form.Item label="建设状态" {...formItemLayout}>
+                  <AutoComplete
+                    placeholder="请选择建设状态"
+                    defaultValue={`未开工`}
+                    dataSource={config.construct_state}
+                    filterOption={(inputValue, option) =>
+                      option.props.children
+                        .toUpperCase()
+                        .indexOf(inputValue.toUpperCase()) !== -1
+                    }
+                  />
+                </Form.Item>
+                <Form.Item label="项目性质" {...formItemLayout}>
+                  <AutoComplete
+                    placeholder="请选择项目性质"
+                    defaultValue={`新建`}
+                    dataSource={config.project_nature}
+                    filterOption={(inputValue, option) =>
+                      option.props.children
+                        .toUpperCase()
+                        .indexOf(inputValue.toUpperCase()) !== -1
+                    }
+                  />
+                </Form.Item>
+                <Form.Item label="涉及县" {...formItemLayout}>
+                  <TreeSelect
+                    showSearch
+                    style={{ width: "100%" }}
+                    value={this.state.value}
+                    dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
+                    placeholder="请选择涉及县"
+                    allowClear
+                    multiple
+                    treeDefaultExpandAll
+                    onChange={this.onTreeSelectChange}
+                  >
+                    <TreeSelect.TreeNode value="中国" title="中国" key="0-1">
+                      <TreeSelect.TreeNode
+                        value="广东"
+                        title="广东"
+                        key="0-1-1"
+                      >
+                        <TreeSelect.TreeNode
+                          value="广州"
+                          title="广州"
+                          key="random"
+                        />
+                        <TreeSelect.TreeNode
+                          value="中山"
+                          title="中山"
+                          key="random1"
+                        />
+                      </TreeSelect.TreeNode>
+                      <TreeSelect.TreeNode
+                        value="广西"
+                        title="广西"
+                        key="random2"
+                      >
+                        <TreeSelect.TreeNode
+                          value="南宁"
+                          title="南宁"
+                          key="random3"
+                        />
+                      </TreeSelect.TreeNode>
+                    </TreeSelect.TreeNode>
+                  </TreeSelect>
+                </Form.Item>
+                <Form.Item label="备注" {...formItemLayout}>
+                  <Input.TextArea
+                    defaultValue={`东莞市清溪房地产开发公司、`}
+                    autosize
+                  />
+                </Form.Item>
+                <a
+                  style={{ position: "absolute", right: 0, bottom: 0 }}
+                  onClick={() => {
+                    emitter.emit("showEdit", {
+                      show: true,
+                      edit: true
+                    });
+                  }}
+                >
+                  详情
+                </a>
+              </Form>
+              <div className="clearfix">
+                <Upload listType="picture">
+                  <Button>
+                    <Icon type="upload" />
+                    上传附件
+                  </Button>
+                </Upload>
+              </div>
               <Button
                 type="dashed"
                 icon="cloud-download"
@@ -1331,197 +1682,8 @@ export default class integrat extends PureComponent {
               <Button type="dashed" icon="rollback" style={{ marginLeft: 20 }}>
                 撤销归档
               </Button>
-            </List>
-          </div>
-          <div
-            style={{
-              display: projectEdit ? "block" : "none"
-            }}
-          >
-            <Form style={{ position: "relative", paddingBottom: 10 }}>
-              <Form.Item label="项目名" {...formItemLayout}>
-                {getFieldDecorator("project_name", {
-                  initialValue: projectItem.project_name
-                })(<Input.TextArea autosize />)}
-              </Form.Item>
-              <Form.Item label="所在地区" {...formItemLayout}>
-                <Cascader
-                  placeholder="请选择所在地区"
-                  options={config.demo_location}
-                  changeOnSelect
-                />
-              </Form.Item>
-              <Form.Item label="详细地址" {...formItemLayout}>
-                {getFieldDecorator("product_department_id1", {
-                  initialValue: projectItem.product_department_id1
-                })(<Input />)}
-              </Form.Item>
-              <Form.Item label="建设单位" {...formItemLayout}>
-                {getFieldDecorator("product_department_id", {
-                  initialValue: projectItem.product_department_id
-                })(<Input.TextArea autosize />)}
-              </Form.Item>
-              <Form.Item label="监管单位" {...formItemLayout}>
-                {getFieldDecorator("project_sup_id", {
-                  initialValue: projectItem.project_sup_id
-                })(<Input.TextArea autosize />)}
-              </Form.Item>
-              <Form.Item label="批复机构" {...formItemLayout}>
-                {getFieldDecorator("project_rp_id", {
-                  initialValue: projectItem.project_rp_id
-                })(<Input.TextArea autosize />)}
-              </Form.Item>
-              <Form.Item label="流域管理机构" {...formItemLayout}>
-                {getFieldDecorator("ctn_code", {
-                  initialValue: projectItem.ctn_code
-                })(<Input.TextArea autosize />)}
-              </Form.Item>
-              <Form.Item label="批复文号" {...formItemLayout}>
-                {getFieldDecorator("project_rp_num", {
-                  initialValue: projectItem.project_rp_num
-                })(<Input />)}
-              </Form.Item>
-              <Form.Item label="批复时间" {...formItemLayout}>
-                {getFieldDecorator("project_rp_time", {})(<DatePicker />)}
-              </Form.Item>
-              <Form.Item label="责任面积" {...formItemLayout}>
-                {getFieldDecorator("area", {
-                  initialValue: projectItem.area
-                })(<Input addonAfter="m2" />)}
-              </Form.Item>
-              <Form.Item label="立项级别" {...formItemLayout}>
-                {getFieldDecorator("project_level", {})(
-                  <AutoComplete
-                    placeholder="请选择立项级别"
-                    dataSource={config.approval_level}
-                    filterOption={(inputValue, option) =>
-                      option.props.children
-                        .toUpperCase()
-                        .indexOf(inputValue.toUpperCase()) !== -1
-                    }
-                  />
-                )}
-              </Form.Item>
-              <Form.Item label="项目合规性" {...formItemLayout}>
-                <AutoComplete
-                  placeholder="请选择项目合规性"
-                  defaultValue={`疑似未批先建`}
-                  dataSource={config.compliance}
-                  filterOption={(inputValue, option) =>
-                    option.props.children
-                      .toUpperCase()
-                      .indexOf(inputValue.toUpperCase()) !== -1
-                  }
-                />
-              </Form.Item>
-              <Form.Item label="项目类别" {...formItemLayout}>
-                <AutoComplete
-                  placeholder="请选择项目类别"
-                  defaultValue={`建设类`}
-                  dataSource={config.project_category}
-                  filterOption={(inputValue, option) =>
-                    option.props.children
-                      .toUpperCase()
-                      .indexOf(inputValue.toUpperCase()) !== -1
-                  }
-                />
-              </Form.Item>
-              <Form.Item label="项目类型" {...formItemLayout}>
-                <AutoComplete
-                  placeholder="请选择项目类型"
-                  defaultValue={`铁路工程`}
-                  dataSource={config.project_type}
-                  filterOption={(inputValue, option) =>
-                    option.props.children
-                      .toUpperCase()
-                      .indexOf(inputValue.toUpperCase()) !== -1
-                  }
-                />
-              </Form.Item>
-              <Form.Item label="建设状态" {...formItemLayout}>
-                <AutoComplete
-                  placeholder="请选择建设状态"
-                  defaultValue={`未开工`}
-                  dataSource={config.construct_state}
-                  filterOption={(inputValue, option) =>
-                    option.props.children
-                      .toUpperCase()
-                      .indexOf(inputValue.toUpperCase()) !== -1
-                  }
-                />
-              </Form.Item>
-              <Form.Item label="项目性质" {...formItemLayout}>
-                <AutoComplete
-                  placeholder="请选择项目性质"
-                  defaultValue={`新建`}
-                  dataSource={config.project_nature}
-                  filterOption={(inputValue, option) =>
-                    option.props.children
-                      .toUpperCase()
-                      .indexOf(inputValue.toUpperCase()) !== -1
-                  }
-                />
-              </Form.Item>
-              <Form.Item label="涉及县" {...formItemLayout}>
-                <TreeSelect
-                  showSearch
-                  style={{ width: "100%" }}
-                  value={this.state.value}
-                  dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
-                  placeholder="请选择涉及县"
-                  allowClear
-                  multiple
-                  treeDefaultExpandAll
-                  onChange={this.onTreeSelectChange}
-                >
-                  <TreeNode value="中国" title="中国" key="0-1">
-                    <TreeNode value="广东" title="广东" key="0-1-1">
-                      <TreeNode value="广州" title="广州" key="random" />
-                      <TreeNode value="中山" title="中山" key="random1" />
-                    </TreeNode>
-                    <TreeNode value="广西" title="广西" key="random2">
-                      <TreeNode value="南宁" title="南宁" key="random3" />
-                    </TreeNode>
-                  </TreeNode>
-                </TreeSelect>
-              </Form.Item>
-              <Form.Item label="备注" {...formItemLayout}>
-                <Input.TextArea
-                  defaultValue={`东莞市清溪房地产开发公司、`}
-                  autosize
-                />
-              </Form.Item>
-              <a
-                style={{ position: "absolute", right: 0, bottom: 0 }}
-                onClick={() => {
-                  emitter.emit("showEdit", {
-                    show: true,
-                    edit: true
-                  });
-                }}
-              >
-                详情
-              </a>
-            </Form>
-            <div className="clearfix">
-              <Upload listType="picture">
-                <Button>
-                  <Icon type="upload" />
-                  上传附件
-                </Button>
-              </Upload>
             </div>
-            <Button
-              type="dashed"
-              icon="cloud-download"
-              style={{ marginTop: 20 }}
-            >
-              项目归档
-            </Button>
-            <Button type="dashed" icon="rollback" style={{ marginLeft: 20 }}>
-              撤销归档
-            </Button>
-          </div>
+          </div>{" "}
         </div>
       </div>
     );
