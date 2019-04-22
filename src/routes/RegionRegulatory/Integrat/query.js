@@ -116,13 +116,13 @@ export default class siderbarDetail extends PureComponent {
     return (
       <div
         style={{
-          left: show ? 400 : -550,
+          left: show ? 350 : -550,
           borderLeft: "solid 1px #ddd",
           width: 450,
           backgroundColor: `#fff`,
           position: `absolute`,
           zIndex: 1000,
-          height: `95vh`
+          height: `100%`
         }}
         ref={this.saveRef}
       >

@@ -2,7 +2,10 @@
   width: 100vw;
   background: #001529;
   display: flex;
-  height: 5vh;
+  height: 48px;
+  position: absolute;
+  z-index: 1001;
+  top: 0;
   .left {
     padding: 10px 20px;
     background: #001529;
@@ -31,11 +34,12 @@
     flex: 7;
   }
 }
-.main + div {
-  // padding: 30px;
-  height: 95vh;
+.main ~ div {
+  padding-top: 50px;
+  height: 100vh;
+  box-sizing: border-box;
 }
-.main + div > div {
+.main ~ div > div {
   background: #fff;
   border-radius: 5px;
   // padding: 20px 20px 10px 20px;

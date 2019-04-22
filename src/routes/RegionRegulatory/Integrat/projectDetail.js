@@ -40,6 +40,8 @@ const formItemLayout = {
   wrapperCol: { span: 12 }
 };
 
+let yearDataSource = [];
+
 @createForm()
 export default class integrat extends PureComponent {
   constructor(props) {
@@ -55,6 +57,10 @@ export default class integrat extends PureComponent {
   }
 
   componentDidMount() {
+    const maxYear = new Date().getFullYear();
+    for (let i = maxYear; i >= 1970; i--) {
+      yearDataSource.push(`${i}年`);
+    }
     this.eventEmitter = emitter.addListener("showEdit", data => {
       this.setState({
         show: data.show,
@@ -429,7 +435,13 @@ export default class integrat extends PureComponent {
               </Col>
               <Col span={12}>
                 <Form.Item label="设计水平年">
-                  <Input />
+                  <AutoComplete
+                    allowClear
+                    dataSource={yearDataSource}
+                    filterOption={(inputValue, option) =>
+                      option.props.children.indexOf(inputValue) !== -1
+                    }
+                  />
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -633,12 +645,12 @@ export default class integrat extends PureComponent {
               <Divider />
               <Col span={12}>
                 <Form.Item label="项目变更信息">
-                  <Input.TextArea autosize/>
+                  <Input.TextArea autosize />
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="变更原因">
-                  <Input.TextArea autosize/>
+                  <Input.TextArea autosize />
                 </Form.Item>
               </Col>
               <Col span={12}>

@@ -40,6 +40,9 @@ export default class integrat extends PureComponent {
     this.map = null;
   }
   componentDidMount() {
+    window.goDetail = obj => {
+      emitter.emit("showProjectSpotInfo", obj);
+    };
     const me = this;
     //获取url参数
     me.initUrlParams();
@@ -63,7 +66,6 @@ export default class integrat extends PureComponent {
           config.mapSpotLayerName
         );
       }
-      //console.log(data)
     });
   }
   /*
@@ -80,7 +82,6 @@ export default class integrat extends PureComponent {
     userconfig.dwdm = userParams.ctn_code;
     userconfig.userId = userParams.us_id;
     userconfig.userName = userParams.us_truename;
-    //console.log(123);
   };
   // 创建地图
   createMap = () => {
@@ -181,7 +182,6 @@ export default class integrat extends PureComponent {
         }
       }
     });
-    //console.log(this.props);
   };
   /*点选查询图层
    *@method queryWFSServiceByPoint
@@ -227,23 +227,25 @@ export default class integrat extends PureComponent {
         };
         me.loadGeojsonLayer(data, style);
         if (data.features.length > 0) {
-          let content;
+          let content = "";
+          let content_;
           for (let i = 0; i < data.features.length; i++) {
             let feature = data.features[i];
             if (i === data.features.length - 1) {
-              content = me.getWinContent(feature.properties);
+              content += me.getWinContent(feature.properties)[0].innerHTML;
+              content_ = me.getWinContent(feature.properties);
             } else {
-              content = me.getWinContent(feature.properties) + "<br>";
+              content +=
+                me.getWinContent(feature.properties)[0].innerHTML + "<br><br>";
+              content_ = me.getWinContent(feature.properties) + "<br><br>";
             }
           }
-          console.log();
-          map.openPopup(content[0], userconfig.mapPoint);
+          map.openPopup(content, userconfig.mapPoint);
 
           // feature.bindPopup(elements[0]).addTo(layer);
         }
       }
     });
-    //console.log(this.props);
   };
   /*
    * 匹配气泡窗口信息模版函数
@@ -251,6 +253,12 @@ export default class integrat extends PureComponent {
 
   getWinContent = properties => {
     let elements;
+    const obj = {
+      show: true,
+      edit: false,
+      id: properties.spot_tbid || properties.project_id,
+      from: properties.spot_tbid ? "spot" : "project"
+    };
     elements = properties.spot_tbid
       ? jQuery(
           `<div>图斑编号:${properties.spot_tbid}</br>
@@ -260,50 +268,17 @@ export default class integrat extends PureComponent {
             : ""
         }${
             properties.byd ? "扰动范围:" + properties.byd + "</br>" : ""
-          }<a class="look">详情</a>    <a class="edit">编辑</a></div>`
+          }<a onclick='goDetail(${JSON.stringify(
+            obj
+          )})'>详情</a>    <a class="edit">图形编辑</a></div>`
         )
       : jQuery(
           `<div>项目ID:${properties.project_id}</br>
-          <a class="look">详情</a>    <a class="edit">编辑</a></div>`
+          <a onclick='goDetail(${JSON.stringify(
+            obj
+          )})'>详情</a>    <a class="edit">图形编辑</a></div>`
         );
-    elements.find(".look").on("click", () => {
-      emitter.emit("showProjectSpotInfo", {
-        show: true,
-        edit: false,
-        id: properties.spot_tbid || properties.project_id,
-        from: properties.spot_tbid ? "spot" : "project"
-      });
-    });
-    elements.find(".edit").on("click", () => {
-      emitter.emit("showProjectSpotInfo", {
-        show: true,
-        edit: true,
-        id: properties.spot_tbid || properties.project_id,
-        from: properties.spot_tbid ? "spot" : "project"
-      });
-    });
     return elements;
-  };
-
-  /*
-   * 显示详情信息
-   */
-
-  showInfo = id => {
-    console.log(id);
-    this.props.dispatch({
-      type: "project/queryProjectById",
-      payload: {
-        project_id: id
-      }
-    });
-  };
-  /*
-   * 显示编辑信息
-   */
-
-  showEdit = id => {
-    console.log(id);
   };
   /*
    * 绘制图形函数
@@ -443,7 +418,6 @@ export default class integrat extends PureComponent {
                   }
                 }
               }
-              //console.log(polygon);
               //let polygon = '123';
               emitter.emit("polygon", {
                 polygon: polygon
@@ -491,7 +465,6 @@ export default class integrat extends PureComponent {
   };
 
   render() {
-    //console.log(this.props);
     return (
       <LocaleProvider locale={zhCN}>
         <div>
@@ -503,7 +476,19 @@ export default class integrat extends PureComponent {
           <Query />
           <Sparse />
           <ProjectDetail />
-          <div id="map" style={{ height: "95vh" }} />
+          <div
+            style={{
+              paddingTop: 48
+            }}
+          >
+            <div
+              id="map"
+              style={{
+                height: "100%",
+                boxSizing: "border-box"
+              }}
+            />
+          </div>
         </div>
       </LocaleProvider>
     );

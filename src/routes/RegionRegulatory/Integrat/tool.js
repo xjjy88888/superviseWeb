@@ -57,6 +57,7 @@ export default class siderbarDetail extends PureComponent {
         style={{
           left: show ? 350 : -350,
           width: 240,
+          height: 450,
           backgroundColor: `#fff`,
           position: `absolute`,
           zIndex: 1000,

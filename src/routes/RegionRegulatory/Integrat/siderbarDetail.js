@@ -61,6 +61,7 @@ export default class siderbarDetail extends PureComponent {
       }
     });
     this.eventEmitter = emitter.addListener("showProjectSpotInfo", data => {
+      console.log(data);
       if (data.from === "spot") {
         this.setState({
           show: data.show,
@@ -132,7 +133,6 @@ export default class siderbarDetail extends PureComponent {
           backgroundColor: `#fff`,
           position: `absolute`,
           zIndex: 1000,
-          height: `95vh`,
           borderLeft: `solid 1px #ddd`
         }}
       >

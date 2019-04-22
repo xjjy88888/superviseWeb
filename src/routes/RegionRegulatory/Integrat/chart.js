@@ -214,7 +214,7 @@ export default class siderbarDetail extends PureComponent {
           minWidth: 600,
           minHeight: 500,
           left: 700,
-          width: `50vw`,
+          width: `55vw`,
           height: `80vh`,
           top: `50%`,
           transform: `translate(0,-47%)`
@@ -259,7 +259,7 @@ export default class siderbarDetail extends PureComponent {
           ref={this.charRef}
           style={{
             width: `50vw`,
-            height: `75vh`
+            height: `72vh`
           }}
         />
       </div>

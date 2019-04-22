@@ -105,7 +105,6 @@ export default class integrat extends PureComponent {
       }
     });
     this.eventEmitter = emitter.addListener("polygon", data => {
-      //console.log(data);
       this.props.dispatch({
         type: "project/queryProject",
         payload: {
@@ -131,7 +130,7 @@ export default class integrat extends PureComponent {
       type: "project/queryProjectById",
       payload: {
         id: id
-      },
+      }
     });
   };
 
@@ -146,11 +145,9 @@ export default class integrat extends PureComponent {
 
   handleChange = ({ fileList }) => this.setState({ fileList });
   onTreeSelectChange = value => {
-    console.log(value);
     this.setState({ value });
   };
   onTreeSelectChange = value => {
-    console.log(value);
     this.setState({ value });
   };
 
@@ -297,7 +294,6 @@ export default class integrat extends PureComponent {
     const v = e.target.value;
     const key = v.slice(0, v.length - 1);
     const type = v.charAt(v.length - 1);
-    console.log(key, type);
   };
 
   query = () => {
@@ -361,7 +357,7 @@ export default class integrat extends PureComponent {
           backgroundColor: "#fff",
           position: "absolute",
           zIndex: 1000,
-          height: "95vh"
+          height: "100%"
         }}
         ref={this.saveRef}
       >
@@ -381,7 +377,9 @@ export default class integrat extends PureComponent {
         />
         <div
           style={{
-            display: showProjectDetail ? "none" : "block"
+            display: showProjectDetail ? "none" : "block",
+            height: "100%",
+            overflow: "hidden"
           }}
         >
           <Menu mode="horizontal" defaultSelectedKeys={["project"]}>
@@ -430,7 +428,6 @@ export default class integrat extends PureComponent {
                 key={index}
                 value={item.value}
                 focus={() => {
-                  console.log(111);
                 }}
               >
                 {item.title}
@@ -508,7 +505,7 @@ export default class integrat extends PureComponent {
           <List
             style={{
               overflow: "auto",
-              height: clientHeight ? clientHeight - 207 : 500,
+              height: clientHeight ? clientHeight - 211 : 500,
               width: 350,
               padding: "10px 20px 10px 20px"
             }}
@@ -546,9 +543,9 @@ export default class integrat extends PureComponent {
                         }}
                         onClick={e => {
                           e.stopPropagation();
-                          console.log(item.project_id);
                           emitter.emit("mapLocation", {
-                            project_id: item.project_id
+                            item: item,
+                            key: key
                           });
                         }}
                       />
@@ -625,9 +622,9 @@ export default class integrat extends PureComponent {
         <div
           style={{
             display: showProjectDetail ? "block" : "none",
-            height: "95vh",
             overflow: "auto",
-            padding: 20
+            padding: 20,
+            height: "100%"
           }}
         >
           <p>
