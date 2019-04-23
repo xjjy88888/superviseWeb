@@ -121,7 +121,7 @@ export default class siderbarDetail extends PureComponent {
           width: 450,
           backgroundColor: `#fff`,
           position: `absolute`,
-          zIndex: 1000,
+          zIndex: 1001,
           height: `100%`
         }}
         ref={this.saveRef}

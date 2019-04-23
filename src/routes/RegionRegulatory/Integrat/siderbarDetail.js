@@ -93,20 +93,6 @@ export default class siderbarDetail extends PureComponent {
     }
   };
 
-  goDuty = () => {
-    emitter.emit("showSiderbarDetail", {
-      show: true,
-      from: "duty"
-    });
-    emitter.emit("showTool", {
-      show: false
-    });
-    emitter.emit("showQuery", {
-      show: false,
-      type: 1
-    });
-  };
-
   switchShow = () => {
     this.setState({ show: !this.state.show, showDetail: false });
   };
@@ -152,15 +138,14 @@ export default class siderbarDetail extends PureComponent {
           onClick={this.switchShow}
         />
         <Button
-          type="dashed"
           icon={edit ? "check" : "edit"}
           shape="circle"
           style={{
             float: "right",
             position: "absolute",
             color: "#1890ff",
-            right: 20,
-            top: 10
+            right: 25,
+            top: 60
           }}
           onClick={this.submit}
         />
@@ -178,12 +163,7 @@ export default class siderbarDetail extends PureComponent {
                 <Input defaultValue={`矢量化类型`} disabled={!edit} />
               </Form.Item>
               <Form.Item label="面积" {...formItemLayout}>
-                <InputNumber
-                  defaultValue={`68`}
-                  disabled={!edit}
-                  formatter={value => `${value}公顷`}
-                  style={{ width: `100%` }}
-                />
+                <Input disabled={!edit} addonAfter="公顷" />
               </Form.Item>
               <Form.Item label="组成部分" {...formItemLayout}>
                 <Input defaultValue={`矢量化类型`} disabled={!edit} />

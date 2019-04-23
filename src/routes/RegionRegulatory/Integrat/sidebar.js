@@ -96,12 +96,6 @@ export default class integrat extends PureComponent {
   }
 
   componentDidMount() {
-    this.eventEmitter = emitter.addListener("showProjectDetail", data => {
-      this.setState({
-        showProjectDetail: data.show
-      });
-      this.queryProjectById(data.id);
-    });
     this.eventEmitter = emitter.addListener("showProjectSpotInfo", data => {
       if (data.from === "project") {
         this.setState({
@@ -158,30 +152,6 @@ export default class integrat extends PureComponent {
     this.setState({ value });
   };
 
-  submit_project = () => {
-    const { projectEdit } = this.state;
-    this.setState({ projectEdit: !projectEdit });
-    if (projectEdit) {
-      this.props.form.validateFields((err, values) => {
-        if (!err) {
-          console.log(values);
-        }
-      });
-      notification["success"]({
-        message: "编辑成功"
-      });
-      emitter.emit("showEdit", {
-        show: true,
-        edit: false
-      });
-    } else {
-      emitter.emit("showEdit", {
-        show: true,
-        edit: true
-      });
-    }
-  };
-
   switchShow = () => {
     this.setState({ show: !this.state.show, showProjectDetail: false });
   };
@@ -192,7 +162,7 @@ export default class integrat extends PureComponent {
       this.setState({
         projectEdit: false
       });
-      emitter.emit("showEdit", {
+      emitter.emit("showProjectDetail", {
         show: true,
         edit: false
       });
@@ -205,7 +175,7 @@ export default class integrat extends PureComponent {
         show: false,
         from: "spot"
       });
-      emitter.emit("showEdit", {
+      emitter.emit("showProjectDetail", {
         show: false,
         edit: false
       });
@@ -337,6 +307,18 @@ export default class integrat extends PureComponent {
     } else {
       return "magenta";
     }
+  };
+
+  closeAll = () => {
+    emitter.emit("showSiderbarDetail", {
+      show: false,
+      from: "spot",
+      item: { id: "2017154_14848_4848" }
+    });
+    emitter.emit("showProjectDetail", {
+      show: false,
+      edit: false
+    });
   };
 
   render() {
@@ -827,7 +809,29 @@ export default class integrat extends PureComponent {
                   fontSize: 18,
                   zIndex: 1
                 }}
-                onClick={this.submit_project}
+                onClick={() => {
+                  this.closeAll();
+                  this.setState({ projectEdit: !projectEdit });
+                  if (projectEdit) {
+                    this.props.form.validateFields((err, values) => {
+                      if (!err) {
+                        console.log(values);
+                      }
+                    });
+                    notification["success"]({
+                      message: "编辑成功"
+                    });
+                    emitter.emit("showProjectDetail", {
+                      show: true,
+                      edit: false
+                    });
+                  } else {
+                    emitter.emit("showProjectDetail", {
+                      show: true,
+                      edit: true
+                    });
+                  }
+                }}
               />
             </p>
             <div
@@ -861,7 +865,7 @@ export default class integrat extends PureComponent {
                   paddingRight: 30
                 }}
               >
-                <Collapse defaultActiveKey={["0", "1"]}>
+                <Collapse defaultActiveKey={["0", "1", "2"]}>
                   <Collapse.Panel header="基本信息" key="0">
                     <div
                       style={{
@@ -933,7 +937,7 @@ export default class integrat extends PureComponent {
                       <a
                         style={{ position: "absolute", right: 0, bottom: 0 }}
                         onClick={() => {
-                          emitter.emit("showEdit", {
+                          emitter.emit("showProjectDetail", {
                             show: true,
                             edit: false
                           });
@@ -943,11 +947,12 @@ export default class integrat extends PureComponent {
                       </a>
                     </div>
                   </Collapse.Panel>
-                  <Collapse.Panel header="监督执法记录：2" key="1">
+                  <Collapse.Panel header="监督执法记录：1" key="1">
                     <p
                       style={{ cursor: "pointer" }}
                       onClick={() => {
                         this.setState({ showCompany: true });
+                        this.closeAll();
                       }}
                     >
                       2019/3/22 检查记录
@@ -965,6 +970,7 @@ export default class integrat extends PureComponent {
                       style={{ cursor: "pointer" }}
                       onClick={() => {
                         this.setState({ showCompany: true });
+                        this.closeAll();
                       }}
                     >
                       2019/3/22 检查记录
@@ -979,8 +985,18 @@ export default class integrat extends PureComponent {
                       />
                     </p>
                   </Collapse.Panel>
-                  <Collapse.Panel header="扰动图斑：5" key="2">
-                    <p>
+                  <Collapse.Panel header="扰动图斑：2" key="2">
+                    <p
+                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        this.closeAll();
+                        emitter.emit("showSiderbarDetail", {
+                          show: true,
+                          from: "spot",
+                          item: { id: "2017154_14848_4848" }
+                        });
+                      }}
+                    >
                       2017154_14848_4848
                       <Icon
                         type="environment"
@@ -992,31 +1008,17 @@ export default class integrat extends PureComponent {
                         }}
                       />
                     </p>
-                    <p>
-                      2017154_14848_4848
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                    <p>
-                      2017154_14848_4848
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                    <p>
+                    <p
+                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        this.closeAll();
+                        emitter.emit("showSiderbarDetail", {
+                          show: true,
+                          from: "spot",
+                          item: { id: "2017154_14848_4848" }
+                        });
+                      }}
+                    >
                       2017154_14848_4848
                       <Icon
                         type="environment"
@@ -1030,7 +1032,17 @@ export default class integrat extends PureComponent {
                     </p>
                   </Collapse.Panel>
                   <Collapse.Panel header="防治责任范围：2" key="3">
-                    <p>
+                    <p
+                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        this.closeAll();
+                        emitter.emit("showSiderbarDetail", {
+                          show: true,
+                          from: "duty",
+                          item: { id: "2017154_14848_4848" }
+                        });
+                      }}
+                    >
                       红线第一部分
                       <Icon
                         type="environment"
@@ -1042,8 +1054,18 @@ export default class integrat extends PureComponent {
                         }}
                       />
                     </p>
-                    <p>
-                      红线第二部分
+                    <p
+                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        this.closeAll();
+                        emitter.emit("showSiderbarDetail", {
+                          show: true,
+                          from: "duty",
+                          item: { id: "2017154_14848_4848" }
+                        });
+                      }}
+                    >
+                      红线第一部分
                       <Icon
                         type="environment"
                         style={{
@@ -1688,7 +1710,7 @@ export default class integrat extends PureComponent {
                 <a
                   style={{ position: "absolute", right: 0, bottom: 0 }}
                   onClick={() => {
-                    emitter.emit("showEdit", {
+                    emitter.emit("showProjectDetail", {
                       show: true,
                       edit: true
                     });

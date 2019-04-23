@@ -60,7 +60,7 @@ export default class siderbarDetail extends PureComponent {
           height: 450,
           backgroundColor: `#fff`,
           position: `absolute`,
-          zIndex: 1000,
+          zIndex: 1001,
           top: 410,
           borderRadius: `0px 10px 10px 0`,
           padding: `10px 10px 30px 20px`,

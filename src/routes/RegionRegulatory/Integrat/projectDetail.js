@@ -61,7 +61,7 @@ export default class integrat extends PureComponent {
     for (let i = maxYear; i >= 1970; i--) {
       yearDataSource.push(`${i}年`);
     }
-    this.eventEmitter = emitter.addListener("showEdit", data => {
+    this.eventEmitter = emitter.addListener("showProjectDetail", data => {
       this.setState({
         show: data.show,
         edit: data.edit
@@ -113,7 +113,7 @@ export default class integrat extends PureComponent {
           width: 800,
           backgroundColor: `#fff`,
           position: `absolute`,
-          zIndex: 1000,
+          zIndex: 1001,
           height: `95vh`,
           borderLeft: `solid 1px #ddd`
           // overflow: "auto"
