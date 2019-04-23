@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
-import { Menu, Icon, Button, LocaleProvider } from "antd";
+import { Menu, Icon, Button, LocaleProvider, Switch } from "antd";
 import zhCN from "antd/lib/locale-provider/zh_CN";
 import SiderMenu from "../../../components/SiderMenu";
 import Sidebar from "./sidebar";
@@ -535,6 +535,7 @@ export default class integrat extends PureComponent {
                 position: "relative"
               }}
             >
+              {/* 编辑图形-保存、取消保存按钮 */}
               <div
                 style={{
                   position: "absolute",
@@ -557,6 +558,43 @@ export default class integrat extends PureComponent {
                     this.setState({ showButton: false });
                   }}
                 />
+              </div>
+              {/*图标联动按钮 */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: 20,
+                  left: 380,
+                  zIndex: 1000
+                }}
+              >
+                <Switch
+                  checkedChildren="图表联动"
+                  unCheckedChildren="图表不联动"
+                  defaultChecked
+                  style={{
+                    width: 100
+                  }}
+                />
+              </div>
+              {/*测量、历史对比按钮 */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: 20,
+                  right: 80,
+                  zIndex: 1000
+                }}
+              >
+                <Button
+                  icon="colum-height"
+                  style={{
+                    marginRight: 20
+                  }}
+                >
+                  测量
+                </Button>
+                <Button icon="swap">历史对比</Button>
               </div>
             </div>
           </div>
