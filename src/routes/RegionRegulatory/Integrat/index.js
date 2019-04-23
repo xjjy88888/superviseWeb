@@ -52,16 +52,21 @@ export default class integrat extends PureComponent {
     };
     //气泡窗口图形编辑
     window.goEditGraphic = obj => {
-      me.setState({ showButton: true });
-      //移除地图监听事件
-      //map.off('click contextmenu');
-      map.off("click");
-      //编辑图形
-      userconfig.projectgeojsonLayer.pm.enable({
-        allowSelfIntersection: false
-      });
-      //移动图形
-      map.pm.toggleGlobalDragMode();
+      if (obj.from === "project") {
+        me.queryWFSServiceByProperty(
+          obj.id,
+          "project_id",
+          config.mapProjectLayerName,
+          me.callbackEditQueryWFSService
+        );
+      }else if (obj.from === "spot") {
+        me.queryWFSServiceByProperty(
+          obj.id,
+          "spot_tbid",
+          config.mapSpotLayerName,
+          me.callbackEditQueryWFSService
+        );
+      }
     };
     //获取url参数
     me.initUrlParams();
@@ -76,17 +81,83 @@ export default class integrat extends PureComponent {
         this.queryWFSServiceByProperty(
           data.item.project_id,
           "project_id",
-          config.mapProjectLayerName
+          config.mapProjectLayerName,
+          this.callbackLocationQueryWFSService
+          
         );
       } else if (data.key === "spot") {
         this.queryWFSServiceByProperty(
           data.item.spot_tbid,
           "spot_tbid",
-          config.mapSpotLayerName
+          config.mapSpotLayerName,
+          this.callbackLocationQueryWFSService
         );
       }
     });
   }
+  /*
+   * 编辑图形查询回调函数
+  */ 
+  callbackEditQueryWFSService = (data)=>{
+    const me = this;
+    //关闭地图气泡窗口
+    map.closePopup();
+    //显示图形编辑菜单按钮
+    me.setState({ showButton: true });
+    //移除地图监听事件
+    //map.off('click contextmenu');
+    map.off("click");
+    me.clearGeojsonLayer();
+    let style = {
+      color: "#33CCFF", //#33CCFF #e60000
+      weight: 3,
+      opacity: 1,
+      fillColor: "#e6d933", //#33CCFF #e6d933
+      fillOpacity: 0.1
+    };
+    me.loadGeojsonLayer(data, style);
+    //编辑图形
+    userconfig.projectgeojsonLayer.pm.enable({
+      allowSelfIntersection: false
+    });
+    //移动图形
+    //map.pm.toggleGlobalDragMode();
+
+  };
+  /*
+   * 地图定位查询回调函数
+  */
+  callbackLocationQueryWFSService = (data)=>{
+    const me = this;
+    me.clearGeojsonLayer();
+    let style = {
+      color: "#33CCFF", //#33CCFF #e60000
+      weight: 3,
+      opacity: 1,
+      fillColor: "#e6d933", //#33CCFF #e6d933
+      fillOpacity: 0.1
+    };
+    me.loadGeojsonLayer(data, style);
+    map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
+      maxZoom: 16
+    });
+    if (data.features.length > 0) {
+      let content = "";
+      for (let i = 0; i < data.features.length; i++) {
+        let feature = data.features[i];
+        if (i === data.features.length - 1) {
+          content += me.getWinContent(feature.properties)[0].innerHTML;
+        } else {
+          content +=
+            me.getWinContent(feature.properties)[0].innerHTML + "<br><br>";
+        }
+      }
+      map.openPopup(
+        content,
+        userconfig.projectgeojsonLayer.getBounds().getCenter()
+      );
+    }
+  };
   /*
    * 获取url参数
    */
@@ -135,13 +206,13 @@ export default class integrat extends PureComponent {
       影像图: baseLayer1
     };
     map.on("click", me.onClickMap);
-    map.on("popupclose", function(e) {
+    /*map.on("popupclose", function(e) {
       map.on("click", me.onClickMap);
       //禁止编辑图形
       userconfig.projectgeojsonLayer.pm.disable();
       //禁止移动图形
       map.pm.disableGlobalRemovalMode();
-    });
+    });*/
     //获取项目区域范围
     me.getRegionGeometry();
     //编辑图形工具
@@ -175,7 +246,7 @@ export default class integrat extends PureComponent {
    *@param typeName 图层名称
    *@return null
    */
-  queryWFSServiceByProperty = (propertyValue, propertyName, typeName) => {
+  queryWFSServiceByProperty = (propertyValue, propertyName, typeName,callback) => {
     const me = this;
     let filter =
       '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
@@ -197,7 +268,8 @@ export default class integrat extends PureComponent {
     me.props.dispatch({
       type: "mapdata/queryWFSLayer",
       payload: { geojsonUrl },
-      callback: data => {
+      callback:callback
+      /*callback: data => {
         me.clearGeojsonLayer();
         let style = {
           color: "#33CCFF", //#33CCFF #e60000
@@ -226,7 +298,7 @@ export default class integrat extends PureComponent {
             userconfig.projectgeojsonLayer.getBounds().getCenter()
           );
         }
-      }
+      }*/
     });
   };
   /*点选查询图层
@@ -508,6 +580,24 @@ export default class integrat extends PureComponent {
     };
     L.control.layers(userconfig.baseLayers, overlays).addTo(map);
   };
+  /*
+   * 取消编辑图形
+  */
+  cancelEditGraphic = ()=>{
+    this.setState({ showButton: false });
+    map.on("click", this.onClickMap);
+    //禁止编辑图形
+    userconfig.projectgeojsonLayer.pm.disable();
+    //禁止移动图形
+    //map.pm.disableGlobalRemovalMode();
+    this.clearGeojsonLayer();
+  };
+  /*
+   * 保存编辑图形
+  */ 
+  saveEditGraphic = ()=>{
+    this.setState({ showButton: false });
+  }
 
   render() {
     const { showButton } = this.state;
@@ -548,14 +638,14 @@ export default class integrat extends PureComponent {
                 <Button
                   icon="rollback"
                   onClick={() => {
-                    this.setState({ showButton: false });
+                     this.cancelEditGraphic();
                   }}
                 />
                 <br />
                 <Button
                   icon="check"
                   onClick={() => {
-                    this.setState({ showButton: false });
+                    this.saveEditGraphic();
                   }}
                 />
               </div>

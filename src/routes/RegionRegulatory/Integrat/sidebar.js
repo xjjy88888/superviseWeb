@@ -3,6 +3,7 @@ import { connect } from "dva";
 import { createForm } from "rc-form";
 import {
   Menu,
+  Progress,
   Icon,
   Tag,
   Tree,
@@ -386,7 +387,7 @@ export default class integrat extends PureComponent {
           width: 350,
           backgroundColor: "#fff",
           position: "absolute",
-          zIndex: 1000,
+          zIndex: 1001,
           height: "100%"
         }}
         ref={this.saveRef}
@@ -679,7 +680,17 @@ export default class integrat extends PureComponent {
                 >
                   {item.data.map((ite, idx) => (
                     <TreeNode
-                      title={ite.title}
+                      title={
+                        <span>
+                          <span style={{ marginRight: 10 }}>{ite.title}</span>
+                          {/* <Progress
+                            type="circle"
+                            percent={idx % 2 ? 0 : 50}
+                            format={percent => percent}
+                            width={20}
+                          /> */}
+                        </span>
+                      }
                       key={`${index}${idx}`}
                     />
                   ))}
@@ -744,12 +755,30 @@ export default class integrat extends PureComponent {
                       <Tag color={this.toColor(item.sort)}>{item.sort}</Tag>
                       {item.record}
                     </p>
-                    <p>
+                    <p style={{ margin: 0 }}>
                       <Radio.Group name="radiogroup">
                         <Radio value={1}>是</Radio>
                         <Radio value={0}>否</Radio>
                       </Radio.Group>
                     </p>
+                    <Collapse
+                      bordered={false}
+                      style={{ position: "relative", left: -18 }}
+                    >
+                      <Collapse.Panel header="附件" key="1">
+                        <Input.TextArea
+                          autosize
+                          placeholder="问题描述"
+                          style={{ marginBottom: 10 }}
+                        />
+                        <Upload listType="picture">
+                          <Button>
+                            <Icon type="upload" />
+                            上传附件
+                          </Button>
+                        </Upload>
+                      </Collapse.Panel>
+                    </Collapse>
                   </div>
                 ))}
               </div>
