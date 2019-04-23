@@ -725,7 +725,7 @@ export default class integrat extends PureComponent {
                   fontSize: 18,
                   position: "absolute",
                   right: 30,
-                  top: 20
+                  top: 15
                 }}
                 onClick={() => {
                   this.setState({ showProblem: false });
