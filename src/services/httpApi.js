@@ -48,6 +48,20 @@ export async function spotById(id) {
   });
 }
 
+//编辑扰动图斑图形信息
+export async function updateSpotGraphic(params) {
+  return request(`${config.url.updateSpotGraphic}?obj=${JSON.stringify(params)}`, {
+    method: 'GET',
+  });
+}
+
+//编辑项目红线图形信息
+export async function updateProjectScopeGraphic(params) {
+  return request(`${config.url.updateProjectScopeGraphic}?obj=${JSON.stringify(params)}`, {
+    method: 'GET',
+  });
+}
+
 //地图WFS请求图层数据源
 export async function queryWFSLayer(params) {
   //console.log(params);

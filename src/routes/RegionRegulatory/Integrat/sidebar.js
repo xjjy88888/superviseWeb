@@ -9,6 +9,7 @@ import {
   Tree,
   Button,
   notification,
+  Affix,
   Input,
   Radio,
   List,
@@ -619,35 +620,43 @@ export default class integrat extends PureComponent {
               position: "relation"
             }}
           >
-            <Button
-              icon="close"
-              shape="circle"
+            <p
               style={{
-                float: "right",
-                color: "#1890ff",
-                fontSize: 18,
-                zIndex: 1
+                position: "fixed",
+                top: 62,
+                left: 256
               }}
-              onClick={() => {
-                this.setState({ showCompany: false });
-              }}
-            />
-            <Button
-              icon="check"
-              shape="circle"
-              style={{
-                float: "right",
-                color: "#1890ff",
-                fontSize: 18,
-                zIndex: 1
-              }}
-              onClick={() => {
-                this.setState({ showProblem: false });
-                notification["success"]({
-                  message: "编辑成功"
-                });
-              }}
-            />
+            >
+              <Button
+                icon="close"
+                shape="circle"
+                style={{
+                  float: "right",
+                  color: "#1890ff",
+                  fontSize: 18,
+                  zIndex: 1
+                }}
+                onClick={() => {
+                  this.setState({ showCompany: false });
+                }}
+              />
+              <Button
+                icon="check"
+                shape="circle"
+                style={{
+                  float: "right",
+                  color: "#1890ff",
+                  fontSize: 18,
+                  zIndex: 1
+                }}
+                onClick={() => {
+                  this.setState({ showProblem: false });
+                  notification["success"]({
+                    message: "编辑成功"
+                  });
+                }}
+              />
+            </p>
             <Tree defaultExpandAll onSelect={this.TreeOnSelect}>
               {data.map((item, index) => (
                 <TreeNode
@@ -773,8 +782,16 @@ export default class integrat extends PureComponent {
               display: showCompany ? "none" : "block"
             }}
           >
-            <p>
-              {/* 返回 */}
+            <p
+              style={{
+                width: 100,
+                height: 0,
+                left: 220,
+                top: 62,
+                zIndex: 1,
+                position: "fixed"
+              }}
+            >
               <Button
                 icon="rollback"
                 shape="circle"
@@ -952,7 +969,7 @@ export default class integrat extends PureComponent {
                   <Collapse.Panel
                     header={
                       <b>
-                        监督执法记录：1
+                        监督执法记录：2
                         <Icon
                           type="plus-circle"
                           style={{
@@ -987,6 +1004,12 @@ export default class integrat extends PureComponent {
                           cursor: "point",
                           color: "#1890ff"
                         }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          notification["info"]({
+                            message: "删除监督执法记录"
+                          });
+                        }}
                       />
                       <Icon
                         type="file-text"
@@ -996,6 +1019,12 @@ export default class integrat extends PureComponent {
                           cursor: "point",
                           color: "#1890ff",
                           marginRight: 10
+                        }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          notification["info"]({
+                            message: "查看监督执法记录报告"
+                          });
                         }}
                       />
                     </p>
@@ -1015,6 +1044,12 @@ export default class integrat extends PureComponent {
                           cursor: "point",
                           color: "#1890ff"
                         }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          notification["info"]({
+                            message: "删除监督执法记录"
+                          });
+                        }}
                       />
                       <Icon
                         type="file-text"
@@ -1024,6 +1059,12 @@ export default class integrat extends PureComponent {
                           cursor: "point",
                           color: "#1890ff",
                           marginRight: 10
+                        }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          notification["info"]({
+                            message: "查看监督执法记录报告"
+                          });
                         }}
                       />
                     </p>

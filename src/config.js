@@ -20,7 +20,10 @@ const config = {
     //根据扰动图斑id获取对应的扰动图斑信息
     spotBytbId: `${domain}/api/app/spotBytbId`,
     //spotGetIntersects: `http://10.7.23.81:8090/stbcSys/api/app/spotGetIntersects`
-    updateSpotGraphic:`http://10.7.23.81:8090/stbcSys/api/app/spotGetIntersects`
+    //编辑图斑图形
+    updateSpotGraphic:`${domain}/api/app/updateSpotGraphic`,
+    //编辑项目红线图形
+    updateProjectScopeGraphic:`${domain}/api/app/updateProjectScopeGraphic`
 
   },
 

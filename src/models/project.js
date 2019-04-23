@@ -4,7 +4,9 @@ import {
   projectListApi,
   projectById,
   spotGetIntersects,
-  spotById
+  spotById,
+  updateSpotGraphic,
+  updateProjectScopeGraphic
 } from "../services/httpApi";
 
 export default {
@@ -54,6 +56,22 @@ export default {
         });
       }
       if (callback) callback(spotItem);
+    },
+    *updateSpotGraphic({ payload,callback }, { call, put }) {     
+      const { data: obj } = yield call(updateSpotGraphic, payload);      
+      notification[obj ? "success" : "error"]({
+        message: obj ? "编辑图斑图形成功" : "编辑图斑图形失败"
+      });
+      yield put({ type: "save", payload: { obj } });
+      if (callback) callback(obj);
+    },
+    *updateProjectScopeGraphic({ payload,callback }, { call, put }) {     
+      const { data: obj } = yield call(updateProjectScopeGraphic, payload);      
+      notification[obj ? "success" : "error"]({
+        message: obj ? "编辑项目红线图形成功" : "编辑项目红线图形失败"
+      });
+      yield put({ type: "save", payload: { obj } });
+      if (callback) callback(obj);
     }
   },
 

@@ -596,7 +596,82 @@ export default class integrat extends PureComponent {
    * 保存编辑图形
   */ 
   saveEditGraphic = ()=>{
+    const me = this;
     this.setState({ showButton: false });
+    map.on("click", this.onClickMap);
+    //禁止编辑图形
+    userconfig.projectgeojsonLayer.pm.disable();
+    //禁止移动图形
+    //map.pm.disableGlobalRemovalMode();
+
+    //console.log(userconfig.projectgeojsonLayer.toGeoJSON());
+    let geojson = userconfig.projectgeojsonLayer.toGeoJSON();
+    //MULTIPOLYGON(((0 0,4 0,4 4,0 4,0 0),(1 1,2 1,2 2,1 2,1 1)), ((-1 -1,-1 -2,-2 -2,-2 -1,-1 -1)))
+    let polygon = 'multipolygon((';
+    let coordinates = geojson.features[0].geometry.coordinates;
+    for(let i=0;i<coordinates.length;i++){
+      let coordinate = coordinates[i];
+      if(i === coordinates.length-1){
+        polygon += '(';
+        for (let j = 0; j < coordinate.length; j++) {
+          let xy = coordinate[j];
+          for(let n=0;n<xy.length;n++){
+            let data = xy[n];
+            if(n===xy.length-1){
+              polygon += data[0] + " " + data[1];
+            }
+            else{
+              polygon += data[0] + " " + data[1] + ",";
+            }
+          }
+        }
+        polygon += ')';   
+      }
+      else{
+        polygon += '(';
+        for (let j = 0; j < coordinate.length; j++) {
+          let xy = coordinate[j];
+          for(let n=0;n<xy.length;n++){
+            let data = xy[n];
+            if(n===xy.length-1){
+              polygon += data[0] + " " + data[1];
+            }
+            else{
+              polygon += data[0] + " " + data[1] + ",";
+            }
+          }
+        }
+        polygon += '),';   
+      } 
+    }
+    polygon += '))';
+
+    if(geojson.features[0].properties.spot_tbid){
+      this.props.dispatch({
+        type: "project/updateSpotGraphic",
+        payload: {
+          spot_tbid: geojson.features[0].properties.spot_tbid,
+          geometry:polygon      
+        },
+        callback:(obj) =>{
+          me.clearGeojsonLayer();
+        }
+      });
+    }
+    else{
+      this.props.dispatch({
+        type: "project/updateProjectScopeGraphic",
+        payload: {
+          project_id: geojson.features[0].properties.project_id,
+          geometry:polygon      
+        },
+        callback:(obj) =>{
+          me.clearGeojsonLayer();         
+        }
+      });
+    }
+
+
   }
 
   render() {
