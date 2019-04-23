@@ -17,13 +17,9 @@ export async function login(params) {
 }
 
 // 项目列表
-export async function projectScopeGetIntersects(params) {
-  return request(`${config.url.projectScopeGetIntersects}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json; charset=utf-8"
-    },
-    body: JSON.stringify(params.polygon)
+export async function projectListApi(params) {
+  return request(`${config.url.projectListUrl}?MaxResultCount=10&SkipCount=0`, {
+    method: "GET"
   });
 }
 

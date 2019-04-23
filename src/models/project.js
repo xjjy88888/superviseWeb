@@ -1,7 +1,7 @@
 import { routerRedux } from "dva/router";
 import { Button, notification } from "antd";
 import {
-  projectScopeGetIntersects,
+  projectListApi,
   projectById,
   spotGetIntersects,
   spotById
@@ -11,7 +11,7 @@ export default {
   namespace: "project",
 
   state: {
-    projectList: [],
+    projectList: { totalCount: 0, items: [] },
     spotList: [],
     projectItem: {},
     spotItem: {}
@@ -23,10 +23,9 @@ export default {
 
   effects: {
     *queryProject({ payload }, { call, put }) {
-      const { data: projectList } = yield call(
-        projectScopeGetIntersects,
-        payload
-      );
+      const {
+        data: { result: projectList }
+      } = yield call(projectListApi, payload);
       yield put({ type: "save", payload: { projectList } });
     },
     *queryProjectById({ payload, callback }, { call, put }) {

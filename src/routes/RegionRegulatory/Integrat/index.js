@@ -14,8 +14,8 @@ import ProjectDetail from "./projectDetail";
 import L from "leaflet";
 import "proj4";
 import "proj4leaflet";
-import 'leaflet.pm/dist/leaflet.pm.css';
-import 'leaflet.pm';
+import "leaflet.pm/dist/leaflet.pm.css";
+import "leaflet.pm";
 import shp from "shpjs";
 import * as turf from "@turf/turf";
 //import '@h21-map/leaflet-path-drag';
@@ -39,16 +39,30 @@ export default class integrat extends PureComponent {
     super(props);
     this.state = {
       loading: false,
-      showTool: false
+      showButton: false
     };
     this.map = null;
   }
   componentDidMount() {
+    const me = this;
+    //气泡窗口详情查看
     window.goDetail = obj => {
       //console.log("goDetail", obj);
       emitter.emit("showProjectSpotInfo", obj);
     };
-    const me = this;
+    //气泡窗口图形编辑
+    window.goEditGraphic = obj => {
+      me.setState({ showButton: true });
+      //移除地图监听事件
+      //map.off('click contextmenu');
+      map.off("click");
+      //编辑图形
+      userconfig.projectgeojsonLayer.pm.enable({
+        allowSelfIntersection: false
+      });
+      //移动图形
+      map.pm.toggleGlobalDragMode();
+    };
     //获取url参数
     me.initUrlParams();
     // 创建地图
@@ -120,18 +134,20 @@ export default class integrat extends PureComponent {
       街道图: baseLayer,
       影像图: baseLayer1
     };
-    map.on("click", function(e) {
-      //点查WMS图层
-      userconfig.mapPoint = e.latlng;
-      let point = { x: e.latlng.lng, y: e.latlng.lat };
-      me.queryWFSServiceByPoint(point, config.mapLayersName);
+    map.on("click", me.onClickMap);
+    map.on("popupclose", function(e) {
+      map.on("click", me.onClickMap);
+      //禁止编辑图形
+      userconfig.projectgeojsonLayer.pm.disable();
+      //禁止移动图形
+      map.pm.disableGlobalRemovalMode();
     });
     //获取项目区域范围
     me.getRegionGeometry();
     //编辑图形工具
     // 定义图层绘制控件选择项
     const options = {
-      position: 'topright', // toolbar position, options are 'topleft', 'topright', 'bottomleft', 'bottomright'
+      position: "topright", // toolbar position, options are 'topleft', 'topright', 'bottomleft', 'bottomright'
       drawMarker: false, // adds button to draw markers
       drawPolyline: false, // adds button to draw a polyline
       drawRectangle: false, // adds button to draw a rectangle
@@ -139,12 +155,18 @@ export default class integrat extends PureComponent {
       drawCircle: false, // adds button to draw a cricle
       cutPolygon: false, // adds button to cut a hole in a polygon
       editMode: false, // adds button to toggle edit mode for all layers
-      dragMode:true,//adds button to toggle drag mode for all layers
-      removalMode: true, // adds a button to remove layers
+      dragMode: false, //adds button to toggle drag mode for all layers
+      removalMode: false // adds a button to remove layers
     };
     // 将图层绘制控件添加的地图页面上
     map.pm.addControls(options);
-
+  };
+  onClickMap = e => {
+    const me = this;
+    //点查WMS图层
+    userconfig.mapPoint = e.latlng;
+    let point = { x: e.latlng.lng, y: e.latlng.lat };
+    me.queryWFSServiceByPoint(point, config.mapLayersName);
   };
   /*属性查询图层
    *@method queryWFSServiceByProperty
@@ -195,13 +217,15 @@ export default class integrat extends PureComponent {
             if (i === data.features.length - 1) {
               content += me.getWinContent(feature.properties)[0].innerHTML;
             } else {
-              content += me.getWinContent(feature.properties)[0].innerHTML + "<br><br>";
+              content +=
+                me.getWinContent(feature.properties)[0].innerHTML + "<br><br>";
             }
           }
-          map.openPopup(content, userconfig.projectgeojsonLayer.getBounds().getCenter());
+          map.openPopup(
+            content,
+            userconfig.projectgeojsonLayer.getBounds().getCenter()
+          );
         }
-
-
       }
     });
   };
@@ -260,11 +284,6 @@ export default class integrat extends PureComponent {
             }
           }
           map.openPopup(content, userconfig.mapPoint);
-          //编辑图形测试
-          userconfig.projectgeojsonLayer.pm.enable({
-            allowSelfIntersection: false,
-          });
-
         }
       }
     });
@@ -292,13 +311,17 @@ export default class integrat extends PureComponent {
             properties.byd ? "扰动范围:" + properties.byd + "</br>" : ""
           }<a onclick='goDetail(${JSON.stringify(
             obj
-          )})'>详情</a>    <a class="edit">图形编辑</a></div>`
+          )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
+            obj
+          )})'>图形编辑</a></div>`
         )
       : jQuery(
           `<div>项目ID:${properties.project_id}</br>
           <a onclick='goDetail(${JSON.stringify(
             obj
-          )})'>详情</a>    <a class="edit">图形编辑</a></div>`
+          )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
+            obj
+          )})'>图形编辑</a></div>`
         );
     return elements;
   };
@@ -487,6 +510,7 @@ export default class integrat extends PureComponent {
   };
 
   render() {
+    const { showButton } = this.state;
     return (
       <LocaleProvider locale={zhCN}>
         <div>
@@ -507,9 +531,34 @@ export default class integrat extends PureComponent {
               id="map"
               style={{
                 height: "100%",
-                boxSizing: "border-box"
+                boxSizing: "border-box",
+                position: "relative"
               }}
-            />
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  display: showButton ? "block" : "none",
+                  top: 220,
+                  right: 15,
+                  zIndex: 1000
+                }}
+              >
+                <Button
+                  icon="rollback"
+                  onClick={() => {
+                    this.setState({ showButton: false });
+                  }}
+                />
+                <br />
+                <Button
+                  icon="check"
+                  onClick={() => {
+                    this.setState({ showButton: false });
+                  }}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </LocaleProvider>

@@ -1,4 +1,5 @@
 const domain = "http://aj.zkygis.cn/dutySys";
+const domain_ = "http://aj.zkygis.cn/stbc/";
 
 const config = {
   url: {
@@ -6,7 +7,8 @@ const config = {
     GetUserPassWord: `${domain}/api/account/GetUserPassWord`,
 
     //项目列表
-    projectScopeGetIntersects: `${domain}/api/app/projectScopeGetIntersects`,
+    // projectListUrl: `${domain}/api/app/projectScopeGetIntersects`,
+    projectListUrl: `${domain_}api/services/app/ProjectManagerService/GetAll`,
     
     //根据项目id获取对应的项目信息
     projectById: `${domain}/api/app/projectById`,

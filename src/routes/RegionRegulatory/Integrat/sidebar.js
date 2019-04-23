@@ -323,7 +323,6 @@ export default class integrat extends PureComponent {
       this.setState({ showProblem: true });
       if (!isRoot) {
         const item = data[e[0].slice(0, 1)].data[e[0].slice(1, 2)];
-        console.log("selected", e, item);
         this.setState({ problem: item });
       }
     }
@@ -470,7 +469,7 @@ export default class integrat extends PureComponent {
           </Button>
           <p style={{ padding: "20px 20px 0 20px" }}>
             <span>{`共有${
-              key === "project" ? projectList.length : spotList.length
+              key === "project" ? projectList.totalCount : spotList.length
             }条记录`}</span>
             <span
               style={{
@@ -521,7 +520,7 @@ export default class integrat extends PureComponent {
           </p>
           <Spin
             style={{
-              display: projectList.length <= 1 ? "block" : "none",
+              display: projectList.totalCount === 0 ? "block" : "none",
               padding: 100,
               position: "absolute",
               top: 300,
@@ -536,7 +535,7 @@ export default class integrat extends PureComponent {
               padding: "10px 20px 10px 20px"
             }}
             itemLayout="horizontal"
-            dataSource={key === "project" ? projectList : spotList}
+            dataSource={key === "project" ? projectList.items : spotList}
             renderItem={item => (
               <List.Item>
                 <List.Item.Meta
@@ -545,19 +544,10 @@ export default class integrat extends PureComponent {
                   }}
                   title={
                     <p style={{ textAlign: "justify" }}>
-                      <span
-                        style={{
-                          display: key === "project" ? "block" : "none"
-                        }}
-                      >
-                        {item.project_name}
-                      </span>
-                      <span
-                        style={{
-                          display: key === "spot" ? "block" : "none"
-                        }}
-                      >
-                        {item.spot_tbid}
+                      <span>
+                        {key === "project"
+                          ? item.project.project_name
+                          : item.spot_tbid}
                       </span>
                       <Icon
                         type="environment"
@@ -579,33 +569,20 @@ export default class integrat extends PureComponent {
                   }
                   description={
                     <p>
-                      <span
-                        style={{
-                          display: key === "project" ? "block" : "none"
-                        }}
-                      >
+                      <span>
                         <span style={{ wordBreak: "break-all" }}>
-                          建设单位：{item.product_department_id}
+                          {key === "project"
+                            ? `建设单位：${item.product_department.name}`
+                            : `关联项目：${item.project_id}`}
                         </span>
                         <br />
                         <span style={{ wordBreak: "break-all" }}>
-                          批复机构：{item.project_rp_id}
+                          {key === "project"
+                            ? `批复机构：${item.project.project_name}`
+                            : `扰动合规性：${item.byd}`}
                         </span>
                       </span>
-                      <span
-                        style={{
-                          display: key === "spot" ? "block" : "none"
-                        }}
-                      >
-                        <span style={{ wordBreak: "break-all" }}>
-                          关联项目：{item.project_id}
-                        </span>
-                        <br />
-                        <span style={{ wordBreak: "break-all" }}>
-                          扰动合规性：{item.byd}
-                        </span>
-                      </span>
-                      <span
+                      {/* <span
                         style={{
                           display: key === "point" ? "block" : "none"
                         }}
@@ -616,8 +593,8 @@ export default class integrat extends PureComponent {
                         <br />
                         <span style={{ wordBreak: "break-all" }}>
                           描述：{item.desc}
-                        </span>
-                      </span>
+                        </span> 
+                      </span> */}
                     </p>
                   }
                   onClick={() => {
@@ -625,12 +602,12 @@ export default class integrat extends PureComponent {
                       this.setState({
                         showProjectDetail: true
                       });
-                      this.queryProjectById(item.project_id);
+                      this.queryProjectById(item.id);
                     } else if (key === "spot") {
                       emitter.emit("showSiderbarDetail", {
                         show: key === "spot",
                         from: key,
-                        id: key === "project" ? item.project_id : item.spot_tbid
+                        id: key === "project" ? item.id : item.spot_tbid
                       });
                     }
                     emitter.emit("showTool", {
@@ -704,9 +681,6 @@ export default class integrat extends PureComponent {
                     <TreeNode
                       title={ite.title}
                       key={`${index}${idx}`}
-                      onClick={() => {
-                        console.log(`onClick`);
-                      }}
                     />
                   ))}
                 </TreeNode>
@@ -832,9 +806,7 @@ export default class integrat extends PureComponent {
                 display: projectEdit ? "none" : "block"
               }}
             >
-              <p>
-                <b>{projectItem.project_name}</b>
-              </p>
+              <p>{/* <b>{projectItem.project_name}</b> */}</p>
               <p
                 style={
                   {
@@ -1513,8 +1485,8 @@ export default class integrat extends PureComponent {
             >
               <Form style={{ position: "relative", paddingBottom: 10 }}>
                 <Form.Item label="项目名" {...formItemLayout}>
-                  {getFieldDecorator("project_name", {
-                    initialValue: projectItem.project_name
+                  {getFieldDecorator("project_name1", {
+                    // initialValue: projectItem.project_name
                   })(<Input.TextArea autosize />)}
                 </Form.Item>
                 <Form.Item label="所在地区" {...formItemLayout}>
