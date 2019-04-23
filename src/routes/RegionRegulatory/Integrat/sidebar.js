@@ -652,11 +652,13 @@ export default class integrat extends PureComponent {
               {data.map((item, index) => (
                 <TreeNode
                   title={
-                    item.title !== "八、措施缺陷" ? (
-                      <span>{item.title}</span>
-                    ) : (
-                      <span style={{ color: "red" }}>{item.title}</span>
-                    )
+                    <b
+                      style={{
+                        color: index === 7 ? "red" : "#000"
+                      }}
+                    >
+                      {item.title}
+                    </b>
                   }
                   key={item.key}
                 >
@@ -841,12 +843,12 @@ export default class integrat extends PureComponent {
             >
               <p>{/* <b>{projectItem.project_name}</b> */}</p>
               <p
-                style={
-                  {
-                    // borderBottom: "solid 1px #dedede",
-                    // paddingBottom: 10
-                  }
-                }
+                style={{
+                  position: "relative",
+                  left: 10
+                  // borderBottom: "solid 1px #dedede",
+                  // paddingBottom: 10
+                }}
               >
                 <span>位置：</span>
                 <span>
@@ -865,72 +867,72 @@ export default class integrat extends PureComponent {
                   paddingRight: 30
                 }}
               >
-                <Collapse defaultActiveKey={["0", "1", "2"]}>
-                  <Collapse.Panel header="基本信息" key="0">
+                <Collapse bordered={false} defaultActiveKey={["0", "1", "2"]}>
+                  <Collapse.Panel header={<b>基本信息</b>} key="0">
                     <div
                       style={{
                         // borderBottom: "solid 1px #dedede",
-                        paddingBottom: 10,
+                        // paddingBottom: 10,
                         position: "relative"
                       }}
                     >
-                      <p style={{ margin: 10 }}>
+                      <p style={{ marginBottom: 10 }}>
                         <span>建设单位：</span>
                         <span>{projectItem.product_department_id}</span>
                       </p>
-                      <p style={{ margin: 10 }}>
+                      <p style={{ marginBottom: 10 }}>
                         <span>监管单位：</span>
                         <span>{projectItem.project_sup_id}</span>
                       </p>
-                      <p style={{ margin: 10 }}>
+                      <p style={{ marginBottom: 10 }}>
                         <span>批复机构：</span>
                         <span>{projectItem.project_rp_id}</span>
                       </p>
-                      <p style={{ margin: 10 }}>
+                      <p style={{ marginBottom: 10 }}>
                         <span>流域管理机构：</span>
                         <span>{projectItem.ctn_code}</span>
                       </p>
-                      <p style={{ margin: 10 }}>
+                      <p style={{ marginBottom: 10 }}>
                         <span>批复文号：</span>
                         <span>{projectItem.project_rp_num}</span>
                       </p>
-                      <p style={{ margin: 10 }}>
+                      <p style={{ marginBottom: 10 }}>
                         <span>批复时间：</span>
                         <span>{projectItem.project_rp_time}</span>
                       </p>
-                      <p style={{ margin: 10 }}>
+                      <p style={{ marginBottom: 10 }}>
                         <span>责任面积：</span>
                         <span>{projectItem.area}m2</span>
                       </p>
-                      <p style={{ margin: 10 }}>
+                      <p style={{ marginBottom: 10 }}>
                         <span>立项级别：</span>
                         <span>{projectItem.project_level}</span>
                       </p>
-                      <p style={{ margin: 10 }}>
+                      <p style={{ marginBottom: 10 }}>
                         <span>项目合规性：</span>
                         <span>----</span>
                       </p>
-                      <p style={{ margin: 10 }}>
+                      <p style={{ marginBottom: 10 }}>
                         <span>项目类别：</span>
                         <span>----</span>
                       </p>
-                      <p style={{ margin: 10 }}>
+                      <p style={{ marginBottom: 10 }}>
                         <span>项目类型：</span>
                         <span>----</span>
                       </p>
-                      <p style={{ margin: 10 }}>
+                      <p style={{ marginBottom: 10 }}>
                         <span>建设状态：</span>
                         <span>----</span>
                       </p>
-                      <p style={{ margin: 10 }}>
+                      <p style={{ marginBottom: 10 }}>
                         <span>项目性质：</span>
                         <span>----</span>
                       </p>
-                      <p style={{ margin: 10 }}>
+                      <p style={{ marginBottom: 10 }}>
                         <span>涉及县：</span>
                         <span>----</span>
                       </p>
-                      <p style={{ margin: 10, textAlign: "justify" }}>
+                      <p style={{ textAlign: "justify" }}>
                         <span>备注：</span>
                         <span>----</span>
                       </p>
@@ -947,7 +949,28 @@ export default class integrat extends PureComponent {
                       </a>
                     </div>
                   </Collapse.Panel>
-                  <Collapse.Panel header="监督执法记录：1" key="1">
+                  <Collapse.Panel
+                    header={
+                      <b>
+                        监督执法记录：1
+                        <Icon
+                          type="plus-circle"
+                          style={{
+                            marginLeft: 10,
+                            fontSize: 16,
+                            color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            notification["info"]({
+                              message: "添加监督执法记录"
+                            });
+                          }}
+                        />
+                      </b>
+                    }
+                    key="1"
+                  >
                     <p
                       style={{ cursor: "pointer" }}
                       onClick={() => {
@@ -957,12 +980,22 @@ export default class integrat extends PureComponent {
                     >
                       2019/3/22 检查记录
                       <Icon
-                        type="environment"
+                        type="delete"
                         style={{
                           float: "right",
                           fontSize: 18,
                           cursor: "point",
                           color: "#1890ff"
+                        }}
+                      />
+                      <Icon
+                        type="file-text"
+                        style={{
+                          float: "right",
+                          fontSize: 16,
+                          cursor: "point",
+                          color: "#1890ff",
+                          marginRight: 10
                         }}
                       />
                     </p>
@@ -975,17 +1008,57 @@ export default class integrat extends PureComponent {
                     >
                       2019/3/22 检查记录
                       <Icon
-                        type="environment"
+                        type="delete"
                         style={{
                           float: "right",
                           fontSize: 18,
                           cursor: "point",
                           color: "#1890ff"
+                        }}
+                      />
+                      <Icon
+                        type="file-text"
+                        style={{
+                          float: "right",
+                          fontSize: 16,
+                          cursor: "point",
+                          color: "#1890ff",
+                          marginRight: 10
                         }}
                       />
                     </p>
                   </Collapse.Panel>
-                  <Collapse.Panel header="扰动图斑：2" key="2">
+                  <Collapse.Panel
+                    header={
+                      <b>
+                        扰动图斑：2
+                        <Icon
+                          type="plus-circle"
+                          style={{
+                            marginLeft: 10,
+                            fontSize: 16,
+                            color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            notification["info"]({
+                              message: "添加扰动图斑"
+                            });
+                          }}
+                        />
+                        <Switch
+                          checkedChildren="归档图斑"
+                          unCheckedChildren="非归档图斑"
+                          defaultChecked
+                          style={{ position: "relative", left: 10, top: -2 }}
+                          onChange={(v, e) => {
+                            e.stopPropagation();
+                          }}
+                        />
+                      </b>
+                    }
+                    key="2"
+                  >
                     <p
                       style={{ cursor: "pointer" }}
                       onClick={() => {
@@ -1031,7 +1104,28 @@ export default class integrat extends PureComponent {
                       />
                     </p>
                   </Collapse.Panel>
-                  <Collapse.Panel header="防治责任范围：2" key="3">
+                  <Collapse.Panel
+                    header={
+                      <b>
+                        防治责任范围：2
+                        <Icon
+                          type="plus-circle"
+                          style={{
+                            marginLeft: 10,
+                            fontSize: 16,
+                            color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            notification["info"]({
+                              message: "添加防治责任范围"
+                            });
+                          }}
+                        />
+                      </b>
+                    }
+                    key="3"
+                  >
                     <p
                       style={{ cursor: "pointer" }}
                       onClick={() => {
@@ -1077,7 +1171,28 @@ export default class integrat extends PureComponent {
                       />
                     </p>
                   </Collapse.Panel>
-                  <Collapse.Panel header="设计分区：5" key="4">
+                  <Collapse.Panel
+                    header={
+                      <b>
+                        设计分区：5
+                        <Icon
+                          type="plus-circle"
+                          style={{
+                            marginLeft: 10,
+                            fontSize: 16,
+                            color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            notification["info"]({
+                              message: "添加设计分区"
+                            });
+                          }}
+                        />
+                      </b>
+                    }
+                    key="4"
+                  >
                     <p>
                       主体功能区
                       <Icon
@@ -1139,7 +1254,28 @@ export default class integrat extends PureComponent {
                       />
                     </p>
                   </Collapse.Panel>
-                  <Collapse.Panel header="设计措施：5" key="5">
+                  <Collapse.Panel
+                    header={
+                      <b>
+                        设计措施：5
+                        <Icon
+                          type="plus-circle"
+                          style={{
+                            marginLeft: 10,
+                            fontSize: 16,
+                            color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            notification["info"]({
+                              message: "添加设计措施"
+                            });
+                          }}
+                        />
+                      </b>
+                    }
+                    key="5"
+                  >
                     <p>
                       截排水沟
                       <Icon
@@ -1201,7 +1337,28 @@ export default class integrat extends PureComponent {
                       />
                     </p>
                   </Collapse.Panel>
-                  <Collapse.Panel header="责任点：5" key="6">
+                  <Collapse.Panel
+                    header={
+                      <b>
+                        责任点：5
+                        <Icon
+                          type="plus-circle"
+                          style={{
+                            marginLeft: 10,
+                            fontSize: 16,
+                            color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            notification["info"]({
+                              message: "添加责任点"
+                            });
+                          }}
+                        />
+                      </b>
+                    }
+                    key="6"
+                  >
                     <p>
                       某渣场坡面
                       <Icon
@@ -1263,7 +1420,28 @@ export default class integrat extends PureComponent {
                       />
                     </p>
                   </Collapse.Panel>
-                  <Collapse.Panel header="实施措施：5" key="7">
+                  <Collapse.Panel
+                    header={
+                      <b>
+                        实施措施：5
+                        <Icon
+                          type="plus-circle"
+                          style={{
+                            marginLeft: 10,
+                            fontSize: 16,
+                            color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            notification["info"]({
+                              message: "添加实施措施"
+                            });
+                          }}
+                        />
+                      </b>
+                    }
+                    key="7"
+                  >
                     <p>
                       截排水沟
                       <Icon
@@ -1325,7 +1503,28 @@ export default class integrat extends PureComponent {
                       />
                     </p>
                   </Collapse.Panel>
-                  <Collapse.Panel header="问题地块：5" key="8">
+                  <Collapse.Panel
+                    header={
+                      <b>
+                        问题地块：5
+                        <Icon
+                          type="plus-circle"
+                          style={{
+                            marginLeft: 10,
+                            fontSize: 16,
+                            color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            notification["info"]({
+                              message: "添加问题地块"
+                            });
+                          }}
+                        />
+                      </b>
+                    }
+                    key="8"
+                  >
                     <p>
                       某渣场坡面
                       <Icon
