@@ -1,14 +1,6 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
-import {
-  Menu,
-  Icon,
-  Button,
-  LocaleProvider,
-  Switch,
-  Popover,
-  Modal
-} from "antd";
+import { Menu, Icon, Button, LocaleProvider, Switch, Popover, Modal, message } from "antd";
 import zhCN from "antd/lib/locale-provider/zh_CN";
 import SiderMenu from "../../../components/SiderMenu";
 import Sidebar from "./sidebar";
@@ -158,8 +150,6 @@ export default class integrat extends PureComponent {
    */
   callbackLocationQueryWFSService = data => {
     const me = this;
-    const { clientWidth, clientHeight } = me.refDom;
-    const { showSiderbar, showSiderbarDetail, showQuery } = me.state;
     me.clearGeojsonLayer();
     let style = {
       color: "#33CCFF", //#33CCFF #e60000
@@ -187,23 +177,28 @@ export default class integrat extends PureComponent {
         content,
         userconfig.projectgeojsonLayer.getBounds().getCenter()
       );
-      let point = map.latLngToContainerPoint(
-        userconfig.projectgeojsonLayer.getBounds().getCenter()
-      );
-      const offsetSiderbar = showSiderbar ? 200 : 0;
-      const offsetSiderbarDetail = showSiderbarDetail ? 200 : 0;
-      const offsetQuery = showQuery ? 225 : 0;
-      point.x =
-        point.x -
-        clientWidth / 2 -
-        offsetSiderbar -
-        offsetSiderbarDetail -
-        offsetQuery;
-      point.y = point.y - clientHeight / 2;
-      map.panBy(point);
-      //console.log(map.latLngToContainerPoint(userconfig.projectgeojsonLayer.getBounds().getCenter()));
+      me.automaticToMap();
     }
   };
+  /*
+   * 自动匹配地图偏移
+  */
+  automaticToMap = () =>{
+    const me = this;
+    const { clientWidth, clientHeight } = me.refDom;
+    const { showSiderbar, showSiderbarDetail, showQuery } = me.state;
+    let point = map.latLngToContainerPoint(
+      userconfig.projectgeojsonLayer.getBounds().getCenter()
+    );
+    const offsetSiderbar = showSiderbar ? 200 : 0;
+    const offsetSiderbarDetail = showSiderbarDetail ? 200 : 0;
+    const offsetQuery = showQuery ? 225 : 0;
+    point.x =
+    point.x - clientWidth / 2 - offsetSiderbar - offsetSiderbarDetail -
+      offsetQuery;
+    point.y = point.y - clientHeight / 2;
+    map.panBy(point);
+  }
   /*
    * 获取url参数
    */
@@ -271,12 +266,12 @@ export default class integrat extends PureComponent {
     const me = this;
     let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
     if (!turf.booleanContains(userconfig.polygon, turfpoint)) {
-      //promptdialog("提示信息", "区域范围之外的数据没有权限操作");
-      const modal = Modal.success({
-        title: "提示信息",
-        content: `区域范围之外的数据没有权限操作`
-      });
-      return;
+        /*const modal = Modal.success({
+          title: '提示信息',
+          content: `区域范围之外的数据没有权限操作`,
+        });*/
+        message.warning('区域范围之外的数据没有权限操作', 1);
+        return;
     }
     //点查WMS图层
     userconfig.mapPoint = e.latlng;
@@ -318,36 +313,6 @@ export default class integrat extends PureComponent {
       type: "mapdata/queryWFSLayer",
       payload: { geojsonUrl },
       callback: callback
-      /*callback: data => {
-        me.clearGeojsonLayer();
-        let style = {
-          color: "#33CCFF", //#33CCFF #e60000
-          weight: 3,
-          opacity: 1,
-          fillColor: "#e6d933", //#33CCFF #e6d933
-          fillOpacity: 0.1
-        };
-        me.loadGeojsonLayer(data, style);
-        map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
-          maxZoom: 16
-        });
-        if (data.features.length > 0) {
-          let content = "";
-          for (let i = 0; i < data.features.length; i++) {
-            let feature = data.features[i];
-            if (i === data.features.length - 1) {
-              content += me.getWinContent(feature.properties)[0].innerHTML;
-            } else {
-              content +=
-                me.getWinContent(feature.properties)[0].innerHTML + "<br><br>";
-            }
-          }
-          map.openPopup(
-            content,
-            userconfig.projectgeojsonLayer.getBounds().getCenter()
-          );
-        }
-      }*/
     });
   };
   /*点选查询图层
@@ -405,6 +370,7 @@ export default class integrat extends PureComponent {
             }
           }
           map.openPopup(content, userconfig.mapPoint);
+          me.automaticToMap();
         }
       }
     });
@@ -806,13 +772,35 @@ export default class integrat extends PureComponent {
               <div
                 style={{
                   position: "absolute",
-                  bottom: 50,
-                  right: 50,
-                  zIndex: 1000
+                  bottom: 20,
+                  right: 20,
+                  zIndex: 1000,
+                  background: "#fff",
+                  padding: "10px 10px 0px 17px",
+                  border: "solid 1px #ddd",
+                  borderRadius: 5
                 }}
               >
-              <p>
-                </p></div>
+                {config.legend.map((item, index) => (
+                  <p key={index}>
+                    <span
+                      style={{
+                        background: item.background,
+                        border: `${index < 2 ? "dotted" : "solid"} 2px ${
+                          item.border
+                        }`,
+                        width: 13,
+                        height: 13,
+                        display: "inline-block",
+                        position: "relative",
+                        top: 2,
+                        right: 6
+                      }}
+                    />
+                    <span>{item.title}</span>
+                  </p>
+                ))}
+              </div>
             </div>
           </div>
         </div>

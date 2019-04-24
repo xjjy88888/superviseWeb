@@ -9,22 +9,21 @@ const config = {
     //项目列表
     // projectListUrl: `${domain}/api/app/projectScopeGetIntersects`,
     projectListUrl: `${domain_}api/services/app/ProjectManagerService/GetAll`,
-    
+
     //根据项目id获取对应的项目信息
     projectById: `${domain}/api/app/projectById`,
     //projectScopeGetIntersects: `http://10.7.23.81:8090/stbcSys/api/app/projectScopeGetIntersects`,
 
     //图斑列表
     spotGetIntersects: `${domain}/api/app/spotGetIntersects`,
-   
+
     //根据扰动图斑id获取对应的扰动图斑信息
     spotBytbId: `${domain}/api/app/spotBytbId`,
     //spotGetIntersects: `http://10.7.23.81:8090/stbcSys/api/app/spotGetIntersects`
     //编辑图斑图形
-    updateSpotGraphic:`${domain}/api/app/updateSpotGraphic`,
+    updateSpotGraphic: `${domain}/api/app/updateSpotGraphic`,
     //编辑项目红线图形
-    updateProjectScopeGraphic:`${domain}/api/app/updateProjectScopeGraphic`
-
+    updateProjectScopeGraphic: `${domain}/api/app/updateProjectScopeGraphic`
   },
 
   //扰动类型
@@ -325,8 +324,35 @@ const config = {
   },
   mapLayersName: "ZKYGIS:project_scope,ZKYGIS:spot",
   mapProjectLayerName: "ZKYGIS:project_scope",
-  mapSpotLayerName: "ZKYGIS:spot"
+  mapSpotLayerName: "ZKYGIS:spot",
 
+  legend: [
+    {
+      title: "扰动图斑_未关联_未复核",
+      background: "#FDFF99",
+      border: "#E4DC48"
+    },
+    {
+      title: "扰动图斑_未关联_已复核",
+      background: "#FDFF99",
+      border: "#FF6513"
+    },
+    {
+      title: "扰动图斑_已关联_未复核",
+      background: "#FDFF99",
+      border: "#E4DC48"
+    },
+    {
+      title: "扰动图斑_已关联_已复核",
+      background: "#FDFF99",
+      border: "#FF6513"
+    },
+    {
+      title: "项目红线",
+      background: "#F49A98",
+      border: "#E2060C"
+    }
+  ]
 };
 
 export default config;
