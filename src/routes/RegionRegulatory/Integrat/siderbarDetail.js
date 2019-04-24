@@ -93,10 +93,6 @@ export default class siderbarDetail extends PureComponent {
     }
   };
 
-  switchShow = () => {
-    this.setState({ show: !this.state.show, showDetail: false });
-  };
-
   render() {
     const {
       dispatch,
@@ -135,7 +131,12 @@ export default class siderbarDetail extends PureComponent {
             padding: 10,
             cursor: `pointer`
           }}
-          onClick={this.switchShow}
+          onClick={() => {
+            this.setState({ show: !show, showDetail: false });
+            emitter.emit("showSiderbarDetail", {
+              show: !show
+            });
+          }}
         />
         <Button
           icon={edit ? "check" : "edit"}

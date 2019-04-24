@@ -78,9 +78,6 @@ export default class siderbarDetail extends PureComponent {
         count: this.getRandomInt(200, 100)
       }));
   };
-  switchShow = () => {
-    this.setState({ show: false });
-  };
 
   renderOption = item => {
     return (
@@ -139,7 +136,12 @@ export default class siderbarDetail extends PureComponent {
             padding: 10,
             cursor: `pointer`
           }}
-          onClick={this.switchShow}
+          onClick={() => {
+            this.setState({ show: false });
+            emitter.emit("showQuery", {
+              show: !show
+            });
+          }}
         />
         <Button
           type="dashed"

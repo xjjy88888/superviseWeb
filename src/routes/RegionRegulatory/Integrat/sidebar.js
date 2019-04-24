@@ -153,10 +153,6 @@ export default class integrat extends PureComponent {
     this.setState({ value });
   };
 
-  switchShow = () => {
-    this.setState({ show: !this.state.show, showProjectDetail: false });
-  };
-
   close = () => {
     const { showProjectDetail, projectEdit } = this.state;
     if (projectEdit) {
@@ -387,7 +383,12 @@ export default class integrat extends PureComponent {
             padding: 10,
             cursor: "pointer"
           }}
-          onClick={this.switchShow}
+          onClick={() => {
+            this.setState({ show: !show, showProjectDetail: false });
+            emitter.emit("showSiderbar", {
+              show: !show
+            });
+          }}
         />
         <div
           style={{

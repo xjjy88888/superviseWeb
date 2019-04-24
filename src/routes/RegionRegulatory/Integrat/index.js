@@ -1,6 +1,14 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
-import { Menu, Icon, Button, LocaleProvider, Switch } from "antd";
+import {
+  Menu,
+  Icon,
+  Button,
+  LocaleProvider,
+  Switch,
+  Popover,
+  Modal
+} from "antd";
 import zhCN from "antd/lib/locale-provider/zh_CN";
 import SiderMenu from "../../../components/SiderMenu";
 import Sidebar from "./sidebar";
@@ -39,9 +47,15 @@ export default class integrat extends PureComponent {
     super(props);
     this.state = {
       loading: false,
-      showButton: false
+      showButton: false,
+      showSiderbar: true,
+      showSiderbarDetail: false,
+      showQuery: false
     };
     this.map = null;
+    this.saveRef = v => {
+      this.refDom = v;
+    };
   }
   componentDidMount() {
     const me = this;
@@ -59,7 +73,7 @@ export default class integrat extends PureComponent {
           config.mapProjectLayerName,
           me.callbackEditQueryWFSService
         );
-      }else if (obj.from === "spot") {
+      } else if (obj.from === "spot") {
         me.queryWFSServiceByProperty(
           obj.id,
           "spot_tbid",
@@ -83,7 +97,6 @@ export default class integrat extends PureComponent {
           "project_id",
           config.mapProjectLayerName,
           this.callbackLocationQueryWFSService
-          
         );
       } else if (data.key === "spot") {
         this.queryWFSServiceByProperty(
@@ -94,11 +107,28 @@ export default class integrat extends PureComponent {
         );
       }
     });
+    //监听侧边栏显隐
+    this.eventEmitter = emitter.addListener("showSiderbar", data => {
+      this.setState({
+        showSiderbar: data.show
+      });
+    });
+    this.eventEmitter = emitter.addListener("showSiderbarDetail", data => {
+      this.setState({
+        showSiderbarDetail: data.show
+      });
+    });
+    this.eventEmitter = emitter.addListener("showQuery", data => {
+      this.setState({
+        showQuery: data.show
+      });
+    });
   }
   /*
    * 编辑图形查询回调函数
-  */ 
-  callbackEditQueryWFSService = (data)=>{
+   */
+
+  callbackEditQueryWFSService = data => {
     const me = this;
     //关闭地图气泡窗口
     map.closePopup();
@@ -122,13 +152,14 @@ export default class integrat extends PureComponent {
     });
     //移动图形
     //map.pm.toggleGlobalDragMode();
-
   };
   /*
    * 地图定位查询回调函数
-  */
-  callbackLocationQueryWFSService = (data)=>{
+   */
+  callbackLocationQueryWFSService = data => {
     const me = this;
+    const { clientWidth, clientHeight } = me.refDom;
+    const { showSiderbar, showSiderbarDetail, showQuery } = me.state;
     me.clearGeojsonLayer();
     let style = {
       color: "#33CCFF", //#33CCFF #e60000
@@ -156,6 +187,21 @@ export default class integrat extends PureComponent {
         content,
         userconfig.projectgeojsonLayer.getBounds().getCenter()
       );
+      let point = map.latLngToContainerPoint(
+        userconfig.projectgeojsonLayer.getBounds().getCenter()
+      );
+      const offsetSiderbar = showSiderbar ? 200 : 0;
+      const offsetSiderbarDetail = showSiderbarDetail ? 200 : 0;
+      const offsetQuery = showQuery ? 225 : 0;
+      point.x =
+        point.x -
+        clientWidth / 2 -
+        offsetSiderbar -
+        offsetSiderbarDetail -
+        offsetQuery;
+      point.y = point.y - clientHeight / 2;
+      map.panBy(point);
+      //console.log(map.latLngToContainerPoint(userconfig.projectgeojsonLayer.getBounds().getCenter()));
     }
   };
   /*
@@ -178,13 +224,9 @@ export default class integrat extends PureComponent {
     const me = this;
     map = L.map("map", {
       zoomControl: false,
-      //editable: true,
       attributionControl: false
     }).setView(config.mapInitParams.center, config.mapInitParams.zoom);
-    /*map = L.map('map',{
-      zoomControl: false,
-      attributionControl: false,
-    });*/
+
     L.control
       .zoom({ zoomInTitle: "放大", zoomOutTitle: "缩小", position: "topright" })
       .addTo(map);
@@ -206,13 +248,6 @@ export default class integrat extends PureComponent {
       影像图: baseLayer1
     };
     map.on("click", me.onClickMap);
-    /*map.on("popupclose", function(e) {
-      map.on("click", me.onClickMap);
-      //禁止编辑图形
-      userconfig.projectgeojsonLayer.pm.disable();
-      //禁止移动图形
-      map.pm.disableGlobalRemovalMode();
-    });*/
     //获取项目区域范围
     me.getRegionGeometry();
     //编辑图形工具
@@ -234,6 +269,15 @@ export default class integrat extends PureComponent {
   };
   onClickMap = e => {
     const me = this;
+    let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
+    if (!turf.booleanContains(userconfig.polygon, turfpoint)) {
+      //promptdialog("提示信息", "区域范围之外的数据没有权限操作");
+      const modal = Modal.success({
+        title: "提示信息",
+        content: `区域范围之外的数据没有权限操作`
+      });
+      return;
+    }
     //点查WMS图层
     userconfig.mapPoint = e.latlng;
     let point = { x: e.latlng.lng, y: e.latlng.lat };
@@ -246,7 +290,12 @@ export default class integrat extends PureComponent {
    *@param typeName 图层名称
    *@return null
    */
-  queryWFSServiceByProperty = (propertyValue, propertyName, typeName,callback) => {
+  queryWFSServiceByProperty = (
+    propertyValue,
+    propertyName,
+    typeName,
+    callback
+  ) => {
     const me = this;
     let filter =
       '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
@@ -268,7 +317,7 @@ export default class integrat extends PureComponent {
     me.props.dispatch({
       type: "mapdata/queryWFSLayer",
       payload: { geojsonUrl },
-      callback:callback
+      callback: callback
       /*callback: data => {
         me.clearGeojsonLayer();
         let style = {
@@ -582,8 +631,8 @@ export default class integrat extends PureComponent {
   };
   /*
    * 取消编辑图形
-  */
-  cancelEditGraphic = ()=>{
+   */
+  cancelEditGraphic = () => {
     this.setState({ showButton: false });
     map.on("click", this.onClickMap);
     //禁止编辑图形
@@ -594,8 +643,9 @@ export default class integrat extends PureComponent {
   };
   /*
    * 保存编辑图形
-  */ 
-  saveEditGraphic = ()=>{
+   */
+
+  saveEditGraphic = () => {
     const me = this;
     this.setState({ showButton: false });
     map.on("click", this.onClickMap);
@@ -607,72 +657,66 @@ export default class integrat extends PureComponent {
     //console.log(userconfig.projectgeojsonLayer.toGeoJSON());
     let geojson = userconfig.projectgeojsonLayer.toGeoJSON();
     //MULTIPOLYGON(((0 0,4 0,4 4,0 4,0 0),(1 1,2 1,2 2,1 2,1 1)), ((-1 -1,-1 -2,-2 -2,-2 -1,-1 -1)))
-    let polygon = 'multipolygon((';
+    let polygon = "multipolygon((";
     let coordinates = geojson.features[0].geometry.coordinates;
-    for(let i=0;i<coordinates.length;i++){
+    for (let i = 0; i < coordinates.length; i++) {
       let coordinate = coordinates[i];
-      if(i === coordinates.length-1){
-        polygon += '(';
+      if (i === coordinates.length - 1) {
+        polygon += "(";
         for (let j = 0; j < coordinate.length; j++) {
           let xy = coordinate[j];
-          for(let n=0;n<xy.length;n++){
+          for (let n = 0; n < xy.length; n++) {
             let data = xy[n];
-            if(n===xy.length-1){
+            if (n === xy.length - 1) {
               polygon += data[0] + " " + data[1];
-            }
-            else{
+            } else {
               polygon += data[0] + " " + data[1] + ",";
             }
           }
         }
-        polygon += ')';   
+        polygon += ")";
+      } else {
+        polygon += "(";
+        for (let j = 0; j < coordinate.length; j++) {
+          let xy = coordinate[j];
+          for (let n = 0; n < xy.length; n++) {
+            let data = xy[n];
+            if (n === xy.length - 1) {
+              polygon += data[0] + " " + data[1];
+            } else {
+              polygon += data[0] + " " + data[1] + ",";
+            }
+          }
+        }
+        polygon += "),";
       }
-      else{
-        polygon += '(';
-        for (let j = 0; j < coordinate.length; j++) {
-          let xy = coordinate[j];
-          for(let n=0;n<xy.length;n++){
-            let data = xy[n];
-            if(n===xy.length-1){
-              polygon += data[0] + " " + data[1];
-            }
-            else{
-              polygon += data[0] + " " + data[1] + ",";
-            }
-          }
-        }
-        polygon += '),';   
-      } 
     }
-    polygon += '))';
+    polygon += "))";
 
-    if(geojson.features[0].properties.spot_tbid){
+    if (geojson.features[0].properties.spot_tbid) {
       this.props.dispatch({
         type: "project/updateSpotGraphic",
         payload: {
           spot_tbid: geojson.features[0].properties.spot_tbid,
-          geometry:polygon      
+          geometry: polygon
         },
-        callback:(obj) =>{
+        callback: obj => {
           me.clearGeojsonLayer();
         }
       });
-    }
-    else{
+    } else {
       this.props.dispatch({
         type: "project/updateProjectScopeGraphic",
         payload: {
           project_id: geojson.features[0].properties.project_id,
-          geometry:polygon      
+          geometry: polygon
         },
-        callback:(obj) =>{
-          me.clearGeojsonLayer();         
+        callback: obj => {
+          me.clearGeojsonLayer();
         }
       });
     }
-
-
-  }
+  };
 
   render() {
     const { showButton } = this.state;
@@ -688,6 +732,7 @@ export default class integrat extends PureComponent {
           <Sparse />
           <ProjectDetail />
           <div
+            ref={this.saveRef}
             style={{
               paddingTop: 48
             }}
@@ -713,7 +758,7 @@ export default class integrat extends PureComponent {
                 <Button
                   icon="rollback"
                   onClick={() => {
-                     this.cancelEditGraphic();
+                    this.cancelEditGraphic();
                   }}
                 />
                 <br />
@@ -736,7 +781,6 @@ export default class integrat extends PureComponent {
                 <Switch
                   checkedChildren="图表联动"
                   unCheckedChildren="图表不联动"
-                  defaultChecked
                   style={{
                     width: 100
                   }}
@@ -751,16 +795,24 @@ export default class integrat extends PureComponent {
                   zIndex: 1000
                 }}
               >
-                <Button
-                  icon="colum-height"
-                  style={{
-                    marginRight: 20
-                  }}
-                >
-                  测量
-                </Button>
-                <Button icon="swap">历史对比</Button>
+                <Popover content="测量" title="" trigger="hover">
+                  <Button icon="colum-height" />
+                </Popover>
+                <Popover content="历史对比" title="" trigger="hover">
+                  <Button icon="swap" />
+                </Popover>
               </div>
+              {/* 图例说明 */}
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 50,
+                  right: 50,
+                  zIndex: 1000
+                }}
+              >
+              <p>
+                </p></div>
             </div>
           </div>
         </div>
