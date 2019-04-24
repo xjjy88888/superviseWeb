@@ -1,6 +1,12 @@
 const domain = "http://aj.zkygis.cn/dutySys";
 const domain_ = "http://aj.zkygis.cn/stbc/";
 
+const color_back_spot = "rgba(255,255,0,0.4)"; //背景色-图斑
+const color_back_redLine = "rgba(230,0,0,0.4)"; //背景色-红线
+const color_border_spot1 = "#ffd700"; //边框色-图斑-未复核
+const color_border_spot2 = "#E09A00"; //边框色-图斑-已复核
+const color_border_redLine = "#e60000"; //边框色-红线
+
 const config = {
   url: {
     //登录
@@ -329,28 +335,28 @@ const config = {
   legend: [
     {
       title: "扰动图斑_未关联_未复核",
-      background: "#FDFF99",
-      border: "#E4DC48"
+      background: color_back_spot,
+      border: color_border_spot1
     },
     {
       title: "扰动图斑_未关联_已复核",
-      background: "#FDFF99",
-      border: "#FF6513"
+      background: color_back_spot,
+      border: color_border_spot2
     },
     {
       title: "扰动图斑_已关联_未复核",
-      background: "#FDFF99",
-      border: "#E4DC48"
+      background: color_back_spot,
+      border: color_border_spot1
     },
     {
       title: "扰动图斑_已关联_已复核",
-      background: "#FDFF99",
-      border: "#FF6513"
+      background: color_back_spot,
+      border: color_border_spot2
     },
     {
       title: "项目红线",
-      background: "#F49A98",
-      border: "#E2060C"
+      background: color_back_redLine,
+      border: color_border_redLine
     }
   ]
 };

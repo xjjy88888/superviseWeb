@@ -1,6 +1,15 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
-import { Menu, Icon, Button, LocaleProvider, Switch, Popover, Modal, message } from "antd";
+import {
+  Menu,
+  Icon,
+  Button,
+  LocaleProvider,
+  Switch,
+  Popover,
+  Modal,
+  message
+} from "antd";
 import zhCN from "antd/lib/locale-provider/zh_CN";
 import SiderMenu from "../../../components/SiderMenu";
 import Sidebar from "./sidebar";
@@ -16,6 +25,8 @@ import "proj4";
 import "proj4leaflet";
 import "leaflet.pm/dist/leaflet.pm.css";
 import "leaflet.pm";
+import "leaflet-navbar/Leaflet.NavBar.css";
+import "leaflet-navbar";
 import shp from "shpjs";
 import * as turf from "@turf/turf";
 //import '@h21-map/leaflet-path-drag';
@@ -182,8 +193,8 @@ export default class integrat extends PureComponent {
   };
   /*
    * 自动匹配地图偏移
-  */
-  automaticToMap = () =>{
+   */
+  automaticToMap = () => {
     const me = this;
     const { clientWidth, clientHeight } = me.refDom;
     const { showSiderbar, showSiderbarDetail, showQuery } = me.state;
@@ -194,11 +205,14 @@ export default class integrat extends PureComponent {
     const offsetSiderbarDetail = showSiderbarDetail ? 200 : 0;
     const offsetQuery = showQuery ? 225 : 0;
     point.x =
-    point.x - clientWidth / 2 - offsetSiderbar - offsetSiderbarDetail -
+      point.x -
+      clientWidth / 2 -
+      offsetSiderbar -
+      offsetSiderbarDetail -
       offsetQuery;
     point.y = point.y - clientHeight / 2;
     map.panBy(point);
-  }
+  };
   /*
    * 获取url参数
    */
@@ -266,12 +280,12 @@ export default class integrat extends PureComponent {
     const me = this;
     let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
     if (!turf.booleanContains(userconfig.polygon, turfpoint)) {
-        /*const modal = Modal.success({
+      /*const modal = Modal.success({
           title: '提示信息',
           content: `区域范围之外的数据没有权限操作`,
         });*/
-        message.warning('区域范围之外的数据没有权限操作', 1);
-        return;
+      message.warning("区域范围之外的数据没有权限操作", 1);
+      return;
     }
     //点查WMS图层
     userconfig.mapPoint = e.latlng;
@@ -593,6 +607,14 @@ export default class integrat extends PureComponent {
       项目红线: projectlayerGroup,
       扰动图斑: spotlayerGroup
     };
+    L.control
+      .navbar({
+        center: bounds.getCenter(),
+        forwardTitle: "前视图",
+        backTitle: "后视图",
+        homeTitle: "全图"
+      })
+      .addTo(map);
     L.control.layers(userconfig.baseLayers, overlays).addTo(map);
   };
   /*
@@ -772,13 +794,13 @@ export default class integrat extends PureComponent {
               <div
                 style={{
                   position: "absolute",
-                  bottom: 20,
+                  bottom: 50,
                   right: 20,
                   zIndex: 1000,
                   background: "#fff",
                   padding: "10px 10px 0px 17px",
                   border: "solid 1px #ddd",
-                  borderRadius: 5
+                  borderRadius: 3
                 }}
               >
                 {config.legend.map((item, index) => (
@@ -801,6 +823,17 @@ export default class integrat extends PureComponent {
                   </p>
                 ))}
               </div>
+              {/* 比例尺 */}
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  height: 30,
+                  width: "100vw",
+                  zIndex: 1000,
+                  background: "rgba(0,0,0,.4)"
+                }}
+              />
             </div>
           </div>
         </div>
