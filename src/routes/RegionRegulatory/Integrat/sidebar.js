@@ -454,7 +454,7 @@ export default class integrat extends PureComponent {
           </Button>
           <p style={{ padding: "20px 20px 0 20px" }}>
             <span>{`共有${
-              key === "project" ? projectList.totalCount : spotList.length
+              key === "project" ? projectList.totalCount : spotList.totalCount
             }条记录`}</span>
             <span
               style={{
@@ -520,7 +520,7 @@ export default class integrat extends PureComponent {
               padding: "10px 20px 10px 20px"
             }}
             itemLayout="horizontal"
-            dataSource={key === "project" ? projectList.items : spotList}
+            dataSource={key === "project" ? projectList.items : spotList.items}
             renderItem={item => (
               <List.Item>
                 <List.Item.Meta
@@ -530,9 +530,7 @@ export default class integrat extends PureComponent {
                   title={
                     <p style={{ textAlign: "justify" }}>
                       <span>
-                        {key === "project"
-                          ? item.projectName
-                          : item.spot_tbid}
+                        {key === "project" ? item.projectName : item.mapNum}
                       </span>
                       <Icon
                         type="environment"
@@ -558,13 +556,13 @@ export default class integrat extends PureComponent {
                         <span style={{ wordBreak: "break-all" }}>
                           {key === "project"
                             ? `建设单位：${item.productDepartmentName}`
-                            : `关联项目：${item.project_id}`}
+                            : `关联项目：${item.projectName}`}
                         </span>
                         <br />
                         <span style={{ wordBreak: "break-all" }}>
                           {key === "project"
                             ? `批复机构：${item.replyDepartmentName}`
-                            : `扰动合规性：${item.byd}`}
+                            : `扰动合规性：${item.interferenceCompliance}`}
                         </span>
                       </span>
                       {/* <span

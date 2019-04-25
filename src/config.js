@@ -21,7 +21,8 @@ const config = {
     //projectScopeGetIntersects: `http://10.7.23.81:8090/stbcSys/api/app/projectScopeGetIntersects`,
 
     //图斑列表
-    spotGetIntersects: `${domain}/api/app/spotGetIntersects`,
+    // spotGetIntersects: `${domain}/api/app/spotGetIntersects`,
+    spotListUrl: `${domain_}api/services/app/SpotsService/GetAll`,
 
     //根据扰动图斑id获取对应的扰动图斑信息
     spotBytbId: `${domain}/api/app/spotBytbId`,

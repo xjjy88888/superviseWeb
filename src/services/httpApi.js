@@ -31,13 +31,9 @@ export async function projectById(id) {
 }
 
 // 图斑列表
-export async function spotGetIntersects(params) {
-  return request(`${config.url.spotGetIntersects}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json; charset=utf-8"
-    },
-    body: JSON.stringify(params.polygon)
+export async function spotListUrlApi(params) {
+  return request(`${config.url.spotListUrl}?MaxResultCount=10&SkipCount=0`, {
+    method: "GET"
   });
 }
 
@@ -50,16 +46,22 @@ export async function spotById(id) {
 
 //编辑扰动图斑图形信息
 export async function updateSpotGraphic(params) {
-  return request(`${config.url.updateSpotGraphic}?obj=${JSON.stringify(params)}`, {
-    method: 'GET',
-  });
+  return request(
+    `${config.url.updateSpotGraphic}?obj=${JSON.stringify(params)}`,
+    {
+      method: "GET"
+    }
+  );
 }
 
 //编辑项目红线图形信息
 export async function updateProjectScopeGraphic(params) {
-  return request(`${config.url.updateProjectScopeGraphic}?obj=${JSON.stringify(params)}`, {
-    method: 'GET',
-  });
+  return request(
+    `${config.url.updateProjectScopeGraphic}?obj=${JSON.stringify(params)}`,
+    {
+      method: "GET"
+    }
+  );
 }
 
 //地图WFS请求图层数据源

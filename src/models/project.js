@@ -3,7 +3,7 @@ import { Button, notification } from "antd";
 import {
   projectListApi,
   projectById,
-  spotGetIntersects,
+  spotListUrlApi,
   spotById,
   updateSpotGraphic,
   updateProjectScopeGraphic
@@ -14,7 +14,7 @@ export default {
 
   state: {
     projectList: { totalCount: 0, items: [] },
-    spotList: [],
+    spotList: { totalCount: 0, items: [] },
     projectItem: {},
     spotItem: {}
   },
@@ -41,7 +41,9 @@ export default {
       if (callback) callback(projectItem);
     },
     *querySpot({ payload }, { call, put }) {
-      const { data: spotList } = yield call(spotGetIntersects, payload);
+      const {
+        data: { result: spotList }
+      } = yield call(spotListUrlApi, payload);
       yield put({ type: "save", payload: { spotList } });
     },
     *querySpotById({ payload, callback }, { call, put }) {
@@ -57,16 +59,16 @@ export default {
       }
       if (callback) callback(spotItem);
     },
-    *updateSpotGraphic({ payload,callback }, { call, put }) {     
-      const { data: obj } = yield call(updateSpotGraphic, payload);      
+    *updateSpotGraphic({ payload, callback }, { call, put }) {
+      const { data: obj } = yield call(updateSpotGraphic, payload);
       notification[obj ? "success" : "error"]({
         message: obj ? "编辑图斑图形成功" : "编辑图斑图形失败"
       });
       yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);
     },
-    *updateProjectScopeGraphic({ payload,callback }, { call, put }) {     
-      const { data: obj } = yield call(updateProjectScopeGraphic, payload);      
+    *updateProjectScopeGraphic({ payload, callback }, { call, put }) {
+      const { data: obj } = yield call(updateProjectScopeGraphic, payload);
       notification[obj ? "success" : "error"]({
         message: obj ? "编辑项目红线图形成功" : "编辑项目红线图形失败"
       });
