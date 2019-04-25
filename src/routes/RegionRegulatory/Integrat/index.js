@@ -90,10 +90,8 @@ export default class integrat extends PureComponent {
     // 创建地图
     me.createMap();
     // 组件通信
+    //地图定位
     this.eventEmitter = emitter.addListener("mapLocation", data => {
-      /*this.setState({
-        item: data.item
-      });*/
       if (data.key === "project") {
         this.queryWFSServiceByProperty(
           data.item.project_id,
@@ -108,6 +106,11 @@ export default class integrat extends PureComponent {
           config.mapSpotLayerName,
           this.callbackLocationQueryWFSService
         );
+      }
+    });
+    //绘制扰动图斑图形
+    this.eventEmitter = emitter.addListener("drawSpot", data => {
+      if (data.draw ) {
       }
     });
     //监听侧边栏显隐
@@ -239,6 +242,16 @@ export default class integrat extends PureComponent {
     L.control
       .zoom({ zoomInTitle: "放大", zoomOutTitle: "缩小", position: "topright" })
       .addTo(map);
+    const scale = L.control
+      .scale({ imperial: false, position: "bottomright" })
+      .addTo(map);
+    jQuery(scale.getContainer())
+      .find("div")
+      .css({
+        background: "rgba(255, 255, 255, 1)",
+        border: "1px solid #000",
+        borderTop: "none"
+      });
     map.createPane("tileLayerZIndex");
     map.getPane("tileLayerZIndex").style.zIndex = 0;
     const baseLayer = L.tileLayer(config.baseMaps[0].Url, {
@@ -280,10 +293,6 @@ export default class integrat extends PureComponent {
     const me = this;
     let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
     if (!turf.booleanContains(userconfig.polygon, turfpoint)) {
-      /*const modal = Modal.success({
-          title: '提示信息',
-          content: `区域范围之外的数据没有权限操作`,
-        });*/
       message.warning("区域范围之外的数据没有权限操作", 1);
       return;
     }
@@ -600,7 +609,6 @@ export default class integrat extends PureComponent {
         transparent: true
       })
       .addTo(spotlayerGroup);
-
     map.addLayer(projectlayerGroup);
     map.addLayer(spotlayerGroup);
     const overlays = {
@@ -738,7 +746,7 @@ export default class integrat extends PureComponent {
                 style={{
                   position: "absolute",
                   display: showButton ? "block" : "none",
-                  top: 220,
+                  top: 248,
                   right: 15,
                   zIndex: 1000
                 }}
@@ -757,84 +765,103 @@ export default class integrat extends PureComponent {
                   }}
                 />
               </div>
-              {/*图标联动按钮 */}
-              <div
+            </div>
+            {/*图标联动按钮 */}
+            <div
+              style={{
+                position: "absolute",
+                top: 70,
+                left: 380,
+                height: 0,
+                zIndex: 1000,
+                background: "transparent"
+              }}
+              onClick={(v, e) => {
+                console.log(111);
+              }}
+            >
+              <Switch
+                checkedChildren="图表联动"
+                unCheckedChildren="图表不联动"
                 style={{
-                  position: "absolute",
-                  top: 20,
-                  left: 380,
-                  zIndex: 1000
+                  width: 100
                 }}
-              >
-                <Switch
-                  checkedChildren="图表联动"
-                  unCheckedChildren="图表不联动"
-                  style={{
-                    width: 100
-                  }}
-                />
-              </div>
-              {/*测量、历史对比按钮 */}
-              <div
-                style={{
-                  position: "absolute",
-                  top: 20,
-                  right: 80,
-                  zIndex: 1000
-                }}
-              >
-                <Popover content="测量" title="" trigger="hover">
-                  <Button icon="colum-height" />
-                </Popover>
-                <Popover content="历史对比" title="" trigger="hover">
-                  <Button icon="swap" />
-                </Popover>
-              </div>
-              {/* 图例说明 */}
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 50,
-                  right: 20,
-                  zIndex: 1000,
-                  background: "#fff",
-                  padding: "10px 10px 0px 17px",
-                  border: "solid 1px #ddd",
-                  borderRadius: 3
-                }}
-              >
-                {config.legend.map((item, index) => (
-                  <p key={index}>
-                    <span
-                      style={{
-                        background: item.background,
-                        border: `${index < 2 ? "dotted" : "solid"} 2px ${
-                          item.border
-                        }`,
-                        width: 13,
-                        height: 13,
-                        display: "inline-block",
-                        position: "relative",
-                        top: 2,
-                        right: 6
-                      }}
-                    />
-                    <span>{item.title}</span>
-                  </p>
-                ))}
-              </div>
-              {/* 比例尺 */}
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  height: 30,
-                  width: "100vw",
-                  zIndex: 1000,
-                  background: "rgba(0,0,0,.4)"
+                onClick={(v, e) => {
+                  e.stopPropagation();
+                  console.log(v, e);
                 }}
               />
             </div>
+            {/*测量、历史对比按钮 */}
+            <div
+              style={{
+                position: "absolute",
+                top: 62,
+                right: 80,
+                zIndex: 1000
+              }}
+            >
+              <Popover content="测量" title="" trigger="hover">
+                <Button icon="colum-height" />
+              </Popover>
+              <Popover content="历史对比" title="" trigger="hover">
+                <Button icon="swap" />
+              </Popover>
+            </div>
+            {/* 图例说明 */}
+            <div
+              style={{
+                position: "absolute",
+                bottom: 50,
+                right: 20,
+                zIndex: 1000,
+                background: "#fff"
+                // padding: "10px 10px 0px 17px",
+                // border: "solid 1px #ddd",
+                // borderRadius: 3
+              }}
+            >
+              <Popover
+                content={
+                  <div>
+                    {config.legend.map((item, index) => (
+                      <p key={index}>
+                        <span
+                          style={{
+                            background: item.background,
+                            border: `${index < 2 ? "dotted" : "solid"} 2px ${
+                              item.border
+                            }`,
+                            width: 13,
+                            height: 13,
+                            display: "inline-block",
+                            position: "relative",
+                            top: 2,
+                            right: 6
+                          }}
+                        />
+                        <span>{item.title}</span>
+                      </p>
+                    ))}
+                  </div>
+                }
+                title=""
+                trigger="hover"
+              >
+                <Button icon="question-circle" />
+              </Popover>
+            </div>
+            {/* 底部遮罩层 */}
+            {/* <div
+              style={{
+                position: "absolute",
+                bottom: 0,
+                height: 30,
+                width: "100vw",
+                zIndex: 1000,
+                background: "rgba(0,0,0,.4)"
+              }}
+            /> */}
           </div>
         </div>
       </LocaleProvider>

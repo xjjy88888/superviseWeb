@@ -531,7 +531,7 @@ export default class integrat extends PureComponent {
                     <p style={{ textAlign: "justify" }}>
                       <span>
                         {key === "project"
-                          ? item.project.project_name
+                          ? item.projectName
                           : item.spot_tbid}
                       </span>
                       <Icon
@@ -557,13 +557,13 @@ export default class integrat extends PureComponent {
                       <span>
                         <span style={{ wordBreak: "break-all" }}>
                           {key === "project"
-                            ? `建设单位：${item.product_department.name}`
+                            ? `建设单位：${item.productDepartmentName}`
                             : `关联项目：${item.project_id}`}
                         </span>
                         <br />
                         <span style={{ wordBreak: "break-all" }}>
                           {key === "project"
-                            ? `批复机构：${item.project.project_name}`
+                            ? `批复机构：${item.replyDepartmentName}`
                             : `扰动合规性：${item.byd}`}
                         </span>
                       </span>
@@ -1085,6 +1085,9 @@ export default class integrat extends PureComponent {
                             e.stopPropagation();
                             notification["info"]({
                               message: "添加扰动图斑"
+                            });
+                            emitter.emit("drawSpot", {
+                              draw: true
                             });
                           }}
                         />

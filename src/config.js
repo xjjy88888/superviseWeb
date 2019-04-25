@@ -14,7 +14,7 @@ const config = {
 
     //项目列表
     // projectListUrl: `${domain}/api/app/projectScopeGetIntersects`,
-    projectListUrl: `${domain_}api/services/app/ProjectManagerService/GetAll`,
+    projectListUrl: `${domain_}api/services/app/ProjectsService/GetAll`,
 
     //根据项目id获取对应的项目信息
     projectById: `${domain}/api/app/projectById`,

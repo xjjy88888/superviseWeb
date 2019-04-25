@@ -11,3 +11,6 @@ body,
   width: 200px;
   margin-right: 8px;
 }
+.leaflet-control-scale-line {
+  border: none !important;
+}
