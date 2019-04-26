@@ -35,8 +35,8 @@ export async function projectListApi(params) {
 }
 
 // 项目id查询项目信息
-export async function projectById(id) {
-  return request(`${config.url.projectById}?project_id=${id}`, {
+export async function projectByIdApi(id) {
+  return request(`${config.url.projectByIdUrl}?id=${id}`, {
     method: "GET"
   });
 }

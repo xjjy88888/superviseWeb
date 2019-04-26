@@ -857,7 +857,9 @@ export default class integrat extends PureComponent {
                 display: projectEdit ? "none" : "block"
               }}
             >
-              <p>{/* <b>{projectItem.project_name}</b> */}</p>
+              <p>
+                <b>{projectItem.projectBaseInfo.name}</b>
+              </p>
               <p
                 style={{
                   position: "relative",
@@ -868,11 +870,11 @@ export default class integrat extends PureComponent {
               >
                 <span>位置：</span>
                 <span>
-                  {projectItem.project_province}
-                  {projectItem.project_city}
-                  {projectItem.project_district}
-                  {projectItem.project_town}
-                  {projectItem.project_village}
+                  {projectItem.projectBaseInfo.provinceCode}
+                  {projectItem.projectBaseInfo.cityCode}
+                  {projectItem.projectBaseInfo.districtCode}
+                  {projectItem.projectBaseInfo.town}
+                  {projectItem.projectBaseInfo.village}
                 </span>
               </p>
 
@@ -894,63 +896,64 @@ export default class integrat extends PureComponent {
                     >
                       <p style={{ marginBottom: 10 }}>
                         <span>建设单位：</span>
-                        <span>{projectItem.product_department_id}</span>
+                        <span>{projectItem.productDepartment.name}</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>监管单位：</span>
-                        <span>{projectItem.project_sup_id}</span>
+                        <span>{projectItem.supDepartment}</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>批复机构：</span>
-                        <span>{projectItem.project_rp_id}</span>
+                        <span>{projectItem.replyDepartment.name}</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>流域管理机构：</span>
-                        <span>{projectItem.ctn_code}</span>
+                        <span>{projectItem.riverBasinOU}</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>批复文号：</span>
-                        <span>{projectItem.project_rp_num}</span>
+                        <span>{projectItem.replyNum}</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>批复时间：</span>
-                        <span>{projectItem.project_rp_time}</span>
+                        <span>{projectItem.replyTime}</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>责任面积：</span>
-                        <span>{projectItem.area}m2</span>
+                        <span>{projectItem.respArea}m2</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>立项级别：</span>
-                        <span>{projectItem.project_level}</span>
+                        {/* （01：部级，02：省级，03：市级，04：县级） */}
+                        <span>{projectItem.projectLevel}</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>项目合规性：</span>
-                        <span>----</span>
+                        <span>空</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>项目类别：</span>
-                        <span>----</span>
+                        <span>{projectItem.planInfo.projectCate.value}</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>项目类型：</span>
-                        <span>----</span>
+                        <span>{projectItem.planInfo.projectType.value}</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>建设状态：</span>
-                        <span>----</span>
+                        <span>空</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>项目性质：</span>
-                        <span>----</span>
+                        <span>{projectItem.planInfo.projectNat.value}</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>涉及县：</span>
-                        <span>----</span>
+                        <span>空</span>
                       </p>
                       <p style={{ textAlign: "justify" }}>
                         <span>备注：</span>
-                        <span>----</span>
+                        <span>空</span>
                       </p>
                       <a
                         style={{ position: "absolute", right: 0, bottom: 0 }}
@@ -1086,7 +1089,7 @@ export default class integrat extends PureComponent {
                             });
                             emitter.emit("drawSpot", {
                               draw: true,
-                              project_id:"123"
+                              project_id: "123"
                             });
                           }}
                         />
@@ -1635,7 +1638,7 @@ export default class integrat extends PureComponent {
                   </Collapse.Panel>
                 */}
                 </Collapse>
-               
+
                 {/* <List.Item>
                 <List.Item.Meta
                   title={
@@ -1785,7 +1788,7 @@ export default class integrat extends PureComponent {
               <Form style={{ position: "relative", paddingBottom: 10 }}>
                 <Form.Item label="项目名" {...formItemLayout}>
                   {getFieldDecorator("project_name1", {
-                    // initialValue: projectItem.project_name
+                    initialValue: projectItem.projectBaseInfo.name
                   })(<Input.TextArea autosize />)}
                 </Form.Item>
                 <Form.Item label="所在地区" {...formItemLayout}>

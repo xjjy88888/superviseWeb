@@ -18,8 +18,8 @@ const config = {
     projectListUrl: `${domain_}api/services/app/ProjectsService/GetAll`,
 
     //根据项目id获取对应的项目信息
-    projectById: `${domain}/api/app/projectById`,
-    //projectScopeGetIntersects: `http://10.7.23.81:8090/stbcSys/api/app/projectScopeGetIntersects`,
+    // projectById: `${domain}/api/app/projectById`,
+    projectByIdUrl: `${domain_}/api/services/app/ProjectsService/GetInfo`,
 
     //图斑列表
     // spotGetIntersects: `${domain}/api/app/spotGetIntersects`,

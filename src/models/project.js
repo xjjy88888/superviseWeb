@@ -2,7 +2,7 @@ import { routerRedux } from "dva/router";
 import { Button, notification } from "antd";
 import {
   projectListApi,
-  projectById,
+  projectByIdApi,
   spotListApi,
   spotById,
   updateSpotGraphic,
@@ -15,7 +15,42 @@ export default {
   state: {
     projectList: { totalCount: 0, items: [] },
     spotList: { totalCount: 0, items: [] },
-    projectItem: {},
+    projectItem: {
+      projectBaseInfo: { name: "" },
+      productDepartment: { name: "" },
+      replyDepartment: { name: "" },
+      projectDepartment: { name: "" },
+      planInfo: {
+        designStartTime:"",
+        designCompTime:"",
+        actStartTime:"",
+        actCompTime:"",
+        projectCate: {
+          value: ""
+        },
+        projectType: {
+          value: ""
+        },
+        projectNat: {
+          value: ""
+        },
+        prevenStd: {
+          value: ""
+        },
+        prevenZoneType: {
+          value: ""
+        },
+        landType: {
+          value: ""
+        },
+        soilType: {
+          value: ""
+        },
+        vegType: {
+          value: ""
+        }
+      }
+    },
     spotItem: {}
   },
 
@@ -31,14 +66,15 @@ export default {
       yield put({ type: "save", payload: { projectList } });
     },
     *queryProjectById({ payload, callback }, { call, put }) {
-      const { data: projectItem } = yield call(projectById, payload.id);
-      notification[projectItem.length ? "success" : "error"]({
-        message: projectItem.length ? "查询项目成功" : "查询项目失败"
+      const {
+        data: { success, result }
+      } = yield call(projectByIdApi, payload.id);
+      notification[success ? "success" : "error"]({
+        message: success ? "查询项目成功" : "查询项目失败"
       });
-      if (projectItem.length) {
-        yield put({ type: "save", payload: { projectItem: projectItem[0] } });
+      if (success) {
+        yield put({ type: "save", payload: { projectItem: result } });
       }
-      if (callback) callback(projectItem);
     },
     *querySpot({ payload }, { call, put }) {
       const {

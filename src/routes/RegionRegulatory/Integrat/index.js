@@ -679,6 +679,7 @@ export default class integrat extends PureComponent {
    * 取消新增图形
    */
   cancelAddGraphic = e => {
+    //addGraphLayer.toGeoJSON()
     e.stopPropagation();
     this.setState({ showButton: false });
     const { addGraphLayer } = this.state;
