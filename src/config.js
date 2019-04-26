@@ -10,7 +10,8 @@ const color_border_redLine = "#e60000"; //边框色-红线
 const config = {
   url: {
     //登录
-    GetUserPassWord: `${domain}/api/account/GetUserPassWord`,
+    // loginUrl: `${domain}/api/account/GetUserPassWord`,
+    loginUrl: `${domain_}api/TokenAuth/Authenticate`,
 
     //项目列表
     // projectListUrl: `${domain}/api/app/projectScopeGetIntersects`,

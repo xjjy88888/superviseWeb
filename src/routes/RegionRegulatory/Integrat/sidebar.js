@@ -1085,7 +1085,8 @@ export default class integrat extends PureComponent {
                               message: "添加扰动图斑"
                             });
                             emitter.emit("drawSpot", {
-                              draw: true
+                              draw: true,
+                              project_id:"123"
                             });
                           }}
                         />
@@ -1214,7 +1215,7 @@ export default class integrat extends PureComponent {
                       />
                     </p>
                   </Collapse.Panel>
-                  <Collapse.Panel
+                  {/* <Collapse.Panel
                     header={
                       <b>
                         设计分区：5
@@ -1297,7 +1298,8 @@ export default class integrat extends PureComponent {
                       />
                     </p>
                   </Collapse.Panel>
-                  <Collapse.Panel
+                  */}
+                  {/* <Collapse.Panel
                     header={
                       <b>
                         设计措施：5
@@ -1380,6 +1382,7 @@ export default class integrat extends PureComponent {
                       />
                     </p>
                   </Collapse.Panel>
+                  */}
                   <Collapse.Panel
                     header={
                       <b>
@@ -1463,7 +1466,7 @@ export default class integrat extends PureComponent {
                       />
                     </p>
                   </Collapse.Panel>
-                  <Collapse.Panel
+                  {/* <Collapse.Panel
                     header={
                       <b>
                         实施措施：5
@@ -1546,7 +1549,8 @@ export default class integrat extends PureComponent {
                       />
                     </p>
                   </Collapse.Panel>
-                  <Collapse.Panel
+                  */}
+                  {/* <Collapse.Panel
                     header={
                       <b>
                         问题地块：5
@@ -1629,7 +1633,9 @@ export default class integrat extends PureComponent {
                       />
                     </p>
                   </Collapse.Panel>
+                */}
                 </Collapse>
+               
                 {/* <List.Item>
                 <List.Item.Meta
                   title={

@@ -3,18 +3,29 @@ import request from "../utils/request";
 import CryptoJS from "crypto-js";
 
 // 登录
-export async function login(params) {
-  const { username, password } = params;
-  const passwordMd5 = CryptoJS.MD5(password).toString();
-  return request(
-    `${
-      config.url.GetUserPassWord
-    }?username=${username}&password=${passwordMd5}`,
-    {
-      method: "GET"
-    }
-  );
+export async function loginApi(params) {
+  // const passwordMd5 = CryptoJS.MD5(password).toString();
+  return request(config.url.loginUrl, {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer Token",
+      "content-type": "application/json"
+    },
+    body: JSON.stringify(params)
+  });
 }
+// export async function loginApi(params) {
+//   const { userName, password } = params;
+//   const passwordMd5 = CryptoJS.MD5(password).toString();
+//   return request(
+//     `${
+//       config.url.loginUrl
+//     }?username=${userName}&password=${passwordMd5}`,
+//     {
+//       method: "GET"
+//     }
+//   );
+// }
 
 // 项目列表
 export async function projectListApi(params) {
@@ -31,7 +42,7 @@ export async function projectById(id) {
 }
 
 // 图斑列表
-export async function spotListUrlApi(params) {
+export async function spotListApi(params) {
   return request(`${config.url.spotListUrl}?MaxResultCount=10&SkipCount=0`, {
     method: "GET"
   });

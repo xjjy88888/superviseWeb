@@ -3,7 +3,7 @@ import { Button, notification } from "antd";
 import {
   projectListApi,
   projectById,
-  spotListUrlApi,
+  spotListApi,
   spotById,
   updateSpotGraphic,
   updateProjectScopeGraphic
@@ -43,7 +43,7 @@ export default {
     *querySpot({ payload }, { call, put }) {
       const {
         data: { result: spotList }
-      } = yield call(spotListUrlApi, payload);
+      } = yield call(spotListApi, payload);
       yield put({ type: "save", payload: { spotList } });
     },
     *querySpotById({ payload, callback }, { call, put }) {

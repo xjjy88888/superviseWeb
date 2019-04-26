@@ -21,13 +21,13 @@ export default class login extends PureComponent {
         let lastLogin;
         if (values.remember) {
           lastLogin = {
-            username: values.username,
+            userName: values.userName,
             password: values.password,
             remember: true
           };
         } else {
           lastLogin = {
-            username: "",
+            userName: "",
             password: "",
             remember: false
           };
@@ -36,7 +36,7 @@ export default class login extends PureComponent {
         this.props.dispatch({
           type: "user/login",
           payload: {
-            username: values.username,
+            userName: values.userName,
             password: values.password
           }
         });
@@ -59,18 +59,16 @@ export default class login extends PureComponent {
     return (
       <div
         style={{
-          position: 'absolute',
+          position: "absolute",
           top: "50%",
           left: "50%",
-          transform: "translate(-50%,-50%)",background: '#fff',
+          transform: "translate(-50%,-50%)",
+          background: "#fff",
           padding: 50,
           borderRadius: 10
         }}
       >
-        <Form
-          onSubmit={this.handleSubmit}
-          style={{ maxWidth: 300}}
-        >
+        <Form onSubmit={this.handleSubmit} style={{ maxWidth: 300 }}>
           <Form.Item>
             <img
               src="./img/logo.png"
@@ -80,11 +78,11 @@ export default class login extends PureComponent {
             生产建设项目水土保持信息化监管系统
           </Form.Item>
           <Form.Item>
-            {getFieldDecorator("username", {
+            {getFieldDecorator("userName", {
               rules: [
-                { required: true, message: "Please input your username!" }
+                { required: true, message: "Please input your userName!" }
               ],
-              initialValue: lastLogin ? lastLogin.username : ""
+              initialValue: lastLogin ? lastLogin.userName : ""
             })(
               <Input
                 prefix={

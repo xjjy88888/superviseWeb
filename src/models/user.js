@@ -1,4 +1,4 @@
-import { login } from "../services/httpApi";
+import { loginApi } from "../services/httpApi";
 import { routerRedux } from "dva/router";
 import { Form, Icon, Input, Button, Checkbox, message } from "antd";
 
@@ -23,15 +23,16 @@ export default {
       yield put({ type: "save" });
     },
     *login({ payload }, { call, put }) {
-      const { data: current_user } = yield call(login, payload);
-      if (current_user.length === 0) {
+      const { err, data } = yield call(loginApi, payload);
+      if (err) {
         message.error("账号密码错误");
       } else {
+        console.log(data.result);
         message.success("登录成功");
-        sessionStorage.setItem("user", JSON.stringify(current_user[0]));
+        sessionStorage.setItem("user", JSON.stringify(data.result));
         yield put({
           type: "save",
-          payload: { current_user }
+          payload: { current_user: data.result }
         });
         yield put(routerRedux.replace("/regionRegulatory/integrat"));
       }

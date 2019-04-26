@@ -32,6 +32,8 @@ import * as turf from "@turf/turf";
 //import '@h21-map/leaflet-path-drag';
 //import 'leaflet-editable';
 //import { greatCircle, point, circle } from '@turf/turf';
+import "leaflet-measure/dist/leaflet-measure.css";
+import "leaflet-measure/dist/leaflet-measure.cn";
 import "leaflet/dist/leaflet.css";
 import "antd-mobile/dist/antd-mobile.css";
 import config from "../../../config";
@@ -53,7 +55,10 @@ export default class integrat extends PureComponent {
       showButton: false,
       showSiderbar: true,
       showSiderbarDetail: false,
-      showQuery: false
+      showQuery: false,
+      drawGrphic: "edit",
+      project_id:null,//针对新增图形的项目红线id
+      addGraphLayer:null//针对新增图形的图层
     };
     this.map = null;
     this.saveRef = v => {
@@ -69,6 +74,7 @@ export default class integrat extends PureComponent {
     };
     //气泡窗口图形编辑
     window.goEditGraphic = obj => {
+      me.setState({ drawGrphic: "edit" });
       if (obj.from === "project") {
         me.queryWFSServiceByProperty(
           obj.id,
@@ -110,7 +116,28 @@ export default class integrat extends PureComponent {
     });
     //绘制扰动图斑图形
     this.eventEmitter = emitter.addListener("drawSpot", data => {
-      if (data.draw ) {
+      if (data.draw) {
+        me.setState({ drawGrphic: "add",project_id:data.project_id });
+        const { addGraphLayer } = me.state;
+        if(addGraphLayer){
+            map.removeLayer(addGraphLayer);
+            me.setState({ addGraphLayer: null });
+        }
+        map.pm.enableDraw("Polygon", {
+          finishOn: "dblclick",
+          allowSelfIntersection: false,
+          tooltips: false
+        });
+        //显示图形编辑菜单按钮
+        me.setState({ showButton: true });
+        //编辑图形
+        map.on('pm:create', e => {
+          //console.log(e);
+          me.setState({addGraphLayer:e.layer});
+          e.layer.pm.enable({
+            allowSelfIntersection: false,
+          });
+        });       
       }
     });
     //监听侧边栏显隐
@@ -227,9 +254,9 @@ export default class integrat extends PureComponent {
       });
       return;
     }
-    userconfig.dwdm = userParams.ctn_code;
-    userconfig.userId = userParams.us_id;
-    userconfig.userName = userParams.us_truename;
+    userconfig.dwdm = userParams.displayArea;
+    userconfig.userId = userParams.userId;
+    userconfig.userName = userParams.displayName;
   };
   // 创建地图
   createMap = () => {
@@ -237,6 +264,7 @@ export default class integrat extends PureComponent {
     map = L.map("map", {
       zoomControl: false,
       attributionControl: false
+      //editable: true
     }).setView(config.mapInitParams.center, config.mapInitParams.zoom);
 
     L.control
@@ -252,6 +280,7 @@ export default class integrat extends PureComponent {
         border: "1px solid #000",
         borderTop: "none"
       });
+
     map.createPane("tileLayerZIndex");
     map.getPane("tileLayerZIndex").style.zIndex = 0;
     const baseLayer = L.tileLayer(config.baseMaps[0].Url, {
@@ -624,11 +653,20 @@ export default class integrat extends PureComponent {
       })
       .addTo(map);
     L.control.layers(userconfig.baseLayers, overlays).addTo(map);
+    //量算工具
+    var measureControl = new L.Control.Measure({
+      primaryLengthUnit: "kilometers",
+      primaryAreaUnit: "sqmeters",
+      activeColor: "#3388FF",
+      completedColor: "#3388FF"
+    });
+    measureControl.addTo(map);
   };
   /*
    * 取消编辑图形
    */
-  cancelEditGraphic = () => {
+  cancelEditGraphic = e => {
+    e.stopPropagation();
     this.setState({ showButton: false });
     map.on("click", this.onClickMap);
     //禁止编辑图形
@@ -638,10 +676,25 @@ export default class integrat extends PureComponent {
     this.clearGeojsonLayer();
   };
   /*
+   * 取消新增图形
+   */
+  cancelAddGraphic = e => {
+    e.stopPropagation();
+    this.setState({ showButton: false });
+    const { addGraphLayer } = this.state;
+    //禁止编辑图形
+    if(addGraphLayer){
+      addGraphLayer.pm.disable();
+      map.removeLayer(addGraphLayer);
+      this.setState({ addGraphLayer: null });
+    }
+  };
+  /*
    * 保存编辑图形
    */
 
-  saveEditGraphic = () => {
+  saveEditGraphic = e => {
+    e.stopPropagation();
     const me = this;
     this.setState({ showButton: false });
     map.on("click", this.onClickMap);
@@ -650,9 +703,7 @@ export default class integrat extends PureComponent {
     //禁止移动图形
     //map.pm.disableGlobalRemovalMode();
 
-    //console.log(userconfig.projectgeojsonLayer.toGeoJSON());
     let geojson = userconfig.projectgeojsonLayer.toGeoJSON();
-    //MULTIPOLYGON(((0 0,4 0,4 4,0 4,0 0),(1 1,2 1,2 2,1 2,1 1)), ((-1 -1,-1 -2,-2 -2,-2 -1,-1 -1)))
     let polygon = "multipolygon((";
     let coordinates = geojson.features[0].geometry.coordinates;
     for (let i = 0; i < coordinates.length; i++) {
@@ -715,7 +766,7 @@ export default class integrat extends PureComponent {
   };
 
   render() {
-    const { showButton } = this.state;
+    const { showButton, drawGrphic } = this.state;
     return (
       <LocaleProvider locale={zhCN}>
         <div>
@@ -744,25 +795,22 @@ export default class integrat extends PureComponent {
               {/* 编辑图形-保存、取消保存按钮 */}
               <div
                 style={{
-                  position: "absolute",
                   display: showButton ? "block" : "none",
-                  top: 248,
-                  right: 15,
+                  position: "absolute",
+                  top: 15,
+                  right: 180,
                   zIndex: 1000
                 }}
               >
                 <Button
                   icon="rollback"
-                  onClick={() => {
-                    this.cancelEditGraphic();
-                  }}
+                  onClick={
+                    drawGrphic === "edit" ? this.cancelEditGraphic : this.cancelAddGraphic
+                  }
                 />
-                <br />
                 <Button
                   icon="check"
-                  onClick={() => {
-                    this.saveEditGraphic();
-                  }}
+                  onClick={drawGrphic === "edit" ? this.saveEditGraphic : null}
                 />
               </div>
             </div>
