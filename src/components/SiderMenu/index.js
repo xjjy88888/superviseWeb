@@ -67,87 +67,90 @@ export default class SiderMenu extends PureComponent {
         title: "首页",
         keys: "1",
         icon: "home",
+        path: "/home/welcome",
         items: [
           {
-            text: "产品序列",
+            text: "首页",
             path: "/home/welcome",
             key: "101"
-          },
-          {
-            text: "首页2",
-            path: "/home/home2",
-            key: "102"
           }
+          // {
+          //   text: "首页2",
+          //   path: "/home/home2",
+          //   key: "102"
+          // }
         ]
       },
       {
         title: "区域监管",
         keys: "2",
         icon: "environment",
+        path: "/regionRegulatory/integrat",
         items: [
           {
             text: "天地一体化",
             path: "/regionRegulatory/integrat",
             key: "201"
-          },
-          {
-            text: "区域监管2",
-            path: "/regionRegulatory/regionRegulatory2",
-            key: "202"
           }
+          // {
+          //   text: "区域监管2",
+          //   path: "/regionRegulatory/regionRegulatory2",
+          //   key: "202"
+          // }
         ]
       },
       {
         title: "项目监管",
         keys: "3",
         icon: "book",
+        path: "/projectRegulatory/projectRegulatory1",
         items: [
           {
             text: "项目监管",
             path: "/projectRegulatory/projectRegulatory1",
             key: "301"
-          },
-          {
-            text: "项目监管2",
-            path: "/projectRegulatory/projectRegulatory2",
-            key: "302"
           }
-        ]
-      },
-      {
-        title: "责任追究",
-        keys: "4",
-        icon: "bell",
-        items: [
-          {
-            text: "责任追究1",
-            path: "/accountability/accountability1",
-            key: "401"
-          },
-          {
-            text: "责任追究2",
-            path: "/accountability/accountability2",
-            key: "402"
-          }
-        ]
-      },
-      {
-        title: "目标考核",
-        keys: "5",
-        icon: "form",
-        items: [
-          {
-            text: "目标考核1",
-            path: "/assess/assess1",
-            key: "501"
-          },
-          {
-            text: "目标考核2",
-            path: "/assess/assess2",
-            key: "502"
-          }
+          // {
+          //   text: "项目监管2",
+          //   path: "/projectRegulatory/projectRegulatory2",
+          //   key: "302"
+          // }
         ]
       }
+      // {
+      //   title: "责任追究",
+      //   keys: "4",
+      //   icon: "bell",
+      //   items: [
+      //     {
+      //       text: "责任追究1",
+      //       path: "/accountability/accountability1",
+      //       key: "401"
+      //     },
+      //     {
+      //       text: "责任追究2",
+      //       path: "/accountability/accountability2",
+      //       key: "402"
+      //     }
+      //   ]
+      // },
+      // {
+      //   title: "目标考核",
+      //   keys: "5",
+      //   icon: "form",
+      //   items: [
+      //     {
+      //       text: "目标考核1",
+      //       path: "/assess/assess1",
+      //       key: "501"
+      //     },
+      //     {
+      //       text: "目标考核2",
+      //       path: "/assess/assess2",
+      //       key: "502"
+      //     }
+      //   ]
+      // }
     ];
     return (
       <div className={styles.main}>
@@ -155,7 +158,7 @@ export default class SiderMenu extends PureComponent {
           <img src="./img/logo.png" />
           <Link
             className={styles.text}
-            to="/projectRegulatory/projectRegulatory1"
+            to="/regionRegulatory/integrat"
           >
             生产建设项目水土保持信息化监管系统
           </Link>
@@ -169,21 +172,26 @@ export default class SiderMenu extends PureComponent {
           defaultSelectedKeys={this.state.defaultSelectedKeys}
         >
           {tabs.map(item => (
-            <SubMenu
-              key={item.keys}
-              title={
-                <span>
-                  <Icon type={item.icon} />
-                  <span>{item.title}</span>
-                </span>
-              }
-            >
-              {item.items.map(ite => (
-                <Menu.Item key={ite.key}>
-                  <Link to={ite.path}>{ite.text}</Link>
-                </Menu.Item>
-              ))}
-            </SubMenu>
+            <Menu.Item key={item.keys}>
+              <Link to={item.path}>{item.title}</Link>
+            </Menu.Item>
+            // <SubMenu
+            //   key={item.keys}
+            //   title={
+            //     <span>
+            //       <Icon type={item.icon} />
+            //       <Link to={item.path}>
+            //         <span>{item.title}</span>
+            //       </Link>
+            //     </span>
+            //   }
+            // >
+            //   {/* {item.items.map(ite => (
+            //     <Menu.Item key={ite.key}>
+            //       <Link to={ite.path}>{ite.text}</Link>
+            //     </Menu.Item>
+            //   ))} */}
+            // </SubMenu>
           ))}
         </Menu>
         <div className={styles.right} style={{ margin: "0 20px" }}>

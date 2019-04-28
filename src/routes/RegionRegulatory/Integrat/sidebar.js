@@ -59,8 +59,10 @@ export default class integrat extends PureComponent {
       projectEdit: false,
       showCompany: false,
       showProblem: false,
+      showCheck: false,
       key: "project",
       inputDisabled: true,
+      select: [],
       problem: { title: "", records: [] },
       placeholder: "项目",
       sort: [
@@ -97,6 +99,11 @@ export default class integrat extends PureComponent {
   }
 
   componentDidMount() {
+    this.eventEmitter = emitter.addListener("showCheck", data => {
+      this.setState({
+        showCheck: data.show
+      });
+    });
     this.eventEmitter = emitter.addListener("showProjectSpotInfo", data => {
       if (data.from === "project") {
         this.setState({
@@ -332,8 +339,10 @@ export default class integrat extends PureComponent {
       inputDisabled,
       previewVisible,
       previewImage,
+      showCheck,
       showProblem,
       fileList,
+      select,
       problem
     } = this.state;
     const {
@@ -515,7 +524,7 @@ export default class integrat extends PureComponent {
           <List
             style={{
               overflow: "auto",
-              height: clientHeight ? clientHeight - 211 : 500,
+              height: clientHeight ? clientHeight - 257 : 500,
               width: 350,
               padding: "10px 20px 10px 20px"
             }}
@@ -529,7 +538,49 @@ export default class integrat extends PureComponent {
                   }}
                   title={
                     <p style={{ textAlign: "justify" }}>
-                      <span>
+                      <Checkbox
+                        style={{ display: showCheck ? "inline" : "none" }}
+                        onChange={e => {
+                          if (e.target.checked) {
+                            const data = [...select, item.id];
+                            emitter.emit("checkResult", {
+                              result: data
+                            });
+                            this.setState({ select: data });
+                          } else {
+                            select.map((ite, idx) => {
+                              if (ite === item.id) {
+                                const data = select.splice(idx, 1);
+                                emitter.emit("checkResult", {
+                                  result: select
+                                });
+                              }
+                            });
+                          }
+                        }}
+                      />
+                      <span
+                        onClick={() => {
+                          if (key === "project") {
+                            this.setState({
+                              showProjectDetail: true
+                            });
+                            this.queryProjectById(item.id);
+                          } else if (key === "spot") {
+                            emitter.emit("showSiderbarDetail", {
+                              show: key === "spot",
+                              from: key,
+                              id: key === "project" ? item.id : item.spot_tbid
+                            });
+                          }
+                          emitter.emit("showTool", {
+                            show: false
+                          });
+                          emitter.emit("showQuery", {
+                            show: false
+                          });
+                        }}
+                      >
                         {key === "project" ? item.projectName : item.mapNum}
                       </span>
                       <Icon
@@ -580,26 +631,6 @@ export default class integrat extends PureComponent {
                       </span> */}
                     </p>
                   }
-                  onClick={() => {
-                    if (key === "project") {
-                      this.setState({
-                        showProjectDetail: true
-                      });
-                      this.queryProjectById(item.id);
-                    } else if (key === "spot") {
-                      emitter.emit("showSiderbarDetail", {
-                        show: key === "spot",
-                        from: key,
-                        id: key === "project" ? item.id : item.spot_tbid
-                      });
-                    }
-                    emitter.emit("showTool", {
-                      show: false
-                    });
-                    emitter.emit("showQuery", {
-                      show: false
-                    });
-                  }}
                 />
               </List.Item>
             )}
@@ -1084,18 +1115,24 @@ export default class integrat extends PureComponent {
                           }}
                           onClick={e => {
                             e.stopPropagation();
-                            notification["info"]({
-                              message: "添加扰动图斑"
-                            });
+                            // notification["info"]({
+                            //   message: "添加扰动图斑"
+                            // });
                             emitter.emit("drawSpot", {
                               draw: true,
                               project_id: "123"
+                            });
+                            emitter.emit("showSiderbarDetail", {
+                              show: true,
+                              edit: true,
+                              from: "spot",
+                              item: { id: "" }
                             });
                           }}
                         />
                         <Switch
                           checkedChildren="归档图斑"
-                          unCheckedChildren="非归档图斑"
+                          unCheckedChildren="归档图斑"
                           defaultChecked
                           style={{ position: "relative", left: 10, top: -2 }}
                           onChange={(v, e) => {
@@ -1166,6 +1203,16 @@ export default class integrat extends PureComponent {
                             e.stopPropagation();
                             notification["info"]({
                               message: "添加防治责任范围"
+                            });
+                            emitter.emit("drawDuty", {
+                              draw: true,
+                              project_id: "123"
+                            });
+                            emitter.emit("showSiderbarDetail", {
+                              show: true,
+                              edit: true,
+                              from: "duty",
+                              item: { id: "" }
                             });
                           }}
                         />

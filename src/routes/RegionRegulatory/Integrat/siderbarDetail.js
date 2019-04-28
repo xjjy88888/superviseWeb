@@ -53,6 +53,7 @@ export default class siderbarDetail extends PureComponent {
     this.eventEmitter = emitter.addListener("showSiderbarDetail", data => {
       this.setState({
         show: data.show,
+        edit: data.edit,
         from: data.from,
         item: data.item
       });

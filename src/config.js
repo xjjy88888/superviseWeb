@@ -31,7 +31,11 @@ const config = {
     //编辑图斑图形
     updateSpotGraphic: `${domain}/api/app/updateSpotGraphic`,
     //编辑项目红线图形
-    updateProjectScopeGraphic: `${domain}/api/app/updateProjectScopeGraphic`
+    updateProjectScopeGraphic: `${domain}/api/app/updateProjectScopeGraphic`,
+    //新增图斑图形
+    addSpotGraphic: `http://10.7.23.81:8090/stbcSys/api/app/addSpotGraphic`,
+    //新增项目红线图形
+    addProjectScopeGraphic: `http://10.7.23.81:8090/stbcSys/api/app/addProjectScopeGraphic`
   },
 
   //扰动类型
@@ -116,6 +120,11 @@ const config = {
 
   //工具箱
   toolbox: [
+    {
+      label: "勾选管理",
+      value: "check",
+      icon: "check"
+    },
     {
       label: "导出当前列表数据",
       value: "shopping",

@@ -22,7 +22,7 @@ const RadioGroup = Radio.Group;
 export default class siderbarDetail extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = { show: false };
+    this.state = { show: false, checkResult: [], showCheck: true };
     this.charRef = ref => {
       this.chartDom = ref;
     };
@@ -34,6 +34,13 @@ export default class siderbarDetail extends PureComponent {
         show: data.show,
         type: data.type,
         typeChild: data.typeChild
+      });
+    });
+    this.eventEmitter = emitter.addListener("checkResult", data => {
+      console.log(data.result);
+      const result = data.result;
+      this.setState({
+        checkResult: result
       });
     });
   }
@@ -50,14 +57,15 @@ export default class siderbarDetail extends PureComponent {
   };
 
   render() {
-    const { show, type, typeChild } = this.state;
+    const { show, type, typeChild, checkResult, showCheck } = this.state;
+    console.log(checkResult);
 
     return (
       <div
         style={{
           left: show ? 350 : -350,
           width: 240,
-          height: 450,
+          height: 490,
           backgroundColor: `#fff`,
           position: `absolute`,
           zIndex: 1001,
@@ -85,16 +93,29 @@ export default class siderbarDetail extends PureComponent {
         />
         <div style={{ display: type === "tool" ? "block" : "none" }}>
           <p style={{ margin: `20px 0 10px 0` }}>工具箱</p>
+          <span style={{ display: !showCheck ? "block" : "none" }}>
+            已选中{checkResult.length}条数据
+          </span>
           {config.toolbox.map((item, index) => (
             <div key={index}>
               <Button
                 style={{ margin: `15px 10px 0 10px` }}
                 icon={item.icon}
                 onClick={() => {
-                  if (item.label === "数据抽稀") {
-                    emitter.emit("showSparse", {
-                      show: true
-                    });
+                  switch (item.label) {
+                    case "数据抽稀":
+                      emitter.emit("showSparse", {
+                        show: true
+                      });
+                      break;
+                    case "勾选管理":
+                      emitter.emit("showCheck", {
+                        show: showCheck
+                      });
+                      this.setState({ showCheck: !showCheck });
+                      break;
+                    default:
+                      break;
                   }
                 }}
               >

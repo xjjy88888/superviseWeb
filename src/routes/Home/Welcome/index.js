@@ -6,7 +6,7 @@ export default class home2 extends PureComponent {
     return (
       <div>
         <SiderMenu active="101" />
-        <div>首页1</div>
+        <div>首页</div>
       </div>
     );
   }

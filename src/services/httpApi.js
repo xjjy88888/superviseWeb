@@ -65,10 +65,30 @@ export async function updateSpotGraphic(params) {
   );
 }
 
+//新增扰动图斑图形信息
+export async function addSpotGraphic(params) {
+  return request(
+    `${config.url.addSpotGraphic}?obj=${JSON.stringify(params)}`,
+    {
+      method: "GET"
+    }
+  );
+}
+
 //编辑项目红线图形信息
 export async function updateProjectScopeGraphic(params) {
   return request(
     `${config.url.updateProjectScopeGraphic}?obj=${JSON.stringify(params)}`,
+    {
+      method: "GET"
+    }
+  );
+}
+
+//新增项目红线图形信息
+export async function addProjectScopeGraphic(params) {
+  return request(
+    `${config.url.addProjectScopeGraphic}?obj=${JSON.stringify(params)}`,
     {
       method: "GET"
     }

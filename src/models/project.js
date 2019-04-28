@@ -6,7 +6,9 @@ import {
   spotListApi,
   spotById,
   updateSpotGraphic,
-  updateProjectScopeGraphic
+  addSpotGraphic,
+  updateProjectScopeGraphic,
+  addProjectScopeGraphic
 } from "../services/httpApi";
 
 export default {
@@ -103,10 +105,26 @@ export default {
       yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);
     },
+    *addSpotGraphic({ payload, callback }, { call, put }) {
+      const { data: obj } = yield call(addSpotGraphic, payload);
+      notification[obj ? "success" : "error"]({
+        message: obj ? "新增图斑图形成功" : "新增图斑图形失败"
+      });
+      yield put({ type: "save", payload: { obj } });
+      if (callback) callback(obj);
+    },
     *updateProjectScopeGraphic({ payload, callback }, { call, put }) {
       const { data: obj } = yield call(updateProjectScopeGraphic, payload);
       notification[obj ? "success" : "error"]({
         message: obj ? "编辑项目红线图形成功" : "编辑项目红线图形失败"
+      });
+      yield put({ type: "save", payload: { obj } });
+      if (callback) callback(obj);
+    },
+    *addProjectScopeGraphic({ payload, callback }, { call, put }) {
+      const { data: obj } = yield call(addProjectScopeGraphic, payload);
+      notification[obj ? "success" : "error"]({
+        message: obj ? "新增项目红线图形成功" : "新增项目红线图形失败"
       });
       yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);

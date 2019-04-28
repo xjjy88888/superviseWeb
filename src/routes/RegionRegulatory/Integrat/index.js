@@ -57,8 +57,8 @@ export default class integrat extends PureComponent {
       showSiderbarDetail: false,
       showQuery: false,
       drawGrphic: "edit",
-      project_id:null,//针对新增图形的项目红线id
-      addGraphLayer:null//针对新增图形的图层
+      project_id: null, //针对新增图形的项目红线id
+      addGraphLayer: null //针对新增图形的图层
     };
     this.map = null;
     this.saveRef = v => {
@@ -117,11 +117,11 @@ export default class integrat extends PureComponent {
     //绘制扰动图斑图形
     this.eventEmitter = emitter.addListener("drawSpot", data => {
       if (data.draw) {
-        me.setState({ drawGrphic: "add",project_id:data.project_id });
+        me.setState({ drawGrphic: "addSpot", project_id: data.project_id });
         const { addGraphLayer } = me.state;
-        if(addGraphLayer){
-            map.removeLayer(addGraphLayer);
-            me.setState({ addGraphLayer: null });
+        if (addGraphLayer) {
+          map.removeLayer(addGraphLayer);
+          me.setState({ addGraphLayer: null });
         }
         map.pm.enableDraw("Polygon", {
           finishOn: "dblclick",
@@ -131,13 +131,39 @@ export default class integrat extends PureComponent {
         //显示图形编辑菜单按钮
         me.setState({ showButton: true });
         //编辑图形
-        map.on('pm:create', e => {
+        map.on("pm:create", e => {
           //console.log(e);
-          me.setState({addGraphLayer:e.layer});
+          me.setState({ addGraphLayer: e.layer });
           e.layer.pm.enable({
-            allowSelfIntersection: false,
+            allowSelfIntersection: false
           });
-        });       
+        });
+      }
+    });
+    //绘制项目红线图形
+    this.eventEmitter = emitter.addListener("drawDuty", data => {
+      if (data.draw) {
+         me.setState({ drawGrphic: "addDuty"});
+         const { addGraphLayer } = me.state;
+         if (addGraphLayer) {
+           map.removeLayer(addGraphLayer);
+           me.setState({ addGraphLayer: null });
+         }
+         map.pm.enableDraw("Polygon", {
+           finishOn: "dblclick",
+           allowSelfIntersection: false,
+           tooltips: false
+         });
+         //显示图形编辑菜单按钮
+         me.setState({ showButton: true });
+         //编辑图形
+         map.on("pm:create", e => {
+        //console.log(e);
+           me.setState({ addGraphLayer: e.layer });
+           e.layer.pm.enable({
+             allowSelfIntersection: false
+           });
+         });
       }
     });
     //监听侧边栏显隐
@@ -266,20 +292,6 @@ export default class integrat extends PureComponent {
       attributionControl: false
       //editable: true
     }).setView(config.mapInitParams.center, config.mapInitParams.zoom);
-
-    L.control
-      .zoom({ zoomInTitle: "放大", zoomOutTitle: "缩小", position: "topright" })
-      .addTo(map);
-    const scale = L.control
-      .scale({ imperial: false, position: "bottomright" })
-      .addTo(map);
-    jQuery(scale.getContainer())
-      .find("div")
-      .css({
-        background: "rgba(255, 255, 255, 1)",
-        border: "1px solid #000",
-        borderTop: "none"
-      });
 
     map.createPane("tileLayerZIndex");
     map.getPane("tileLayerZIndex").style.zIndex = 0;
@@ -644,6 +656,13 @@ export default class integrat extends PureComponent {
       项目红线: projectlayerGroup,
       扰动图斑: spotlayerGroup
     };
+    //底图切换控件
+    L.control.layers(userconfig.baseLayers, overlays).addTo(map);
+    //地图缩放控件
+    L.control
+      .zoom({ zoomInTitle: "放大", zoomOutTitle: "缩小", position: "topright" })
+      .addTo(map);
+    //地图视图控件
     L.control
       .navbar({
         center: bounds.getCenter(),
@@ -652,7 +671,17 @@ export default class integrat extends PureComponent {
         homeTitle: "全图"
       })
       .addTo(map);
-    L.control.layers(userconfig.baseLayers, overlays).addTo(map);
+    //地图比例尺控件
+    const scale = L.control
+      .scale({ imperial: false, position: "bottomright" })
+      .addTo(map);
+    jQuery(scale.getContainer())
+      .find("div")
+      .css({
+        background: "rgba(255, 255, 255, 1)",
+        border: "1px solid #000",
+        borderTop: "none"
+      });
     //量算工具
     var measureControl = new L.Control.Measure({
       primaryLengthUnit: "kilometers",
@@ -665,8 +694,7 @@ export default class integrat extends PureComponent {
   /*
    * 取消编辑图形
    */
-  cancelEditGraphic = e => {
-    e.stopPropagation();
+  cancelEditGraphic = () => {
     this.setState({ showButton: false });
     map.on("click", this.onClickMap);
     //禁止编辑图形
@@ -678,23 +706,77 @@ export default class integrat extends PureComponent {
   /*
    * 取消新增图形
    */
-  cancelAddGraphic = e => {
+  cancelAddGraphic = () => {
     //addGraphLayer.toGeoJSON()
-    e.stopPropagation();
     this.setState({ showButton: false });
     const { addGraphLayer } = this.state;
     //禁止编辑图形
-    if(addGraphLayer){
+    if (addGraphLayer) {
       addGraphLayer.pm.disable();
       map.removeLayer(addGraphLayer);
       this.setState({ addGraphLayer: null });
+    }
+    emitter.emit("showSiderbarDetail", {
+      show: false,
+      from: "spot",
+      item: { id: "" }
+    });
+  };
+  /*
+   * 保存新增图形
+   */
+  saveAddGraphic = () => {
+    const me = this;
+    me.setState({ showButton: false });
+    const { addGraphLayer, drawGrphic, project_id } = me.state;
+    //禁止编辑图形
+    if (addGraphLayer) {
+      addGraphLayer.pm.disable();
+      let geojson = addGraphLayer.toGeoJSON();
+      let polygon = me.geojson2Multipolygon(geojson, 1);
+      if (drawGrphic === "addSpot") {
+        //新增绘制扰动图斑保存
+        me.props.dispatch({
+          type: "project/addSpotGraphic",
+          payload: {
+            spot_tbid: "test123",
+            project_id: project_id,
+            geometry: polygon
+          },
+          callback: obj => {
+            map.removeLayer(addGraphLayer);
+            me.setState({ addGraphLayer: null });
+            emitter.emit("showSiderbarDetail", {
+              show: false,
+              from: "spot"
+            });
+          }
+        });
+      } else {
+        //新增绘制项目红线范围保存
+        me.props.dispatch({
+          type: "project/addProjectScopeGraphic",
+          payload: {
+            project_id: "",
+            geometry: polygon
+          },
+          callback: obj => {
+            map.removeLayer(addGraphLayer);
+            me.setState({ addGraphLayer: null });
+            emitter.emit("showSiderbarDetail", {
+              show: false,
+              from: "spot"
+            });
+          }
+        });
+      }
     }
   };
   /*
    * 保存编辑图形
    */
-
   saveEditGraphic = e => {
+    console.log(e);
     e.stopPropagation();
     const me = this;
     this.setState({ showButton: false });
@@ -705,42 +787,7 @@ export default class integrat extends PureComponent {
     //map.pm.disableGlobalRemovalMode();
 
     let geojson = userconfig.projectgeojsonLayer.toGeoJSON();
-    let polygon = "multipolygon((";
-    let coordinates = geojson.features[0].geometry.coordinates;
-    for (let i = 0; i < coordinates.length; i++) {
-      let coordinate = coordinates[i];
-      if (i === coordinates.length - 1) {
-        polygon += "(";
-        for (let j = 0; j < coordinate.length; j++) {
-          let xy = coordinate[j];
-          for (let n = 0; n < xy.length; n++) {
-            let data = xy[n];
-            if (n === xy.length - 1) {
-              polygon += data[0] + " " + data[1];
-            } else {
-              polygon += data[0] + " " + data[1] + ",";
-            }
-          }
-        }
-        polygon += ")";
-      } else {
-        polygon += "(";
-        for (let j = 0; j < coordinate.length; j++) {
-          let xy = coordinate[j];
-          for (let n = 0; n < xy.length; n++) {
-            let data = xy[n];
-            if (n === xy.length - 1) {
-              polygon += data[0] + " " + data[1];
-            } else {
-              polygon += data[0] + " " + data[1] + ",";
-            }
-          }
-        }
-        polygon += "),";
-      }
-    }
-    polygon += "))";
-
+    let polygon = me.geojson2Multipolygon(geojson, 0);
     if (geojson.features[0].properties.spot_tbid) {
       this.props.dispatch({
         type: "project/updateSpotGraphic",
@@ -764,6 +811,63 @@ export default class integrat extends PureComponent {
         }
       });
     }
+  };
+  /*
+   * geojson转换multipolygon
+   * @type 0代表编辑图形;1代表新增图形
+   */
+  geojson2Multipolygon = (geojson, type) => {
+    let polygon = "";
+    let coordinates;
+    type === 0
+      ? (coordinates = geojson.features[0].geometry.coordinates)
+      : (coordinates = geojson.geometry.coordinates);
+    polygon += "multipolygon((";
+    //let coordinates = geojson.features[0].geometry.coordinates;
+    for (let i = 0; i < coordinates.length; i++) {
+      let coordinate = coordinates[i];
+      if (i === coordinates.length - 1) {
+        polygon += "(";
+        for (let j = 0; j < coordinate.length; j++) {
+          let xy = coordinate[j];
+          if (type === 0) {
+            //编辑图形
+            for (let n = 0; n < xy.length; n++) {
+              let data = xy[n];
+              if (n === xy.length - 1) {
+                polygon += data[0] + " " + data[1];
+              } else {
+                polygon += data[0] + " " + data[1] + ",";
+              }
+            }
+          } else {
+            //新增图形
+            if (j === coordinate.length - 1) {
+              polygon += xy[0] + " " + xy[1];
+            } else {
+              polygon += xy[0] + " " + xy[1] + ",";
+            }
+          }
+        }
+        polygon += ")";
+      } else {
+        polygon += "(";
+        for (let j = 0; j < coordinate.length; j++) {
+          let xy = coordinate[j];
+          for (let n = 0; n < xy.length; n++) {
+            let data = xy[n];
+            if (n === xy.length - 1) {
+              polygon += data[0] + " " + data[1];
+            } else {
+              polygon += data[0] + " " + data[1] + ",";
+            }
+          }
+        }
+        polygon += "),";
+      }
+    }
+    polygon += "))";
+    return polygon;
   };
 
   render() {
@@ -792,35 +896,40 @@ export default class integrat extends PureComponent {
                 boxSizing: "border-box",
                 position: "relative"
               }}
+            />
+            {/* 编辑图形-保存、取消保存按钮 */}
+            <div
+              style={{
+                display: showButton ? "block" : "none",
+                position: "absolute",
+                top: 65,
+                right: 190,
+                zIndex: 1000
+              }}
             >
-              {/* 编辑图形-保存、取消保存按钮 */}
-              <div
-                style={{
-                  display: showButton ? "block" : "none",
-                  position: "absolute",
-                  top: 15,
-                  right: 180,
-                  zIndex: 1000
-                }}
-              >
-                <Button
-                  icon="rollback"
-                  onClick={
-                    drawGrphic === "edit" ? this.cancelEditGraphic : this.cancelAddGraphic
-                  }
-                />
-                <Button
-                  icon="check"
-                  onClick={drawGrphic === "edit" ? this.saveEditGraphic : null}
-                />
-              </div>
+              <Button
+                icon="rollback"
+                onClick={
+                  drawGrphic === "edit"
+                    ? this.cancelEditGraphic
+                    : this.cancelAddGraphic
+                }
+              />
+              <Button
+                icon="check"
+                onClick={
+                  drawGrphic === "edit"
+                    ? this.saveEditGraphic
+                    : this.saveAddGraphic
+                }
+              />
             </div>
             {/*图标联动按钮 */}
             <div
               style={{
                 position: "absolute",
-                top: 70,
-                left: 380,
+                top: 65,
+                right: 75,
                 height: 0,
                 zIndex: 1000,
                 background: "transparent"
@@ -831,7 +940,7 @@ export default class integrat extends PureComponent {
             >
               <Switch
                 checkedChildren="图表联动"
-                unCheckedChildren="图表不联动"
+                unCheckedChildren="图表联动"
                 style={{
                   width: 100
                 }}
@@ -841,22 +950,6 @@ export default class integrat extends PureComponent {
                 }}
               />
             </div>
-            {/*测量、历史对比按钮 */}
-            <div
-              style={{
-                position: "absolute",
-                top: 62,
-                right: 80,
-                zIndex: 1000
-              }}
-            >
-              <Popover content="测量" title="" trigger="hover">
-                <Button icon="colum-height" />
-              </Popover>
-              <Popover content="历史对比" title="" trigger="hover">
-                <Button icon="swap" />
-              </Popover>
-            </div>
             {/* 图例说明 */}
             <div
               style={{
@@ -865,11 +958,12 @@ export default class integrat extends PureComponent {
                 right: 20,
                 zIndex: 1000,
                 background: "#fff"
-                // padding: "10px 10px 0px 17px",
-                // border: "solid 1px #ddd",
-                // borderRadius: 3
               }}
             >
+              <Popover content="历史对比" title="" trigger="hover">
+                <Button icon="swap" />
+              </Popover>
+              <br />
               <Popover
                 content={
                   <div>
@@ -897,7 +991,7 @@ export default class integrat extends PureComponent {
                 title=""
                 trigger="hover"
               >
-                <Button icon="question-circle" />
+                <Button icon="bars" />
               </Popover>
             </div>
             {/* 底部遮罩层 */}
