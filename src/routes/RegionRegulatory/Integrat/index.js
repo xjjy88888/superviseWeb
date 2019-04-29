@@ -93,17 +93,16 @@ export default class integrat extends PureComponent {
     };
     //气泡窗口图形删除
     window.goDeleteGraphic = obj => {
-
       Modal.confirm({
-        title: '你确定要删除该图形?',
-        content: '删除之后该图形无法恢复',
+        title: "你确定要删除该图形?",
+        content: "删除之后该图形无法恢复",
         onOk() {
           me.setState({ drawGrphic: "delete" });
           if (obj.from === "project") {
             me.props.dispatch({
               type: "project/removeProjectScopeGraphic",
               payload: {
-                project_id: obj.id,
+                project_id: obj.id
               },
               callback: obj => {
                 me.clearGeojsonLayer();
@@ -114,7 +113,7 @@ export default class integrat extends PureComponent {
             me.props.dispatch({
               type: "project/removeSpotGraphic",
               payload: {
-                spot_tbid: obj.id,
+                spot_tbid: obj.id
               },
               callback: obj => {
                 me.clearGeojsonLayer();
@@ -126,7 +125,7 @@ export default class integrat extends PureComponent {
         onCancel() {
           me.clearGeojsonLayer();
           map.closePopup();
-        },
+        }
       });
     };
     //获取url参数
@@ -151,6 +150,10 @@ export default class integrat extends PureComponent {
           this.callbackLocationQueryWFSService
         );
       }
+    });
+    //照片定位
+    this.eventEmitter = emitter.addListener("imgLocation", data => {
+      console.log("照片经纬度", data);
     });
     //绘制扰动图斑图形
     this.eventEmitter = emitter.addListener("drawSpot", data => {
@@ -181,27 +184,27 @@ export default class integrat extends PureComponent {
     //绘制项目红线图形
     this.eventEmitter = emitter.addListener("drawDuty", data => {
       if (data.draw) {
-         me.setState({ drawGrphic: "addDuty"});
-         const { addGraphLayer } = me.state;
-         if (addGraphLayer) {
-           map.removeLayer(addGraphLayer);
-           me.setState({ addGraphLayer: null });
-         }
-         map.pm.enableDraw("Polygon", {
-           finishOn: "dblclick",
-           allowSelfIntersection: false,
-           tooltips: false
-         });
-         //显示图形编辑菜单按钮
-         me.setState({ showButton: true });
-         //编辑图形
-         map.on("pm:create", e => {
-        //console.log(e);
-           me.setState({ addGraphLayer: e.layer });
-           e.layer.pm.enable({
-             allowSelfIntersection: false
-           });
-         });
+        me.setState({ drawGrphic: "addDuty" });
+        const { addGraphLayer } = me.state;
+        if (addGraphLayer) {
+          map.removeLayer(addGraphLayer);
+          me.setState({ addGraphLayer: null });
+        }
+        map.pm.enableDraw("Polygon", {
+          finishOn: "dblclick",
+          allowSelfIntersection: false,
+          tooltips: false
+        });
+        //显示图形编辑菜单按钮
+        me.setState({ showButton: true });
+        //编辑图形
+        map.on("pm:create", e => {
+          //console.log(e);
+          me.setState({ addGraphLayer: e.layer });
+          e.layer.pm.enable({
+            allowSelfIntersection: false
+          });
+        });
       }
     });
     //监听侧边栏显隐
@@ -628,7 +631,7 @@ export default class integrat extends PureComponent {
                 userconfig.zoom = map.getZoom() + 1;
               }
               //加载geoserver发布的WMS地图服务
-              me.overlayWMSLayers();
+              me.overlayWMSLayers();          
               //当前用户区域范围过滤空间数据
               let polygon = "";
               if (userconfig.geojson) {
@@ -660,6 +663,25 @@ export default class integrat extends PureComponent {
               emitter.emit("polygon", {
                 polygon: polygon
               });
+              //地图模态层效果  
+              let xy1 = [-180, -90];
+              let xy2 = [180, 90];
+              let xy3 = [180, -90];
+              let xy4 = [-180, 90];            
+              let boundCoord = [[[xy1[0],xy1[1]], [xy3[0],xy3[1]], [xy2[0],xy2[1]], [xy4[0],xy4[1]], [xy1[0],xy1[1]]]];             
+              let boundGeo = turf.polygon(boundCoord);
+              let modalJson = turf.difference(boundGeo, userconfig.polygon);
+              L.Proj.geoJson(modalJson, {
+                style: {
+                  color: "#0070FF",
+                  cursor:"not-allowed",
+                  weight: 3,
+                  opacity: 1,
+                  fillColor:"rgba(0, 0, 0, 0.45)",
+                  fillOpacity: 1
+                }
+              }).addTo(map);
+             
               break;
             }
           }

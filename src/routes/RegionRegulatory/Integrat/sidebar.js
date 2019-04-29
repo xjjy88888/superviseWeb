@@ -35,6 +35,16 @@ import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
 import config from "../../../config";
 import data from "../../../data";
+import { EXIF } from "exif-js";
+import jQuery from "jquery";
+// import {
+//   ROOT_DIR_PATH,
+//   resolveLocalFileSystemURL,
+//   getDirectory,
+//   copyTo,
+//   getPicture,
+//   getPictureExif,
+// } from '../../../utils/fileUtil';
 
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 const dateFormat = "YYYY-MM-DD";
@@ -87,8 +97,7 @@ export default class integrat extends PureComponent {
           uid: "-1",
           name: "xxx.png",
           status: "done",
-          url:
-            "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
+          url: "./img/logo2.jpg"
         }
       ]
     };
@@ -133,6 +142,37 @@ export default class integrat extends PureComponent {
     });
   }
 
+  getFile = dom => {
+    EXIF.getData(dom, function() {
+      const allMetaData = EXIF.getAllTags(this);
+      let Longitude;
+      if (allMetaData.GPSLongitude) {
+        const LongitudeArry = allMetaData.GPSLongitude;
+        const longLongitude =
+          LongitudeArry[0].numerator / LongitudeArry[0].denominator +
+          LongitudeArry[1].numerator / LongitudeArry[1].denominator / 60 +
+          LongitudeArry[2].numerator / LongitudeArry[2].denominator / 3600;
+        Longitude = longLongitude.toFixed(8);
+      }
+
+      // 纬度 numerator(数值) denominator（自身的进制） 三个参数 度、分、秒换算 ，保留小数点后两位
+      let Latitude;
+      if (allMetaData.GPSLatitude) {
+        const LatitudeArry = allMetaData.GPSLatitude;
+        const longLatitude =
+          LatitudeArry[0].numerator / LatitudeArry[0].denominator +
+          LatitudeArry[1].numerator / LatitudeArry[1].denominator / 60 +
+          LatitudeArry[2].numerator / LatitudeArry[2].denominator / 3600;
+        Latitude = longLatitude.toFixed(8);
+      }
+      console.log(Longitude, Latitude);
+      emitter.emit("imgLocation", {
+        Latitude: Latitude,
+        Longitude: Longitude
+      });
+    });
+  };
+
   queryProjectById = id => {
     const { dispatch } = this.props;
     dispatch({
@@ -146,10 +186,12 @@ export default class integrat extends PureComponent {
   handleCancel = () => this.setState({ previewVisible: false });
 
   handlePreview = file => {
+    const dom = jQuery(`<img src=${file.url}></img>`);
     this.setState({
       previewImage: file.url || file.thumbUrl,
       previewVisible: true
     });
+    this.getFile(dom[0]);
   };
 
   handleChange = ({ fileList }) => this.setState({ fileList });
@@ -381,6 +423,11 @@ export default class integrat extends PureComponent {
         }}
         ref={this.saveRef}
       >
+        <img
+          src="./img/logo2.jpg"
+          id="img1"
+          style={{ width: 100, display: "none" }}
+        />
         <Icon
           type={show ? "left" : "right"}
           style={{
@@ -418,6 +465,7 @@ export default class integrat extends PureComponent {
             allowClear
             placeholder={`${placeholder}名`}
             onSearch={v => {
+              this.getFile();
               if (v) {
                 notification["success"]({
                   message: `查询${v}成功！`

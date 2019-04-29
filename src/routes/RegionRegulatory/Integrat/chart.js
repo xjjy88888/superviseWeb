@@ -213,8 +213,8 @@ export default class siderbarDetail extends PureComponent {
           padding: "10px 00px 10px 30px",
           minWidth: 600,
           minHeight: 500,
-          left: 700,
-          width: `55vw`,
+          left: 650,
+          width: `53vw`,
           height: `80vh`,
           top: `50%`,
           transform: `translate(0,-47%)`
