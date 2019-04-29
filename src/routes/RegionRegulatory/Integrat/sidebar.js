@@ -342,7 +342,7 @@ export default class integrat extends PureComponent {
       const isRoot = isNaN(e[0].slice(0, 1));
       this.setState({ showProblem: true });
       emitter.emit("showProblem", {
-        show: true,
+        show: true
       });
       this.handleCancel();
       if (!isRoot) {
@@ -875,7 +875,7 @@ export default class integrat extends PureComponent {
                 onClick={() => {
                   this.setState({ showProblem: false });
                   emitter.emit("showProblem", {
-                    show: false,
+                    show: false
                   });
                   notification["success"]({
                     message: "编辑成功"
@@ -942,7 +942,7 @@ export default class integrat extends PureComponent {
                 onClick={() => {
                   this.setState({ showProblem: false });
                   emitter.emit("showProblem", {
-                    show: false,
+                    show: false
                   });
                 }}
               />
@@ -960,7 +960,7 @@ export default class integrat extends PureComponent {
                 onClick={() => {
                   this.setState({ showProblem: false });
                   emitter.emit("showProblem", {
-                    show: false,
+                    show: false
                   });
                   notification["success"]({
                     message: "编辑成功"
