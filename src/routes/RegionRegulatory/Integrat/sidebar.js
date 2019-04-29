@@ -414,6 +414,14 @@ export default class integrat extends PureComponent {
         key: ["point"]
       }
     ];
+
+    const list = key === "project" ? projectList.items : spotList.items;
+    const dataSourceTable = list.map((item, index) => {
+      return {
+        ...item,
+        key: index
+      };
+    });
     const columnsTable = [
       {
         title: (
@@ -712,7 +720,7 @@ export default class integrat extends PureComponent {
             }}
             rowSelection={showCheck ? rowSelectionTable : null}
             columns={columnsTable}
-            dataSource={key === "project" ? projectList.items : spotList.items}
+            dataSource={dataSourceTable}
             pagination={false}
           />
           {/* <List
