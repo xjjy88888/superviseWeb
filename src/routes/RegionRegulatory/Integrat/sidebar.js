@@ -145,6 +145,7 @@ export default class integrat extends PureComponent {
   getFile = dom => {
     EXIF.getData(dom, function() {
       const allMetaData = EXIF.getAllTags(this);
+
       let Longitude;
       if (allMetaData.GPSLongitude) {
         const LongitudeArry = allMetaData.GPSLongitude;
@@ -155,7 +156,6 @@ export default class integrat extends PureComponent {
         Longitude = longLongitude.toFixed(8);
       }
 
-      // 纬度 numerator(数值) denominator（自身的进制） 三个参数 度、分、秒换算 ，保留小数点后两位
       let Latitude;
       if (allMetaData.GPSLatitude) {
         const LatitudeArry = allMetaData.GPSLatitude;
@@ -165,6 +165,7 @@ export default class integrat extends PureComponent {
           LatitudeArry[2].numerator / LatitudeArry[2].denominator / 3600;
         Latitude = longLatitude.toFixed(8);
       }
+
       console.log(Longitude, Latitude);
       emitter.emit("imgLocation", {
         Latitude: Latitude,
@@ -465,7 +466,6 @@ export default class integrat extends PureComponent {
             allowClear
             placeholder={`${placeholder}名`}
             onSearch={v => {
-              this.getFile();
               if (v) {
                 notification["success"]({
                   message: `查询${v}成功！`
@@ -541,7 +541,7 @@ export default class integrat extends PureComponent {
                 工具箱
               </Button>
               <Button
-                type="dashed"
+                type="dashboard"
                 icon="desktop"
                 onClick={() => {
                   emitter.emit("showSiderbarDetail", {
@@ -557,7 +557,7 @@ export default class integrat extends PureComponent {
                   });
                 }}
               >
-                控制台
+                仪表盘
               </Button>
             </span>
           </p>

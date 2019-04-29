@@ -993,7 +993,7 @@ export default class integrat extends PureComponent {
               style={{
                 position: "absolute",
                 top: 65,
-                right: 75,
+                right: 120,
                 height: 0,
                 zIndex: 1000,
                 background: "transparent"
