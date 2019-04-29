@@ -56,6 +56,7 @@ export default class integrat extends PureComponent {
       showHistoryContrast: false,
       showSiderbar: true,
       showSiderbarDetail: false,
+      showProblem: false,
       showQuery: false,
       drawGrphic: "edit",
       project_id: null, //针对新增图形的项目红线id
@@ -159,7 +160,8 @@ export default class integrat extends PureComponent {
         iconSize: [25, 41]
       });
       L.marker([data.Latitude, data.Longitude], { icon: myIcon }).addTo(map);
-      map.flyTo([data.Latitude, data.Longitude], 14);
+      me.automaticToMap([data.Latitude, data.Longitude]);
+      //map.flyTo([data.Latitude, data.Longitude], 14);
       //map.panTo([data.Latitude, data.Longitude]);
       //.bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
       //.openPopup();
@@ -264,6 +266,11 @@ export default class integrat extends PureComponent {
         showQuery: data.show
       });
     });
+    this.eventEmitter = emitter.addListener("showProblem", data => {
+      this.setState({
+        showProblem: data.show
+      });
+    });
   }
   /*
    * 编辑图形查询回调函数
@@ -326,27 +333,35 @@ export default class integrat extends PureComponent {
         content,
         userconfig.projectgeojsonLayer.getBounds().getCenter()
       );
-      me.automaticToMap();
+      me.automaticToMap(userconfig.projectgeojsonLayer.getBounds().getCenter());
     }
   };
   /*
    * 自动匹配地图偏移
    */
-  automaticToMap = () => {
+  automaticToMap = latLng => {
     const me = this;
     const { clientWidth, clientHeight } = me.refDom;
-    const { showSiderbar, showSiderbarDetail, showQuery } = me.state;
+    const {
+      showSiderbar,
+      showSiderbarDetail,
+      showQuery,
+      showProblem
+    } = me.state;
     let point = map.latLngToContainerPoint(
-      userconfig.projectgeojsonLayer.getBounds().getCenter()
+      //userconfig.projectgeojsonLayer.getBounds().getCenter()
+      latLng
     );
     const offsetSiderbar = showSiderbar ? 200 : 0;
     const offsetSiderbarDetail = showSiderbarDetail ? 200 : 0;
     const offsetQuery = showQuery ? 225 : 0;
+    const offsetProblem = showProblem ? 215 : 0;
     point.x =
       point.x -
       clientWidth / 2 -
       offsetSiderbar -
       offsetSiderbarDetail -
+      offsetProblem -
       offsetQuery;
     point.y = point.y - clientHeight / 2;
     map.panBy(point);
@@ -473,25 +488,29 @@ export default class integrat extends PureComponent {
    *@param typeName 图层名称
    *@return null
    */
-  queryWFSServiceByPolygon = (typeName) => {
+  queryWFSServiceByPolygon = typeName => {
     const me = this;
     let bounds = map.getBounds();
     let polygon = bounds.getSouthWest().lng + "," + bounds.getSouthWest().lat;
-    polygon += " " + bounds.getSouthWest().lng + "," + bounds.getNorthEast().lat;
-    polygon += " " + bounds.getNorthEast().lng + "," + bounds.getNorthEast().lat;
-    polygon += " " + bounds.getNorthEast().lng + "," + bounds.getSouthWest().lat;
-    polygon += " " + bounds.getSouthWest().lng + "," + bounds.getSouthWest().lat;
+    polygon +=
+      " " + bounds.getSouthWest().lng + "," + bounds.getNorthEast().lat;
+    polygon +=
+      " " + bounds.getNorthEast().lng + "," + bounds.getNorthEast().lat;
+    polygon +=
+      " " + bounds.getNorthEast().lng + "," + bounds.getSouthWest().lat;
+    polygon +=
+      " " + bounds.getSouthWest().lng + "," + bounds.getSouthWest().lat;
     let filter =
       '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
     filter += "<Intersects>";
     filter += "<PropertyName>geom</PropertyName>";
-    filter += '<gml:Polygon>';
-    filter += '<gml:outerBoundaryIs>';
-    filter += '<gml:LinearRing>';
-    filter += '<gml:coordinates>' + polygon + '</gml:coordinates>';
-    filter += '</gml:LinearRing>';
-    filter += '</gml:outerBoundaryIs>';
-    filter += '</gml:Polygon>';
+    filter += "<gml:Polygon>";
+    filter += "<gml:outerBoundaryIs>";
+    filter += "<gml:LinearRing>";
+    filter += "<gml:coordinates>" + polygon + "</gml:coordinates>";
+    filter += "</gml:LinearRing>";
+    filter += "</gml:outerBoundaryIs>";
+    filter += "</gml:Polygon>";
     filter += "</Intersects>";
     filter += "</Filter>";
     let urlString = config.mapUrl.geoserverUrl + "/ows";
@@ -520,12 +539,13 @@ export default class integrat extends PureComponent {
             }
           }
           map.openPopup(content, bounds.getCenter());
-          me.automaticToMap();
+          me.automaticToMap(
+            userconfig.projectgeojsonLayer.getBounds().getCenter()
+          );
         }
       }
     });
-
-  }
+  };
   /*点选查询图层
    *@method queryWFSServiceByPoint
    *@param point 坐标点
@@ -581,7 +601,9 @@ export default class integrat extends PureComponent {
             }
           }
           map.openPopup(content, userconfig.mapPoint);
-          me.automaticToMap();
+          me.automaticToMap(
+            userconfig.projectgeojsonLayer.getBounds().getCenter()
+          );
         }
       }
     });
