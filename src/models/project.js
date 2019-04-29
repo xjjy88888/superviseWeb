@@ -7,8 +7,10 @@ import {
   spotById,
   updateSpotGraphic,
   addSpotGraphic,
+  removeSpotGraphic,
   updateProjectScopeGraphic,
-  addProjectScopeGraphic
+  addProjectScopeGraphic,
+  removeProjectScopeGraphic
 } from "../services/httpApi";
 
 export default {
@@ -113,6 +115,14 @@ export default {
       yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);
     },
+    *removeSpotGraphic({ payload, callback }, { call, put }) {
+      const { data: obj } = yield call(removeSpotGraphic, payload.spot_tbid);
+      notification[obj ? "success" : "error"]({
+        message: obj ? "删除图斑图形成功" : "删除图斑图形失败"
+      });
+      yield put({ type: "save", payload: { obj } });
+      if (callback) callback(obj);
+    },
     *updateProjectScopeGraphic({ payload, callback }, { call, put }) {
       const { data: obj } = yield call(updateProjectScopeGraphic, payload);
       notification[obj ? "success" : "error"]({
@@ -125,6 +135,14 @@ export default {
       const { data: obj } = yield call(addProjectScopeGraphic, payload);
       notification[obj ? "success" : "error"]({
         message: obj ? "新增项目红线图形成功" : "新增项目红线图形失败"
+      });
+      yield put({ type: "save", payload: { obj } });
+      if (callback) callback(obj);
+    },
+    *removeProjectScopeGraphic({ payload, callback }, { call, put }) {
+      const { data: obj } = yield call(removeProjectScopeGraphic, payload.project_id);
+      notification[obj ? "success" : "error"]({
+        message: obj ? "删除项目红线图形成功" : "删除项目红线图形失败"
       });
       yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);

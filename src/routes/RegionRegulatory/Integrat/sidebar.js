@@ -296,6 +296,7 @@ export default class integrat extends PureComponent {
     if (e.length) {
       const isRoot = isNaN(e[0].slice(0, 1));
       this.setState({ showProblem: true });
+      this.handleCancel();
       if (!isRoot) {
         const item = data[e[0].slice(0, 1)].data[e[0].slice(1, 2)];
         this.setState({ problem: item });
@@ -726,7 +727,7 @@ export default class integrat extends PureComponent {
                 position: "absolute",
                 top: 48,
                 left: 350,
-                width: 400,
+                width: 430,
                 bottom: 0,
                 background: "#fff"
               }}
@@ -755,7 +756,8 @@ export default class integrat extends PureComponent {
                   fontSize: 18,
                   position: "absolute",
                   right: 30,
-                  top: 15
+                  top: 15,
+                  zIndex: 1
                 }}
                 onClick={() => {
                   this.setState({ showProblem: false });
@@ -767,11 +769,35 @@ export default class integrat extends PureComponent {
               <div
                 style={{
                   overflow: "auto",
-                  padding: 20,
+                  padding: "20px 10px 20px 20px",
                   height: "100%"
                 }}
               >
                 <p>{problem.title}</p>
+                <div
+                  style={{
+                    display: previewVisible ? "block" : "none",
+                    position: "fixed",
+                    zIndex: 1,
+                    width: 380
+                  }}
+                >
+                  <Icon
+                    type="close"
+                    style={{
+                      fontSize: 18,
+                      position: "absolute",
+                      top: 0,
+                      right: 0
+                    }}
+                    onClick={this.handleCancel}
+                  />
+                  <img
+                    alt="example"
+                    style={{ width: "100%" }}
+                    src={previewImage}
+                  />
+                </div>
                 {problem.records.map((item, index) => (
                   <div style={{ padding: 5 }} key={index}>
                     <p>
@@ -787,6 +813,7 @@ export default class integrat extends PureComponent {
                     <Collapse
                       bordered={false}
                       style={{ position: "relative", left: -18 }}
+                      onChange={this.handleCancel}
                     >
                       <Collapse.Panel header="附件" key="1">
                         <Input.TextArea
@@ -794,10 +821,23 @@ export default class integrat extends PureComponent {
                           placeholder="问题描述"
                           style={{ marginBottom: 10 }}
                         />
-                        <Upload listType="picture">
-                          <Button>
-                            <Icon type="upload" />
-                            上传附件
+                        <Upload
+                          action="//jsonplaceholder.typicode.com/posts/"
+                          listType="picture-card"
+                          fileList={fileList}
+                          onPreview={this.handlePreview}
+                          onChange={this.handleChange}
+                        >
+                          <Button type="div" icon="plus">
+                            上传文件
+                          </Button>
+                          <Button
+                            icon="picture"
+                            onClick={e => {
+                              e.stopPropagation();
+                            }}
+                          >
+                            屏幕截图
                           </Button>
                         </Upload>
                       </Collapse.Panel>

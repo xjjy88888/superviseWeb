@@ -75,6 +75,16 @@ export async function addSpotGraphic(params) {
   );
 }
 
+//删除扰动图斑图形信息
+export async function removeSpotGraphic(spot_tbid) {
+  return request(
+    `${config.url.removeSpotGraphic}?spot_tbid=${spot_tbid}`,
+    {
+      method: "GET"
+    }
+  );
+}
+
 //编辑项目红线图形信息
 export async function updateProjectScopeGraphic(params) {
   return request(
@@ -89,6 +99,16 @@ export async function updateProjectScopeGraphic(params) {
 export async function addProjectScopeGraphic(params) {
   return request(
     `${config.url.addProjectScopeGraphic}?obj=${JSON.stringify(params)}`,
+    {
+      method: "GET"
+    }
+  );
+}
+
+//删除项目红线图形信息
+export async function removeProjectScopeGraphic(project_id) {
+  return request(
+    `${config.url.removeProjectScopeGraphic}?project_id=${project_id}`,
     {
       method: "GET"
     }

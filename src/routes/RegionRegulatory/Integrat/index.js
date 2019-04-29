@@ -91,6 +91,44 @@ export default class integrat extends PureComponent {
         );
       }
     };
+    //气泡窗口图形删除
+    window.goDeleteGraphic = obj => {
+
+      Modal.confirm({
+        title: '你确定要删除该图形?',
+        content: '删除之后该图形无法恢复',
+        onOk() {
+          me.setState({ drawGrphic: "delete" });
+          if (obj.from === "project") {
+            me.props.dispatch({
+              type: "project/removeProjectScopeGraphic",
+              payload: {
+                project_id: obj.id,
+              },
+              callback: obj => {
+                me.clearGeojsonLayer();
+                map.closePopup();
+              }
+            });
+          } else if (obj.from === "spot") {
+            me.props.dispatch({
+              type: "project/removeSpotGraphic",
+              payload: {
+                spot_tbid: obj.id,
+              },
+              callback: obj => {
+                me.clearGeojsonLayer();
+                map.closePopup();
+              }
+            });
+          }
+        },
+        onCancel() {
+          me.clearGeojsonLayer();
+          map.closePopup();
+        },
+      });
+    };
     //获取url参数
     me.initUrlParams();
     // 创建地图
@@ -464,7 +502,9 @@ export default class integrat extends PureComponent {
             obj
           )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
             obj
-          )})'>图形编辑</a></div>`
+          )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+            obj
+          )})'>图形删除</a></div>`
         )
       : jQuery(
           `<div>项目ID:${properties.project_id}</br>
@@ -472,7 +512,9 @@ export default class integrat extends PureComponent {
             obj
           )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
             obj
-          )})'>图形编辑</a></div>`
+          )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+            obj
+          )})'>图形删除</a></div>`
         );
     return elements;
   };
@@ -739,7 +781,7 @@ export default class integrat extends PureComponent {
         me.props.dispatch({
           type: "project/addSpotGraphic",
           payload: {
-            spot_tbid: "test123",
+            spot_tbid: "spot_" + Math.random(),
             project_id: project_id,
             geometry: polygon
           },

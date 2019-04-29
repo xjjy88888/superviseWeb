@@ -33,9 +33,13 @@ const config = {
     //编辑项目红线图形
     updateProjectScopeGraphic: `${domain}/api/app/updateProjectScopeGraphic`,
     //新增图斑图形
-    addSpotGraphic: `http://10.7.23.81:8090/stbcSys/api/app/addSpotGraphic`,
+    addSpotGraphic: `${domain}/api/app/addSpotGraphic`,
     //新增项目红线图形
-    addProjectScopeGraphic: `http://10.7.23.81:8090/stbcSys/api/app/addProjectScopeGraphic`
+    addProjectScopeGraphic: `${domain}/api/app/addProjectScopeGraphic`,
+    //删除图斑图形
+    removeSpotGraphic: `${domain}/api/app/removeSpotGraphic`,
+    //删除项目红线图形
+    removeProjectScopeGraphic: `${domain}/api/app/removeProjectScopeGraphic`
   },
 
   //扰动类型
