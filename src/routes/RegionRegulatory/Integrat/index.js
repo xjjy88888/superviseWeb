@@ -394,6 +394,8 @@ export default class integrat extends PureComponent {
     };
     //监听地图点击事件
     map.on("click", me.onClickMap);
+    //监听地图移动完成事件
+    map.on("moveend", me.onMoveendMap);
     //获取项目区域范围
     me.getRegionGeometry();
     //编辑图形工具
@@ -424,6 +426,9 @@ export default class integrat extends PureComponent {
     userconfig.mapPoint = e.latlng;
     let point = { x: e.latlng.lng, y: e.latlng.lat };
     me.queryWFSServiceByPoint(point, config.mapLayersName);
+  };
+  onMoveendMap = e => {
+    console.log(map.getZoom());
   };
   /*属性查询图层
    *@method queryWFSServiceByProperty
@@ -462,6 +467,65 @@ export default class integrat extends PureComponent {
       callback: callback
     });
   };
+
+  /*空间查询图层
+   *@method queryWFSServiceByPolygon
+   *@param typeName 图层名称
+   *@return null
+   */
+  queryWFSServiceByPolygon = (typeName) => {
+    const me = this;
+    let bounds = map.getBounds();
+    let polygon = bounds.getSouthWest().lng + "," + bounds.getSouthWest().lat;
+    polygon += " " + bounds.getSouthWest().lng + "," + bounds.getNorthEast().lat;
+    polygon += " " + bounds.getNorthEast().lng + "," + bounds.getNorthEast().lat;
+    polygon += " " + bounds.getNorthEast().lng + "," + bounds.getSouthWest().lat;
+    polygon += " " + bounds.getSouthWest().lng + "," + bounds.getSouthWest().lat;
+    let filter =
+      '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
+    filter += "<Intersects>";
+    filter += "<PropertyName>geom</PropertyName>";
+    filter += '<gml:Polygon>';
+    filter += '<gml:outerBoundaryIs>';
+    filter += '<gml:LinearRing>';
+    filter += '<gml:coordinates>' + polygon + '</gml:coordinates>';
+    filter += '</gml:LinearRing>';
+    filter += '</gml:outerBoundaryIs>';
+    filter += '</gml:Polygon>';
+    filter += "</Intersects>";
+    filter += "</Filter>";
+    let urlString = config.mapUrl.geoserverUrl + "/ows";
+    let param = {
+      service: "WFS",
+      version: "1.0.0",
+      request: "GetFeature",
+      typeName: typeName,
+      outputFormat: "application/json",
+      filter: filter
+    };
+    let geojsonUrl = urlString + L.Util.getParamString(param, urlString);
+    me.props.dispatch({
+      type: "mapdata/queryWFSLayer",
+      payload: { geojsonUrl },
+      callback: data => {
+        if (data.features.length > 0) {
+          let content = "";
+          for (let i = 0; i < data.features.length; i++) {
+            let feature = data.features[i];
+            if (i === data.features.length - 1) {
+              content += me.getWinContent(feature.properties)[0].innerHTML;
+            } else {
+              content +=
+                me.getWinContent(feature.properties)[0].innerHTML + "<br><br>";
+            }
+          }
+          map.openPopup(content, bounds.getCenter());
+          me.automaticToMap();
+        }
+      }
+    });
+
+  }
   /*点选查询图层
    *@method queryWFSServiceByPoint
    *@param point 坐标点
