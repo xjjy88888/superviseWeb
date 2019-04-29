@@ -20,6 +20,7 @@ import Sparse from "./sparse";
 import Chart from "./chart";
 import Query from "./query";
 import ProjectDetail from "./projectDetail";
+import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "proj4";
 import "proj4leaflet";
@@ -27,14 +28,13 @@ import "leaflet.pm/dist/leaflet.pm.css";
 import "leaflet.pm";
 import "leaflet-navbar/Leaflet.NavBar.css";
 import "leaflet-navbar";
+import "leaflet-measure/dist/leaflet-measure.css";
+import "leaflet-measure/dist/leaflet-measure.cn";
 import shp from "shpjs";
 import * as turf from "@turf/turf";
 //import '@h21-map/leaflet-path-drag';
 //import 'leaflet-editable';
 //import { greatCircle, point, circle } from '@turf/turf';
-import "leaflet-measure/dist/leaflet-measure.css";
-import "leaflet-measure/dist/leaflet-measure.cn";
-import "leaflet/dist/leaflet.css";
 import "antd-mobile/dist/antd-mobile.css";
 import config from "../../../config";
 import emitter from "../../../utils/event";
@@ -53,6 +53,7 @@ export default class integrat extends PureComponent {
     this.state = {
       loading: false,
       showButton: false,
+      showHistoryContrast: false,
       showSiderbar: true,
       showSiderbarDetail: false,
       showQuery: false,
@@ -153,7 +154,15 @@ export default class integrat extends PureComponent {
     });
     //照片定位
     this.eventEmitter = emitter.addListener("imgLocation", data => {
-      console.log("照片经纬度", data);
+      let myIcon = L.icon({
+        iconUrl: "./img/marker-icon-2x.png",
+        iconSize: [25, 41]
+      });
+      L.marker([data.Latitude, data.Longitude], { icon: myIcon }).addTo(map);
+      map.flyTo([data.Latitude, data.Longitude], 14);
+      //map.panTo([data.Latitude, data.Longitude]);
+      //.bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
+      //.openPopup();
     });
     //绘制扰动图斑图形
     this.eventEmitter = emitter.addListener("drawSpot", data => {
@@ -164,6 +173,22 @@ export default class integrat extends PureComponent {
           map.removeLayer(addGraphLayer);
           me.setState({ addGraphLayer: null });
         }
+        //绘制图形之前
+        map.on("pm:drawstart", ({ workingLayer }) => {
+          workingLayer.on("pm:vertexadded", e => {
+            let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
+            if (!turf.booleanContains(userconfig.polygon, turfpoint)) {
+              map.pm.disableDraw("Polygon");
+              emitter.emit("showSiderbarDetail", {
+                show: false,
+                from: "spot",
+                item: { id: "" }
+              });
+              me.setState({ showButton: false });
+              return;
+            }
+          });
+        });
         map.pm.enableDraw("Polygon", {
           finishOn: "dblclick",
           allowSelfIntersection: false,
@@ -190,6 +215,22 @@ export default class integrat extends PureComponent {
           map.removeLayer(addGraphLayer);
           me.setState({ addGraphLayer: null });
         }
+        //绘制图形之前
+        map.on("pm:drawstart", ({ workingLayer }) => {
+          workingLayer.on("pm:vertexadded", e => {
+            let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
+            if (!turf.booleanContains(userconfig.polygon, turfpoint)) {
+              map.pm.disableDraw("Polygon");
+              emitter.emit("showSiderbarDetail", {
+                show: false,
+                from: "spot",
+                item: { id: "" }
+              });
+              me.setState({ showButton: false });
+              return;
+            }
+          });
+        });
         map.pm.enableDraw("Polygon", {
           finishOn: "dblclick",
           allowSelfIntersection: false,
@@ -351,6 +392,7 @@ export default class integrat extends PureComponent {
       街道图: baseLayer,
       影像图: baseLayer1
     };
+    //监听地图点击事件
     map.on("click", me.onClickMap);
     //获取项目区域范围
     me.getRegionGeometry();
@@ -631,7 +673,7 @@ export default class integrat extends PureComponent {
                 userconfig.zoom = map.getZoom() + 1;
               }
               //加载geoserver发布的WMS地图服务
-              me.overlayWMSLayers();          
+              me.overlayWMSLayers();
               //当前用户区域范围过滤空间数据
               let polygon = "";
               if (userconfig.geojson) {
@@ -663,31 +705,49 @@ export default class integrat extends PureComponent {
               emitter.emit("polygon", {
                 polygon: polygon
               });
-              //地图模态层效果  
-              let xy1 = [-180, -90];
-              let xy2 = [180, 90];
-              let xy3 = [180, -90];
-              let xy4 = [-180, 90];            
-              let boundCoord = [[[xy1[0],xy1[1]], [xy3[0],xy3[1]], [xy2[0],xy2[1]], [xy4[0],xy4[1]], [xy1[0],xy1[1]]]];             
-              let boundGeo = turf.polygon(boundCoord);
-              let modalJson = turf.difference(boundGeo, userconfig.polygon);
-              L.Proj.geoJson(modalJson, {
-                style: {
-                  color: "#0070FF",
-                  cursor:"not-allowed",
-                  weight: 3,
-                  opacity: 1,
-                  fillColor:"rgba(0, 0, 0, 0.45)",
-                  fillOpacity: 1
-                }
-              }).addTo(map);
-             
+              //地图模态层效果
+              me.loadmodalLayer();
+
               break;
             }
           }
         }
       });
     }
+  };
+  /*
+   * 加载地图模态层效果
+   */
+  loadmodalLayer = () => {
+    let xy1 = [-180, -90];
+    let xy2 = [180, 90];
+    let xy3 = [180, -90];
+    let xy4 = [-180, 90];
+    let boundCoord = [
+      [
+        [xy1[0], xy1[1]],
+        [xy3[0], xy3[1]],
+        [xy2[0], xy2[1]],
+        [xy4[0], xy4[1]],
+        [xy1[0], xy1[1]]
+      ]
+    ];
+    let boundGeo = turf.polygon(boundCoord);
+    let modalJson = turf.difference(boundGeo, userconfig.polygon);
+    let tempLayer = L.Proj.geoJson(modalJson, {
+      style: {
+        color: "#0070FF",
+        weight: 3,
+        opacity: 1,
+        fillColor: "rgba(0, 0, 0, 0.45)",
+        fillOpacity: 1
+      }
+    }).addTo(map);
+    jQuery(tempLayer.getPane())
+      .find("path")
+      .css({
+        cursor: "not-allowed"
+      });
   };
   /*
    * 加载geoserver发布的WMS地图服务
@@ -935,7 +995,7 @@ export default class integrat extends PureComponent {
   };
 
   render() {
-    const { showButton, drawGrphic } = this.state;
+    const { showButton, drawGrphic, showHistoryContrast } = this.state;
     return (
       <LocaleProvider locale={zhCN}>
         <div>
@@ -967,7 +1027,7 @@ export default class integrat extends PureComponent {
                 display: showButton ? "block" : "none",
                 position: "absolute",
                 top: 65,
-                right: 190,
+                right: 240,
                 zIndex: 1000
               }}
             >
@@ -1025,7 +1085,12 @@ export default class integrat extends PureComponent {
               }}
             >
               <Popover content="历史对比" title="" trigger="hover">
-                <Button icon="swap" />
+                <Button
+                  icon="swap"
+                  onClick={() => {
+                    this.setState({ showHistoryContrast: true });
+                  }}
+                />
               </Popover>
               <br />
               <Popover
@@ -1069,6 +1134,58 @@ export default class integrat extends PureComponent {
                 background: "rgba(0,0,0,.4)"
               }}
             /> */}
+            {/* 历史对比 */}
+            <div
+              style={{
+                display: showHistoryContrast ? "block" : "none",
+                position: "fixed",
+                left: 0,
+                top: 0,
+                height: "100vh",
+                width: "100vw",
+                background: "rgba(0,0,0,.3)",
+                zIndex: 1001
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: "50%",
+                  width: "80vw",
+                  height: "80vh",
+                  background: "#fff",
+                  transform: "translate(-50%,-50%)",
+                  display: "flex"
+                }}
+              >
+                <Icon
+                  type="close"
+                  style={{
+                    position: "absolute",
+                    top: 10,
+                    right: 10,
+                    fontSize: 20
+                  }}
+                  onClick={() => {
+                    this.setState({ showHistoryContrast: false });
+                  }}
+                />
+                <div
+                  style={{
+                    flex: 1,
+                    textAlign: "center",
+                    borderRight: "solid 2px #ddd",
+                    height: "100%"
+                  }}
+                >
+                  111
+                </div>
+                <div style={{ flex: 1, textAlign: "center", height: "100%" }}>
+                  222
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </LocaleProvider>

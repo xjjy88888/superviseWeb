@@ -37,7 +37,6 @@ export default class siderbarDetail extends PureComponent {
       });
     });
     this.eventEmitter = emitter.addListener("checkResult", data => {
-      console.log(data.result);
       const result = data.result;
       this.setState({
         checkResult: result
@@ -58,7 +57,6 @@ export default class siderbarDetail extends PureComponent {
 
   render() {
     const { show, type, typeChild, checkResult, showCheck } = this.state;
-    console.log(checkResult);
 
     return (
       <div

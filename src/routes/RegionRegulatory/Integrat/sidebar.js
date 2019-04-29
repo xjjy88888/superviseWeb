@@ -27,6 +27,7 @@ import {
   DatePicker,
   InputNumber,
   AutoComplete,
+  Table,
   Collapse,
   message
 } from "antd";
@@ -70,6 +71,7 @@ export default class integrat extends PureComponent {
       showCompany: false,
       showProblem: false,
       showCheck: false,
+      checked: false,
       key: "project",
       inputDisabled: true,
       select: [],
@@ -387,6 +389,7 @@ export default class integrat extends PureComponent {
       showProblem,
       fileList,
       select,
+      checked,
       problem
     } = this.state;
     const {
@@ -411,6 +414,125 @@ export default class integrat extends PureComponent {
         key: ["point"]
       }
     ];
+    const columnsTable = [
+      {
+        title: (
+          <span>
+            <span>
+              共有
+              {key === "project" ? projectList.totalCount : spotList.totalCount}
+              条记录
+            </span>
+
+            <Button
+              type="dashed"
+              icon="shopping"
+              onClick={() => {
+                emitter.emit("showSiderbarDetail", {
+                  show: false
+                });
+                emitter.emit("showTool", {
+                  show: true,
+                  type: "tool"
+                });
+                emitter.emit("showQuery", {
+                  show: false
+                });
+              }}
+            >
+              {showCheck ? "" : "工具箱"}
+            </Button>
+            <Button
+              type="dashed"
+              icon="dashboard"
+              onClick={() => {
+                emitter.emit("showSiderbarDetail", {
+                  show: false
+                });
+                emitter.emit("showTool", {
+                  show: true,
+                  type: "control",
+                  typeChild: key
+                });
+                emitter.emit("showQuery", {
+                  show: false
+                });
+              }}
+            >
+              {showCheck ? "" : "仪表盘"}
+            </Button>
+          </span>
+        ),
+        dataIndex: "name",
+        render: (v, item) => (
+          <span>
+            <p>
+              <b
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  if (key === "project") {
+                    this.setState({
+                      showProjectDetail: true
+                    });
+                    this.queryProjectById(item.id);
+                  } else if (key === "spot") {
+                    emitter.emit("showSiderbarDetail", {
+                      show: key === "spot",
+                      from: key,
+                      id: key === "project" ? item.id : item.spot_tbid
+                    });
+                  }
+                  emitter.emit("showTool", {
+                    show: false
+                  });
+                  emitter.emit("showQuery", {
+                    show: false
+                  });
+                }}
+              >
+                {key === "project" ? item.projectName : item.mapNum}
+              </b>
+              <Icon
+                type="environment"
+                style={{
+                  float: "right",
+                  fontSize: 18,
+                  cursor: "point",
+                  color: "#1890ff"
+                }}
+                onClick={e => {
+                  e.stopPropagation();
+                  emitter.emit("mapLocation", {
+                    item: item,
+                    key: key
+                  });
+                }}
+              />
+            </p>
+            <span>
+              {" "}
+              {key === "project"
+                ? `建设单位：${item.productDepartmentName}`
+                : `关联项目：${item.projectName}`}
+            </span>
+            <br />
+            <span>
+              {key === "project"
+                ? `批复机构：${item.replyDepartmentName}`
+                : `扰动合规性：${item.interferenceCompliance}`}
+            </span>
+          </span>
+        )
+      }
+    ];
+
+    const rowSelectionTable = {
+      onChange: (selectedRowKeys, selectedRows) => {
+        emitter.emit("checkResult", {
+          result: selectedRows
+        });
+      }
+    };
 
     return (
       <div
@@ -489,7 +611,6 @@ export default class integrat extends PureComponent {
               color: "#1890ff"
             }}
           />
-
           <Radio.Group
             defaultValue="a"
             buttonStyle="solid"
@@ -510,10 +631,21 @@ export default class integrat extends PureComponent {
           >
             筛选
           </Button>
-          <p style={{ padding: "20px 20px 0 20px" }}>
-            <span>{`共有${
-              key === "project" ? projectList.totalCount : spotList.totalCount
-            }条记录`}</span>
+          {/* <p style={{ padding: "20px 20px 0 20px" }}>
+            <span>
+              <Checkbox
+                style={{
+                  display: showCheck ? "inline" : "none",
+                  paddingRight: 10
+                }}
+                onChange={() => {
+                  this.setState({ checked: !checked });
+                }}
+              />
+              {`共有${
+                key === "project" ? projectList.totalCount : spotList.totalCount
+              }条记录`}
+            </span>
             <span
               style={{
                 float: "right",
@@ -541,8 +673,8 @@ export default class integrat extends PureComponent {
                 工具箱
               </Button>
               <Button
-                type="dashboard"
-                icon="desktop"
+                type="dashed"
+                icon="dashboard"
                 onClick={() => {
                   emitter.emit("showSiderbarDetail", {
                     show: false
@@ -560,17 +692,30 @@ export default class integrat extends PureComponent {
                 仪表盘
               </Button>
             </span>
-          </p>
+          </p> */}
           <Spin
             style={{
               display: projectList.totalCount === 0 ? "block" : "none",
               padding: 100,
               position: "absolute",
               top: 300,
-              left: 60
+              left: 60,
+              zIndex: 1001
             }}
           />
-          <List
+          <Table
+            style={{
+              overflow: "auto",
+              height: clientHeight ? clientHeight - 202 : 500,
+              width: 350,
+              padding: "10px 10px"
+            }}
+            rowSelection={showCheck ? rowSelectionTable : null}
+            columns={columnsTable}
+            dataSource={key === "project" ? projectList.items : spotList.items}
+            pagination={false}
+          />
+          {/* <List
             style={{
               overflow: "auto",
               height: clientHeight ? clientHeight - 257 : 500,
@@ -588,6 +733,7 @@ export default class integrat extends PureComponent {
                   title={
                     <p style={{ textAlign: "justify" }}>
                       <Checkbox
+                        // checked={checked}
                         style={{ display: showCheck ? "inline" : "none" }}
                         onChange={e => {
                           if (e.target.checked) {
@@ -665,25 +811,12 @@ export default class integrat extends PureComponent {
                             : `扰动合规性：${item.interferenceCompliance}`}
                         </span>
                       </span>
-                      {/* <span
-                        style={{
-                          display: key === "point" ? "block" : "none"
-                        }}
-                      >
-                        <span style={{ wordBreak: "break-all" }}>
-                          关联项目：{item.project}
-                        </span>
-                        <br />
-                        <span style={{ wordBreak: "break-all" }}>
-                          描述：{item.desc}
-                        </span> 
-                      </span> */}
                     </p>
                   }
                 />
               </List.Item>
             )}
-          />
+          /> */}
         </div>
         <div
           style={{
