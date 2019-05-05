@@ -41,7 +41,22 @@ export default {
       const {
         data: { result: projectList }
       } = yield call(projectListApi, payload.row);
-      yield put({ type: "save", payload: { projectList } });
+      const data = {
+        items: [...payload.items, ...projectList.items],
+        totalCount: projectList.totalCount
+      };
+      yield put({ type: "save", payload: { projectList: data } });
+    },
+    *querySpot({ payload }, { call, put }) {
+      const {
+        data: { result: spotList }
+      } = yield call(spotListApi, payload.row);
+      console.log(payload,spotList)
+      const data = {
+        items: [...payload.items, ...spotList.items],
+        totalCount: spotList.totalCount
+      };
+      yield put({ type: "save", payload: { spotList:data } });
     },
     *queryProjectById({ payload, callback }, { call, put }) {
       const {
@@ -53,12 +68,6 @@ export default {
       if (success) {
         yield put({ type: "save", payload: { projectItem: result } });
       }
-    },
-    *querySpot({ payload }, { call, put }) {
-      const {
-        data: { result: spotList }
-      } = yield call(spotListApi, payload.row);
-      yield put({ type: "save", payload: { spotList } });
     },
     *querySpotById({ payload, callback }, { call, put }) {
       const { data: spotItem } = yield call(spotById, payload.id);

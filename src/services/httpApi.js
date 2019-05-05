@@ -30,7 +30,7 @@ export async function loginApi(params) {
 // 项目列表
 export async function projectListApi(row) {
   return request(
-    `${config.url.projectListUrl}?MaxResultCount=${row}&SkipCount=0`,
+    `${config.url.projectListUrl}?MaxResultCount=10&SkipCount=${row - 10}`,
     {
       method: "GET"
     }
@@ -46,9 +46,12 @@ export async function projectByIdApi(id) {
 
 // 图斑列表
 export async function spotListApi(row) {
-  return request(`${config.url.spotListUrl}?MaxResultCount=${row}&SkipCount=0`, {
-    method: "GET"
-  });
+  return request(
+    `${config.url.spotListUrl}?MaxResultCount=10&SkipCount=${row - 10}`,
+    {
+      method: "GET"
+    }
+  );
 }
 
 // 图斑id查询图斑信息

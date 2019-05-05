@@ -205,21 +205,29 @@ export default class integrat extends PureComponent {
   };
 
   queryProject = row => {
-    const { dispatch } = this.props;
+    const {
+      dispatch,
+      project: { projectList }
+    } = this.props;
     dispatch({
       type: "project/queryProject",
       payload: {
-        row: row
+        row: row,
+        items: row === 10 ? [] : projectList.items
       }
     });
   };
 
   querySpot = row => {
-    const { dispatch } = this.props;
+    const {
+      dispatch,
+      project: { spotList }
+    } = this.props;
     dispatch({
       type: "project/querySpot",
       payload: {
-        row: row
+        row: row,
+        items: row === 10 ? [] : spotList.items
       }
     });
   };
@@ -280,6 +288,7 @@ export default class integrat extends PureComponent {
   };
 
   switchMenu = e => {
+    this.scrollDom.scrollTop = 0;
     emitter.emit("showSiderbarDetail", {
       show: false,
       from: "spot"
