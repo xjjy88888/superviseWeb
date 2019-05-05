@@ -62,7 +62,7 @@ export default class integrat extends PureComponent {
       drawGrphic: "edit",
       project_id: null, //针对新增图形的项目红线id
       addGraphLayer: null, //针对新增图形的图层
-      historymap:null//卷帘地图
+      historymap: null //卷帘地图
     };
     this.map = null;
     this.saveRef = v => {
@@ -1089,7 +1089,7 @@ export default class integrat extends PureComponent {
    */
   showHistoryMap = () => {
     const { historymap } = this.state;
-    if(!historymap){
+    if (!historymap) {
       //map.remove()
       const map = L.map("historymap", {
         zoomControl: false,
@@ -1263,6 +1263,7 @@ export default class integrat extends PureComponent {
               }}
             >
               <div
+                id="historymap"
                 style={{
                   position: "absolute",
                   left: "50%",
@@ -1271,7 +1272,6 @@ export default class integrat extends PureComponent {
                   height: "80vh",
                   background: "#fff",
                   transform: "translate(-50%,-50%)",
-                  display: "flex"
                 }}
               >
                 <Icon
@@ -1287,20 +1287,6 @@ export default class integrat extends PureComponent {
                     this.setState({ showHistoryContrast: false });
                   }}
                 />
-                <div
-                  id="historymap"
-                  style={{
-                    flex: 1,
-                    textAlign: "center",
-                    borderRight: "solid 2px #ddd",
-                    height: "100%"
-                  }}
-                >
-                  111
-                </div>
-                {/*<div style={{ flex: 1, textAlign: "center", height: "100%" }}>
-                  222
-                </div>*/}
               </div>
             </div>
           </div>
