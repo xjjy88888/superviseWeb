@@ -719,7 +719,6 @@ export default class integrat extends PureComponent {
               overflow: "auto",
               height: clientHeight ? clientHeight - 202 : 500,
               width: 350,
-              padding: "10px 10px"
             }}
             rowSelection={showCheck ? rowSelectionTable : null}
             columns={columnsTable}

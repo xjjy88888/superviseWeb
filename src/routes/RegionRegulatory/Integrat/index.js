@@ -28,6 +28,7 @@ import "leaflet.pm/dist/leaflet.pm.css";
 import "leaflet.pm";
 import "leaflet-navbar/Leaflet.NavBar.css";
 import "leaflet-navbar";
+import "leaflet-side-by-side";
 import "leaflet-measure/dist/leaflet-measure.css";
 import "leaflet-measure/dist/leaflet-measure.cn";
 import shp from "shpjs";
@@ -155,12 +156,14 @@ export default class integrat extends PureComponent {
     });
     //照片定位
     this.eventEmitter = emitter.addListener("imgLocation", data => {
-      let myIcon = L.icon({
+      let latLng = [data.Latitude, data.Longitude];
+      /*let myIcon = L.icon({
         iconUrl: "./img/marker-icon-2x.png",
         iconSize: [25, 41]
       });
-      L.marker([data.Latitude, data.Longitude], { icon: myIcon }).addTo(map);
-      me.automaticToMap([data.Latitude, data.Longitude]);
+      L.marker([data.Latitude, data.Longitude], { icon: myIcon }).addTo(map);*/
+      L.marker(latLng).addTo(map);
+      me.automaticToMap(latLng);
       //map.flyTo([data.Latitude, data.Longitude], 14);
       //map.panTo([data.Latitude, data.Longitude]);
       //.bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
@@ -384,6 +387,13 @@ export default class integrat extends PureComponent {
   // 创建地图
   createMap = () => {
     const me = this;
+    /* This code is needed to properly load the images in the Leaflet CSS */
+    delete L.Icon.Default.prototype._getIconUrl;
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
+      iconUrl: require("leaflet/dist/images/marker-icon.png"),
+      shadowUrl: require("leaflet/dist/images/marker-shadow.png")
+    });
     map = L.map("map", {
       zoomControl: false,
       attributionControl: false
@@ -398,15 +408,18 @@ export default class integrat extends PureComponent {
     const baseLayer1 = L.tileLayer(config.baseMaps[1].Url, {
       pane: "tileLayerZIndex"
     });
-    map.addLayer(baseLayer1);
     const baseLayer2 = L.tileLayer(config.baseMaps[2].Url, {
       pane: "tileLayerZIndex"
     });
+    map.addLayer(baseLayer);
+    map.addLayer(baseLayer1);
     userconfig.baseLayers = {
       监管影像: baseLayer2,
       街道图: baseLayer,
       影像图: baseLayer1
     };
+    //卷帘地图效果
+    L.control.sideBySide(baseLayer1, baseLayer).addTo(map);
     //监听地图点击事件
     map.on("click", me.onClickMap);
     //监听地图移动完成事件
@@ -443,7 +456,10 @@ export default class integrat extends PureComponent {
     me.queryWFSServiceByPoint(point, config.mapLayersName);
   };
   onMoveendMap = e => {
-    console.log(map.getZoom());
+    //console.log(map.getZoom());
+    if (map.getZoom() >= 13) {
+      this.queryWFSServiceByPolygon(config.mapLayersName);
+    }
   };
   /*属性查询图层
    *@method queryWFSServiceByProperty
@@ -500,6 +516,7 @@ export default class integrat extends PureComponent {
       " " + bounds.getNorthEast().lng + "," + bounds.getSouthWest().lat;
     polygon +=
       " " + bounds.getSouthWest().lng + "," + bounds.getSouthWest().lat;
+    //console.log(polygon);
     let filter =
       '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
     filter += "<Intersects>";
@@ -528,20 +545,7 @@ export default class integrat extends PureComponent {
       payload: { geojsonUrl },
       callback: data => {
         if (data.features.length > 0) {
-          let content = "";
-          for (let i = 0; i < data.features.length; i++) {
-            let feature = data.features[i];
-            if (i === data.features.length - 1) {
-              content += me.getWinContent(feature.properties)[0].innerHTML;
-            } else {
-              content +=
-                me.getWinContent(feature.properties)[0].innerHTML + "<br><br>";
-            }
-          }
-          map.openPopup(content, bounds.getCenter());
-          me.automaticToMap(
-            userconfig.projectgeojsonLayer.getBounds().getCenter()
-          );
+          console.log(data);
         }
       }
     });
@@ -787,7 +791,7 @@ export default class integrat extends PureComponent {
                   }
                 }
               }
-              //let polygon = '123';
+              //console.log(polygon);
               emitter.emit("polygon", {
                 polygon: polygon
               });
@@ -1079,6 +1083,31 @@ export default class integrat extends PureComponent {
     polygon += "))";
     return polygon;
   };
+  /*
+   * 地图历史对比-卷帘效果
+   */
+  showHistoryMap = () => {
+    const historymap = L.map("historymap", {
+      zoomControl: false,
+      attributionControl: false
+      //editable: true
+    }).setView(config.mapInitParams.center, config.mapInitParams.zoom);
+
+    //map.createPane("tileLayerZIndex");
+    //map.getPane("tileLayerZIndex").style.zIndex = 0;
+    const baseLayer = L.tileLayer(config.baseMaps[0].Url, {
+      //pane: "tileLayerZIndex"
+    });
+    //const baseLayer1 = L.tileLayer(config.baseMaps[1].Url, {
+    //pane: "tileLayerZIndex"
+    //});
+    const baseLayer2 = L.tileLayer(config.baseMaps[2].Url, {
+      //pane: "tileLayerZIndex"
+    });
+    historymap.addLayer(baseLayer2);
+    //卷帘地图效果
+    //L.control.sideBySide(baseLayer2, baseLayer).addTo(historymap);
+  };
 
   render() {
     const { showButton, drawGrphic, showHistoryContrast } = this.state;
@@ -1175,6 +1204,9 @@ export default class integrat extends PureComponent {
                   icon="swap"
                   onClick={() => {
                     this.setState({ showHistoryContrast: true });
+                    setTimeout(() => {
+                      this.showHistoryMap();
+                    }, 200);
                   }}
                 />
               </Popover>
@@ -1251,13 +1283,15 @@ export default class integrat extends PureComponent {
                     position: "absolute",
                     top: 10,
                     right: 10,
-                    fontSize: 20
+                    fontSize: 20,
+                    zIndex: 1001
                   }}
                   onClick={() => {
                     this.setState({ showHistoryContrast: false });
                   }}
                 />
                 <div
+                  id="historymap"
                   style={{
                     flex: 1,
                     textAlign: "center",
@@ -1267,9 +1301,9 @@ export default class integrat extends PureComponent {
                 >
                   111
                 </div>
-                <div style={{ flex: 1, textAlign: "center", height: "100%" }}>
+                {/*<div style={{ flex: 1, textAlign: "center", height: "100%" }}>
                   222
-                </div>
+                </div>*/}
               </div>
             </div>
           </div>
