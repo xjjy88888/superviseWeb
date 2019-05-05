@@ -156,62 +156,62 @@ export default class integrat extends PureComponent {
             <p style={{ margin: 10 }}>
               <span>防治标准：</span>
               {/* （一级/二级/三级） */}
-              <span>{projectItem.planInfo.prevenStd.value}</span>
+              <span>{projectItem.expand.prevenStd}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>总投资：</span>
-              <span>{projectItem.planInfo.totalInvest}万元</span>
+              <span>{projectItem.expand.totalInvest}万元</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>土建投资：</span>
-              <span>{projectItem.planInfo.civilEngInvest}万元</span>
+              <span>{projectItem.expand.civilEngInvest}万元</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>项目规模：</span>
-              <span>{projectItem.planInfo.projectSize}</span>
+              <span>{projectItem.expand.projectSize}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>设计动工时间：</span>
-              <span>{projectItem.planInfo.designStartTime.slice(0,10)}</span>
+              <span>{projectItem.expand.designStartTime}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>设计完工时间：</span>
-              <span>{projectItem.planInfo.designCompTime.slice(0,10)}</span>
+              <span>{projectItem.expand.designCompTime}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>实际开工时间：</span>
-              <span>{projectItem.planInfo.actStartTime.slice(0,10)}</span>
+              <span>{projectItem.expand.actStartTime}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>实际完工时间：</span>
-              <span>{projectItem.planInfo.actCompTime.slice(0,10)}</span>
+              <span>{projectItem.expand.actCompTime}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>设计水平年：</span>
-              <span>{projectItem.planInfo.designLevelYear}</span>
+              <span>{projectItem.expand.designLevelYear}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>防治区类型：</span>
               {/* （01：预防保护区、02：重点治理区） */}
-              <span>{projectItem.planInfo.prevenZoneType.value}</span>
+              <span>{projectItem.expand.prevenZoneType}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>防治区级别：</span>
               {/* （国家/省级） */}
-              <span>{projectItem.planInfo.prevenZoneLevel}</span>
+              <span>{projectItem.expand.prevenZoneLevel}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>地貌类型：</span>
               {/* （01：山地、02：丘陵、03：平原） */}
-              <span>{projectItem.planInfo.landType.value}</span>
+              <span>{projectItem.expand.landType}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>土壤类型：</span>
-              <span>{projectItem.planInfo.soilType.value}</span>
+              <span>{projectItem.expand.soilType}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>植被类型：</span>
-              <span>{projectItem.planInfo.vegType.value}</span>
+              <span>{projectItem.expand.vegType}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>——</span>
@@ -219,19 +219,19 @@ export default class integrat extends PureComponent {
             </p>
             <p style={{ margin: 10 }}>
               <span>项目建设区面积：</span>
-              <span>{projectItem.planInfo.consArea}m2</span>
+              <span>{projectItem.expand.consArea}m2</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>直接影响区面积：</span>
-              <span>{projectItem.planInfo.affeArea}m2</span>
+              <span>{projectItem.expand.affeArea}m2</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>扰动地表面积：</span>
-              <span>{projectItem.planInfo.distSurfaceArea}m2</span>
+              <span>{projectItem.expand.distSurfaceArea}m2</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>损坏水土保持设施面积：</span>
-              <span>{projectItem.planInfo.dmgArea}m2</span>
+              <span>{projectItem.expand.dmgArea}m2</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>——</span>
@@ -239,23 +239,23 @@ export default class integrat extends PureComponent {
             </p>
             <p style={{ margin: 10 }}>
               <span>原地貌土壤侵蚀模数：</span>
-              <span>{projectItem.planInfo.landErsn}t/km2*a</span>
+              <span>{projectItem.expand.landErsn}t/km2*a</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>土壤容许流失量：</span>
-              <span>{projectItem.planInfo.soilLoss}t/km2*a</span>
+              <span>{projectItem.expand.soilLoss}t/km2*a</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>水土流失预测总量：</span>
-              <span>{projectItem.planInfo.ersnAmt}t</span>
+              <span>{projectItem.expand.ersnAmt}t</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>新增水土流失量：</span>
-              <span>{projectItem.planInfo.newErsnAmt}t</span>
+              <span>{projectItem.expand.newErsnAmt}t</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>新增水土流失主要区域：</span>
-              <span>{projectItem.planInfo.newArea}</span>
+              <span>{projectItem.expand.newArea}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>——</span>
@@ -265,27 +265,27 @@ export default class integrat extends PureComponent {
           <div style={{ float: "left", width: 350, padding: "0 60px" }}>
             <p style={{ margin: 10 }}>
               <span>扰动土地整治率：</span>
-              <span>{projectItem.planInfo.fixRate}%</span>
+              <span>{projectItem.expand.fixRate}%</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>水土流失总治理度：</span>
-              <span>{projectItem.planInfo.govern}%</span>
+              <span>{projectItem.expand.govern}%</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>土壤流失控制比：</span>
-              <span>{projectItem.planInfo.ctlRatio}%</span>
+              <span>{projectItem.expand.ctlRatio}%</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>拦渣率：</span>
-              <span>{projectItem.planInfo.blkRate}%</span>
+              <span>{projectItem.expand.blkRate}%</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>植被恢复系数：</span>
-              <span>{projectItem.planInfo.vegRec}%</span>
+              <span>{projectItem.expand.vegRec}%</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>林草覆盖率：</span>
-              <span>{projectItem.planInfo.forestGrassCover}%</span>
+              <span>{projectItem.expand.forestGrassCover}%</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>——</span>
@@ -293,39 +293,39 @@ export default class integrat extends PureComponent {
             </p>
             <p style={{ margin: 10 }}>
               <span>水土保持总投资：</span>
-              <span>{projectItem.planInfo.waterSoilTotal}万元</span>
+              <span>{projectItem.expand.waterSoilTotal}万元</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>独立费用：</span>
-              <span>{projectItem.planInfo.idptExp}万元</span>
+              <span>{projectItem.expand.idptExp}万元</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>水土保持监理费：</span>
-              <span>{projectItem.planInfo.waterSoilSupervise}万元</span>
+              <span>{projectItem.expand.waterSoilSupervise}万元</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>水土保持监测费：</span>
-              <span>{projectItem.planInfo.waterSoilDetect}万元</span>
+              <span>{projectItem.expand.waterSoilDetect}万元</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>水土保持补偿费：</span>
-              <span>{projectItem.planInfo.waterSoilCompensate}万元</span>
+              <span>{projectItem.expand.waterSoilCompensate}万元</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>工程措施设计投资：</span>
-              <span>{projectItem.planInfo.EngInvest}万元</span>
+              <span>{projectItem.expand.EngInvest}万元</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>植物措施设计投资：</span>
-              <span>{projectItem.planInfo.vegInvest}万元</span>
+              <span>{projectItem.expand.vegInvest}万元</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>临时措施设计投资：</span>
-              <span>{projectItem.planInfo.temInvest}万元</span>
+              <span>{projectItem.expand.temInvest}万元</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>附件(水保方案)：</span>
-              <span>{projectItem.planInfo.AttachmentId}</span>
+              <span>{projectItem.expand.AttachmentId}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>——</span>
@@ -333,7 +333,7 @@ export default class integrat extends PureComponent {
             </p>
             <p style={{ margin: 10 }}>
               <span>方案编制单位：</span>
-              <span>{projectItem.projectDepartment.name}</span>
+              <span>{projectItem.projectDepartment}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>监测单位：</span>
@@ -341,7 +341,7 @@ export default class integrat extends PureComponent {
             </p>
             <p style={{ margin: 10 }}>
               <span>监理单位：</span>
-              <span>{projectItem.planInfo.SupervisionDepartment}</span>
+              <span>{projectItem.expand.SupervisionDepartment}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>设计单位：</span>
@@ -353,7 +353,7 @@ export default class integrat extends PureComponent {
             </p>
             <p style={{ margin: 10 }}>
               <span>验收报告编制单位：</span>
-              <span>{projectItem.planInfo.ReportDepartment}</span>
+              <span>{projectItem.expand.ReportDepartment}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>——</span>

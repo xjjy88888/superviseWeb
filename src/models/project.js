@@ -20,39 +20,13 @@ export default {
     projectList: { totalCount: 0, items: [] },
     spotList: { totalCount: 0, items: [] },
     projectItem: {
-      projectBaseInfo: { name: "" },
-      productDepartment: { name: "" },
-      replyDepartment: { name: "" },
-      projectDepartment: { name: "" },
-      planInfo: {
-        designStartTime:"",
-        designCompTime:"",
-        actStartTime:"",
-        actCompTime:"",
-        projectCate: {
-          value: ""
-        },
-        projectType: {
-          value: ""
-        },
-        projectNat: {
-          value: ""
-        },
-        prevenStd: {
-          value: ""
-        },
-        prevenZoneType: {
-          value: ""
-        },
-        landType: {
-          value: ""
-        },
-        soilType: {
-          value: ""
-        },
-        vegType: {
-          value: ""
-        }
+      projectBase: { name: "" },
+      // projectDepartment: { name: "" },
+      expand: {
+        designStartTime: "",
+        designCompTime: "",
+        actStartTime: "",
+        actCompTime: ""
       }
     },
     spotItem: {}
@@ -140,7 +114,10 @@ export default {
       if (callback) callback(obj);
     },
     *removeProjectScopeGraphic({ payload, callback }, { call, put }) {
-      const { data: obj } = yield call(removeProjectScopeGraphic, payload.project_id);
+      const { data: obj } = yield call(
+        removeProjectScopeGraphic,
+        payload.project_id
+      );
       notification[obj ? "success" : "error"]({
         message: obj ? "删除项目红线图形成功" : "删除项目红线图形失败"
       });

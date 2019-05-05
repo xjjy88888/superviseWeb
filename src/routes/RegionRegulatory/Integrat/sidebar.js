@@ -55,6 +55,7 @@ const formItemLayout = {
   labelCol: { span: 7 },
   wrapperCol: { span: 16 }
 };
+let scrollTop = 0;
 
 @connect(({ project }) => ({
   project
@@ -110,6 +111,7 @@ export default class integrat extends PureComponent {
   }
 
   componentDidMount() {
+    window.addEventListener("scroll", this.handleScroll);
     this.eventEmitter = emitter.addListener("showCheck", data => {
       this.setState({
         showCheck: data.show
@@ -142,6 +144,10 @@ export default class integrat extends PureComponent {
     this.setState({
       clientHeight: clientHeight
     });
+  }
+
+  handleScroll(e) {
+    console.log(window.scrollY);
   }
 
   getFile = dom => {
@@ -714,17 +720,19 @@ export default class integrat extends PureComponent {
               zIndex: 1001
             }}
           />
-          <Table
-            style={{
-              overflow: "auto",
-              height: clientHeight ? clientHeight - 202 : 500,
-              width: 350,
-            }}
-            rowSelection={showCheck ? rowSelectionTable : null}
-            columns={columnsTable}
-            dataSource={dataSourceTable}
-            pagination={false}
-          />
+          <div onScroll={this.handleScroll}>
+            <Table
+              style={{
+                overflow: "auto",
+                height: clientHeight ? clientHeight - 202 : 500,
+                width: 350
+              }}
+              rowSelection={showCheck ? rowSelectionTable : null}
+              columns={columnsTable}
+              dataSource={dataSourceTable}
+              pagination={false}
+            />
+          </div>
           {/* <List
             style={{
               overflow: "auto",
@@ -1129,7 +1137,7 @@ export default class integrat extends PureComponent {
               }}
             >
               <p>
-                <b>{projectItem.projectBaseInfo.name}</b>
+                <b>{projectItem.projectBase.name}</b>
               </p>
               <p
                 style={{
@@ -1141,11 +1149,11 @@ export default class integrat extends PureComponent {
               >
                 <span>位置：</span>
                 <span>
-                  {projectItem.projectBaseInfo.provinceCode}
-                  {projectItem.projectBaseInfo.cityCode}
-                  {projectItem.projectBaseInfo.districtCode}
-                  {projectItem.projectBaseInfo.town}
-                  {projectItem.projectBaseInfo.village}
+                  {projectItem.projectBase.provinceCode}
+                  {projectItem.projectBase.cityCode}
+                  {projectItem.projectBase.districtCode}
+                  {projectItem.projectBase.town}
+                  {projectItem.projectBase.village}
                 </span>
               </p>
 
@@ -1167,7 +1175,7 @@ export default class integrat extends PureComponent {
                     >
                       <p style={{ marginBottom: 10 }}>
                         <span>建设单位：</span>
-                        <span>{projectItem.productDepartment.name}</span>
+                        <span>{projectItem.productDepartment}</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>监管单位：</span>
@@ -1175,7 +1183,7 @@ export default class integrat extends PureComponent {
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>批复机构：</span>
-                        <span>{projectItem.replyDepartment.name}</span>
+                        <span>{projectItem.replyDepartment}</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>流域管理机构：</span>
@@ -1204,11 +1212,11 @@ export default class integrat extends PureComponent {
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>项目类别：</span>
-                        <span>{projectItem.planInfo.projectCate.value}</span>
+                        <span>{projectItem.expand.projectCate}</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>项目类型：</span>
-                        <span>{projectItem.planInfo.projectType.value}</span>
+                        <span>{projectItem.expand.projectType}</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>建设状态：</span>
@@ -1216,7 +1224,7 @@ export default class integrat extends PureComponent {
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>项目性质：</span>
-                        <span>{projectItem.planInfo.projectNat.value}</span>
+                        <span>{projectItem.expand.projectNat}</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>涉及县：</span>
@@ -2075,7 +2083,7 @@ export default class integrat extends PureComponent {
               <Form style={{ position: "relative", paddingBottom: 10 }}>
                 <Form.Item label="项目名" {...formItemLayout}>
                   {getFieldDecorator("project_name1", {
-                    initialValue: projectItem.projectBaseInfo.name
+                    initialValue: projectItem.projectBase.name
                   })(<Input.TextArea autosize />)}
                 </Form.Item>
                 <Form.Item label="所在地区" {...formItemLayout}>

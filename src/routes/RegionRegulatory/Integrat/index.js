@@ -61,7 +61,8 @@ export default class integrat extends PureComponent {
       showQuery: false,
       drawGrphic: "edit",
       project_id: null, //针对新增图形的项目红线id
-      addGraphLayer: null //针对新增图形的图层
+      addGraphLayer: null, //针对新增图形的图层
+      historymap:null//卷帘地图
     };
     this.map = null;
     this.saveRef = v => {
@@ -605,9 +606,9 @@ export default class integrat extends PureComponent {
             }
           }
           map.openPopup(content, userconfig.mapPoint);
-          me.automaticToMap(
+          /*me.automaticToMap(
             userconfig.projectgeojsonLayer.getBounds().getCenter()
-          );
+          );*/
         }
       }
     });
@@ -1087,26 +1088,22 @@ export default class integrat extends PureComponent {
    * 地图历史对比-卷帘效果
    */
   showHistoryMap = () => {
-    const historymap = L.map("historymap", {
-      zoomControl: false,
-      attributionControl: false
-      //editable: true
-    }).setView(config.mapInitParams.center, config.mapInitParams.zoom);
-
-    //map.createPane("tileLayerZIndex");
-    //map.getPane("tileLayerZIndex").style.zIndex = 0;
-    const baseLayer = L.tileLayer(config.baseMaps[0].Url, {
-      //pane: "tileLayerZIndex"
-    });
-    //const baseLayer1 = L.tileLayer(config.baseMaps[1].Url, {
-    //pane: "tileLayerZIndex"
-    //});
-    const baseLayer2 = L.tileLayer(config.baseMaps[2].Url, {
-      //pane: "tileLayerZIndex"
-    });
-    historymap.addLayer(baseLayer2);
-    //卷帘地图效果
-    //L.control.sideBySide(baseLayer2, baseLayer).addTo(historymap);
+    const { historymap } = this.state;
+    if(!historymap){
+      //map.remove()
+      const map = L.map("historymap", {
+        zoomControl: false,
+        attributionControl: false
+      }).setView(config.mapInitParams.center, config.mapInitParams.zoom);
+      const baseLayer = L.tileLayer(config.baseMaps[0].Url);
+      const baseLayer1 = L.tileLayer(config.baseMaps[1].Url);
+      //const baseLayer2 = L.tileLayer(config.baseMaps[2].Url);
+      map.addLayer(baseLayer);
+      map.addLayer(baseLayer1);
+      //卷帘地图效果
+      L.control.sideBySide(baseLayer1, baseLayer).addTo(map);
+      this.setState({ historymap: map });
+    }
   };
 
   render() {
