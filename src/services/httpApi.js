@@ -28,10 +28,13 @@ export async function loginApi(params) {
 // }
 
 // 项目列表
-export async function projectListApi(params) {
-  return request(`${config.url.projectListUrl}?MaxResultCount=10&SkipCount=0`, {
-    method: "GET"
-  });
+export async function projectListApi(row) {
+  return request(
+    `${config.url.projectListUrl}?MaxResultCount=${row}&SkipCount=0`,
+    {
+      method: "GET"
+    }
+  );
 }
 
 // 项目id查询项目信息
@@ -42,8 +45,8 @@ export async function projectByIdApi(id) {
 }
 
 // 图斑列表
-export async function spotListApi(params) {
-  return request(`${config.url.spotListUrl}?MaxResultCount=10&SkipCount=0`, {
+export async function spotListApi(row) {
+  return request(`${config.url.spotListUrl}?MaxResultCount=${row}&SkipCount=0`, {
     method: "GET"
   });
 }
@@ -67,22 +70,16 @@ export async function updateSpotGraphic(params) {
 
 //新增扰动图斑图形信息
 export async function addSpotGraphic(params) {
-  return request(
-    `${config.url.addSpotGraphic}?obj=${JSON.stringify(params)}`,
-    {
-      method: "GET"
-    }
-  );
+  return request(`${config.url.addSpotGraphic}?obj=${JSON.stringify(params)}`, {
+    method: "GET"
+  });
 }
 
 //删除扰动图斑图形信息
 export async function removeSpotGraphic(spot_tbid) {
-  return request(
-    `${config.url.removeSpotGraphic}?spot_tbid=${spot_tbid}`,
-    {
-      method: "GET"
-    }
-  );
+  return request(`${config.url.removeSpotGraphic}?spot_tbid=${spot_tbid}`, {
+    method: "GET"
+  });
 }
 
 //编辑项目红线图形信息

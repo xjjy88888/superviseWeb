@@ -73,6 +73,8 @@ export default class integrat extends PureComponent {
       showProblem: false,
       showCheck: false,
       checked: false,
+      row_pro: 10,
+      row_spot: 10,
       key: "project",
       inputDisabled: true,
       select: [],
@@ -105,13 +107,14 @@ export default class integrat extends PureComponent {
       ]
     };
     this.map = null;
-    this.saveRef = ref => {
-      this.refDom = ref;
-    };
   }
 
   componentDidMount() {
-    window.addEventListener("scroll", this.handleScroll);
+    if (this.scrollDom) {
+      this.scrollDom.addEventListener("scroll", () => {
+        this.onScroll(this);
+      });
+    }
     this.eventEmitter = emitter.addListener("showCheck", data => {
       this.setState({
         showCheck: data.show
@@ -127,27 +130,36 @@ export default class integrat extends PureComponent {
       }
     });
     this.eventEmitter = emitter.addListener("polygon", data => {
-      this.props.dispatch({
-        type: "project/queryProject",
-        payload: {
-          polygon: data.polygon
-        }
-      });
-      this.props.dispatch({
-        type: "project/querySpot",
-        payload: {
-          polygon: data.polygon
-        }
-      });
+      this.queryProject(10);
+      this.querySpot(10);
     });
     const { clientWidth, clientHeight } = this.refDom;
     this.setState({
       clientHeight: clientHeight
     });
   }
+  componentWillUnmount() {
+    if (this.scrollDom) {
+      this.scrollDom.removeEventListener("scroll", () => {
+        this.onScroll(this);
+      });
+    }
+  }
 
-  handleScroll(e) {
-    console.log(window.scrollY);
+  onScroll() {
+    const { clientHeight, scrollHeight, scrollTop } = this.scrollDom;
+    const { row_pro, row_spot, key } = this.state;
+    const isBottom = clientHeight + scrollTop === scrollHeight;
+    console.log(clientHeight, scrollHeight, scrollTop, isBottom);
+    if (isBottom) {
+      if (key === "project") {
+        this.queryProject(row_pro + 10);
+        this.setState({ row_pro: row_pro + 10 });
+      } else {
+        this.querySpot(row_spot + 10);
+        this.setState({ row_spot: row_spot + 10 });
+      }
+    }
   }
 
   getFile = dom => {
@@ -188,6 +200,26 @@ export default class integrat extends PureComponent {
       type: "project/queryProjectById",
       payload: {
         id: id
+      }
+    });
+  };
+
+  queryProject = row => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "project/queryProject",
+      payload: {
+        row: row
+      }
+    });
+  };
+
+  querySpot = row => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "project/querySpot",
+      payload: {
+        row: row
       }
     });
   };
@@ -438,7 +470,7 @@ export default class integrat extends PureComponent {
             <span>
               共有
               {key === "project" ? projectList.totalCount : spotList.totalCount}
-              条记录
+              条
             </span>
 
             <Button
@@ -561,7 +593,7 @@ export default class integrat extends PureComponent {
           zIndex: 1001,
           height: "100%"
         }}
-        ref={this.saveRef}
+        ref={e => (this.refDom = e)}
       >
         <img
           src="./img/logo2.jpg"
@@ -720,13 +752,15 @@ export default class integrat extends PureComponent {
               zIndex: 1001
             }}
           />
-          <div onScroll={this.handleScroll}>
+          <div
+            ref={e => (this.scrollDom = e)}
+            style={{
+              overflow: "auto",
+              height: clientHeight ? clientHeight - 202 : 500,
+              width: 350
+            }}
+          >
             <Table
-              style={{
-                overflow: "auto",
-                height: clientHeight ? clientHeight - 202 : 500,
-                width: 350
-              }}
               rowSelection={showCheck ? rowSelectionTable : null}
               columns={columnsTable}
               dataSource={dataSourceTable}

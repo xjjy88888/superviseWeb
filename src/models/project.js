@@ -40,7 +40,7 @@ export default {
     *queryProject({ payload }, { call, put }) {
       const {
         data: { result: projectList }
-      } = yield call(projectListApi, payload);
+      } = yield call(projectListApi, payload.row);
       yield put({ type: "save", payload: { projectList } });
     },
     *queryProjectById({ payload, callback }, { call, put }) {
@@ -57,7 +57,7 @@ export default {
     *querySpot({ payload }, { call, put }) {
       const {
         data: { result: spotList }
-      } = yield call(spotListApi, payload);
+      } = yield call(spotListApi, payload.row);
       yield put({ type: "save", payload: { spotList } });
     },
     *querySpotById({ payload, callback }, { call, put }) {

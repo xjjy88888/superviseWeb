@@ -412,7 +412,7 @@ export default class integrat extends PureComponent {
     const baseLayer2 = L.tileLayer(config.baseMaps[2].Url, {
       pane: "tileLayerZIndex"
     });
-    map.addLayer(baseLayer);
+    //map.addLayer(baseLayer);
     map.addLayer(baseLayer1);
     userconfig.baseLayers = {
       监管影像: baseLayer2,
@@ -420,7 +420,7 @@ export default class integrat extends PureComponent {
       影像图: baseLayer1
     };
     //卷帘地图效果
-    L.control.sideBySide(baseLayer1, baseLayer).addTo(map);
+    //L.control.sideBySide(baseLayer1, baseLayer).addTo(map);
     //监听地图点击事件
     map.on("click", me.onClickMap);
     //监听地图移动完成事件
@@ -1268,8 +1268,8 @@ export default class integrat extends PureComponent {
                   position: "absolute",
                   left: "50%",
                   top: "50%",
-                  width: "80vw",
-                  height: "80vh",
+                  width: "85vw",
+                  height: "85vh",
                   background: "#fff",
                   transform: "translate(-50%,-50%)",
                 }}
