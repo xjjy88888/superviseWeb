@@ -8,6 +8,7 @@ import {
   Switch,
   Popover,
   Modal,
+  Select,
   message
 } from "antd";
 import zhCN from "antd/lib/locale-provider/zh_CN";
@@ -1095,15 +1096,27 @@ export default class integrat extends PureComponent {
         zoomControl: false,
         attributionControl: false
       }).setView(config.mapInitParams.center, config.mapInitParams.zoom);
-      const baseLayer = L.tileLayer(config.baseMaps[0].Url);
-      const baseLayer1 = L.tileLayer(config.baseMaps[1].Url);
-      //const baseLayer2 = L.tileLayer(config.baseMaps[2].Url);
+      const baseLayer = L.tileLayer(config.baseMaps[0].Url); //街道图
+      const baseLayer1 = L.tileLayer(config.baseMaps[1].Url); //影像图
+      const baseLayer2 = L.tileLayer(config.baseMaps[2].Url); //监管影像
+      map.addLayer(baseLayer2);
       map.addLayer(baseLayer);
       map.addLayer(baseLayer1);
       //卷帘地图效果
       L.control.sideBySide(baseLayer1, baseLayer).addTo(map);
       this.setState({ historymap: map });
+      setTimeout(() => {
+        //map.removeLayer(baseLayer1);
+        //map.addLayer(baseLayer2);
+      }, 1500);
     }
+  };
+
+  onChangeSelectLeft = v => {
+    console.log(v);
+  };
+  onChangeSelectRight = v => {
+    console.log(v);
   };
 
   render() {
@@ -1271,7 +1284,7 @@ export default class integrat extends PureComponent {
                   width: "85vw",
                   height: "85vh",
                   background: "#fff",
-                  transform: "translate(-50%,-50%)",
+                  transform: "translate(-50%,-50%)"
                 }}
               >
                 <Icon
@@ -1287,6 +1300,35 @@ export default class integrat extends PureComponent {
                     this.setState({ showHistoryContrast: false });
                   }}
                 />
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 20,
+                    left: 20,
+                    zIndex: 1001
+                  }}
+                >
+                  <Select defaultValue="111" onChange={this.onChangeSelectLeft}>
+                    <Select.Option value="111">一一一</Select.Option>
+                    <Select.Option value="222">二二二</Select.Option>
+                  </Select>
+                </div>
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 20,
+                    right: 40,
+                    zIndex: 1001
+                  }}
+                >
+                  <Select
+                    defaultValue="111"
+                    onChange={this.onChangeSelectRight}
+                  >
+                    <Select.Option value="111">一一一</Select.Option>
+                    <Select.Option value="222">二二二</Select.Option>
+                  </Select>
+                </div>
               </div>
             </div>
           </div>
