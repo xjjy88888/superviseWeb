@@ -165,17 +165,20 @@ export default class integrat extends PureComponent {
       row_spot,
       key,
       query_pro_ProjectName,
-      ProductDepartment,
       queryInfo
     } = this.state;
     const { clientHeight, scrollHeight, scrollTop } = this.scrollDom;
-    const isBottom = clientHeight + scrollTop === scrollHeight;
+    const isBottom = clientHeight + parseInt(scrollTop, 0) + 1 >= scrollHeight;
     const {
-      dispatch,
       project: { projectList, projectItem },
       spot: { spotList }
     } = this.props;
-    console.log(clientHeight, scrollHeight, scrollTop, isBottom);
+    console.log(
+      clientHeight,
+      scrollHeight,
+      parseInt(scrollTop, 0) + 1,
+      isBottom
+    );
     if (isBottom) {
       if (key === "project") {
         const len = projectList.totalCount;
