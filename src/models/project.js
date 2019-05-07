@@ -35,13 +35,18 @@ export default {
     // 项目列表
     *queryProject({ payload }, { call, put }) {
       const {
-        data: { result: projectList }
-      } = yield call(projectListApi, payload.row);
+        data: { success, result: projectList }
+      } = yield call(projectListApi, payload);
       const data = {
         items: [...payload.items, ...projectList.items],
         totalCount: projectList.totalCount
       };
       yield put({ type: "save", payload: { projectList: data } });
+      if (payload.from === "query") {
+        notification[success ? "success" : "error"]({
+          message: success ? "查询项目成功" : "查询项目失败"
+        });
+      }
     },
 
     // id查询项目
@@ -50,7 +55,7 @@ export default {
         data: { success, result }
       } = yield call(projectByIdApi, payload.id);
       notification[success ? "success" : "error"]({
-        message: success ? "查询项目成功" : "查询项目失败"
+        message: success ? "查询项目信息成功" : "查询项目信息失败"
       });
       if (success) {
         yield put({ type: "save", payload: { projectItem: result } });

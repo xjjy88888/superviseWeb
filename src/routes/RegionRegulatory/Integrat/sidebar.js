@@ -70,6 +70,7 @@ export default class integrat extends PureComponent {
       row_pro: 10,
       row_spot: 10,
       key: "project",
+      query_pro_ProjectName: "",
       inputDisabled: true,
       select: [],
       problem: { title: "", records: [] },
@@ -129,7 +130,7 @@ export default class integrat extends PureComponent {
       }
     });
     this.eventEmitter = emitter.addListener("polygon", data => {
-      this.queryProject(10);
+      this.queryProject({ row: 10 });
       this.querySpot(10);
     });
     const { clientHeight } = this.refDom;
@@ -147,12 +148,15 @@ export default class integrat extends PureComponent {
 
   onScroll() {
     const { clientHeight, scrollHeight, scrollTop } = this.scrollDom;
-    const { row_pro, row_spot, key } = this.state;
+    const { row_pro, row_spot, key, query_pro_ProjectName } = this.state;
     const isBottom = clientHeight + scrollTop === scrollHeight;
     console.log(clientHeight, scrollHeight, scrollTop, isBottom);
     if (isBottom) {
       if (key === "project") {
-        this.queryProject(row_pro + 10);
+        this.queryProject({
+          row: row_pro + 10,
+          ProjectName: query_pro_ProjectName
+        });
         this.setState({ row_pro: row_pro + 10 });
       } else {
         this.querySpot(row_spot + 10);
@@ -212,7 +216,7 @@ export default class integrat extends PureComponent {
     });
   };
 
-  queryProject = row => {
+  queryProject = items => {
     const {
       dispatch,
       project: { projectList }
@@ -220,8 +224,10 @@ export default class integrat extends PureComponent {
     dispatch({
       type: "project/queryProject",
       payload: {
-        row: row,
-        items: row === 10 ? [] : projectList.items
+        from: items.from,
+        ProjectName: items.ProjectName,
+        row: items.row,
+        items: items.row === 10 ? [] : projectList.items
       }
     });
   };
@@ -650,15 +656,8 @@ export default class integrat extends PureComponent {
             allowClear
             placeholder={`${placeholder}名`}
             onSearch={v => {
-              if (v) {
-                notification["success"]({
-                  message: `查询${v}成功！`
-                });
-              } else {
-                notification["warning"]({
-                  message: "请输入查询信息！"
-                });
-              }
+              this.setState({ query_pro_ProjectName: v, row_pro: 10 });
+              this.queryProject({ row: 10, ProjectName: v, from: "query" });
             }}
             style={{ padding: "20px 20px", width: 300 }}
             enterButton

@@ -15,9 +15,11 @@ export async function loginApi(params) {
 }
 
 // 项目列表
-export async function projectListApi(row) {
+export async function projectListApi(params) {
+  const ProjectName = params.ProjectName || "";
   return request(
-    `${config.url.projectListUrl}?MaxResultCount=10&SkipCount=${row - 10}`,
+    `${config.url.projectListUrl}?MaxResultCount=10&SkipCount=${params.row -
+      10}&ProjectName=${ProjectName}`,
     {
       method: "GET"
     }
