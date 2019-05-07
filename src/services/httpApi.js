@@ -1,6 +1,7 @@
 import config from "../config";
 import request from "../utils/request";
 import CryptoJS from "crypto-js";
+import { dateFormat } from "../utils/util";
 
 // 登录
 export async function loginApi(params) {
@@ -16,10 +17,47 @@ export async function loginApi(params) {
 
 // 项目列表
 export async function projectListApi(params) {
-  const ProjectName = params.ProjectName || "";
   return request(
     `${config.url.projectListUrl}?MaxResultCount=10&SkipCount=${params.row -
-      10}&ProjectName=${ProjectName}`,
+      10}` +
+      `&ProjectName=${params.ProjectName || ""}` +
+      `&SupDepartment=${params.SupDepartment || ""}` +
+      `&ReplyDepartment=${params.ReplyDepartment || ""}` +
+      `&ReplyNum=${params.ReplyNum || ""}` +
+      `&ProductDepartment=${params.ProductDepartment || ""}` +
+      `&ProjectCate=${
+        params.ProjectCate ? params.ProjectCate.map(v => v).join(",") : ""
+      }` +
+      `&ProjectNat=${
+        params.ProjectNat ? params.ProjectNat.map(v => v).join(",") : ""
+      }` +
+      `&ProjectStatus=${
+        params.ProjectStatus ? params.ProjectStatus.map(v => v).join(",") : ""
+      }` +
+      `&vectorization_type=${
+        params.vectorization_type
+          ? params.vectorization_type.map(v => v).join(",")
+          : ""
+      }` +
+      `&ProjectType=${
+        params.ProjectType ? params.ProjectType.map(v => v).join(",") : ""
+      }` +
+      `&Compliance=${
+        params.Compliance ? params.Compliance.map(v => v).join(",") : ""
+      }` +
+      `&ReplyTimeBegin=${
+        params.ReplyTime && params.ReplyTime.length
+          ? dateFormat(params.ReplyTime[0]._d)
+          : ""
+      }` +
+      `&ReplyTimeEnd=${
+        params.ReplyTime && params.ReplyTime.length
+          ? dateFormat(params.ReplyTime[1]._d)
+          : ""
+      }` +
+      `&ProjectLevel=${
+        params.ProjectLevel ? params.ProjectLevel.map(v => v).join(",") : ""
+      }`,
     {
       method: "GET"
     }

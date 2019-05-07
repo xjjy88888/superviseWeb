@@ -1,16 +1,11 @@
 import moment from "moment";
 
-const dateFormat = value => {
-  return value ? moment(parseInt(value, 0)).format("YYYY-MM-DD") : "";
+const dateFormat = v => {
+  return v ? moment(new Date(v).getTime()).format("YYYY-MM-DD") : "";
 };
 
-const dateTimeFormat = value => {
-  return value ? moment(parseInt(value, 0)).format("YYYY-MM-DD HH:mm:ss") : "";
+const dateTimeFormat = v => {
+  return v ? moment(new Date(v).getTime()).format("YYYY-MM-DD HH:mm:ss") : "";
 };
 
-const numberFormat = (value, e) => {
-  const times = e ? 10 ** e : 1;
-  return Math.round(value * times) / times;
-};
-
-export { numberFormat, dateFormat, dateTimeFormat };
+export { dateFormat, dateTimeFormat };

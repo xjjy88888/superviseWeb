@@ -71,6 +71,7 @@ export default class integrat extends PureComponent {
       row_spot: 10,
       key: "project",
       query_pro_ProjectName: "",
+      queryInfo: {},
       inputDisabled: true,
       select: [],
       problem: { title: "", records: [] },
@@ -110,6 +111,18 @@ export default class integrat extends PureComponent {
         show: data.show
       });
     });
+    this.eventEmitter = emitter.addListener("queryInfo", data => {
+      const { row_pro, row_spot, key, query_pro_ProjectName } = this.state;
+      if (data.from === "project") {
+        this.setState({ queryInfo: data.info, row_pro: 10 });
+        console.log(query_pro_ProjectName);
+        this.queryProject({
+          ...data.info,
+          row: 10,
+          ProjectName: query_pro_ProjectName
+        });
+      }
+    });
     if (this.scrollDom) {
       this.scrollDom.addEventListener("scroll", () => {
         this.onScroll(this);
@@ -147,17 +160,34 @@ export default class integrat extends PureComponent {
   }
 
   onScroll() {
+    const {
+      row_pro,
+      row_spot,
+      key,
+      query_pro_ProjectName,
+      ProductDepartment,
+      queryInfo
+    } = this.state;
     const { clientHeight, scrollHeight, scrollTop } = this.scrollDom;
-    const { row_pro, row_spot, key, query_pro_ProjectName } = this.state;
     const isBottom = clientHeight + scrollTop === scrollHeight;
+    const {
+      dispatch,
+      project: { projectList, projectItem },
+      spot: { spotList }
+    } = this.props;
     console.log(clientHeight, scrollHeight, scrollTop, isBottom);
     if (isBottom) {
       if (key === "project") {
-        this.queryProject({
-          row: row_pro + 10,
-          ProjectName: query_pro_ProjectName
-        });
-        this.setState({ row_pro: row_pro + 10 });
+        const len = projectList.totalCount;
+        if (row_pro < len) {
+          const new_row = row_pro + 10 > len ? len : row_pro + 10;
+          this.queryProject({
+            ...queryInfo,
+            row: new_row,
+            ProjectName: query_pro_ProjectName
+          });
+          this.setState({ row_pro: new_row });
+        }
       } else {
         this.querySpot(row_spot + 10);
         this.setState({ row_spot: row_spot + 10 });
@@ -224,9 +254,7 @@ export default class integrat extends PureComponent {
     dispatch({
       type: "project/queryProject",
       payload: {
-        from: items.from,
-        ProjectName: items.ProjectName,
-        row: items.row,
+        ...items,
         items: items.row === 10 ? [] : projectList.items
       }
     });
@@ -448,7 +476,8 @@ export default class integrat extends PureComponent {
       checked,
       problem,
       row_pro,
-      row_spot
+      row_spot,
+      queryInfo
     } = this.state;
     const {
       dispatch,
@@ -486,7 +515,15 @@ export default class integrat extends PureComponent {
         title: (
           <span>
             <span>
-              有{key === "project" ? row_pro : row_spot}/
+              有
+              {key === "project"
+                ? row_pro < projectList.totalCount
+                  ? row_pro
+                  : projectList.totalCount
+                : row_spot < spotList.totalCount
+                ? row_spot
+                : spotList.totalCount}
+              /
               {key === "project" ? projectList.totalCount : spotList.totalCount}
               条
             </span>
@@ -657,7 +694,12 @@ export default class integrat extends PureComponent {
             placeholder={`${placeholder}名`}
             onSearch={v => {
               this.setState({ query_pro_ProjectName: v, row_pro: 10 });
-              this.queryProject({ row: 10, ProjectName: v, from: "query" });
+              this.queryProject({
+                ...queryInfo,
+                row: 10,
+                ProjectName: v,
+                from: "query"
+              });
             }}
             style={{ padding: "20px 20px", width: 300 }}
             enterButton
@@ -728,7 +770,7 @@ export default class integrat extends PureComponent {
           </Button>
           <Spin
             style={{
-              display: projectList.totalCount === 0 ? "block" : "none",
+              display: projectList.totalCount === "" ? "block" : "none",
               padding: 100,
               position: "absolute",
               top: 300,

@@ -159,22 +159,19 @@ export default class integrat extends PureComponent {
     });
     //照片定位
     this.eventEmitter = emitter.addListener("imgLocation", data => {
-      if(data.show){
+      if (data.show) {
         let latLng = [data.Latitude, data.Longitude];
         let myIcon = L.icon({
           iconUrl: "./img/north.png",
           iconSize: [60, 60]
         });
-        if(marker)
-           marker.remove();
+        if (marker) marker.remove();
         marker = L.marker(latLng, { icon: myIcon }).addTo(map);
         //marker = L.marker(latLng).addTo(map);
         //direction 方位角
         me.automaticToMap(latLng);
-      }
-      else{
-        if(marker)
-           marker.remove();
+      } else {
+        if (marker) marker.remove();
       }
     });
     //绘制扰动图斑图形
@@ -351,7 +348,7 @@ export default class integrat extends PureComponent {
    * 根据方位角获取对应的图片
    */
   getPicByAzimuth = azimuth => {
-     let east,south,west,north;
+    let east, south, west, north;
   };
   /*
    * 自动匹配地图偏移
@@ -1101,12 +1098,9 @@ export default class integrat extends PureComponent {
    * 地图历史对比-卷帘效果
    */
   showHistoryMap = () => {
-    const { historymap,showHistoryContrast } = this.state;
-    if(showHistoryContrast){
-
-    }
-    else{
-
+    const { historymap, showHistoryContrast } = this.state;
+    if (showHistoryContrast) {
+    } else {
     }
     if (!historymap) {
       const map = (userconfig.leftrightMap = L.map("historymap", {

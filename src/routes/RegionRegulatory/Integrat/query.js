@@ -22,6 +22,7 @@ import {
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
 import config from "../../../config";
+import moment from "moment";
 
 const CheckboxGroup = Checkbox.Group;
 const RadioGroup = Radio.Group;
@@ -48,7 +49,7 @@ const marks = {
 export default class siderbarDetail extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = { show: false, type: "spot", dataSource: [] };
+    this.state = { show: false, type: "project", dataSource: [] };
     this.saveRef = ref => {
       this.refDom = ref;
     };
@@ -143,25 +144,62 @@ export default class siderbarDetail extends PureComponent {
             });
           }}
         />
+        <div
+          style={{
+            position: "absolute",
+            color: "#1890ff",
+            right: 66,
+            top: 42,
+            width: "78%",
+            height: 62,
+            zIndex: 1
+          }}
+        >
+          <Button
+            icon="undo"
+            style={{ margin: "20px 60px 0px 75px" }}
+            onClick={() => {
+              this.props.form.resetFields();
+            }}
+          >
+            重置
+          </Button>
+          <Button
+            icon="search"
+            onClick={() => {
+              this.props.form.validateFields((err, v) => {
+                if (!err) {
+                  console.log("筛选信息", v);
+                  emitter.emit("queryInfo", {
+                    from: type,
+                    info: v
+                  });
+                }
+              });
+            }}
+          >
+            查询
+          </Button>
+        </div>
+
         <Button
           type="dashed"
-          icon="check"
+          icon="close"
           shape="circle"
           style={{
             position: "absolute",
             color: "#1890ff",
-            right: 20,
-            top: 10
+            right: 25,
+            top: 60
           }}
           onClick={() => {
-            message.success(`筛选成功！`);
             this.setState({ show: false });
           }}
         />
         <div
           style={{
             display: type === "project" ? "block" : "none",
-            padding: "30px 0",
+            padding: "60px 0 10px 0",
             overflow: "auto",
             height: "100%"
           }}
@@ -175,73 +213,80 @@ export default class siderbarDetail extends PureComponent {
               />
             </Form.Item>
             <Form.Item label="建设单位" {...formItemLayout}>
-              <AutoComplete
-                dataSource={dataSource.map(this.renderOption)}
-                onSearch={this.handleSearch}
-                optionLabelProp="text"
-                placeholder="请填写建设单位"
-              />
+              {getFieldDecorator("ProductDepartment", { initialValue: "" })(
+                <Input placeholder="请填写建设单位" allowClear />
+              )}
             </Form.Item>
             <Form.Item label="监管单位" {...formItemLayout}>
-              <AutoComplete
-                dataSource={dataSource.map(this.renderOption)}
-                onSearch={this.handleSearch}
-                optionLabelProp="text"
-                placeholder="请填写监管单位"
-              />
+              {getFieldDecorator("SupDepartment", { initialValue: "" })(
+                <Input placeholder="请填写监管单位" allowClear />
+              )}
             </Form.Item>
             <Form.Item label="立项级别" {...formItemLayoutlong}>
-              <CheckboxGroup options={config.approval_level} />
+              {getFieldDecorator("ProjectLevel", { initialValue: [] })(
+                <CheckboxGroup options={config.approval_level} />
+              )}
             </Form.Item>
             <Form.Item label="批复机构" {...formItemLayout}>
-              <AutoComplete
-                dataSource={dataSource.map(this.renderOption)}
-                onSearch={this.handleSearch}
-                optionLabelProp="text"
-                placeholder="请填写批复机构"
-              />
+              {getFieldDecorator("ReplyDepartment", { initialValue: "" })(
+                <Input placeholder="请填写批复机构" allowClear />
+              )}
             </Form.Item>
             <Form.Item label="批复文号" {...formItemLayout}>
-              <Input placeholder="请填写批复文号" />
+              {getFieldDecorator("ReplyNum", { initialValue: "" })(
+                <Input placeholder="请填写批复文号" allowClear />
+              )}
             </Form.Item>
             <Form.Item label="批复时间" {...formItemLayout}>
-              <RangePicker style={{ width: "100%" }} />
+              {getFieldDecorator("ReplyTime", { initialValue: [] })(
+                <RangePicker style={{ width: "100%" }} />
+              )}
             </Form.Item>
             <Form.Item label="项目类型" {...formItemLayout}>
-              <Select
-                mode="multiple"
-                style={{ width: "100%" }}
-                placeholder="请选择项目类型"
-                onChange={() => {}}
-              >
-                {config.project_type.map(item => (
-                  <Select.Option key={item}>{item}</Select.Option>
-                ))}
-              </Select>
+              {getFieldDecorator("ProjectType", { initialValue: [] })(
+                <Select
+                  mode="multiple"
+                  style={{ width: "100%" }}
+                  placeholder="请选择项目类型"
+                >
+                  {config.project_type.map(item => (
+                    <Select.Option key={item}>{item}</Select.Option>
+                  ))}
+                </Select>
+              )}
             </Form.Item>
             <Form.Item label="项目类别" {...formItemLayout}>
-              <CheckboxGroup options={config.project_category} />
+              {getFieldDecorator("ProjectCate", { initialValue: [] })(
+                <CheckboxGroup options={config.project_category} />
+              )}
             </Form.Item>
             <Form.Item label="项目性质" {...formItemLayoutlong}>
-              <CheckboxGroup options={config.project_nature} />
+              {getFieldDecorator("ProjectNat", { initialValue: [] })(
+                <CheckboxGroup options={config.project_nature} />
+              )}
             </Form.Item>
             <Form.Item label="建设状态" {...formItemLayoutlong}>
-              <CheckboxGroup options={config.construct_state} />
+              {getFieldDecorator("ProjectStatus", { initialValue: [] })(
+                <CheckboxGroup options={config.construct_state} />
+              )}
             </Form.Item>
             <Form.Item label="项目合规性" {...formItemLayout}>
-              <Select
-                mode="multiple"
-                style={{ width: "100%" }}
-                placeholder="请选择项目合规性"
-                onChange={() => {}}
-              >
-                {config.compliance.map(item => (
-                  <Select.Option key={item}>{item}</Select.Option>
-                ))}
-              </Select>
+              {getFieldDecorator("Compliance", { initialValue: [] })(
+                <Select
+                  mode="multiple"
+                  style={{ width: "100%" }}
+                  placeholder="请选择项目合规性"
+                >
+                  {config.compliance.map(item => (
+                    <Select.Option key={item}>{item}</Select.Option>
+                  ))}
+                </Select>
+              )}
             </Form.Item>
             <Form.Item label="矢量化类型" {...formItemLayoutlong}>
-              <CheckboxGroup options={config.vectorization_type} />
+              {getFieldDecorator("vectorization_type", { initialValue: [] })(
+                <CheckboxGroup options={config.vectorization_type} />
+              )}
             </Form.Item>
             <Form.Item label="显示归档数据" {...formItemLayoutlong}>
               <Switch checkedChildren="是" unCheckedChildren="否" />

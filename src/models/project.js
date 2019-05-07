@@ -15,7 +15,7 @@ export default {
   namespace: "project",
 
   state: {
-    projectList: { totalCount: 0, items: [] },
+    projectList: { totalCount: "", items: [] },
     projectItem: {
       projectBase: { name: "" },
       expand: {
