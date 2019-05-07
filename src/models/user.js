@@ -1,6 +1,14 @@
 import { loginApi } from "../services/httpApi";
 import { routerRedux } from "dva/router";
-import { Form, Icon, Input, Button, Checkbox, message } from "antd";
+import {
+  Form,
+  Icon,
+  Input,
+  Button,
+  Checkbox,
+  message,
+  notification
+} from "antd";
 
 export default {
   namespace: "user",
@@ -19,22 +27,24 @@ export default {
 
   effects: {
     *fetch({ payload }, { call, put }) {
-      // eslint-disable-line
       yield put({ type: "save" });
     },
     *login({ payload }, { call, put }) {
-      const { err, data } = yield call(loginApi, payload);
-      if (err) {
-        message.error("账号密码错误");
-      } else {
-        console.log(data.result);
-        message.success("登录成功");
-        sessionStorage.setItem("user", JSON.stringify(data.result));
+      const { data: response } = yield call(loginApi, payload);
+      if (response.success) {
+        notification["success"]({
+          message: "登录成功"
+        });
+        sessionStorage.setItem("user", JSON.stringify(response.result));
         yield put({
           type: "save",
-          payload: { current_user: data.result }
+          payload: { current_user: response.result }
         });
         yield put(routerRedux.replace("/regionRegulatory/integrat"));
+      } else {
+        notification["error"]({
+          message: response.error.message
+        });
       }
     },
     *loginOut({ payload }, { call, put }) {

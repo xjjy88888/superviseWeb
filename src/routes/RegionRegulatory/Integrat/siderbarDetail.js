@@ -33,8 +33,9 @@ const formItemLayout = {
   wrapperCol: { span: 16 }
 };
 
-@connect(({ project }) => ({
-  project
+@connect(({ project, spot }) => ({
+  project,
+  spot
 }))
 @createForm()
 export default class siderbarDetail extends PureComponent {
@@ -76,7 +77,7 @@ export default class siderbarDetail extends PureComponent {
   querySpotById = id => {
     const { dispatch } = this.props;
     dispatch({
-      type: "project/querySpotById",
+      type: "spot/querySpotById",
       payload: {
         id: id
       }
@@ -87,8 +88,13 @@ export default class siderbarDetail extends PureComponent {
     const { edit } = this.state;
     this.setState({ edit: !edit });
     if (edit) {
-      notification["success"]({
-        message: "编辑成功"
+      this.props.form.validateFields((err, v) => {
+        if (!err) {
+          console.log("图斑信息", v);
+          notification["success"]({
+            message: "编辑图斑成功"
+          });
+        }
       });
     } else {
     }
@@ -105,7 +111,7 @@ export default class siderbarDetail extends PureComponent {
         setFieldsValue,
         setFields
       },
-      project: { spotItem }
+      spot: { spotItem }
     } = this.props;
     const { show, from, edit, item } = this.state;
     return (
@@ -188,14 +194,14 @@ export default class siderbarDetail extends PureComponent {
             }}
           >
             <Form>
-              <Form.Item label="扰动图斑" {...formItemLayout}>
-                {getFieldDecorator("spot_tbid", {
-                  initialValue: spotItem.spot_tbid
+              <Form.Item label="图斑编号" {...formItemLayout}>
+                {getFieldDecorator("mapNum", {
+                  initialValue: spotItem.mapNum
                 })(<Input disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="关联项目" {...formItemLayout}>
-                {getFieldDecorator("project_id", {
-                  initialValue: spotItem.project_id
+                {getFieldDecorator("projectName", {
+                  initialValue: spotItem.projectName
                 })(
                   <Input
                     disabled={!edit}
@@ -208,7 +214,13 @@ export default class siderbarDetail extends PureComponent {
                         onClick={() => {
                           emitter.emit("showProjectDetail", {
                             show: true,
-                            id: spotItem.project_id
+                            id: spotItem.projectId
+                          });
+                          emitter.emit("showProjectSpotInfo", {
+                            show: true,
+                            edit: false,
+                            from: "project",
+                            id: spotItem.projectId
                           });
                         }}
                       />
@@ -233,18 +245,18 @@ export default class siderbarDetail extends PureComponent {
                 )}
               </Form.Item>
               <Form.Item label="扰动面积" {...formItemLayout}>
-                {getFieldDecorator("qarea", {
-                  initialValue: spotItem.qarea
+                {getFieldDecorator("interferenceArea", {
+                  initialValue: spotItem.interferenceArea
                 })(<Input disabled={!edit} addonAfter="公顷" />)}
               </Form.Item>
               <Form.Item label="扰动超出面积" {...formItemLayout}>
-                {getFieldDecorator("earea", {
-                  initialValue: spotItem.earea
+                {getFieldDecorator("overAreaOfRes", {
+                  initialValue: spotItem.overAreaOfRes
                 })(<Input disabled={!edit} addonAfter="公顷" />)}
               </Form.Item>
               <Form.Item label="扰动合规性" {...formItemLayout}>
-                {getFieldDecorator("byd", {
-                  initialValue: spotItem.byd
+                {getFieldDecorator("interferenceCompliance", {
+                  initialValue: spotItem.interferenceCompliance
                 })(
                   <AutoComplete
                     placeholder="请选择扰动合规性"
@@ -259,8 +271,8 @@ export default class siderbarDetail extends PureComponent {
                 )}
               </Form.Item>
               <Form.Item label="扰动变化类型" {...formItemLayout}>
-                {getFieldDecorator("qdtype", {
-                  initialValue: spotItem.qdtype
+                {getFieldDecorator("interferenceVaryType", {
+                  initialValue: spotItem.interferenceVaryType
                 })(
                   <AutoComplete
                     placeholder="请选择扰动变化类型"
@@ -275,8 +287,8 @@ export default class siderbarDetail extends PureComponent {
                 )}
               </Form.Item>
               <Form.Item label="建设状态" {...formItemLayout}>
-                {getFieldDecorator("qdcs", {
-                  initialValue: spotItem.qdcs
+                {getFieldDecorator("buildStatus", {
+                  initialValue: spotItem.buildStatus
                 })(
                   <AutoComplete
                     placeholder="请选择建设状态"
@@ -291,8 +303,8 @@ export default class siderbarDetail extends PureComponent {
                 )}
               </Form.Item>
               <Form.Item label="复核状态" {...formItemLayout}>
-                {getFieldDecorator("isreview", {
-                  initialValue: spotItem.isreview
+                {getFieldDecorator("isReview", {
+                  initialValue: spotItem.isReview ? "是" : "否"
                 })(<Input disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="地址" {...formItemLayout}>
@@ -304,25 +316,19 @@ export default class siderbarDetail extends PureComponent {
                 />
               </Form.Item>
               <Form.Item label="问题" {...formItemLayout}>
-                <TextArea
-                  autosize={true}
-                  defaultValue={`----`}
-                  disabled={!edit}
-                />
+                {getFieldDecorator("problem", {
+                  initialValue: spotItem.problem
+                })(<TextArea autosize={true} disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="建议" {...formItemLayout}>
-                <TextArea
-                  autosize={true}
-                  defaultValue={`----`}
-                  disabled={!edit}
-                />
+                {getFieldDecorator("proposal", {
+                  initialValue: spotItem.proposal
+                })(<TextArea autosize={true} disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="备注" {...formItemLayout}>
-                <TextArea
-                  autosize={true}
-                  defaultValue={`----`}
-                  disabled={!edit}
-                />
+                {getFieldDecorator("description", {
+                  initialValue: spotItem.description
+                })(<TextArea autosize={true} disabled={!edit} />)}
               </Form.Item>
             </Form>
             <Carousel autoplay>

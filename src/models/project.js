@@ -3,8 +3,6 @@ import { Button, notification } from "antd";
 import {
   projectListApi,
   projectByIdApi,
-  spotListApi,
-  spotById,
   updateSpotGraphic,
   addSpotGraphic,
   removeSpotGraphic,
@@ -18,18 +16,15 @@ export default {
 
   state: {
     projectList: { totalCount: 0, items: [] },
-    spotList: { totalCount: 0, items: [] },
     projectItem: {
       projectBase: { name: "" },
-      // projectDepartment: { name: "" },
       expand: {
         designStartTime: "",
         designCompTime: "",
         actStartTime: "",
         actCompTime: ""
       }
-    },
-    spotItem: {}
+    }
   },
 
   subscriptions: {
@@ -37,6 +32,7 @@ export default {
   },
 
   effects: {
+    // 项目列表
     *queryProject({ payload }, { call, put }) {
       const {
         data: { result: projectList }
@@ -47,17 +43,8 @@ export default {
       };
       yield put({ type: "save", payload: { projectList: data } });
     },
-    *querySpot({ payload }, { call, put }) {
-      const {
-        data: { result: spotList }
-      } = yield call(spotListApi, payload.row);
-      console.log(payload,spotList)
-      const data = {
-        items: [...payload.items, ...spotList.items],
-        totalCount: spotList.totalCount
-      };
-      yield put({ type: "save", payload: { spotList:data } });
-    },
+
+    // id查询项目
     *queryProjectById({ payload, callback }, { call, put }) {
       const {
         data: { success, result }
@@ -68,19 +55,6 @@ export default {
       if (success) {
         yield put({ type: "save", payload: { projectItem: result } });
       }
-    },
-    *querySpotById({ payload, callback }, { call, put }) {
-      const { data: spotItem } = yield call(spotById, payload.id);
-      notification[spotItem.length ? "success" : "error"]({
-        message: spotItem.length ? "查询图斑成功" : "查询图斑失败"
-      });
-      if (spotItem.length) {
-        yield put({
-          type: "save",
-          payload: { spotItem: spotItem[0] }
-        });
-      }
-      if (callback) callback(spotItem);
     },
     *updateSpotGraphic({ payload, callback }, { call, put }) {
       const { data: obj } = yield call(updateSpotGraphic, payload);

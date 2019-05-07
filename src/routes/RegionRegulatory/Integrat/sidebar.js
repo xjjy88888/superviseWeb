@@ -38,14 +38,6 @@ import config from "../../../config";
 import data from "../../../data";
 import { EXIF } from "exif-js";
 import jQuery from "jquery";
-// import {
-//   ROOT_DIR_PATH,
-//   resolveLocalFileSystemURL,
-//   getDirectory,
-//   copyTo,
-//   getPicture,
-//   getPictureExif,
-// } from '../../../utils/fileUtil';
 
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 const dateFormat = "YYYY-MM-DD";
@@ -57,8 +49,9 @@ const formItemLayout = {
 };
 let scrollTop = 0;
 
-@connect(({ project }) => ({
-  project
+@connect(({ project, spot }) => ({
+  project,
+  spot
 }))
 @createForm()
 export default class integrat extends PureComponent {
@@ -71,6 +64,7 @@ export default class integrat extends PureComponent {
       projectEdit: false,
       showCompany: false,
       showProblem: false,
+      showQuery: false,
       showCheck: false,
       checked: false,
       row_pro: 10,
@@ -110,6 +104,11 @@ export default class integrat extends PureComponent {
   }
 
   componentDidMount() {
+    this.eventEmitter = emitter.addListener("showSiderbar", data => {
+      this.setState({
+        show: data.show
+      });
+    });
     if (this.scrollDom) {
       this.scrollDom.addEventListener("scroll", () => {
         this.onScroll(this);
@@ -133,7 +132,7 @@ export default class integrat extends PureComponent {
       this.queryProject(10);
       this.querySpot(10);
     });
-    const { clientWidth, clientHeight } = this.refDom;
+    const { clientHeight } = this.refDom;
     this.setState({
       clientHeight: clientHeight
     });
@@ -166,6 +165,12 @@ export default class integrat extends PureComponent {
     EXIF.getData(dom, function() {
       const allMetaData = EXIF.getAllTags(this);
 
+      let direction;
+      if (allMetaData.GPSImgDirection) {
+        const directionArry = allMetaData.GPSImgDirection; // 方位角
+        direction = directionArry.numerator / directionArry.denominator;
+      }
+
       let Longitude;
       if (allMetaData.GPSLongitude) {
         const LongitudeArry = allMetaData.GPSLongitude;
@@ -186,10 +191,13 @@ export default class integrat extends PureComponent {
         Latitude = longLatitude.toFixed(8);
       }
 
-      console.log(Longitude, Latitude);
+      console.log(allMetaData);
+      console.log(Longitude, Latitude, direction);
       emitter.emit("imgLocation", {
         Latitude: Latitude,
-        Longitude: Longitude
+        Longitude: Longitude,
+        direction: direction,
+        show: true
       });
     });
   };
@@ -221,10 +229,10 @@ export default class integrat extends PureComponent {
   querySpot = row => {
     const {
       dispatch,
-      project: { spotList }
+      spot: { spotList }
     } = this.props;
     dispatch({
-      type: "project/querySpot",
+      type: "spot/querySpot",
       payload: {
         row: row,
         items: row === 10 ? [] : spotList.items
@@ -232,7 +240,14 @@ export default class integrat extends PureComponent {
     });
   };
 
-  handleCancel = () => this.setState({ previewVisible: false });
+  handleCancel = () => {
+    this.setState({ previewVisible: false });
+    emitter.emit("imgLocation", {
+      Latitude: 0,
+      Longitude: 0,
+      show: false
+    });
+  };
 
   handlePreview = file => {
     const dom = jQuery(`<img src=${file.url}></img>`);
@@ -369,21 +384,6 @@ export default class integrat extends PureComponent {
     const type = v.charAt(v.length - 1);
   };
 
-  query = () => {
-    const { key } = this.state;
-    emitter.emit("showSiderbarDetail", {
-      show: false
-    });
-    emitter.emit("showTool", {
-      show: false,
-      type: "tool"
-    });
-    emitter.emit("showQuery", {
-      show: true,
-      type: key
-    });
-  };
-
   TreeOnSelect = e => {
     if (e.length) {
       const isRoot = isNaN(e[0].slice(0, 1));
@@ -391,7 +391,7 @@ export default class integrat extends PureComponent {
       emitter.emit("showProblem", {
         show: true
       });
-      this.handleCancel();
+      this.setState({ previewVisible: false });
       if (!isRoot) {
         const item = data[e[0].slice(0, 1)].data[e[0].slice(1, 2)];
         this.setState({ problem: item });
@@ -440,11 +440,14 @@ export default class integrat extends PureComponent {
       fileList,
       select,
       checked,
-      problem
+      problem,
+      row_pro,
+      row_spot
     } = this.state;
     const {
       dispatch,
-      project: { projectList, spotList, projectItem }
+      project: { projectList, projectItem },
+      spot: { spotList }
     } = this.props;
     const { getFieldDecorator } = this.props.form;
 
@@ -477,32 +480,14 @@ export default class integrat extends PureComponent {
         title: (
           <span>
             <span>
-              共有
+              有{key === "project" ? row_pro : row_spot}/
               {key === "project" ? projectList.totalCount : spotList.totalCount}
               条
             </span>
-
-            <Button
-              type="dashed"
-              icon="shopping"
-              onClick={() => {
-                emitter.emit("showSiderbarDetail", {
-                  show: false
-                });
-                emitter.emit("showTool", {
-                  show: true,
-                  type: "tool"
-                });
-                emitter.emit("showQuery", {
-                  show: false
-                });
-              }}
-            >
-              {showCheck ? "" : "工具箱"}
-            </Button>
             <Button
               type="dashed"
               icon="dashboard"
+              style={{ float: "right" }}
               onClick={() => {
                 emitter.emit("showSiderbarDetail", {
                   show: false
@@ -518,6 +503,25 @@ export default class integrat extends PureComponent {
               }}
             >
               {showCheck ? "" : "仪表盘"}
+            </Button>
+            <Button
+              type="dashed"
+              icon="shopping"
+              style={{ float: "right" }}
+              onClick={() => {
+                emitter.emit("showSiderbarDetail", {
+                  show: false
+                });
+                emitter.emit("showTool", {
+                  show: true,
+                  type: "tool"
+                });
+                emitter.emit("showQuery", {
+                  show: false
+                });
+              }}
+            >
+              {showCheck ? "" : "工具箱"}
             </Button>
           </span>
         ),
@@ -537,7 +541,7 @@ export default class integrat extends PureComponent {
                     emitter.emit("showSiderbarDetail", {
                       show: key === "spot",
                       from: key,
-                      id: key === "project" ? item.id : item.spot_tbid
+                      id: key === "project" ? item.id : item.id
                     });
                   }
                   emitter.emit("showTool", {
@@ -668,6 +672,26 @@ export default class integrat extends PureComponent {
               cursor: "pointer",
               color: "#1890ff"
             }}
+            onClick={() => {
+              if (key === "project") {
+                this.setState({ showProjectDetail: true, projectEdit: true });
+                emitter.emit("showProjectDetail", {
+                  show: true,
+                  edit: true
+                });
+              } else if (key === "spot") {
+                emitter.emit("drawSpot", {
+                  draw: true,
+                  project_id: "123"
+                });
+                emitter.emit("showSiderbarDetail", {
+                  show: true,
+                  edit: true,
+                  from: "spot",
+                  item: { id: "" }
+                });
+              }
+            }}
           />
           <Radio.Group
             defaultValue="a"
@@ -685,72 +709,24 @@ export default class integrat extends PureComponent {
             style={{
               display: showPoint ? "none" : "inline"
             }}
-            onClick={this.query}
+            onClick={() => {
+              const { key, showQuery } = this.state;
+              this.setState({ showQuery: !showQuery });
+              emitter.emit("showSiderbarDetail", {
+                show: false
+              });
+              emitter.emit("showTool", {
+                show: false,
+                type: "tool"
+              });
+              emitter.emit("showQuery", {
+                show: !showQuery,
+                type: key
+              });
+            }}
           >
             筛选
           </Button>
-          {/* <p style={{ padding: "20px 20px 0 20px" }}>
-            <span>
-              <Checkbox
-                style={{
-                  display: showCheck ? "inline" : "none",
-                  paddingRight: 10
-                }}
-                onChange={() => {
-                  this.setState({ checked: !checked });
-                }}
-              />
-              {`共有${
-                key === "project" ? projectList.totalCount : spotList.totalCount
-              }条记录`}
-            </span>
-            <span
-              style={{
-                float: "right",
-                position: "relative",
-                top: -5,
-                display: showPoint ? "none" : "inline"
-              }}
-            >
-              <Button
-                type="dashed"
-                icon="shopping"
-                onClick={() => {
-                  emitter.emit("showSiderbarDetail", {
-                    show: false
-                  });
-                  emitter.emit("showTool", {
-                    show: true,
-                    type: "tool"
-                  });
-                  emitter.emit("showQuery", {
-                    show: false
-                  });
-                }}
-              >
-                工具箱
-              </Button>
-              <Button
-                type="dashed"
-                icon="dashboard"
-                onClick={() => {
-                  emitter.emit("showSiderbarDetail", {
-                    show: false
-                  });
-                  emitter.emit("showTool", {
-                    show: true,
-                    type: "control",
-                    typeChild: key
-                  });
-                  emitter.emit("showQuery", {
-                    show: false
-                  });
-                }}
-              >
-                仪表盘
-              </Button>
-            </span>
-          </p> */}
           <Spin
             style={{
               display: projectList.totalCount === 0 ? "block" : "none",
@@ -776,108 +752,6 @@ export default class integrat extends PureComponent {
               pagination={false}
             />
           </div>
-          {/* <List
-            style={{
-              overflow: "auto",
-              height: clientHeight ? clientHeight - 257 : 500,
-              width: 350,
-              padding: "10px 20px 10px 20px"
-            }}
-            itemLayout="horizontal"
-            dataSource={key === "project" ? projectList.items : spotList.items}
-            renderItem={item => (
-              <List.Item>
-                <List.Item.Meta
-                  style={{
-                    cursor: "pointer"
-                  }}
-                  title={
-                    <p style={{ textAlign: "justify" }}>
-                      <Checkbox
-                        // checked={checked}
-                        style={{ display: showCheck ? "inline" : "none" }}
-                        onChange={e => {
-                          if (e.target.checked) {
-                            const data = [...select, item.id];
-                            emitter.emit("checkResult", {
-                              result: data
-                            });
-                            this.setState({ select: data });
-                          } else {
-                            select.map((ite, idx) => {
-                              if (ite === item.id) {
-                                const data = select.splice(idx, 1);
-                                emitter.emit("checkResult", {
-                                  result: select
-                                });
-                              }
-                            });
-                          }
-                        }}
-                      />
-                      <span
-                        onClick={() => {
-                          if (key === "project") {
-                            this.setState({
-                              showProjectDetail: true
-                            });
-                            this.queryProjectById(item.id);
-                          } else if (key === "spot") {
-                            emitter.emit("showSiderbarDetail", {
-                              show: key === "spot",
-                              from: key,
-                              id: key === "project" ? item.id : item.spot_tbid
-                            });
-                          }
-                          emitter.emit("showTool", {
-                            show: false
-                          });
-                          emitter.emit("showQuery", {
-                            show: false
-                          });
-                        }}
-                      >
-                        {key === "project" ? item.projectName : item.mapNum}
-                      </span>
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={e => {
-                          e.stopPropagation();
-                          emitter.emit("mapLocation", {
-                            item: item,
-                            key: key
-                          });
-                        }}
-                      />
-                    </p>
-                  }
-                  description={
-                    <p>
-                      <span>
-                        <span style={{ wordBreak: "break-all" }}>
-                          {key === "project"
-                            ? `建设单位：${item.productDepartmentName}`
-                            : `关联项目：${item.projectName}`}
-                        </span>
-                        <br />
-                        <span style={{ wordBreak: "break-all" }}>
-                          {key === "project"
-                            ? `批复机构：${item.replyDepartmentName}`
-                            : `扰动合规性：${item.interferenceCompliance}`}
-                        </span>
-                      </span>
-                    </p>
-                  }
-                />
-              </List.Item>
-            )}
-          /> */}
         </div>
         <div
           style={{
@@ -952,12 +826,6 @@ export default class integrat extends PureComponent {
                       title={
                         <span>
                           <span style={{ marginRight: 10 }}>{ite.title}</span>
-                          {/* <Progress
-                            type="circle"
-                            percent={idx % 2 ? 0 : 50}
-                            format={percent => percent}
-                            width={20}
-                          /> */}
                         </span>
                       }
                       key={`${index}${idx}`}
@@ -1406,9 +1274,6 @@ export default class integrat extends PureComponent {
                           }}
                           onClick={e => {
                             e.stopPropagation();
-                            // notification["info"]({
-                            //   message: "添加扰动图斑"
-                            // });
                             emitter.emit("drawSpot", {
                               draw: true,
                               project_id: "123"
@@ -1424,7 +1289,6 @@ export default class integrat extends PureComponent {
                         <Switch
                           checkedChildren="归档图斑"
                           unCheckedChildren="归档图斑"
-                          defaultChecked
                           style={{ position: "relative", left: 10, top: -2 }}
                           onChange={(v, e) => {
                             e.stopPropagation();

@@ -9,25 +9,21 @@ const color_border_redLine = "#e60000"; //边框色-红线
 
 const config = {
   url: {
-    //登录
-    // loginUrl: `${domain}/api/account/GetUserPassWord`,
+    // 登录
     loginUrl: `${domain_}api/TokenAuth/Authenticate`,
 
-    //项目列表
-    // projectListUrl: `${domain}/api/app/projectScopeGetIntersects`,
+    // 项目列表
     projectListUrl: `${domain_}api/services/app/ProjectsService/GetAll`,
 
-    //根据项目id获取对应的项目信息
-    // projectById: `${domain}/api/app/projectById`,
-    projectByIdUrl: `${domain_}/api/services/app/ProjectsService/GetInfo`,
-
-    //图斑列表
-    // spotGetIntersects: `${domain}/api/app/spotGetIntersects`,
+    // 图斑列表
     spotListUrl: `${domain_}api/services/app/SpotsService/GetAll`,
 
-    //根据扰动图斑id获取对应的扰动图斑信息
-    spotBytbId: `${domain}/api/app/spotBytbId`,
-    //spotGetIntersects: `http://10.7.23.81:8090/stbcSys/api/app/spotGetIntersects`
+    // id查询项目
+    projectByIdUrl: `${domain_}/api/services/app/ProjectsService/GetInfo`,
+
+    // id查询图斑
+    spotBytbId: `${domain_}/api/services/app/SpotsService/GetInfo`,
+
     //编辑图斑图形
     updateSpotGraphic: `${domain}/api/app/updateSpotGraphic`,
     //编辑项目红线图形

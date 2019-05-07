@@ -44,6 +44,7 @@ import jQuery from "jquery";
 
 let userconfig = {};
 let map;
+let marker;
 @connect(({ user, mapdata, project }) => ({
   user,
   mapdata,
@@ -158,18 +159,23 @@ export default class integrat extends PureComponent {
     });
     //照片定位
     this.eventEmitter = emitter.addListener("imgLocation", data => {
-      let latLng = [data.Latitude, data.Longitude];
-      /*let myIcon = L.icon({
-        iconUrl: "./img/marker-icon-2x.png",
-        iconSize: [25, 41]
-      });
-      L.marker([data.Latitude, data.Longitude], { icon: myIcon }).addTo(map);*/
-      L.marker(latLng).addTo(map);
-      me.automaticToMap(latLng);
-      //map.flyTo([data.Latitude, data.Longitude], 14);
-      //map.panTo([data.Latitude, data.Longitude]);
-      //.bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
-      //.openPopup();
+      if(data.show){
+        let latLng = [data.Latitude, data.Longitude];
+        let myIcon = L.icon({
+          iconUrl: "./img/north.png",
+          iconSize: [60, 60]
+        });
+        if(marker)
+           marker.remove();
+        marker = L.marker(latLng, { icon: myIcon }).addTo(map);
+        //marker = L.marker(latLng).addTo(map);
+        //direction 方位角
+        me.automaticToMap(latLng);
+      }
+      else{
+        if(marker)
+           marker.remove();
+      }
     });
     //绘制扰动图斑图形
     this.eventEmitter = emitter.addListener("drawSpot", data => {
@@ -342,6 +348,12 @@ export default class integrat extends PureComponent {
     }
   };
   /*
+   * 根据方位角获取对应的图片
+   */
+  getPicByAzimuth = azimuth => {
+     let east,south,west,north;
+  };
+  /*
    * 自动匹配地图偏移
    */
   automaticToMap = latLng => {
@@ -421,7 +433,7 @@ export default class integrat extends PureComponent {
       影像图: baseLayer1
     };
     //卷帘地图效果
-    //L.control.sideBySide(baseLayer1, baseLayer).addTo(map);
+    L.control.sideBySide(baseLayer1, baseLayer).addTo(map);
     //监听地图点击事件
     map.on("click", me.onClickMap);
     //监听地图移动完成事件
@@ -1089,31 +1101,68 @@ export default class integrat extends PureComponent {
    * 地图历史对比-卷帘效果
    */
   showHistoryMap = () => {
-    const { historymap } = this.state;
+    const { historymap,showHistoryContrast } = this.state;
+    if(showHistoryContrast){
+
+    }
+    else{
+
+    }
     if (!historymap) {
-      //map.remove()
-      const map = L.map("historymap", {
+      const map = (userconfig.leftrightMap = L.map("historymap", {
         zoomControl: false,
         attributionControl: false
-      }).setView(config.mapInitParams.center, config.mapInitParams.zoom);
-      const baseLayer = L.tileLayer(config.baseMaps[0].Url); //街道图
-      const baseLayer1 = L.tileLayer(config.baseMaps[1].Url); //影像图
-      const baseLayer2 = L.tileLayer(config.baseMaps[2].Url); //监管影像
-      map.addLayer(baseLayer2);
-      map.addLayer(baseLayer);
+      }).setView(config.mapInitParams.center, config.mapInitParams.zoom));
+      const baseLayer1 = (userconfig.baseLayer1 = L.tileLayer(
+        config.baseMaps[0].Url
+      )); //街道图
+      const baseLayer2 = (userconfig.baseLayer2 = L.tileLayer(
+        config.baseMaps[1].Url
+      )); //影像图
+      const baseLayer3 = (userconfig.baseLayer3 = L.tileLayer(
+        config.baseMaps[2].Url
+      )); //监管影像
+      //map.addLayer(baseLayer3);
       map.addLayer(baseLayer1);
+      map.addLayer(baseLayer2);
       //卷帘地图效果
-      L.control.sideBySide(baseLayer1, baseLayer).addTo(map);
+      userconfig.sideBySide = L.control
+        .sideBySide(baseLayer2, baseLayer1)
+        .addTo(map);
+      userconfig.curleftlayer = baseLayer2;
       this.setState({ historymap: map });
-      setTimeout(() => {
-        //map.removeLayer(baseLayer1);
-        //map.addLayer(baseLayer2);
-      }, 1500);
+      /*setTimeout(() => {
+        map.addLayer(baseLayer2);
+        map.removeLayer(baseLayer1);
+      }, 1500);*/
     }
   };
 
   onChangeSelectLeft = v => {
     console.log(v);
+    let layer;
+    switch (v) {
+      case "1":
+        layer = userconfig.baseLayer1;
+        break;
+      case "2":
+        layer = userconfig.baseLayer2;
+        break;
+      case "3":
+        layer = userconfig.baseLayer3;
+        break;
+      default:
+    }
+    //userconfig.leftrightMap.removeLayer(userconfig.curleftlayer);
+    //userconfig.leftrightMap.addLayer(layer);
+    //userconfig.curleftlayer =layer;
+    //userconfig.sideBySide.setLeftLayers(layer);
+    userconfig.sideBySide.remove();
+    userconfig.leftrightMap.addLayer(layer);
+    userconfig.leftrightMap.addLayer(userconfig.baseLayer1);
+    userconfig.sideBySide = L.control
+      .sideBySide(layer, userconfig.baseLayer1)
+      .addTo(userconfig.leftrightMap);
   };
   onChangeSelectRight = v => {
     console.log(v);
@@ -1199,7 +1248,7 @@ export default class integrat extends PureComponent {
                 }}
               />
             </div>
-            {/* 图例说明 */}
+            {/* 图例说明、历史对比 */}
             <div
               style={{
                 position: "absolute",
@@ -1213,7 +1262,12 @@ export default class integrat extends PureComponent {
                 <Button
                   icon="swap"
                   onClick={() => {
-                    this.setState({ showHistoryContrast: true });
+                    this.setState({
+                      showHistoryContrast: !showHistoryContrast
+                    });
+                    emitter.emit("showSiderbar", {
+                      show: showHistoryContrast
+                    });
                     setTimeout(() => {
                       this.showHistoryMap();
                     }, 200);
@@ -1251,6 +1305,37 @@ export default class integrat extends PureComponent {
                 <Button icon="bars" />
               </Popover>
             </div>
+            {/* 历史对比地图切换 */}
+            <div
+              style={{
+                display: showHistoryContrast ? "block" : "none",
+                position: "absolute",
+                top: 65,
+                left: 15,
+                zIndex: 1000
+              }}
+            >
+              <Select defaultValue="2" onChange={this.onChangeSelectLeft}>
+                <Select.Option value="1">街道图</Select.Option>
+                <Select.Option value="2">影像图</Select.Option>
+                <Select.Option value="3">监管影像</Select.Option>
+              </Select>
+            </div>
+            <div
+              style={{
+                display: showHistoryContrast ? "block" : "none",
+                position: "absolute",
+                top: 65,
+                right: 240,
+                zIndex: 1001
+              }}
+            >
+              <Select defaultValue="1" onChange={this.onChangeSelectRight}>
+                <Select.Option value="1">街道图</Select.Option>
+                <Select.Option value="2">影像图</Select.Option>
+                <Select.Option value="3">监管影像</Select.Option>
+              </Select>
+            </div>
             {/* 底部遮罩层 */}
             {/* <div
               style={{
@@ -1263,7 +1348,7 @@ export default class integrat extends PureComponent {
               }}
             /> */}
             {/* 历史对比 */}
-            <div
+            {/* <div
               style={{
                 display: showHistoryContrast ? "block" : "none",
                 position: "fixed",
@@ -1300,37 +1385,9 @@ export default class integrat extends PureComponent {
                     this.setState({ showHistoryContrast: false });
                   }}
                 />
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 20,
-                    left: 20,
-                    zIndex: 1001
-                  }}
-                >
-                  <Select defaultValue="111" onChange={this.onChangeSelectLeft}>
-                    <Select.Option value="111">一一一</Select.Option>
-                    <Select.Option value="222">二二二</Select.Option>
-                  </Select>
-                </div>
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 20,
-                    right: 40,
-                    zIndex: 1001
-                  }}
-                >
-                  <Select
-                    defaultValue="111"
-                    onChange={this.onChangeSelectRight}
-                  >
-                    <Select.Option value="111">一一一</Select.Option>
-                    <Select.Option value="222">二二二</Select.Option>
-                  </Select>
-                </div>
               </div>
             </div>
+ */}
           </div>
         </div>
       </LocaleProvider>

@@ -4,28 +4,15 @@ import CryptoJS from "crypto-js";
 
 // 登录
 export async function loginApi(params) {
-  // const passwordMd5 = CryptoJS.MD5(password).toString();
   return request(config.url.loginUrl, {
     method: "POST",
     headers: {
-      Authorization: "Bearer Token",
+      // 'Authorization': "Bearer Token",
       "content-type": "application/json"
     },
     body: JSON.stringify(params)
   });
 }
-// export async function loginApi(params) {
-//   const { userName, password } = params;
-//   const passwordMd5 = CryptoJS.MD5(password).toString();
-//   return request(
-//     `${
-//       config.url.loginUrl
-//     }?username=${userName}&password=${passwordMd5}`,
-//     {
-//       method: "GET"
-//     }
-//   );
-// }
 
 // 项目列表
 export async function projectListApi(row) {
@@ -35,13 +22,6 @@ export async function projectListApi(row) {
       method: "GET"
     }
   );
-}
-
-// 项目id查询项目信息
-export async function projectByIdApi(id) {
-  return request(`${config.url.projectByIdUrl}?id=${id}`, {
-    method: "GET"
-  });
 }
 
 // 图斑列表
@@ -54,9 +34,16 @@ export async function spotListApi(row) {
   );
 }
 
-// 图斑id查询图斑信息
-export async function spotById(id) {
-  return request(`${config.url.spotBytbId}?spot_tbid=${id}`, {
+// id查询项目
+export async function projectByIdApi(id) {
+  return request(`${config.url.projectByIdUrl}?id=${id}`, {
+    method: "GET"
+  });
+}
+
+// id查询图斑
+export async function spotByIdApi(id) {
+  return request(`${config.url.spotBytbId}?id=${id}`, {
     method: "GET"
   });
 }
