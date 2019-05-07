@@ -62,6 +62,7 @@ export default class integrat extends PureComponent {
       value: undefined,
       showProjectDetail: false,
       projectEdit: false,
+      showProjectAllInfo: false,
       showCompany: false,
       showProblem: false,
       showQuery: false,
@@ -109,6 +110,16 @@ export default class integrat extends PureComponent {
     this.eventEmitter = emitter.addListener("showSiderbar", data => {
       this.setState({
         show: data.show
+      });
+    });
+    this.eventEmitter = emitter.addListener("hideQuery", data => {
+      this.setState({
+        showQuery: !data.hide
+      });
+    });
+    this.eventEmitter = emitter.addListener("hideProjectDetail", data => {
+      this.setState({
+        showProjectAllInfo: !data.hide
       });
     });
     this.eventEmitter = emitter.addListener("queryInfo", data => {
@@ -340,6 +351,7 @@ export default class integrat extends PureComponent {
   };
 
   switchMenu = e => {
+    this.setState({ showQuery: false });
     this.scrollDom.scrollTop = 0;
     emitter.emit("showSiderbarDetail", {
       show: false,
@@ -474,6 +486,7 @@ export default class integrat extends PureComponent {
       previewImage,
       showCheck,
       showProblem,
+      showProjectAllInfo,
       fileList,
       select,
       checked,
@@ -666,7 +679,7 @@ export default class integrat extends PureComponent {
             position: "absolute",
             right: -50,
             top: "48%",
-            backgroundColor: "rgba(0, 0, 0, 0.3)",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
             borderRadius: "50%",
             padding: 10,
             cursor: "pointer"
@@ -896,7 +909,7 @@ export default class integrat extends PureComponent {
                   position: "absolute",
                   right: -50,
                   top: "48%",
-                  backgroundColor: "rgba(0, 0, 0, 0.3)",
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
                   borderRadius: "50%",
                   padding: 10,
                   cursor: "pointer"
@@ -1190,10 +1203,18 @@ export default class integrat extends PureComponent {
                         <span>空</span>
                       </p>
                       <a
-                        style={{ position: "absolute", right: 0, bottom: 0 }}
+                        style={{
+                          position: "absolute",
+                          right: 0,
+                          bottom: 0,
+                          userSelect: "none"
+                        }}
                         onClick={() => {
+                          this.setState({
+                            showProjectAllInfo: !showProjectAllInfo
+                          });
                           emitter.emit("showProjectDetail", {
-                            show: true,
+                            show: !showProjectAllInfo,
                             edit: false
                           });
                         }}
@@ -2205,10 +2226,18 @@ export default class integrat extends PureComponent {
                   />
                 </Form.Item>
                 <a
-                  style={{ position: "absolute", right: 0, bottom: 0 }}
+                  style={{
+                    position: "absolute",
+                    right: 0,
+                    bottom: 0,
+                    userSelect: "none"
+                  }}
                   onClick={() => {
+                    this.setState({
+                      showProjectAllInfo: !showProjectAllInfo
+                    });
                     emitter.emit("showProjectDetail", {
-                      show: true,
+                      show: !showProjectAllInfo,
                       edit: true
                     });
                   }}

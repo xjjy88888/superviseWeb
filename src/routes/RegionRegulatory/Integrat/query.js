@@ -132,15 +132,15 @@ export default class siderbarDetail extends PureComponent {
             position: `absolute`,
             right: -50,
             top: `48%`,
-            backgroundColor: `rgba(0, 0, 0, 0.3)`,
+            backgroundColor: `rgba(0, 0, 0, 0.5)`,
             borderRadius: `50%`,
             padding: 10,
             cursor: `pointer`
           }}
           onClick={() => {
             this.setState({ show: false });
-            emitter.emit("showQuery", {
-              show: !show
+            emitter.emit("hideQuery", {
+              hide: true
             });
           }}
         />
@@ -194,6 +194,9 @@ export default class siderbarDetail extends PureComponent {
           }}
           onClick={() => {
             this.setState({ show: false });
+            emitter.emit("hideQuery", {
+              hide: true
+            });
           }}
         />
         <div
@@ -296,7 +299,7 @@ export default class siderbarDetail extends PureComponent {
         <div
           style={{
             display: type === "project" ? "none" : "block",
-            padding: "30px 0",
+            padding: "60px 0 10px 0",
             overflow: "auto",
             height: "100%"
           }}

@@ -73,12 +73,6 @@ export default class integrat extends PureComponent {
     });
   }
 
-  close = () => {
-    this.setState({
-      show: false
-    });
-  };
-
   getFields() {
     const count = this.state.expand ? 10 : 6;
     const { getFieldDecorator } = this.props.form;
@@ -137,12 +131,19 @@ export default class integrat extends PureComponent {
             position: `absolute`,
             right: -50,
             top: `48%`,
-            backgroundColor: `rgba(0, 0, 0, 0.3)`,
+            backgroundColor: `rgba(0, 0, 0, 0.5)`,
             borderRadius: `50%`,
             padding: 10,
             cursor: `pointer`
           }}
-          onClick={this.close}
+          onClick={() => {
+            emitter.emit("hideProjectDetail", {
+              hide: true,
+            });
+            this.setState({
+              show: false
+            });
+          }}
         />
         <div
           style={{

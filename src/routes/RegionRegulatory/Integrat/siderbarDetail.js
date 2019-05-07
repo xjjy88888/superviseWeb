@@ -133,7 +133,7 @@ export default class siderbarDetail extends PureComponent {
             position: `absolute`,
             right: -50,
             top: `48%`,
-            backgroundColor: `rgba(0, 0, 0, 0.3)`,
+            backgroundColor: `rgba(0, 0, 0, 0.5)`,
             borderRadius: `50%`,
             padding: 10,
             cursor: `pointer`
