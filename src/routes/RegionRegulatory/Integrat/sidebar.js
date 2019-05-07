@@ -531,7 +531,7 @@ export default class integrat extends PureComponent {
         title: (
           <span>
             <span>
-              有
+              共有
               {key === "project"
                 ? row_pro < projectList.totalCount
                   ? row_pro

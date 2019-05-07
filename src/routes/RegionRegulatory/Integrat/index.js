@@ -64,7 +64,7 @@ export default class integrat extends PureComponent {
       drawGrphic: "edit",
       project_id: null, //针对新增图形的项目红线id
       addGraphLayer: null, //针对新增图形的图层
-      historymap: null //卷帘地图
+      //historymap: null //卷帘地图
     };
     this.map = null;
     this.saveRef = v => {
@@ -161,14 +161,16 @@ export default class integrat extends PureComponent {
     this.eventEmitter = emitter.addListener("imgLocation", data => {
       if (data.show) {
         let latLng = [data.Latitude, data.Longitude];
+        //direction 方位角
+        let picName = me.getPicByAzimuth(data.direction);
         let myIcon = L.icon({
-          iconUrl: "./img/north.png",
+          iconUrl: "./img/"+picName+".png",
           iconSize: [60, 60]
         });
         if (marker) marker.remove();
         marker = L.marker(latLng, { icon: myIcon }).addTo(map);
         //marker = L.marker(latLng).addTo(map);
-        //direction 方位角
+        map.setZoom(13);
         me.automaticToMap(latLng);
       } else {
         if (marker) marker.remove();
@@ -348,7 +350,10 @@ export default class integrat extends PureComponent {
    * 根据方位角获取对应的图片
    */
   getPicByAzimuth = azimuth => {
-    let east, south, west, north;
+     let pic;
+     pic = azimuth === 0 ? 'north' :azimuth < 90 ? 'east_north':azimuth === 90 ? 'east' :azimuth < 180 ? 'east_south' :azimuth === 180  ? 'south':azimuth < 270 ? 'west_south':azimuth === 270  ? 'west':azimuth < 360  ? 'west_north' : 'north';
+     //console.log(pic);
+     return pic;
   };
   /*
    * 自动匹配地图偏移
@@ -430,7 +435,7 @@ export default class integrat extends PureComponent {
       影像图: baseLayer1
     };
     //卷帘地图效果
-    L.control.sideBySide(baseLayer1, baseLayer).addTo(map);
+    //L.control.sideBySide(baseLayer1, baseLayer).addTo(map);
     //监听地图点击事件
     map.on("click", me.onClickMap);
     //监听地图移动完成事件
@@ -1098,38 +1103,46 @@ export default class integrat extends PureComponent {
    * 地图历史对比-卷帘效果
    */
   showHistoryMap = () => {
-    const { historymap, showHistoryContrast } = this.state;
+    // const { historymap, showHistoryContrast } = this.state;
+    const {showHistoryContrast } = this.state;
     if (showHistoryContrast) {
     } else {
     }
-    if (!historymap) {
-      const map = (userconfig.leftrightMap = L.map("historymap", {
+    //if (!historymap) {
+      /*const map = userconfig.leftrightMap = L.map("historymap", {
         zoomControl: false,
         attributionControl: false
-      }).setView(config.mapInitParams.center, config.mapInitParams.zoom));
-      const baseLayer1 = (userconfig.baseLayer1 = L.tileLayer(
+      }).setView(config.mapInitParams.center, config.mapInitParams.zoom);*/
+      const baseLayer1 = userconfig.baseLayer1 = L.tileLayer(
         config.baseMaps[0].Url
-      )); //街道图
-      const baseLayer2 = (userconfig.baseLayer2 = L.tileLayer(
+      ); //街道图
+      const baseLayer2 = userconfig.baseLayer2 = L.tileLayer(
         config.baseMaps[1].Url
-      )); //影像图
-      const baseLayer3 = (userconfig.baseLayer3 = L.tileLayer(
+      ); //影像图
+      const baseLayer3 = userconfig.baseLayer3 = L.tileLayer(
         config.baseMaps[2].Url
-      )); //监管影像
-      //map.addLayer(baseLayer3);
+      ); //监管影像
+      map.addLayer(baseLayer3);
       map.addLayer(baseLayer1);
       map.addLayer(baseLayer2);
       //卷帘地图效果
-      userconfig.sideBySide = L.control
-        .sideBySide(baseLayer2, baseLayer1)
-        .addTo(map);
+      let sideBySide = userconfig.sideBySide = L.control.sideBySide(baseLayer2, baseLayer1).addTo(map);
       userconfig.curleftlayer = baseLayer2;
-      this.setState({ historymap: map });
-      /*setTimeout(() => {
-        map.addLayer(baseLayer2);
+      //this.setState({ historymap: map });
+      setTimeout(function() {
+        //userconfig.sideBySide._updateLayers(baseLayer1, baseLayer2);
+        map.removeLayer(baseLayer2);
         map.removeLayer(baseLayer1);
-      }, 1500);*/
-    }
+        map.addLayer(baseLayer1);
+        map.addLayer(baseLayer2);
+        sideBySide.setLeftLayers(baseLayer1);
+        sideBySide.setRightLayers(baseLayer2);
+      }, 3000);
+    //}
+    setTimeout(() => {
+      //this.showHistoryMap();
+    }, 2000);
+
   };
 
   onChangeSelectLeft = v => {
