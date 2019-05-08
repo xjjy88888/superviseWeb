@@ -19,8 +19,7 @@ export default {
     *querySpot({ payload }, { call, put }) {
       const {
         data: { result: spotList }
-      } = yield call(spotListApi, payload.row);
-      console.log(payload, spotList);
+      } = yield call(spotListApi, payload);
       const data = {
         items: [...payload.items, ...spotList.items],
         totalCount: spotList.totalCount

@@ -941,6 +941,7 @@ export default class integrat extends PureComponent {
     this.setState({ showButton: false });
     const { addGraphLayer } = this.state;
     //禁止编辑图形
+    map.pm.disableDraw("Polygon");
     if (addGraphLayer) {
       addGraphLayer.pm.disable();
       map.removeLayer(addGraphLayer);

@@ -72,6 +72,7 @@ export default class integrat extends PureComponent {
       row_spot: 10,
       key: "project",
       query_pro_ProjectName: "",
+      query_pro_MapNum: "",
       queryInfo: {},
       inputDisabled: true,
       select: [],
@@ -123,14 +124,27 @@ export default class integrat extends PureComponent {
       });
     });
     this.eventEmitter = emitter.addListener("queryInfo", data => {
-      const { row_pro, row_spot, key, query_pro_ProjectName } = this.state;
+      this.scrollDom.scrollTop = 0;
+      const {
+        row_pro,
+        row_spot,
+        key,
+        query_pro_ProjectName,
+        query_pro_MapNum
+      } = this.state;
       if (data.from === "project") {
         this.setState({ queryInfo: data.info, row_pro: 10 });
-        console.log(query_pro_ProjectName);
         this.queryProject({
           ...data.info,
           row: 10,
           ProjectName: query_pro_ProjectName
+        });
+      } else if (data.from === "spot") {
+        this.setState({ queryInfo: data.info, row_spot: 10 });
+        this.querySpot({
+          ...data.info,
+          row: 10,
+          MapNum: query_pro_MapNum
         });
       }
     });
@@ -155,7 +169,7 @@ export default class integrat extends PureComponent {
     });
     this.eventEmitter = emitter.addListener("polygon", data => {
       this.queryProject({ row: 10 });
-      this.querySpot(10);
+      this.querySpot({ row: 10 });
     });
     const { clientHeight } = this.refDom;
     this.setState({
@@ -176,6 +190,7 @@ export default class integrat extends PureComponent {
       row_spot,
       key,
       query_pro_ProjectName,
+      query_pro_MapNum,
       queryInfo
     } = this.state;
     const { clientHeight, scrollHeight, scrollTop } = this.scrollDom;
@@ -202,9 +217,18 @@ export default class integrat extends PureComponent {
           });
           this.setState({ row_pro: new_row });
         }
+      } else if (key === "spot") {
+        const len = spotList.totalCount;
+        if (row_spot < len) {
+          const new_row = row_spot + 10 > len ? len : row_spot + 10;
+          this.querySpot({
+            ...queryInfo,
+            row: new_row,
+            MapNum: query_pro_MapNum
+          });
+          this.setState({ row_spot: new_row });
+        }
       } else {
-        this.querySpot(row_spot + 10);
-        this.setState({ row_spot: row_spot + 10 });
       }
     }
   }
@@ -274,7 +298,7 @@ export default class integrat extends PureComponent {
     });
   };
 
-  querySpot = row => {
+  querySpot = items => {
     const {
       dispatch,
       spot: { spotList }
@@ -282,8 +306,8 @@ export default class integrat extends PureComponent {
     dispatch({
       type: "spot/querySpot",
       payload: {
-        row: row,
-        items: row === 10 ? [] : spotList.items
+        ...items,
+        items: items.row === 10 ? [] : spotList.items
       }
     });
   };
@@ -387,7 +411,7 @@ export default class integrat extends PureComponent {
       });
     } else if (e.key === "spot") {
       this.setState({
-        placeholder: "图斑",
+        placeholder: "图斑编号",
         sort: [
           {
             title: "编号",
@@ -707,15 +731,26 @@ export default class integrat extends PureComponent {
           </Menu>
           <Input.Search
             allowClear
-            placeholder={`${placeholder}名`}
+            placeholder={`${placeholder}`}
             onSearch={v => {
-              this.setState({ query_pro_ProjectName: v, row_pro: 10 });
-              this.queryProject({
-                ...queryInfo,
-                row: 10,
-                ProjectName: v,
-                from: "query"
-              });
+              this.scrollDom.scrollTop = 0;
+              if (key === "project") {
+                this.setState({ query_pro_ProjectName: v, row_pro: 10 });
+                this.queryProject({
+                  ...queryInfo,
+                  row: 10,
+                  ProjectName: v,
+                  from: "query"
+                });
+              } else if (key === "spot") {
+                this.setState({ query_pro_MapNum: v, row_spot: 10 });
+                this.querySpot({
+                  ...queryInfo,
+                  row: 10,
+                  MapNum: v,
+                  from: "query"
+                });
+              }
             }}
             style={{ padding: "20px 20px", width: 300 }}
             enterButton

@@ -65,9 +65,40 @@ export async function projectListApi(params) {
 }
 
 // 图斑列表
-export async function spotListApi(row) {
+export async function spotListApi(params) {
   return request(
-    `${config.url.spotListUrl}?MaxResultCount=10&SkipCount=${row - 10}`,
+    `${config.url.spotListUrl}?MaxResultCount=10&SkipCount=${params.row - 10}` +
+      `&MapNum=${params.MapNum || ""}` +
+      `&InterferenceAreaMin=${
+        params.InterferenceArea ? params.InterferenceArea[0] : ""
+      }` +
+      `&InterferenceAreaMax=${
+        params.InterferenceArea ? params.InterferenceArea[1] : ""
+      }` +
+      `&OverAreaOfResMin=${
+        params.OverAreaOfRes ? params.OverAreaOfRes[0] : ""
+      }` +
+      `&OverAreaOfResMax=${
+        params.OverAreaOfRes ? params.OverAreaOfRes[1] : ""
+      }` +
+      `&InterferenceVaryType=${
+        params.InterferenceVaryType
+          ? params.InterferenceVaryType.map(v => v).join(",")
+          : ""
+      }` +
+      `&BuildStatus=${
+        params.BuildStatus ? params.BuildStatus.map(v => v).join(",") : ""
+      }` +
+      `&InterferenceCompliance=${
+        params.InterferenceCompliance
+          ? params.InterferenceCompliance.map(v => v).join(",")
+          : ""
+      }` +
+      `&InterferenceType=${
+        params.InterferenceType
+          ? params.InterferenceType.map(v => v).join(",")
+          : ""
+      }`,
     {
       method: "GET"
     }

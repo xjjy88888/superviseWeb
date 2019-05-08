@@ -313,31 +313,44 @@ export default class siderbarDetail extends PureComponent {
               />
             </Form.Item>
             <Form.Item label="扰动面积" {...formItemLayoutlong}>
-              <Slider marks={marks} range max={1000} defaultValue={[0, 1000]} />
+              {getFieldDecorator("InterferenceArea", { initialValue: [0, 1000] })(
+                <Slider marks={marks} range max={1000} />
+              )}
             </Form.Item>
             <Form.Item label="扰动超出面积" {...formItemLayoutlong}>
-              <Slider marks={marks} range max={1000} defaultValue={[0, 1000]} />
+              {getFieldDecorator("OverAreaOfRes", { initialValue: [0, 1000] })(
+                <Slider marks={marks} range max={1000} />
+              )}
             </Form.Item>
             <Form.Item label="扰动类型" {...formItemLayoutlong}>
-              <CheckboxGroup options={config.disturb_type} />
+              {getFieldDecorator("InterferenceType", { initialValue: [] })(
+                <CheckboxGroup options={config.disturb_type} />
+              )}
             </Form.Item>
             <Form.Item label="扰动合规性" {...formItemLayout}>
-              <Select
-                mode="multiple"
-                style={{ width: "100%" }}
-                placeholder="请选择扰动合规性"
-                onChange={() => {}}
-              >
-                {config.compliance.map(item => (
-                  <Select.Option key={item}>{item}</Select.Option>
-                ))}
-              </Select>
+              {getFieldDecorator("InterferenceCompliance", {
+                initialValue: []
+              })(
+                <Select
+                  mode="multiple"
+                  style={{ width: "100%" }}
+                  placeholder="请选择扰动合规性"
+                >
+                  {config.compliance.map(item => (
+                    <Select.Option key={item}>{item}</Select.Option>
+                  ))}
+                </Select>
+              )}
             </Form.Item>
             <Form.Item label="扰动变化类型" {...formItemLayoutlong}>
-              <CheckboxGroup options={config.disturb_change_type} />
+              {getFieldDecorator("InterferenceVaryType", { initialValue: [] })(
+                <CheckboxGroup options={config.disturb_change_type} />
+              )}
             </Form.Item>
             <Form.Item label="建设状态" {...formItemLayoutlong}>
-              <CheckboxGroup options={config.construct_state} />
+              {getFieldDecorator("BuildStatus", { initialValue: [] })(
+                <CheckboxGroup options={config.construct_state} />
+              )}
             </Form.Item>
             <Form.Item label="显示归档数据" {...formItemLayoutlong}>
               <Switch checkedChildren="是" unCheckedChildren="否" />
