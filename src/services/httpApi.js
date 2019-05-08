@@ -69,6 +69,7 @@ export async function projectListApi(params) {
 export async function spotListApi(params) {
   return request(
     `${config.url.spotListUrl}?MaxResultCount=10&SkipCount=${params.row - 10}` +
+      `&Sorting=${params.Sorting || ""}` +
       `&MapNum=${params.MapNum || ""}` +
       `&InterferenceAreaMin=${
         params.InterferenceArea ? params.InterferenceArea[0] : ""

@@ -160,6 +160,10 @@ export default class siderbarDetail extends PureComponent {
             style={{ margin: "20px 60px 0px 75px" }}
             onClick={() => {
               this.props.form.resetFields();
+              emitter.emit("queryInfo", {
+                from: type,
+                info: {}
+              });
             }}
           >
             重置
@@ -313,9 +317,9 @@ export default class siderbarDetail extends PureComponent {
               />
             </Form.Item>
             <Form.Item label="扰动面积" {...formItemLayoutlong}>
-              {getFieldDecorator("InterferenceArea", { initialValue: [0, 1000] })(
-                <Slider marks={marks} range max={1000} />
-              )}
+              {getFieldDecorator("InterferenceArea", {
+                initialValue: [0, 1000]
+              })(<Slider marks={marks} range max={1000} />)}
             </Form.Item>
             <Form.Item label="扰动超出面积" {...formItemLayoutlong}>
               {getFieldDecorator("OverAreaOfRes", { initialValue: [0, 1000] })(

@@ -79,7 +79,7 @@ export default class integrat extends PureComponent {
       inputDisabled: true,
       select: [],
       problem: { title: "", records: [] },
-      placeholder: "项目",
+      placeholder: "项目名称",
       sort: [
         {
           value: "名称",
@@ -135,11 +135,13 @@ export default class integrat extends PureComponent {
         Sorting,
         query_pro_MapNum
       } = this.state;
+      this.setState({
+        sort_by: "",
+        sort_key: "",
+        queryInfo: data.info
+      });
       if (data.from === "project") {
         this.setState({
-          sort_by: "",
-          sort_key: "",
-          queryInfo: data.info,
           row_pro: 10
         });
         this.queryProject({
@@ -148,7 +150,7 @@ export default class integrat extends PureComponent {
           ProjectName: query_pro_ProjectName
         });
       } else if (data.from === "spot") {
-        this.setState({ queryInfo: data.info, row_spot: 10 });
+        this.setState({ row_spot: 10 });
         this.querySpot({
           ...data.info,
           row: 10,
@@ -234,6 +236,7 @@ export default class integrat extends PureComponent {
           this.querySpot({
             ...queryInfo,
             row: new_row,
+            Sorting: Sorting,
             MapNum: query_pro_MapNum
           });
           this.setState({ row_spot: new_row });
@@ -401,63 +404,59 @@ export default class integrat extends PureComponent {
     emitter.emit("showChart", {
       show: false
     });
-    if (e.key === "project") {
-      this.setState({
-        placeholder: "项目",
-        sort: [
-          {
-            title: "名称",
-            value: "name"
-          },
-          {
-            title: "操作时间",
-            value: "time"
-          },
-          {
-            title: "立项级别",
-            value: "level"
-          }
-        ]
-      });
-    } else if (e.key === "spot") {
-      this.setState({
-        placeholder: "图斑编号",
-        sort: [
-          {
-            title: "编号",
-            value: "numb"
-          },
-          {
-            title: "操作时间",
-            value: "time"
-          },
-          {
-            title: "复核状态",
-            value: "state"
-          }
-        ]
-      });
-    } else {
-      this.setState({
-        placeholder: "关联项目",
-        sort: [
-          {
-            title: "描述",
-            value: "desc"
-          },
-          {
-            title: "标注时间",
-            value: "time"
-          },
-          {
-            title: "关联项目",
-            value: "proj"
-          }
-        ]
-      });
-    }
+
+    const k = e.key;
     this.setState({
-      key: e.key
+      placeholder:
+        k === "project" ? "项目名称" : k === "spot" ? "图斑编号" : "关联项目",
+      sort:
+        k === "project"
+          ? [
+              {
+                value: "名称",
+                key: "ProjectBase.Name"
+              },
+              {
+                value: "操作时间",
+                key: "ProjectBase.ModifyTime"
+              },
+              {
+                value: "立项级别",
+                key: "ProjectLevel.Key"
+              }
+            ]
+          : k === "spot"
+          ? [
+              {
+                value: "编号",
+                key: "MapNum"
+              },
+              {
+                value: "操作时间",
+                key: "ModifyTime"
+              },
+              {
+                value: "复核状态",
+                key: "IsReview"
+              }
+            ]
+          : [
+              {
+                value: "描述",
+                key: "ProjectBase.Name"
+              },
+              {
+                value: "标注时间",
+                key: "ProjectBase.ModifyTime"
+              },
+              {
+                value: "关联项目",
+                key: "ProjectLevel.Key"
+              }
+            ]
+    });
+    this.setState({
+      key: k
     });
   };
 
@@ -748,10 +747,14 @@ export default class integrat extends PureComponent {
             placeholder={`${placeholder}`}
             onSearch={v => {
               this.scrollDom.scrollTop = 0;
+              this.setState({
+                sort_by: "",
+                sort_key: "",
+                query_pro_ProjectName: v,
+                row_pro: 10
+              });
               if (key === "project") {
                 this.setState({
-                  sort_by: "",
-                  sort_key: "",
                   query_pro_ProjectName: v,
                   row_pro: 10
                 });
@@ -825,19 +828,28 @@ export default class integrat extends PureComponent {
                     item.key === sort_key && sort_by && sort_by === "Desc"
                       ? "Asc"
                       : "Desc";
+                  const Sorting_new = `${item.key} ${by}`;
                   this.setState({
                     sort_key: item.key,
-                    sort_by: by
+                    sort_by: by,
+                    Sorting: Sorting_new
                   });
-                  console.log(item.key, by);
                   this.scrollDom.scrollTop = 0;
                   if (key === "project") {
-                    const Sorting_new = `${item.key} ${by}`;
                     this.setState({
-                      Sorting: Sorting_new,
                       row_pro: 10
                     });
                     this.queryProject({
+                      ...queryInfo,
+                      Sorting: Sorting_new,
+                      row: 10,
+                      ProjectName: query_pro_ProjectName
+                    });
+                  } else if (key === "spot") {
+                    this.setState({
+                      row_spot: 10
+                    });
+                    this.querySpot({
                       ...queryInfo,
                       Sorting: Sorting_new,
                       row: 10,

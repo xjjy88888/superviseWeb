@@ -42,11 +42,6 @@ export default {
         totalCount: projectList.totalCount
       };
       yield put({ type: "save", payload: { projectList: data } });
-      if (payload.from === "query") {
-        notification[success ? "success" : "error"]({
-          message: success ? "查询项目成功" : "查询项目失败"
-        });
-      }
     },
 
     // id查询项目
