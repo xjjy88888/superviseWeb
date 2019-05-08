@@ -10,6 +10,8 @@ import {
   Radio,
   Cascader,
   notification,
+  Upload,
+  Modal,
   List,
   Avatar,
   message,
@@ -45,7 +47,27 @@ export default class siderbarDetail extends PureComponent {
       show: false,
       from: "spot",
       edit: false,
-      item: { project_id: "" }
+      item: { project_id: "" },
+      fileList: [
+        {
+          uid: "-1",
+          name: "xxx.png",
+          status: "done",
+          url: "./img/logo2.jpg"
+        },
+        {
+          uid: "-2",
+          name: "xxx.png",
+          status: "done",
+          url: "./img/spot.jpg"
+        },
+        {
+          uid: "-3",
+          name: "xxx.png",
+          status: "done",
+          url: "./img/spot.jpg"
+        }
+      ]
     };
     this.map = null;
   }
@@ -91,9 +113,6 @@ export default class siderbarDetail extends PureComponent {
       this.props.form.validateFields((err, v) => {
         if (!err) {
           console.log("图斑信息", v);
-          notification["success"]({
-            message: "编辑图斑成功"
-          });
         }
       });
     } else {
@@ -113,7 +132,15 @@ export default class siderbarDetail extends PureComponent {
       },
       spot: { spotItem }
     } = this.props;
-    const { show, from, edit, item } = this.state;
+    const {
+      show,
+      from,
+      edit,
+      item,
+      fileList,
+      previewVisible,
+      previewImage
+    } = this.state;
     return (
       <div
         style={{
@@ -121,7 +148,7 @@ export default class siderbarDetail extends PureComponent {
           width: 400,
           backgroundColor: `#fff`,
           position: `absolute`,
-          zIndex: 1001,
+          zIndex: 1000,
           borderLeft: `solid 1px #ddd`
         }}
       >
@@ -153,11 +180,12 @@ export default class siderbarDetail extends PureComponent {
             position: "absolute",
             color: "#1890ff",
             right: 25,
-            top: 60
+            top: 60,
+            zIndex: 1
           }}
           onClick={this.submit}
         />
-        <div style={{ height: "100%", overflow: `auto`, padding: 30 }}>
+        <div style={{ height: "100%", overflow: `auto`, padding: 23 }}>
           <div
             style={{
               display: from === "duty" ? "block" : "none"
@@ -180,13 +208,33 @@ export default class siderbarDetail extends PureComponent {
                 <Input defaultValue={`矢量化类型`} disabled={!edit} />
               </Form.Item>
             </Form>
-            <Carousel autoplay>
-              <img src="./img/spot.jpg" />
-              <img src="./img/spot2.jpg" />
-              <img src="./img/spot.jpg" />
-              <img src="./img/spot2.jpg" />
-              <img src="./img/spot.jpg" />
-            </Carousel>
+            <Upload
+              style={{ width: 200 }}
+              action="//jsonplaceholder.typicode.com/posts/"
+              listType="picture-card"
+              fileList={fileList}
+              onPreview={file => {
+                this.setState({
+                  previewImage: file.url || file.thumbUrl,
+                  previewVisible: true
+                });
+              }}
+              onChange={({ fileList }) => this.setState({ fileList })}
+            >
+              {edit ? (
+                <div>
+                  <Icon type="plus" />
+                  <div className="ant-upload-text">上传</div>
+                </div>
+              ) : null}
+            </Upload>
+            <Modal
+              visible={previewVisible}
+              footer={null}
+              onCancel={() => this.setState({ previewVisible: false })}
+            >
+              <img alt="example" style={{ width: "100%" }} src={previewImage} />
+            </Modal>
           </div>
           <div
             style={{
@@ -331,11 +379,33 @@ export default class siderbarDetail extends PureComponent {
                 })(<TextArea autosize={true} disabled={!edit} />)}
               </Form.Item>
             </Form>
-            <Carousel autoplay>
-              <img src="./img/spot.jpg" />
-              <img src="./img/spot2.jpg" />
-              <img src="./img/spot.jpg" />
-            </Carousel>
+            <Upload
+              style={{ width: 200 }}
+              action="//jsonplaceholder.typicode.com/posts/"
+              listType="picture-card"
+              fileList={fileList}
+              onPreview={file => {
+                this.setState({
+                  previewImage: file.url || file.thumbUrl,
+                  previewVisible: true
+                });
+              }}
+              onChange={({ fileList }) => this.setState({ fileList })}
+            >
+              {edit ? (
+                <div>
+                  <Icon type="plus" />
+                  <div className="ant-upload-text">上传</div>
+                </div>
+              ) : null}
+            </Upload>
+            <Modal
+              visible={previewVisible}
+              footer={null}
+              onCancel={() => this.setState({ previewVisible: false })}
+            >
+              <img alt="example" style={{ width: "100%" }} src={previewImage} />
+            </Modal>
             <Button type="dashed" icon="swap" style={{ marginTop: 20 }}>
               历史查看
             </Button>
@@ -418,11 +488,33 @@ export default class siderbarDetail extends PureComponent {
                 />
               </Form.Item>
             </Form>
-            <Carousel autoplay>
-              <img src="./img/spot.jpg" />
-              <img src="./img/spot2.jpg" />
-              <img src="./img/spot.jpg" />
-            </Carousel>
+            <Upload
+              style={{ width: 200 }}
+              action="//jsonplaceholder.typicode.com/posts/"
+              listType="picture-card"
+              fileList={fileList}
+              onPreview={file => {
+                this.setState({
+                  previewImage: file.url || file.thumbUrl,
+                  previewVisible: true
+                });
+              }}
+              onChange={({ fileList }) => this.setState({ fileList })}
+            >
+              {edit ? (
+                <div>
+                  <Icon type="plus" />
+                  <div className="ant-upload-text">上传</div>
+                </div>
+              ) : null}
+            </Upload>
+            <Modal
+              visible={previewVisible}
+              footer={null}
+              onCancel={() => this.setState({ previewVisible: false })}
+            >
+              <img alt="example" style={{ width: "100%" }} src={previewImage} />
+            </Modal>
           </div>
         </div>
       </div>

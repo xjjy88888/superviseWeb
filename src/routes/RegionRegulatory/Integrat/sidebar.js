@@ -99,10 +99,16 @@ export default class integrat extends PureComponent {
       previewImage: "",
       fileList: [
         {
-          uid: "-1",
+          uid: "1",
           name: "xxx.png",
           status: "done",
           url: "./img/logo2.jpg"
+        },
+        {
+          uid: "2",
+          name: "xxx.png",
+          status: "done",
+          url: "./img/spot.jpg"
         }
       ]
     };
@@ -699,7 +705,7 @@ export default class integrat extends PureComponent {
           width: 350,
           backgroundColor: "#fff",
           position: "absolute",
-          zIndex: 1001,
+          zIndex: 1000,
           height: "100%"
         }}
         ref={e => (this.refDom = e)}
@@ -1240,7 +1246,10 @@ export default class integrat extends PureComponent {
                   paddingRight: 30
                 }}
               >
-                <Collapse bordered={false} defaultActiveKey={["0", "1", "2"]}>
+                <Collapse
+                  bordered={false}
+                  defaultActiveKey={["0", "1", "2", "3"]}
+                >
                   <Collapse.Panel header={<b>基本信息</b>} key="0">
                     <div
                       style={{
@@ -2013,146 +2022,6 @@ export default class integrat extends PureComponent {
                   </Collapse.Panel>
                 */}
                 </Collapse>
-
-                {/* <List.Item>
-                <List.Item.Meta
-                  title={
-                    <span>
-                      扰动图斑：3
-                      <Icon
-                        type="link"
-                        style={{
-                          padding: 10,
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                      <Icon
-                        type="plus"
-                        style={{
-                          paddingRight: 10,
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                      <Switch
-                        checkedChildren="归档图斑"
-                        unCheckedChildren="非归档图斑"
-                      />
-                    </span>
-                  }
-                  description={
-                    <p
-                      onClick={() => {
-                        this.goSiderbarDetail("spot");
-                      }}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <span>
-                        2017154_14848_4848
-                        <Icon
-                          type="environment"
-                          style={{
-                            float: "right",
-                            fontSize: 18,
-                            cursor: "point",
-                            color: "#1890ff"
-                          }}
-                        />
-                      </span>
-                      <br />
-                      <span>
-                        2017154_14848_4848
-                        <Icon
-                          type="environment"
-                          style={{
-                            float: "right",
-                            fontSize: 18,
-                            cursor: "point",
-                            color: "#1890ff"
-                          }}
-                        />
-                      </span>
-                      <br />
-                      <span>
-                        2017154_14848_4848
-                        <Icon
-                          type="environment"
-                          style={{
-                            float: "right",
-                            fontSize: 18,
-                            cursor: "point",
-                            color: "#1890ff"
-                          }}
-                        />
-                      </span>
-                    </p>
-                  }
-                />
-              </List.Item>
-              <List.Item>
-                <List.Item.Meta
-                  title={
-                    <span>
-                      <span>设计阶段：可研</span>
-                      <br />
-                      <span> 防治责任范围：1</span>
-                      <Icon
-                        type="plus"
-                        style={{
-                          padding: 10,
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </span>
-                  }
-                  description={
-                    <p
-                      onClick={() => {
-                        this.goSiderbarDetail("duty");
-                      }}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <span>
-                        道路主题红线
-                        <Icon
-                          type="environment"
-                          style={{
-                            float: "right",
-                            fontSize: 18,
-                            cursor: "point",
-                            color: "#1890ff"
-                          }}
-                        />
-                      </span>
-                    </p>
-                  }
-                />
-              </List.Item> */}
-                <Carousel autoplay>
-                  <img src="./img/spot.jpg" />
-                  <img src="./img/spot2.jpg" />
-                  <img src="./img/spot.jpg" />
-                  <img src="./img/spot2.jpg" />
-                </Carousel>
-                <Button
-                  type="dashed"
-                  icon="cloud-download"
-                  style={{ marginTop: 20 }}
-                >
-                  项目归档
-                </Button>
-                <Button
-                  type="dashed"
-                  icon="rollback"
-                  style={{ marginLeft: 20 }}
-                >
-                  撤销归档
-                </Button>
               </List>
             </div>
             <div
@@ -2353,14 +2222,36 @@ export default class integrat extends PureComponent {
                   详情
                 </a>
               </Form>
-              <div className="clearfix">
-                <Upload listType="picture">
-                  <Button>
-                    <Icon type="upload" />
-                    上传附件
-                  </Button>
-                </Upload>
-              </div>
+            </div>
+            <div style={{ marginTop: 20 }}>
+              <Upload
+                action="//jsonplaceholder.typicode.com/posts/"
+                listType="picture-card"
+                fileList={fileList}
+                onPreview={file => {
+                  this.setState({
+                    previewImage: file.url || file.thumbUrl,
+                    previewVisible: true
+                  });
+                }}
+                onChange={({ fileList }) => this.setState({ fileList })}
+              >
+                {projectEdit ? (
+                  <div>
+                    <Icon type="plus" />
+                    <div className="ant-upload-text">上传</div>
+                  </div>
+                ) : null}
+              </Upload>
+            </div>
+            <Modal
+              visible={previewVisible}
+              footer={null}
+              onCancel={() => this.setState({ previewVisible: false })}
+            >
+              <img alt="example" style={{ width: "100%" }} src={previewImage} />
+            </Modal>
+            <div>
               <Button
                 type="dashed"
                 icon="cloud-download"
@@ -2372,7 +2263,7 @@ export default class integrat extends PureComponent {
                 撤销归档
               </Button>
             </div>
-          </div>{" "}
+          </div>
         </div>
       </div>
     );
