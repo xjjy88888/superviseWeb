@@ -20,6 +20,7 @@ export async function projectListApi(params) {
   return request(
     `${config.url.projectListUrl}?MaxResultCount=10&SkipCount=${params.row -
       10}` +
+      `&Sorting=${params.Sorting || ""}` +
       `&ProjectName=${params.ProjectName || ""}` +
       `&SupDepartment=${params.SupDepartment || ""}` +
       `&ReplyDepartment=${params.ReplyDepartment || ""}` +

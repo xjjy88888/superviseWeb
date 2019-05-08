@@ -19,10 +19,10 @@ const config = {
     spotListUrl: `${domain_}api/services/app/SpotsService/GetAll`,
 
     // id查询项目
-    projectByIdUrl: `${domain_}/api/services/app/ProjectsService/GetInfo`,
+    projectByIdUrl: `${domain_}/api/services/app/ProjectsService/Get`,
 
     // id查询图斑
-    spotBytbId: `${domain_}/api/services/app/SpotsService/GetInfo`,
+    spotBytbId: `${domain_}/api/services/app/SpotsService/Get`,
 
     //编辑图斑图形
     updateSpotGraphic: `${domain}/api/app/updateSpotGraphic`,

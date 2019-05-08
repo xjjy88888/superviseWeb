@@ -73,6 +73,8 @@ export default class integrat extends PureComponent {
       key: "project",
       query_pro_ProjectName: "",
       query_pro_MapNum: "",
+      sort_by: "",
+      sort_key: "",
       queryInfo: {},
       inputDisabled: true,
       select: [],
@@ -80,16 +82,16 @@ export default class integrat extends PureComponent {
       placeholder: "项目",
       sort: [
         {
-          title: "名称",
-          value: "name"
+          value: "名称",
+          key: "ProjectBase.Name"
         },
         {
-          title: "操作时间",
-          value: "time1"
+          value: "操作时间",
+          key: "ProjectBase.ModifyTime"
         },
         {
-          title: "立项级别",
-          value: "level"
+          value: "立项级别",
+          key: "ProjectLevel.Key"
         }
       ],
       listData: [],
@@ -130,10 +132,16 @@ export default class integrat extends PureComponent {
         row_spot,
         key,
         query_pro_ProjectName,
+        Sorting,
         query_pro_MapNum
       } = this.state;
       if (data.from === "project") {
-        this.setState({ queryInfo: data.info, row_pro: 10 });
+        this.setState({
+          sort_by: "",
+          sort_key: "",
+          queryInfo: data.info,
+          row_pro: 10
+        });
         this.queryProject({
           ...data.info,
           row: 10,
@@ -189,6 +197,7 @@ export default class integrat extends PureComponent {
       row_pro,
       row_spot,
       key,
+      Sorting,
       query_pro_ProjectName,
       query_pro_MapNum,
       queryInfo
@@ -213,6 +222,7 @@ export default class integrat extends PureComponent {
           this.queryProject({
             ...queryInfo,
             row: new_row,
+            Sorting: Sorting,
             ProjectName: query_pro_ProjectName
           });
           this.setState({ row_pro: new_row });
@@ -497,6 +507,8 @@ export default class integrat extends PureComponent {
   render() {
     const {
       show,
+      Sorting,
+      query_pro_ProjectName,
       showCompany,
       placeholder,
       sort,
@@ -517,7 +529,9 @@ export default class integrat extends PureComponent {
       problem,
       row_pro,
       row_spot,
-      queryInfo
+      queryInfo,
+      sort_by,
+      sort_key
     } = this.state;
     const {
       dispatch,
@@ -735,7 +749,12 @@ export default class integrat extends PureComponent {
             onSearch={v => {
               this.scrollDom.scrollTop = 0;
               if (key === "project") {
-                this.setState({ query_pro_ProjectName: v, row_pro: 10 });
+                this.setState({
+                  sort_by: "",
+                  sort_key: "",
+                  query_pro_ProjectName: v,
+                  row_pro: 10
+                });
                 this.queryProject({
                   ...queryInfo,
                   row: 10,
@@ -788,12 +807,54 @@ export default class integrat extends PureComponent {
           <Radio.Group
             defaultValue="a"
             buttonStyle="solid"
-            style={{ padding: "0px 20px" }}
-            onClick={this.sort}
+            style={{ padding: "0px 15px" }}
+            onClick={e => {
+              const v = e.target.value;
+              const key = v.slice(0, v.length - 1);
+              const type = v.charAt(v.length - 1);
+              console.log(v, key, type);
+            }}
           >
             {sort.map((item, index) => (
-              <Radio.Button key={index} value={item.value} focus={() => {}}>
-                {item.title}
+              <Radio.Button
+                style={{ userSelect: "none" }}
+                key={item.key}
+                value={item.key}
+                onClick={() => {
+                  const by =
+                    item.key === sort_key && sort_by && sort_by === "Desc"
+                      ? "Asc"
+                      : "Desc";
+                  this.setState({
+                    sort_key: item.key,
+                    sort_by: by
+                  });
+                  console.log(item.key, by);
+                  this.scrollDom.scrollTop = 0;
+                  if (key === "project") {
+                    const Sorting_new = `${item.key} ${by}`;
+                    this.setState({
+                      Sorting: Sorting_new,
+                      row_pro: 10
+                    });
+                    this.queryProject({
+                      ...queryInfo,
+                      Sorting: Sorting_new,
+                      row: 10,
+                      ProjectName: query_pro_ProjectName
+                    });
+                  }
+                }}
+              >
+                {item.value}
+                <Icon
+                  type={sort_by === "Desc" ? "down" : "up"}
+                  style={{
+                    display:
+                      sort_key === item.key && sort_by ? "inherit  " : "none",
+                    fontSize: 5
+                  }}
+                />
               </Radio.Button>
             ))}
           </Radio.Group>
