@@ -17,6 +17,7 @@ export async function loginApi(params) {
 
 // 项目列表
 export async function projectListApi(params) {
+  const token = JSON.parse(sessionStorage.user).accessToken;
   return request(
     `${config.url.projectListUrl}?MaxResultCount=10&SkipCount=${params.row -
       10}` +
@@ -60,13 +61,17 @@ export async function projectListApi(params) {
         params.ProjectLevel ? params.ProjectLevel.map(v => v).join(",") : ""
       }`,
     {
-      method: "GET"
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     }
   );
 }
 
 // 图斑列表
 export async function spotListApi(params) {
+  const token = JSON.parse(sessionStorage.user).accessToken;
   return request(
     `${config.url.spotListUrl}?MaxResultCount=10&SkipCount=${params.row - 10}` +
       `&Sorting=${params.Sorting || ""}` +
@@ -102,7 +107,10 @@ export async function spotListApi(params) {
           : ""
       }`,
     {
-      method: "GET"
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     }
   );
 }
