@@ -37,6 +37,7 @@ import emitter from "../../../utils/event";
 import config from "../../../config";
 import data from "../../../data";
 import { EXIF } from "exif-js";
+import { getFile } from "../../../utils/util";
 import jQuery from "jquery";
 
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
@@ -252,47 +253,6 @@ export default class integrat extends PureComponent {
     }
   }
 
-  getFile = dom => {
-    EXIF.getData(dom, function() {
-      const allMetaData = EXIF.getAllTags(this);
-
-      let direction;
-      if (allMetaData.GPSImgDirection) {
-        const directionArry = allMetaData.GPSImgDirection; // 方位角
-        direction = directionArry.numerator / directionArry.denominator;
-      }
-
-      let Longitude;
-      if (allMetaData.GPSLongitude) {
-        const LongitudeArry = allMetaData.GPSLongitude;
-        const longLongitude =
-          LongitudeArry[0].numerator / LongitudeArry[0].denominator +
-          LongitudeArry[1].numerator / LongitudeArry[1].denominator / 60 +
-          LongitudeArry[2].numerator / LongitudeArry[2].denominator / 3600;
-        Longitude = longLongitude.toFixed(8);
-      }
-
-      let Latitude;
-      if (allMetaData.GPSLatitude) {
-        const LatitudeArry = allMetaData.GPSLatitude;
-        const longLatitude =
-          LatitudeArry[0].numerator / LatitudeArry[0].denominator +
-          LatitudeArry[1].numerator / LatitudeArry[1].denominator / 60 +
-          LatitudeArry[2].numerator / LatitudeArry[2].denominator / 3600;
-        Latitude = longLatitude.toFixed(8);
-      }
-
-      console.log(allMetaData);
-      console.log(Longitude, Latitude, direction);
-      emitter.emit("imgLocation", {
-        Latitude: Latitude,
-        Longitude: Longitude,
-        direction: direction,
-        show: true
-      });
-    });
-  };
-
   queryProjectById = id => {
     const { dispatch } = this.props;
     dispatch({
@@ -346,7 +306,7 @@ export default class integrat extends PureComponent {
       previewImage: file.url || file.thumbUrl,
       previewVisible: true
     });
-    this.getFile(dom[0]);
+    getFile(dom[0]);
   };
 
   handleChange = ({ fileList }) => this.setState({ fileList });
@@ -535,6 +495,7 @@ export default class integrat extends PureComponent {
       row_pro,
       row_spot,
       queryInfo,
+      isArchivalSpot,
       sort_by,
       sort_key
     } = this.state;
@@ -1474,6 +1435,8 @@ export default class integrat extends PureComponent {
                           style={{ position: "relative", left: 10, top: -2 }}
                           onChange={(v, e) => {
                             e.stopPropagation();
+                            console.log(v);
+                            this.setState({ isArchivalSpot: v });
                           }}
                         />
                       </b>
@@ -1491,7 +1454,7 @@ export default class integrat extends PureComponent {
                         });
                       }}
                     >
-                      2017154_14848_4848
+                      2017154_14848_4848 {isArchivalSpot ? "2019-05-08" : ""}
                       <Icon
                         type="environment"
                         style={{
@@ -1513,7 +1476,7 @@ export default class integrat extends PureComponent {
                         });
                       }}
                     >
-                      2017154_14848_4848
+                      2017154_14848_4848 {isArchivalSpot ? "2019-05-08" : ""}
                       <Icon
                         type="environment"
                         style={{
@@ -2233,6 +2196,8 @@ export default class integrat extends PureComponent {
                     previewImage: file.url || file.thumbUrl,
                     previewVisible: true
                   });
+                  const dom = jQuery(`<img src=${file.url}></img>`);
+                  getFile(dom[0]);
                 }}
                 onChange={({ fileList }) => this.setState({ fileList })}
               >
@@ -2247,7 +2212,14 @@ export default class integrat extends PureComponent {
             <Modal
               visible={previewVisible}
               footer={null}
-              onCancel={() => this.setState({ previewVisible: false })}
+              onCancel={() => {
+                this.setState({ previewVisible: false });
+                emitter.emit("imgLocation", {
+                  Latitude: 0,
+                  Longitude: 0,
+                  show: false
+                });
+              }}
             >
               <img alt="example" style={{ width: "100%" }} src={previewImage} />
             </Modal>

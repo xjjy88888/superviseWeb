@@ -26,6 +26,8 @@ import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
 import zhCN from "antd/lib/locale-provider/zh_CN";
 import config from "../../../config";
+import { getFile } from "../../../utils/util";
+import jQuery from "jquery";
 
 const { TextArea } = Input;
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
@@ -218,6 +220,8 @@ export default class siderbarDetail extends PureComponent {
                   previewImage: file.url || file.thumbUrl,
                   previewVisible: true
                 });
+                const dom = jQuery(`<img src=${file.url}></img>`);
+                getFile(dom[0]);
               }}
               onChange={({ fileList }) => this.setState({ fileList })}
             >
@@ -231,7 +235,14 @@ export default class siderbarDetail extends PureComponent {
             <Modal
               visible={previewVisible}
               footer={null}
-              onCancel={() => this.setState({ previewVisible: false })}
+              onCancel={() => {
+                this.setState({ previewVisible: false });
+                emitter.emit("imgLocation", {
+                  Latitude: 0,
+                  Longitude: 0,
+                  show: false
+                });
+              }}
             >
               <img alt="example" style={{ width: "100%" }} src={previewImage} />
             </Modal>
@@ -389,6 +400,8 @@ export default class siderbarDetail extends PureComponent {
                   previewImage: file.url || file.thumbUrl,
                   previewVisible: true
                 });
+                const dom = jQuery(`<img src=${file.url}></img>`);
+                getFile(dom[0]);
               }}
               onChange={({ fileList }) => this.setState({ fileList })}
             >
@@ -402,7 +415,14 @@ export default class siderbarDetail extends PureComponent {
             <Modal
               visible={previewVisible}
               footer={null}
-              onCancel={() => this.setState({ previewVisible: false })}
+              onCancel={() => {
+                this.setState({ previewVisible: false });
+                emitter.emit("imgLocation", {
+                  Latitude: 0,
+                  Longitude: 0,
+                  show: false
+                });
+              }}
             >
               <img alt="example" style={{ width: "100%" }} src={previewImage} />
             </Modal>
@@ -498,6 +518,8 @@ export default class siderbarDetail extends PureComponent {
                   previewImage: file.url || file.thumbUrl,
                   previewVisible: true
                 });
+                const dom = jQuery(`<img src=${file.url}></img>`);
+                getFile(dom[0]);
               }}
               onChange={({ fileList }) => this.setState({ fileList })}
             >
@@ -511,7 +533,14 @@ export default class siderbarDetail extends PureComponent {
             <Modal
               visible={previewVisible}
               footer={null}
-              onCancel={() => this.setState({ previewVisible: false })}
+              onCancel={() => {
+                this.setState({ previewVisible: false });
+                emitter.emit("imgLocation", {
+                  Latitude: 0,
+                  Longitude: 0,
+                  show: false
+                });
+              }}
             >
               <img alt="example" style={{ width: "100%" }} src={previewImage} />
             </Modal>
