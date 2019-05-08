@@ -291,25 +291,6 @@ export default class integrat extends PureComponent {
     });
   };
 
-  handleCancel = () => {
-    this.setState({ previewVisible: false });
-    emitter.emit("imgLocation", {
-      Latitude: 0,
-      Longitude: 0,
-      show: false
-    });
-  };
-
-  handlePreview = file => {
-    const dom = jQuery(`<img src=${file.url}></img>`);
-    this.setState({
-      previewImage: file.url || file.thumbUrl,
-      previewVisible: true
-    });
-    getFile(dom[0]);
-  };
-
-  handleChange = ({ fileList }) => this.setState({ fileList });
   onTreeSelectChange = value => {
     this.setState({ value });
   };
@@ -354,7 +335,7 @@ export default class integrat extends PureComponent {
   };
 
   switchMenu = e => {
-    this.setState({ showQuery: false });
+    this.setState({ showQuery: false, showCheck: false });
     this.scrollDom.scrollTop = 0;
     emitter.emit("showSiderbarDetail", {
       show: false,
@@ -370,7 +351,10 @@ export default class integrat extends PureComponent {
     emitter.emit("showChart", {
       show: false
     });
-
+    emitter.emit("checkResult", {
+      show: false,
+      result: []
+    });
     const k = e.key;
     this.setState({
       placeholder:
@@ -473,6 +457,8 @@ export default class integrat extends PureComponent {
     const {
       show,
       Sorting,
+      previewVisible_min,
+      previewVisible_min_left,
       query_pro_ProjectName,
       showCompany,
       placeholder,
@@ -548,7 +534,6 @@ export default class integrat extends PureComponent {
               条
             </span>
             <Button
-              type="dashed"
               icon="dashboard"
               style={{ float: "right" }}
               onClick={() => {
@@ -558,7 +543,7 @@ export default class integrat extends PureComponent {
                 emitter.emit("showTool", {
                   show: true,
                   type: "control",
-                  typeChild: key
+                  from: key
                 });
                 emitter.emit("showQuery", {
                   show: false
@@ -568,7 +553,6 @@ export default class integrat extends PureComponent {
               {showCheck ? "" : "仪表盘"}
             </Button>
             <Button
-              type="dashed"
               icon="shopping"
               style={{ float: "right" }}
               onClick={() => {
@@ -577,7 +561,8 @@ export default class integrat extends PureComponent {
                 });
                 emitter.emit("showTool", {
                   show: true,
-                  type: "tool"
+                  type: "tool",
+                  from: key
                 });
                 emitter.emit("showQuery", {
                   show: false
@@ -597,7 +582,8 @@ export default class integrat extends PureComponent {
                 onClick={() => {
                   if (key === "project") {
                     this.setState({
-                      showProjectDetail: true
+                      showProjectDetail: true,
+                      previewVisible_min_left: false
                     });
                     this.queryProjectById(item.id);
                   } else if (key === "spot") {
@@ -654,6 +640,7 @@ export default class integrat extends PureComponent {
     const rowSelectionTable = {
       onChange: (selectedRowKeys, selectedRows) => {
         emitter.emit("checkResult", {
+          show: true,
           result: selectedRows
         });
       }
@@ -755,7 +742,11 @@ export default class integrat extends PureComponent {
             }}
             onClick={() => {
               if (key === "project") {
-                this.setState({ showProjectDetail: true, projectEdit: true });
+                this.setState({
+                  showProjectDetail: true,
+                  projectEdit: true,
+                  previewVisible_min_left: false
+                });
                 emitter.emit("showProjectDetail", {
                   show: true,
                   edit: true
@@ -1027,7 +1018,7 @@ export default class integrat extends PureComponent {
                 <p>{problem.title}</p>
                 <div
                   style={{
-                    display: previewVisible ? "block" : "none",
+                    display: previewVisible_min ? "block" : "none",
                     position: "fixed",
                     zIndex: 1,
                     width: 380
@@ -1041,12 +1032,25 @@ export default class integrat extends PureComponent {
                       top: 0,
                       right: 0
                     }}
-                    onClick={this.handleCancel}
+                    onClick={() => {
+                      this.setState({ previewVisible_min: false });
+                      emitter.emit("imgLocation", {
+                        Latitude: 0,
+                        Longitude: 0,
+                        show: false
+                      });
+                    }}
                   />
                   <img
                     alt="example"
-                    style={{ width: "100%" }}
+                    style={{ width: "100%", cursor: "pointer" }}
                     src={previewImage}
+                    onClick={() => {
+                      this.setState({
+                        previewImage: previewImage,
+                        previewVisible: true
+                      });
+                    }}
                   />
                 </div>
                 {problem.records.map((item, index) => (
@@ -1064,7 +1068,9 @@ export default class integrat extends PureComponent {
                     <Collapse
                       bordered={false}
                       style={{ position: "relative", left: -18 }}
-                      onChange={this.handleCancel}
+                      onChange={() =>
+                        this.setState({ previewVisible_min: false })
+                      }
                     >
                       <Collapse.Panel header="附件" key="1">
                         <Input.TextArea
@@ -1076,8 +1082,17 @@ export default class integrat extends PureComponent {
                           action="//jsonplaceholder.typicode.com/posts/"
                           listType="picture-card"
                           fileList={fileList}
-                          onPreview={this.handlePreview}
-                          onChange={this.handleChange}
+                          onPreview={file => {
+                            const dom = jQuery(`<img src=${file.url}></img>`);
+                            this.setState({
+                              previewImage: file.url || file.thumbUrl,
+                              previewVisible_min: true
+                            });
+                            getFile(dom[0]);
+                          }}
+                          onChange={({ fileList }) =>
+                            this.setState({ fileList })
+                          }
                         >
                           <Button type="div" icon="plus">
                             上传文件
@@ -1086,6 +1101,9 @@ export default class integrat extends PureComponent {
                             icon="picture"
                             onClick={e => {
                               e.stopPropagation();
+                              emitter.emit("screenshot", {
+                                show: true
+                              });
                             }}
                           >
                             屏幕截图
@@ -1174,6 +1192,43 @@ export default class integrat extends PureComponent {
                 }}
               />
             </p>
+            <div
+              style={{
+                display: previewVisible_min_left ? "block" : "none",
+                position: "fixed",
+                zIndex: 1,
+                width: 305
+              }}
+            >
+              <Icon
+                type="close"
+                style={{
+                  fontSize: 18,
+                  position: "absolute",
+                  top: 0,
+                  right: 0
+                }}
+                onClick={() => {
+                  this.setState({ previewVisible_min_left: false });
+                  emitter.emit("imgLocation", {
+                    Latitude: 0,
+                    Longitude: 0,
+                    show: false
+                  });
+                }}
+              />
+              <img
+                alt="example"
+                style={{ width: "100%", cursor: "pointer" }}
+                src={previewImage}
+                onClick={() => {
+                  this.setState({
+                    previewImage: previewImage,
+                    previewVisible: true
+                  });
+                }}
+              />
+            </div>
             <div
               style={{
                 display: projectEdit ? "none" : "block"
@@ -2194,7 +2249,7 @@ export default class integrat extends PureComponent {
                 onPreview={file => {
                   this.setState({
                     previewImage: file.url || file.thumbUrl,
-                    previewVisible: true
+                    previewVisible_min_left: true
                   });
                   const dom = jQuery(`<img src=${file.url}></img>`);
                   getFile(dom[0]);
@@ -2214,11 +2269,6 @@ export default class integrat extends PureComponent {
               footer={null}
               onCancel={() => {
                 this.setState({ previewVisible: false });
-                emitter.emit("imgLocation", {
-                  Latitude: 0,
-                  Longitude: 0,
-                  show: false
-                });
               }}
             >
               <img alt="example" style={{ width: "100%" }} src={previewImage} />

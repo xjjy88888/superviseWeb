@@ -80,7 +80,8 @@ export default class siderbarDetail extends PureComponent {
         show: data.show,
         edit: data.edit,
         from: data.from,
-        item: data.item
+        item: data.item,
+        previewVisible_min: false
       });
       if (data.from === "spot" && data.show) {
         this.querySpotById(data.id);
@@ -108,19 +109,6 @@ export default class siderbarDetail extends PureComponent {
     });
   };
 
-  submit = () => {
-    const { edit } = this.state;
-    this.setState({ edit: !edit });
-    if (edit) {
-      this.props.form.validateFields((err, v) => {
-        if (!err) {
-          console.log("图斑信息", v);
-        }
-      });
-    } else {
-    }
-  };
-
   render() {
     const {
       dispatch,
@@ -141,7 +129,8 @@ export default class siderbarDetail extends PureComponent {
       item,
       fileList,
       previewVisible,
-      previewImage
+      previewImage,
+      previewVisible_min
     } = this.state;
     return (
       <div
@@ -174,20 +163,94 @@ export default class siderbarDetail extends PureComponent {
             });
           }}
         />
-        <Button
-          icon={edit ? "check" : "edit"}
-          shape="circle"
+        <p
           style={{
             float: "right",
             position: "absolute",
-            color: "#1890ff",
             right: 25,
             top: 60,
             zIndex: 1
           }}
-          onClick={this.submit}
-        />
+        >
+          <Button
+            icon={edit ? "check" : "edit"}
+            shape="circle"
+            style={{
+              float: "right",
+              color: "#1890ff"
+            }}
+            onClick={() => {
+              this.setState({ edit: !edit });
+              if (edit) {
+                this.props.form.validateFields((err, v) => {
+                  if (!err) {
+                    console.log("图斑信息", v);
+                  }
+                });
+              } else {
+              }
+            }}
+          />
+          <Button
+            icon="rollback"
+            shape="circle"
+            style={{
+              display: edit ? "block" : "none",
+              float: "right",
+              color: "#1890ff"
+            }}
+            onClick={() => {
+              this.setState({ edit: !edit });
+            }}
+          />
+        </p>
         <div style={{ height: "100%", overflow: `auto`, padding: 23 }}>
+          <div
+            style={{
+              display: previewVisible_min ? "block" : "none",
+              position: "fixed",
+              zIndex: 2,
+              width: 350
+            }}
+          >
+            <Icon
+              type="close"
+              style={{
+                fontSize: 18,
+                position: "absolute",
+                top: 0,
+                right: 0
+              }}
+              onClick={() => {
+                this.setState({ previewVisible_min: false });
+                emitter.emit("imgLocation", {
+                  Latitude: 0,
+                  Longitude: 0,
+                  show: false
+                });
+              }}
+            />
+            <img
+              alt="example"
+              style={{ width: "100%", cursor: "pointer" }}
+              src={previewImage}
+              onClick={() => {
+                this.setState({
+                  previewImage: previewImage,
+                  previewVisible: true
+                });
+              }}
+            />
+          </div>
+          <Modal
+            visible={previewVisible}
+            footer={null}
+            onCancel={() => {
+              this.setState({ previewVisible: false });
+            }}
+          >
+            <img alt="example" style={{ width: "100%" }} src={previewImage} />
+          </Modal>
           <div
             style={{
               display: from === "duty" ? "block" : "none"
@@ -218,7 +281,7 @@ export default class siderbarDetail extends PureComponent {
               onPreview={file => {
                 this.setState({
                   previewImage: file.url || file.thumbUrl,
-                  previewVisible: true
+                  previewVisible_min: true
                 });
                 const dom = jQuery(`<img src=${file.url}></img>`);
                 getFile(dom[0]);
@@ -232,20 +295,6 @@ export default class siderbarDetail extends PureComponent {
                 </div>
               ) : null}
             </Upload>
-            <Modal
-              visible={previewVisible}
-              footer={null}
-              onCancel={() => {
-                this.setState({ previewVisible: false });
-                emitter.emit("imgLocation", {
-                  Latitude: 0,
-                  Longitude: 0,
-                  show: false
-                });
-              }}
-            >
-              <img alt="example" style={{ width: "100%" }} src={previewImage} />
-            </Modal>
           </div>
           <div
             style={{
@@ -398,7 +447,7 @@ export default class siderbarDetail extends PureComponent {
               onPreview={file => {
                 this.setState({
                   previewImage: file.url || file.thumbUrl,
-                  previewVisible: true
+                  previewVisible_min: true
                 });
                 const dom = jQuery(`<img src=${file.url}></img>`);
                 getFile(dom[0]);
@@ -412,20 +461,6 @@ export default class siderbarDetail extends PureComponent {
                 </div>
               ) : null}
             </Upload>
-            <Modal
-              visible={previewVisible}
-              footer={null}
-              onCancel={() => {
-                this.setState({ previewVisible: false });
-                emitter.emit("imgLocation", {
-                  Latitude: 0,
-                  Longitude: 0,
-                  show: false
-                });
-              }}
-            >
-              <img alt="example" style={{ width: "100%" }} src={previewImage} />
-            </Modal>
             <Button type="dashed" icon="swap" style={{ marginTop: 20 }}>
               历史查看
             </Button>
@@ -516,7 +551,7 @@ export default class siderbarDetail extends PureComponent {
               onPreview={file => {
                 this.setState({
                   previewImage: file.url || file.thumbUrl,
-                  previewVisible: true
+                  previewVisible_min: true
                 });
                 const dom = jQuery(`<img src=${file.url}></img>`);
                 getFile(dom[0]);
@@ -530,20 +565,6 @@ export default class siderbarDetail extends PureComponent {
                 </div>
               ) : null}
             </Upload>
-            <Modal
-              visible={previewVisible}
-              footer={null}
-              onCancel={() => {
-                this.setState({ previewVisible: false });
-                emitter.emit("imgLocation", {
-                  Latitude: 0,
-                  Longitude: 0,
-                  show: false
-                });
-              }}
-            >
-              <img alt="example" style={{ width: "100%" }} src={previewImage} />
-            </Modal>
           </div>
         </div>
       </div>

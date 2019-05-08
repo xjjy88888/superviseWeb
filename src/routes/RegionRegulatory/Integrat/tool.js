@@ -8,6 +8,7 @@ import {
   List,
   Avatar,
   Carousel,
+  Modal,
   Checkbox
 } from "antd";
 import emitter from "../../../utils/event";
@@ -22,7 +23,12 @@ const RadioGroup = Radio.Group;
 export default class siderbarDetail extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = { show: false, checkResult: [], showCheck: true };
+    this.state = {
+      show: false,
+      checkResult: [],
+      showCheck: false,
+      key: "project"
+    };
     this.charRef = ref => {
       this.chartDom = ref;
     };
@@ -33,31 +39,19 @@ export default class siderbarDetail extends PureComponent {
       this.setState({
         show: data.show,
         type: data.type,
-        typeChild: data.typeChild
+        key: data.from
       });
     });
     this.eventEmitter = emitter.addListener("checkResult", data => {
-      const result = data.result;
       this.setState({
-        checkResult: result
+        showCheck: data.show,
+        checkResult: data.result
       });
     });
   }
 
-  switchShow = () => {
-    this.setState({ show: false });
-    emitter.emit("showChart", {
-      show: false
-    });
-  };
-
-  onChange = checkedValues => {
-    console.log("checked = ", checkedValues);
-  };
-
   render() {
-    const { show, type, typeChild, checkResult, showCheck } = this.state;
-
+    const { show, type, key, checkResult, showCheck } = this.state;
     return (
       <div
         style={{
@@ -66,7 +60,7 @@ export default class siderbarDetail extends PureComponent {
           height: 490,
           backgroundColor: `#fff`,
           position: `absolute`,
-          zIndex: 1001,
+          zIndex: 1000,
           top: 410,
           borderRadius: `0px 10px 10px 0`,
           padding: `10px 10px 30px 20px`,
@@ -87,11 +81,16 @@ export default class siderbarDetail extends PureComponent {
             padding: 10,
             cursor: `pointer`
           }}
-          onClick={this.switchShow}
+          onClick={() => {
+            this.setState({ show: false });
+            emitter.emit("showChart", {
+              show: false
+            });
+          }}
         />
         <div style={{ display: type === "tool" ? "block" : "none" }}>
           <p style={{ margin: `20px 0 10px 0` }}>工具箱</p>
-          <span style={{ display: !showCheck ? "block" : "none" }}>
+          <span style={{ display: showCheck ? "block" : "none" }}>
             已选中{checkResult.length}条数据
           </span>
           {config.toolbox.map((item, index) => (
@@ -100,17 +99,23 @@ export default class siderbarDetail extends PureComponent {
                 style={{ margin: `15px 10px 0 10px` }}
                 icon={item.icon}
                 onClick={() => {
-                  switch (item.label) {
-                    case "数据抽稀":
+                  console.log(item);
+                  switch (item.key) {
+                    case "data_sparse":
                       emitter.emit("showSparse", {
                         show: true
                       });
                       break;
-                    case "勾选管理":
+                    case "checklist":
                       emitter.emit("showCheck", {
-                        show: showCheck
+                        show: !showCheck
                       });
                       this.setState({ showCheck: !showCheck });
+                      break;
+                    case "archiving":
+                      this.setState({
+                        visible: true
+                      });
                       break;
                     default:
                       break;
@@ -122,6 +127,30 @@ export default class siderbarDetail extends PureComponent {
               <br />
             </div>
           ))}
+          <Modal
+            title={`${key === "project" ? "项目" : "图斑"}数据归档`}
+            visible={this.state.visible}
+            onOk={() => {
+              this.setState({
+                visible: false
+              });
+            }}
+            onCancel={() => {
+              this.setState({
+                visible: false
+              });
+            }}
+          >
+            <p>
+              将要归档的数据有{checkResult.length}条：
+              {checkResult
+                .map(item =>
+                  key === "project" ? item.projectName : item.mapNum
+                )
+                .join("，")}
+            </p>
+            <p>归档后的数据将不再显示和操作，是否确定归档？</p>
+          </Modal>
         </div>
         <div
           style={{
@@ -130,7 +159,7 @@ export default class siderbarDetail extends PureComponent {
         >
           <div
             style={{
-              display: typeChild === "project" ? "block" : "none"
+              display: key === "project" ? "block" : "none"
             }}
           >
             <p style={{ margin: `20px 0 10px 0` }}>控制台 - 项目统计</p>
@@ -155,7 +184,7 @@ export default class siderbarDetail extends PureComponent {
           </div>
           <div
             style={{
-              display: typeChild === "project" ? "none" : "block"
+              display: key === "project" ? "none" : "block"
             }}
           >
             <p style={{ margin: `20px 0 10px 0` }}>控制台 - 图斑统计</p>

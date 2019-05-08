@@ -122,42 +122,42 @@ const config = {
   toolbox: [
     {
       label: "勾选管理",
-      value: "check",
+      key: "checklist",
       icon: "check"
     },
     {
       label: "导出当前列表数据",
-      value: "shopping",
+      key: "export",
       icon: "shopping"
     },
     {
       label: "模板下载",
-      value: "login",
+      key: "template_download",
       icon: "login"
     },
     {
       label: "模板说明",
-      value: "question-circle",
+      key: "template_description",
       icon: "question-circle"
     },
     {
       label: "批量上传(Shapfile)",
-      value: "upload",
+      key: "upload_shapfile",
       icon: "upload"
     },
     {
       label: "批量上传(Excel)",
-      value: "upload",
+      key: "upload_excel",
       icon: "upload"
     },
     {
       label: "数据归档",
-      value: "cloud-download",
+      key: "archiving",
       icon: "cloud-download"
     },
     {
       label: "数据抽稀",
-      value: "font-size",
+      key: "data_sparse",
       icon: "font-size"
     }
   ],
