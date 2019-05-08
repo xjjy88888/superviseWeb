@@ -93,40 +93,42 @@ export default class siderbarDetail extends PureComponent {
           <span style={{ display: showCheck ? "block" : "none" }}>
             已选中{checkResult.length}条数据
           </span>
-          {config.toolbox.map((item, index) => (
-            <div key={index}>
-              <Button
-                style={{ margin: `15px 10px 0 10px` }}
-                icon={item.icon}
-                onClick={() => {
-                  console.log(item);
-                  switch (item.key) {
-                    case "data_sparse":
-                      emitter.emit("showSparse", {
-                        show: true
-                      });
-                      break;
-                    case "checklist":
-                      emitter.emit("showCheck", {
-                        show: !showCheck
-                      });
-                      this.setState({ showCheck: !showCheck });
-                      break;
-                    case "archiving":
-                      this.setState({
-                        visible: true
-                      });
-                      break;
-                    default:
-                      break;
-                  }
-                }}
-              >
-                {item.label}
-              </Button>
-              <br />
-            </div>
-          ))}
+          {config.toolbox.map((item, index) =>
+            key !== "spot" || item.key !== "upload_excel" ? (
+              <div key={index}>
+                <Button
+                  style={{ margin: `15px 10px 0 10px` }}
+                  icon={item.icon}
+                  onClick={() => {
+                    console.log(item);
+                    switch (item.key) {
+                      case "data_sparse":
+                        emitter.emit("showSparse", {
+                          show: true
+                        });
+                        break;
+                      case "checklist":
+                        emitter.emit("showCheck", {
+                          show: !showCheck
+                        });
+                        this.setState({ showCheck: !showCheck });
+                        break;
+                      case "archiving":
+                        this.setState({
+                          visible: true
+                        });
+                        break;
+                      default:
+                        break;
+                    }
+                  }}
+                >
+                  {item.label}
+                </Button>
+                <br />
+              </div>
+            ) : null
+          )}
           <Modal
             title={`${key === "project" ? "项目" : "图斑"}数据归档`}
             visible={this.state.visible}
