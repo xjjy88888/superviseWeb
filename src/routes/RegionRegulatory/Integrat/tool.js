@@ -8,6 +8,7 @@ import {
   List,
   Avatar,
   Carousel,
+  notification,
   Modal,
   Checkbox
 } from "antd";
@@ -19,6 +20,7 @@ import config from "../../../config";
 
 const CheckboxGroup = Checkbox.Group;
 const RadioGroup = Radio.Group;
+const url = "http://aj.zkygis.cn/stbcSys/Template/";
 
 export default class siderbarDetail extends PureComponent {
   constructor(props) {
@@ -57,7 +59,7 @@ export default class siderbarDetail extends PureComponent {
         style={{
           left: show ? 350 : -350,
           width: 240,
-          height: 490,
+          height: 510,
           backgroundColor: `#fff`,
           position: `absolute`,
           zIndex: 1000,
@@ -94,7 +96,9 @@ export default class siderbarDetail extends PureComponent {
             已选中{checkResult.length}条数据
           </span>
           {config.toolbox.map((item, index) =>
-            key !== "spot" || item.key !== "upload_excel" ? (
+            key === "spot" &&
+            (item.key === "upload_excel" ||
+              item.key === "download_excel") ? null : (
               <div key={index}>
                 <Button
                   style={{ margin: `15px 10px 0 10px` }}
@@ -102,20 +106,56 @@ export default class siderbarDetail extends PureComponent {
                   onClick={() => {
                     console.log(item);
                     switch (item.key) {
-                      case "data_sparse":
-                        emitter.emit("showSparse", {
-                          show: true
-                        });
-                        break;
+                      //勾选管理
                       case "checklist":
                         emitter.emit("showCheck", {
                           show: !showCheck
                         });
                         this.setState({ showCheck: !showCheck });
                         break;
+                      //模板下载(Shapfile)
+                      case "download_shapfile":
+                        window.open(
+                          `${url}Shapefile/${
+                            key === "project" ? "项目红线范围" : "扰动图斑"
+                          }.zip`,
+                          "_blank"
+                        );
+                        notification["success"]({
+                          message: `下载${
+                            key === "project" ? "项目" : "图斑"
+                          }模板(Shapfile)成功`
+                        });
+                        break;
+                      //模板下载(Excel)
+                      case "download_excel":
+                        window.open(
+                          `${url}Excel/项目红线范围（无图形）.xlsx`,
+                          "_blank"
+                        );
+                        notification["success"]({
+                          message: `下载项目模板(Excel)成功`
+                        });
+                        break;
+                      //模板说明
+                      case "template_description":
+                        window.open(`${url}Shapefile/模板说明.docx`, "_blank");
+                        notification["success"]({
+                          message: `下载${
+                            key === "project" ? "项目" : "图斑"
+                          }模板说明成功`
+                        });
+                        break;
+                      //数据归档
                       case "archiving":
                         this.setState({
                           visible: true
+                        });
+                        break;
+                      //数据抽稀
+                      case "data_sparse":
+                        emitter.emit("showSparse", {
+                          show: true
                         });
                         break;
                       default:
@@ -127,7 +167,7 @@ export default class siderbarDetail extends PureComponent {
                 </Button>
                 <br />
               </div>
-            ) : null
+            )
           )}
           <Modal
             title={`${key === "project" ? "项目" : "图斑"}数据归档`}

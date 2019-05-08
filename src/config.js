@@ -131,9 +131,14 @@ const config = {
       icon: "shopping"
     },
     {
-      label: "模板下载",
-      key: "template_download",
-      icon: "login"
+      label: "模板下载(Shapfile)",
+      key: "download_shapfile",
+      icon: "download"
+    },
+    {
+      label: "模板下载(Excel)",
+      key: "download_excel",
+      icon: "download"
     },
     {
       label: "模板说明",
