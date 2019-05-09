@@ -639,6 +639,7 @@ export default class integrat extends PureComponent {
 
     const rowSelectionTable = {
       onChange: (selectedRowKeys, selectedRows) => {
+        console.log(selectedRows);
         emitter.emit("checkResult", {
           show: true,
           result: selectedRows

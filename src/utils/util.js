@@ -51,4 +51,7 @@ const getFile = dom => {
   });
 };
 
-export { dateFormat, dateTimeFormat, getFile };
+const accessToken = () =>
+  sessionStorage.length > 0 ? JSON.parse(sessionStorage.user).accessToken : "";
+
+export { dateFormat, dateTimeFormat, getFile, accessToken };

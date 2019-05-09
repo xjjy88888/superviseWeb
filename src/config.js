@@ -24,6 +24,9 @@ const config = {
     // id查询图斑
     spotBytbId: `${domain_}/api/services/app/SpotsService/Get`,
 
+    // 获取边界
+    GetBoundAsync: `${domain_}/api/services/app/User/GetBoundAsync`,
+
     //编辑图斑图形
     updateSpotGraphic: `${domain}/api/app/updateSpotGraphic`,
     //编辑项目红线图形

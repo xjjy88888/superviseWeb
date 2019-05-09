@@ -63,7 +63,7 @@ export default class integrat extends PureComponent {
       showQuery: false,
       drawGrphic: "edit",
       project_id: null, //针对新增图形的项目红线id
-      addGraphLayer: null, //针对新增图形的图层
+      addGraphLayer: null //针对新增图形的图层
     };
     this.map = null;
     this.saveRef = v => {
@@ -71,6 +71,13 @@ export default class integrat extends PureComponent {
     };
   }
   componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "mapdata/GetBoundAsync",
+      callback: boundary => {
+        console.log(boundary);
+      }
+    });
     const me = this;
     //气泡窗口详情查看
     window.goDetail = obj => {
@@ -163,7 +170,7 @@ export default class integrat extends PureComponent {
         //direction 方位角
         let picName = me.getPicByAzimuth(data.direction);
         let myIcon = L.icon({
-          iconUrl: "./img/"+picName+".png",
+          iconUrl: "./img/" + picName + ".png",
           iconSize: [60, 60]
         });
         if (marker) marker.remove();
@@ -349,10 +356,27 @@ export default class integrat extends PureComponent {
    * 根据方位角获取对应的图片
    */
   getPicByAzimuth = azimuth => {
-     let pic;
-     pic = azimuth === 0 ? 'north' :azimuth < 90 ? 'east_north':azimuth === 90 ? 'east' :azimuth < 180 ? 'east_south' :azimuth === 180  ? 'south':azimuth < 270 ? 'west_south':azimuth === 270  ? 'west':azimuth < 360  ? 'west_north' : 'north';
-     //console.log(pic);
-     return pic;
+    let pic;
+    pic =
+      azimuth === 0
+        ? "north"
+        : azimuth < 90
+        ? "east_north"
+        : azimuth === 90
+        ? "east"
+        : azimuth < 180
+        ? "east_south"
+        : azimuth === 180
+        ? "south"
+        : azimuth < 270
+        ? "west_south"
+        : azimuth === 270
+        ? "west"
+        : azimuth < 360
+        ? "west_north"
+        : "north";
+    //console.log(pic);
+    return pic;
   };
   /*
    * 自动匹配地图偏移
@@ -418,21 +442,24 @@ export default class integrat extends PureComponent {
     map.createPane("tileLayerZIndex");
     map.getPane("tileLayerZIndex").style.zIndex = 0;
 
-    const baseLayer1 = userconfig.baseLayer1 = L.tileLayer(
-      config.baseMaps[0].Url, {
+    const baseLayer1 = (userconfig.baseLayer1 = L.tileLayer(
+      config.baseMaps[0].Url,
+      {
         pane: "tileLayerZIndex"
       }
-    ); //街道图
-    const baseLayer2 = userconfig.baseLayer2  = L.tileLayer(
-      config.baseMaps[1].Url, {
+    )); //街道图
+    const baseLayer2 = (userconfig.baseLayer2 = L.tileLayer(
+      config.baseMaps[1].Url,
+      {
         pane: "tileLayerZIndex"
       }
-    ); //影像图
-    const baseLayer3 = userconfig.baseLayer3 = L.tileLayer(
-      config.baseMaps[2].Url, {
+    )); //影像图
+    const baseLayer3 = (userconfig.baseLayer3 = L.tileLayer(
+      config.baseMaps[2].Url,
+      {
         pane: "tileLayerZIndex"
       }
-    ); //监管影像
+    )); //监管影像
     map.addLayer(baseLayer2);
     userconfig.baseLayers = {
       监管影像: baseLayer3,
@@ -1109,28 +1136,29 @@ export default class integrat extends PureComponent {
    * 地图历史对比-卷帘效果
    */
   showHistoryMap = () => {
-    const {showHistoryContrast } = this.state;
+    const { showHistoryContrast } = this.state;
     if (showHistoryContrast) {
       //移除卷帘效果
-      this.removeSideBySide(); 
-      this.addSideBySide();  
-    }
-    else {
+      this.removeSideBySide();
+      this.addSideBySide();
+    } else {
       //移除卷帘效果
       this.removeSideBySide();
       //还原默认底图加载
-      map.addLayer(userconfig.baseLayer2);    
+      map.addLayer(userconfig.baseLayer2);
     }
   };
   /*
-  * 添加卷帘效果
-  */   
-  addSideBySide = () =>{
+   * 添加卷帘效果
+   */
+  addSideBySide = () => {
     //map.addLayer(userconfig.baseLayer3);
     map.addLayer(userconfig.baseLayer1);
     map.addLayer(userconfig.baseLayer2);
     //卷帘地图效果
-    userconfig.sideBySide = L.control.sideBySide(userconfig.baseLayer2, userconfig.baseLayer1).addTo(map);
+    userconfig.sideBySide = L.control
+      .sideBySide(userconfig.baseLayer2, userconfig.baseLayer1)
+      .addTo(map);
     userconfig.curleftlayer = userconfig.baseLayer2;
     userconfig.currightlayer = userconfig.baseLayer1;
     /*setTimeout(function() {
@@ -1140,21 +1168,21 @@ export default class integrat extends PureComponent {
       map.addLayer(userconfig.baseLayer1);
       sideBySide.setLeftLayers(userconfig.baseLayer2);
       sideBySide.setRightLayers(userconfig.baseLayer1);
-    }, 3000);*/     
+    }, 3000);*/
   };
   /*
-  * 移除卷帘效果
-  */ 
-  removeSideBySide = () =>{
-    if(userconfig.sideBySide){
-        userconfig.sideBySide.remove();
+   * 移除卷帘效果
+   */
+  removeSideBySide = () => {
+    if (userconfig.sideBySide) {
+      userconfig.sideBySide.remove();
     }
-    if(map.hasLayer(userconfig.baseLayer1))
-        map.removeLayer(userconfig.baseLayer1);
-    if(map.hasLayer(userconfig.baseLayer2))
-        map.removeLayer(userconfig.baseLayer2);
-    if(map.hasLayer(userconfig.baseLayer3))
-        map.removeLayer(userconfig.baseLayer3);
+    if (map.hasLayer(userconfig.baseLayer1))
+      map.removeLayer(userconfig.baseLayer1);
+    if (map.hasLayer(userconfig.baseLayer2))
+      map.removeLayer(userconfig.baseLayer2);
+    if (map.hasLayer(userconfig.baseLayer3))
+      map.removeLayer(userconfig.baseLayer3);
   };
   onChangeSelectLeft = v => {
     //console.log(v);
@@ -1171,10 +1199,10 @@ export default class integrat extends PureComponent {
         break;
       default:
     }
-    if(map.hasLayer(userconfig.curleftlayer))
-       map.removeLayer(userconfig.curleftlayer);
-    if(map.hasLayer(userconfig.currightlayer))
-       map.removeLayer(userconfig.currightlayer);
+    if (map.hasLayer(userconfig.curleftlayer))
+      map.removeLayer(userconfig.curleftlayer);
+    if (map.hasLayer(userconfig.currightlayer))
+      map.removeLayer(userconfig.currightlayer);
     map.addLayer(layer);
     map.addLayer(userconfig.currightlayer);
     userconfig.sideBySide.setLeftLayers(layer);
@@ -1196,16 +1224,15 @@ export default class integrat extends PureComponent {
         break;
       default:
     }
-    if(map.hasLayer(userconfig.curleftlayer))
-       map.removeLayer(userconfig.curleftlayer);
-    if(map.hasLayer(userconfig.currightlayer))
-       map.removeLayer(userconfig.currightlayer);
+    if (map.hasLayer(userconfig.curleftlayer))
+      map.removeLayer(userconfig.curleftlayer);
+    if (map.hasLayer(userconfig.currightlayer))
+      map.removeLayer(userconfig.currightlayer);
     map.addLayer(layer);
     map.addLayer(userconfig.curleftlayer);
     userconfig.sideBySide.setLeftLayers(userconfig.curleftlayer);
     userconfig.sideBySide.setRightLayers(layer);
     userconfig.currightlayer = layer;
-
   };
 
   render() {
