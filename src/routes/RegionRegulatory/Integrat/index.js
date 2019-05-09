@@ -240,7 +240,8 @@ export default class integrat extends PureComponent {
         map.on("pm:drawstart", ({ workingLayer }) => {
           workingLayer.on("pm:vertexadded", e => {
             let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
-            if (!turf.booleanContains(userconfig.polygon, turfpoint)) {
+            //if (!turf.booleanContains(userconfig.polygon, turfpoint)) {
+            if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {
               map.pm.disableDraw("Polygon");
               emitter.emit("showSiderbarDetail", {
                 show: false,
@@ -282,7 +283,8 @@ export default class integrat extends PureComponent {
         map.on("pm:drawstart", ({ workingLayer }) => {
           workingLayer.on("pm:vertexadded", e => {
             let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
-            if (!turf.booleanContains(userconfig.polygon, turfpoint)) {
+            //if (!turf.booleanContains(userconfig.polygon, turfpoint)) {
+            if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {              
               map.pm.disableDraw("Polygon");
               emitter.emit("showSiderbarDetail", {
                 show: false,
@@ -521,7 +523,8 @@ export default class integrat extends PureComponent {
   onClickMap = e => {
     const me = this;
     let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
-    if (!turf.booleanContains(userconfig.polygon, turfpoint)) {
+    //if (!turf.booleanContains(userconfig.polygon, turfpoint)) {
+    if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {      
       message.warning("区域范围之外的数据没有权限操作", 1);
       return;
     }
@@ -767,9 +770,13 @@ export default class integrat extends PureComponent {
       features: [
         {
           "type": "Feature",
-          "geometry": {
+          /*"geometry": {
             "type": "Polygon",
             "coordinates": userconfig.geojson.coordinates[0]
+          }*/
+          "geometry": {
+            "type": "MultiPolygon",
+            "coordinates": userconfig.geojson.coordinates
           }
         }
       ]
@@ -792,8 +799,9 @@ export default class integrat extends PureComponent {
     map.fitBounds(bounds);
     //构造面
     //userconfig.polygon = turf.multiPolygon(userconfig.geojson.coordinates);
+    userconfig.polygon = turf.multiPolygon(geojson.features[0].geometry.coordinates);
     //userconfig.polygon = turf.polygon(userconfig.geojson.coordinates[0]);
-    userconfig.polygon = turf.polygon(geojson.features[0].geometry.coordinates);
+    //userconfig.polygon = turf.polygon(geojson.features[0].geometry.coordinates);
     if (userconfig.dwdm === "100000") {
       //admin管理员
     } else if (userconfig.dwdm.endsWith("0000")) {

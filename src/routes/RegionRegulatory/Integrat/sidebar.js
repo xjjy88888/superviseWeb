@@ -622,14 +622,14 @@ export default class integrat extends PureComponent {
             <span>
               {" "}
               {key === "project"
-                ? `建设单位：${item.productDepartmentName}`
-                : `关联项目：${item.projectName}`}
+                ? `建设单位：${item.productDepartmentName || ""}`
+                : `关联项目：${item.projectName || ""}`}
             </span>
             <br />
             <span>
               {key === "project"
-                ? `批复机构：${item.replyDepartmentName}`
-                : `扰动合规性：${item.interferenceCompliance}`}
+                ? `批复机构：${item.replyDepartmentName || ""}`
+                : `扰动合规性：${item.interferenceCompliance || ""}`}
             </span>
           </span>
         )
