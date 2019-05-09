@@ -117,7 +117,8 @@ export default class integrat extends PureComponent {
   }
 
   componentDidMount() {
-    console.log("sider_componentDidMount");
+    this.queryProject({ row: 10 });
+    this.querySpot({ row: 10 });
     this.eventEmitter = emitter.addListener("showSiderbar", data => {
       this.setState({
         show: data.show
@@ -189,12 +190,6 @@ export default class integrat extends PureComponent {
         });
         this.queryProjectById(data.id);
       }
-    });
-    this.queryProject({ row: 10 });
-    this.querySpot({ row: 10 });
-    this.eventEmitter = emitter.addListener("polygon", data => {
-      this.queryProject({ row: 10 });
-      this.querySpot({ row: 10 });
     });
     const { clientHeight } = this.refDom;
     this.setState({
