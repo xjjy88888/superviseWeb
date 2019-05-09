@@ -32,9 +32,6 @@ import "leaflet-navbar";
 import "leaflet-side-by-side";
 import "leaflet-measure/dist/leaflet-measure.css";
 import "leaflet-measure/dist/leaflet-measure.cn";
-import leafletImage from "leaflet-image";
-//import "leaflet-area-select-npm/dist/leaflet-areaselect.css";
-//import "leaflet-area-select-npm/dist/leaflet-areaselect.js";
 import shp from "shpjs";
 import * as turf from "@turf/turf";
 //import '@h21-map/leaflet-path-drag';
@@ -66,7 +63,8 @@ export default class integrat extends PureComponent {
       showQuery: false,
       drawGrphic: "edit",
       project_id: null, //针对新增图形的项目红线id
-      addGraphLayer: null //针对新增图形的图层
+      addGraphLayer: null, //针对新增图形的图层
+      //historymap: null //卷帘地图
     };
     this.map = null;
     this.saveRef = v => {
@@ -74,8 +72,8 @@ export default class integrat extends PureComponent {
     };
   }
   componentDidMount() {
-    const { dispatch } = this.props;
     const me = this;
+    const { dispatch } = this.props;
     dispatch({
       type: "mapdata/GetBoundAsync",
       callback: boundary => {
@@ -148,6 +146,8 @@ export default class integrat extends PureComponent {
     };
     //获取url参数
     me.initUrlParams();
+    // 创建地图
+    //me.createMap();
     // 组件通信
     //地图定位
     this.eventEmitter = emitter.addListener("mapLocation", data => {
@@ -169,12 +169,12 @@ export default class integrat extends PureComponent {
     });
     //照片定位
     this.eventEmitter = emitter.addListener("imgLocation", data => {
-      if (data.show && data.Latitude) {
+      if (data.show) {
         let latLng = [data.Latitude, data.Longitude];
         //direction 方位角
         let picName = me.getPicByAzimuth(data.direction);
         let myIcon = L.icon({
-          iconUrl: "./img/" + picName + ".png",
+          iconUrl: "./img/"+picName+".png",
           iconSize: [60, 60]
         });
         if (marker) marker.remove();
@@ -187,7 +187,7 @@ export default class integrat extends PureComponent {
       }
     });
     //屏幕截图
-    this.eventEmitter = emitter.addListener("screenshot", data => {
+     this.eventEmitter = emitter.addListener("screenshot", data => {
       //var areaSelect = L.areaSelect({width:200, height:300});
       //areaSelect.addTo(map);
       //绘制图形之前 
@@ -212,7 +212,7 @@ export default class integrat extends PureComponent {
         let width = Math.abs((northEastPoint.x - southWestPoint.x));
         let height = Math.abs((northEastPoint.y - southWestPoint.y));
         //let size = {x:width,y:height};
-        leafletImage(map, (err, canvas)=>{
+        /*leafletImage(map, (err, canvas)=>{
           //console.log(canvas.toDataURL());
           //let snapshot = document.getElementById('snapshot');
           var img = document.createElement('img');
@@ -224,9 +224,9 @@ export default class integrat extends PureComponent {
           img.src = canvas.toDataURL();
           //snapshot.innerHTML = '';
           //snapshot.appendChild(img);
-        });
+        });*/
       });  
-    });
+    });   
     //绘制扰动图斑图形
     this.eventEmitter = emitter.addListener("drawSpot", data => {
       if (data.draw) {
@@ -401,27 +401,10 @@ export default class integrat extends PureComponent {
    * 根据方位角获取对应的图片
    */
   getPicByAzimuth = azimuth => {
-    let pic;
-    pic =
-      azimuth === 0
-        ? "north"
-        : azimuth < 90
-        ? "east_north"
-        : azimuth === 90
-        ? "east"
-        : azimuth < 180
-        ? "east_south"
-        : azimuth === 180
-        ? "south"
-        : azimuth < 270
-        ? "west_south"
-        : azimuth === 270
-        ? "west"
-        : azimuth < 360
-        ? "west_north"
-        : "north";
-    //console.log(pic);
-    return pic;
+     let pic;
+     pic = azimuth === 0 ? 'north' :azimuth < 90 ? 'east_north':azimuth === 90 ? 'east' :azimuth < 180 ? 'east_south' :azimuth === 180  ? 'south':azimuth < 270 ? 'west_south':azimuth === 270  ? 'west':azimuth < 360  ? 'west_north' : 'north';
+     //console.log(pic);
+     return pic;
   };
   /*
    * 自动匹配地图偏移
@@ -480,14 +463,12 @@ export default class integrat extends PureComponent {
     });
     map = L.map("map", {
       zoomControl: false,
-      attributionControl: false,
-      preferCanvas:true
+      attributionControl: false
       //editable: true
     }).setView(config.mapInitParams.center, config.mapInitParams.zoom);
 
     map.createPane("tileLayerZIndex");
     map.getPane("tileLayerZIndex").style.zIndex = 0;
-
     const baseLayer1 = (userconfig.baseLayer1 = L.tileLayer(
       config.baseMaps[0].Url,
       {
@@ -536,10 +517,6 @@ export default class integrat extends PureComponent {
     };
     // 将图层绘制控件添加的地图页面上
     map.pm.addControls(options);
-    /*leafletImage(map, (err, canvas)=>{
-      console.log(canvas.toDataURL());
-    });*/
-
   };
   onClickMap = e => {
     const me = this;
@@ -783,11 +760,25 @@ export default class integrat extends PureComponent {
    */
   getRegionGeometry = () => {
     const me = this;
+   
     //调用后台接口形式改造
+    let geojson = {
+      type: "FeatureCollection",
+      features: [
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": userconfig.geojson.coordinates[0]
+          }
+        }
+      ]
+    };
+    userconfig.geojson = geojson;
     // L.Proj.GeoJSON继承于L.GeoJSON，可调样式
     map.createPane("geoJsonZIndex");
     map.getPane("geoJsonZIndex").style.zIndex = 1;
-    userconfig.geoJsonLayer = L.Proj.geoJson(userconfig.geojson, {
+    userconfig.geoJsonLayer = L.Proj.geoJson(geojson, {
       style: {
         color: "#0070FF",
         weight: 3,
@@ -796,28 +787,29 @@ export default class integrat extends PureComponent {
         fillOpacity: 0
       },
       pane: "geoJsonZIndex"
-    }).addTo(map);    
+    }).addTo(map);  
+    let bounds = userconfig.geoJsonLayer.getBounds();
+    map.fitBounds(bounds);
+    //构造面
+    //userconfig.polygon = turf.multiPolygon(userconfig.geojson.coordinates);
+    //userconfig.polygon = turf.polygon(userconfig.geojson.coordinates[0]);
+    userconfig.polygon = turf.polygon(geojson.features[0].geometry.coordinates);
+    if (userconfig.dwdm === "100000") {
+      //admin管理员
+    } else if (userconfig.dwdm.endsWith("0000")) {
+      userconfig.zoom = map.getZoom() + 1;
+    } else if (userconfig.dwdm.endsWith("00")) {
+      userconfig.zoom = map.getZoom() + 1;
+    } else {
+      userconfig.zoom = map.getZoom() + 1;
+    }
+    //加载geoserver发布的WMS地图服务
+    me.overlayWMSLayers();
+    //地图模态层效果
+    me.loadmodalLayer();
 
-
-    //let url = "";
-    /*if(userconfig.regionArea != "") {//流域账号
-      //url = config.url.xzqhUrl + "/0?t=" + timeStamp;//区县
-  }
-  else{
-      if (userconfig.dwdm == "100000") { //admin管理员
-          url = "SHP/Country.zip"; //全国
-      }
-      else if (userconfig.dwdm.endsWith("0000")) {
-          url = "SHP/Province.zip"; //省
-      }
-      else if (userconfig.dwdm.endsWith("00")) {
-          url = "SHP/City.zip";//市
-      }
-      else {
-          url = "SHP/District.zip";//区县
-      }
-  }*/
-    /*if (userconfig.dwdm === "100000") {
+    /*let url = "";
+    if (userconfig.dwdm === "100000") {
       //admin管理员
       url = config.mapUrl.SHP + "Country.zip"; //全国
     } else if (userconfig.dwdm.endsWith("0000")) {
@@ -844,7 +836,7 @@ export default class integrat extends PureComponent {
           let len = data.features.length;
           for (let i = 0; i < len; i++) {
             let feature = data.features[i];
-            if (feature.properties.XZQDM === userconfig.dwdm) {
+            if (feature.properties.XZQDM == userconfig.dwdm) {
               geojson.features.push(feature);
               userconfig.geojson = geojson;
               // L.Proj.GeoJSON继承于L.GeoJSON，可调样式
@@ -1039,7 +1031,6 @@ export default class integrat extends PureComponent {
     this.setState({ showButton: false });
     const { addGraphLayer } = this.state;
     //禁止编辑图形
-    map.pm.disableDraw("Polygon");
     if (addGraphLayer) {
       addGraphLayer.pm.disable();
       map.removeLayer(addGraphLayer);
@@ -1381,14 +1372,6 @@ export default class integrat extends PureComponent {
                 }}
               />
             </div>
-            {/*<div id='snapshot' style={{
-                position: "absolute",
-                top: 65,
-                right: 300,
-                //height: 0,
-                zIndex: 1000,
-                background: "transparent"
-              }}></div>*/}
             {/* 图例说明、历史对比 */}
             <div
               style={{

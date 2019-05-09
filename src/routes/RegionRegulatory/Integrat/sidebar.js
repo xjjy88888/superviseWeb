@@ -828,7 +828,7 @@ export default class integrat extends PureComponent {
               >
                 {item.value}
                 <Icon
-                  type={sort_by === "Desc" ? "down" : "up"}
+                  type={sort_by === "Desc" ? "caret-down" : "caret-up"}
                   style={{
                     display:
                       sort_key === item.key && sort_by ? "inherit  " : "none",

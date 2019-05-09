@@ -221,7 +221,7 @@ export async function queryWFSLayer(params) {
     method: "GET",
     dataType: "json",
     headers: {
-      Authorization: `Bearer ${accessToken()}`
+      //Authorization: `Bearer ${accessToken()}`
     }
   });
 }

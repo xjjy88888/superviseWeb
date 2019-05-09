@@ -129,14 +129,19 @@ const config = {
       icon: "check"
     },
     {
-      label: "导出当前列表数据",
+      label: "导出",
       key: "export",
-      icon: "shopping"
+      icon: "export"
+    },
+    {
+      label: "归档",
+      key: "archiving",
+      icon: "folder-open"
     },
     {
       label: "模板下载(Shapfile)",
       key: "download_shapfile",
-      icon: "download"
+      icon: "cloud-download"
     },
     {
       label: "模板下载(Excel)",
@@ -151,17 +156,12 @@ const config = {
     {
       label: "批量上传(Shapfile)",
       key: "upload_shapfile",
-      icon: "upload"
+      icon: "cloud-upload"
     },
     {
       label: "批量上传(Excel)",
       key: "upload_excel",
       icon: "upload"
-    },
-    {
-      label: "数据归档",
-      key: "archiving",
-      icon: "cloud-download"
     },
     {
       label: "数据抽稀",
