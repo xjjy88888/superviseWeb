@@ -9,6 +9,7 @@ import {
   Avatar,
   Carousel,
   notification,
+  Alert,
   Modal,
   Checkbox
 } from "antd";
@@ -148,9 +149,16 @@ export default class siderbarDetail extends PureComponent {
                         break;
                       //数据归档
                       case "archiving":
-                        this.setState({
-                          visible: true
-                        });
+                        console.log(showCheck);
+                        if (showCheck && checkResult.length === 0) {
+                          notification["warning"]({
+                            message: "至少选择一条数据进行归档"
+                          });
+                        } else {
+                          this.setState({
+                            visible: true
+                          });
+                        }
                         break;
                       //数据抽稀
                       case "data_sparse":
@@ -184,14 +192,25 @@ export default class siderbarDetail extends PureComponent {
             }}
           >
             <p>
-              将要归档的数据有{checkResult.length}条：
-              {checkResult
-                .map(item =>
-                  key === "project" ? item.projectName : item.mapNum
-                )
-                .join("，")}
+              {showCheck ? (
+                <span>
+                  将要归档的数据有{checkResult.length}条：
+                  {checkResult
+                    .map(item =>
+                      key === "project" ? item.projectName : item.mapNum
+                    )
+                    .join("，")}
+                </span>
+              ) : (
+                <span>将要归档全部数据</span>
+              )}
             </p>
-            <p>归档后的数据将不再显示和操作，是否确定归档？</p>
+
+            <Alert
+              type="warning"
+              message="归档后的数据将不再显示和操作，是否确定归档？"
+              showIcon
+            />
           </Modal>
         </div>
         <div

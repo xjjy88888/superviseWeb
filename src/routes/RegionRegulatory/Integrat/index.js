@@ -32,6 +32,9 @@ import "leaflet-navbar";
 import "leaflet-side-by-side";
 import "leaflet-measure/dist/leaflet-measure.css";
 import "leaflet-measure/dist/leaflet-measure.cn";
+import leafletImage from "leaflet-image";
+//import "leaflet-area-select-npm/dist/leaflet-areaselect.css";
+//import "leaflet-area-select-npm/dist/leaflet-areaselect.js";
 import shp from "shpjs";
 import * as turf from "@turf/turf";
 //import '@h21-map/leaflet-path-drag';
@@ -72,13 +75,16 @@ export default class integrat extends PureComponent {
   }
   componentDidMount() {
     const { dispatch } = this.props;
+    const me = this;
     dispatch({
       type: "mapdata/GetBoundAsync",
       callback: boundary => {
-        console.log(boundary);
+        //console.log(boundary);       
+        userconfig.geojson = JSON.parse(boundary.result);
+        // 创建地图
+        me.createMap();
       }
     });
-    const me = this;
     //气泡窗口详情查看
     window.goDetail = obj => {
       //console.log("goDetail", obj);
@@ -142,8 +148,6 @@ export default class integrat extends PureComponent {
     };
     //获取url参数
     me.initUrlParams();
-    // 创建地图
-    me.createMap();
     // 组件通信
     //地图定位
     this.eventEmitter = emitter.addListener("mapLocation", data => {
@@ -181,6 +185,47 @@ export default class integrat extends PureComponent {
       } else {
         if (marker) marker.remove();
       }
+    });
+    //屏幕截图
+    this.eventEmitter = emitter.addListener("screenshot", data => {
+      //var areaSelect = L.areaSelect({width:200, height:300});
+      //areaSelect.addTo(map);
+      //绘制图形之前 
+      if (userconfig.screenLayer) {
+        map.removeLayer(userconfig.screenLayer);
+      }     
+      //绘制矩形
+      map.pm.enableDraw("Rectangle", {
+        finishOn: "dblclick",
+        allowSelfIntersection: false,
+        tooltips: false
+      });  
+      map.on("pm:create", e => {
+        userconfig.screenLayer = e.layer;
+        //console.log(userconfig.screenLayer.getBounds());
+        let northEast = userconfig.screenLayer.getBounds()._northEast;
+        let southWest = userconfig.screenLayer.getBounds()._southWest;
+        //console.log(map.latLngToContainerPoint(northEast));
+        //console.log(map.latLngToContainerPoint(southWest));
+        let northEastPoint = map.latLngToContainerPoint(northEast);
+        let southWestPoint = map.latLngToContainerPoint(southWest);
+        let width = Math.abs((northEastPoint.x - southWestPoint.x));
+        let height = Math.abs((northEastPoint.y - southWestPoint.y));
+        //let size = {x:width,y:height};
+        leafletImage(map, (err, canvas)=>{
+          //console.log(canvas.toDataURL());
+          //let snapshot = document.getElementById('snapshot');
+          var img = document.createElement('img');
+          img.width = width;
+          img.height = height;
+          //var dimensions = map.getSize();
+          //img.width = dimensions.x;
+          //img.height = dimensions.y;
+          img.src = canvas.toDataURL();
+          //snapshot.innerHTML = '';
+          //snapshot.appendChild(img);
+        });
+      });  
     });
     //绘制扰动图斑图形
     this.eventEmitter = emitter.addListener("drawSpot", data => {
@@ -435,7 +480,8 @@ export default class integrat extends PureComponent {
     });
     map = L.map("map", {
       zoomControl: false,
-      attributionControl: false
+      attributionControl: false,
+      preferCanvas:true
       //editable: true
     }).setView(config.mapInitParams.center, config.mapInitParams.zoom);
 
@@ -490,6 +536,10 @@ export default class integrat extends PureComponent {
     };
     // 将图层绘制控件添加的地图页面上
     map.pm.addControls(options);
+    /*leafletImage(map, (err, canvas)=>{
+      console.log(canvas.toDataURL());
+    });*/
+
   };
   onClickMap = e => {
     const me = this;
@@ -733,7 +783,23 @@ export default class integrat extends PureComponent {
    */
   getRegionGeometry = () => {
     const me = this;
-    let url = "";
+    //调用后台接口形式改造
+    // L.Proj.GeoJSON继承于L.GeoJSON，可调样式
+    map.createPane("geoJsonZIndex");
+    map.getPane("geoJsonZIndex").style.zIndex = 1;
+    userconfig.geoJsonLayer = L.Proj.geoJson(userconfig.geojson, {
+      style: {
+        color: "#0070FF",
+        weight: 3,
+        opacity: 1,
+        //"fillColor":"",
+        fillOpacity: 0
+      },
+      pane: "geoJsonZIndex"
+    }).addTo(map);    
+
+
+    //let url = "";
     /*if(userconfig.regionArea != "") {//流域账号
       //url = config.url.xzqhUrl + "/0?t=" + timeStamp;//区县
   }
@@ -751,7 +817,7 @@ export default class integrat extends PureComponent {
           url = "SHP/District.zip";//区县
       }
   }*/
-    if (userconfig.dwdm === "100000") {
+    /*if (userconfig.dwdm === "100000") {
       //admin管理员
       url = config.mapUrl.SHP + "Country.zip"; //全国
     } else if (userconfig.dwdm.endsWith("0000")) {
@@ -761,7 +827,7 @@ export default class integrat extends PureComponent {
     } else {
       url = config.mapUrl.SHP + "District.zip"; //区县
     }
-    me.loadSHP(url);
+    me.loadSHP(url);*/
   };
   /*
    * 获取SHP图层
@@ -778,7 +844,7 @@ export default class integrat extends PureComponent {
           let len = data.features.length;
           for (let i = 0; i < len; i++) {
             let feature = data.features[i];
-            if (feature.properties.XZQDM == userconfig.dwdm) {
+            if (feature.properties.XZQDM === userconfig.dwdm) {
               geojson.features.push(feature);
               userconfig.geojson = geojson;
               // L.Proj.GeoJSON继承于L.GeoJSON，可调样式
@@ -1315,6 +1381,14 @@ export default class integrat extends PureComponent {
                 }}
               />
             </div>
+            {/*<div id='snapshot' style={{
+                position: "absolute",
+                top: 65,
+                right: 300,
+                //height: 0,
+                zIndex: 1000,
+                background: "transparent"
+              }}></div>*/}
             {/* 图例说明、历史对比 */}
             <div
               style={{

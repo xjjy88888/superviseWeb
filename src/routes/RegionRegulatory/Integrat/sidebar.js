@@ -117,6 +117,7 @@ export default class integrat extends PureComponent {
   }
 
   componentDidMount() {
+    console.log("sider_componentDidMount");
     this.eventEmitter = emitter.addListener("showSiderbar", data => {
       this.setState({
         show: data.show
@@ -142,7 +143,12 @@ export default class integrat extends PureComponent {
         Sorting,
         query_pro_MapNum
       } = this.state;
+      emitter.emit("checkResult", {
+        show: false,
+        result: []
+      });
       this.setState({
+        showCheck: false,
         sort_by: "",
         sort_key: "",
         queryInfo: data.info
@@ -184,6 +190,8 @@ export default class integrat extends PureComponent {
         this.queryProjectById(data.id);
       }
     });
+    this.queryProject({ row: 10 });
+    this.querySpot({ row: 10 });
     this.eventEmitter = emitter.addListener("polygon", data => {
       this.queryProject({ row: 10 });
       this.querySpot({ row: 10 });
@@ -523,12 +531,8 @@ export default class integrat extends PureComponent {
             <span>
               共有
               {key === "project"
-                ? row_pro < projectList.totalCount
-                  ? row_pro
-                  : projectList.totalCount
-                : row_spot < spotList.totalCount
-                ? row_spot
-                : spotList.totalCount}
+                ? projectList.items.length
+                : spotList.items.length}
               /
               {key === "project" ? projectList.totalCount : spotList.totalCount}
               条
@@ -702,7 +706,12 @@ export default class integrat extends PureComponent {
             placeholder={`${placeholder}`}
             onSearch={v => {
               this.scrollDom.scrollTop = 0;
+              emitter.emit("checkResult", {
+                show: false,
+                result: []
+              });
               this.setState({
+                showCheck: false,
                 sort_by: "",
                 sort_key: "",
                 query_pro_ProjectName: v,
