@@ -348,9 +348,9 @@ const config = {
       ]
     }
   },
-  mapLayersName: "ZKYGIS:project_scope,ZKYGIS:spot",
-  mapProjectLayerName: "ZKYGIS:project_scope",
-  mapSpotLayerName: "ZKYGIS:spot",
+  mapLayersName: "ZKYGIS:bs_project_scope,ZKYGIS:bs_spot",
+  mapProjectLayerName: "ZKYGIS:bs_project_scope",
+  mapSpotLayerName: "ZKYGIS:bs_spot",
 
   legend: [
     {

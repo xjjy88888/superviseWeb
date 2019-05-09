@@ -64,7 +64,6 @@ export default class integrat extends PureComponent {
       drawGrphic: "edit",
       project_id: null, //针对新增图形的项目红线id
       addGraphLayer: null, //针对新增图形的图层
-      //historymap: null //卷帘地图
     };
     this.map = null;
     this.saveRef = v => {
@@ -85,7 +84,6 @@ export default class integrat extends PureComponent {
     });
     //气泡窗口详情查看
     window.goDetail = obj => {
-      //console.log("goDetail", obj);
       emitter.emit("showProjectSpotInfo", obj);
     };
     //气泡窗口图形编辑
@@ -101,7 +99,7 @@ export default class integrat extends PureComponent {
       } else if (obj.from === "spot") {
         me.queryWFSServiceByProperty(
           obj.id,
-          "spot_tbid",
+          "map_num",
           config.mapSpotLayerName,
           me.callbackEditQueryWFSService
         );
@@ -153,15 +151,15 @@ export default class integrat extends PureComponent {
     this.eventEmitter = emitter.addListener("mapLocation", data => {
       if (data.key === "project") {
         this.queryWFSServiceByProperty(
-          data.item.project_id,
+          data.item.projectId,
           "project_id",
           config.mapProjectLayerName,
           this.callbackLocationQueryWFSService
         );
       } else if (data.key === "spot") {
         this.queryWFSServiceByProperty(
-          data.item.spot_tbid,
-          "spot_tbid",
+          data.item.mapNum,
+          "map_num",
           config.mapSpotLayerName,
           this.callbackLocationQueryWFSService
         );
@@ -770,10 +768,6 @@ export default class integrat extends PureComponent {
       features: [
         {
           "type": "Feature",
-          /*"geometry": {
-            "type": "Polygon",
-            "coordinates": userconfig.geojson.coordinates[0]
-          }*/
           "geometry": {
             "type": "MultiPolygon",
             "coordinates": userconfig.geojson.coordinates
@@ -798,10 +792,7 @@ export default class integrat extends PureComponent {
     let bounds = userconfig.geoJsonLayer.getBounds();
     map.fitBounds(bounds);
     //构造面
-    //userconfig.polygon = turf.multiPolygon(userconfig.geojson.coordinates);
     userconfig.polygon = turf.multiPolygon(geojson.features[0].geometry.coordinates);
-    //userconfig.polygon = turf.polygon(userconfig.geojson.coordinates[0]);
-    //userconfig.polygon = turf.polygon(geojson.features[0].geometry.coordinates);
     if (userconfig.dwdm === "100000") {
       //admin管理员
     } else if (userconfig.dwdm.endsWith("0000")) {
@@ -965,7 +956,7 @@ export default class integrat extends PureComponent {
     //加载项目红线图层wms
     L.tileLayer
       .wms(config.mapUrl.geoserverUrl + "/wms?", {
-        layers: "ZKYGIS:project_scope", //需要加载的图层
+        layers: "ZKYGIS:bs_project_scope", //需要加载的图层
         format: "image/png", //返回的数据格式
         transparent: true
       })
@@ -973,7 +964,7 @@ export default class integrat extends PureComponent {
     //加载图斑图层wms
     L.tileLayer
       .wms(config.mapUrl.geoserverUrl + "/wms?", {
-        layers: "ZKYGIS:spot", //需要加载的图层
+        layers: "	ZKYGIS:bs_spot", //需要加载的图层
         format: "image/png", //返回的数据格式
         transparent: true
       })
@@ -1226,14 +1217,6 @@ export default class integrat extends PureComponent {
       .addTo(map);
     userconfig.curleftlayer = userconfig.baseLayer2;
     userconfig.currightlayer = userconfig.baseLayer1;
-    /*setTimeout(function() {
-      map.removeLayer(userconfig.baseLayer1);
-      map.removeLayer(userconfig.baseLayer2);
-      map.addLayer(userconfig.baseLayer2);
-      map.addLayer(userconfig.baseLayer1);
-      sideBySide.setLeftLayers(userconfig.baseLayer2);
-      sideBySide.setRightLayers(userconfig.baseLayer1);
-    }, 3000);*/
   };
   /*
    * 移除卷帘效果

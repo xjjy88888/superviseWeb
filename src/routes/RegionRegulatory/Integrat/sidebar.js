@@ -620,7 +620,6 @@ export default class integrat extends PureComponent {
               />
             </p>
             <span>
-              {" "}
               {key === "project"
                 ? `建设单位：${item.productDepartmentName || ""}`
                 : `关联项目：${item.projectName || ""}`}
