@@ -193,6 +193,7 @@ export default class integrat extends PureComponent {
           projectEdit: data.edit
         });
         this.queryProjectById(data.id);
+        this.querySpotByProjectId(data.id);
       }
     });
     const { clientHeight } = this.refDom;
@@ -322,6 +323,18 @@ export default class integrat extends PureComponent {
       type: "project/queryProjectById",
       payload: {
         id: id
+      }
+    });
+  };
+
+  querySpotByProjectId = id => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "spot/querySpotByProjectId",
+      payload: {
+        ProjectId: id,
+        MaxResultCount: 20,
+        row: 10
       }
     });
   };
@@ -522,7 +535,7 @@ export default class integrat extends PureComponent {
     const {
       dispatch,
       project: { projectList, projectItem },
-      spot: { spotList },
+      spot: { spotList, projectInfoSpotList },
       point: { pointList }
     } = this.props;
     console.log(this.props);
@@ -629,6 +642,7 @@ export default class integrat extends PureComponent {
                       previewVisible_min_left: false
                     });
                     this.queryProjectById(item.id);
+                    this.querySpotByProjectId(item.id);
                   } else if (key === "spot") {
                     emitter.emit("showSiderbarDetail", {
                       show: key === "spot",
@@ -1534,7 +1548,7 @@ export default class integrat extends PureComponent {
                   <Collapse.Panel
                     header={
                       <b>
-                        扰动图斑：2
+                        扰动图斑：{projectInfoSpotList.items.length}
                         <Icon
                           type="plus-circle"
                           style={{
@@ -1570,50 +1584,38 @@ export default class integrat extends PureComponent {
                     }
                     key="2"
                   >
-                    <p
-                      style={{ cursor: "pointer" }}
-                      onClick={() => {
-                        this.closeAll();
-                        emitter.emit("showSiderbarDetail", {
-                          show: true,
-                          from: "spot",
-                          item: { id: "2017154_14848_4848" }
-                        });
-                      }}
-                    >
-                      2017154_14848_4848 {isArchivalSpot ? "2019-05-08" : ""}
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
+                    {projectInfoSpotList.items.map((item, index) => (
+                      <p
+                        key={index}
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          this.closeAll();
+                          emitter.emit("showSiderbarDetail", {
+                            show: true,
+                            from: "spot",
+                            item: { id: item.id }
+                          });
                         }}
-                      />
-                    </p>
-                    <p
-                      style={{ cursor: "pointer" }}
-                      onClick={() => {
-                        this.closeAll();
-                        emitter.emit("showSiderbarDetail", {
-                          show: true,
-                          from: "spot",
-                          item: { id: "2017154_14848_4848" }
-                        });
-                      }}
-                    >
-                      2017154_14848_4848 {isArchivalSpot ? "2019-05-08" : ""}
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
+                      >
+                        {item.mapNum} {isArchivalSpot ? "2019-05-08" : ""}
+                        <Icon
+                          type="environment"
+                          style={{
+                            float: "right",
+                            fontSize: 18,
+                            cursor: "point",
+                            color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            emitter.emit("mapLocation", {
+                              item: item,
+                              key: key
+                            });
+                          }}
+                        />
+                      </p>
+                    ))}
                   </Collapse.Panel>
                   <Collapse.Panel
                     header={

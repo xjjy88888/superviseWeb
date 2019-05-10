@@ -70,7 +70,9 @@ export async function projectListApi(params) {
 // 图斑列表
 export async function spotListApi(params) {
   return request(
-    `${config.url.spotListUrl}?MaxResultCount=10&SkipCount=${params.row - 10}` +
+    `${config.url.spotListUrl}?MaxResultCount=${params.MaxResultCount ||
+      "10"}&SkipCount=${params.row - 10}` +
+      `&ProjectId=${params.ProjectId || ""}` +
       `&Sorting=${params.Sorting || ""}` +
       `&MapNum=${params.MapNum || ""}` +
       `&InterferenceAreaMin=${

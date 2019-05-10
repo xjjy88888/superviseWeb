@@ -7,7 +7,8 @@ export default {
 
   state: {
     spotList: { totalCount: 0, items: [] },
-    spotItem: {  }
+    projectInfoSpotList: { totalCount: 0, items: [] },
+    spotItem: {}
   },
 
   subscriptions: {
@@ -25,6 +26,14 @@ export default {
         totalCount: spotList.totalCount
       };
       yield put({ type: "save", payload: { spotList: data } });
+    },
+
+    // 项目id查询图斑列表
+    *querySpotByProjectId({ payload }, { call, put }) {
+      const {
+        data: { result: projectInfoSpotList }
+      } = yield call(spotListApi, payload);
+      yield put({ type: "save", payload: { projectInfoSpotList } });
     },
 
     // id查询图斑
