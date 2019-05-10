@@ -50,10 +50,11 @@ const formItemLayout = {
 };
 let scrollTop = 0;
 
-@connect(({ project, spot, point }) => ({
+@connect(({ project, spot, point, other }) => ({
   project,
   spot,
-  point
+  point,
+  other
 }))
 @createForm()
 export default class integrat extends PureComponent {
@@ -138,6 +139,19 @@ export default class integrat extends PureComponent {
       this.setState({
         showProjectAllInfo: !data.hide
       });
+    });
+    this.eventEmitter = emitter.addListener("chartLinkage", data => {
+      if (data.open) {
+        this.setState({
+          showProjectAllInfo: !data.hide
+        });
+        if (data.type === "spot") {
+          this.querySpot({
+            row: 10,
+            polygon: data.polygon
+          });
+        }
+      }
     });
     this.eventEmitter = emitter.addListener("queryInfo", data => {
       this.scrollDom.scrollTop = 0;

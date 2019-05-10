@@ -1,5 +1,6 @@
 const domain = "http://aj.zkygis.cn/dutySys";
 const domain_ = "http://aj.zkygis.cn/stbc/";
+const txKey = "TERBZ-ZU46D-KZT46-HZZIB-RNDMZ-7GFP3";
 
 const color_back_spot = "rgba(255,255,0,0.4)"; //背景色-图斑
 const color_back_redLine = "rgba(230,0,0,0.4)"; //背景色-红线
@@ -17,6 +18,9 @@ const config = {
 
     // 图斑列表
     spotListUrl: `${domain_}api/services/app/Spot/GetAll`,
+
+    // 图斑列表-图标联动
+    spotListLinkageUrl: `${domain_}api/services/app/Spot/GetAllByPolygon`,
 
     // 标注点列表
     pointListUrl: `${domain_}api/services/app/MarkingPoint/GetAll`,
@@ -38,6 +42,10 @@ const config = {
 
     // 获取边界
     boundaryUrl: `${domain_}/api/services/app/User/GetBoundAsync`,
+
+    // 腾讯地图
+    // txRegionUrl: `https://apis.map.qq.com/ws/district/v1/list?key=${txKey}`,
+    txRegionUrl: `http://api.tianditu.gov.cn/administrative?postStr={"searchWord":"北京","searchType":"1","needSubInfo":"false","needAll":"false","needPolygon":"true","needPre":"true"}&tk=e606f896eaad4c8ab29275f85861af96`,
 
     //编辑图斑图形
     updateSpotGraphic: `${domain}/api/app/updateSpotGraphic`,

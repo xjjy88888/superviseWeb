@@ -195,6 +195,16 @@ export async function boundaryApi(id) {
   });
 }
 
+// 腾讯地图
+export async function txRegionApi(id) {
+  return request(`${config.url.txRegionUrl}`, {
+    method: "GET",
+    headers: {
+      contentType: "application/json;charset=utf-8"
+    }
+  });
+}
+
 //编辑扰动图斑图形信息
 export async function updateSpotGraphic(params) {
   return request(

@@ -13,6 +13,7 @@ app.model(require("./models/mapdata").default);
 app.model(require("./models/project").default);
 app.model(require("./models/point").default);
 app.model(require("./models/spot").default);
+app.model(require("./models/other").default);
 
 // 4. Router
 app.router(require("./router").default);

@@ -62,6 +62,7 @@ export default class integrat extends PureComponent {
       showProblem: false,
       showQuery: false,
       drawGrphic: "edit",
+      chartStatus: false,
       project_id: null, //针对新增图形的项目红线id
       addGraphLayer: null //针对新增图形的图层
     };
@@ -149,7 +150,7 @@ export default class integrat extends PureComponent {
     // 组件通信
     //地图定位
     this.eventEmitter = emitter.addListener("mapLocation", data => {
-      if (data.key === "project") {
+      if (data.key === "project") {//项目红线
         dispatch({
           type: "mapdata/queryProjectPosition",
           payload: {
@@ -157,23 +158,37 @@ export default class integrat extends PureComponent {
           },
           callback: response => {
             //console.log("response", response);
-            if(response.success){
-              //点查WMS图层
+            if (response.success) {
               let point = { x: response.result.pointX, y: response.result.pointY};
-              userconfig.mapPoint = [point.y,point.x];
-              me.queryWFSServiceByPoint(point, config.mapLayersName,true);
+              let latLng = [point.y,point.x];
+              switch (response.result.type) {
+                case "ProjectScope"://项目红线
+                case "Spot"://扰动图斑
+                        //点查WMS图层
+                        userconfig.mapPoint = latLng;
+                        me.queryWFSServiceByPoint(point, config.mapLayersName,true);
+                        break;
+                case "ProjectPoint"://项目点
+                        if (marker)
+                            marker.remove();
+                        marker = L.marker(latLng).addTo(map);
+                        map.setZoom(15);
+                        me.automaticToMap(latLng);
+                        break;
+                default:
+              }
             }else{
-              message.warning("地图定位不到相关数据", 1);             
+              message.warning("地图定位不到相关数据", 1);
             }
           }
         });
         /*this.queryWFSServiceByProperty(
           data.item.projectId,
           "project_id",
-          config.mapProjectLayerName,
+          config.mapProjectLayerName,                                  
           this.callbackLocationQueryWFSService
         );*/
-      } else if (data.key === "spot") {
+      } else if (data.key === "spot") {//扰动图斑
         this.queryWFSServiceByProperty(
           data.item.mapNum,
           "map_num",
@@ -565,12 +580,33 @@ export default class integrat extends PureComponent {
     //点查WMS图层
     userconfig.mapPoint = e.latlng;
     let point = { x: e.latlng.lng, y: e.latlng.lat };
-    me.queryWFSServiceByPoint(point, config.mapLayersName,false);
+    me.queryWFSServiceByPoint(point, config.mapLayersName, false);
   };
   onMoveendMap = e => {
     //console.log(map.getZoom());
-    if (map.getZoom() >= 13) {
-      this.queryWFSServiceByPolygon(config.mapLayersName);
+    const { chartStatus } = this.state;
+    if (map.getZoom() >= 13 && chartStatus) {
+      //this.queryWFSServiceByPolygon(config.mapLayersName);
+      let bounds = map.getBounds();
+      let polygon = "polygon((";
+      polygon +=
+        bounds.getSouthWest().lng + " " + bounds.getSouthWest().lat + ",";
+      polygon +=
+        bounds.getSouthWest().lng + " " + bounds.getNorthEast().lat + ",";
+      polygon +=
+        bounds.getNorthEast().lng + " " + bounds.getNorthEast().lat + ",";
+      polygon +=
+        bounds.getNorthEast().lng + " " + bounds.getSouthWest().lat + ",";
+      polygon += bounds.getSouthWest().lng + " " + bounds.getSouthWest().lat;
+      polygon += "))";
+
+      emitter.emit("chartLinkage", {
+        open: true,
+        type: "spot",
+        polygon: polygon
+      });
+
+      //console.log(polygon);
     }
   };
   /*属性查询图层
@@ -669,7 +705,7 @@ export default class integrat extends PureComponent {
    *@param isautomaticToMap 是否自动跳转居中地图不被遮盖
    *@return null
    */
-  queryWFSServiceByPoint = (point, typeName,isautomaticToMap) => {
+  queryWFSServiceByPoint = (point, typeName, isautomaticToMap) => {
     const me = this;
     point = point.x + "," + point.y;
     let filter =
@@ -718,7 +754,7 @@ export default class integrat extends PureComponent {
             }
           }
           map.openPopup(content, userconfig.mapPoint);
-          if(isautomaticToMap){
+          if (isautomaticToMap) {
             map.setZoom(15);
             me.automaticToMap(
               userconfig.projectgeojsonLayer.getBounds().getCenter()
@@ -1403,6 +1439,7 @@ export default class integrat extends PureComponent {
                 }}
                 onClick={(v, e) => {
                   e.stopPropagation();
+                  this.setState({ chartStatus: v });
                   console.log(v, e);
                 }}
               />
