@@ -430,15 +430,15 @@ export default class integrat extends PureComponent {
           : [
               {
                 value: "描述",
-                key: "ProjectBase.Name"
+                key: "Description"
               },
               {
                 value: "标注时间",
-                key: "ProjectBase.ModifyTime"
+                key: "CreateTime"
               },
               {
                 value: "关联项目",
-                key: "ProjectLevel.Key"
+                key: "Project.Id"
               }
             ]
     });
