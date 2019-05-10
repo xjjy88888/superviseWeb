@@ -21,6 +21,9 @@ const config = {
     // 标注点列表
     pointListUrl: `${domain_}api/services/app/MarkingPoint/GetAll`,
 
+    // 项目id查询项目红线列表
+    redLineByProjectIdUrl: `${domain_}api/services/app/ProjectScope/GetAll`,
+
     // id查询项目
     projectByIdUrl: `${domain_}/api/services/app/Project/Get`,
 

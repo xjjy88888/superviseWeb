@@ -81,9 +81,10 @@ export default class siderbarDetail extends PureComponent {
         edit: data.edit,
         from: data.from,
         item: data.item,
+        type: data.type,
         previewVisible_min: false
       });
-      if (data.from === "spot" && data.show) {
+      if (data.from === "spot" && data.show && data.type !== "add") {
         this.querySpotById(data.id);
       }
     });

@@ -156,7 +156,15 @@ export default class integrat extends PureComponent {
             id: data.item.projectId
           },
           callback: response => {
-            console.log("response", response);
+            //console.log("response", response);
+            if(response.success){
+              //点查WMS图层
+              let point = { x: response.result.pointX, y: response.result.pointY};
+              userconfig.mapPoint = [point.y,point.x];
+              me.queryWFSServiceByPoint(point, config.mapLayersName,true);
+            }else{
+              message.warning("地图定位不到相关数据", 1);             
+            }
           }
         });
         /*this.queryWFSServiceByProperty(
@@ -165,10 +173,6 @@ export default class integrat extends PureComponent {
           config.mapProjectLayerName,
           this.callbackLocationQueryWFSService
         );*/
-        //点查WMS图层
-        //userconfig.mapPoint = e.latlng;
-        //let point = { x: e.latlng.lng, y: e.latlng.lat };
-        //me.queryWFSServiceByPoint(point, config.mapLayersName);
       } else if (data.key === "spot") {
         this.queryWFSServiceByProperty(
           data.item.mapNum,
@@ -561,7 +565,7 @@ export default class integrat extends PureComponent {
     //点查WMS图层
     userconfig.mapPoint = e.latlng;
     let point = { x: e.latlng.lng, y: e.latlng.lat };
-    me.queryWFSServiceByPoint(point, config.mapLayersName);
+    me.queryWFSServiceByPoint(point, config.mapLayersName,false);
   };
   onMoveendMap = e => {
     //console.log(map.getZoom());
@@ -662,9 +666,10 @@ export default class integrat extends PureComponent {
    *@method queryWFSServiceByPoint
    *@param point 坐标点
    *@param typeName 图层名称
+   *@param isautomaticToMap 是否自动跳转居中地图不被遮盖
    *@return null
    */
-  queryWFSServiceByPoint = (point, typeName) => {
+  queryWFSServiceByPoint = (point, typeName,isautomaticToMap) => {
     const me = this;
     point = point.x + "," + point.y;
     let filter =
@@ -713,9 +718,12 @@ export default class integrat extends PureComponent {
             }
           }
           map.openPopup(content, userconfig.mapPoint);
-          /*me.automaticToMap(
-            userconfig.projectgeojsonLayer.getBounds().getCenter()
-          );*/
+          if(isautomaticToMap){
+            map.setZoom(15);
+            me.automaticToMap(
+              userconfig.projectgeojsonLayer.getBounds().getCenter()
+            );
+          }
         }
       }
     });

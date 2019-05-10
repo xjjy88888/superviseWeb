@@ -120,6 +120,7 @@ export default class integrat extends PureComponent {
   }
 
   componentDidMount() {
+    console.log("贵阳至黄平高速公路", "六枝特区平寨镇跃进砂石厂");
     this.queryProject({ row: 10 });
     this.querySpot({ row: 10 });
     this.queryPoint({ row: 10 });
@@ -194,6 +195,7 @@ export default class integrat extends PureComponent {
         });
         this.queryProjectById(data.id);
         this.querySpotByProjectId(data.id);
+        this.queryRedLineByProjectId(data.id);
       }
     });
     const { clientHeight } = this.refDom;
@@ -335,6 +337,16 @@ export default class integrat extends PureComponent {
         ProjectId: id,
         MaxResultCount: 20,
         row: 10
+      }
+    });
+  };
+
+  queryRedLineByProjectId = id => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "project/queryRedLineByProjectId",
+      payload: {
+        ProjectId: id
       }
     });
   };
@@ -534,11 +546,10 @@ export default class integrat extends PureComponent {
     } = this.state;
     const {
       dispatch,
-      project: { projectList, projectItem },
+      project: { projectList, projectItem, projectInfoRedLineList },
       spot: { spotList, projectInfoSpotList },
       point: { pointList }
     } = this.props;
-    console.log(this.props);
     const { getFieldDecorator } = this.props.form;
 
     const showPoint = key === "point";
@@ -643,6 +654,7 @@ export default class integrat extends PureComponent {
                     });
                     this.queryProjectById(item.id);
                     this.querySpotByProjectId(item.id);
+                    this.queryRedLineByProjectId(item.id);
                   } else if (key === "spot") {
                     emitter.emit("showSiderbarDetail", {
                       show: key === "spot",
@@ -1566,7 +1578,7 @@ export default class integrat extends PureComponent {
                               show: true,
                               edit: true,
                               from: "spot",
-                              item: { id: "" }
+                              type: "add"
                             });
                           }}
                         />
@@ -1592,8 +1604,10 @@ export default class integrat extends PureComponent {
                           this.closeAll();
                           emitter.emit("showSiderbarDetail", {
                             show: true,
+                            edit: false,
                             from: "spot",
-                            item: { id: item.id }
+                            type: "edit",
+                            id: item.id
                           });
                         }}
                       >
@@ -1610,7 +1624,7 @@ export default class integrat extends PureComponent {
                             e.stopPropagation();
                             emitter.emit("mapLocation", {
                               item: item,
-                              key: key
+                              key: "spot"
                             });
                           }}
                         />
@@ -1620,7 +1634,7 @@ export default class integrat extends PureComponent {
                   <Collapse.Panel
                     header={
                       <b>
-                        防治责任范围：2
+                        防治责任范围：{projectInfoRedLineList.items.length}
                         <Icon
                           type="plus-circle"
                           style={{
@@ -1630,9 +1644,6 @@ export default class integrat extends PureComponent {
                           }}
                           onClick={e => {
                             e.stopPropagation();
-                            notification["info"]({
-                              message: "添加防治责任范围"
-                            });
                             emitter.emit("drawDuty", {
                               draw: true,
                               project_id: "123"
@@ -1649,50 +1660,38 @@ export default class integrat extends PureComponent {
                     }
                     key="3"
                   >
-                    <p
-                      style={{ cursor: "pointer" }}
-                      onClick={() => {
-                        this.closeAll();
-                        emitter.emit("showSiderbarDetail", {
-                          show: true,
-                          from: "duty",
-                          item: { id: "2017154_14848_4848" }
-                        });
-                      }}
-                    >
-                      红线第一部分
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
+                    {projectInfoRedLineList.items.map((item, index) => (
+                      <p
+                        key={index}
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          this.closeAll();
+                          emitter.emit("showSiderbarDetail", {
+                            show: true,
+                            from: "duty",
+                            id: item.id
+                          });
                         }}
-                      />
-                    </p>
-                    <p
-                      style={{ cursor: "pointer" }}
-                      onClick={() => {
-                        this.closeAll();
-                        emitter.emit("showSiderbarDetail", {
-                          show: true,
-                          from: "duty",
-                          item: { id: "2017154_14848_4848" }
-                        });
-                      }}
-                    >
-                      红线第一部分
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
+                      >
+                        {item.id}
+                        <Icon
+                          type="environment"
+                          style={{
+                            float: "right",
+                            fontSize: 18,
+                            cursor: "point",
+                            color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            emitter.emit("mapLocation", {
+                              item: item,
+                              key: "redLine"
+                            });
+                          }}
+                        />
+                      </p>
+                    ))}
                   </Collapse.Panel>
                   {/* <Collapse.Panel
                     header={

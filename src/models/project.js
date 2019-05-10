@@ -8,6 +8,7 @@ import {
   removeSpotGraphic,
   updateProjectScopeGraphic,
   addProjectScopeGraphic,
+  redLineByProjectIdApi,
   removeProjectScopeGraphic
 } from "../services/httpApi";
 
@@ -16,6 +17,7 @@ export default {
 
   state: {
     projectList: { totalCount: "", items: [] },
+    projectInfoRedLineList: { totalCount: "", items: [] },
     projectItem: {
       projectBase: { name: "" },
       expand: {
@@ -56,6 +58,15 @@ export default {
         yield put({ type: "save", payload: { projectItem: result } });
       }
     },
+
+    // 项目id查询项目红线列表
+    *queryRedLineByProjectId({ payload }, { call, put }) {
+      const {
+        data: { result: projectInfoRedLineList }
+      } = yield call(redLineByProjectIdApi, payload.ProjectId);
+      yield put({ type: "save", payload: { projectInfoRedLineList } });
+    },
+
     *updateSpotGraphic({ payload, callback }, { call, put }) {
       const { data: obj } = yield call(updateSpotGraphic, payload);
       notification[obj ? "success" : "error"]({

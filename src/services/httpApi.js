@@ -130,6 +130,21 @@ export async function pointListApi(params) {
   );
 }
 
+// 项目id查询项目红线列表
+export async function redLineByProjectIdApi(ProjectId) {
+  return request(
+    `${
+      config.url.redLineByProjectIdUrl
+    }?SkipCount=0&MaxResultCount=20&ProjectId=${ProjectId}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`
+      }
+    }
+  );
+}
+
 // id查询项目
 export async function projectByIdApi(id) {
   return request(`${config.url.projectByIdUrl}?id=${id}`, {
