@@ -63,7 +63,7 @@ export default class integrat extends PureComponent {
       showQuery: false,
       drawGrphic: "edit",
       project_id: null, //针对新增图形的项目红线id
-      addGraphLayer: null, //针对新增图形的图层
+      addGraphLayer: null //针对新增图形的图层
     };
     this.map = null;
     this.saveRef = v => {
@@ -76,7 +76,7 @@ export default class integrat extends PureComponent {
     dispatch({
       type: "mapdata/GetBoundAsync",
       callback: boundary => {
-        //console.log(boundary);       
+        //console.log(boundary);
         userconfig.geojson = JSON.parse(boundary.result);
         // 创建地图
         me.createMap();
@@ -150,12 +150,25 @@ export default class integrat extends PureComponent {
     //地图定位
     this.eventEmitter = emitter.addListener("mapLocation", data => {
       if (data.key === "project") {
-        this.queryWFSServiceByProperty(
+        dispatch({
+          type: "mapdata/queryProjectPosition",
+          payload: {
+            id: data.item.projectId
+          },
+          callback: response => {
+            console.log("response", response);
+          }
+        });
+        /*this.queryWFSServiceByProperty(
           data.item.projectId,
           "project_id",
           config.mapProjectLayerName,
           this.callbackLocationQueryWFSService
-        );
+        );*/
+        //点查WMS图层
+        //userconfig.mapPoint = e.latlng;
+        //let point = { x: e.latlng.lng, y: e.latlng.lat };
+        //me.queryWFSServiceByPoint(point, config.mapLayersName);
       } else if (data.key === "spot") {
         this.queryWFSServiceByProperty(
           data.item.mapNum,
@@ -172,7 +185,7 @@ export default class integrat extends PureComponent {
         //direction 方位角
         let picName = me.getPicByAzimuth(data.direction);
         let myIcon = L.icon({
-          iconUrl: "./img/"+picName+".png",
+          iconUrl: "./img/" + picName + ".png",
           iconSize: [60, 60]
         });
         if (marker) marker.remove();
@@ -185,19 +198,19 @@ export default class integrat extends PureComponent {
       }
     });
     //屏幕截图
-     this.eventEmitter = emitter.addListener("screenshot", data => {
+    this.eventEmitter = emitter.addListener("screenshot", data => {
       //var areaSelect = L.areaSelect({width:200, height:300});
       //areaSelect.addTo(map);
-      //绘制图形之前 
+      //绘制图形之前
       if (userconfig.screenLayer) {
         map.removeLayer(userconfig.screenLayer);
-      }     
+      }
       //绘制矩形
       map.pm.enableDraw("Rectangle", {
         finishOn: "dblclick",
         allowSelfIntersection: false,
         tooltips: false
-      });  
+      });
       map.on("pm:create", e => {
         userconfig.screenLayer = e.layer;
         //console.log(userconfig.screenLayer.getBounds());
@@ -207,8 +220,8 @@ export default class integrat extends PureComponent {
         //console.log(map.latLngToContainerPoint(southWest));
         let northEastPoint = map.latLngToContainerPoint(northEast);
         let southWestPoint = map.latLngToContainerPoint(southWest);
-        let width = Math.abs((northEastPoint.x - southWestPoint.x));
-        let height = Math.abs((northEastPoint.y - southWestPoint.y));
+        let width = Math.abs(northEastPoint.x - southWestPoint.x);
+        let height = Math.abs(northEastPoint.y - southWestPoint.y);
         //let size = {x:width,y:height};
         /*leafletImage(map, (err, canvas)=>{
           //console.log(canvas.toDataURL());
@@ -223,8 +236,8 @@ export default class integrat extends PureComponent {
           //snapshot.innerHTML = '';
           //snapshot.appendChild(img);
         });*/
-      });  
-    });   
+      });
+    });
     //绘制扰动图斑图形
     this.eventEmitter = emitter.addListener("drawSpot", data => {
       if (data.draw) {
@@ -282,7 +295,7 @@ export default class integrat extends PureComponent {
           workingLayer.on("pm:vertexadded", e => {
             let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
             //if (!turf.booleanContains(userconfig.polygon, turfpoint)) {
-            if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {              
+            if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {
               map.pm.disableDraw("Polygon");
               emitter.emit("showSiderbarDetail", {
                 show: false,
@@ -367,19 +380,19 @@ export default class integrat extends PureComponent {
    */
   callbackLocationQueryWFSService = data => {
     const me = this;
-    me.clearGeojsonLayer();
-    let style = {
-      color: "#33CCFF", //#33CCFF #e60000
-      weight: 3,
-      opacity: 1,
-      fillColor: "#e6d933", //#33CCFF #e6d933
-      fillOpacity: 0.1
-    };
-    me.loadGeojsonLayer(data, style);
-    map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
-      maxZoom: 16
-    });
     if (data.features.length > 0) {
+      me.clearGeojsonLayer();
+      let style = {
+        color: "#33CCFF", //#33CCFF #e60000
+        weight: 3,
+        opacity: 1,
+        fillColor: "#e6d933", //#33CCFF #e6d933
+        fillOpacity: 0.1
+      };
+      me.loadGeojsonLayer(data, style);
+      map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
+        maxZoom: 16
+      });
       let content = "";
       for (let i = 0; i < data.features.length; i++) {
         let feature = data.features[i];
@@ -395,16 +408,35 @@ export default class integrat extends PureComponent {
         userconfig.projectgeojsonLayer.getBounds().getCenter()
       );
       me.automaticToMap(userconfig.projectgeojsonLayer.getBounds().getCenter());
+    } else {
+      message.warning("地图定位不到相关数据", 1);
     }
   };
   /*
    * 根据方位角获取对应的图片
    */
   getPicByAzimuth = azimuth => {
-     let pic;
-     pic = azimuth === 0 ? 'north' :azimuth < 90 ? 'east_north':azimuth === 90 ? 'east' :azimuth < 180 ? 'east_south' :azimuth === 180  ? 'south':azimuth < 270 ? 'west_south':azimuth === 270  ? 'west':azimuth < 360  ? 'west_north' : 'north';
-     //console.log(pic);
-     return pic;
+    let pic;
+    pic =
+      azimuth === 0
+        ? "north"
+        : azimuth < 90
+        ? "east_north"
+        : azimuth === 90
+        ? "east"
+        : azimuth < 180
+        ? "east_south"
+        : azimuth === 180
+        ? "south"
+        : azimuth < 270
+        ? "west_south"
+        : azimuth === 270
+        ? "west"
+        : azimuth < 360
+        ? "west_north"
+        : "north";
+    //console.log(pic);
+    return pic;
   };
   /*
    * 自动匹配地图偏移
@@ -522,7 +554,7 @@ export default class integrat extends PureComponent {
     const me = this;
     let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
     //if (!turf.booleanContains(userconfig.polygon, turfpoint)) {
-    if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {      
+    if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {
       message.warning("区域范围之外的数据没有权限操作", 1);
       return;
     }
@@ -697,18 +729,20 @@ export default class integrat extends PureComponent {
     const obj = {
       show: true,
       edit: false,
-      id: properties.spot_tbid || properties.project_id,
-      from: properties.spot_tbid ? "spot" : "project"
+      id: properties.map_num || properties.project_id,
+      from: properties.map_num ? "spot" : "project"
     };
-    elements = properties.spot_tbid
+    elements = properties.map_num
       ? jQuery(
-          `<div>图斑编号:${properties.spot_tbid}</br>
+          `<div>图斑编号:${properties.map_num}</br>
         ${
           properties.project_id
             ? "关联项目:" + properties.project_id + "</br>"
             : ""
         }${
-            properties.byd ? "扰动范围:" + properties.byd + "</br>" : ""
+            properties.interference_compliance_id
+              ? "扰动范围:" + properties.interference_compliance_id + "</br>"
+              : ""
           }<a onclick='goDetail(${JSON.stringify(
             obj
           )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
@@ -761,16 +795,16 @@ export default class integrat extends PureComponent {
    */
   getRegionGeometry = () => {
     const me = this;
-   
+
     //调用后台接口形式改造
     let geojson = {
       type: "FeatureCollection",
       features: [
         {
-          "type": "Feature",
-          "geometry": {
-            "type": "MultiPolygon",
-            "coordinates": userconfig.geojson.coordinates
+          type: "Feature",
+          geometry: {
+            type: "MultiPolygon",
+            coordinates: userconfig.geojson.coordinates
           }
         }
       ]
@@ -788,11 +822,13 @@ export default class integrat extends PureComponent {
         fillOpacity: 0
       },
       pane: "geoJsonZIndex"
-    }).addTo(map);  
+    }).addTo(map);
     let bounds = userconfig.geoJsonLayer.getBounds();
     map.fitBounds(bounds);
     //构造面
-    userconfig.polygon = turf.multiPolygon(geojson.features[0].geometry.coordinates);
+    userconfig.polygon = turf.multiPolygon(
+      geojson.features[0].geometry.coordinates
+    );
     if (userconfig.dwdm === "100000") {
       //admin管理员
     } else if (userconfig.dwdm.endsWith("0000")) {

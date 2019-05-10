@@ -13,19 +13,28 @@ const config = {
     loginUrl: `${domain_}api/TokenAuth/Authenticate`,
 
     // 项目列表
-    projectListUrl: `${domain_}api/services/app/ProjectsService/GetAll`,
+    projectListUrl: `${domain_}api/services/app/Project/GetAll`,
 
     // 图斑列表
-    spotListUrl: `${domain_}api/services/app/SpotsService/GetAll`,
+    spotListUrl: `${domain_}api/services/app/Spot/GetAll`,
+
+    // 标注点列表
+    pointListUrl: `${domain_}api/services/app/MarkingPoint/GetAll`,
 
     // id查询项目
-    projectByIdUrl: `${domain_}/api/services/app/ProjectsService/Get`,
+    projectByIdUrl: `${domain_}/api/services/app/Project/Get`,
 
     // id查询图斑
-    spotBytbId: `${domain_}/api/services/app/SpotsService/Get`,
+    spotByIdUrl: `${domain_}/api/services/app/Spot/Get`,
+
+    // id查询标注点
+    pointByIdUrl: `${domain_}/api/services/app/MarkingPoint/Get`,
+
+    // 项目位置
+    projectPositionUrl: `${domain_}/api/services/app/Project/GetPoint`,
 
     // 获取边界
-    GetBoundAsync: `${domain_}/api/services/app/User/GetBoundAsync`,
+    boundaryUrl: `${domain_}/api/services/app/User/GetBoundAsync`,
 
     //编辑图斑图形
     updateSpotGraphic: `${domain}/api/app/updateSpotGraphic`,

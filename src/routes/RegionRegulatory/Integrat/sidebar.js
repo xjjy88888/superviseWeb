@@ -50,9 +50,10 @@ const formItemLayout = {
 };
 let scrollTop = 0;
 
-@connect(({ project, spot }) => ({
+@connect(({ project, spot, point }) => ({
   project,
-  spot
+  spot,
+  point
 }))
 @createForm()
 export default class integrat extends PureComponent {
@@ -71,9 +72,11 @@ export default class integrat extends PureComponent {
       checked: false,
       row_pro: 10,
       row_spot: 10,
+      row_point: 10,
+      query_pro: "",
+      query_spot: "",
+      query_point: "",
       key: "project",
-      query_pro_ProjectName: "",
-      query_pro_MapNum: "",
       sort_by: "",
       sort_key: "",
       queryInfo: {},
@@ -119,6 +122,7 @@ export default class integrat extends PureComponent {
   componentDidMount() {
     this.queryProject({ row: 10 });
     this.querySpot({ row: 10 });
+    this.queryPoint({ row: 10 });
     this.eventEmitter = emitter.addListener("showSiderbar", data => {
       this.setState({
         show: data.show
@@ -136,14 +140,7 @@ export default class integrat extends PureComponent {
     });
     this.eventEmitter = emitter.addListener("queryInfo", data => {
       this.scrollDom.scrollTop = 0;
-      const {
-        row_pro,
-        row_spot,
-        key,
-        query_pro_ProjectName,
-        Sorting,
-        query_pro_MapNum
-      } = this.state;
+      const { key, query_pro, Sorting, query_spot, query_point } = this.state;
       emitter.emit("checkResult", {
         show: false,
         result: []
@@ -161,14 +158,21 @@ export default class integrat extends PureComponent {
         this.queryProject({
           ...data.info,
           row: 10,
-          ProjectName: query_pro_ProjectName
+          ProjectName: query_pro
         });
       } else if (data.from === "spot") {
         this.setState({ row_spot: 10 });
         this.querySpot({
           ...data.info,
           row: 10,
-          MapNum: query_pro_MapNum
+          MapNum: query_spot
+        });
+      } else {
+        this.setState({ row_point: 10 });
+        this.queryPoint({
+          ...data.info,
+          row: 10,
+          ProjectName: query_point
         });
       }
     });
@@ -208,17 +212,20 @@ export default class integrat extends PureComponent {
     const {
       row_pro,
       row_spot,
+      row_point,
+      query_pro,
+      query_spot,
+      query_point,
       key,
       Sorting,
-      query_pro_ProjectName,
-      query_pro_MapNum,
       queryInfo
     } = this.state;
     const { clientHeight, scrollHeight, scrollTop } = this.scrollDom;
     const isBottom = clientHeight + parseInt(scrollTop, 0) + 1 >= scrollHeight;
     const {
       project: { projectList, projectItem },
-      spot: { spotList }
+      spot: { spotList },
+      point: { pointList }
     } = this.props;
     console.log(
       clientHeight,
@@ -235,7 +242,7 @@ export default class integrat extends PureComponent {
             ...queryInfo,
             row: new_row,
             Sorting: Sorting,
-            ProjectName: query_pro_ProjectName
+            ProjectName: query_pro
           });
           this.setState({ row_pro: new_row });
         }
@@ -247,24 +254,25 @@ export default class integrat extends PureComponent {
             ...queryInfo,
             row: new_row,
             Sorting: Sorting,
-            MapNum: query_pro_MapNum
+            MapNum: query_spot
           });
           this.setState({ row_spot: new_row });
         }
       } else {
+        const len = pointList.totalCount;
+        if (row_point < len) {
+          const new_row = row_point + 10 > len ? len : row_point + 10;
+          this.queryPoint({
+            ...queryInfo,
+            row: new_row,
+            Sorting: Sorting,
+            MapNum: query_point
+          });
+          this.setState({ row_point: new_row });
+        }
       }
     }
   }
-
-  queryProjectById = id => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: "project/queryProjectById",
-      payload: {
-        id: id
-      }
-    });
-  };
 
   queryProject = items => {
     const {
@@ -290,6 +298,30 @@ export default class integrat extends PureComponent {
       payload: {
         ...items,
         items: items.row === 10 ? [] : spotList.items
+      }
+    });
+  };
+
+  queryPoint = items => {
+    const {
+      dispatch,
+      point: { pointList }
+    } = this.props;
+    dispatch({
+      type: "point/queryPoint",
+      payload: {
+        ...items,
+        items: items.row === 10 ? [] : pointList.items
+      }
+    });
+  };
+
+  queryProjectById = id => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "project/queryProjectById",
+      payload: {
+        id: id
       }
     });
   };
@@ -338,7 +370,6 @@ export default class integrat extends PureComponent {
   };
 
   switchMenu = e => {
-    this.setState({ showQuery: false, showCheck: false });
     this.scrollDom.scrollTop = 0;
     emitter.emit("showSiderbarDetail", {
       show: false,
@@ -360,6 +391,9 @@ export default class integrat extends PureComponent {
     });
     const k = e.key;
     this.setState({
+      showQuery: false,
+      showCheck: false,
+      key: k,
       placeholder:
         k === "project" ? "项目名称" : k === "spot" ? "图斑编号" : "关联项目",
       sort:
@@ -407,9 +441,6 @@ export default class integrat extends PureComponent {
                 key: "ProjectLevel.Key"
               }
             ]
-    });
-    this.setState({
-      key: k
     });
   };
 
@@ -462,7 +493,9 @@ export default class integrat extends PureComponent {
       Sorting,
       previewVisible_min,
       previewVisible_min_left,
-      query_pro_ProjectName,
+      query_pro,
+      query_spot,
+      query_point,
       showCompany,
       placeholder,
       sort,
@@ -481,8 +514,6 @@ export default class integrat extends PureComponent {
       select,
       checked,
       problem,
-      row_pro,
-      row_spot,
       queryInfo,
       isArchivalSpot,
       sort_by,
@@ -491,8 +522,10 @@ export default class integrat extends PureComponent {
     const {
       dispatch,
       project: { projectList, projectItem },
-      spot: { spotList }
+      spot: { spotList },
+      point: { pointList }
     } = this.props;
+    console.log(this.props);
     const { getFieldDecorator } = this.props.form;
 
     const showPoint = key === "point";
@@ -512,7 +545,12 @@ export default class integrat extends PureComponent {
       }
     ];
 
-    const list = key === "project" ? projectList.items : spotList.items;
+    const list =
+      key === "project"
+        ? projectList.items
+        : key === "spot"
+        ? spotList.items
+        : pointList.items;
     const dataSourceTable = list.map((item, index) => {
       return {
         ...item,
@@ -527,9 +565,15 @@ export default class integrat extends PureComponent {
               共有
               {key === "project"
                 ? projectList.items.length
-                : spotList.items.length}
+                : key === "spot"
+                ? spotList.items.length
+                : pointList.items.length}
               /
-              {key === "project" ? projectList.totalCount : spotList.totalCount}
+              {key === "project"
+                ? projectList.totalCount
+                : key === "spot"
+                ? spotList.totalCount
+                : pointList.totalCount}
               条
             </span>
             <Button
@@ -600,7 +644,11 @@ export default class integrat extends PureComponent {
                   });
                 }}
               >
-                {key === "project" ? item.projectName : item.mapNum}
+                {key === "project"
+                  ? item.projectName
+                  : key === "spot"
+                  ? item.mapNum
+                  : item.createTime}
               </b>
               <Icon
                 type="environment"
@@ -622,13 +670,17 @@ export default class integrat extends PureComponent {
             <span>
               {key === "project"
                 ? `建设单位：${item.productDepartmentName || ""}`
+                : key === "spot"
+                ? `关联项目：${item.projectName || ""}`
                 : `关联项目：${item.projectName || ""}`}
             </span>
             <br />
             <span>
               {key === "project"
                 ? `批复机构：${item.replyDepartmentName || ""}`
-                : `扰动合规性：${item.interferenceCompliance || ""}`}
+                : key === "spot"
+                ? `扰动合规性：${item.interferenceCompliance || ""}`
+                : `描述：${item.description || ""}`}
             </span>
           </span>
         )
@@ -707,13 +759,11 @@ export default class integrat extends PureComponent {
               this.setState({
                 showCheck: false,
                 sort_by: "",
-                sort_key: "",
-                query_pro_ProjectName: v,
-                row_pro: 10
+                sort_key: ""
               });
               if (key === "project") {
                 this.setState({
-                  query_pro_ProjectName: v,
+                  query_pro: v,
                   row_pro: 10
                 });
                 this.queryProject({
@@ -723,11 +773,19 @@ export default class integrat extends PureComponent {
                   from: "query"
                 });
               } else if (key === "spot") {
-                this.setState({ query_pro_MapNum: v, row_spot: 10 });
+                this.setState({ query_spot: v, row_spot: 10 });
                 this.querySpot({
                   ...queryInfo,
                   row: 10,
                   MapNum: v,
+                  from: "query"
+                });
+              } else {
+                this.setState({ query_point: v, row_point: 10 });
+                this.queryPoint({
+                  ...queryInfo,
+                  row: 10,
+                  ProjectName: v,
                   from: "query"
                 });
               }
@@ -805,7 +863,7 @@ export default class integrat extends PureComponent {
                       ...queryInfo,
                       Sorting: Sorting_new,
                       row: 10,
-                      ProjectName: query_pro_ProjectName
+                      ProjectName: query_pro
                     });
                   } else if (key === "spot") {
                     this.setState({
@@ -815,7 +873,17 @@ export default class integrat extends PureComponent {
                       ...queryInfo,
                       Sorting: Sorting_new,
                       row: 10,
-                      ProjectName: query_pro_ProjectName
+                      ProjectName: query_spot
+                    });
+                  } else {
+                    this.setState({
+                      row_point: 10
+                    });
+                    this.queryPoint({
+                      ...queryInfo,
+                      Sorting: Sorting_new,
+                      row: 10,
+                      ProjectName: query_point
                     });
                   }
                 }}

@@ -112,6 +112,22 @@ export async function spotListApi(params) {
   );
 }
 
+// 标注点列表
+export async function pointListApi(params) {
+  return request(
+    `${config.url.pointListUrl}?MaxResultCount=10&SkipCount=${params.row -
+      10}` +
+      `&Sorting=${params.Sorting || ""}` +
+      `&ProjectName=${params.ProjectName || ""}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`
+      }
+    }
+  );
+}
+
 // id查询项目
 export async function projectByIdApi(id) {
   return request(`${config.url.projectByIdUrl}?id=${id}`, {
@@ -124,7 +140,27 @@ export async function projectByIdApi(id) {
 
 // id查询图斑
 export async function spotByIdApi(id) {
-  return request(`${config.url.spotBytbId}?id=${id}`, {
+  return request(`${config.url.spotByIdUrl}?id=${id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// id查询标注点
+export async function pointByIdApi(id) {
+  return request(`${config.url.pointByIdUrl}?id=${id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 项目位置
+export async function projectPositionApi(id) {
+  return request(`${config.url.projectPositionUrl}?id=${id}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
@@ -133,8 +169,8 @@ export async function spotByIdApi(id) {
 }
 
 // 获取边界
-export async function GetBoundAsyncApi(id) {
-  return request(`${config.url.GetBoundAsync}`, {
+export async function boundaryApi(id) {
+  return request(`${config.url.boundaryUrl}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
