@@ -34,6 +34,7 @@ import "leaflet-measure/dist/leaflet-measure.css";
 import "leaflet-measure/dist/leaflet-measure.cn";
 import shp from "shpjs";
 import * as turf from "@turf/turf";
+import domtoimage from "dom-to-image";
 //import '@h21-map/leaflet-path-drag';
 //import 'leaflet-editable';
 //import { greatCircle, point, circle } from '@turf/turf';
@@ -150,7 +151,8 @@ export default class integrat extends PureComponent {
     // 组件通信
     //地图定位
     this.eventEmitter = emitter.addListener("mapLocation", data => {
-      if (data.key === "project") {//项目红线
+      if (data.key === "project") {
+        //项目红线
         dispatch({
           type: "mapdata/queryProjectPosition",
           payload: {
@@ -159,25 +161,27 @@ export default class integrat extends PureComponent {
           callback: response => {
             //console.log("response", response);
             if (response.success) {
-              let point = { x: response.result.pointX, y: response.result.pointY};
-              let latLng = [point.y,point.x];
+              let point = {
+                x: response.result.pointX,
+                y: response.result.pointY
+              };
+              let latLng = [point.y, point.x];
               switch (response.result.type) {
-                case "ProjectScope"://项目红线
-                case "Spot"://扰动图斑
-                        //点查WMS图层
-                        userconfig.mapPoint = latLng;
-                        me.queryWFSServiceByPoint(point, config.mapLayersName,true);
-                        break;
-                case "ProjectPoint"://项目点
-                        if (marker)
-                            marker.remove();
-                        marker = L.marker(latLng).addTo(map);
-                        map.setZoom(15);
-                        me.automaticToMap(latLng);
-                        break;
+                case "ProjectScope": //项目红线
+                case "Spot": //扰动图斑
+                  //点查WMS图层
+                  userconfig.mapPoint = latLng;
+                  me.queryWFSServiceByPoint(point, config.mapLayersName, true);
+                  break;
+                case "ProjectPoint": //项目点
+                  if (marker) marker.remove();
+                  marker = L.marker(latLng).addTo(map);
+                  map.setZoom(15);
+                  me.automaticToMap(latLng);
+                  break;
                 default:
               }
-            }else{
+            } else {
               message.warning("地图定位不到相关数据", 1);
             }
           }
@@ -185,10 +189,11 @@ export default class integrat extends PureComponent {
         /*this.queryWFSServiceByProperty(
           data.item.projectId,
           "project_id",
-          config.mapProjectLayerName,                                  
+          config.mapProjectLayerName,
           this.callbackLocationQueryWFSService
         );*/
-      } else if (data.key === "spot") {//扰动图斑
+      } else if (data.key === "spot") {
+        //扰动图斑
         this.queryWFSServiceByProperty(
           data.item.mapNum,
           "map_num",
@@ -222,7 +227,10 @@ export default class integrat extends PureComponent {
       //areaSelect.addTo(map);
       //绘制图形之前
       if (userconfig.screenLayer) {
+        map.pm.disableDraw("Rectangle");
+        map.off("pm:create");
         map.removeLayer(userconfig.screenLayer);
+        userconfig.screenLayer = null;
       }
       //绘制矩形
       map.pm.enableDraw("Rectangle", {
@@ -235,26 +243,40 @@ export default class integrat extends PureComponent {
         //console.log(userconfig.screenLayer.getBounds());
         let northEast = userconfig.screenLayer.getBounds()._northEast;
         let southWest = userconfig.screenLayer.getBounds()._southWest;
-        //console.log(map.latLngToContainerPoint(northEast));
-        //console.log(map.latLngToContainerPoint(southWest));
+
+        let centerPoint = L.latLng((northEast.lat+southWest.lat)/2.0, (northEast.lng+southWest.lng)/2.0);
+        L.marker(northEast).addTo(map);
+        L.marker(southWest).addTo(map);
+        L.marker(centerPoint).addTo(map);
+
+        console.log("northEast:"+northEast);
+        console.log("southWest:"+southWest);
+        console.log(map.latLngToContainerPoint(northEast));
+        console.log(map.latLngToContainerPoint(southWest));
         let northEastPoint = map.latLngToContainerPoint(northEast);
         let southWestPoint = map.latLngToContainerPoint(southWest);
+        //console.log(map.latLngToLayerPoint(northEast));
+        //console.log(map.latLngToLayerPoint(southWest));
+        //let northEastPoint = map.latLngToLayerPoint(northEast);
+        //let southWestPoint = map.latLngToLayerPoint(southWest);
         let width = Math.abs(northEastPoint.x - southWestPoint.x);
         let height = Math.abs(northEastPoint.y - southWestPoint.y);
-        //let size = {x:width,y:height};
-        /*leafletImage(map, (err, canvas)=>{
-          //console.log(canvas.toDataURL());
-          //let snapshot = document.getElementById('snapshot');
-          var img = document.createElement('img');
-          img.width = width;
-          img.height = height;
-          //var dimensions = map.getSize();
-          //img.width = dimensions.x;
-          //img.height = dimensions.y;
-          img.src = canvas.toDataURL();
-          //snapshot.innerHTML = '';
-          //snapshot.appendChild(img);
-        });*/
+        let node = document.getElementById('map');
+        domtoimage.toPng(node, {
+          width: width,
+          height: height
+        })
+        //domtoimage.toPng(node)
+        .then(function (dataUrl) {
+          console.log("屏幕截图:"+dataUrl);
+          //var img = new Image();
+          //img.src = dataUrl;
+          //document.body.appendChild(img);
+        })
+        .catch(function (error) {
+            console.error('oops, something went wrong!', error);
+        });
+
       });
     });
     //绘制扰动图斑图形
@@ -1427,9 +1449,6 @@ export default class integrat extends PureComponent {
                 zIndex: 1000,
                 background: "transparent"
               }}
-              onClick={(v, e) => {
-                console.log(111);
-              }}
             >
               <Switch
                 checkedChildren="图表联动"
@@ -1441,6 +1460,11 @@ export default class integrat extends PureComponent {
                   e.stopPropagation();
                   this.setState({ chartStatus: v });
                   console.log(v, e);
+                  emitter.emit("chartLinkage", {
+                    open: v,
+                    type: "",
+                    polygon: ""
+                  });
                 }}
               />
             </div>

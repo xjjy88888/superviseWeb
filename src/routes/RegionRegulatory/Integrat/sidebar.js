@@ -143,7 +143,7 @@ export default class integrat extends PureComponent {
     this.eventEmitter = emitter.addListener("chartLinkage", data => {
       if (data.open) {
         this.setState({
-          showProjectAllInfo: !data.hide
+          polygon: data.polygon
         });
         if (data.type === "spot") {
           this.querySpot({
@@ -151,11 +151,22 @@ export default class integrat extends PureComponent {
             polygon: data.polygon
           });
         }
+      } else {
+        this.setState({
+          polygon: ""
+        });
       }
     });
     this.eventEmitter = emitter.addListener("queryInfo", data => {
       this.scrollDom.scrollTop = 0;
-      const { key, query_pro, Sorting, query_spot, query_point } = this.state;
+      const {
+        key,
+        query_pro,
+        Sorting,
+        query_spot,
+        query_point,
+        polygon
+      } = this.state;
       emitter.emit("checkResult", {
         show: false,
         result: []
@@ -180,7 +191,8 @@ export default class integrat extends PureComponent {
         this.querySpot({
           ...data.info,
           row: 10,
-          MapNum: query_spot
+          MapNum: query_spot,
+          polygon: polygon
         });
       } else {
         this.setState({ row_point: 10 });
@@ -233,6 +245,7 @@ export default class integrat extends PureComponent {
       query_pro,
       query_spot,
       query_point,
+      polygon,
       key,
       Sorting,
       queryInfo
@@ -271,6 +284,7 @@ export default class integrat extends PureComponent {
             ...queryInfo,
             row: new_row,
             Sorting: Sorting,
+            polygon: polygon,
             MapNum: query_spot
           });
           this.setState({ row_spot: new_row });
@@ -542,6 +556,7 @@ export default class integrat extends PureComponent {
       showProjectDetail,
       key,
       projectEdit,
+      polygon,
       clientHeight,
       inputDisabled,
       previewVisible,
@@ -818,6 +833,7 @@ export default class integrat extends PureComponent {
                   ...queryInfo,
                   row: 10,
                   MapNum: v,
+                  polygon: polygon,
                   from: "query"
                 });
               } else {
@@ -912,6 +928,7 @@ export default class integrat extends PureComponent {
                     this.querySpot({
                       ...queryInfo,
                       Sorting: Sorting_new,
+                      polygon: polygon,
                       row: 10,
                       ProjectName: query_spot
                     });
