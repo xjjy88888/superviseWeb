@@ -18,11 +18,12 @@ export default {
   effects: {
     // 图斑列表
     *querySpot({ payload }, { call, put }) {
+      const items_old = payload.items;
       const {
         data: { result: spotList }
       } = yield call(spotListApi, payload);
       const data = {
-        items: [...payload.items, ...spotList.items],
+        items: [...items_old, ...spotList.items],
         totalCount: spotList.totalCount
       };
       yield put({ type: "save", payload: { spotList: data } });

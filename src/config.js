@@ -14,13 +14,10 @@ const config = {
     loginUrl: `${domain_}api/TokenAuth/Authenticate`,
 
     // 项目列表
-    projectListUrl: `${domain_}api/services/app/Project/GetAll`,
+    projectListUrl: `${domain_}api/services/app/Project/GetAllByPost`,
 
     // 图斑列表
-    spotListUrl: `${domain_}api/services/app/Spot/GetAll`,
-
-    // 图斑列表-图标联动
-    spotListLinkageUrl: `${domain_}api/services/app/Spot/GetAllByPolygon`,
+    spotListUrl: `${domain_}api/services/app/Spot/GetAllByPost`,
 
     // 标注点列表
     pointListUrl: `${domain_}api/services/app/MarkingPoint/GetAll`,

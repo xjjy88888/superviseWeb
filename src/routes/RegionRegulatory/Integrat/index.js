@@ -243,35 +243,38 @@ export default class integrat extends PureComponent {
         //console.log(userconfig.screenLayer.getBounds());
         let northEast = userconfig.screenLayer.getBounds()._northEast;
         let southWest = userconfig.screenLayer.getBounds()._southWest;
-
+        //框选矩形的中心点
         let centerPoint = L.latLng((northEast.lat+southWest.lat)/2.0, (northEast.lng+southWest.lng)/2.0);
-        L.marker(northEast).addTo(map);
-        L.marker(southWest).addTo(map);
-        L.marker(centerPoint).addTo(map);
-
-        console.log("northEast:"+northEast);
-        console.log("southWest:"+southWest);
-        console.log(map.latLngToContainerPoint(northEast));
-        console.log(map.latLngToContainerPoint(southWest));
+        //L.marker(centerPoint).addTo(map);
+        //地理坐标转换屏幕坐标
         let northEastPoint = map.latLngToContainerPoint(northEast);
         let southWestPoint = map.latLngToContainerPoint(southWest);
-        //console.log(map.latLngToLayerPoint(northEast));
-        //console.log(map.latLngToLayerPoint(southWest));
-        //let northEastPoint = map.latLngToLayerPoint(northEast);
-        //let southWestPoint = map.latLngToLayerPoint(southWest);
+        //计算框选矩形的宽度以及高度像素
         let width = Math.abs(northEastPoint.x - southWestPoint.x);
         let height = Math.abs(northEastPoint.y - southWestPoint.y);
+        //计算框选矩形的左上角屏幕坐标
+        let minx = northEastPoint.x <= southWestPoint.x ? northEastPoint.x : southWestPoint.x; 
+        let miny = northEastPoint.y <= southWestPoint.y ? northEastPoint.y : southWestPoint.y; 
+        //获取当前地图元素dom节点node,用于屏幕截图        
         let node = document.getElementById('map');
-        domtoimage.toPng(node, {
+        /*domtoimage.toPng(node, {
           width: width,
           height: height
-        })
-        //domtoimage.toPng(node)
+        })*/
+        domtoimage.toPng(node)
         .then(function (dataUrl) {
-          console.log("屏幕截图:"+dataUrl);
-          //var img = new Image();
-          //img.src = dataUrl;
+          //过渡img图片,为了截取img指定位置的截图需要
+          let img = new Image();
+          img.src = dataUrl;
           //document.body.appendChild(img);
+          img.onload=function(){ //要先确保图片完整获取到，这是个异步事件
+            let canvas = document.createElement("canvas");//创建canvas元素
+            canvas.width=width;
+            canvas.height=height;
+            canvas.getContext("2d").drawImage(img,minx,miny,width,height,0,0,width,height); //将图片绘制到canvas中
+            dataUrl=canvas.toDataURL(); //转换图片为dataURL
+            console.log(dataUrl+"\n经度:"+centerPoint.lng+",纬度"+centerPoint.lat);
+          };
         })
         .catch(function (error) {
             console.error('oops, something went wrong!', error);

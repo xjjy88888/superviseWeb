@@ -36,11 +36,12 @@ export default {
   effects: {
     // 项目列表
     *queryProject({ payload }, { call, put }) {
+      const items_old = payload.items;
       const {
         data: { success, result: projectList }
       } = yield call(projectListApi, payload);
       const data = {
-        items: [...payload.items, ...projectList.items],
+        items: [...items_old, ...projectList.items],
         totalCount: projectList.totalCount
       };
       yield put({ type: "save", payload: { projectList: data } });

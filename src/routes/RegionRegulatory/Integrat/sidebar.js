@@ -122,9 +122,9 @@ export default class integrat extends PureComponent {
 
   componentDidMount() {
     console.log("贵阳至黄平高速公路", "六枝特区平寨镇跃进砂石厂");
-    this.queryProject({ row: 10 });
-    this.querySpot({ row: 10 });
-    this.queryPoint({ row: 10 });
+    this.queryProject({ SkipCount: 0 });
+    this.querySpot({ SkipCount: 0 });
+    this.queryPoint({ SkipCount: 0 });
     this.eventEmitter = emitter.addListener("showSiderbar", data => {
       this.setState({
         show: data.show
@@ -147,8 +147,7 @@ export default class integrat extends PureComponent {
         });
         if (data.type === "spot") {
           this.querySpot({
-            row: 10,
-            polygon: data.polygon
+            SkipCount: 0
           });
         }
       } else {
@@ -183,22 +182,21 @@ export default class integrat extends PureComponent {
         });
         this.queryProject({
           ...data.info,
-          row: 10,
+          SkipCount: 0,
           ProjectName: query_pro
         });
       } else if (data.from === "spot") {
         this.setState({ row_spot: 10 });
         this.querySpot({
           ...data.info,
-          row: 10,
-          MapNum: query_spot,
-          polygon: polygon
+          SkipCount: 0,
+          MapNum: query_spot
         });
       } else {
         this.setState({ row_point: 10 });
         this.queryPoint({
           ...data.info,
-          row: 10,
+          SkipCount: 0,
           ProjectName: query_point
         });
       }
@@ -265,47 +263,41 @@ export default class integrat extends PureComponent {
     );
     if (isBottom) {
       if (key === "project") {
-        const len = projectList.totalCount;
-        if (row_pro < len) {
-          const new_row = row_pro + 10 > len ? len : row_pro + 10;
+        if (projectList.items.length < projectList.totalCount) {
           this.queryProject({
             ...queryInfo,
-            row: new_row,
+            SkipCount: row_pro,
             Sorting: Sorting,
             ProjectName: query_pro
           });
-          this.setState({ row_pro: new_row });
+          this.setState({ row_pro: row_pro + 10 });
         }
       } else if (key === "spot") {
-        const len = spotList.totalCount;
-        if (row_spot < len) {
-          const new_row = row_spot + 10 > len ? len : row_spot + 10;
+        if (spotList.items.length < spotList.totalCount) {
           this.querySpot({
             ...queryInfo,
-            row: new_row,
+            SkipCount: row_spot,
             Sorting: Sorting,
-            polygon: polygon,
             MapNum: query_spot
           });
-          this.setState({ row_spot: new_row });
+          this.setState({ row_spot: row_spot + 10 });
         }
       } else {
-        const len = pointList.totalCount;
-        if (row_point < len) {
-          const new_row = row_point + 10 > len ? len : row_point + 10;
+        if (pointList.items.length < pointList.totalCount) {
           this.queryPoint({
             ...queryInfo,
-            row: new_row,
+            SkipCount: row_point,
             Sorting: Sorting,
             MapNum: query_point
           });
-          this.setState({ row_point: new_row });
+          this.setState({ row_point: row_point + 10 });
         }
       }
     }
   }
 
   queryProject = items => {
+    const { polygon } = this.state;
     const {
       dispatch,
       project: { projectList }
@@ -314,12 +306,14 @@ export default class integrat extends PureComponent {
       type: "project/queryProject",
       payload: {
         ...items,
-        items: items.row === 10 ? [] : projectList.items
+        polygon: polygon,
+        items: items.SkipCount === 0 ? [] : projectList.items
       }
     });
   };
 
   querySpot = items => {
+    const { polygon } = this.state;
     const {
       dispatch,
       spot: { spotList }
@@ -328,7 +322,8 @@ export default class integrat extends PureComponent {
       type: "spot/querySpot",
       payload: {
         ...items,
-        items: items.row === 10 ? [] : spotList.items
+        polygon: polygon,
+        items: items.SkipCount === 0 ? [] : spotList.items
       }
     });
   };
@@ -342,7 +337,7 @@ export default class integrat extends PureComponent {
       type: "point/queryPoint",
       payload: {
         ...items,
-        items: items.row === 10 ? [] : pointList.items
+        items: items.SkipCount === 0 ? [] : pointList.items
       }
     });
   };
@@ -364,7 +359,7 @@ export default class integrat extends PureComponent {
       payload: {
         ProjectId: id,
         MaxResultCount: 20,
-        row: 10
+        SkipCount: 0
       }
     });
   };
@@ -823,7 +818,7 @@ export default class integrat extends PureComponent {
                 });
                 this.queryProject({
                   ...queryInfo,
-                  row: 10,
+                  SkipCount: 0,
                   ProjectName: v,
                   from: "query"
                 });
@@ -831,16 +826,15 @@ export default class integrat extends PureComponent {
                 this.setState({ query_spot: v, row_spot: 10 });
                 this.querySpot({
                   ...queryInfo,
-                  row: 10,
+                  SkipCount: 0,
                   MapNum: v,
-                  polygon: polygon,
                   from: "query"
                 });
               } else {
                 this.setState({ query_point: v, row_point: 10 });
                 this.queryPoint({
                   ...queryInfo,
-                  row: 10,
+                  SkipCount: 0,
                   ProjectName: v,
                   from: "query"
                 });
@@ -918,7 +912,7 @@ export default class integrat extends PureComponent {
                     this.queryProject({
                       ...queryInfo,
                       Sorting: Sorting_new,
-                      row: 10,
+                      SkipCount: 0,
                       ProjectName: query_pro
                     });
                   } else if (key === "spot") {
@@ -928,8 +922,7 @@ export default class integrat extends PureComponent {
                     this.querySpot({
                       ...queryInfo,
                       Sorting: Sorting_new,
-                      polygon: polygon,
-                      row: 10,
+                      SkipCount: 0,
                       ProjectName: query_spot
                     });
                   } else {
@@ -939,7 +932,7 @@ export default class integrat extends PureComponent {
                     this.queryPoint({
                       ...queryInfo,
                       Sorting: Sorting_new,
-                      row: 10,
+                      SkipCount: 0,
                       ProjectName: query_point
                     });
                   }
