@@ -73,14 +73,6 @@ export async function spotListApi(params) {
       ...params,
       MaxResultCount: params.MaxResultCount || "10",
       Sorting: params.Sorting || "ModifyTime Desc",
-      InterferenceAreaMin: params.InterferenceArea
-        ? params.InterferenceArea[0]
-        : "",
-      InterferenceAreaMax: params.InterferenceArea
-        ? params.InterferenceArea[1]
-        : "",
-      OverAreaOfResMin: params.OverAreaOfRes ? params.OverAreaOfRes[0] : "",
-      OverAreaOfResMax: params.OverAreaOfRes ? params.OverAreaOfRes[1] : "",
       InterferenceType: params.InterferenceType
         ? params.InterferenceType.map(v => v).join(",")
         : "",

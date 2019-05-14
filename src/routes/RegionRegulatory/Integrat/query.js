@@ -11,6 +11,7 @@ import {
   Carousel,
   message,
   notification,
+  InputNumber,
   Cascader,
   Slider,
   Switch,
@@ -317,13 +318,39 @@ export default class siderbarDetail extends PureComponent {
               />
             </Form.Item>
             <Form.Item label="扰动面积" {...formItemLayoutlong}>
-              {getFieldDecorator("InterferenceArea", {
-                initialValue: [0, 1000]
-              })(<Slider marks={marks} range max={1000} />)}
+              {getFieldDecorator("InterferenceAreaMin", {})(
+                <InputNumber min={0} />
+              )}
+              <Input
+                style={{
+                  width: 30,
+                  borderLeft: 0,
+                  pointerEvents: "none",
+                  backgroundColor: "#fff"
+                }}
+                placeholder="~"
+                disabled
+              />
+              {getFieldDecorator("InterferenceAreaMax", {})(
+                <InputNumber min={0} />
+              )}
             </Form.Item>
             <Form.Item label="扰动超出面积" {...formItemLayoutlong}>
-              {getFieldDecorator("OverAreaOfRes", { initialValue: [0, 1000] })(
-                <Slider marks={marks} range max={1000} />
+              {getFieldDecorator("OverAreaOfResMin", {})(
+                <InputNumber min={0} />
+              )}
+              <Input
+                style={{
+                  width: 30,
+                  borderLeft: 0,
+                  pointerEvents: "none",
+                  backgroundColor: "#fff"
+                }}
+                placeholder="~"
+                disabled
+              />
+              {getFieldDecorator("OverAreaOfResMax", {})(
+                <InputNumber min={0} />
               )}
             </Form.Item>
             <Form.Item label="扰动类型" {...formItemLayoutlong}>
