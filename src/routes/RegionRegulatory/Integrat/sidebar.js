@@ -1601,6 +1601,22 @@ export default class integrat extends PureComponent {
                             });
                           }}
                         />
+                        <Icon
+                          type="block"
+                          style={{
+                            marginLeft: 10,
+                            fontSize: 16,
+                            color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            //图斑关联
+                            emitter.emit("spotRelate", {
+                              status: "start", //start：开始，end：结束
+                              mapNum: ""
+                            });
+                          }}
+                        />
                         <Switch
                           checkedChildren="归档图斑"
                           unCheckedChildren="归档图斑"
@@ -1632,12 +1648,28 @@ export default class integrat extends PureComponent {
                       >
                         {item.mapNum} {isArchivalSpot ? "2019-05-08" : ""}
                         <Icon
-                          type="environment"
+                          type="disconnect"
                           style={{
                             float: "right",
                             fontSize: 18,
                             cursor: "point",
                             color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            notification["info"]({
+                              message: "解绑图斑"
+                            });
+                          }}
+                        />
+                        <Icon
+                          type="environment"
+                          style={{
+                            float: "right",
+                            fontSize: 16,
+                            cursor: "point",
+                            color: "#1890ff",
+                            marginRight: 10
                           }}
                           onClick={e => {
                             e.stopPropagation();
