@@ -72,7 +72,9 @@ export default class integrat extends PureComponent {
       this.refDom = v;
     };
   }
+
   componentDidMount() {
+    console.log(111);
     const me = this;
     const { dispatch } = this.props;
     dispatch({
@@ -186,13 +188,11 @@ export default class integrat extends PureComponent {
             }
           }
         });
-        /*this.queryWFSServiceByProperty(
-          data.item.projectId,
-          "project_id",
-          config.mapProjectLayerName,
-          this.callbackLocationQueryWFSService
-        );*/
       } else if (data.key === "spot") {
+        if (data.item.mapNum === "") {
+          message.warning("地图定位不到相关数据", 1);
+          return;
+        }
         //扰动图斑
         this.queryWFSServiceByProperty(
           data.item.mapNum,
@@ -227,8 +227,7 @@ export default class integrat extends PureComponent {
     });
     //屏幕截图
     this.eventEmitter = emitter.addListener("screenshot", data => {
-      //var areaSelect = L.areaSelect({width:200, height:300});
-      //areaSelect.addTo(map);
+      me.setState({ drawGrphic: "screenshot" });
       //绘制图形之前
       if (userconfig.screenLayer) {
         map.pm.disableDraw("Rectangle");
@@ -243,6 +242,9 @@ export default class integrat extends PureComponent {
         tooltips: false
       });
       map.on("pm:create", e => {
+        //显示屏幕截图绘制保存取消菜单按钮
+        me.setState({ showButton: true });
+
         userconfig.screenLayer = e.layer;
         //console.log(userconfig.screenLayer.getBounds());
         let northEast = userconfig.screenLayer.getBounds()._northEast;
@@ -418,35 +420,15 @@ export default class integrat extends PureComponent {
 
   callbackEditQueryWFSService = data => {
     const me = this;
-    //关闭地图气泡窗口
-    map.closePopup();
-    //显示图形编辑菜单按钮
-    me.setState({ showButton: true });
-    //移除地图监听事件
-    //map.off('click contextmenu');
-    map.off("click");
-    me.clearGeojsonLayer();
-    let style = {
-      color: "#33CCFF", //#33CCFF #e60000
-      weight: 3,
-      opacity: 1,
-      fillColor: "#e6d933", //#33CCFF #e6d933
-      fillOpacity: 0.1
-    };
-    me.loadGeojsonLayer(data, style);
-    //编辑图形
-    userconfig.projectgeojsonLayer.pm.enable({
-      allowSelfIntersection: false
-    });
-    //移动图形
-    //map.pm.toggleGlobalDragMode();
-  };
-  /*
-   * 地图定位查询回调函数
-   */
-  callbackLocationQueryWFSService = data => {
-    const me = this;
-    if (data.features.length > 0) {
+    if (data.success) {
+      data = data.result;
+      //关闭地图气泡窗口
+      map.closePopup();
+      //显示图形编辑菜单按钮
+      me.setState({ showButton: true });
+      //移除地图监听事件
+      //map.off('click contextmenu');
+      map.off("click");
       me.clearGeojsonLayer();
       let style = {
         color: "#33CCFF", //#33CCFF #e60000
@@ -456,24 +438,66 @@ export default class integrat extends PureComponent {
         fillOpacity: 0.1
       };
       me.loadGeojsonLayer(data, style);
-      map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
-        maxZoom: 16
+      //编辑图形
+      userconfig.projectgeojsonLayer.pm.enable({
+        allowSelfIntersection: false
       });
-      let content = "";
-      for (let i = 0; i < data.features.length; i++) {
-        let feature = data.features[i];
-        if (i === data.features.length - 1) {
-          content += me.getWinContent(feature.properties)[0].innerHTML;
-        } else {
-          content +=
-            me.getWinContent(feature.properties)[0].innerHTML + "<br><br>";
+      //移动图形
+      //map.pm.toggleGlobalDragMode();
+    } else {
+      message.warning("匹配不到相关图形编辑", 1);
+    }
+  };
+  /*
+   * 地图定位查询回调函数
+   */
+  callbackLocationQueryWFSService = data => {
+    const me = this;
+    if (data.success) {
+      data = data.result;
+      if (data.features.length > 0) {
+        me.clearGeojsonLayer();
+        let style = {
+          color: "#33CCFF", //#33CCFF #e60000
+          weight: 3,
+          opacity: 1,
+          fillColor: "#e6d933", //#33CCFF #e6d933
+          fillOpacity: 0.1
+        };
+        me.loadGeojsonLayer(data, style);
+        map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
+          maxZoom: 16
+        });
+        let content = "";
+        for (let i = 0; i < data.features.length; i++) {
+          let feature = data.features[i];
+          if (i === data.features.length - 1) {
+            // content += me.getWinContent(feature.properties)[0].innerHTML;
+            me.getWinContent(feature.properties, data => {
+              console.log(data[0].innerHTML);
+              content += data[0].innerHTML;
+            });
+          } else {
+            me.getWinContent(feature.properties, data => {
+              console.log(data[0].innerHTML);
+              content += data[0].innerHTML + "<br><br>";
+            });
+            // content +=
+            //   me.getWinContent(feature.properties)[0].innerHTML + "<br><br>";
+          }
         }
+        setTimeout(() => {
+          map.openPopup(
+            content,
+            userconfig.projectgeojsonLayer.getBounds().getCenter()
+          );
+          me.automaticToMap(
+            userconfig.projectgeojsonLayer.getBounds().getCenter()
+          );
+        }, 500);
+      } else {
+        message.warning("地图定位不到相关数据", 1);
       }
-      map.openPopup(
-        content,
-        userconfig.projectgeojsonLayer.getBounds().getCenter()
-      );
-      me.automaticToMap(userconfig.projectgeojsonLayer.getBounds().getCenter());
     } else {
       message.warning("地图定位不到相关数据", 1);
     }
@@ -632,8 +656,7 @@ export default class integrat extends PureComponent {
   onMoveendMap = e => {
     //console.log(map.getZoom());
     const { chartStatus } = this.state;
-    if (map.getZoom() >= 13 && chartStatus) {
-      //this.queryWFSServiceByPolygon(config.mapLayersName);
+    if (map.getZoom() >= 15 && chartStatus) {
       let bounds = map.getBounds();
       let polygon = "polygon((";
       polygon +=
@@ -780,33 +803,47 @@ export default class integrat extends PureComponent {
       type: "mapdata/queryWFSLayer",
       payload: { geojsonUrl },
       callback: data => {
-        me.clearGeojsonLayer();
-        let style = {
-          color: "#33CCFF", //#33CCFF #e60000
-          weight: 3,
-          opacity: 1,
-          fillColor: "#e6d933", //#33CCFF #e6d933
-          fillOpacity: 0.1
-        };
-        me.loadGeojsonLayer(data, style);
-        if (data.features.length > 0) {
-          let content = "";
-          for (let i = 0; i < data.features.length; i++) {
-            let feature = data.features[i];
-            if (i === data.features.length - 1) {
-              content += me.getWinContent(feature.properties)[0].innerHTML;
-            } else {
-              content +=
-                me.getWinContent(feature.properties)[0].innerHTML + "<br><br>";
+        if (data.success) {
+          data = data.result;
+          me.clearGeojsonLayer();
+          let style = {
+            color: "#33CCFF", //#33CCFF #e60000
+            weight: 3,
+            opacity: 1,
+            fillColor: "#e6d933", //#33CCFF #e6d933
+            fillOpacity: 0.1
+          };
+          me.loadGeojsonLayer(data, style);
+          if (data.features.length > 0) {
+            let content = "";
+            for (let i = 0; i < data.features.length; i++) {
+              let feature = data.features[i];
+              if (i === data.features.length - 1) {
+                me.getWinContent(feature.properties, data => {
+                  content += data[0].innerHTML;
+                });
+                // content += me.getWinContent(feature.properties)[0].innerHTML;
+              } else {
+                content +=
+                  // me.getWinContent(feature.properties)[0].innerHTML +
+                  // "<br><br>";
+                  me.getWinContent(feature.properties, data => {
+                    content += data[0].innerHTML + "<br><br>";
+                  });
+              }
+            }
+            setTimeout(() => {
+              map.openPopup(content, userconfig.mapPoint);
+            }, 500);
+            if (isautomaticToMap) {
+              map.setZoom(15);
+              me.automaticToMap(
+                userconfig.projectgeojsonLayer.getBounds().getCenter()
+              );
             }
           }
-          map.openPopup(content, userconfig.mapPoint);
-          if (isautomaticToMap) {
-            map.setZoom(15);
-            me.automaticToMap(
-              userconfig.projectgeojsonLayer.getBounds().getCenter()
-            );
-          }
+        } else {
+          message.warning("点查获取不到相关数据", 1);
         }
       }
     });
@@ -815,22 +852,69 @@ export default class integrat extends PureComponent {
    * 匹配气泡窗口信息模版函数
    */
 
-  getWinContent = properties => {
+  getProjectName = id => {
+    return new Promise((resolve, reject) => {
+      const { dispatch } = this.props;
+      dispatch({
+        type: "project/queryProjectById",
+        payload: {
+          id: id
+        },
+        callback: data => {
+          resolve(data.projectBase.name);
+        }
+      });
+    });
+  };
+
+  getWinContent = (properties, callback) => {
+    console.log("properties", properties);
     let elements;
     const obj = {
       show: true,
       edit: false,
-      id: properties.map_num || properties.project_id,
+      id: properties.id || properties.project_id,
       from: properties.map_num ? "spot" : "project"
     };
-    elements = properties.map_num
+    console.log(properties);
+    this.getProjectName(properties.project_id).then(data => {
+      elements = properties.map_num
+        ? jQuery(
+            `<div>图斑编号:${properties.map_num}</br>
+      ${properties.project_id ? "关联项目:" + data + "</br>" : ""}${
+              properties.interference_compliance_id
+                ? "扰动范围:" + properties.interference_compliance_id + "</br>"
+                : ""
+            }<a onclick='goDetail(${JSON.stringify(
+              obj
+            )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
+              obj
+            )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+              obj
+            )})' style='display:none'>图形删除</a></div>`
+          )
+        : jQuery(
+            `<div>项目:${data}</br>
+        <a onclick='goDetail(${JSON.stringify(
+          obj
+        )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
+              obj
+            )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+              obj
+            )})' style='display:none'>图形删除</a></div>`
+          );
+      console.log(elements);
+      callback(elements);
+    });
+
+    /*elements = properties.map_num
       ? jQuery(
           `<div>图斑编号:${properties.map_num}</br>
-        ${
-          properties.project_id
-            ? "关联项目:" + properties.project_id + "</br>"
-            : ""
-        }${
+      ${
+        properties.project_id
+          ? "关联项目:" + properties.project_id + "</br>"
+          : ""
+      }${
             properties.interference_compliance_id
               ? "扰动范围:" + properties.interference_compliance_id + "</br>"
               : ""
@@ -840,20 +924,63 @@ export default class integrat extends PureComponent {
             obj
           )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
             obj
-          )})'>图形删除</a></div>`
+          )})' style='display:none'>图形删除</a></div>`
         )
       : jQuery(
-          `<div>项目ID:${properties.project_id}</br>
-          <a onclick='goDetail(${JSON.stringify(
-            obj
-          )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
+          `<div>项目ID:${123}</br>
+        <a onclick='goDetail(${JSON.stringify(
+          obj
+        )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
             obj
           )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
             obj
-          )})'>图形删除</a></div>`
+          )})' style='display:none'>图形删除</a></div>`
         );
-    return elements;
+    console.log(elements);*/
+    //return elements;
   };
+  // getWinContent = properties => {
+  //   let elements;
+  //   const obj = {
+  //     show: true,
+  //     edit: false,
+  //     id: properties.map_num || properties.project_id,
+  //     from: properties.map_num ? "spot" : "project"
+  //   };
+  //   this.getProjectName(properties.project_id).then(data => {
+  //     console.log(data);
+  //   });
+  //   elements = properties.map_num
+  //     ? jQuery(
+  //         `<div>图斑编号:${properties.map_num}</br>
+  //     ${
+  //       properties.project_id
+  //         ? "关联项目:" + properties.project_id + "</br>"
+  //         : ""
+  //     }${
+  //           properties.interference_compliance_id
+  //             ? "扰动范围:" + properties.interference_compliance_id + "</br>"
+  //             : ""
+  //         }<a onclick='goDetail(${JSON.stringify(
+  //           obj
+  //         )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
+  //           obj
+  //         )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+  //           obj
+  //         )})' style='display:none'>图形删除</a></div>`
+  //       )
+  //     : jQuery(
+  //         `<div>项目ID:${1}</br>
+  //       <a onclick='goDetail(${JSON.stringify(
+  //         obj
+  //       )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
+  //           obj
+  //         )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+  //           obj
+  //         )})' style='display:none'>图形删除</a></div>`
+  //       );
+  //   return elements;
+  // };
   /*
    * 绘制图形函数
    */
@@ -1169,6 +1296,18 @@ export default class integrat extends PureComponent {
     });
   };
   /*
+   * 取消屏幕截图
+   */
+  cancelScreenshot = () => {
+    this.setState({ showButton: false });
+    if (userconfig.screenLayer) {
+      map.pm.disableDraw("Rectangle");
+      map.off("pm:create");
+      map.removeLayer(userconfig.screenLayer);
+      userconfig.screenLayer = null;
+    }
+  };
+  /*
    * 保存新增图形
    */
   saveAddGraphic = () => {
@@ -1222,7 +1361,7 @@ export default class integrat extends PureComponent {
    * 保存编辑图形
    */
   saveEditGraphic = e => {
-    console.log(e);
+    //console.log(e);
     e.stopPropagation();
     const me = this;
     this.setState({ showButton: false });
@@ -1258,6 +1397,10 @@ export default class integrat extends PureComponent {
       });
     }
   };
+  /*
+   * 保存屏幕截图
+   */
+  saveScreenshot = e => {};
   /*
    * geojson转换multipolygon
    * @type 0代表编辑图形;1代表新增图形
@@ -1452,6 +1595,8 @@ export default class integrat extends PureComponent {
                 onClick={
                   drawGrphic === "edit"
                     ? this.cancelEditGraphic
+                    : drawGrphic === "screenshot"
+                    ? this.cancelScreenshot
                     : this.cancelAddGraphic
                 }
               />
@@ -1460,6 +1605,8 @@ export default class integrat extends PureComponent {
                 onClick={
                   drawGrphic === "edit"
                     ? this.saveEditGraphic
+                    : drawGrphic === "screenshot"
+                    ? this.saveScreenshot
                     : this.saveAddGraphic
                 }
               />

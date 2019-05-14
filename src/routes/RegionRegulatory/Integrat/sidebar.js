@@ -1240,9 +1240,9 @@ export default class integrat extends PureComponent {
           >
             <p
               style={{
-                width: 100,
+                width: 150,
                 height: 0,
-                left: 220,
+                left: 173,
                 top: 62,
                 zIndex: 1,
                 position: "fixed"
@@ -1306,6 +1306,31 @@ export default class integrat extends PureComponent {
                       edit: true
                     });
                   }
+                }}
+              />
+              <Button
+                icon="delete"
+                shape="circle"
+                style={{
+                  float: "right",
+                  color: "#1890ff",
+                  fontSize: 18,
+                  zIndex: 1
+                }}
+                onClick={() => {
+                  Modal.confirm({
+                    title: "删除",
+                    content: "你是否确定要删除这条项目数据？",
+                    okText: "是",
+                    okType: "danger",
+                    cancelText: "否",
+                    onOk() {
+                      console.log("OK");
+                    },
+                    onCancel() {
+                      console.log("Cancel");
+                    }
+                  });
                 }}
               />
             </p>

@@ -55,7 +55,11 @@ const config = {
     //删除图斑图形
     removeSpotGraphic: `${domain}/api/app/removeSpotGraphic`,
     //删除项目红线图形
-    removeProjectScopeGraphic: `${domain}/api/app/removeProjectScopeGraphic`
+    removeProjectScopeGraphic: `${domain}/api/app/removeProjectScopeGraphic`,
+
+    //点查地图服务后台接口
+    queryWFSLayer: `${domain_}api/Tool/Forward`
+
   },
 
   //扰动类型
@@ -339,31 +343,9 @@ const config = {
     }
   ],
   mapUrl: {
-    //SHP: `http://aj.zkygis.cn/stbcSys/mapfile/SHP/`,
-    //mapshaper: `http://aj.zkygis.cn/stbcSys/mapshaper/index.html`,
     SHP: `./mapfile/SHP/`,
     mapshaper: `./mapshaper/index.html`,
-    geoserverUrl: "http://rs.stbcjg.cn:8080/geoserver/ZKYGIS"
-  },
-  /*配置气泡窗口模板匹配字段信息*/
-  mapFields: {
-    spot: {
-      simple: [
-        { field: "spot_tbid", alias: "图斑编号" },
-        { field: "project_id", alias: "所属项目ID" },
-        { field: "qtype", alias: "扰动类型" },
-        { field: "qarea", alias: "扰动面积" },
-        { field: "earea", alias: "超出防治责任范围面积" },
-        { field: "qdcs", alias: "建设状态" },
-        { field: "qdtype", alias: "扰动变化类型" },
-        { field: "byd", alias: "扰动合规性" },
-        { field: "isreview", alias: "复核状态" },
-        { field: "c_time", alias: "创建时间" },
-        { field: "file_time", alias: "归档时间" },
-        { field: "m_time", alias: "修改时间" },
-        { field: "interpretation_unitid", alias: "解译单位ID" }
-      ]
-    }
+    geoserverUrl: "http://10.7.23.177:8080/geoserver/ZKYGIS"
   },
   mapLayersName: "ZKYGIS:bs_project_scope,ZKYGIS:bs_spot",
   mapProjectLayerName: "ZKYGIS:bs_project_scope",

@@ -254,13 +254,26 @@ export async function removeProjectScopeGraphic(project_id) {
 }
 
 //地图WFS请求图层数据源
-export async function queryWFSLayer(params) {
-  //console.log(params);
+/*export async function queryWFSLayer(params) {
   return request(params.geojsonUrl, {
     method: "GET",
     dataType: "json",
     headers: {
-      //Authorization: `Bearer ${accessToken()}`
     }
+  });
+}*/
+export async function queryWFSLayer(params) {
+  //console.log(params);
+  return request(`${config.url.queryWFSLayer}`, {
+    method: "POST",
+    dataType: "json",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify({
+      "method": "get",
+      "url": params.geojsonUrl,
+    })
   });
 }

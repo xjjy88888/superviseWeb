@@ -35,7 +35,7 @@ export default {
 
   effects: {
     // 项目列表
-    *queryProject({ payload }, { call, put }) {
+    *queryProject({ payload, callback }, { call, put }) {
       const items_old = payload.items;
       const {
         data: { success, result: projectList }
@@ -57,6 +57,7 @@ export default {
       });
       if (success) {
         yield put({ type: "save", payload: { projectItem: result } });
+        if (callback) callback(result);
       }
     },
 
