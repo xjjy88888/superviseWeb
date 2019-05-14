@@ -200,6 +200,8 @@ export default class integrat extends PureComponent {
           config.mapSpotLayerName,
           this.callbackLocationQueryWFSService
         );
+      } else if (data.key === "point") {
+        //标注点定位
       }
     });
     //照片定位
@@ -244,7 +246,10 @@ export default class integrat extends PureComponent {
         let northEast = userconfig.screenLayer.getBounds()._northEast;
         let southWest = userconfig.screenLayer.getBounds()._southWest;
         //框选矩形的中心点
-        let centerPoint = L.latLng((northEast.lat+southWest.lat)/2.0, (northEast.lng+southWest.lng)/2.0);
+        let centerPoint = L.latLng(
+          (northEast.lat + southWest.lat) / 2.0,
+          (northEast.lng + southWest.lng) / 2.0
+        );
         //L.marker(centerPoint).addTo(map);
         //地理坐标转换屏幕坐标
         let northEastPoint = map.latLngToContainerPoint(northEast);
@@ -253,33 +258,48 @@ export default class integrat extends PureComponent {
         let width = Math.abs(northEastPoint.x - southWestPoint.x);
         let height = Math.abs(northEastPoint.y - southWestPoint.y);
         //计算框选矩形的左上角屏幕坐标
-        let minx = northEastPoint.x <= southWestPoint.x ? northEastPoint.x : southWestPoint.x; 
-        let miny = northEastPoint.y <= southWestPoint.y ? northEastPoint.y : southWestPoint.y; 
-        //获取当前地图元素dom节点node,用于屏幕截图        
-        let node = document.getElementById('map');
+        let minx =
+          northEastPoint.x <= southWestPoint.x
+            ? northEastPoint.x
+            : southWestPoint.x;
+        let miny =
+          northEastPoint.y <= southWestPoint.y
+            ? northEastPoint.y
+            : southWestPoint.y;
+        //获取当前地图元素dom节点node,用于屏幕截图
+        let node = document.getElementById("map");
         /*domtoimage.toPng(node, {
           width: width,
           height: height
         })*/
-        domtoimage.toPng(node)
-        .then(function (dataUrl) {
-          //过渡img图片,为了截取img指定位置的截图需要
-          let img = new Image();
-          img.src = dataUrl;
-          //document.body.appendChild(img);
-          img.onload=function(){ //要先确保图片完整获取到，这是个异步事件
-            let canvas = document.createElement("canvas");//创建canvas元素
-            canvas.width=width;
-            canvas.height=height;
-            canvas.getContext("2d").drawImage(img,minx,miny,width,height,0,0,width,height); //将图片绘制到canvas中
-            dataUrl=canvas.toDataURL(); //转换图片为dataURL
-            console.log(dataUrl+"\n经度:"+centerPoint.lng+",纬度"+centerPoint.lat);
-          };
-        })
-        .catch(function (error) {
-            console.error('oops, something went wrong!', error);
-        });
-
+        domtoimage
+          .toPng(node)
+          .then(function(dataUrl) {
+            //过渡img图片,为了截取img指定位置的截图需要
+            let img = new Image();
+            img.src = dataUrl;
+            //document.body.appendChild(img);
+            img.onload = function() {
+              //要先确保图片完整获取到，这是个异步事件
+              let canvas = document.createElement("canvas"); //创建canvas元素
+              canvas.width = width;
+              canvas.height = height;
+              canvas
+                .getContext("2d")
+                .drawImage(img, minx, miny, width, height, 0, 0, width, height); //将图片绘制到canvas中
+              dataUrl = canvas.toDataURL(); //转换图片为dataURL
+              console.log(
+                dataUrl +
+                  "\n经度:" +
+                  centerPoint.lng +
+                  ",纬度" +
+                  centerPoint.lat
+              );
+            };
+          })
+          .catch(function(error) {
+            console.error("oops, something went wrong!", error);
+          });
       });
     });
     //绘制扰动图斑图形
