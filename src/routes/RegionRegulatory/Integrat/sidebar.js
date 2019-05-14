@@ -358,7 +358,7 @@ export default class integrat extends PureComponent {
       type: "spot/querySpotByProjectId",
       payload: {
         ProjectId: id,
-        MaxResultCount: 20,
+        MaxResultCount: 1000,
         SkipCount: 0
       }
     });
@@ -759,11 +759,6 @@ export default class integrat extends PureComponent {
         }}
         ref={e => (this.refDom = e)}
       >
-        <img
-          src="./img/logo2.jpg"
-          id="img1"
-          style={{ width: 100, display: "none" }}
-        />
         <Icon
           type={show ? "left" : "right"}
           style={{
@@ -1699,12 +1694,28 @@ export default class integrat extends PureComponent {
                       >
                         {item.id}
                         <Icon
-                          type="environment"
+                          type="delete"
                           style={{
                             float: "right",
                             fontSize: 18,
                             cursor: "point",
                             color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            notification["info"]({
+                              message: "删除防治责任范围"
+                            });
+                          }}
+                        />
+                        <Icon
+                          type="environment"
+                          style={{
+                            float: "right",
+                            fontSize: 16,
+                            cursor: "point",
+                            color: "#1890ff",
+                            marginRight: 10
                           }}
                           onClick={e => {
                             e.stopPropagation();

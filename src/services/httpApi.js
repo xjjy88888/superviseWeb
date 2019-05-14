@@ -70,7 +70,6 @@ export async function spotListApi(params) {
     },
     body: JSON.stringify({
       ...params,
-      MaxResultCount: 10,
       MaxResultCount: params.MaxResultCount || "10",
       InterferenceAreaMin: params.InterferenceArea
         ? params.InterferenceArea[0]

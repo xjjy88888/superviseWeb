@@ -175,11 +175,11 @@ export default class siderbarDetail extends PureComponent {
                   {item.key === "archiving"
                     ? showCheck
                       ? "归档勾选数据"
-                      : "归档全部数据"
+                      : "归档列表数据"
                     : item.key === "export"
                     ? showCheck
                       ? "导出勾选数据"
-                      : "导出全部数据"
+                      : "导出列表数据"
                     : item.label}
                 </Button>
                 <br />
