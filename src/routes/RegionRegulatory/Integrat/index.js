@@ -202,6 +202,8 @@ export default class integrat extends PureComponent {
         );
       } else if (data.key === "point") {
         //标注点定位
+      } else if (data.key === "redLine") {
+        //防治责任范围定位
       }
     });
     //照片定位
