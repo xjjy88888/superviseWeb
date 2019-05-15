@@ -243,7 +243,7 @@ export default class integrat extends PureComponent {
           map.setZoom(13);
           setTimeout(() => {
             me.automaticToMap(latLng);
-          }, 200);
+          }, 500);
         }
       } else {
         if (marker) marker.remove();

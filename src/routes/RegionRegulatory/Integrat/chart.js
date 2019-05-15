@@ -221,7 +221,6 @@ export default class siderbarDetail extends PureComponent {
         }}
       >
         <Button
-          type="dashed"
           icon="close"
           shape="circle"
           style={{

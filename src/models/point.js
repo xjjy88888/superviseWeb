@@ -16,7 +16,7 @@ export default {
 
   effects: {
     // 标注点列表
-    *queryPoint({ payload }, { call, put }) {
+    *queryPoint({ payload, callback }, { call, put }) {
       const {
         data: { result: pointList }
       } = yield call(pointListApi, payload);
@@ -25,6 +25,7 @@ export default {
         totalCount: pointList.totalCount
       };
       yield put({ type: "save", payload: { pointList: data } });
+      if (callback) callback(data);
     },
 
     // id查询标注点

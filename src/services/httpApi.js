@@ -26,7 +26,6 @@ export async function projectListApi(params) {
     body: JSON.stringify({
       ...params,
       MaxResultCount: 10,
-      Sorting: params.Sorting || "ProjectBase.ModifyTime Desc",
       ReplyTimeBegin:
         params.ReplyTime && params.ReplyTime.length
           ? dateFormat(params.ReplyTime[0]._d)
@@ -72,7 +71,6 @@ export async function spotListApi(params) {
     body: JSON.stringify({
       ...params,
       MaxResultCount: params.MaxResultCount || "10",
-      Sorting: params.Sorting || "ModifyTime Desc",
       InterferenceType: params.InterferenceType
         ? params.InterferenceType.map(v => v).join(",")
         : "",
@@ -95,7 +93,7 @@ export async function pointListApi(params) {
     `${config.url.pointListUrl}?MaxResultCount=10&SkipCount=${
       params.SkipCount
     }` +
-      `&Sorting=${params.Sorting || "ModifyTime Desc"}` +
+      `&Sorting=${params.Sorting || ""}` +
       `&ProjectName=${params.ProjectName || ""}`,
     {
       method: "GET",

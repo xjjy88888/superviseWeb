@@ -417,7 +417,7 @@ export default class siderbarDetail extends PureComponent {
               </Form.Item>
               <Form.Item label="详细地址" {...formItemLayout}>
                 {getFieldDecorator("product_department_id1", {
-                  initialValue: ''
+                  initialValue: ""
                 })(<Input />)}
               </Form.Item>
               <Form.Item label="问题" {...formItemLayout}>
@@ -460,11 +460,10 @@ export default class siderbarDetail extends PureComponent {
             </Upload>
             {edit ? (
               <span>
-                <Button type="dashed" icon="check" style={{ marginTop: 20 }}>
+                <Button icon="check" style={{ marginTop: 20 }}>
                   保存
                 </Button>
                 <Button
-                  type="dashed"
                   icon="check-circle"
                   style={{ marginLeft: 20 }}
                   onClick={() => {
@@ -484,7 +483,6 @@ export default class siderbarDetail extends PureComponent {
                   归档保存
                 </Button>
                 <Button
-                  type="dashed"
                   icon="delete"
                   style={{ marginLeft: 20 }}
                   onClick={() => {
@@ -508,17 +506,13 @@ export default class siderbarDetail extends PureComponent {
               </span>
             ) : (
               <span>
-                <Button type="dashed" icon="swap" style={{ marginTop: 20 }}>
+                <Button icon="swap" style={{ marginTop: 20 }}>
                   历史查看
                 </Button>
-                <Button
-                  type="dashed"
-                  icon="cloud-download"
-                  style={{ marginLeft: 20 }}
-                >
+                <Button icon="cloud-download" style={{ marginLeft: 20 }}>
                   数据归档
                 </Button>
-                <Button type="dashed" icon="rollback" style={{ marginTop: 20 }}>
+                <Button icon="rollback" style={{ marginTop: 20 }}>
                   撤销归档
                 </Button>
               </span>

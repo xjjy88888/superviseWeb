@@ -72,6 +72,7 @@ export default class integrat extends PureComponent {
       showQuery: false,
       showCheck: false,
       checked: false,
+      showSpin: true,
       queryHighlight: false,
       row_pro: 10,
       row_spot: 10,
@@ -311,6 +312,10 @@ export default class integrat extends PureComponent {
     }
   }
 
+  showSpin = state => {
+    this.setState({ showSpin: state });
+  };
+
   queryDistrict = () => {
     const { dispatch } = this.props;
     dispatch({
@@ -324,6 +329,7 @@ export default class integrat extends PureComponent {
       dispatch,
       project: { projectList }
     } = this.props;
+    this.showSpin(true);
     dispatch({
       type: "project/queryProject",
       payload: {
@@ -332,6 +338,7 @@ export default class integrat extends PureComponent {
         items: items.SkipCount === 0 ? [] : projectList.items
       },
       callback: data => {
+        this.showSpin(false);
         emitter.emit("checkResult", {
           show: false,
           result: data.items
@@ -346,6 +353,7 @@ export default class integrat extends PureComponent {
       dispatch,
       spot: { spotList }
     } = this.props;
+    this.showSpin(true);
     dispatch({
       type: "spot/querySpot",
       payload: {
@@ -354,6 +362,7 @@ export default class integrat extends PureComponent {
         items: items.SkipCount === 0 ? [] : spotList.items
       },
       callback: data => {
+        this.showSpin(false);
         emitter.emit("checkResult", {
           show: false,
           result: data.items
@@ -367,11 +376,15 @@ export default class integrat extends PureComponent {
       dispatch,
       point: { pointList }
     } = this.props;
+    this.showSpin(true);
     dispatch({
       type: "point/queryPoint",
       payload: {
         ...items,
         items: items.SkipCount === 0 ? [] : pointList.items
+      },
+      callback: data => {
+        this.showSpin(false);
       }
     });
   };
@@ -579,6 +592,7 @@ export default class integrat extends PureComponent {
     const {
       show,
       Sorting,
+      showSpin,
       queryHighlight,
       previewVisible_min,
       previewVisible_min_left,
@@ -1011,12 +1025,13 @@ export default class integrat extends PureComponent {
             筛选
           </Button>
           <Spin
+            size="large"
             style={{
-              display: projectList.totalCount === "" ? "block" : "none",
+              display: showSpin ? "block" : "none",
               padding: 100,
               position: "absolute",
               top: 300,
-              left: 60,
+              left: 45,
               zIndex: 1001
             }}
           />
@@ -2544,14 +2559,10 @@ export default class integrat extends PureComponent {
               <img alt="example" style={{ width: "100%" }} src={previewImage} />
             </Modal>
             <div>
-              <Button
-                type="dashed"
-                icon="cloud-download"
-                style={{ marginTop: 20 }}
-              >
+              <Button icon="cloud-download" style={{ marginTop: 20 }}>
                 项目归档
               </Button>
-              <Button type="dashed" icon="rollback" style={{ marginLeft: 20 }}>
+              <Button icon="rollback" style={{ marginLeft: 20 }}>
                 撤销归档
               </Button>
             </div>
