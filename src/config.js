@@ -160,6 +160,11 @@ const config = {
       icon: "folder-open"
     },
     {
+      label: "删除",
+      key: "delete",
+      icon: "delete"
+    },
+    {
       label: "模板下载(Shapfile)",
       key: "download_shapfile",
       icon: "cloud-download"

@@ -476,6 +476,28 @@ export default class siderbarDetail extends PureComponent {
                 >
                   归档保存
                 </Button>
+                <Button
+                  type="dashed"
+                  icon="delete"
+                  style={{ marginLeft: 20 }}
+                  onClick={() => {
+                    Modal.confirm({
+                      title: "删除",
+                      content: "是否确定要删除这条图斑数据？",
+                      okText: "是",
+                      okType: "danger",
+                      cancelText: "否",
+                      onOk() {
+                        console.log("OK");
+                      },
+                      onCancel() {
+                        console.log("Cancel");
+                      }
+                    });
+                  }}
+                >
+                  删除
+                </Button>
               </span>
             ) : (
               <span>

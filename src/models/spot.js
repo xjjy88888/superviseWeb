@@ -17,7 +17,7 @@ export default {
 
   effects: {
     // 图斑列表
-    *querySpot({ payload }, { call, put }) {
+    *querySpot({ payload, callback }, { call, put }) {
       const items_old = payload.items;
       const {
         data: { result: spotList }
@@ -27,6 +27,7 @@ export default {
         totalCount: spotList.totalCount
       };
       yield put({ type: "save", payload: { spotList: data } });
+      if (callback) callback(data);
     },
 
     // 项目id查询图斑列表
@@ -48,6 +49,10 @@ export default {
       if (success) {
         yield put({ type: "save", payload: { spotItem: result } });
         if (callback) callback(result);
+      } else {
+        notification["error"]({
+          message: "查询图斑失败"
+        });
       }
     }
   },

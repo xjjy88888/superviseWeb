@@ -213,6 +213,8 @@ export default class integrat extends PureComponent {
         this.queryProjectById(data.id);
         this.querySpotByProjectId(data.id);
         this.queryRedLineByProjectId(data.id);
+      } else if (data.from === "spot") {
+      } else {
       }
     });
     const { clientHeight } = this.refDom;
@@ -301,6 +303,12 @@ export default class integrat extends PureComponent {
         ...items,
         polygon: polygon,
         items: items.SkipCount === 0 ? [] : projectList.items
+      },
+      callback: data => {
+        emitter.emit("checkResult", {
+          show: false,
+          result: data.items
+        });
       }
     });
   };
@@ -317,6 +325,12 @@ export default class integrat extends PureComponent {
         polygon: polygon,
         ...items,
         items: items.SkipCount === 0 ? [] : spotList.items
+      },
+      callback: data => {
+        emitter.emit("checkResult", {
+          show: false,
+          result: data.items
+        });
       }
     });
   };
@@ -341,6 +355,12 @@ export default class integrat extends PureComponent {
       type: "project/queryProjectById",
       payload: {
         id: id
+      },
+      callback: (result, success) => {
+        console.log(result, success);
+        if (!success) {
+          this.setState({ showProjectDetail: false });
+        }
       }
     });
   };

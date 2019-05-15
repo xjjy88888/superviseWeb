@@ -45,6 +45,7 @@ export default {
         totalCount: projectList.totalCount
       };
       yield put({ type: "save", payload: { projectList: data } });
+      if (callback) callback(data);
     },
 
     // id查询项目
@@ -57,7 +58,11 @@ export default {
       // });
       if (success) {
         yield put({ type: "save", payload: { projectItem: result } });
-        if (callback) callback(result);
+        if (callback) callback(result,success);
+      } else {
+        notification["error"]({
+          message: "查询项目信息失败"
+        });
       }
     },
 

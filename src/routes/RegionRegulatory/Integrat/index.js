@@ -96,7 +96,7 @@ export default class integrat extends PureComponent {
       if (obj.from === "project") {
         me.queryWFSServiceByProperty(
           obj.id,
-          "id",
+          "project_id",
           config.mapProjectLayerName,
           me.callbackEditQueryWFSService
         );
@@ -228,6 +228,8 @@ export default class integrat extends PureComponent {
     //屏幕截图
     this.eventEmitter = emitter.addListener("screenshot", data => {
       me.setState({ drawGrphic: "screenshot" });
+      //显示屏幕截图绘制保存取消菜单按钮
+      me.setState({ showButton: true });
       //绘制图形之前
       if (userconfig.screenLayer) {
         map.pm.disableDraw("Rectangle");
@@ -242,9 +244,6 @@ export default class integrat extends PureComponent {
         tooltips: false
       });
       map.on("pm:create", e => {
-        //显示屏幕截图绘制保存取消菜单按钮
-        me.setState({ showButton: true });
-
         userconfig.screenLayer = e.layer;
         //console.log(userconfig.screenLayer.getBounds());
         let northEast = userconfig.screenLayer.getBounds()._northEast;
@@ -292,13 +291,17 @@ export default class integrat extends PureComponent {
                 .getContext("2d")
                 .drawImage(img, minx, miny, width, height, 0, 0, width, height); //将图片绘制到canvas中
               dataUrl = canvas.toDataURL(); //转换图片为dataURL
-              console.log(
+              /*console.log(
                 dataUrl +
                   "\n经度:" +
                   centerPoint.lng +
                   ",纬度" +
                   centerPoint.lat
-              );
+              );*/
+              //保存截图以及中心点经纬度
+              userconfig.dataImgUrl = dataUrl;
+              userconfig.imglng = centerPoint.lng;
+              userconfig.imglat= centerPoint.lat;
             };
           })
           .catch(function(error) {
@@ -884,7 +887,8 @@ export default class integrat extends PureComponent {
     const obj = {
       show: true,
       edit: false,
-      id: properties.id || properties.project_id,
+      //id: properties.id || properties.project_id,
+      id: properties.map_num ? properties.id: properties.project_id,
       from: properties.map_num ? "spot" : "project"
     };
     if (properties.project_id) {
@@ -1321,9 +1325,9 @@ export default class integrat extends PureComponent {
    */
   cancelScreenshot = () => {
     this.setState({ showButton: false });
+    map.pm.disableDraw("Rectangle");
+    map.off("pm:create");
     if (userconfig.screenLayer) {
-      map.pm.disableDraw("Rectangle");
-      map.off("pm:create");
       map.removeLayer(userconfig.screenLayer);
       userconfig.screenLayer = null;
     }
@@ -1421,7 +1425,15 @@ export default class integrat extends PureComponent {
   /*
    * 保存屏幕截图
    */
-  saveScreenshot = e => {};
+  saveScreenshot = e => {
+    console.log(
+      userconfig.dataImgUrl +
+        "\n经度:" +
+        userconfig.imglng  +
+        ",纬度" +
+        userconfig.imglat
+    ); 
+  };
   /*
    * geojson转换multipolygon
    * @type 0代表编辑图形;1代表新增图形

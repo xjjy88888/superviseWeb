@@ -54,13 +54,21 @@ export default class siderbarDetail extends PureComponent {
   }
 
   render() {
-    const { show, type, key, checkResult, showCheck, funcType } = this.state;
+    const {
+      show,
+      type,
+      key,
+      checkResult,
+      showCheck,
+      funcType,
+      funcTypeText
+    } = this.state;
     return (
       <div
         style={{
           left: show ? 350 : -350,
           width: 240,
-          height: 530,
+          height: 580,
           backgroundColor: `#fff`,
           position: `absolute`,
           zIndex: 1000,
@@ -112,7 +120,10 @@ export default class siderbarDetail extends PureComponent {
                         emitter.emit("showCheck", {
                           show: !showCheck
                         });
-                        this.setState({ showCheck: !showCheck });
+                        this.setState({
+                          showCheck: !showCheck,
+                          checkResult: showCheck ? checkResult : []
+                        });
                         break;
                       //模板下载(Shapfile)
                       case "download_shapfile":
@@ -128,9 +139,10 @@ export default class siderbarDetail extends PureComponent {
                           }模板(Shapfile)成功`
                         });
                         break;
-                      //导出数据-归档数据
+                      //导出数据-归档数据-删除
                       case "export":
                       case "archiving":
+                      case "delete":
                         if (showCheck && checkResult.length === 0) {
                           notification["warning"]({
                             message: `至少选择一条数据进行${item.label}`
@@ -140,7 +152,10 @@ export default class siderbarDetail extends PureComponent {
                             visible: true
                           });
                         }
-                        this.setState({ funcType: item.key });
+                        this.setState({
+                          funcType: item.key,
+                          funcTypeText: item.label
+                        });
                         break;
                       //模板下载(Excel)
                       case "download_excel":
@@ -172,14 +187,10 @@ export default class siderbarDetail extends PureComponent {
                     }
                   }}
                 >
-                  {item.key === "archiving"
-                    ? showCheck
-                      ? "归档勾选数据"
-                      : "归档列表数据"
-                    : item.key === "export"
-                    ? showCheck
-                      ? "导出勾选数据"
-                      : "导出列表数据"
+                  {item.key === "export" ||
+                  item.key === "archiving" ||
+                  item.key === "delete"
+                    ? `${item.label}${showCheck ? "勾选" : "列表"}数据`
                     : item.label}
                 </Button>
                 <br />
@@ -187,9 +198,7 @@ export default class siderbarDetail extends PureComponent {
             )
           )}
           <Modal
-            title={`${funcType === "export" ? "导出" : "归档"}${
-              key === "project" ? "项目" : "图斑"
-            }数据`}
+            title={`${funcTypeText}${key === "project" ? "项目" : "图斑"}数据`}
             visible={this.state.visible}
             onOk={() => {
               this.setState({
@@ -203,28 +212,24 @@ export default class siderbarDetail extends PureComponent {
             }}
           >
             <p>
-              {showCheck ? (
-                <span>
-                  将要{funcType === "export" ? "导出" : "归档"}的数据有
-                  {checkResult.length}条：
-                  {checkResult
-                    .map(item =>
-                      key === "project" ? item.projectName : item.mapNum
-                    )
-                    .join("，")}
-                </span>
-              ) : (
-                <span>
-                  将要{funcType === "export" ? "导出" : "归档"}全部数据
-                </span>
-              )}
+              <span>
+                将要
+                {funcTypeText}
+                的数据有
+                {checkResult.length}条：
+                {checkResult
+                  .map(item =>
+                    key === "project" ? item.projectName : item.mapNum
+                  )
+                  .join("，")}
+              </span>
             </p>
 
             <Alert
               type="warning"
               message={`${
                 funcType === "export" ? "" : "归档后的数据将不再显示和操作，"
-              }是否确定${funcType === "export" ? "导出" : "归档"}？`}
+              }是否确定${funcTypeText}？`}
               showIcon
             />
           </Modal>
