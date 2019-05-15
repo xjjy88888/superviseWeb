@@ -204,6 +204,11 @@ export default class siderbarDetail extends PureComponent {
               this.setState({
                 visible: false
               });
+              if (funcType !== "export") {
+                this.setState({
+                  visibleDelete: true
+                });
+              }
             }}
             onCancel={() => {
               this.setState({
@@ -230,6 +235,23 @@ export default class siderbarDetail extends PureComponent {
               message={`${
                 funcType === "export" ? "" : "归档后的数据将不再显示和操作，"
               }是否确定${funcTypeText}？`}
+              showIcon
+            />
+          </Modal>
+
+          <Modal
+            title={funcTypeText}
+            visible={this.state.visibleDelete}
+            onOk={() => {
+              this.setState({ visibleDelete: false });
+            }}
+            onCancel={() => {
+              this.setState({ visibleDelete: false });
+            }}
+          >
+            <Alert
+              type="error"
+              message={`确定要${funcTypeText}吗？`}
               showIcon
             />
           </Modal>
