@@ -22,6 +22,7 @@ import {
   DatePicker,
   Form
 } from "antd";
+import locale from "antd/lib/date-picker/locale/zh_CN";
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
 import zhCN from "antd/lib/locale-provider/zh_CN";
@@ -174,7 +175,7 @@ export default class siderbarDetail extends PureComponent {
           }}
         >
           <Button
-            icon={edit ? "check" : "edit"}
+            icon={edit ? "rollback" : "edit"}
             shape="circle"
             style={{
               float: "right",
@@ -190,18 +191,6 @@ export default class siderbarDetail extends PureComponent {
                 });
               } else {
               }
-            }}
-          />
-          <Button
-            icon="rollback"
-            shape="circle"
-            style={{
-              display: edit ? "block" : "none",
-              float: "right",
-              color: "#1890ff"
-            }}
-            onClick={() => {
-              this.setState({ edit: !edit });
             }}
           />
         </p>
@@ -462,19 +451,49 @@ export default class siderbarDetail extends PureComponent {
                 </div>
               ) : null}
             </Upload>
-            <Button type="dashed" icon="swap" style={{ marginTop: 20 }}>
-              历史查看
-            </Button>
-            <Button
-              type="dashed"
-              icon="cloud-download"
-              style={{ marginLeft: 20 }}
-            >
-              数据归档
-            </Button>
-            <Button type="dashed" icon="rollback" style={{ marginTop: 20 }}>
-              撤销归档
-            </Button>
+            {edit ? (
+              <span>
+                <Button type="dashed" icon="check" style={{ marginTop: 20 }}>
+                  保存
+                </Button>
+                <Button
+                  type="dashed"
+                  icon="check-circle"
+                  style={{ marginLeft: 20 }}
+                  onClick={() => {
+                    Modal.confirm({
+                      title: "归档保存",
+                      content: (
+                        <span>
+                          归档时间：
+                          <DatePicker locale={locale} />
+                        </span>
+                      ),
+                      onOk() {},
+                      onCancel() {}
+                    });
+                  }}
+                >
+                  归档保存
+                </Button>
+              </span>
+            ) : (
+              <span>
+                <Button type="dashed" icon="swap" style={{ marginTop: 20 }}>
+                  历史查看
+                </Button>
+                <Button
+                  type="dashed"
+                  icon="cloud-download"
+                  style={{ marginLeft: 20 }}
+                >
+                  数据归档
+                </Button>
+                <Button type="dashed" icon="rollback" style={{ marginTop: 20 }}>
+                  撤销归档
+                </Button>
+              </span>
+            )}
           </div>
           <div
             style={{
