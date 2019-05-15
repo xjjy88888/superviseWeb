@@ -116,7 +116,7 @@ export default class integrat extends PureComponent {
           width: 800,
           backgroundColor: `#fff`,
           position: `absolute`,
-          zIndex: 1001,
+          zIndex: 1000,
           height: `100%`,
           borderLeft: `solid 1px #ddd`
           // overflow: "auto"

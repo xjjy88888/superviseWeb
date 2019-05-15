@@ -141,20 +141,13 @@ export default class integrat extends PureComponent {
       });
     });
     this.eventEmitter = emitter.addListener("chartLinkage", data => {
-      if (data.open) {
-        this.setState({
-          polygon: data.polygon
-        });
-        if (data.type === "spot") {
-          this.querySpot({
-            SkipCount: 0
-          });
-        }
-      } else {
-        this.setState({
-          polygon: ""
-        });
-      }
+      this.setState({
+        polygon: data.polygon
+      });
+      this.querySpot({
+        SkipCount: 0,
+        polygon: data.polygon
+      });
     });
     this.eventEmitter = emitter.addListener("queryInfo", data => {
       this.scrollDom.scrollTop = 0;
@@ -321,8 +314,8 @@ export default class integrat extends PureComponent {
     dispatch({
       type: "spot/querySpot",
       payload: {
-        ...items,
         polygon: polygon,
+        ...items,
         items: items.SkipCount === 0 ? [] : spotList.items
       }
     });
@@ -1260,21 +1253,6 @@ export default class integrat extends PureComponent {
                 onClick={this.close}
               />
               <Button
-                icon="environment"
-                shape="circle"
-                style={{
-                  float: "right",
-                  color: "#1890ff",
-                  fontSize: 18,
-                  zIndex: 1
-                }}
-                onClick={() => {
-                  notification["success"]({
-                    message: "定位成功"
-                  });
-                }}
-              />
-              <Button
                 icon={projectEdit ? "check" : "edit"}
                 shape="circle"
                 htmlType="submit"
@@ -1306,31 +1284,6 @@ export default class integrat extends PureComponent {
                       edit: true
                     });
                   }
-                }}
-              />
-              <Button
-                icon="delete"
-                shape="circle"
-                style={{
-                  float: "right",
-                  color: "#1890ff",
-                  fontSize: 18,
-                  zIndex: 1
-                }}
-                onClick={() => {
-                  Modal.confirm({
-                    title: "删除",
-                    content: "你是否确定要删除这条项目数据？",
-                    okText: "是",
-                    okType: "danger",
-                    cancelText: "否",
-                    onOk() {
-                      console.log("OK");
-                    },
-                    onCancel() {
-                      console.log("Cancel");
-                    }
-                  });
                 }}
               />
             </p>
@@ -1395,6 +1348,21 @@ export default class integrat extends PureComponent {
                   {projectItem.projectBase.town}
                   {projectItem.projectBase.village}
                 </span>
+                <Button
+                  icon="environment"
+                  shape="circle"
+                  style={{
+                    float: "right",
+                    color: "#1890ff",
+                    fontSize: 18,
+                    zIndex: 1
+                  }}
+                  onClick={() => {
+                    notification["success"]({
+                      message: "定位成功"
+                    });
+                  }}
+                />
               </p>
 
               <List
@@ -1480,7 +1448,7 @@ export default class integrat extends PureComponent {
                       <a
                         style={{
                           position: "absolute",
-                          right: 0,
+                          right: 40,
                           bottom: 0,
                           userSelect: "none"
                         }}
@@ -1495,6 +1463,35 @@ export default class integrat extends PureComponent {
                         }}
                       >
                         详情
+                      </a>
+                      <a
+                        style={{
+                          position: "absolute",
+                          right: 0,
+                          bottom: 0,
+                          userSelect: "none"
+                        }}
+                        onClick={() => {
+                          Modal.confirm({
+                            title: "是否确定要删除这条项目数据？",
+                            content: (
+                              <span>
+                                删除之后，项目关联的监督执法记录、防治责任范围、责任点都将被删除，扰动图斑保留。
+                              </span>
+                            ),
+                            okText: "是",
+                            okType: "danger",
+                            cancelText: "否",
+                            onOk() {
+                              console.log("OK");
+                            },
+                            onCancel() {
+                              console.log("Cancel");
+                            }
+                          });
+                        }}
+                      >
+                        删除
                       </a>
                     </div>
                   </Collapse.Panel>
@@ -2388,7 +2385,7 @@ export default class integrat extends PureComponent {
                 <a
                   style={{
                     position: "absolute",
-                    right: 0,
+                    right: 40,
                     bottom: 0,
                     userSelect: "none"
                   }}
@@ -2403,6 +2400,35 @@ export default class integrat extends PureComponent {
                   }}
                 >
                   详情
+                </a>
+                <a
+                  style={{
+                    position: "absolute",
+                    right: 0,
+                    bottom: 0,
+                    userSelect: "none"
+                  }}
+                  onClick={() => {
+                    Modal.confirm({
+                      title: "是否确定要删除这条项目数据？",
+                      content: (
+                        <span>
+                          删除之后，项目关联的监督执法记录、防治责任范围、责任点都将被删除，扰动图斑保留。
+                        </span>
+                      ),
+                      okText: "是",
+                      okType: "danger",
+                      cancelText: "否",
+                      onOk() {
+                        console.log("OK");
+                      },
+                      onCancel() {
+                        console.log("Cancel");
+                      }
+                    });
+                  }}
+                >
+                  删除
                 </a>
               </Form>
             </div>

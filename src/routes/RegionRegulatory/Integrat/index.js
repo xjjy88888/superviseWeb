@@ -74,7 +74,6 @@ export default class integrat extends PureComponent {
   }
 
   componentDidMount() {
-    console.log(111);
     const me = this;
     const { dispatch } = this.props;
     dispatch({
@@ -103,7 +102,7 @@ export default class integrat extends PureComponent {
       } else if (obj.from === "spot") {
         me.queryWFSServiceByProperty(
           obj.id,
-          "map_num",
+          "id",
           config.mapSpotLayerName,
           me.callbackEditQueryWFSService
         );
@@ -195,8 +194,8 @@ export default class integrat extends PureComponent {
         }
         //扰动图斑
         this.queryWFSServiceByProperty(
-          data.item.mapNum,
-          "map_num",
+          data.item.id,
+          "id",
           config.mapSpotLayerName,
           this.callbackLocationQueryWFSService
         );
@@ -474,12 +473,12 @@ export default class integrat extends PureComponent {
           if (i === data.features.length - 1) {
             // content += me.getWinContent(feature.properties)[0].innerHTML;
             me.getWinContent(feature.properties, data => {
-              console.log(data[0].innerHTML);
+              //console.log(data[0].innerHTML);
               content += data[0].innerHTML;
             });
           } else {
             me.getWinContent(feature.properties, data => {
-              console.log(data[0].innerHTML);
+              //console.log(data[0].innerHTML);
               content += data[0].innerHTML + "<br><br>";
             });
             // content +=
@@ -820,7 +819,7 @@ export default class integrat extends PureComponent {
               let feature = data.features[i];
               if (i === data.features.length - 1) {
                 me.getWinContent(feature.properties, data => {
-                  content += data[0].innerHTML;
+                  const content1 = data[0].innerHTML;
                 });
                 // content += me.getWinContent(feature.properties)[0].innerHTML;
               } else {
@@ -828,7 +827,8 @@ export default class integrat extends PureComponent {
                   // me.getWinContent(feature.properties)[0].innerHTML +
                   // "<br><br>";
                   me.getWinContent(feature.properties, data => {
-                    content += data[0].innerHTML + "<br><br>";
+                    let content2;
+                    content2 += data[0].innerHTML + "<br><br>";
                   });
               }
             }
@@ -868,7 +868,7 @@ export default class integrat extends PureComponent {
   };
 
   getWinContent = (properties, callback) => {
-    console.log("properties", properties);
+    //console.log("properties", properties);
     let elements;
     const obj = {
       show: true,
@@ -876,12 +876,44 @@ export default class integrat extends PureComponent {
       id: properties.id || properties.project_id,
       from: properties.map_num ? "spot" : "project"
     };
-    console.log(properties);
-    this.getProjectName(properties.project_id).then(data => {
+    //console.log(properties);
+    if (properties.project_id) {
+      this.getProjectName(properties.project_id).then(data => {
+        elements = properties.map_num
+          ? jQuery(
+              `<div>图斑编号:${properties.map_num}</br>
+        ${properties.project_id ? "关联项目:" + data + "</br>" : ""}${
+                properties.interference_compliance_id
+                  ? "扰动范围:" +
+                    properties.interference_compliance_id +
+                    "</br>"
+                  : ""
+              }<a onclick='goDetail(${JSON.stringify(
+                obj
+              )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
+                obj
+              )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+                obj
+              )})' style='display:none'>图形删除</a></div>`
+            )
+          : jQuery(
+              `<div>项目:${data}</br>
+          <a onclick='goDetail(${JSON.stringify(
+            obj
+          )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
+                obj
+              )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+                obj
+              )})' style='display:none'>图形删除</a></div>`
+            );
+        //console.log(elements);
+        callback(elements);
+      });
+    } else {
       elements = properties.map_num
         ? jQuery(
             `<div>图斑编号:${properties.map_num}</br>
-      ${properties.project_id ? "关联项目:" + data + "</br>" : ""}${
+      ${properties.project_id ? "关联项目:</br>" : ""}${
               properties.interference_compliance_id
                 ? "扰动范围:" + properties.interference_compliance_id + "</br>"
                 : ""
@@ -894,7 +926,7 @@ export default class integrat extends PureComponent {
             )})' style='display:none'>图形删除</a></div>`
           )
         : jQuery(
-            `<div>项目:${data}</br>
+            `<div>项目:</br>
         <a onclick='goDetail(${JSON.stringify(
           obj
         )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
@@ -903,41 +935,9 @@ export default class integrat extends PureComponent {
               obj
             )})' style='display:none'>图形删除</a></div>`
           );
-      console.log(elements);
+      //console.log(elements);
       callback(elements);
-    });
-
-    /*elements = properties.map_num
-      ? jQuery(
-          `<div>图斑编号:${properties.map_num}</br>
-      ${
-        properties.project_id
-          ? "关联项目:" + properties.project_id + "</br>"
-          : ""
-      }${
-            properties.interference_compliance_id
-              ? "扰动范围:" + properties.interference_compliance_id + "</br>"
-              : ""
-          }<a onclick='goDetail(${JSON.stringify(
-            obj
-          )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
-            obj
-          )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
-            obj
-          )})' style='display:none'>图形删除</a></div>`
-        )
-      : jQuery(
-          `<div>项目ID:${123}</br>
-        <a onclick='goDetail(${JSON.stringify(
-          obj
-        )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
-            obj
-          )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
-            obj
-          )})' style='display:none'>图形删除</a></div>`
-        );
-    console.log(elements);*/
-    //return elements;
+    }
   };
   // getWinContent = properties => {
   //   let elements;
@@ -1632,10 +1632,40 @@ export default class integrat extends PureComponent {
                   e.stopPropagation();
                   this.setState({ chartStatus: v });
                   console.log(v, e);
+                  let polygon = "";
+                  if (map.getZoom() >= 15) {
+                    let bounds = map.getBounds();
+                    polygon = "polygon((";
+                    polygon +=
+                      bounds.getSouthWest().lng +
+                      " " +
+                      bounds.getSouthWest().lat +
+                      ",";
+                    polygon +=
+                      bounds.getSouthWest().lng +
+                      " " +
+                      bounds.getNorthEast().lat +
+                      ",";
+                    polygon +=
+                      bounds.getNorthEast().lng +
+                      " " +
+                      bounds.getNorthEast().lat +
+                      ",";
+                    polygon +=
+                      bounds.getNorthEast().lng +
+                      " " +
+                      bounds.getSouthWest().lat +
+                      ",";
+                    polygon +=
+                      bounds.getSouthWest().lng +
+                      " " +
+                      bounds.getSouthWest().lat;
+                    polygon += "))";
+                  }
                   emitter.emit("chartLinkage", {
                     open: v,
-                    type: "",
-                    polygon: ""
+                    type: "spot",
+                    polygon: v ? polygon : ""
                   });
                 }}
               />
