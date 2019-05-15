@@ -150,7 +150,10 @@ export default class integrat extends PureComponent {
     me.initUrlParams();
     // 创建地图
     //me.createMap();
-    // 组件通信
+    // 位置定位
+    this.eventEmitter = emitter.addListener("siteLocation", data => {
+      console.log(data);
+    });
     //地图定位
     this.eventEmitter = emitter.addListener("mapLocation", data => {
       if (data.key === "project") {
@@ -301,7 +304,7 @@ export default class integrat extends PureComponent {
               //保存截图以及中心点经纬度
               userconfig.dataImgUrl = dataUrl;
               userconfig.imglng = centerPoint.lng;
-              userconfig.imglat= centerPoint.lat;
+              userconfig.imglat = centerPoint.lat;
             };
           })
           .catch(function(error) {
@@ -888,7 +891,7 @@ export default class integrat extends PureComponent {
       show: true,
       edit: false,
       //id: properties.id || properties.project_id,
-      id: properties.map_num ? properties.id: properties.project_id,
+      id: properties.map_num ? properties.id : properties.project_id,
       from: properties.map_num ? "spot" : "project"
     };
     if (properties.project_id) {
@@ -1080,7 +1083,7 @@ export default class integrat extends PureComponent {
       } else {
         userconfig.zoom = map.getZoom() + 1;
       }*/
-      userconfig.zoom = map.getZoom()+1;
+      userconfig.zoom = map.getZoom() + 1;
       //加载geoserver发布的WMS地图服务
       me.overlayWMSLayers();
       //地图模态层效果
@@ -1429,10 +1432,10 @@ export default class integrat extends PureComponent {
     console.log(
       userconfig.dataImgUrl +
         "\n经度:" +
-        userconfig.imglng  +
+        userconfig.imglng +
         ",纬度" +
         userconfig.imglat
-    ); 
+    );
   };
   /*
    * geojson转换multipolygon

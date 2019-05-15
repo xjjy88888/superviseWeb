@@ -1355,7 +1355,8 @@ export default class integrat extends PureComponent {
               <p
                 style={{
                   position: "relative",
-                  left: 10
+                  left: 10,
+                  marginTop: 10
                   // borderBottom: "solid 1px #dedede",
                   // paddingBottom: 10
                 }}
@@ -1368,19 +1369,13 @@ export default class integrat extends PureComponent {
                   {projectItem.projectBase.town}
                   {projectItem.projectBase.village}
                 </span>
-                <Button
-                  icon="environment"
-                  shape="circle"
+                <Icon
+                  type="environment"
                   style={{
                     float: "right",
                     color: "#1890ff",
                     fontSize: 18,
                     zIndex: 1
-                  }}
-                  onClick={() => {
-                    notification["success"]({
-                      message: "定位成功"
-                    });
                   }}
                 />
               </p>
@@ -2243,6 +2238,41 @@ export default class integrat extends PureComponent {
                   {getFieldDecorator("product_department_id1", {
                     initialValue: projectItem.product_department_id1
                   })(<Input />)}
+                </Form.Item>
+
+                <Form.Item label="所在经纬度" {...formItemLayout}>
+                  {getFieldDecorator("longitude", {})(
+                    <InputNumber placeholder="经度" style={{ width: 80 }} />
+                  )}
+                  {getFieldDecorator("latitude", {})(
+                    <InputNumber placeholder="纬度" style={{ width: 80 }} />
+                  )}
+                  <Icon
+                    type="environment"
+                    style={{
+                      float: "right",
+                      color: "#1890ff",
+                      fontSize: 18,
+                      zIndex: 1,
+                      position: "relative",
+                      top: 10
+                    }}
+                    onClick={() => {
+                      this.props.form.validateFields((err, values) => {
+                        if (!err) {
+                          console.log(values);
+                          emitter.emit("siteLocation", {
+                            status:
+                              values.longitude && values.latitude
+                                ? "begin"
+                                : "end",
+                            Latitude: values.latitude,
+                            Longitude: values.longitude
+                          });
+                        }
+                      });
+                    }}
+                  />
                 </Form.Item>
                 <Form.Item label="建设单位" {...formItemLayout}>
                   {getFieldDecorator("product_department_id", {
