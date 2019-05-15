@@ -310,10 +310,10 @@ export default class siderbarDetail extends PureComponent {
                           color: "#1890ff"
                         }}
                         onClick={() => {
-                          emitter.emit("showProjectDetail", {
-                            show: true,
-                            id: spotItem.projectId
-                          });
+                          // emitter.emit("showProjectDetail", {
+                          //   show: true,
+                          //   id: spotItem.projectId
+                          // });
                           emitter.emit("showProjectSpotInfo", {
                             show: true,
                             edit: false,
