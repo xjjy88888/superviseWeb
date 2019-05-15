@@ -46,10 +46,11 @@ import jQuery from "jquery";
 let userconfig = {};
 let map;
 let marker;
-@connect(({ user, mapdata, project }) => ({
+@connect(({ user, mapdata, project, spot }) => ({
   user,
   mapdata,
-  project
+  project,
+  spot
 }))
 export default class integrat extends PureComponent {
   constructor(props) {
@@ -95,7 +96,7 @@ export default class integrat extends PureComponent {
       if (obj.from === "project") {
         me.queryWFSServiceByProperty(
           obj.id,
-          "project_id",
+          "id",
           config.mapProjectLayerName,
           me.callbackEditQueryWFSService
         );
@@ -819,17 +820,12 @@ export default class integrat extends PureComponent {
               let feature = data.features[i];
               if (i === data.features.length - 1) {
                 me.getWinContent(feature.properties, data => {
-                  const content1 = data[0].innerHTML;
+                  content += data[0].innerHTML + "<br><br>";
                 });
-                // content += me.getWinContent(feature.properties)[0].innerHTML;
               } else {
-                content +=
-                  // me.getWinContent(feature.properties)[0].innerHTML +
-                  // "<br><br>";
-                  me.getWinContent(feature.properties, data => {
-                    let content2;
-                    content2 += data[0].innerHTML + "<br><br>";
-                  });
+                me.getWinContent(feature.properties, data => {
+                  content += data[0].innerHTML + "<br><br>";
+                });
               }
             }
             setTimeout(() => {
@@ -852,7 +848,7 @@ export default class integrat extends PureComponent {
    * 匹配气泡窗口信息模版函数
    */
 
-  getProjectName = id => {
+  getProjectInfo = id => {
     return new Promise((resolve, reject) => {
       const { dispatch } = this.props;
       dispatch({
@@ -867,8 +863,23 @@ export default class integrat extends PureComponent {
     });
   };
 
-  getWinContent = (properties, callback) => {
-    //console.log("properties", properties);
+  getSpotInfo = id => {
+    return new Promise((resolve, reject) => {
+      const { dispatch } = this.props;
+      dispatch({
+        type: "spot/querySpotById",
+        payload: {
+          id: id
+        },
+        callback: data => {
+          console.log(data);
+          resolve(data.interferenceCompliance);
+        }
+      });
+    });
+  };
+
+  creatElements = (properties, callback, spot) => {
     let elements;
     const obj = {
       show: true,
@@ -876,17 +887,14 @@ export default class integrat extends PureComponent {
       id: properties.id || properties.project_id,
       from: properties.map_num ? "spot" : "project"
     };
-    //console.log(properties);
     if (properties.project_id) {
-      this.getProjectName(properties.project_id).then(data => {
+      this.getProjectInfo(properties.project_id).then(data => {
         elements = properties.map_num
           ? jQuery(
               `<div>图斑编号:${properties.map_num}</br>
         ${properties.project_id ? "关联项目:" + data + "</br>" : ""}${
                 properties.interference_compliance_id
-                  ? "扰动范围:" +
-                    properties.interference_compliance_id +
-                    "</br>"
+                  ? "扰动范围:" + spot + "</br>"
                   : ""
               }<a onclick='goDetail(${JSON.stringify(
                 obj
@@ -913,9 +921,9 @@ export default class integrat extends PureComponent {
       elements = properties.map_num
         ? jQuery(
             `<div>图斑编号:${properties.map_num}</br>
-      ${properties.project_id ? "关联项目:</br>" : ""}${
+    ${properties.project_id ? "关联项目:</br>" : ""}${
               properties.interference_compliance_id
-                ? "扰动范围:" + properties.interference_compliance_id + "</br>"
+                ? "扰动范围:" + spot + "</br>"
                 : ""
             }<a onclick='goDetail(${JSON.stringify(
               obj
@@ -927,9 +935,9 @@ export default class integrat extends PureComponent {
           )
         : jQuery(
             `<div>项目:</br>
-        <a onclick='goDetail(${JSON.stringify(
-          obj
-        )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
+      <a onclick='goDetail(${JSON.stringify(
+        obj
+      )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
               obj
             )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
               obj
@@ -937,6 +945,17 @@ export default class integrat extends PureComponent {
           );
       //console.log(elements);
       callback(elements);
+    }
+  };
+
+  getWinContent = (properties, callback) => {
+    console.log("properties", properties);
+    if (properties.map_num) {
+      this.getSpotInfo(properties.id).then(spot => {
+        this.creatElements(properties, callback, spot);
+      });
+    } else {
+      this.creatElements(properties, callback, "");
     }
   };
   // getWinContent = properties => {
@@ -947,7 +966,7 @@ export default class integrat extends PureComponent {
   //     id: properties.map_num || properties.project_id,
   //     from: properties.map_num ? "spot" : "project"
   //   };
-  //   this.getProjectName(properties.project_id).then(data => {
+  //   this.getProjectInfo(properties.project_id).then(data => {
   //     console.log(data);
   //   });
   //   elements = properties.map_num
@@ -1047,20 +1066,22 @@ export default class integrat extends PureComponent {
     userconfig.polygon = turf.multiPolygon(
       geojson.features[0].geometry.coordinates
     );
-    if (userconfig.dwdm === "100000") {
-      //admin管理员
-    } else if (userconfig.dwdm.endsWith("0000")) {
-      userconfig.zoom = map.getZoom() + 1;
-    } else if (userconfig.dwdm.endsWith("00")) {
-      userconfig.zoom = map.getZoom() + 1;
-    } else {
-      userconfig.zoom = map.getZoom() + 1;
-    }
-    //加载geoserver发布的WMS地图服务
-    me.overlayWMSLayers();
-    //地图模态层效果
-    me.loadmodalLayer();
-
+    setTimeout(() => {
+      /*if (userconfig.dwdm === "100000") {
+        //admin管理员
+      } else if (userconfig.dwdm.endsWith("0000")) {
+        userconfig.zoom = map.getZoom()+1;
+      } else if (userconfig.dwdm.endsWith("00")) {
+        userconfig.zoom = map.getZoom()+1;
+      } else {
+        userconfig.zoom = map.getZoom() + 1;
+      }*/
+      userconfig.zoom = map.getZoom()+1;
+      //加载geoserver发布的WMS地图服务
+      me.overlayWMSLayers();
+      //地图模态层效果
+      me.loadmodalLayer();
+    }, 500);
     /*let url = "";
     if (userconfig.dwdm === "100000") {
       //admin管理员
@@ -1661,12 +1682,12 @@ export default class integrat extends PureComponent {
                       " " +
                       bounds.getSouthWest().lat;
                     polygon += "))";
+                    emitter.emit("chartLinkage", {
+                      open: v,
+                      type: "spot",
+                      polygon: v ? polygon : ""
+                    });
                   }
-                  emitter.emit("chartLinkage", {
-                    open: v,
-                    type: "spot",
-                    polygon: v ? polygon : ""
-                  });
                 }}
               />
             </div>

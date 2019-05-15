@@ -52,9 +52,9 @@ export default {
       const {
         data: { success, result }
       } = yield call(projectByIdApi, payload.id);
-      notification[success ? "success" : "error"]({
-        message: success ? "查询项目信息成功" : "查询项目信息失败"
-      });
+      // notification[success ? "success" : "error"]({
+      //   message: success ? "查询项目信息成功" : "查询项目信息失败"
+      // });
       if (success) {
         yield put({ type: "save", payload: { projectItem: result } });
         if (callback) callback(result);

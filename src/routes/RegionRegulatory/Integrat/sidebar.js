@@ -1474,11 +1474,8 @@ export default class integrat extends PureComponent {
                         onClick={() => {
                           Modal.confirm({
                             title: "是否确定要删除这条项目数据？",
-                            content: (
-                              <span>
-                                删除之后，项目关联的监督执法记录、防治责任范围、责任点都将被删除，扰动图斑保留。
-                              </span>
-                            ),
+                            content:
+                              "删除之后，项目关联的监督执法记录、防治责任范围、责任点都将被删除，扰动图斑保留。 ",
                             okText: "是",
                             okType: "danger",
                             cancelText: "否",

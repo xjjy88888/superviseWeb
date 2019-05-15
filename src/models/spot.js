@@ -42,11 +42,12 @@ export default {
       const {
         data: { success, result }
       } = yield call(spotByIdApi, payload.id);
-      notification[success ? "success" : "error"]({
-        message: success ? "查询图斑成功" : "查询图斑失败"
-      });
+      // notification[success ? "success" : "error"]({
+      //   message: success ? "查询图斑成功" : "查询图斑失败"
+      // });
       if (success) {
         yield put({ type: "save", payload: { spotItem: result } });
+        if (callback) callback(result);
       }
     }
   },
