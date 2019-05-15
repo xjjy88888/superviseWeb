@@ -71,6 +71,7 @@ export default class integrat extends PureComponent {
       showQuery: false,
       showCheck: false,
       checked: false,
+      queryHighlight: false,
       row_pro: 10,
       row_spot: 10,
       row_point: 10,
@@ -163,11 +164,19 @@ export default class integrat extends PureComponent {
         show: false,
         result: []
       });
+      let queryHighlight = false;
+      for (let i in data.info) {
+        if (data.info[i] && (data.info[i].length || !isNaN(data.info[i]))) {
+          queryHighlight = true;
+          console.log(data.info[i]);
+        }
+      }
       this.setState({
         showCheck: false,
         sort_by: "",
         sort_key: "",
-        queryInfo: data.info
+        queryInfo: data.info,
+        queryHighlight: queryHighlight
       });
       if (data.from === "project") {
         this.setState({
@@ -552,6 +561,7 @@ export default class integrat extends PureComponent {
     const {
       show,
       Sorting,
+      queryHighlight,
       previewVisible_min,
       previewVisible_min_left,
       query_pro,
@@ -959,6 +969,7 @@ export default class integrat extends PureComponent {
             ))}
           </Radio.Group>
           <Button
+            type={queryHighlight ? "primary" : ""}
             style={{
               display: showPoint ? "none" : "inline"
             }}
