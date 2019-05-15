@@ -769,10 +769,23 @@ export default class integrat extends PureComponent {
                 }}
                 onClick={e => {
                   e.stopPropagation();
-                  emitter.emit("mapLocation", {
-                    item: item,
-                    key: key
-                  });
+                  if (key === "point") {
+                    dispatch({
+                      type: "point/queryPointById",
+                      payload: { id: item.id },
+                      callback: data => {
+                        emitter.emit("mapLocation", {
+                          item: data,
+                          key: key
+                        });
+                      }
+                    });
+                  } else {
+                    emitter.emit("mapLocation", {
+                      item: item,
+                      key: key
+                    });
+                  }
                 }}
               />
             </p>
