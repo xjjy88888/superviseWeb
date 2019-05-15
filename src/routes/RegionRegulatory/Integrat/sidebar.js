@@ -50,11 +50,12 @@ const formItemLayout = {
 };
 let scrollTop = 0;
 
-@connect(({ project, spot, point, other }) => ({
+@connect(({ project, spot, point, other, user }) => ({
   project,
   spot,
   point,
-  other
+  other,
+  user
 }))
 @createForm()
 export default class integrat extends PureComponent {
@@ -123,6 +124,7 @@ export default class integrat extends PureComponent {
 
   componentDidMount() {
     console.log("贵阳至黄平高速公路", "六枝特区平寨镇跃进砂石厂");
+    this.queryDistrict();
     this.queryProject({ SkipCount: 0 });
     this.querySpot({ SkipCount: 0 });
     this.queryPoint({ SkipCount: 0 });
@@ -308,6 +310,13 @@ export default class integrat extends PureComponent {
       }
     }
   }
+
+  queryDistrict = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "user/queryDistrict"
+    });
+  };
 
   queryProject = items => {
     const { polygon } = this.state;
@@ -604,7 +613,8 @@ export default class integrat extends PureComponent {
       dispatch,
       project: { projectList, projectItem, projectInfoRedLineList },
       spot: { spotList, projectInfoSpotList },
-      point: { pointList }
+      point: { pointList },
+      user: { districtList }
     } = this.props;
     const { getFieldDecorator } = this.props.form;
 
@@ -2250,7 +2260,7 @@ export default class integrat extends PureComponent {
                 <Form.Item label="所在地区" {...formItemLayout}>
                   <Cascader
                     placeholder="请选择所在地区"
-                    options={config.demo_location}
+                    options={districtList}
                     changeOnSelect
                   />
                 </Form.Item>
@@ -2259,7 +2269,6 @@ export default class integrat extends PureComponent {
                     initialValue: projectItem.product_department_id1
                   })(<Input />)}
                 </Form.Item>
-
                 <Form.Item label="所在经纬度" {...formItemLayout}>
                   {getFieldDecorator("longitude", {})(
                     <InputNumber placeholder="经度" style={{ width: 80 }} />

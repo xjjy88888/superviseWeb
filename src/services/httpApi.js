@@ -151,6 +151,16 @@ export async function pointByIdApi(id) {
   });
 }
 
+// 行政区域
+export async function districtApi() {
+  return request(`${config.url.districtUrl}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
 // 项目位置
 export async function projectPositionApi(id) {
   return request(`${config.url.projectPositionUrl}?id=${id}`, {
@@ -272,8 +282,8 @@ export async function queryWFSLayer(params) {
       "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify({
-      "method": "get",
-      "url": params.geojsonUrl,
+      method: "get",
+      url: params.geojsonUrl
     })
   });
 }

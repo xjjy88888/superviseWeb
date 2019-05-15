@@ -1,4 +1,4 @@
-import { loginApi } from "../services/httpApi";
+import { loginApi, districtApi } from "../services/httpApi";
 import { routerRedux } from "dva/router";
 import {
   Form,
@@ -18,7 +18,8 @@ export default {
       {
         us_name: "请登录"
       }
-    ]
+    ],
+    districtList: []
   },
 
   subscriptions: {
@@ -46,6 +47,15 @@ export default {
           message: response.error.message
         });
       }
+    },
+    *queryDistrict({ payload }, { call, put }) {
+      const {
+        data: { result: districtList }
+      } = yield call(districtApi);
+      yield put({
+        type: "save",
+        payload: { districtList: [districtList] }
+      });
     },
     *loginOut({ payload }, { call, put }) {
       yield put(routerRedux.replace("/user/login"));

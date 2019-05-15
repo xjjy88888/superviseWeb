@@ -1,5 +1,6 @@
 import React, { PureComponent } from "react";
 import { createForm } from "rc-form";
+import { connect } from "dva";
 import {
   Menu,
   Icon,
@@ -47,6 +48,9 @@ const marks = {
 };
 
 @createForm()
+@connect(({ user }) => ({
+  user
+}))
 export default class siderbarDetail extends PureComponent {
   constructor(props) {
     super(props);
@@ -110,7 +114,10 @@ export default class siderbarDetail extends PureComponent {
 
   render() {
     const { show, type, dataSource } = this.state;
-    const { getFieldDecorator } = this.props.form;
+    const {
+      form: { getFieldDecorator },
+      user: { districtList }
+    } = this.props;
 
     return (
       <div
@@ -215,7 +222,7 @@ export default class siderbarDetail extends PureComponent {
           <Form>
             <Form.Item label="所在地区" {...formItemLayout}>
               <Cascader
-                options={config.demo_location}
+                options={districtList}
                 changeOnSelect
                 placeholder="请选择所在地区"
               />
@@ -313,7 +320,7 @@ export default class siderbarDetail extends PureComponent {
             <Form.Item label="所在地区" {...formItemLayout}>
               <Cascader
                 placeholder="请选择所在地区"
-                options={config.demo_location}
+                options={districtList}
                 changeOnSelect
               />
             </Form.Item>

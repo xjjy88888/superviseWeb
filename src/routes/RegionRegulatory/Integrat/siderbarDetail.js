@@ -38,9 +38,10 @@ const formItemLayout = {
   wrapperCol: { span: 16 }
 };
 
-@connect(({ project, spot }) => ({
+@connect(({ project, spot, user }) => ({
   project,
-  spot
+  spot,
+  user
 }))
 @createForm()
 export default class siderbarDetail extends PureComponent {
@@ -122,7 +123,8 @@ export default class siderbarDetail extends PureComponent {
         setFieldsValue,
         setFields
       },
-      spot: { spotItem }
+      spot: { spotItem },
+      user: { districtList }
     } = this.props;
     const {
       show,
@@ -405,13 +407,18 @@ export default class siderbarDetail extends PureComponent {
                   initialValue: spotItem.isReview ? "是" : "否"
                 })(<Input disabled={!edit} />)}
               </Form.Item>
-              <Form.Item label="地址" {...formItemLayout}>
+              <Form.Item label="所在地区" {...formItemLayout}>
                 <Cascader
                   disabled={!edit}
-                  placeholder="----"
-                  options={config.demo_location}
+                  placeholder="请选择所在地区"
+                  options={districtList}
                   changeOnSelect
                 />
+              </Form.Item>
+              <Form.Item label="详细地址" {...formItemLayout}>
+                {getFieldDecorator("product_department_id1", {
+                  initialValue: ''
+                })(<Input />)}
               </Form.Item>
               <Form.Item label="问题" {...formItemLayout}>
                 {getFieldDecorator("problem", {

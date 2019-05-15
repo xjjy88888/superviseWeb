@@ -236,8 +236,15 @@ export default class integrat extends PureComponent {
         if (marker) marker.remove();
         marker = L.marker(latLng, { icon: myIcon }).addTo(map);
         //marker = L.marker(latLng).addTo(map);
-        map.setZoom(13);
-        me.automaticToMap(latLng);
+        if(map.getZoom()>=13){
+          me.automaticToMap(latLng);
+        }
+        else{
+          map.setZoom(13);
+          setTimeout(() => {
+            me.automaticToMap(latLng);
+          }, 200);
+        }
       } else {
         if (marker) marker.remove();
       }
@@ -679,8 +686,8 @@ export default class integrat extends PureComponent {
           cursor: "pointer"
         });
       emitter.emit("siteLocationBack", {
-        latitude: userconfig.mapPoint.lng,
-        longitude: userconfig.mapPoint.lat
+        latitude: userconfig.mapPoint.lat,
+        longitude: userconfig.mapPoint.lng
       });
       return;
     }

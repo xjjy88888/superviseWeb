@@ -37,6 +37,9 @@ const config = {
     // 项目位置
     projectPositionUrl: `${domain_}/api/services/app/Project/GetPoint`,
 
+    // 行政区域
+    districtUrl: `${domain_}/api/services/app/User/GetDistrictCodesTree`,
+
     // 获取边界
     boundaryUrl: `${domain_}/api/services/app/User/GetBoundAsync`,
 
@@ -264,65 +267,6 @@ const config = {
     }
   ],
 
-  // -----------------------------------------------------------------------
-
-  //所在地区
-  demo_location: [
-    {
-      value: "guangdong",
-      label: "广东",
-      children: [
-        {
-          value: "gaungzhou",
-          label: "广州",
-          children: [
-            {
-              value: "tianhe",
-              label: "天河区"
-            },
-            {
-              value: "haizhu",
-              label: "海珠区"
-            },
-            {
-              value: "baiyun",
-              label: "白云区"
-            }
-          ]
-        },
-        {
-          value: "zhongshan",
-          label: "中山市",
-          children: [
-            {
-              value: "dongqu",
-              label: "东区"
-            },
-            {
-              value: "xiqu",
-              label: "西区"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      value: "jiangsu",
-      label: "北京",
-      children: [
-        {
-          value: "nanjing",
-          label: "北京市",
-          children: [
-            {
-              value: "zhonghuamen",
-              label: "东城区"
-            }
-          ]
-        }
-      ]
-    }
-  ],
   /*----------------------------------地图配置部分-------------------------------------*/
   mapInitParams: {
     center: [23.1441, 113.3693],
