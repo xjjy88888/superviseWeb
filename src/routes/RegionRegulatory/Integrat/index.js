@@ -152,7 +152,7 @@ export default class integrat extends PureComponent {
     //me.createMap();
     // 位置定位
     this.eventEmitter = emitter.addListener("siteLocation", data => {
-      console.log(data);
+      //console.log(data);
       if (data.state === "begin") {
         //地图获取定位点
         jQuery(userconfig.geoJsonLayer.getPane())
@@ -166,6 +166,7 @@ export default class integrat extends PureComponent {
         if (marker) marker.remove();
         let latLng = [data.Latitude,data.Longitude];
         marker = L.marker(latLng).addTo(map);
+        me.automaticToMap(latLng);
       }
     });
     //地图定位

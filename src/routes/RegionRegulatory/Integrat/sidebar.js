@@ -178,7 +178,10 @@ export default class integrat extends PureComponent {
       });
       let queryHighlight = false;
       for (let i in data.info) {
-        if (data.info[i] && (data.info[i].length || !isNaN(data.info[i]))) {
+        if (
+          data.info[i] &&
+          (data.info[i].length || typeof data.info[i] === "number")
+        ) {
           queryHighlight = true;
           console.log(data.info[i]);
         }
