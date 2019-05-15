@@ -126,6 +126,12 @@ export default class integrat extends PureComponent {
     this.queryProject({ SkipCount: 0 });
     this.querySpot({ SkipCount: 0 });
     this.queryPoint({ SkipCount: 0 });
+    this.eventEmitter = emitter.addListener("siteLocationBack", data => {
+      this.props.form.setFieldsValue({
+        latitude: data.latitude,
+        longitude: data.longitude
+      });
+    });
     this.eventEmitter = emitter.addListener("showSiderbar", data => {
       this.setState({
         show: data.show
@@ -651,8 +657,7 @@ export default class integrat extends PureComponent {
               条
             </span>
             <Button
-              size="small"
-              icon="dashboard"
+              icon={showCheck ? "dashboard" : ""}
               style={{ float: "right" }}
               onClick={() => {
                 emitter.emit("showSiderbarDetail", {
@@ -671,8 +676,7 @@ export default class integrat extends PureComponent {
               {showCheck ? "" : "仪表盘"}
             </Button>
             <Button
-              size="small"
-              icon="shopping"
+              icon={showCheck ? "shopping" : ""}
               style={{ float: "right" }}
               onClick={() => {
                 emitter.emit("showSiderbarDetail", {
@@ -2274,9 +2278,12 @@ export default class integrat extends PureComponent {
                       top: 10
                     }}
                     onClick={() => {
+                      emitter.emit("showProjectDetail", {
+                        show: false,
+                        edit: false
+                      });
                       this.props.form.validateFields((err, values) => {
                         if (!err) {
-                          console.log(values);
                           emitter.emit("siteLocation", {
                             state:
                               values.longitude && values.latitude

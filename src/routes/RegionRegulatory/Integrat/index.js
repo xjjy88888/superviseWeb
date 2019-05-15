@@ -152,21 +152,20 @@ export default class integrat extends PureComponent {
     //me.createMap();
     // 位置定位
     this.eventEmitter = emitter.addListener("siteLocation", data => {
-      //console.log(data);
-      if(data.state === "begin" ){
+      console.log(data);
+      if (data.state === "begin") {
+        //地图获取定位点
         jQuery(userconfig.geoJsonLayer.getPane())
-        .find("path")
-        .css({
-          cursor: "crosshair"
-        });
-         /*emitter.emit("siteLocation", {
-          status: "end",
-          //Latitude: values.latitude,
-          //Longitude: values.longitude
-        });*/       
-      }
-      else if(data.state === "end"){
-        //地图定位
+          .find("path")
+          .css({
+            cursor: "crosshair"
+          });
+        userconfig.state = "begin";
+      } else if (data.state === "end") {
+        //地图定位点
+        if (marker) marker.remove();
+        let latLng = [data.Latitude,data.Longitude];
+        marker = L.marker(latLng).addTo(map);
       }
     });
     //地图定位
@@ -669,8 +668,23 @@ export default class integrat extends PureComponent {
       message.warning("区域范围之外的数据没有权限操作", 1);
       return;
     }
-    //点查WMS图层
     userconfig.mapPoint = e.latlng;
+
+    if (userconfig.state === "begin") {
+      //地图获取经纬度
+      userconfig.state = "end";
+      jQuery(userconfig.geoJsonLayer.getPane())
+        .find("path")
+        .css({
+          cursor: "pointer"
+        });
+      emitter.emit("siteLocationBack", {
+        latitude: userconfig.mapPoint.lng,
+        longitude: userconfig.mapPoint.lat
+      });
+      return;
+    }
+    //点查WMS图层
     let point = { x: e.latlng.lng, y: e.latlng.lat };
     me.queryWFSServiceByPoint(point, config.mapLayersName, false);
   };
@@ -1239,7 +1253,7 @@ export default class integrat extends PureComponent {
       .find("path")
       .css({
         cursor: "not-allowed"
-    });
+      });
   };
   /*
    * 加载geoserver发布的WMS地图服务
