@@ -152,7 +152,22 @@ export default class integrat extends PureComponent {
     //me.createMap();
     // 位置定位
     this.eventEmitter = emitter.addListener("siteLocation", data => {
-      console.log(data);
+      //console.log(data);
+      if(data.state === "begin" ){
+        jQuery(userconfig.geoJsonLayer.getPane())
+        .find("path")
+        .css({
+          cursor: "crosshair"
+        });
+         /*emitter.emit("siteLocation", {
+          status: "end",
+          //Latitude: values.latitude,
+          //Longitude: values.longitude
+        });*/       
+      }
+      else if(data.state === "end"){
+        //地图定位
+      }
     });
     //地图定位
     this.eventEmitter = emitter.addListener("mapLocation", data => {
@@ -1224,7 +1239,7 @@ export default class integrat extends PureComponent {
       .find("path")
       .css({
         cursor: "not-allowed"
-      });
+    });
   };
   /*
    * 加载geoserver发布的WMS地图服务
@@ -1436,6 +1451,11 @@ export default class integrat extends PureComponent {
         ",纬度" +
         userconfig.imglat
     );
+    emitter.emit("screenshotBack", {
+      longitude: userconfig.imglng,
+      latitude: userconfig.imglat,
+      img: userconfig.dataImgUrl
+    });
   };
   /*
    * geojson转换multipolygon

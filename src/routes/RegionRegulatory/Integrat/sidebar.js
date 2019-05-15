@@ -141,6 +141,9 @@ export default class integrat extends PureComponent {
         showProjectAllInfo: !data.hide
       });
     });
+    this.eventEmitter = emitter.addListener("screenshotBack", data => {
+      console.log("屏幕截图", data);
+    });
     this.eventEmitter = emitter.addListener("chartLinkage", data => {
       this.setState({
         polygon: data.polygon
@@ -648,6 +651,7 @@ export default class integrat extends PureComponent {
               条
             </span>
             <Button
+              size="small"
               icon="dashboard"
               style={{ float: "right" }}
               onClick={() => {
@@ -667,6 +671,7 @@ export default class integrat extends PureComponent {
               {showCheck ? "" : "仪表盘"}
             </Button>
             <Button
+              size="small"
               icon="shopping"
               style={{ float: "right" }}
               onClick={() => {
@@ -2273,10 +2278,10 @@ export default class integrat extends PureComponent {
                         if (!err) {
                           console.log(values);
                           emitter.emit("siteLocation", {
-                            status:
+                            state:
                               values.longitude && values.latitude
-                                ? "begin"
-                                : "end",
+                                ? "end"
+                                : "begin",
                             Latitude: values.latitude,
                             Longitude: values.longitude
                           });
