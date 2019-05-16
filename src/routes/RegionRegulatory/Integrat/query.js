@@ -220,11 +220,13 @@ export default class siderbarDetail extends PureComponent {
         >
           <Form>
             <Form.Item label="所在地区" {...formItemLayout}>
-              <Cascader
-                options={districtList}
-                changeOnSelect
-                placeholder="请选择所在地区"
-              />
+              {getFieldDecorator("diqu", { initialValue: "" })(
+                <Cascader
+                  options={districtList}
+                  changeOnSelect
+                  placeholder="请选择所在地区"
+                />
+              )}
             </Form.Item>
             <Form.Item label="建设单位" {...formItemLayout}>
               {getFieldDecorator("ProductDepartment", { initialValue: "" })(

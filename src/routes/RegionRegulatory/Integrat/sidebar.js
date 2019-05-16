@@ -2408,16 +2408,19 @@ export default class integrat extends PureComponent {
                   />
                 </Form.Item>
                 <Form.Item label="项目类型" {...formItemLayout}>
-                  <AutoComplete
-                    placeholder="请选择项目类型"
-                    defaultValue={`铁路工程`}
-                    dataSource={config.project_type}
-                    filterOption={(inputValue, option) =>
-                      option.props.children
-                        .toUpperCase()
-                        .indexOf(inputValue.toUpperCase()) !== -1
-                    }
-                  />
+                  {getFieldDecorator("ProjectType", {
+                    initialValue: "铁路工程"
+                  })(
+                    <AutoComplete
+                      placeholder="请选择项目类型"
+                      dataSource={config.project_type}
+                      filterOption={(inputValue, option) =>
+                        option.props.children
+                          .toUpperCase()
+                          .indexOf(inputValue.toUpperCase()) !== -1
+                      }
+                    />
+                  )}
                 </Form.Item>
                 <Form.Item label="建设状态" {...formItemLayout}>
                   <AutoComplete
