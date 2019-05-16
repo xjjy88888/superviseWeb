@@ -34,6 +34,9 @@ const config = {
     // id查询标注点
     pointByIdUrl: `${domain_}/api/services/app/MarkingPoint/Get`,
 
+    // id查询标注点经纬度
+    pointSiteByIdUrl: `${domain_}/api/services/app/MarkingPoint/GetPoint`,
+
     // 项目位置
     projectPositionUrl: `${domain_}/api/services/app/Project/GetPoint`,
 

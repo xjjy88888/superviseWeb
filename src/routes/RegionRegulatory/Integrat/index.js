@@ -188,10 +188,14 @@ export default class integrat extends PureComponent {
               let latLng = [point.y, point.x];
               switch (response.result.type) {
                 case "ProjectScope": //项目红线
+                  //点查WMS图层
+                  userconfig.mapPoint = latLng;
+                  me.queryWFSServiceByPoint(point, config.mapProjectLayerName, true);
+                  break;
                 case "Spot": //扰动图斑
                   //点查WMS图层
                   userconfig.mapPoint = latLng;
-                  me.queryWFSServiceByPoint(point, config.mapLayersName, true);
+                  me.queryWFSServiceByPoint(point, config.mapSpotLayerName, true);
                   break;
                 case "ProjectPoint": //项目点
                   if (marker) marker.remove();
@@ -202,7 +206,7 @@ export default class integrat extends PureComponent {
                 default:
               }
             } else {
-              message.warning("地图定位不到相关数据", 1);
+              message.warning("项目无可用位置信息", 1);
             }
           }
         });
@@ -524,10 +528,10 @@ export default class integrat extends PureComponent {
           );
         }, 500);
       } else {
-        message.warning("地图定位不到相关数据", 1);
+        message.warning("项目无可用位置信息", 1);
       }
     } else {
-      message.warning("地图定位不到相关数据", 1);
+      message.warning("项目无可用位置信息", 1);
     }
   };
   /*
@@ -872,17 +876,27 @@ export default class integrat extends PureComponent {
               }
             }
             setTimeout(() => {
+              map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
+                maxZoom: 16
+              });
               map.openPopup(content, userconfig.mapPoint);
+              if (isautomaticToMap) {
+                //map.setZoom(15);
+                me.automaticToMap(
+                  userconfig.projectgeojsonLayer.getBounds().getCenter()
+                );
+              }
             }, 500);
-            if (isautomaticToMap) {
-              map.setZoom(15);
-              me.automaticToMap(
-                userconfig.projectgeojsonLayer.getBounds().getCenter()
-              );
-            }
+
           }
-        } else {
-          message.warning("点查获取不到相关数据", 1);
+          else {
+            //message.warning("地图匹配不到相关数据", 1);
+            map.closePopup();
+          }
+        }
+        else {
+            message.warning("地图匹配不到相关数据", 1);
+            map.closePopup();
         }
       }
     });
@@ -993,7 +1007,7 @@ export default class integrat extends PureComponent {
   };
 
   getWinContent = (properties, callback) => {
-    console.log("properties", properties);
+    //console.log("properties", properties);
     if (properties.map_num) {
       this.getSpotInfo(properties.id).then(spot => {
         this.creatElements(properties, callback, spot);

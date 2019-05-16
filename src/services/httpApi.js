@@ -149,6 +149,16 @@ export async function pointByIdApi(id) {
   });
 }
 
+// id查询标注点经纬度
+export async function pointSiteByIdApi(id) {
+  return request(`${config.url.pointSiteByIdUrl}?id=${id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
 // 行政区域
 export async function districtApi() {
   return request(`${config.url.districtUrl}`, {

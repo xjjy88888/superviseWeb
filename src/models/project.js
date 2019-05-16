@@ -40,12 +40,18 @@ export default {
       const {
         data: { success, result: projectList }
       } = yield call(projectListApi, payload);
-      const data = {
-        items: [...items_old, ...projectList.items],
-        totalCount: projectList.totalCount
-      };
-      yield put({ type: "save", payload: { projectList: data } });
-      if (callback) callback(data);
+      if (success) {
+        const data = {
+          items: [...items_old, ...projectList.items],
+          totalCount: projectList.totalCount
+        };
+        yield put({ type: "save", payload: { projectList: data } });
+        if (callback) callback(data);
+      } else {
+        notification["error"]({
+          message: "查询项目列表失败"
+        });
+      }
     },
 
     // id查询项目
@@ -53,12 +59,9 @@ export default {
       const {
         data: { success, result }
       } = yield call(projectByIdApi, payload.id);
-      // notification[success ? "success" : "error"]({
-      //   message: success ? "查询项目信息成功" : "查询项目信息失败"
-      // });
       if (success) {
         yield put({ type: "save", payload: { projectItem: result } });
-        if (callback) callback(result,success);
+        if (callback) callback(result, success);
       } else {
         notification["error"]({
           message: "查询项目信息失败"
@@ -69,9 +72,15 @@ export default {
     // 项目id查询项目红线列表
     *queryRedLineByProjectId({ payload }, { call, put }) {
       const {
-        data: { result: projectInfoRedLineList }
+        data: { success, result: projectInfoRedLineList }
       } = yield call(redLineByProjectIdApi, payload.ProjectId);
-      yield put({ type: "save", payload: { projectInfoRedLineList } });
+      if (success) {
+        yield put({ type: "save", payload: { projectInfoRedLineList } });
+      } else {
+        notification["error"]({
+          message: "查询项目关联红线列表失败"
+        });
+      }
     },
 
     *updateSpotGraphic({ payload, callback }, { call, put }) {

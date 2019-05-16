@@ -38,9 +38,10 @@ const formItemLayout = {
   wrapperCol: { span: 16 }
 };
 
-@connect(({ project, spot, user }) => ({
+@connect(({ project, spot, point, user }) => ({
   project,
   spot,
+  point,
   user
 }))
 @createForm()
@@ -77,6 +78,12 @@ export default class siderbarDetail extends PureComponent {
   }
 
   componentDidMount() {
+    this.eventEmitter = emitter.addListener("siteLocationBack", data => {
+      this.props.form.setFieldsValue({
+        latitude: data.latitude,
+        longitude: data.longitude
+      });
+    });
     this.eventEmitter = emitter.addListener("showSiderbarDetail", data => {
       this.setState({
         show: data.show,
@@ -86,8 +93,14 @@ export default class siderbarDetail extends PureComponent {
         type: data.type,
         previewVisible_min: false
       });
-      if (data.from === "spot" && data.show && data.type !== "add") {
-        this.querySpotById(data.id);
+      if (data.show && data.type !== "add") {
+        this.props.form.resetFields();
+        if (data.from === "spot") {
+          this.querySpotById(data.id);
+        } else if (data.from === "point") {
+          this.queryPointById(data.id);
+          this.queryPointSiteById(data.id);
+        }
       }
     });
     this.eventEmitter = emitter.addListener("showProjectSpotInfo", data => {
@@ -112,6 +125,26 @@ export default class siderbarDetail extends PureComponent {
     });
   };
 
+  queryPointById = id => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "point/queryPointById",
+      payload: {
+        id: id
+      }
+    });
+  };
+
+  queryPointSiteById = id => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "point/queryPointSiteById",
+      payload: {
+        id: id
+      }
+    });
+  };
+
   render() {
     const {
       dispatch,
@@ -124,8 +157,10 @@ export default class siderbarDetail extends PureComponent {
         setFields
       },
       spot: { spotItem },
+      point: { pointItem, pointSite },
       user: { districtList }
     } = this.props;
+    console.log(pointSite);
     const {
       show,
       from,
@@ -312,10 +347,6 @@ export default class siderbarDetail extends PureComponent {
                           color: "#1890ff"
                         }}
                         onClick={() => {
-                          // emitter.emit("showProjectDetail", {
-                          //   show: true,
-                          //   id: spotItem.projectId
-                          // });
                           emitter.emit("showProjectSpotInfo", {
                             show: true,
                             edit: false,
@@ -524,66 +555,94 @@ export default class siderbarDetail extends PureComponent {
             }}
           >
             <Form>
-              <p>
-                <b>标注点详情</b>
-              </p>
+              <Form.Item label="标注点" {...formItemLayout}>
+                {getFieldDecorator("name", {
+                  initialValue: pointItem.name
+                })(<Input allowClear disabled={!edit} />)}
+              </Form.Item>
               <Form.Item label="标注时间" {...formItemLayout}>
-                <DatePicker
-                  disabled={!edit}
-                  defaultValue={moment("2015/01/01", dateFormat)}
-                />
+                {getFieldDecorator("createTime", {
+                  initialValue: moment(pointItem.createTime, dateFormat)
+                })(<DatePicker disabled={!edit} showTime />)}
               </Form.Item>
               <Form.Item label="关联项目" {...formItemLayout}>
-                <Input
-                  defaultValue={`其他扰动`}
-                  disabled={!edit}
-                  addonAfter={
-                    <Icon
-                      type="link"
-                      style={{
-                        color: "#1890ff"
-                      }}
-                      onClick={() => {
-                        emitter.emit("showProjectDetail", {
-                          show: true
-                        });
-                      }}
-                    />
-                  }
-                />
+                {getFieldDecorator("project", {
+                  initialValue: pointItem.project
+                })(
+                  <Input
+                    allowClear
+                    disabled={!edit}
+                    addonAfter={
+                      <Icon
+                        type="link"
+                        style={{
+                          color: "#1890ff"
+                        }}
+                        onClick={() => {
+                          emitter.emit("showProjectSpotInfo", {
+                            show: true,
+                            edit: false,
+                            from: "project",
+                            id: pointItem.projectId
+                          });
+                        }}
+                      />
+                    }
+                  />
+                )}
               </Form.Item>
               <Form.Item label="描述" {...formItemLayout}>
-                <TextArea
-                  autosize={true}
-                  defaultValue={`新建广州至香港铁路建设线标注描述,新建广州至香港铁路建设线标注描述,新建广州至香港铁路建设线标注描述,新建广州至香港铁路建设线标注描述`}
-                  disabled={!edit}
-                />
+                {getFieldDecorator("description", {
+                  initialValue: pointItem.description
+                })(<TextArea allowClear autosize={true} disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="坐标" {...formItemLayout}>
-                <Input
-                  defaultValue={`123.423，29.543`}
-                  disabled={!edit}
-                  addonAfter={
-                    <Icon
-                      type="compass"
-                      style={{
-                        cursor: "point",
-                        color: edit ? "#1890ff" : ""
-                      }}
-                      onClick={() => {
-                        if (edit) {
-                          notification["success"]({
-                            message: "更新坐标成功"
+                {getFieldDecorator("longitude", {
+                  initialValue: pointSite.pointX
+                })(
+                  <Input
+                    allowClear
+                    placeholder="经度"
+                    disabled={!edit}
+                    style={{ width: 90 }}
+                  />
+                )}
+                {getFieldDecorator("latitude", {
+                  initialValue: pointSite.pointY
+                })(
+                  <Input
+                    allowClear
+                    placeholder="纬度"
+                    disabled={!edit}
+                    style={{ width: 130, position: "relative", top: -2 }}
+                    addonAfter={
+                      <Icon
+                        type="compass"
+                        style={{
+                          color: "#1890ff"
+                        }}
+                        onClick={() => {
+                          emitter.emit("showProjectDetail", {
+                            show: false,
+                            edit: false
                           });
-                        } else {
-                          notification["info"]({
-                            message: "请先开始编辑"
+                          this.props.form.validateFields((err, values) => {
+                            if (!err) {
+                              emitter.emit("siteLocation", {
+                                state:
+                                  values.longitude && values.latitude
+                                    ? "end"
+                                    : "begin",
+                                Latitude: values.latitude,
+                                Longitude: values.longitude
+                              });
+                            }
                           });
-                        }
-                      }}
-                    />
-                  }
-                />
+                        }}
+                      />
+                    }
+                  />
+                )}
               </Form.Item>
             </Form>
             <Upload
@@ -608,6 +667,34 @@ export default class siderbarDetail extends PureComponent {
                 </div>
               ) : null}
             </Upload>
+            {edit ? (
+              <span>
+                <Button icon="check" style={{ marginTop: 20 }}>
+                  保存
+                </Button>
+                <Button
+                  icon="delete"
+                  style={{ marginLeft: 20 }}
+                  onClick={() => {
+                    Modal.confirm({
+                      title: "删除",
+                      content: "是否确定要删除这条标注点数据？",
+                      okText: "是",
+                      okType: "danger",
+                      cancelText: "否",
+                      onOk() {
+                        console.log("OK");
+                      },
+                      onCancel() {
+                        console.log("Cancel");
+                      }
+                    });
+                  }}
+                >
+                  删除
+                </Button>
+              </span>
+            ) : null}
           </div>
         </div>
       </div>

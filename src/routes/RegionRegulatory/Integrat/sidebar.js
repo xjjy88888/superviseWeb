@@ -738,11 +738,11 @@ export default class integrat extends PureComponent {
                     this.queryProjectById(item.id);
                     this.querySpotByProjectId(item.id);
                     this.queryRedLineByProjectId(item.id);
-                  } else if (key === "spot") {
+                  } else {
                     emitter.emit("showSiderbarDetail", {
-                      show: key === "spot",
+                      show: key !== "project",
                       from: key,
-                      id: key === "project" ? item.id : item.id
+                      id: item.id
                     });
                   }
                   emitter.emit("showTool", {
@@ -771,7 +771,7 @@ export default class integrat extends PureComponent {
                   e.stopPropagation();
                   if (key === "point") {
                     dispatch({
-                      type: "point/queryPointById",
+                      type: "point/queryPointSiteById",
                       payload: { id: item.id },
                       callback: data => {
                         emitter.emit("mapLocation", {
@@ -2300,42 +2300,42 @@ export default class integrat extends PureComponent {
                     initialValue: projectItem.product_department_id1
                   })(<Input />)}
                 </Form.Item>
-                <Form.Item label="所在经纬度" {...formItemLayout}>
+                <Form.Item label="坐标" {...formItemLayout}>
                   {getFieldDecorator("longitude", {})(
-                    <InputNumber placeholder="经度" style={{ width: 80 }} />
+                    <Input placeholder="经度" style={{ width: 72 }} />
                   )}
                   {getFieldDecorator("latitude", {})(
-                    <InputNumber placeholder="纬度" style={{ width: 80 }} />
+                    <Input
+                      placeholder="纬度"
+                      style={{ width: 110, position: "relative", top: -2 }}
+                      addonAfter={
+                        <Icon
+                          type="environment"
+                          style={{
+                            color: "#1890ff"
+                          }}
+                          onClick={() => {
+                            emitter.emit("showProjectDetail", {
+                              show: false,
+                              edit: false
+                            });
+                            this.props.form.validateFields((err, values) => {
+                              if (!err) {
+                                emitter.emit("siteLocation", {
+                                  state:
+                                    values.longitude && values.latitude
+                                      ? "end"
+                                      : "begin",
+                                  Latitude: values.latitude,
+                                  Longitude: values.longitude
+                                });
+                              }
+                            });
+                          }}
+                        />
+                      }
+                    />
                   )}
-                  <Icon
-                    type="environment"
-                    style={{
-                      float: "right",
-                      color: "#1890ff",
-                      fontSize: 18,
-                      zIndex: 1,
-                      position: "relative",
-                      top: 10
-                    }}
-                    onClick={() => {
-                      emitter.emit("showProjectDetail", {
-                        show: false,
-                        edit: false
-                      });
-                      this.props.form.validateFields((err, values) => {
-                        if (!err) {
-                          emitter.emit("siteLocation", {
-                            state:
-                              values.longitude && values.latitude
-                                ? "end"
-                                : "begin",
-                            Latitude: values.latitude,
-                            Longitude: values.longitude
-                          });
-                        }
-                      });
-                    }}
-                  />
                 </Form.Item>
                 <Form.Item label="建设单位" {...formItemLayout}>
                   {getFieldDecorator("product_department_id", {

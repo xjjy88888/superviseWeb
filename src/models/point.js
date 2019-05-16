@@ -2,8 +2,8 @@ import { routerRedux } from "dva/router";
 import { Button, notification } from "antd";
 import {
   pointListApi,
-  projectByIdApi,
-  pointByIdApi
+  pointByIdApi,
+  pointSiteByIdApi
 } from "../services/httpApi";
 
 export default {
@@ -11,7 +11,8 @@ export default {
 
   state: {
     pointList: { totalCount: 0, items: [] },
-    pointItem: {}
+    pointItem: {},
+    pointSite: {}
   },
 
   subscriptions: {
@@ -22,14 +23,20 @@ export default {
     // 标注点列表
     *queryPoint({ payload, callback }, { call, put }) {
       const {
-        data: { result: pointList }
+        data: { success, result: pointList }
       } = yield call(pointListApi, payload);
       const data = {
         items: [...payload.items, ...pointList.items],
         totalCount: pointList.totalCount
       };
-      yield put({ type: "save", payload: { pointList: data } });
-      if (callback) callback(data);
+      if (success) {
+        yield put({ type: "save", payload: { pointList: data } });
+        if (callback) callback(data);
+      } else {
+        notification["error"]({
+          message: "查询标注点列表失败"
+        });
+      }
     },
 
     // id查询标注点
@@ -37,12 +44,28 @@ export default {
       const {
         data: { success, result }
       } = yield call(pointByIdApi, payload.id);
-      notification[success ? "success" : "error"]({
-        message: success ? "查询标注点成功" : "查询标注点失败"
-      });
       if (success) {
         yield put({ type: "save", payload: { pointItem: result } });
         if (callback) callback(result);
+      } else {
+        notification["error"]({
+          message: "查询标注点信息失败"
+        });
+      }
+    },
+
+    // id查询标注点经纬度
+    *queryPointSiteById({ payload, callback }, { call, put }) {
+      const {
+        data: { success, result }
+      } = yield call(pointSiteByIdApi, payload.id);
+      if (success) {
+        yield put({ type: "save", payload: { pointSite: result } });
+        if (callback) callback(result);
+      } else {
+        notification["error"]({
+          message: "查询标注点经纬度失败"
+        });
       }
     }
   },
