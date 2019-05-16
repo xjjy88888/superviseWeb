@@ -186,7 +186,7 @@ const config = {
       icon: "question-circle"
     },
     {
-      label: "批量上传(Shapfile)",
+      label: "批量上传(GeoJSON)",
       key: "upload_shapfile",
       icon: "cloud-upload"
     },

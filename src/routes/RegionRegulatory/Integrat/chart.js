@@ -15,10 +15,10 @@ const optionPie = {
     orient: "vertical",
     x: "left",
     data: [
-      "部级ggergerhery",
-      "省级ggergerhery",
-      "市级ggergerhery",
-      "县级ggergerhery"
+      "部级",
+      "省级",
+      "市级",
+      "县级"
     ]
   },
   series: [
@@ -46,10 +46,10 @@ const optionPie = {
         }
       },
       data: [
-        { value: 35, name: "部级ggergerhery" },
-        { value: 234, name: "省级ggergerhery" },
-        { value: 310, name: "市级ggergerhery" },
-        { value: 435, name: "县级ggergerhery" }
+        { value: 35, name: "部级" },
+        { value: 234, name: "省级" },
+        { value: 310, name: "市级" },
+        { value: 435, name: "县级" }
       ]
     }
   ]

@@ -90,6 +90,7 @@ export default class integrat extends PureComponent {
     };
     //气泡窗口编辑
     window.goEditGraphic = obj => {
+      emitter.emit("showProjectSpotInfo", { ...obj, edit: true });
       me.setState({ drawGrphic: "edit" });
       if (obj.from === "project") {
         me.queryWFSServiceByProperty(
