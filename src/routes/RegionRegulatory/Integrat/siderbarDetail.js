@@ -594,7 +594,7 @@ export default class siderbarDetail extends PureComponent {
               <Form.Item label="描述" {...formItemLayout}>
                 {getFieldDecorator("description", {
                   initialValue: pointItem.description
-                })(<TextArea allowClear autosize={true} disabled={!edit} />)}
+                })(<TextArea autosize={true} disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="坐标" {...formItemLayout}>
                 {getFieldDecorator("longitude", {

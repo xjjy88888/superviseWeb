@@ -189,13 +189,25 @@ export default class integrat extends PureComponent {
               switch (response.result.type) {
                 case "ProjectScope": //项目红线
                   //点查WMS图层
-                  userconfig.mapPoint = latLng;
-                  me.queryWFSServiceByPoint(point, config.mapProjectLayerName, true);
+                  //userconfig.mapPoint = latLng;
+                  //me.queryWFSServiceByPoint(point, config.mapProjectLayerName, true);
+                  me.queryWFSServiceByProperty(
+                    response.result.id,
+                    "id",
+                    config.mapProjectLayerName,
+                    me.callbackLocationQueryWFSService
+                  );
                   break;
                 case "Spot": //扰动图斑
                   //点查WMS图层
-                  userconfig.mapPoint = latLng;
-                  me.queryWFSServiceByPoint(point, config.mapSpotLayerName, true);
+                  //userconfig.mapPoint = latLng;
+                  //me.queryWFSServiceByPoint(point, config.mapSpotLayerName, true);
+                  me.queryWFSServiceByProperty(
+                    response.result.id,
+                    "id",
+                    config.mapSpotLayerName,
+                    me.callbackLocationQueryWFSService
+                  );
                   break;
                 case "ProjectPoint": //项目点
                   if (marker) marker.remove();

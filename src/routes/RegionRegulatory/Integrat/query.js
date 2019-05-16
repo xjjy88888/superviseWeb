@@ -302,8 +302,15 @@ export default class siderbarDetail extends PureComponent {
                 <CheckboxGroup options={config.vectorization_type} />
               )}
             </Form.Item>
+            <Form.Item label="有无扰动图斑" {...formItemLayoutlong}>
+              {getFieldDecorator("vectorization_type1", {
+                valuePropName: "checked"
+              })(<Switch />)}
+            </Form.Item>
             <Form.Item label="显示归档数据" {...formItemLayoutlong}>
-              <Switch checkedChildren="是" unCheckedChildren="否" />
+              {getFieldDecorator("vectorization_type2", {
+                valuePropName: "checked"
+              })(<Switch />)}
             </Form.Item>
           </Form>
         </div>
@@ -390,7 +397,9 @@ export default class siderbarDetail extends PureComponent {
               )}
             </Form.Item>
             <Form.Item label="显示归档数据" {...formItemLayoutlong}>
-              <Switch checkedChildren="是" unCheckedChildren="否" />
+              {getFieldDecorator("vectorization_type2", {
+                valuePropName: "checked"
+              })(<Switch />)}
             </Form.Item>
           </Form>
         </div>
