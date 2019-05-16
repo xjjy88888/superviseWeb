@@ -3,9 +3,7 @@ import { Table, Button, Input, Icon, LocaleProvider, Switch } from "antd";
 import zhCN from "antd/lib/locale-provider/zh_CN";
 import SiderMenu from "../../../components/SiderMenu";
 import Highlighter from "react-highlight-words";
-import styles from "./index.less";
 import config from "../../../config";
-import moment from "moment";
 
 export default class projectRegulatory extends PureComponent {
   state = {
@@ -111,7 +109,6 @@ export default class projectRegulatory extends PureComponent {
     this.setState({ searchText: "" });
   };
   render() {
-    let { sortedInfo, filteredInfo } = this.state;
     const rowSelection = {};
     const data = [
       {

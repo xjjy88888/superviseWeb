@@ -3,52 +3,38 @@ import { connect } from "dva";
 import { createForm } from "rc-form";
 import {
   Menu,
-  Progress,
   Icon,
   Tag,
   Tree,
   Button,
   notification,
-  Affix,
   Input,
   Radio,
   List,
-  Skeleton,
   Spin,
-  Avatar,
   Upload,
   Modal,
   TreeSelect,
   Cascader,
-  Carousel,
-  Checkbox,
   Form,
   Switch,
   DatePicker,
-  InputNumber,
   AutoComplete,
   Table,
-  Collapse,
-  message
+  Collapse
 } from "antd";
-import moment from "moment";
 import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
 import config from "../../../config";
 import data from "../../../data";
-import { EXIF } from "exif-js";
 import { getFile } from "../../../utils/util";
 import jQuery from "jquery";
 
-const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
-const dateFormat = "YYYY-MM-DD";
 const { TreeNode } = Tree;
-const CheckboxGroup = Checkbox.Group;
 const formItemLayout = {
   labelCol: { span: 7 },
   wrapperCol: { span: 16 }
 };
-let scrollTop = 0;
 
 @connect(({ project, spot, point, other, user }) => ({
   project,
@@ -164,14 +150,7 @@ export default class integrat extends PureComponent {
     });
     this.eventEmitter = emitter.addListener("queryInfo", data => {
       this.scrollDom.scrollTop = 0;
-      const {
-        key,
-        query_pro,
-        Sorting,
-        query_spot,
-        query_point,
-        polygon
-      } = this.state;
+      const { query_pro, query_spot, query_point } = this.state;
       emitter.emit("checkResult", {
         show: false,
         result: []
@@ -262,7 +241,6 @@ export default class integrat extends PureComponent {
       query_pro,
       query_spot,
       query_point,
-      polygon,
       key,
       Sorting,
       queryInfo
@@ -270,7 +248,7 @@ export default class integrat extends PureComponent {
     const { clientHeight, scrollHeight, scrollTop } = this.scrollDom;
     const isBottom = clientHeight + parseInt(scrollTop, 0) + 1 >= scrollHeight;
     const {
-      project: { projectList, projectItem },
+      project: { projectList },
       spot: { spotList },
       point: { pointList }
     } = this.props;
@@ -438,7 +416,7 @@ export default class integrat extends PureComponent {
   };
 
   close = () => {
-    const { showProjectDetail, projectEdit } = this.state;
+    const { projectEdit } = this.state;
     if (projectEdit) {
       this.setState({
         projectEdit: false
@@ -548,12 +526,6 @@ export default class integrat extends PureComponent {
     });
   };
 
-  sort = e => {
-    const v = e.target.value;
-    const key = v.slice(0, v.length - 1);
-    const type = v.charAt(v.length - 1);
-  };
-
   TreeOnSelect = e => {
     if (e.length) {
       const isRoot = isNaN(e[0].slice(0, 1));
@@ -594,7 +566,6 @@ export default class integrat extends PureComponent {
   render() {
     const {
       show,
-      Sorting,
       showSpin,
       queryHighlight,
       previewVisible_min,
@@ -605,21 +576,16 @@ export default class integrat extends PureComponent {
       showCompany,
       placeholder,
       sort,
-      listData,
       showProjectDetail,
       key,
       projectEdit,
-      polygon,
       clientHeight,
-      inputDisabled,
       previewVisible,
       previewImage,
       showCheck,
       showProblem,
       showProjectAllInfo,
       fileList,
-      select,
-      checked,
       problem,
       queryInfo,
       isArchivalSpot,
@@ -2458,35 +2424,29 @@ export default class integrat extends PureComponent {
                     treeDefaultExpandAll
                     onChange={this.onTreeSelectChange}
                   >
-                    <TreeSelect.TreeNode value="中国" title="中国" key="0-1">
+                    {districtList.map(item => (
                       <TreeSelect.TreeNode
-                        value="广东"
-                        title="广东"
-                        key="0-1-1"
+                        value={item.value}
+                        title={item.label}
+                        key={item.value}
                       >
-                        <TreeSelect.TreeNode
-                          value="广州"
-                          title="广州"
-                          key="random"
-                        />
-                        <TreeSelect.TreeNode
-                          value="中山"
-                          title="中山"
-                          key="random1"
-                        />
+                        {item.children.map(ite => (
+                          <TreeSelect.TreeNode
+                            value={ite.value}
+                            title={ite.label}
+                            key={ite.value}
+                          >
+                            {(ite.children || []).map(i => (
+                              <TreeSelect.TreeNode
+                                value={i.value}
+                                title={i.label}
+                                key={i.value}
+                              />
+                            ))}
+                          </TreeSelect.TreeNode>
+                        ))}
                       </TreeSelect.TreeNode>
-                      <TreeSelect.TreeNode
-                        value="广西"
-                        title="广西"
-                        key="random2"
-                      >
-                        <TreeSelect.TreeNode
-                          value="南宁"
-                          title="南宁"
-                          key="random3"
-                        />
-                      </TreeSelect.TreeNode>
-                    </TreeSelect.TreeNode>
+                    ))}
                   </TreeSelect>
                 </Form.Item>
                 <Form.Item label="备注" {...formItemLayout}>

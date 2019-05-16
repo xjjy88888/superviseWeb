@@ -1,11 +1,8 @@
 import React, { PureComponent } from "react";
-import { Menu, Icon, Button, Popover, Dropdown } from "antd";
+import { Menu, Icon, Dropdown } from "antd";
 import { connect } from "dva";
-import { withRouter, Link } from "dva/router";
+import { Link } from "dva/router";
 import styles from "./index.less";
-
-const SubMenu = Menu.SubMenu;
-const MenuItemGroup = Menu.ItemGroup;
 
 @connect(({ user }) => ({
   user
@@ -155,11 +152,8 @@ export default class SiderMenu extends PureComponent {
     return (
       <div className={styles.main}>
         <div className={styles.left}>
-          <img src="./img/logo.png" />
-          <Link
-            className={styles.text}
-            to="/regionRegulatory/integrat"
-          >
+          <img src="./img/logo.png" alt="" />
+          <Link className={styles.text} to="/regionRegulatory/integrat">
             生产建设项目水土保持信息化监管系统
           </Link>
         </div>

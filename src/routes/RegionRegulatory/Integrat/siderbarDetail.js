@@ -3,35 +3,24 @@ import { createForm } from "rc-form";
 import { connect } from "dva";
 import moment from "moment";
 import {
-  Menu,
   Icon,
   Button,
   Input,
-  Radio,
   Cascader,
-  notification,
   Upload,
   Modal,
-  List,
-  Avatar,
-  message,
   AutoComplete,
-  LocaleProvider,
-  InputNumber,
-  Carousel,
   DatePicker,
   Form
 } from "antd";
 import locale from "antd/lib/date-picker/locale/zh_CN";
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
-import zhCN from "antd/lib/locale-provider/zh_CN";
 import config from "../../../config";
 import { getFile } from "../../../utils/util";
 import jQuery from "jquery";
 
 const { TextArea } = Input;
-const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 const dateFormat = "YYYY-MM-DD";
 const formItemLayout = {
   labelCol: { span: 7 },
@@ -147,25 +136,15 @@ export default class siderbarDetail extends PureComponent {
 
   render() {
     const {
-      dispatch,
-      form: {
-        getFieldProps,
-        getFieldDecorator,
-        getFieldError,
-        validateFields,
-        setFieldsValue,
-        setFields
-      },
+      form: { getFieldDecorator },
       spot: { spotItem },
       point: { pointItem, pointSite },
       user: { districtList }
     } = this.props;
-    console.log(pointSite);
     const {
       show,
       from,
       edit,
-      item,
       fileList,
       previewVisible,
       previewImage,

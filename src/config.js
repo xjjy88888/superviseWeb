@@ -1,6 +1,6 @@
 const domain = "http://aj.zkygis.cn/dutySys";
 const domain_ = "http://aj.zkygis.cn/stbc/";
-const txKey = "TERBZ-ZU46D-KZT46-HZZIB-RNDMZ-7GFP3";
+// const txKey = "TERBZ-ZU46D-KZT46-HZZIB-RNDMZ-7GFP3";
 
 const color_back_spot = "rgba(255,255,0,0.4)"; //背景色-图斑
 const color_back_redLine = "rgba(230,0,0,0.4)"; //背景色-红线

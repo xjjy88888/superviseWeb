@@ -1,5 +1,3 @@
-import { routerRedux } from "dva/router";
-import { Button, notification } from "antd";
 import { txRegionApi } from "../services/httpApi";
 
 export default {

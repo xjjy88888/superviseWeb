@@ -1,6 +1,5 @@
 import React from "react";
 import { Router, Route, Switch } from "dva/router";
-// import IndexPage from "./routes/IndexPage";
 import Welcome from "./routes/Home/Welcome";
 import Home2 from "./routes/Home/Home2";
 import Integrat from "./routes/RegionRegulatory/Integrat";
@@ -11,7 +10,6 @@ import Accountability1 from "./routes/Accountability/Accountability1";
 import Accountability2 from "./routes/Accountability/Accountability2";
 import Assess1 from "./routes/Assess/Assess1";
 import Assess2 from "./routes/Assess/Assess2";
-import User1 from "./routes/User/User1";
 import Login from "./routes/User/Login";
 
 function RouterConfig({ history }) {

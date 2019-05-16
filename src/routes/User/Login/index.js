@@ -1,8 +1,6 @@
 import React, { PureComponent } from "react";
 import { createForm } from "rc-form";
 import { connect } from "dva";
-import SiderMenu from "../../../components/SiderMenu";
-import { withRouter, Link } from "dva/router";
 import { Form, Icon, Input, Button, Checkbox, message } from "antd";
 
 @connect(({ user }) => ({
@@ -50,11 +48,7 @@ export default class login extends PureComponent {
     return Object.keys(fieldsError).some(field => fieldsError[field]);
   };
   render() {
-    const {
-      getFieldDecorator,
-      getFieldProps,
-      getFieldsError
-    } = this.props.form;
+    const { getFieldDecorator, getFieldsError } = this.props.form;
     const lastLogin = JSON.parse(localStorage.getItem("lastLogin"));
     return (
       <div
@@ -72,6 +66,7 @@ export default class login extends PureComponent {
           <Form.Item>
             <img
               src="./img/logo.png"
+              alt=""
               style={{ width: 30, marginRight: 10 }}
               onClick={() => {}}
             />

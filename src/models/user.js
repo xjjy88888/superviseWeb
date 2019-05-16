@@ -1,14 +1,6 @@
 import { loginApi, districtApi } from "../services/httpApi";
 import { routerRedux } from "dva/router";
-import {
-  Form,
-  Icon,
-  Input,
-  Button,
-  Checkbox,
-  message,
-  notification
-} from "antd";
+import { notification } from "antd";
 
 export default {
   namespace: "user",

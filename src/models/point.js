@@ -1,5 +1,4 @@
-import { routerRedux } from "dva/router";
-import { Button, notification } from "antd";
+import { notification } from "antd";
 import {
   pointListApi,
   pointByIdApi,

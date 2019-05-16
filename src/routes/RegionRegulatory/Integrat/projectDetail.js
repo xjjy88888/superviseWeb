@@ -2,44 +2,21 @@ import React, { PureComponent } from "react";
 import { connect } from "dva";
 import { createForm } from "rc-form";
 import {
-  Menu,
   Icon,
   Button,
   Input,
   Radio,
   Upload,
-  Modal,
-  List,
   Divider,
-  Avatar,
-  TreeSelect,
-  Cascader,
-  Affix,
-  Carousel,
-  Checkbox,
   Form,
   Row,
   Col,
-  Switch,
   DatePicker,
-  InputNumber,
-  AutoComplete,
-  message
+  AutoComplete
 } from "antd";
-import moment from "moment";
 import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
-import config from "../../../config";
 import styles from "./index.less";
-
-const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
-const dateFormat = "YYYY-MM-DD";
-const TreeNode = TreeSelect.TreeNode;
-const CheckboxGroup = Checkbox.Group;
-const formItemLayout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 12 }
-};
 
 let yearDataSource = [];
 
@@ -99,13 +76,6 @@ export default class integrat extends PureComponent {
     const { show, edit } = this.state;
 
     const {
-      dispatch,
-      form: {
-        getFieldDecorator,
-        getFieldsError,
-        getFieldError,
-        isFieldTouched
-      },
       project: { projectItem }
     } = this.props;
 
@@ -138,7 +108,7 @@ export default class integrat extends PureComponent {
           }}
           onClick={() => {
             emitter.emit("hideProjectDetail", {
-              hide: true,
+              hide: true
             });
             this.setState({
               show: false

@@ -1,23 +1,8 @@
 import React, { PureComponent } from "react";
-import {
-  Menu,
-  Icon,
-  Button,
-  Input,
-  Radio,
-  List,
-  Avatar,
-  Carousel,
-  Checkbox
-} from "antd";
+import { Icon } from "antd";
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
-import echarts from "echarts/lib/echarts";
 import "echarts";
-import config from "../../../config";
-
-const CheckboxGroup = Checkbox.Group;
-const RadioGroup = Radio.Group;
 
 export default class siderbarDetail extends PureComponent {
   constructor(props) {
@@ -78,6 +63,7 @@ export default class siderbarDetail extends PureComponent {
             }}
           />
           <iframe
+            title="抽稀"
             height="595px"
             width="1000px"
             src="http://aj.zkygis.cn/stbcSys/mapshaper/index.html"

@@ -1,26 +1,10 @@
 import React, { PureComponent } from "react";
-import {
-  Menu,
-  Icon,
-  Button,
-  Input,
-  Radio,
-  List,
-  Avatar,
-  Carousel,
-  notification,
-  Alert,
-  Modal,
-  Checkbox
-} from "antd";
+import { Icon, Button, Radio, notification, Alert, Modal } from "antd";
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
-import echarts from "echarts/lib/echarts";
 import "echarts";
 import config from "../../../config";
 
-const CheckboxGroup = Checkbox.Group;
-const RadioGroup = Radio.Group;
 const url = "http://aj.zkygis.cn/stbcSys/Template/";
 
 export default class siderbarDetail extends PureComponent {

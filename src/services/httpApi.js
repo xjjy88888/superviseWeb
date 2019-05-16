@@ -1,6 +1,6 @@
 import config from "../config";
 import request from "../utils/request";
-import CryptoJS from "crypto-js";
+// import CryptoJS from "crypto-js";
 import { dateFormat, accessToken } from "../utils/util";
 
 // 登录

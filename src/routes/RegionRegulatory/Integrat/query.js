@@ -2,19 +2,12 @@ import React, { PureComponent } from "react";
 import { createForm } from "rc-form";
 import { connect } from "dva";
 import {
-  Menu,
   Icon,
   Button,
   Select,
   Input,
-  Radio,
-  Avatar,
-  Carousel,
-  message,
-  notification,
   InputNumber,
   Cascader,
-  Slider,
   Switch,
   Checkbox,
   DatePicker,
@@ -24,11 +17,9 @@ import {
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
 import config from "../../../config";
-import moment from "moment";
 
 const CheckboxGroup = Checkbox.Group;
-const RadioGroup = Radio.Group;
-const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
+const { RangePicker } = DatePicker;
 const formItemLayout = {
   labelCol: { span: 6 },
   wrapperCol: { span: 15 }
@@ -36,15 +27,6 @@ const formItemLayout = {
 const formItemLayoutlong = {
   labelCol: { span: 6 },
   wrapperCol: { span: 15 }
-};
-
-const marks = {
-  0: "0",
-  200: "200",
-  400: "400",
-  600: "600",
-  800: "800",
-  1000: "1000"
 };
 
 @createForm()
@@ -67,7 +49,6 @@ export default class siderbarDetail extends PureComponent {
         type: data.type
       });
     });
-    const { clientWidth, clientHeight } = this.refDom;
   }
 
   getRandomInt = (max, min = 0) => {
@@ -113,7 +94,7 @@ export default class siderbarDetail extends PureComponent {
   };
 
   render() {
-    const { show, type, dataSource } = this.state;
+    const { show, type } = this.state;
     const {
       form: { getFieldDecorator },
       user: { districtList }

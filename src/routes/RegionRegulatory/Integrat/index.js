@@ -1,8 +1,6 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
 import {
-  Menu,
-  Icon,
   Button,
   LocaleProvider,
   Switch,
@@ -15,7 +13,6 @@ import zhCN from "antd/lib/locale-provider/zh_CN";
 import SiderMenu from "../../../components/SiderMenu";
 import Sidebar from "./sidebar";
 import SidebarDetail from "./siderbarDetail";
-import moment from "moment";
 import Tool from "./tool";
 import Sparse from "./sparse";
 import Chart from "./chart";
@@ -164,7 +161,7 @@ export default class integrat extends PureComponent {
       } else if (data.state === "end") {
         //地图定位点
         if (marker) marker.remove();
-        let latLng = [data.Latitude,data.Longitude];
+        let latLng = [data.Latitude, data.Longitude];
         marker = L.marker(latLng).addTo(map);
         me.automaticToMap(latLng);
       }
@@ -253,10 +250,9 @@ export default class integrat extends PureComponent {
         if (marker) marker.remove();
         marker = L.marker(latLng, { icon: myIcon }).addTo(map);
         //marker = L.marker(latLng).addTo(map);
-        if(map.getZoom()>=13){
+        if (map.getZoom() >= 13) {
           me.automaticToMap(latLng);
-        }
-        else{
+        } else {
           map.setZoom(13);
           setTimeout(() => {
             me.automaticToMap(latLng);
@@ -899,16 +895,13 @@ export default class integrat extends PureComponent {
                 );
               }
             }, 500);
-
-          }
-          else {
+          } else {
             //message.warning("地图匹配不到相关数据", 1);
             map.closePopup();
           }
-        }
-        else {
-            message.warning("地图匹配不到相关数据", 1);
-            map.closePopup();
+        } else {
+          message.warning("地图匹配不到相关数据", 1);
+          map.closePopup();
         }
       }
     });
@@ -1180,7 +1173,7 @@ export default class integrat extends PureComponent {
           let len = data.features.length;
           for (let i = 0; i < len; i++) {
             let feature = data.features[i];
-            if (feature.properties.XZQDM == userconfig.dwdm) {
+            if (feature.properties.XZQDM === userconfig.dwdm) {
               geojson.features.push(feature);
               userconfig.geojson = geojson;
               // L.Proj.GeoJSON继承于L.GeoJSON，可调样式
