@@ -289,8 +289,7 @@ export default class siderbarDetail extends PureComponent {
                   previewImage: file.url || file.thumbUrl,
                   previewVisible_min: true
                 });
-                const dom = jQuery(`<img src=${file.url}></img>`);
-                getFile(dom[0]);
+                getFile(file.url);
               }}
               onChange={({ fileList }) => this.setState({ fileList })}
             >
@@ -456,8 +455,7 @@ export default class siderbarDetail extends PureComponent {
                   previewImage: file.url || file.thumbUrl,
                   previewVisible_min: true
                 });
-                const dom = jQuery(`<img src=${file.url}></img>`);
-                getFile(dom[0]);
+                getFile(file.url);
               }}
               onChange={({ fileList }) => this.setState({ fileList })}
             >
@@ -634,8 +632,7 @@ export default class siderbarDetail extends PureComponent {
                   previewImage: file.url || file.thumbUrl,
                   previewVisible_min: true
                 });
-                const dom = jQuery(`<img src=${file.url}></img>`);
-                getFile(dom[0]);
+                getFile(file.url);
               }}
               onChange={({ fileList }) => this.setState({ fileList })}
             >

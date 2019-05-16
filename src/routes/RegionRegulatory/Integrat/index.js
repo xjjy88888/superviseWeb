@@ -7,6 +7,7 @@ import {
   Popover,
   Modal,
   Select,
+  notification,
   message
 } from "antd";
 import zhCN from "antd/lib/locale-provider/zh_CN";
@@ -87,7 +88,7 @@ export default class integrat extends PureComponent {
     window.goDetail = obj => {
       emitter.emit("showProjectSpotInfo", obj);
     };
-    //气泡窗口图形编辑
+    //气泡窗口编辑
     window.goEditGraphic = obj => {
       me.setState({ drawGrphic: "edit" });
       if (obj.from === "project") {
@@ -209,8 +210,10 @@ export default class integrat extends PureComponent {
                 case "ProjectPoint": //项目点
                   if (marker) marker.remove();
                   marker = L.marker(latLng).addTo(map);
-                  map.setZoom(15);
-                  me.automaticToMap(latLng);
+                  map.setZoom(13);
+                  setTimeout(() => {
+                    me.automaticToMap(latLng);
+                  }, 500);
                   break;
                 default:
               }
@@ -232,7 +235,19 @@ export default class integrat extends PureComponent {
           this.callbackLocationQueryWFSService
         );
       } else if (data.key === "point") {
+        let latLng = [data.item.pointY, data.item.pointX];
+        let turfpoint = turf.point([latLng[1], latLng[0]]);
+        if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {
+          message.warning("当前标注点不是区域范围之内的点", 2);
+          return;
+        }
         //标注点定位
+        if (marker) marker.remove();
+        marker = L.marker(latLng).addTo(map);
+        map.setZoom(13);
+        setTimeout(() => {
+          me.automaticToMap(latLng);
+        }, 500);
       } else if (data.key === "redLine") {
         //防治责任范围定位
       }
@@ -240,23 +255,29 @@ export default class integrat extends PureComponent {
     //照片定位
     this.eventEmitter = emitter.addListener("imgLocation", data => {
       if (data.show) {
-        let latLng = [data.Latitude, data.Longitude];
-        //direction 方位角
-        let picName = me.getPicByAzimuth(data.direction);
-        let myIcon = L.icon({
-          iconUrl: "./img/" + picName + ".png",
-          iconSize: [60, 60]
-        });
-        if (marker) marker.remove();
-        marker = L.marker(latLng, { icon: myIcon }).addTo(map);
-        //marker = L.marker(latLng).addTo(map);
-        if (map.getZoom() >= 13) {
-          me.automaticToMap(latLng);
-        } else {
-          map.setZoom(13);
-          setTimeout(() => {
+        if (data.Latitude && data.Longitude) {
+          let latLng = [data.Latitude, data.Longitude];
+          //direction 方位角
+          let picName = me.getPicByAzimuth(data.direction);
+          let myIcon = L.icon({
+            iconUrl: "./img/" + picName + ".png",
+            iconSize: [60, 60]
+          });
+          if (marker) marker.remove();
+          marker = L.marker(latLng, { icon: myIcon }).addTo(map);
+          //marker = L.marker(latLng).addTo(map);
+          if (map.getZoom() >= 13) {
             me.automaticToMap(latLng);
-          }, 500);
+          } else {
+            map.setZoom(13);
+            setTimeout(() => {
+              me.automaticToMap(latLng);
+            }, 500);
+          }
+        } else {
+          notification["error"]({
+            message: "该附件照片无位置信息，无法在地图定位"
+          });
         }
       } else {
         if (marker) marker.remove();
@@ -377,7 +398,7 @@ export default class integrat extends PureComponent {
           allowSelfIntersection: false,
           tooltips: false
         });
-        //显示图形编辑菜单按钮
+        //显示编辑菜单按钮
         me.setState({ showButton: true });
         //编辑图形
         map.on("pm:create", e => {
@@ -420,7 +441,7 @@ export default class integrat extends PureComponent {
           allowSelfIntersection: false,
           tooltips: false
         });
-        //显示图形编辑菜单按钮
+        //显示编辑菜单按钮
         me.setState({ showButton: true });
         //编辑图形
         map.on("pm:create", e => {
@@ -464,7 +485,7 @@ export default class integrat extends PureComponent {
       data = data.result;
       //关闭地图气泡窗口
       map.closePopup();
-      //显示图形编辑菜单按钮
+      //显示编辑菜单按钮
       me.setState({ showButton: true });
       //移除地图监听事件
       //map.off('click contextmenu');
@@ -485,7 +506,7 @@ export default class integrat extends PureComponent {
       //移动图形
       //map.pm.toggleGlobalDragMode();
     } else {
-      message.warning("匹配不到相关图形编辑", 1);
+      message.warning("匹配不到相关编辑", 1);
     }
   };
   /*
@@ -963,7 +984,7 @@ export default class integrat extends PureComponent {
                 obj
               )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
                 obj
-              )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+              )})'>编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
                 obj
               )})' style='display:none'>图形删除</a></div>`
             )
@@ -973,7 +994,7 @@ export default class integrat extends PureComponent {
             obj
           )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
                 obj
-              )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+              )})'>编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
                 obj
               )})' style='display:none'>图形删除</a></div>`
             );
@@ -992,7 +1013,7 @@ export default class integrat extends PureComponent {
               obj
             )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
               obj
-            )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+            )})'>编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
               obj
             )})' style='display:none'>图形删除</a></div>`
           )
@@ -1002,7 +1023,7 @@ export default class integrat extends PureComponent {
         obj
       )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
               obj
-            )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+            )})'>编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
               obj
             )})' style='display:none'>图形删除</a></div>`
           );
@@ -1047,7 +1068,7 @@ export default class integrat extends PureComponent {
   //           obj
   //         )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
   //           obj
-  //         )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+  //         )})'>编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
   //           obj
   //         )})' style='display:none'>图形删除</a></div>`
   //       )
@@ -1057,7 +1078,7 @@ export default class integrat extends PureComponent {
   //         obj
   //       )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
   //           obj
-  //         )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+  //         )})'>编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
   //           obj
   //         )})' style='display:none'>图形删除</a></div>`
   //       );

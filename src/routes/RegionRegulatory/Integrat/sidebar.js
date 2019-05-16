@@ -210,12 +210,14 @@ export default class integrat extends PureComponent {
     this.eventEmitter = emitter.addListener("showProjectSpotInfo", data => {
       if (data.from === "project") {
         this.setState({
-          showProjectDetail: data.show,
+          // showProjectDetail: data.show,
           projectEdit: data.edit
         });
-        this.queryProjectById(data.id);
-        this.querySpotByProjectId(data.id);
-        this.queryRedLineByProjectId(data.id);
+        if (data.show) {
+          this.queryProjectById(data.id);
+          this.querySpotByProjectId(data.id);
+          this.queryRedLineByProjectId(data.id);
+        }
       } else if (data.from === "spot") {
       } else {
       }
@@ -379,9 +381,7 @@ export default class integrat extends PureComponent {
       },
       callback: (result, success) => {
         console.log(result, success);
-        if (!success) {
-          this.setState({ showProjectDetail: false });
-        }
+        this.setState({ showProjectDetail: success });
       }
     });
   };
@@ -1212,16 +1212,16 @@ export default class integrat extends PureComponent {
                 </div>
                 {problem.records.map((item, index) => (
                   <div style={{ padding: 5 }} key={index}>
-                    <p>
+                    <div>
                       <Tag color={this.toColor(item.sort)}>{item.sort}</Tag>
                       {item.record}
-                    </p>
-                    <p style={{ margin: 0 }}>
+                    </div>
+                    <div style={{ margin: 0 }}>
                       <Radio.Group name="radiogroup">
                         <Radio value={1}>是</Radio>
                         <Radio value={0}>否</Radio>
                       </Radio.Group>
-                    </p>
+                    </div>
                     <Collapse
                       bordered={false}
                       style={{ position: "relative", left: -18 }}
@@ -1245,7 +1245,7 @@ export default class integrat extends PureComponent {
                               previewImage: file.url || file.thumbUrl,
                               previewVisible_min: true
                             });
-                            getFile(dom[0]);
+                            getFile(file.url);
                           }}
                           onChange={({ fileList }) =>
                             this.setState({ fileList })
@@ -2413,41 +2413,42 @@ export default class integrat extends PureComponent {
                   />
                 </Form.Item>
                 <Form.Item label="涉及县" {...formItemLayout}>
-                  <TreeSelect
-                    showSearch
-                    style={{ width: "100%" }}
-                    value={this.state.value}
-                    dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
-                    placeholder="请选择涉及县"
-                    allowClear
-                    multiple
-                    treeDefaultExpandAll
-                    onChange={this.onTreeSelectChange}
-                  >
-                    {districtList.map(item => (
-                      <TreeSelect.TreeNode
-                        value={item.value}
-                        title={item.label}
-                        key={item.value}
-                      >
-                        {item.children.map(ite => (
-                          <TreeSelect.TreeNode
-                            value={ite.value}
-                            title={ite.label}
-                            key={ite.value}
-                          >
-                            {(ite.children || []).map(i => (
-                              <TreeSelect.TreeNode
-                                value={i.value}
-                                title={i.label}
-                                key={i.value}
-                              />
-                            ))}
-                          </TreeSelect.TreeNode>
-                        ))}
-                      </TreeSelect.TreeNode>
-                    ))}
-                  </TreeSelect>
+                  {getFieldDecorator("shejixian", { valuePropName: "value" })(
+                    <TreeSelect
+                      showSearch
+                      style={{ width: "100%" }}
+                      dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
+                      placeholder="请选择涉及县"
+                      allowClear
+                      multiple
+                      treeDefaultExpandAll
+                      onChange={this.onTreeSelectChange}
+                    >
+                      {districtList.map(item => (
+                        <TreeSelect.TreeNode
+                          value={item.value}
+                          title={item.label}
+                          key={item.value}
+                        >
+                          {(item.children || []).map(ite => (
+                            <TreeSelect.TreeNode
+                              value={ite.value}
+                              title={ite.label}
+                              key={ite.value}
+                            >
+                              {(ite.children || []).map(i => (
+                                <TreeSelect.TreeNode
+                                  value={i.value}
+                                  title={i.label}
+                                  key={i.value}
+                                />
+                              ))}
+                            </TreeSelect.TreeNode>
+                          ))}
+                        </TreeSelect.TreeNode>
+                      ))}
+                    </TreeSelect>
+                  )}
                 </Form.Item>
                 <Form.Item label="备注" {...formItemLayout}>
                   <Input.TextArea
@@ -2515,8 +2516,7 @@ export default class integrat extends PureComponent {
                     previewImage: file.url || file.thumbUrl,
                     previewVisible_min_left: true
                   });
-                  const dom = jQuery(`<img src=${file.url}></img>`);
-                  getFile(dom[0]);
+                  getFile(file.url);
                 }}
                 onChange={({ fileList }) => this.setState({ fileList })}
               >

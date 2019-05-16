@@ -1,6 +1,7 @@
 import moment from "moment";
 import { EXIF } from "exif-js";
 import emitter from "./event";
+import jQuery from "jquery";
 
 const dateFormat = v => {
   return v ? moment(new Date(v).getTime()).format("YYYY-MM-DD") : "";
@@ -10,10 +11,12 @@ const dateTimeFormat = v => {
   return v ? moment(new Date(v).getTime()).format("YYYY-MM-DD HH:mm:ss") : "";
 };
 
-const getFile = dom => {
-  EXIF.getData(dom, function() {
+const getFile = url => {
+  const dom = jQuery(`<img src=${url}></img>`);
+  EXIF.getData(dom[0], function() {
     const allMetaData = EXIF.getAllTags(this);
 
+    console.log(allMetaData);
     let direction;
     if (allMetaData.GPSImgDirection) {
       const directionArry = allMetaData.GPSImgDirection; // 方位角
@@ -40,7 +43,6 @@ const getFile = dom => {
       Latitude = longLatitude.toFixed(8);
     }
 
-    console.log(allMetaData);
     console.log(Longitude, Latitude, direction);
     emitter.emit("imgLocation", {
       Latitude: Latitude,
