@@ -211,7 +211,7 @@ export default class integrat extends PureComponent {
                 case "ProjectPoint": //项目点
                   if (marker) marker.remove();
                   marker = L.marker(latLng).addTo(map);
-                  map.setZoom(13);
+                  map.setZoom(config.mapInitParams.zoom);
                   setTimeout(() => {
                     me.automaticToMap(latLng);
                   }, 500);
@@ -245,7 +245,7 @@ export default class integrat extends PureComponent {
         //标注点定位
         if (marker) marker.remove();
         marker = L.marker(latLng).addTo(map);
-        map.setZoom(13);
+        map.setZoom(config.mapInitParams.zoom);
         setTimeout(() => {
           me.automaticToMap(latLng);
         }, 500);
@@ -267,10 +267,10 @@ export default class integrat extends PureComponent {
           if (marker) marker.remove();
           marker = L.marker(latLng, { icon: myIcon }).addTo(map);
           //marker = L.marker(latLng).addTo(map);
-          if (map.getZoom() >= 13) {
+          if (map.getZoom() >= config.mapInitParams.zoom) {
             me.automaticToMap(latLng);
           } else {
-            map.setZoom(13);
+            map.setZoom(config.mapInitParams.zoom);
             setTimeout(() => {
               me.automaticToMap(latLng);
             }, 500);
@@ -403,8 +403,8 @@ export default class integrat extends PureComponent {
         me.setState({ showButton: true });
         //编辑图形
         map.on("pm:create", e => {
-          //console.log(e);
           me.setState({ addGraphLayer: e.layer });
+          console.log(turf.area(e.layer.toGeoJSON()));
           e.layer.pm.enable({
             allowSelfIntersection: false
           });
@@ -527,9 +527,11 @@ export default class integrat extends PureComponent {
           fillOpacity: 0.1
         };
         me.loadGeojsonLayer(data, style);
-        map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
-          maxZoom: 16
-        });
+        if (map.getZoom() < config.mapInitParams.zoom) {
+          map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
+            maxZoom: 16
+          });
+        }
         let content = "";
         for (let i = 0; i < data.features.length; i++) {
           let feature = data.features[i];
@@ -733,7 +735,7 @@ export default class integrat extends PureComponent {
   onMoveendMap = e => {
     //console.log(map.getZoom());
     const { chartStatus } = this.state;
-    if (map.getZoom() >= 15 && chartStatus) {
+    if (map.getZoom() >= config.mapInitParams.zoom && chartStatus) {
       let bounds = map.getBounds();
       let polygon = "polygon((";
       polygon +=
@@ -906,12 +908,13 @@ export default class integrat extends PureComponent {
               }
             }
             setTimeout(() => {
-              map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
-                maxZoom: 16
-              });
+              if (map.getZoom() < config.mapInitParams.zoom) {
+                map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
+                  maxZoom: 16
+                });
+              }
               map.openPopup(content, userconfig.mapPoint);
               if (isautomaticToMap) {
-                //map.setZoom(15);
                 me.automaticToMap(
                   userconfig.projectgeojsonLayer.getBounds().getCenter()
                 );
@@ -1152,15 +1155,6 @@ export default class integrat extends PureComponent {
       geojson.features[0].geometry.coordinates
     );
     setTimeout(() => {
-      /*if (userconfig.dwdm === "100000") {
-        //admin管理员
-      } else if (userconfig.dwdm.endsWith("0000")) {
-        userconfig.zoom = map.getZoom()+1;
-      } else if (userconfig.dwdm.endsWith("00")) {
-        userconfig.zoom = map.getZoom()+1;
-      } else {
-        userconfig.zoom = map.getZoom() + 1;
-      }*/
       userconfig.zoom = map.getZoom() + 1;
       //加载geoserver发布的WMS地图服务
       me.overlayWMSLayers();
@@ -1752,7 +1746,7 @@ export default class integrat extends PureComponent {
                   this.setState({ chartStatus: v });
                   console.log(v, e);
                   let polygon = "";
-                  if (map.getZoom() >= 15) {
+                  if (map.getZoom() >= config.mapInitParams.zoom) {
                     let bounds = map.getBounds();
                     polygon = "polygon((";
                     polygon +=
