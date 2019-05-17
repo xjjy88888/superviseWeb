@@ -1,5 +1,6 @@
 import React from "react";
 import { Router, Route, Switch } from "dva/router";
+// import IndexPage from "./routes/IndexPage";
 import Welcome from "./routes/Home/Welcome";
 import Home2 from "./routes/Home/Home2";
 import Integrat from "./routes/RegionRegulatory/Integrat";

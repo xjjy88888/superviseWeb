@@ -281,18 +281,19 @@ export default class siderbarDetail extends PureComponent {
               )}
             </Form.Item>
             <Form.Item label="矢量化类型" {...formItemLayoutlong}>
-              {getFieldDecorator("vectorization_type", { initialValue: [] })(
+              {getFieldDecorator("VecType", { initialValue: [] })(
                 <CheckboxGroup options={config.vectorization_type} />
               )}
             </Form.Item>
             <Form.Item label="有无扰动图斑" {...formItemLayoutlong}>
-              {getFieldDecorator("vectorization_type1", {
-                valuePropName: "checked"
-              })(<Switch />)}
+              {getFieldDecorator("HasSpot", {})(
+                <CheckboxGroup options={["有图斑", "无图斑"]} />
+              )}
             </Form.Item>
             <Form.Item label="显示归档数据" {...formItemLayoutlong}>
-              {getFieldDecorator("vectorization_type2", {
-                valuePropName: "checked"
+              {getFieldDecorator("ShowArchive", {
+                valuePropName: "checked",
+                initialValue: false
               })(<Switch />)}
             </Form.Item>
           </Form>
@@ -380,8 +381,9 @@ export default class siderbarDetail extends PureComponent {
               )}
             </Form.Item>
             <Form.Item label="显示归档数据" {...formItemLayoutlong}>
-              {getFieldDecorator("vectorization_type2", {
-                valuePropName: "checked"
+              {getFieldDecorator("ShowArchive", {
+                valuePropName: "checked",
+                initialValue: false
               })(<Switch />)}
             </Form.Item>
           </Form>

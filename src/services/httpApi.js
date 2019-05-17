@@ -43,9 +43,8 @@ export async function projectListApi(params) {
       ProjectStatus: params.ProjectStatus
         ? params.ProjectStatus.map(v => v).join(",")
         : "",
-      vectorization_type: params.vectorization_type
-        ? params.vectorization_type.map(v => v).join(",")
-        : "",
+      VecType: params.VecType ? params.VecType.map(v => v).join(",") : "",
+      HasSpot: params.HasSpot ? params.HasSpot.map(v => v).join(",") : "",
       ProjectType: params.ProjectType
         ? params.ProjectType.map(v => v).join(",")
         : "",
