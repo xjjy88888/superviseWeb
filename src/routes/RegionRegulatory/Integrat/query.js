@@ -325,7 +325,7 @@ export default class siderbarDetail extends PureComponent {
                   pointerEvents: "none",
                   backgroundColor: "#fff"
                 }}
-                placeholder="~"
+                placeholder="-"
                 disabled
               />
               {getFieldDecorator("InterferenceAreaMax", {})(
@@ -343,7 +343,7 @@ export default class siderbarDetail extends PureComponent {
                   pointerEvents: "none",
                   backgroundColor: "#fff"
                 }}
-                placeholder="~"
+                placeholder="-"
                 disabled
               />
               {getFieldDecorator("OverAreaOfResMax", {})(
