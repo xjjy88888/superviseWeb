@@ -99,10 +99,11 @@ export default class integrat extends PureComponent {
 
   componentDidMount() {
     console.log("贵阳至黄平高速公路", "六枝特区平寨镇跃进砂石厂");
-    this.queryDistrict();
     this.queryProject({ SkipCount: 0 });
     this.querySpot({ SkipCount: 0 });
     this.queryPoint({ SkipCount: 0 });
+    this.queryDistrict();
+    this.queryDict();
     this.eventEmitter = emitter.addListener("siteLocationBack", data => {
       this.props.form.setFieldsValue({
         latitude: data.latitude,
@@ -291,6 +292,13 @@ export default class integrat extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: "user/queryDistrict"
+    });
+  };
+
+  queryDict = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "user/queryDict"
     });
   };
 
@@ -549,6 +557,16 @@ export default class integrat extends PureComponent {
       show: false,
       edit: false
     });
+  };
+
+  getDictKey = (value, type) => {
+    const {
+      user: { dicList }
+    } = this.props;
+    const filter = dicList.filter(item => {
+      return item.dictTypeName === type && item.value === value;
+    });
+    return filter[0].id;
   };
 
   render() {
@@ -822,6 +840,7 @@ export default class integrat extends PureComponent {
             allowClear
             placeholder={`${placeholder}`}
             onSearch={v => {
+              console.log(this.getDictKey("水利枢纽工程", "项目类型"));
               this.scrollDom.scrollTop = 0;
               emitter.emit("checkResult", {
                 show: false,

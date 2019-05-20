@@ -40,6 +40,9 @@ const config = {
     // 上传附件
     uploadAsyncUrl: `${domain_}api/services/app/Attachment/UploadAsync`,
 
+    // 字典
+    dictUrl: `${domain_}api/services/app/DictTable/GetAll`,
+
     // 项目位置
     projectPositionUrl: `${domain_}api/services/app/Attachment/UploadAsync`,
 

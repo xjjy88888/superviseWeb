@@ -1,4 +1,4 @@
-import { loginApi, districtApi } from "../services/httpApi";
+import { loginApi, districtApi, dictApi } from "../services/httpApi";
 import { routerRedux } from "dva/router";
 import { notification } from "antd";
 
@@ -51,6 +51,25 @@ export default {
     },
     *loginOut({ payload }, { call, put }) {
       yield put(routerRedux.replace("/user/login"));
+    },
+    *queryDict({ payload }, { call, put }) {
+      const {
+        data: {
+          success,
+          error,
+          result: { items: dicList }
+        }
+      } = yield call(dictApi, payload);
+      if (success) {
+        yield put({
+          type: "save",
+          payload: { dicList }
+        });
+      } else {
+        notification["error"]({
+          message: error.message
+        });
+      }
     }
   },
 
