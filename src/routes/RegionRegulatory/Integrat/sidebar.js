@@ -1326,7 +1326,7 @@ export default class integrat extends PureComponent {
               style={{
                 display: previewVisible_min_left ? "block" : "none",
                 position: "fixed",
-                zIndex: 1,
+                zIndex: 2,
                 width: 305
               }}
             >
@@ -1335,8 +1335,8 @@ export default class integrat extends PureComponent {
                 style={{
                   fontSize: 18,
                   position: "absolute",
-                  top: 0,
-                  right: 0
+                  top: 10,
+                  right: 10
                 }}
                 onClick={() => {
                   this.setState({ previewVisible_min_left: false });
