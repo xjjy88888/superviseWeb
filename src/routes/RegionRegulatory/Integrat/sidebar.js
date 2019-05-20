@@ -29,6 +29,7 @@ import config from "../../../config";
 import data from "../../../data";
 import { getFile } from "../../../utils/util";
 import jQuery from "jquery";
+import { accessToken } from "../../../utils/util";
 
 const { TreeNode } = Tree;
 const formItemLayout = {
@@ -2508,7 +2509,8 @@ export default class integrat extends PureComponent {
             </div>
             <div style={{ marginTop: 20 }}>
               <Upload
-                action="//jsonplaceholder.typicode.com/posts/"
+                action="http://aj.zkygis.cn/stbc/api/services/app/Attachment/UploadAsync"
+                headers={{ Authorization: `Bearer ${accessToken()}` }}
                 listType="picture-card"
                 fileList={fileList}
                 onPreview={file => {
@@ -2518,7 +2520,10 @@ export default class integrat extends PureComponent {
                   });
                   getFile(file.url);
                 }}
-                onChange={({ fileList }) => this.setState({ fileList })}
+                onChange={({ fileList }) => {
+                  console.log(fileList);
+                  this.setState({ fileList });
+                }}
               >
                 {projectEdit ? (
                   <div>
