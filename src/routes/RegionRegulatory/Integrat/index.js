@@ -21,7 +21,7 @@ import Query from "./query";
 import ProjectDetail from "./projectDetail";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import "proj4";
+import proj4 from "proj4";
 import "proj4leaflet";
 import "leaflet.pm/dist/leaflet.pm.css";
 import "leaflet.pm";
@@ -63,6 +63,8 @@ export default class integrat extends PureComponent {
       showQuery: false,
       drawGrphic: "edit",
       chartStatus: false,
+      selectLeftV: "",
+      selectRightV: "",
       project_id: null, //针对新增图形的项目红线id
       addGraphLayer: null //针对新增图形的图层
     };
@@ -734,9 +736,11 @@ export default class integrat extends PureComponent {
   };
   onMoveendMap = e => {
     //console.log(map.getZoom());
+    const me = this;
     const { chartStatus } = this.state;
-    if (map.getZoom() >= config.mapInitParams.zoom && chartStatus) {
-      let bounds = map.getBounds();
+    let zoom = map.getZoom();
+    let bounds = map.getBounds();
+    if (zoom >= config.mapInitParams.zoom && chartStatus) {
       let polygon = "polygon((";
       polygon +=
         bounds.getSouthWest().lng + " " + bounds.getSouthWest().lat + ",";
@@ -754,9 +758,52 @@ export default class integrat extends PureComponent {
         type: "spot",
         polygon: polygon
       });
-
       //console.log(polygon);
     }
+    //根据地图当前范围获取对应历史影像数据
+    const { showHistoryContrast } = me.state;
+    if (showHistoryContrast) {
+      me.getInfoByExtent(zoom, bounds);
+    }
+  };
+  /*根据地图当前范围获取对应历史影像数据
+   *@method getInfoByExtent
+   *@param zoom 地图当前范围级别
+   *@param bounds 地图当前范围
+   *@return null
+   */
+  getInfoByExtent = (zoom, bounds) => {
+    const { selectLeftV, selectRightV } = this.state;
+    const me = this;
+    let urlString = config.mapUrl.getInfoByExtent;
+    let xyMin = proj4("EPSG:4326", "EPSG:3857", [
+      bounds.getSouthWest().lng,
+      bounds.getSouthWest().lat
+    ]);
+    let xyMax = proj4("EPSG:4326", "EPSG:3857", [
+      bounds.getNorthEast().lng,
+      bounds.getNorthEast().lat
+    ]);
+    let param = {
+      level: zoom, //地图当前范围级别
+      xmin: xyMin[0], //地图当前范围x最小值
+      xmax: xyMax[0], //地图当前范围x最大值
+      ymin: xyMin[1], //地图当前范围y最小值
+      ymax: xyMax[1] //地图当前范围y最大值
+    };
+    let geojsonUrl = urlString + L.Util.getParamString(param, urlString);
+    me.props.dispatch({
+      type: "mapdata/getInfoByExtent",
+      payload: { geojsonUrl },
+      callback: data => {
+        if (!selectLeftV) {
+          this.setState({ selectLeftV: data[0] });
+        }
+        if (!selectRightV) {
+          this.setState({ selectRightV: data[0] });
+        }
+      }
+    });
   };
   /*属性查询图层
    *@method queryWFSServiceByProperty
@@ -1616,7 +1663,9 @@ export default class integrat extends PureComponent {
       map.removeLayer(userconfig.baseLayer3);
   };
   onChangeSelectLeft = v => {
-    //console.log(v);
+    console.log(v);
+    this.setState({ selectLeftV: v });
+    return;
     let layer;
     switch (v) {
       case "1":
@@ -1641,7 +1690,9 @@ export default class integrat extends PureComponent {
     userconfig.sideBySide.setRightLayers(userconfig.currightlayer);
   };
   onChangeSelectRight = v => {
+    this.setState({ selectRightV: v });
     //console.log(v);
+    return;
     let layer;
     switch (v) {
       case "1":
@@ -1667,7 +1718,16 @@ export default class integrat extends PureComponent {
   };
 
   render() {
-    const { showButton, drawGrphic, showHistoryContrast } = this.state;
+    const {
+      showButton,
+      drawGrphic,
+      showHistoryContrast,
+      selectLeftV,
+      selectRightV
+    } = this.state;
+    const {
+      mapdata: { histories }
+    } = this.props;
     return (
       <LocaleProvider locale={zhCN}>
         <div>
@@ -1850,10 +1910,23 @@ export default class integrat extends PureComponent {
                 zIndex: 1000
               }}
             >
-              <Select defaultValue="2" onChange={this.onChangeSelectLeft}>
-                <Select.Option value="1">街道图</Select.Option>
+              {/* <Select defaultValue="2" onChange={this.onChangeSelectLeft}> */}
+              <Select
+                value={[selectLeftV]}
+                placeholder="请选择"
+                onChange={this.onChangeSelectLeft}
+                style={{
+                  width: 150
+                }}
+              >
+                {histories.map((item, id) => (
+                  <Select.Option key={id} value={item}>
+                    {item}
+                  </Select.Option>
+                ))}
+                {/* <Select.Option value="1">街道图</Select.Option>
                 <Select.Option value="2">影像图</Select.Option>
-                <Select.Option value="3">监管影像</Select.Option>
+                <Select.Option value="3">监管影像</Select.Option> */}
               </Select>
             </div>
             <div
@@ -1865,10 +1938,23 @@ export default class integrat extends PureComponent {
                 zIndex: 1001
               }}
             >
-              <Select defaultValue="1" onChange={this.onChangeSelectRight}>
-                <Select.Option value="1">街道图</Select.Option>
+              {/* <Select defaultValue="1" onChange={this.onChangeSelectRight}> */}
+              <Select
+                value={[selectRightV]}
+                placeholder="请选择"
+                onChange={this.onChangeSelectRight}
+                style={{
+                  width: 150
+                }}
+              >
+                {histories.map((item, id) => (
+                  <Select.Option key={id} value={item}>
+                    {item}
+                  </Select.Option>
+                ))}
+                {/* <Select.Option value="1">街道图</Select.Option>
                 <Select.Option value="2">影像图</Select.Option>
-                <Select.Option value="3">监管影像</Select.Option>
+                <Select.Option value="3">监管影像</Select.Option> */}
               </Select>
             </div>
             {/* 底部遮罩层 */}

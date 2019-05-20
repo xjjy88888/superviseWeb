@@ -7,7 +7,7 @@ import {
 export default {
   namespace: "mapdata",
 
-  state: {},
+  state: { histories: [] },
 
   subscriptions: {
     setup({ dispatch, history }) {
@@ -31,14 +31,19 @@ export default {
     },
     // 获取边界
     *queryProjectPosition({ payload, callback }, { call, put }) {
-      const { data: projectPosition } = yield call(projectPositionApi, payload.id);
+      const { data: projectPosition } = yield call(
+        projectPositionApi,
+        payload.id
+      );
       if (callback) callback(projectPosition);
       yield put({ type: "save", payload: { projectPosition } });
     },
     //根据地图当前范围获取对应历史影像数据接口
     *getInfoByExtent({ payload, callback }, { call, put }) {
       const { data: result } = yield call(getInfoByExtent, payload);
-      if (callback) callback(result);
+      let histories = new Set(result.result.histories);
+      yield put({ type: "save", payload: { histories: [...histories] } });
+      if (callback) callback([...histories]);
     }
   },
 

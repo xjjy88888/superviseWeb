@@ -169,23 +169,6 @@ export default class SiderMenu extends PureComponent {
             <Menu.Item key={item.keys}>
               <Link to={item.path}>{item.title}</Link>
             </Menu.Item>
-            // <SubMenu
-            //   key={item.keys}
-            //   title={
-            //     <span>
-            //       <Icon type={item.icon} />
-            //       <Link to={item.path}>
-            //         <span>{item.title}</span>
-            //       </Link>
-            //     </span>
-            //   }
-            // >
-            //   {/* {item.items.map(ite => (
-            //     <Menu.Item key={ite.key}>
-            //       <Link to={ite.path}>{ite.text}</Link>
-            //     </Menu.Item>
-            //   ))} */}
-            // </SubMenu>
           ))}
         </Menu>
         <div className={styles.right} style={{ margin: "0 20px" }}>

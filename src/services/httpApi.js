@@ -295,11 +295,27 @@ export async function queryWFSLayer(params) {
   });
 }
 //根据地图当前范围获取对应历史影像数据接口
-export async function getInfoByExtent(params) {
+/*export async function getInfoByExtent(params) {
   return request(params.geojsonUrl, {
     method: "GET",
-    dataType: "json",
+    //dataType: "json",
+    dataType: "jsonp",
     headers: {
     }
+  });
+}*/
+export async function getInfoByExtent(params) {
+  //return request(`${config.mapUrl.getInfoByExtent}`, {
+  return request(`${config.url.queryWFSLayer}`, {
+    method: "POST",
+    dataType: "json",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify({
+      method: "get",
+      url: params.geojsonUrl
+    })
   });
 }

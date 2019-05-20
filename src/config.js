@@ -304,13 +304,13 @@ const config = {
   mapUrl: {
     SHP: `./mapfile/SHP/`,
     mapshaper: `./mapshaper/index.html`,
-    geoserverUrl: "http://10.7.23.177:8080/geoserver/ZKYGIS"
+    geoserverUrl: "http://10.7.23.177:8080/geoserver/ZKYGIS",
+    //根据地图当前范围获取对应历史影像数据接口
+    getInfoByExtent: `http://10.7.23.178/BasemapService/rest/image/latest/getInfoByExtent`,
   },
   mapLayersName: "ZKYGIS:bs_project_scope,ZKYGIS:bs_spot",
   mapProjectLayerName: "ZKYGIS:bs_project_scope",
   mapSpotLayerName: "ZKYGIS:bs_spot",
-  //根据地图当前范围获取对应历史影像数据接口
-  getInfoByExtent: `http://www.stbcjg.cn/BasemapService/rest/image/latest/getInfoByExtent`,
   legend: [
     {
       title: "扰动图斑_未关联_未复核",
