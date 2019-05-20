@@ -26,46 +26,53 @@ const config = {
     redLineByProjectIdUrl: `${domain_}api/services/app/ProjectScope/GetAll`,
 
     // id查询项目
-    projectByIdUrl: `${domain_}/api/services/app/Project/Get`,
+    projectByIdUrl: `${domain_}api/services/app/Project/Get`,
 
     // id查询图斑
-    spotByIdUrl: `${domain_}/api/services/app/Spot/Get`,
+    spotByIdUrl: `${domain_}api/services/app/Spot/Get`,
 
     // id查询标注点
-    pointByIdUrl: `${domain_}/api/services/app/MarkingPoint/Get`,
+    pointByIdUrl: `${domain_}api/services/app/MarkingPoint/Get`,
 
     // id查询标注点经纬度
-    pointSiteByIdUrl: `${domain_}/api/services/app/MarkingPoint/GetPoint`,
+    pointSiteByIdUrl: `${domain_}api/services/app/MarkingPoint/GetPoint`,
+
+    // 上传附件
+    uploadAsyncUrl: `${domain_}api/services/app/Attachment/UploadAsync`,
 
     // 项目位置
-    projectPositionUrl: `${domain_}/api/services/app/Project/GetPoint`,
+    projectPositionUrl: `${domain_}api/services/app/Attachment/UploadAsync`,
 
     // 行政区域
-    districtUrl: `${domain_}/api/services/app/User/GetDistrictCodesTree`,
+    districtUrl: `${domain_}api/services/app/User/GetDistrictCodesTree`,
 
     // 获取边界
-    boundaryUrl: `${domain_}/api/services/app/User/GetBoundAsync`,
+    boundaryUrl: `${domain_}api/services/app/User/GetBoundAsync`,
 
     // 腾讯地图
     // txRegionUrl: `https://apis.map.qq.com/ws/district/v1/list?key=${txKey}`,
     txRegionUrl: `http://api.tianditu.gov.cn/administrative?postStr={"searchWord":"北京","searchType":"1","needSubInfo":"false","needAll":"false","needPolygon":"true","needPre":"true"}&tk=e606f896eaad4c8ab29275f85861af96`,
 
     //编辑图斑图形
-    updateSpotGraphic: `${domain}/api/app/updateSpotGraphic`,
+    updateSpotGraphic: `${domain}api/app/updateSpotGraphic`,
+
     //编辑项目红线图形
-    updateProjectScopeGraphic: `${domain}/api/app/updateProjectScopeGraphic`,
+    updateProjectScopeGraphic: `${domain}api/app/updateProjectScopeGraphic`,
+
     //新增图斑图形
-    addSpotGraphic: `${domain}/api/app/addSpotGraphic`,
+    addSpotGraphic: `${domain}api/app/addSpotGraphic`,
+
     //新增项目红线图形
-    addProjectScopeGraphic: `${domain}/api/app/addProjectScopeGraphic`,
+    addProjectScopeGraphic: `${domain}api/app/addProjectScopeGraphic`,
+
     //删除图斑图形
-    removeSpotGraphic: `${domain}/api/app/removeSpotGraphic`,
+    removeSpotGraphic: `${domain}api/app/removeSpotGraphic`,
+
     //删除项目红线图形
-    removeProjectScopeGraphic: `${domain}/api/app/removeProjectScopeGraphic`,
+    removeProjectScopeGraphic: `${domain}api/app/removeProjectScopeGraphic`,
 
     //点查地图服务后台接口
     queryWFSLayer: `${domain_}api/Tool/Forward`
-
   },
 
   //扰动类型
@@ -302,7 +309,8 @@ const config = {
   mapLayersName: "ZKYGIS:bs_project_scope,ZKYGIS:bs_spot",
   mapProjectLayerName: "ZKYGIS:bs_project_scope",
   mapSpotLayerName: "ZKYGIS:bs_spot",
-
+  //根据地图当前范围获取对应历史影像数据接口
+  getInfoByExtent: `http://www.stbcjg.cn/BasemapService/rest/image/latest/getInfoByExtent`,
   legend: [
     {
       title: "扰动图斑_未关联_未复核",

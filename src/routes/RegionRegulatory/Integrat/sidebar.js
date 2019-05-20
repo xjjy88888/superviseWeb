@@ -92,20 +92,7 @@ export default class integrat extends PureComponent {
       listData: [],
       previewVisible: false,
       previewImage: "",
-      fileList: [
-        {
-          uid: "1",
-          name: "xxx.png",
-          status: "done",
-          url: "./img/logo2.jpg"
-        },
-        {
-          uid: "2",
-          name: "xxx.png",
-          status: "done",
-          url: "./img/spot.jpg"
-        }
-      ]
+      fileList: []
     };
     this.map = null;
   }
@@ -2509,7 +2496,7 @@ export default class integrat extends PureComponent {
             </div>
             <div style={{ marginTop: 20 }}>
               <Upload
-                action="http://aj.zkygis.cn/stbc/api/services/app/Attachment/UploadAsync"
+                action={config.url.uploadAsyncUrl}
                 headers={{ Authorization: `Bearer ${accessToken()}` }}
                 listType="picture-card"
                 fileList={fileList}

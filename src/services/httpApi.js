@@ -294,3 +294,12 @@ export async function queryWFSLayer(params) {
     })
   });
 }
+//根据地图当前范围获取对应历史影像数据接口
+export async function getInfoByExtent(params) {
+  return request(params.geojsonUrl, {
+    method: "GET",
+    dataType: "json",
+    headers: {
+    }
+  });
+}

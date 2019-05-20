@@ -1,7 +1,8 @@
 import {
   queryWFSLayer,
   boundaryApi,
-  projectPositionApi
+  projectPositionApi,
+  getInfoByExtent
 } from "../services/httpApi";
 export default {
   namespace: "mapdata",
@@ -33,6 +34,11 @@ export default {
       const { data: projectPosition } = yield call(projectPositionApi, payload.id);
       if (callback) callback(projectPosition);
       yield put({ type: "save", payload: { projectPosition } });
+    },
+    //根据地图当前范围获取对应历史影像数据接口
+    *getInfoByExtent({ payload, callback }, { call, put }) {
+      const { data: result } = yield call(getInfoByExtent, payload);
+      if (callback) callback(result);
     }
   },
 
