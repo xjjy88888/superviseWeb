@@ -58,7 +58,7 @@ export async function projectListApi(params) {
   });
 }
 
-// id查询项目
+// 项目信息
 export async function projectByIdApi(id) {
   return request(`${config.url.projectByIdUrl}?id=${id}`, {
     method: "GET",
@@ -81,6 +81,16 @@ export async function projectCreateUpdateApi(params) {
       body: JSON.stringify(params)
     }
   );
+}
+
+// 项目删除
+export async function projectDeleteApi(payload) {
+  return request(`${config.url.projectDeleteUrl}?id=${payload.id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
 }
 
 // 图斑列表

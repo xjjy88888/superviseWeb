@@ -16,7 +16,7 @@ const config = {
     // 项目列表
     projectListUrl: `${domain}api/services/app/Project/GetAllByPost`,
 
-    // id查询项目
+    // 项目信息
     projectByIdUrl: `${domain}api/services/app/Project/Get`,
 
     // 项目新建

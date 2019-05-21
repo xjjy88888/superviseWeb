@@ -9,6 +9,7 @@ import {
   addProjectScopeGraphic,
   redLineByProjectIdApi,
   projectCreateUpdateApi,
+  projectDeleteApi,
   removeProjectScopeGraphic
 } from "../services/httpApi";
 
@@ -54,7 +55,7 @@ export default {
       }
     },
 
-    // id查询项目
+    // 项目信息
     *queryProjectById({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result }
@@ -81,6 +82,19 @@ export default {
           message: `${payload.id ? "编辑" : "新建"}项目失败：${error.message}`
         });
       }
+    },
+
+    // 项目删除
+    *projectDelete({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result: response }
+      } = yield call(projectDeleteApi, payload);
+      if (callback) callback(success);
+      notification[success ? "success" : "error"]({
+        message: `删除项目${success ? "成功" : "失败"}${
+          success ? "" : `：${error.message}`
+        }`
+      });
     },
 
     // 项目id查询项目红线列表

@@ -32,6 +32,7 @@ import { getFile } from "../../../utils/util";
 import jQuery from "jquery";
 import { accessToken } from "../../../utils/util";
 
+let self;
 const { TreeNode } = Tree;
 const formItemLayout = {
   labelCol: { span: 7 },
@@ -101,6 +102,7 @@ export default class integrat extends PureComponent {
   }
 
   componentDidMount() {
+    self = this;
     console.log("贵阳至黄平高速公路", "六枝特区平寨镇跃进砂石厂");
     this.queryProject({ SkipCount: 0 });
     this.querySpot({ SkipCount: 0 });
@@ -397,7 +399,6 @@ export default class integrat extends PureComponent {
         if (result.replyDepartment) {
           arr.push(result.replyDepartment);
         }
-        console.log(arr);
         this.setState({ departList: [...departList, ...arr] });
       }
     });
@@ -633,6 +634,25 @@ export default class integrat extends PureComponent {
     } else {
       return "";
     }
+  };
+
+  projectDelete = id => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "project/projectDelete",
+      payload: {
+        id: id
+      },
+      callback: success => {
+        if (success) {
+          this.setState({ showProjectDetail: false });
+          emitter.emit("showProjectDetail", {
+            show: false,
+            edit: false
+          });
+        }
+      }
+    });
   };
 
   render() {
@@ -1655,11 +1675,9 @@ export default class integrat extends PureComponent {
                             okType: "danger",
                             cancelText: "否",
                             onOk() {
-                              console.log("OK");
+                              self.projectDelete(projectItem.id);
                             },
-                            onCancel() {
-                              console.log("Cancel");
-                            }
+                            onCancel() {}
                           });
                         }}
                       >
@@ -2679,7 +2697,7 @@ export default class integrat extends PureComponent {
                       okType: "danger",
                       cancelText: "否",
                       onOk() {
-                        console.log("OK");
+                        self.projectDelete(projectItem.id);
                       },
                       onCancel() {
                         console.log("Cancel");
