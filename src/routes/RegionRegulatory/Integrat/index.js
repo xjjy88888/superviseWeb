@@ -1639,12 +1639,15 @@ export default class integrat extends PureComponent {
   callbackGetInfoByExtent = data => {
     //const {selectLeftV, selectRightV} = this.state;
     //if (!selectLeftV) {
-      this.setState({ selectLeftV: data[0] });
+    //this.setState({ selectLeftV: data[0] });
     //}
     //if (!selectRightV) {
-      this.setState({ selectRightV: data[0] });
+    //this.setState({ selectRightV: data[0] });
     //}
-    if(userconfig.isLoadSideBySide){
+    if(userconfig.isLoadSideBySide || userconfig.sideBySideZoom !== map.getZoom()){
+      this.setState({ selectLeftV: data[0] });
+      this.setState({ selectRightV: data[0] });
+      userconfig.sideBySideZoom = map.getZoom();
       //移除卷帘效果
       this.removeSideBySide();
       this.addSideBySide();
@@ -1679,6 +1682,9 @@ export default class integrat extends PureComponent {
     .addTo(map);
     //userconfig.curleftlayer = userconfig.leftLayer;
     //userconfig.currightlayer = userconfig.rightLayer;
+    userconfig.sideBySide.on("dividermove",(e)=>{
+       console.log(e);
+    })
   };
   /*
    * 移除卷帘效果

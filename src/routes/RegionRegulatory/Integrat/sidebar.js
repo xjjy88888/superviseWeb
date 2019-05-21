@@ -379,6 +379,7 @@ export default class integrat extends PureComponent {
 
   queryProjectById = id => {
     const { dispatch } = this.props;
+    const { departList } = this.state;
     dispatch({
       type: "project/queryProjectById",
       payload: {
@@ -386,6 +387,18 @@ export default class integrat extends PureComponent {
       },
       callback: (result, success) => {
         this.setState({ showProjectDetail: success });
+        let arr = [];
+        if (result.productDepartment) {
+          arr.push(result.productDepartment);
+        }
+        if (result.supDepartment) {
+          arr.push(result.supDepartment);
+        }
+        if (result.replyDepartment) {
+          arr.push(result.replyDepartment);
+        }
+        console.log(arr);
+        this.setState({ departList: [...departList, ...arr] });
       }
     });
   };
@@ -559,17 +572,19 @@ export default class integrat extends PureComponent {
 
   getDepartKey = value => {
     const { departList } = this.state;
+    console.log(departList);
     if (value) {
       const filter = departList.filter(item => {
         return value === item.name;
       });
+      console.log(filter);
       return filter[0].id;
     } else {
       return "";
     }
   };
 
-  getDepartList = (value, key) => {
+  getDepartList = value => {
     const { dispatch } = this.props;
     const { departList } = this.state;
     dispatch({
@@ -612,6 +627,14 @@ export default class integrat extends PureComponent {
     }
   };
 
+  getDepartName = obj => {
+    if (obj) {
+      return obj.name;
+    } else {
+      return "";
+    }
+  };
+
   render() {
     const {
       show,
@@ -650,18 +673,17 @@ export default class integrat extends PureComponent {
       user: { districtList }
     } = this.props;
 
-    const projectItem = projectInfo;
-    // const projectItem = isProjectUpdate
-    //   ? projectInfo
-    //   : {
-    //       projectBase: { name: "" },
-    //       expand: {
-    //         designStartTime: "",
-    //         designCompTime: "",
-    //         actStartTime: "",
-    //         actCompTime: ""
-    //       }
-    //     };
+    const projectItem = isProjectUpdate
+      ? projectInfo
+      : {
+          projectBase: { name: "" },
+          expand: {
+            designStartTime: "",
+            designCompTime: "",
+            actStartTime: "",
+            actCompTime: ""
+          }
+        };
 
     const { getFieldDecorator } = this.props.form;
 
@@ -1533,15 +1555,21 @@ export default class integrat extends PureComponent {
                     >
                       <p style={{ marginBottom: 10 }}>
                         <span>建设单位：</span>
-                        {/* <span>{projectItem.productDepartment.name}</span> */}
+                        <span>
+                          {this.getDepartName(projectItem.productDepartment)}
+                        </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>监管单位：</span>
-                        {/* <span>{projectItem.supDepartment.name}</span> */}
+                        <span>
+                          {this.getDepartName(projectItem.supDepartment)}
+                        </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>批复机构：</span>
-                        {/* <span>{projectItem.replyDepartment.name}</span> */}
+                        <span>
+                          {this.getDepartName(projectItem.replyDepartment)}
+                        </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>流域管理机构：</span>
@@ -2414,16 +2442,15 @@ export default class integrat extends PureComponent {
                 </Form.Item>
                 <Form.Item label="建设单位" {...formItemLayout}>
                   {getFieldDecorator("productDepartmentId", {
-                    // initialValue: projectItem.productDepartment.name
+                    initialValue: this.getDepartName(
+                      projectItem.productDepartment
+                    )
                   })(
                     <Input.TextArea
                       autosize
                       onBlur={() => {
                         this.props.form.validateFields((err, v) => {
-                          this.getDepartList(
-                            v.productDepartmentId,
-                            "productDepartmentId"
-                          );
+                          this.getDepartList(v.productDepartmentId);
                         });
                       }}
                     />
@@ -2431,13 +2458,33 @@ export default class integrat extends PureComponent {
                 </Form.Item>
                 <Form.Item label="监管单位" {...formItemLayout}>
                   {getFieldDecorator("supDepartmentId", {
-                    // initialValue: projectItem.supDepartment
-                  })(<Input.TextArea autosize />)}
+                    initialValue: this.getDepartName(projectItem.supDepartment)
+                  })(
+                    <Input.TextArea
+                      autosize
+                      onBlur={() => {
+                        this.props.form.validateFields((err, v) => {
+                          this.getDepartList(v.supDepartmentId);
+                        });
+                      }}
+                    />
+                  )}
                 </Form.Item>
                 <Form.Item label="批复机构" {...formItemLayout}>
                   {getFieldDecorator("replyDepartmentId", {
-                    // initialValue: projectItem.replyDepartment
-                  })(<Input.TextArea autosize />)}
+                    initialValue: this.getDepartName(
+                      projectItem.replyDepartment
+                    )
+                  })(
+                    <Input.TextArea
+                      autosize
+                      onBlur={() => {
+                        this.props.form.validateFields((err, v) => {
+                          this.getDepartList(v.replyDepartmentId);
+                        });
+                      }}
+                    />
+                  )}
                 </Form.Item>
                 <Form.Item label="流域管理机构" {...formItemLayout}>
                   {getFieldDecorator("ctn_code111", {

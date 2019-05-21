@@ -20,9 +20,6 @@ export default {
     projectInfoRedLineList: { totalCount: "", items: [] },
     projectInfo: {
       projectBase: { name: "" },
-      productDepartment: { name: "" },
-      supDepartment: { name: "" },
-      replyDepartment: { name: "" },
       expand: {
         designStartTime: "",
         designCompTime: "",
