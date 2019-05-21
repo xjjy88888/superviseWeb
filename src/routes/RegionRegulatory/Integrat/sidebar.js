@@ -23,6 +23,7 @@ import {
   Table,
   Collapse
 } from "antd";
+import moment from "moment";
 import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
 import config from "../../../config";
@@ -554,8 +555,8 @@ export default class integrat extends PureComponent {
     } = this.props;
     if (value) {
       const filter = dicList.filter(item => {
-        // return item.dictTypeName === type && item.value === value;
-        return item.value === value;
+        return item.dictTypeName === type && item.value === value;
+        // return item.value === value;
       });
       return filter.map(item => item.id).join(",");
     } else {
@@ -1507,8 +1508,8 @@ export default class integrat extends PureComponent {
                         <span>{projectItem.projectLevel}</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
-                        <span>扰动合规性</span>
-                        <span>空</span>
+                        <span>扰动合规性：</span>
+                        <span>{projectItem.expand.compliance}</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>项目类别：</span>
@@ -1520,7 +1521,7 @@ export default class integrat extends PureComponent {
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>建设状态：</span>
-                        <span>空</span>
+                        <span>{projectItem.projectStatus}</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>项目性质：</span>
@@ -1528,11 +1529,11 @@ export default class integrat extends PureComponent {
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>涉及县：</span>
-                        <span>空</span>
+                        <span>{projectItem.projectBase.districtCodes}</span>
                       </p>
                       <p style={{ textAlign: "justify" }}>
                         <span>备注：</span>
-                        <span>空</span>
+                        <span>{projectItem.description}</span>
                       </p>
                       <a
                         style={{
@@ -2381,7 +2382,7 @@ export default class integrat extends PureComponent {
                 </Form.Item>
                 <Form.Item label="批复时间" {...formItemLayout}>
                   {getFieldDecorator("replyTime", {
-                    // initialValue: projectItem.replyTime
+                    initialValue: moment(projectItem.replyTime)
                   })(<DatePicker />)}
                 </Form.Item>
                 <Form.Item label="责任面积" {...formItemLayout}>
@@ -2421,7 +2422,7 @@ export default class integrat extends PureComponent {
                 </Form.Item>
                 <Form.Item label="项目类别" {...formItemLayout}>
                   {getFieldDecorator("projectCateId", {
-                    initialValue: "建设类"
+                    initialValue: projectItem.expand.projectCate
                   })(
                     <AutoComplete
                       placeholder="请选择项目类别"
@@ -2436,7 +2437,7 @@ export default class integrat extends PureComponent {
                 </Form.Item>
                 <Form.Item label="项目类型" {...formItemLayout}>
                   {getFieldDecorator("projectTypeId", {
-                    initialValue: "铁路工程"
+                    initialValue: projectItem.expand.projectType
                   })(
                     <AutoComplete
                       placeholder="请选择项目类型"
@@ -2451,7 +2452,7 @@ export default class integrat extends PureComponent {
                 </Form.Item>
                 <Form.Item label="建设状态" {...formItemLayout}>
                   {getFieldDecorator("projectStatusId", {
-                    initialValue: "未开工"
+                    initialValue: projectItem.projectStatus
                   })(
                     <AutoComplete
                       placeholder="请选择建设状态"
@@ -2465,7 +2466,9 @@ export default class integrat extends PureComponent {
                   )}
                 </Form.Item>
                 <Form.Item label="项目性质" {...formItemLayout}>
-                  {getFieldDecorator("projectNatId", { initialValue: "新建" })(
+                  {getFieldDecorator("projectNatId", {
+                    initialValue: projectItem.expand.projectNat
+                  })(
                     <AutoComplete
                       placeholder="请选择项目性质"
                       dataSource={config.project_nature}
