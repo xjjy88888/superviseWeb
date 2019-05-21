@@ -36,7 +36,7 @@ export default {
         yield put(routerRedux.replace("/regionRegulatory/integrat"));
       } else {
         notification["error"]({
-          message: response.error.message
+          message: `登录失败：${response.error.message}`
         });
       }
     },

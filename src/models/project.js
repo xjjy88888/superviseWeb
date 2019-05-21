@@ -8,6 +8,7 @@ import {
   updateProjectScopeGraphic,
   addProjectScopeGraphic,
   redLineByProjectIdApi,
+  projectCreateUpdateApi,
   removeProjectScopeGraphic
 } from "../services/httpApi";
 
@@ -37,7 +38,7 @@ export default {
     *queryProject({ payload, callback }, { call, put }) {
       const items_old = payload.items;
       const {
-        data: { success, result: projectList }
+        data: { success, error, result: projectList }
       } = yield call(projectListApi, payload);
       if (success) {
         const data = {
@@ -48,7 +49,7 @@ export default {
         if (callback) callback(data);
       } else {
         notification["error"]({
-          message: "查询项目列表失败"
+          message: `查询项目列表失败：${error.message}`
         });
       }
     },
@@ -56,14 +57,28 @@ export default {
     // id查询项目
     *queryProjectById({ payload, callback }, { call, put }) {
       const {
-        data: { success, result }
+        data: { success, error, result }
       } = yield call(projectByIdApi, payload.id);
       if (success) {
         yield put({ type: "save", payload: { projectItem: result } });
         if (callback) callback(result, success);
       } else {
         notification["error"]({
-          message: "查询项目信息失败"
+          message: `查询项目信息失败：${error.message}`
+        });
+      }
+    },
+
+    // 项目新建-编辑
+    *projectCreateUpdate({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result: response }
+      } = yield call(projectCreateUpdateApi, payload);
+      if (success) {
+        if (callback) callback(success, response);
+      } else {
+        notification["error"]({
+          message: `${payload.id ? "编辑" : "新建"}项目失败：${error.message}`
         });
       }
     },
@@ -71,13 +86,13 @@ export default {
     // 项目id查询项目红线列表
     *queryRedLineByProjectId({ payload }, { call, put }) {
       const {
-        data: { success, result: projectInfoRedLineList }
+        data: { success, error, result: projectInfoRedLineList }
       } = yield call(redLineByProjectIdApi, payload.ProjectId);
       if (success) {
         yield put({ type: "save", payload: { projectInfoRedLineList } });
       } else {
         notification["error"]({
-          message: "查询项目关联红线列表失败"
+          message: `查询项目关联红线列表失败：${error.message}`
         });
       }
     },
@@ -90,6 +105,7 @@ export default {
       yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);
     },
+
     *addSpotGraphic({ payload, callback }, { call, put }) {
       const { data: obj } = yield call(addSpotGraphic, payload);
       notification[obj ? "success" : "error"]({
@@ -98,6 +114,7 @@ export default {
       yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);
     },
+
     *removeSpotGraphic({ payload, callback }, { call, put }) {
       const { data: obj } = yield call(removeSpotGraphic, payload.spot_tbid);
       notification[obj ? "success" : "error"]({
@@ -106,6 +123,7 @@ export default {
       yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);
     },
+
     *updateProjectScopeGraphic({ payload, callback }, { call, put }) {
       const { data: obj } = yield call(updateProjectScopeGraphic, payload);
       notification[obj ? "success" : "error"]({
@@ -114,6 +132,7 @@ export default {
       yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);
     },
+
     *addProjectScopeGraphic({ payload, callback }, { call, put }) {
       const { data: obj } = yield call(addProjectScopeGraphic, payload);
       notification[obj ? "success" : "error"]({
@@ -122,6 +141,7 @@ export default {
       yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);
     },
+
     *removeProjectScopeGraphic({ payload, callback }, { call, put }) {
       const { data: obj } = yield call(
         removeProjectScopeGraphic,

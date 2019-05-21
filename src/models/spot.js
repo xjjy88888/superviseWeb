@@ -19,7 +19,7 @@ export default {
     *querySpot({ payload, callback }, { call, put }) {
       const items_old = payload.items;
       const {
-        data: { success, result: spotList }
+        data: { success, error, result: spotList }
       } = yield call(spotListApi, payload);
       if (success) {
         const data = {
@@ -30,7 +30,7 @@ export default {
         if (callback) callback(data);
       } else {
         notification["error"]({
-          message: "查询图斑列表失败"
+          message: `查询图斑列表失败：${error.message}`
         });
       }
     },
@@ -38,13 +38,13 @@ export default {
     // 项目id查图斑列表
     *querySpotByProjectId({ payload }, { call, put }) {
       const {
-        data: { success, result: projectInfoSpotList }
+        data: { success, error, result: projectInfoSpotList }
       } = yield call(spotListApi, payload);
       if (success) {
         yield put({ type: "save", payload: { projectInfoSpotList } });
       } else {
         notification["error"]({
-          message: "查询项目关联图斑列表失败"
+          message: `查询项目关联图斑列表失败：${error.message}`
         });
       }
     },
@@ -52,14 +52,14 @@ export default {
     // id查询图斑
     *querySpotById({ payload, callback }, { call, put }) {
       const {
-        data: { success, result }
+        data: { success, error, result }
       } = yield call(spotByIdApi, payload.id);
       if (success) {
         yield put({ type: "save", payload: { spotItem: result } });
         if (callback) callback(result);
       } else {
         notification["error"]({
-          message: "查询图斑信息失败"
+          message: `查询图斑信息失败：${error.message}`
         });
       }
     }

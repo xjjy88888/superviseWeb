@@ -763,18 +763,21 @@ export default class integrat extends PureComponent {
     //根据地图当前范围获取对应历史影像数据
     const { showHistoryContrast } = me.state;
     if (showHistoryContrast) {
-      me.getInfoByExtent(zoom, bounds);
+      me.getInfoByExtent(zoom, bounds,me.callbackGetInfoByExtent,false);
     }
   };
   /*根据地图当前范围获取对应历史影像数据
    *@method getInfoByExtent
    *@param zoom 地图当前范围级别
    *@param bounds 地图当前范围
+   *@param callback 回调函数
+   *@param isLoadSideBySide 是否重新加载地图卷帘
    *@return null
    */
-  getInfoByExtent = (zoom, bounds) => {
+  getInfoByExtent = (zoom, bounds,callback,isLoadSideBySide) => {
     const { selectLeftV, selectRightV } = this.state;
     const me = this;
+    userconfig.isLoadSideBySide = isLoadSideBySide;
     let urlString = config.mapUrl.getInfoByExtent;
     let xyMin = proj4("EPSG:4326", "EPSG:3857", [
       bounds.getSouthWest().lng,
@@ -795,14 +798,7 @@ export default class integrat extends PureComponent {
     me.props.dispatch({
       type: "mapdata/getInfoByExtent",
       payload: { geojsonUrl },
-      callback: data => {
-        if (!selectLeftV) {
-          this.setState({ selectLeftV: data[0] });
-        }
-        if (!selectRightV) {
-          this.setState({ selectRightV: data[0] });
-        }
-      }
+      callback:callback
     });
   };
   /*属性查询图层
@@ -1624,9 +1620,12 @@ export default class integrat extends PureComponent {
   showHistoryMap = () => {
     const { showHistoryContrast } = this.state;
     if (showHistoryContrast) {
+      let zoom = map.getZoom();
+      let bounds = map.getBounds();
+      this.getInfoByExtent(zoom, bounds,this.callbackGetInfoByExtent,true);
       //移除卷帘效果
-      this.removeSideBySide();
-      this.addSideBySide();
+      //this.removeSideBySide();
+      //this.addSideBySide();
     } else {
       //移除卷帘效果
       this.removeSideBySide();
@@ -1635,18 +1634,51 @@ export default class integrat extends PureComponent {
     }
   };
   /*
+   * 根据地图当前范围获取对应历史影像数据回调函数
+  */
+  callbackGetInfoByExtent = data => {
+    //const {selectLeftV, selectRightV} = this.state;
+    //if (!selectLeftV) {
+      this.setState({ selectLeftV: data[0] });
+    //}
+    //if (!selectRightV) {
+      this.setState({ selectRightV: data[0] });
+    //}
+    if(userconfig.isLoadSideBySide){
+      //移除卷帘效果
+      this.removeSideBySide();
+      this.addSideBySide();
+    }
+  };
+  /*
    * 添加卷帘效果
    */
   addSideBySide = () => {
-    //map.addLayer(userconfig.baseLayer3);
-    map.addLayer(userconfig.baseLayer1);
+    /*map.addLayer(userconfig.baseLayer1);
     map.addLayer(userconfig.baseLayer2);
     //卷帘地图效果
     userconfig.sideBySide = L.control
       .sideBySide(userconfig.baseLayer2, userconfig.baseLayer1)
       .addTo(map);
     userconfig.curleftlayer = userconfig.baseLayer2;
-    userconfig.currightlayer = userconfig.baseLayer1;
+    userconfig.currightlayer = userconfig.baseLayer1;*/
+    const {selectLeftV, selectRightV} = this.state;
+    let leftLayerUrl =  config.imageBaseUrl + "/" + selectLeftV.replace(/\//g, "-")+"/tile/{z}/{y}/{x}";
+    userconfig.leftLayer = L.tileLayer(
+      leftLayerUrl
+    ); //左侧影像
+    map.addLayer(userconfig.leftLayer);
+    let rightLayerUrl =  config.imageBaseUrl + "/" + selectRightV.replace(/\//g, "-")+"/tile/{z}/{y}/{x}";
+    userconfig.rightLayer = L.tileLayer(
+      rightLayerUrl
+    ); //右侧影像
+    map.addLayer(userconfig.rightLayer);
+    //卷帘地图效果
+    userconfig.sideBySide = L.control
+    .sideBySide(userconfig.leftLayer, userconfig.rightLayer)
+    .addTo(map);
+    //userconfig.curleftlayer = userconfig.leftLayer;
+    //userconfig.currightlayer = userconfig.rightLayer;
   };
   /*
    * 移除卷帘效果
@@ -1661,12 +1693,15 @@ export default class integrat extends PureComponent {
       map.removeLayer(userconfig.baseLayer2);
     if (map.hasLayer(userconfig.baseLayer3))
       map.removeLayer(userconfig.baseLayer3);
+    if (map.hasLayer(userconfig.leftLayer))
+      map.removeLayer(userconfig.leftLayer);
+    if (map.hasLayer(userconfig.rightLayer))
+      map.removeLayer(userconfig.rightLayer);
   };
   onChangeSelectLeft = v => {
-    console.log(v);
+    //console.log(v);
     this.setState({ selectLeftV: v });
-    return;
-    let layer;
+    /*let layer;
     switch (v) {
       case "1":
         layer = userconfig.baseLayer1;
@@ -1687,13 +1722,30 @@ export default class integrat extends PureComponent {
     map.addLayer(userconfig.currightlayer);
     userconfig.sideBySide.setLeftLayers(layer);
     userconfig.curleftlayer = layer;
-    userconfig.sideBySide.setRightLayers(userconfig.currightlayer);
+    userconfig.sideBySide.setRightLayers(userconfig.currightlayer);*/
+    const {selectRightV} = this.state;
+    if (map.hasLayer(userconfig.leftLayer))
+      map.removeLayer(userconfig.leftLayer);
+    if (map.hasLayer(userconfig.rightLayer))
+      map.removeLayer(userconfig.rightLayer);
+
+    let leftLayerUrl =  config.imageBaseUrl + "/" + v.replace(/\//g, "-")+"/tile/{z}/{y}/{x}";
+    userconfig.leftLayer = L.tileLayer(
+      leftLayerUrl
+    ); //左侧影像
+    map.addLayer(userconfig.leftLayer);
+    let rightLayerUrl =  config.imageBaseUrl + "/" + selectRightV.replace(/\//g, "-")+"/tile/{z}/{y}/{x}";
+    userconfig.rightLayer = L.tileLayer(
+      rightLayerUrl
+    ); //右侧影像
+    map.addLayer(userconfig.rightLayer);
+    userconfig.sideBySide.setLeftLayers(userconfig.leftLayer);
+    userconfig.sideBySide.setRightLayers(userconfig.rightLayer);
+
   };
   onChangeSelectRight = v => {
     this.setState({ selectRightV: v });
-    //console.log(v);
-    return;
-    let layer;
+    /*let layer;
     switch (v) {
       case "1":
         layer = userconfig.baseLayer1;
@@ -1714,7 +1766,25 @@ export default class integrat extends PureComponent {
     map.addLayer(userconfig.curleftlayer);
     userconfig.sideBySide.setLeftLayers(userconfig.curleftlayer);
     userconfig.sideBySide.setRightLayers(layer);
-    userconfig.currightlayer = layer;
+    userconfig.currightlayer = layer;*/
+    const {selectLeftV} = this.state;
+    if (map.hasLayer(userconfig.leftLayer))
+      map.removeLayer(userconfig.leftLayer);
+    if (map.hasLayer(userconfig.rightLayer))
+      map.removeLayer(userconfig.rightLayer);
+
+    let leftLayerUrl =  config.imageBaseUrl + "/" + selectLeftV.replace(/\//g, "-")+"/tile/{z}/{y}/{x}";
+    userconfig.leftLayer = L.tileLayer(
+      leftLayerUrl
+    ); //左侧影像
+    map.addLayer(userconfig.leftLayer);
+    let rightLayerUrl =  config.imageBaseUrl + "/" + v.replace(/\//g, "-")+"/tile/{z}/{y}/{x}";
+    userconfig.rightLayer = L.tileLayer(
+      rightLayerUrl
+    ); //右侧影像
+    map.addLayer(userconfig.rightLayer);
+    userconfig.sideBySide.setLeftLayers(userconfig.leftLayer);
+    userconfig.sideBySide.setRightLayers(userconfig.rightLayer);
   };
 
   render() {

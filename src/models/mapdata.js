@@ -42,8 +42,8 @@ export default {
     *getInfoByExtent({ payload, callback }, { call, put }) {
       const { data: result } = yield call(getInfoByExtent, payload);
       let histories = new Set(result.result.histories);
-      yield put({ type: "save", payload: { histories: [...histories] } });
-      if (callback) callback([...histories]);
+      yield put({ type: "save", payload: { histories: [...histories].reverse() } });
+      if (callback) callback([...histories].reverse());
     }
   },
 

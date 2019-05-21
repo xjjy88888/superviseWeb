@@ -58,6 +58,31 @@ export async function projectListApi(params) {
   });
 }
 
+// id查询项目
+export async function projectByIdApi(id) {
+  return request(`${config.url.projectByIdUrl}?id=${id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 项目新建-编辑
+export async function projectCreateUpdateApi(params) {
+  return request(
+    params.id ? config.url.projectUpdateUrl : config.url.projectCreateUrl,
+    {
+      method: params.id ? "PUT" : "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify(params)
+    }
+  );
+}
+
 // 图斑列表
 export async function spotListApi(params) {
   delete params.items;
@@ -118,16 +143,6 @@ export async function redLineByProjectIdApi(ProjectId) {
   );
 }
 
-// id查询项目
-export async function projectByIdApi(id) {
-  return request(`${config.url.projectByIdUrl}?id=${id}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken()}`
-    }
-  });
-}
-
 // id查询图斑
 export async function spotByIdApi(id) {
   return request(`${config.url.spotByIdUrl}?id=${id}`, {
@@ -160,7 +175,8 @@ export async function pointSiteByIdApi(id) {
 
 // 字典
 export async function dictApi() {
-  const values = "扰动类型,扰动变化类型,合规性,建设状态,立项级别,项目类型,项目类别,项目性质,矢量化类型";
+  const values =
+    "扰动类型,扰动变化类型,合规性,建设状态,立项级别,项目类型,项目类别,项目性质,矢量化类型";
   return request(`${config.url.dictUrl}?DictTypeName=${values}`, {
     method: "GET",
     headers: {

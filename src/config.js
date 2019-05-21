@@ -1,5 +1,6 @@
 const domain = "http://aj.zkygis.cn/dutySys";
 const domain_ = "http://aj.zkygis.cn/stbc/";
+const imageBaseUrl = "http://10.7.23.178/BasemapService/rest/image";
 // const txKey = "TERBZ-ZU46D-KZT46-HZZIB-RNDMZ-7GFP3";
 
 const color_back_spot = "rgba(255,255,0,0.4)"; //背景色-图斑
@@ -16,6 +17,18 @@ const config = {
     // 项目列表
     projectListUrl: `${domain_}api/services/app/Project/GetAllByPost`,
 
+    // id查询项目
+    projectByIdUrl: `${domain_}api/services/app/Project/Get`,
+
+    // 项目新建
+    projectCreateUrl: `${domain_}api/services/app/Project/Create`,
+
+    // 项目编辑
+    projectUpdateUrl: `${domain_}api/services/app/Project/Update`,
+
+    // 项目删除
+    projectDeleteUrl: `${domain_}api/services/app/Project/Delete`,
+
     // 图斑列表
     spotListUrl: `${domain_}api/services/app/Spot/GetAllByPost`,
 
@@ -24,9 +37,6 @@ const config = {
 
     // 项目id查询项目红线列表
     redLineByProjectIdUrl: `${domain_}api/services/app/ProjectScope/GetAll`,
-
-    // id查询项目
-    projectByIdUrl: `${domain_}api/services/app/Project/Get`,
 
     // id查询图斑
     spotByIdUrl: `${domain_}api/services/app/Spot/Get`,
@@ -279,6 +289,7 @@ const config = {
       icon: "border-inner"
     }
   ],
+  imageBaseUrl:imageBaseUrl,
 
   /*----------------------------------地图配置部分-------------------------------------*/
   mapInitParams: {
@@ -301,7 +312,7 @@ const config = {
       label: "监管影像",
       className: "imgType",
       Url:
-        "http://www.stbcjg.cn/BasemapService/rest/image/latest/tile/{z}/{y}/{x}"
+         `${imageBaseUrl}/latest/tile/{z}/{y}/{x}`
     }
   ],
   mapUrl: {
@@ -309,7 +320,7 @@ const config = {
     mapshaper: `./mapshaper/index.html`,
     geoserverUrl: "http://10.7.23.177:8080/geoserver/ZKYGIS",
     //根据地图当前范围获取对应历史影像数据接口
-    getInfoByExtent: `http://10.7.23.178/BasemapService/rest/image/latest/getInfoByExtent`,
+    getInfoByExtent: `${imageBaseUrl}/latest/getInfoByExtent`,
   },
   mapLayersName: "ZKYGIS:bs_project_scope,ZKYGIS:bs_spot",
   mapProjectLayerName: "ZKYGIS:bs_project_scope",
