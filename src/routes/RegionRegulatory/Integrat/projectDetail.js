@@ -52,17 +52,22 @@ export default class integrat extends PureComponent {
       });
     });
     this.eventEmitter = emitter.addListener("projectCreateUpdate", data => {
-      dispatch({
-        type: "project/projectCreateUpdate",
-        payload: data,
-        callback: (success, response) => {
-          if (success) {
-            emitter.emit("projectCreateUpdateBack", {});
-            notification["success"]({
-              message: `${data.id ? "编辑" : "新建"}项目成功`
-            });
+      //submit
+
+      this.props.form.validateFields((err, values) => {
+        console.log(values);
+        dispatch({
+          type: "project/projectCreateUpdate",
+          payload: { ...data, ...values },
+          callback: (success, response) => {
+            if (success) {
+              emitter.emit("projectCreateUpdateBack", {});
+              notification["success"]({
+                message: `${data.id ? "编辑" : "新建"}项目成功`
+              });
+            }
           }
-        }
+        });
       });
     });
   }

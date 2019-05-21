@@ -1405,7 +1405,7 @@ export default class integrat extends PureComponent {
                 }}
                 onClick={() => {
                   if (projectEdit) {
-                    //保存
+                    //submit
                     this.props.form.validateFields((err, values) => {
                       if (!err) {
                         console.log(values);
