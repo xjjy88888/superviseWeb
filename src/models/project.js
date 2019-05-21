@@ -18,7 +18,7 @@ export default {
   state: {
     projectList: { totalCount: "", items: [] },
     projectInfoRedLineList: { totalCount: "", items: [] },
-    projectItem: {
+    projectInfo: {
       projectBase: { name: "" },
       expand: {
         designStartTime: "",
@@ -60,7 +60,7 @@ export default {
         data: { success, error, result }
       } = yield call(projectByIdApi, payload.id);
       if (success) {
-        yield put({ type: "save", payload: { projectItem: result } });
+        yield put({ type: "save", payload: { projectInfo: result } });
         if (callback) callback(result, success);
       } else {
         notification["error"]({

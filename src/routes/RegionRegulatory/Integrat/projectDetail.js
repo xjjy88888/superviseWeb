@@ -6,6 +6,7 @@ import {
   Button,
   Input,
   Radio,
+  notification,
   Upload,
   Divider,
   Form,
@@ -38,6 +39,7 @@ export default class integrat extends PureComponent {
   }
 
   componentDidMount() {
+    const { dispatch } = this.props;
     const maxYear = new Date().getFullYear();
     for (let i = maxYear; i >= 1970; i--) {
       yearDataSource.push(`${i}年`);
@@ -46,6 +48,20 @@ export default class integrat extends PureComponent {
       this.setState({
         show: data.show,
         edit: data.edit
+      });
+    });
+    this.eventEmitter = emitter.addListener("projectCreateUpdate", data => {
+      dispatch({
+        type: "project/projectCreateUpdate",
+        payload: data,
+        callback: (success, response) => {
+          if (success) {
+            emitter.emit("projectCreateUpdateBack", {});
+            notification["success"]({
+              message: `${data.id ? "编辑" : "新建"}项目成功`
+            });
+          }
+        }
       });
     });
   }
@@ -76,8 +92,10 @@ export default class integrat extends PureComponent {
     const { show, edit } = this.state;
 
     const {
-      project: { projectItem }
+      project: { projectInfo }
     } = this.props;
+
+    const projectItem = projectInfo;
 
     return (
       <div

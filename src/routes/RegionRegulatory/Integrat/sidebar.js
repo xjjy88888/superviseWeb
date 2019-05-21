@@ -61,6 +61,7 @@ export default class integrat extends PureComponent {
       showCheck: false,
       checked: false,
       showSpin: true,
+      isProjectUpdate: true,
       queryHighlight: false,
       row_pro: 10,
       row_spot: 10,
@@ -105,6 +106,12 @@ export default class integrat extends PureComponent {
     this.queryPoint({ SkipCount: 0 });
     this.queryDistrict();
     this.queryDict();
+    this.eventEmitter = emitter.addListener("projectCreateUpdateBack", () => {
+      this.closeAll();
+      this.setState({
+        showProjectDetail: false
+      });
+    });
     this.eventEmitter = emitter.addListener("siteLocationBack", data => {
       this.props.form.setFieldsValue({
         latitude: data.latitude,
@@ -610,11 +617,23 @@ export default class integrat extends PureComponent {
     } = this.state;
     const {
       dispatch,
-      project: { projectList, projectItem, projectInfoRedLineList },
+      project: { projectList, projectInfo, projectInfoRedLineList },
       spot: { spotList, projectInfoSpotList },
       point: { pointList },
       user: { districtList }
     } = this.props;
+
+    const projectItem = isProjectUpdate
+      ? projectInfo
+      : {
+          projectBase: { name: "" },
+          expand: {
+            designStartTime: "",
+            designCompTime: "",
+            actStartTime: "",
+            actCompTime: ""
+          }
+        };
 
     const { getFieldDecorator } = this.props.form;
 
@@ -1339,51 +1358,35 @@ export default class integrat extends PureComponent {
                     this.props.form.validateFields((err, values) => {
                       if (!err) {
                         console.log(values);
-                        dispatch({
-                          type: "project/projectCreateUpdate",
-                          payload: {
-                            ...values,
-                            projectLevelId: this.getDictKey(
-                              values.projectLevelId,
-                              "立项级别"
-                            ),
-                            complianceId: this.getDictKey(
-                              values.complianceId,
-                              "扰动范围"
-                            ),
-                            projectCateId: this.getDictKey(
-                              values.projectCateId,
-                              "项目类别"
-                            ),
-                            projectTypeId: this.getDictKey(
-                              values.projectTypeId,
-                              "项目类型"
-                            ),
-                            projectStatusId: this.getDictKey(
-                              values.projectStatusId,
-                              "建设状态"
-                            ),
-                            projectNatId: this.getDictKey(
-                              values.projectNatId,
-                              "项目性质"
-                            ),
-                            id: isProjectUpdate ? projectItem.id : ""
-                          },
-                          callback: (success, response) => {
-                            if (success) {
-                              this.closeAll();
-                              this.setState({
-                                projectEdit: !projectEdit,
-                                showProjectDetail: false
-                              });
-                              notification["success"]({
-                                message: `${
-                                  isProjectUpdate ? "编辑" : "新建"
-                                }项目成功`
-                              });
-                            }
-                          }
-                        });
+                        const data = {
+                          ...values,
+                          projectLevelId: this.getDictKey(
+                            values.projectLevelId,
+                            "立项级别"
+                          ),
+                          complianceId: this.getDictKey(
+                            values.complianceId,
+                            "扰动范围"
+                          ),
+                          projectCateId: this.getDictKey(
+                            values.projectCateId,
+                            "项目类别"
+                          ),
+                          projectTypeId: this.getDictKey(
+                            values.projectTypeId,
+                            "项目类型"
+                          ),
+                          projectStatusId: this.getDictKey(
+                            values.projectStatusId,
+                            "建设状态"
+                          ),
+                          projectNatId: this.getDictKey(
+                            values.projectNatId,
+                            "项目性质"
+                          ),
+                          id: isProjectUpdate ? projectItem.id : ""
+                        };
+                        emitter.emit("projectCreateUpdate", data);
                       }
                     });
                   } else {
