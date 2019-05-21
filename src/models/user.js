@@ -11,7 +11,8 @@ export default {
         us_name: "请登录"
       }
     ],
-    districtList: []
+    districtList: [],
+    dicList: [],
   },
 
   subscriptions: {

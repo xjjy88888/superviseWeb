@@ -564,6 +564,20 @@ export default class integrat extends PureComponent {
     }
   };
 
+  getDictList = type => {
+    const {
+      user: { dicList }
+    } = this.props;
+    if (type) {
+      const filter = dicList.filter(item => {
+        return item.dictTypeName === type;
+      });
+      return filter.map(item => item.value);
+    } else {
+      return [];
+    }
+  };
+
   render() {
     const {
       show,
@@ -601,6 +615,7 @@ export default class integrat extends PureComponent {
       point: { pointList },
       user: { districtList }
     } = this.props;
+
     const { getFieldDecorator } = this.props.form;
 
     const showPoint = key === "point";
@@ -902,6 +917,7 @@ export default class integrat extends PureComponent {
                   previewVisible_min_left: false,
                   isProjectUpdate: false
                 });
+                this.props.form.resetFields();
                 emitter.emit("showProjectDetail", {
                   show: true,
                   edit: true
@@ -2396,7 +2412,7 @@ export default class integrat extends PureComponent {
                   })(
                     <AutoComplete
                       placeholder="请选择立项级别"
-                      dataSource={config.approval_level}
+                      dataSource={this.getDictList("立项级别")}
                       filterOption={(inputValue, option) =>
                         option.props.children
                           .toUpperCase()
@@ -2411,7 +2427,7 @@ export default class integrat extends PureComponent {
                   })(
                     <AutoComplete
                       placeholder="请选择扰动范围"
-                      dataSource={config.compliance}
+                      dataSource={this.getDictList("扰动合规性")}
                       filterOption={(inputValue, option) =>
                         option.props.children
                           .toUpperCase()
@@ -2426,7 +2442,7 @@ export default class integrat extends PureComponent {
                   })(
                     <AutoComplete
                       placeholder="请选择项目类别"
-                      dataSource={config.project_category}
+                      dataSource={this.getDictList("项目类别")}
                       filterOption={(inputValue, option) =>
                         option.props.children
                           .toUpperCase()
@@ -2441,7 +2457,7 @@ export default class integrat extends PureComponent {
                   })(
                     <AutoComplete
                       placeholder="请选择项目类型"
-                      dataSource={config.project_type}
+                      dataSource={this.getDictList("项目类型")}
                       filterOption={(inputValue, option) =>
                         option.props.children
                           .toUpperCase()
@@ -2456,7 +2472,7 @@ export default class integrat extends PureComponent {
                   })(
                     <AutoComplete
                       placeholder="请选择建设状态"
-                      dataSource={config.construct_state}
+                      dataSource={this.getDictList("建设状态")}
                       filterOption={(inputValue, option) =>
                         option.props.children
                           .toUpperCase()
@@ -2471,7 +2487,7 @@ export default class integrat extends PureComponent {
                   })(
                     <AutoComplete
                       placeholder="请选择项目性质"
-                      dataSource={config.project_nature}
+                      dataSource={this.getDictList("项目性质")}
                       filterOption={(inputValue, option) =>
                         option.props.children
                           .toUpperCase()
