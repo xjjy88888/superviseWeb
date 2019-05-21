@@ -175,9 +175,17 @@ export async function pointSiteByIdApi(id) {
 
 // 字典
 export async function dictApi() {
-  const values =
-    "扰动类型,扰动变化类型,合规性,建设状态,立项级别,项目类型,项目类别,项目性质,矢量化类型";
   return request(`${config.url.dictUrl}?DictTypeName=`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 部门
+export async function DepartApi(params) {
+  return request(`${config.url.DepartUrl}?name=${params.name}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`

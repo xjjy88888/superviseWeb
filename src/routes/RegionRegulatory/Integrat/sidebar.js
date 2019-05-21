@@ -75,6 +75,7 @@ export default class integrat extends PureComponent {
       queryInfo: {},
       inputDisabled: true,
       select: [],
+      departList: [],
       problem: { title: "", records: [] },
       placeholder: "项目名称",
       sort: [
@@ -556,6 +557,32 @@ export default class integrat extends PureComponent {
     });
   };
 
+  getDepartKey = value => {
+    const { departList } = this.state;
+    if (value) {
+      const filter = departList.filter(item => {
+        return value === item.name;
+      });
+      return filter[0].id;
+    } else {
+      return "";
+    }
+  };
+
+  getDepartList = (value, key) => {
+    const { dispatch } = this.props;
+    const { departList } = this.state;
+    dispatch({
+      type: "user/queryDepart",
+      payload: {
+        name: value
+      },
+      callback: data => {
+        this.setState({ departList: [...departList, data] });
+      }
+    });
+  };
+
   getDictKey = (value, type) => {
     const {
       user: { dicList }
@@ -623,17 +650,18 @@ export default class integrat extends PureComponent {
       user: { districtList }
     } = this.props;
 
-    const projectItem = isProjectUpdate
-      ? projectInfo
-      : {
-          projectBase: { name: "" },
-          expand: {
-            designStartTime: "",
-            designCompTime: "",
-            actStartTime: "",
-            actCompTime: ""
-          }
-        };
+    const projectItem = projectInfo;
+    // const projectItem = isProjectUpdate
+    //   ? projectInfo
+    //   : {
+    //       projectBase: { name: "" },
+    //       expand: {
+    //         designStartTime: "",
+    //         designCompTime: "",
+    //         actStartTime: "",
+    //         actCompTime: ""
+    //       }
+    //     };
 
     const { getFieldDecorator } = this.props.form;
 
@@ -1355,6 +1383,7 @@ export default class integrat extends PureComponent {
                 }}
                 onClick={() => {
                   if (projectEdit) {
+                    //保存
                     this.props.form.validateFields((err, values) => {
                       if (!err) {
                         console.log(values);
@@ -1383,6 +1412,15 @@ export default class integrat extends PureComponent {
                           projectNatId: this.getDictKey(
                             values.projectNatId,
                             "项目性质"
+                          ),
+                          productDepartmentId: this.getDepartKey(
+                            values.productDepartmentId
+                          ),
+                          supDepartmentId: this.getDepartKey(
+                            values.supDepartmentId
+                          ),
+                          replyDepartmentId: this.getDepartKey(
+                            values.replyDepartmentId
                           ),
                           id: isProjectUpdate ? projectItem.id : ""
                         };
@@ -1495,15 +1533,15 @@ export default class integrat extends PureComponent {
                     >
                       <p style={{ marginBottom: 10 }}>
                         <span>建设单位：</span>
-                        <span>{projectItem.productDepartment}</span>
+                        {/* <span>{projectItem.productDepartment.name}</span> */}
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>监管单位：</span>
-                        <span>{projectItem.supDepartment}</span>
+                        {/* <span>{projectItem.supDepartment.name}</span> */}
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>批复机构：</span>
-                        <span>{projectItem.replyDepartment}</span>
+                        {/* <span>{projectItem.replyDepartment.name}</span> */}
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>流域管理机构：</span>
@@ -2376,17 +2414,29 @@ export default class integrat extends PureComponent {
                 </Form.Item>
                 <Form.Item label="建设单位" {...formItemLayout}>
                   {getFieldDecorator("productDepartmentId", {
-                    initialValue: projectItem.productDepartment
-                  })(<Input.TextArea autosize />)}
+                    // initialValue: projectItem.productDepartment.name
+                  })(
+                    <Input.TextArea
+                      autosize
+                      onBlur={() => {
+                        this.props.form.validateFields((err, v) => {
+                          this.getDepartList(
+                            v.productDepartmentId,
+                            "productDepartmentId"
+                          );
+                        });
+                      }}
+                    />
+                  )}
                 </Form.Item>
                 <Form.Item label="监管单位" {...formItemLayout}>
                   {getFieldDecorator("supDepartmentId", {
-                    initialValue: projectItem.supDepartment
+                    // initialValue: projectItem.supDepartment
                   })(<Input.TextArea autosize />)}
                 </Form.Item>
                 <Form.Item label="批复机构" {...formItemLayout}>
                   {getFieldDecorator("replyDepartmentId", {
-                    initialValue: projectItem.replyDepartment
+                    // initialValue: projectItem.replyDepartment
                   })(<Input.TextArea autosize />)}
                 </Form.Item>
                 <Form.Item label="流域管理机构" {...formItemLayout}>

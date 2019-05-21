@@ -1,5 +1,4 @@
-const domain = "http://aj.zkygis.cn/dutySys";
-const domain_ = "http://aj.zkygis.cn/stbc/";
+const domain = "http://aj.zkygis.cn/stbc/";
 const imageBaseUrl = "http://10.7.23.178/BasemapService/rest/image";
 // const txKey = "TERBZ-ZU46D-KZT46-HZZIB-RNDMZ-7GFP3";
 
@@ -12,55 +11,58 @@ const color_border_redLine = "#e60000"; //边框色-红线
 const config = {
   url: {
     // 登录
-    loginUrl: `${domain_}api/TokenAuth/Authenticate`,
+    loginUrl: `${domain}api/TokenAuth/Authenticate`,
 
     // 项目列表
-    projectListUrl: `${domain_}api/services/app/Project/GetAllByPost`,
+    projectListUrl: `${domain}api/services/app/Project/GetAllByPost`,
 
     // id查询项目
-    projectByIdUrl: `${domain_}api/services/app/Project/Get`,
+    projectByIdUrl: `${domain}api/services/app/Project/Get`,
 
     // 项目新建
-    projectCreateUrl: `${domain_}api/services/app/Project/Create`,
+    projectCreateUrl: `${domain}api/services/app/Project/Create`,
 
     // 项目编辑
-    projectUpdateUrl: `${domain_}api/services/app/Project/Update`,
+    projectUpdateUrl: `${domain}api/services/app/Project/Update`,
 
     // 项目删除
-    projectDeleteUrl: `${domain_}api/services/app/Project/Delete`,
+    projectDeleteUrl: `${domain}api/services/app/Project/Delete`,
 
     // 图斑列表
-    spotListUrl: `${domain_}api/services/app/Spot/GetAllByPost`,
+    spotListUrl: `${domain}api/services/app/Spot/GetAllByPost`,
 
     // 标注点列表
-    pointListUrl: `${domain_}api/services/app/MarkingPoint/GetAll`,
+    pointListUrl: `${domain}api/services/app/MarkingPoint/GetAll`,
 
     // 项目id查询项目红线列表
-    redLineByProjectIdUrl: `${domain_}api/services/app/ProjectScope/GetAll`,
+    redLineByProjectIdUrl: `${domain}api/services/app/ProjectScope/GetAll`,
 
     // id查询图斑
-    spotByIdUrl: `${domain_}api/services/app/Spot/Get`,
+    spotByIdUrl: `${domain}api/services/app/Spot/Get`,
 
     // id查询标注点
-    pointByIdUrl: `${domain_}api/services/app/MarkingPoint/Get`,
+    pointByIdUrl: `${domain}api/services/app/MarkingPoint/Get`,
 
     // id查询标注点经纬度
-    pointSiteByIdUrl: `${domain_}api/services/app/MarkingPoint/GetPoint`,
+    pointSiteByIdUrl: `${domain}api/services/app/MarkingPoint/GetPoint`,
 
     // 上传附件
-    uploadAsyncUrl: `${domain_}api/services/app/Attachment/UploadAsync`,
+    uploadAsyncUrl: `${domain}api/services/app/Attachment/UploadAsync`,
 
     // 字典
-    dictUrl: `${domain_}api/services/app/DictTable/GetAll`,
+    dictUrl: `${domain}api/services/app/DictTable/GetAll`,
+
+    // 部门
+    DepartUrl: `${domain}api/services/app/Department/Vaild`,
 
     // 项目位置
-    projectPositionUrl: `${domain_}api/services/app/Attachment/UploadAsync`,
+    projectPositionUrl: `${domain}api/services/app/Attachment/UploadAsync`,
 
     // 行政区域
-    districtUrl: `${domain_}api/services/app/User/GetDistrictCodesTree`,
+    districtUrl: `${domain}api/services/app/User/GetDistrictCodesTree`,
 
     // 获取边界
-    boundaryUrl: `${domain_}api/services/app/User/GetBoundAsync`,
+    boundaryUrl: `${domain}api/services/app/User/GetBoundAsync`,
 
     // 腾讯地图
     // txRegionUrl: `https://apis.map.qq.com/ws/district/v1/list?key=${txKey}`,
@@ -85,7 +87,7 @@ const config = {
     removeProjectScopeGraphic: `${domain}api/app/removeProjectScopeGraphic`,
 
     //点查地图服务后台接口
-    queryWFSLayer: `${domain_}api/Tool/Forward`
+    queryWFSLayer: `${domain}api/Tool/Forward`
   },
 
   //扰动类型

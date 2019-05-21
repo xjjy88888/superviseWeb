@@ -1,4 +1,4 @@
-import { loginApi, districtApi, dictApi } from "../services/httpApi";
+import { loginApi, districtApi, dictApi, DepartApi } from "../services/httpApi";
 import { routerRedux } from "dva/router";
 import { notification } from "antd";
 
@@ -12,7 +12,7 @@ export default {
       }
     ],
     districtList: [],
-    dicList: [],
+    dicList: []
   },
 
   subscriptions: {
@@ -68,7 +68,25 @@ export default {
         });
       } else {
         notification["error"]({
-          message: error.message
+          message: `查询字典失败：${error.message}`
+        });
+      }
+    },
+    *queryDepart({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result: response }
+      } = yield call(DepartApi, payload);
+      if (success) {
+        if (response.isVaild) {
+          if (callback) callback(response.department);
+        } else {
+          notification["warning"]({
+            message: `查不到${payload.name}单位，请重新输入`
+          });
+        }
+      } else {
+        notification["error"]({
+          message: `单位校验失败：${error.message}`
         });
       }
     }
