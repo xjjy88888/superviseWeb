@@ -376,7 +376,6 @@ export default class integrat extends PureComponent {
         id: id
       },
       callback: (result, success) => {
-        console.log(result, success);
         this.setState({ showProjectDetail: success });
       }
     });
@@ -553,10 +552,15 @@ export default class integrat extends PureComponent {
     const {
       user: { dicList }
     } = this.props;
-    const filter = dicList.filter(item => {
-      return item.dictTypeName === type && item.value === value;
-    });
-    return filter[0].id;
+    if (value) {
+      const filter = dicList.filter(item => {
+        // return item.dictTypeName === type && item.value === value;
+        return item.value === value;
+      });
+      return filter.map(item => item.id).join(",");
+    } else {
+      return "";
+    }
   };
 
   render() {
@@ -832,7 +836,6 @@ export default class integrat extends PureComponent {
             allowClear
             placeholder={`${placeholder}`}
             onSearch={v => {
-              console.log(this.getDictKey("水利枢纽工程", "项目类型"));
               this.scrollDom.scrollTop = 0;
               emitter.emit("checkResult", {
                 show: false,
@@ -917,7 +920,6 @@ export default class integrat extends PureComponent {
             }}
           />
           <Radio.Group
-            defaultValue="a"
             buttonStyle="solid"
             style={{ padding: "0px 15px" }}
             onClick={e => {
@@ -1324,6 +1326,30 @@ export default class integrat extends PureComponent {
                           type: "project/projectCreateUpdate",
                           payload: {
                             ...values,
+                            projectLevelId: this.getDictKey(
+                              values.projectLevelId,
+                              "立项级别"
+                            ),
+                            complianceId: this.getDictKey(
+                              values.complianceId,
+                              "扰动范围"
+                            ),
+                            projectCateId: this.getDictKey(
+                              values.projectCateId,
+                              "项目类别"
+                            ),
+                            projectTypeId: this.getDictKey(
+                              values.projectTypeId,
+                              "项目类型"
+                            ),
+                            projectStatusId: this.getDictKey(
+                              values.projectStatusId,
+                              "建设状态"
+                            ),
+                            projectNatId: this.getDictKey(
+                              values.projectNatId,
+                              "项目性质"
+                            ),
                             id: isProjectUpdate ? projectItem.id : ""
                           },
                           callback: (success, response) => {
@@ -1481,7 +1507,7 @@ export default class integrat extends PureComponent {
                         <span>{projectItem.projectLevel}</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
-                        <span>项目合规性：</span>
+                        <span>扰动合规性</span>
                         <span>空</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
@@ -2277,7 +2303,7 @@ export default class integrat extends PureComponent {
                 </Form.Item>
                 <Form.Item label="所在地区" {...formItemLayout}>
                   {getFieldDecorator("districtCodes1", {
-                    initialValue: projectItem.projectBase.name
+                    initialValue: []
                   })(
                     <Cascader
                       placeholder="请选择所在地区"
@@ -2330,39 +2356,43 @@ export default class integrat extends PureComponent {
                 </Form.Item>
                 <Form.Item label="建设单位" {...formItemLayout}>
                   {getFieldDecorator("productDepartmentId", {
-                    initialValue: projectItem.product_department_id
+                    initialValue: projectItem.productDepartment
                   })(<Input.TextArea autosize />)}
                 </Form.Item>
                 <Form.Item label="监管单位" {...formItemLayout}>
                   {getFieldDecorator("supDepartmentId", {
-                    initialValue: projectItem.project_sup_id
+                    initialValue: projectItem.supDepartment
                   })(<Input.TextArea autosize />)}
                 </Form.Item>
                 <Form.Item label="批复机构" {...formItemLayout}>
                   {getFieldDecorator("replyDepartmentId", {
-                    initialValue: projectItem.project_rp_id
+                    initialValue: projectItem.replyDepartment
                   })(<Input.TextArea autosize />)}
                 </Form.Item>
                 <Form.Item label="流域管理机构" {...formItemLayout}>
                   {getFieldDecorator("ctn_code111", {
-                    initialValue: projectItem.ctn_code
+                    initialValue: projectItem.riverBasinOU
                   })(<Input.TextArea autosize />)}
                 </Form.Item>
                 <Form.Item label="批复文号" {...formItemLayout}>
                   {getFieldDecorator("replyNum", {
-                    initialValue: projectItem.project_rp_num
+                    initialValue: projectItem.replyNum
                   })(<Input />)}
                 </Form.Item>
                 <Form.Item label="批复时间" {...formItemLayout}>
-                  {getFieldDecorator("replyTime", {})(<DatePicker />)}
+                  {getFieldDecorator("replyTime", {
+                    // initialValue: projectItem.replyTime
+                  })(<DatePicker />)}
                 </Form.Item>
                 <Form.Item label="责任面积" {...formItemLayout}>
                   {getFieldDecorator("area", {
-                    initialValue: projectItem.area
+                    initialValue: projectItem.respArea
                   })(<Input addonAfter="m2" />)}
                 </Form.Item>
                 <Form.Item label="立项级别" {...formItemLayout}>
-                  {getFieldDecorator("projectLevelId", {})(
+                  {getFieldDecorator("projectLevelId", {
+                    initialValue: projectItem.projectLevel
+                  })(
                     <AutoComplete
                       placeholder="请选择立项级别"
                       dataSource={config.approval_level}
@@ -2374,11 +2404,12 @@ export default class integrat extends PureComponent {
                     />
                   )}
                 </Form.Item>
-                <Form.Item label="项目合规性" {...formItemLayout}>
-                  {getFieldDecorator("complianceId", {})(
+                <Form.Item label="扰动合规性" {...formItemLayout}>
+                  {getFieldDecorator("complianceId", {
+                    initialValue: projectItem.projectBase.name
+                  })(
                     <AutoComplete
-                      placeholder="请选择项目合规性"
-                      defaultValue={`疑似未批先建`}
+                      placeholder="请选择扰动范围"
                       dataSource={config.compliance}
                       filterOption={(inputValue, option) =>
                         option.props.children
@@ -2389,10 +2420,11 @@ export default class integrat extends PureComponent {
                   )}
                 </Form.Item>
                 <Form.Item label="项目类别" {...formItemLayout}>
-                  {getFieldDecorator("projectCateId", {})(
+                  {getFieldDecorator("projectCateId", {
+                    initialValue: "建设类"
+                  })(
                     <AutoComplete
                       placeholder="请选择项目类别"
-                      defaultValue={`建设类`}
                       dataSource={config.project_category}
                       filterOption={(inputValue, option) =>
                         option.props.children
@@ -2418,10 +2450,11 @@ export default class integrat extends PureComponent {
                   )}
                 </Form.Item>
                 <Form.Item label="建设状态" {...formItemLayout}>
-                  {getFieldDecorator("projectStatusId", {})(
+                  {getFieldDecorator("projectStatusId", {
+                    initialValue: "未开工"
+                  })(
                     <AutoComplete
                       placeholder="请选择建设状态"
-                      defaultValue={`未开工`}
                       dataSource={config.construct_state}
                       filterOption={(inputValue, option) =>
                         option.props.children
@@ -2432,10 +2465,9 @@ export default class integrat extends PureComponent {
                   )}
                 </Form.Item>
                 <Form.Item label="项目性质" {...formItemLayout}>
-                  {getFieldDecorator("projectNatId", {})(
+                  {getFieldDecorator("projectNatId", { initialValue: "新建" })(
                     <AutoComplete
                       placeholder="请选择项目性质"
-                      defaultValue={`新建`}
                       dataSource={config.project_nature}
                       filterOption={(inputValue, option) =>
                         option.props.children
@@ -2486,11 +2518,8 @@ export default class integrat extends PureComponent {
                   )}
                 </Form.Item>
                 <Form.Item label="备注" {...formItemLayout}>
-                  {getFieldDecorator("description", {})(
-                    <Input.TextArea
-                      defaultValue={`东莞市清溪房地产开发公司、`}
-                      autosize
-                    />
+                  {getFieldDecorator("description", { initialValue: "" })(
+                    <Input.TextArea autosize />
                   )}
                 </Form.Item>
                 <a
