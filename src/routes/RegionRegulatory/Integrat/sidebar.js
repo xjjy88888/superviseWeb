@@ -148,6 +148,7 @@ export default class integrat extends PureComponent {
         polygon: data.polygon
       });
     });
+    //search
     this.eventEmitter = emitter.addListener("queryInfo", data => {
       this.scrollDom.scrollTop = 0;
       const { query_pro, query_spot, query_point } = this.state;

@@ -5,7 +5,6 @@ import {
   Icon,
   Button,
   Input,
-  Radio,
   notification,
   Upload,
   Divider,
@@ -18,6 +17,7 @@ import {
 import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
 import styles from "./index.less";
+import moment from "moment";
 
 let yearDataSource = [];
 
@@ -53,9 +53,14 @@ export default class integrat extends PureComponent {
     });
     this.eventEmitter = emitter.addListener("projectCreateUpdate", data => {
       //submit
-
-      this.props.form.validateFields((err, values) => {
-        console.log(values);
+      this.props.form.validateFields((err, v) => {
+        const values = {
+          ...v,
+          designStartTime: v.designStartTime._i,
+          designCompTime: v.designCompTime._i,
+          actStartTime: v.actStartTime._i,
+          actCompTime: v.actCompTime._i
+        };
         dispatch({
           type: "project/projectCreateUpdate",
           payload: { ...data, ...values },
@@ -138,7 +143,6 @@ export default class integrat extends PureComponent {
           zIndex: 1000,
           height: `100%`,
           borderLeft: `solid 1px #ddd`
-          // overflow: "auto"
         }}
         ref={this.saveRef}
       >
@@ -423,7 +427,9 @@ export default class integrat extends PureComponent {
             <Row gutter={24}>
               <Col span={12}>
                 <Form.Item label="防治标准">
-                  {getFieldDecorator("prevenStdId", {})(
+                  {getFieldDecorator("prevenStdId", {
+                    initialValue: projectItem.expand.prevenStd
+                  })(
                     <AutoComplete
                       placeholder="请选择防治标准"
                       dataSource={this.getDictList("防治标准")}
@@ -438,56 +444,58 @@ export default class integrat extends PureComponent {
               </Col>
               <Col span={12}>
                 <Form.Item label="总投资">
-                  {getFieldDecorator("totalInvest", {})(
-                    <Input addonAfter="万元" style={{ width: 150 }} />
-                  )}
+                  {getFieldDecorator("totalInvest", {
+                    initialValue: projectItem.expand.totalInvest
+                  })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="土建投资">
-                  {getFieldDecorator("civilEngInvest", {})(
-                    <Input addonAfter="万元" style={{ width: 150 }} />
-                  )}
+                  {getFieldDecorator("civilEngInvest", {
+                    initialValue: projectItem.expand.civilEngInvest
+                  })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="项目规模">
-                  {getFieldDecorator("projectSize", {})(
-                    <Input addonAfter="m或m2" style={{ width: 150 }} />
-                  )}
+                  {getFieldDecorator("projectSize", {
+                    initialValue: projectItem.expand.projectSize
+                  })(<Input addonAfter="m或m2" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="设计动工时间">
-                  {getFieldDecorator("designStartTime", {})(
-                    <DatePicker placeholder="" style={{ width: 130 }} />
-                  )}
+                  {getFieldDecorator("designStartTime", {
+                    initialValue: moment(projectItem.expand.designStartTime)
+                  })(<DatePicker placeholder="" style={{ width: 130 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="设计完工时间">
-                  {getFieldDecorator("designCompTime", {})(
-                    <DatePicker placeholder="" style={{ width: 130 }} />
-                  )}
+                  {getFieldDecorator("designCompTime", {
+                    initialValue: moment(projectItem.expand.designCompTime)
+                  })(<DatePicker placeholder="" style={{ width: 130 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="实际开工时间">
-                  {getFieldDecorator("actStartTime", {})(
-                    <DatePicker placeholder="" style={{ width: 130 }} />
-                  )}
+                  {getFieldDecorator("actStartTime", {
+                    initialValue: moment(projectItem.expand.actStartTime)
+                  })(<DatePicker placeholder="" style={{ width: 130 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="实际完工时间">
-                  {getFieldDecorator("actCompTime", {})(
-                    <DatePicker placeholder="" style={{ width: 130 }} />
-                  )}
+                  {getFieldDecorator("actCompTime", {
+                    initialValue: moment(projectItem.expand.actCompTime)
+                  })(<DatePicker placeholder="" style={{ width: 130 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="设计水平年">
-                  {getFieldDecorator("designLevelYear", {})(
+                  {getFieldDecorator("designLevelYear", {
+                    initialValue: projectItem.expand.designLevelYear
+                  })(
                     <AutoComplete
                       allowClear
                       dataSource={yearDataSource}
@@ -500,7 +508,9 @@ export default class integrat extends PureComponent {
               </Col>
               <Col span={12}>
                 <Form.Item label="防治区类型">
-                  {getFieldDecorator("prevenZoneTypeId", {})(
+                  {getFieldDecorator("prevenZoneTypeId", {
+                    initialValue: projectItem.expand.prevenZoneType
+                  })(
                     <AutoComplete
                       placeholder="请选择防治区类型"
                       dataSource={this.getDictList("防治区类型")}
@@ -515,7 +525,9 @@ export default class integrat extends PureComponent {
               </Col>
               <Col span={12}>
                 <Form.Item label="防治区级别">
-                  {getFieldDecorator("prevenZoneLevelId", {})(
+                  {getFieldDecorator("prevenZoneLevelId", {
+                    initialValue: projectItem.expand.prevenZoneLevel
+                  })(
                     <AutoComplete
                       placeholder="请选择防治区级别"
                       dataSource={this.getDictList("防治区级别")}
@@ -530,7 +542,9 @@ export default class integrat extends PureComponent {
               </Col>
               <Col span={12}>
                 <Form.Item label="地貌类型">
-                  {getFieldDecorator("landTypeId", {})(
+                  {getFieldDecorator("landTypeId", {
+                    initialValue: projectItem.expand.landType
+                  })(
                     <AutoComplete
                       placeholder="请选择地貌类型"
                       dataSource={this.getDictList("地貌类型")}
@@ -545,7 +559,9 @@ export default class integrat extends PureComponent {
               </Col>
               <Col span={12}>
                 <Form.Item label="土壤类型">
-                  {getFieldDecorator("soilTypeId", {})(
+                  {getFieldDecorator("soilTypeId", {
+                    initialValue: projectItem.expand.soilType
+                  })(
                     <AutoComplete
                       placeholder="请选择土壤类型"
                       dataSource={this.getDictList("土壤类型")}
@@ -560,7 +576,9 @@ export default class integrat extends PureComponent {
               </Col>
               <Col span={12}>
                 <Form.Item label="植被类型">
-                  {getFieldDecorator("vegTypeId", {})(
+                  {getFieldDecorator("vegTypeId", {
+                    initialValue: projectItem.expand.vegType
+                  })(
                     <AutoComplete
                       placeholder="请选择植被类型"
                       dataSource={this.getDictList("植被类型")}
@@ -576,164 +594,166 @@ export default class integrat extends PureComponent {
               <Divider />
               <Col span={12}>
                 <Form.Item label="项目建设区面积">
-                  {getFieldDecorator("consArea", {})(
-                    <Input addonAfter="m2" style={{ width: 150 }} />
-                  )}
+                  {getFieldDecorator("consArea", {
+                    initialValue: projectItem.expand.consArea
+                  })(<Input addonAfter="m2" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="直接影响区面积">
-                  {getFieldDecorator("affeArea", {})(
-                    <Input addonAfter="m2" style={{ width: 150 }} />
-                  )}
+                  {getFieldDecorator("affeArea", {
+                    initialValue: projectItem.expand.affeArea
+                  })(<Input addonAfter="m2" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="扰动地表面积">
-                  {getFieldDecorator("distSurfaceArea", {})(
-                    <Input addonAfter="m2" style={{ width: 150 }} />
-                  )}
+                  {getFieldDecorator("distSurfaceArea", {
+                    initialValue: projectItem.expand.distSurfaceArea
+                  })(<Input addonAfter="m2" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="损坏水土保持设施面积">
-                  {getFieldDecorator("dmgArea", {})(
-                    <Input addonAfter="m2" style={{ width: 150 }} />
-                  )}
+                  {getFieldDecorator("dmgArea", {
+                    initialValue: projectItem.expand.dmgArea
+                  })(<Input addonAfter="m2" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Divider />
               <Col span={12}>
                 <Form.Item label="原地貌土壤侵蚀模数">
-                  {getFieldDecorator("landErsn", {})(
-                    <Input addonAfter="t/km2*a" style={{ width: 150 }} />
-                  )}
+                  {getFieldDecorator("landErsn", {
+                    initialValue: projectItem.expand.landErsn
+                  })(<Input addonAfter="t/km2*a" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="土壤容许流失量">
-                  {getFieldDecorator("soilLoss", {})(
-                    <Input addonAfter="t/km2*a" style={{ width: 150 }} />
-                  )}
+                  {getFieldDecorator("soilLoss", {
+                    initialValue: projectItem.expand.soilLoss
+                  })(<Input addonAfter="t/km2*a" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="水土流失预测总量">
-                  {getFieldDecorator("ersnAmt", {})(
-                    <Input addonAfter="t" style={{ width: 150 }} />
-                  )}
+                  {getFieldDecorator("ersnAmt", {
+                    initialValue: projectItem.expand.ersnAmt
+                  })(<Input addonAfter="t" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="新增水土流失量">
-                  {getFieldDecorator("newErsnAmt", {})(
-                    <Input addonAfter="t" style={{ width: 150 }} />
-                  )}
+                  {getFieldDecorator("newErsnAmt", {
+                    initialValue: projectItem.expand.newErsnAmt
+                  })(<Input addonAfter="t" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="新增水土流失主要区域">
-                  {getFieldDecorator("newErsnAmt", {})(<Input />)}
+                  {getFieldDecorator("newErsnAmt", {
+                    initialValue: projectItem.expand.newArea
+                  })(<Input />)}
                 </Form.Item>
               </Col>
               <Divider />
               <Col span={12}>
                 <Form.Item label="扰动土地整治率">
-                  {getFieldDecorator("fixRate", {})(
-                    <Input addonAfter="%" style={{ width: 100 }} />
-                  )}
+                  {getFieldDecorator("fixRate", {
+                    initialValue: projectItem.expand.fixRate
+                  })(<Input addonAfter="%" style={{ width: 100 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="水土流失总治理度">
-                  {getFieldDecorator("govern", {})(
-                    <Input addonAfter="%" style={{ width: 100 }} />
-                  )}
+                  {getFieldDecorator("govern", {
+                    initialValue: projectItem.expand.govern
+                  })(<Input addonAfter="%" style={{ width: 100 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="土壤流失控制比">
-                  {getFieldDecorator("ctlRatio", {})(
-                    <Input addonAfter="%" style={{ width: 100 }} />
-                  )}
+                  {getFieldDecorator("ctlRatio", {
+                    initialValue: projectItem.expand.ctlRatio
+                  })(<Input addonAfter="%" style={{ width: 100 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="拦渣率">
-                  {getFieldDecorator("blkRate", {})(
-                    <Input addonAfter="%" style={{ width: 100 }} />
-                  )}
+                  {getFieldDecorator("blkRate", {
+                    initialValue: projectItem.expand.blkRate
+                  })(<Input addonAfter="%" style={{ width: 100 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="植被恢复系数">
-                  {getFieldDecorator("vegRec", {})(
-                    <Input addonAfter="%" style={{ width: 100 }} />
-                  )}
+                  {getFieldDecorator("vegRec", {
+                    initialValue: projectItem.expand.vegRec
+                  })(<Input addonAfter="%" style={{ width: 100 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="林草覆盖率">
-                  {getFieldDecorator("forestGrassCover", {})(
-                    <Input addonAfter="%" style={{ width: 100 }} />
-                  )}
+                  {getFieldDecorator("forestGrassCover", {
+                    initialValue: projectItem.expand.forestGrassCover
+                  })(<Input addonAfter="%" style={{ width: 100 }} />)}
                 </Form.Item>
               </Col>
               <Divider />
               <Col span={12}>
                 <Form.Item label="水土保持总投资">
-                  {getFieldDecorator("waterSoilTotal", {})(
-                    <Input addonAfter="万元" style={{ width: 150 }} />
-                  )}
+                  {getFieldDecorator("waterSoilTotal", {
+                    initialValue: projectItem.expand.waterSoilTotal
+                  })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="独立费用">
-                  {getFieldDecorator("idptExp", {})(
-                    <Input addonAfter="万元" style={{ width: 150 }} />
-                  )}
+                  {getFieldDecorator("idptExp", {
+                    initialValue: projectItem.expand.idptExp
+                  })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="水土保持监理费">
-                  {getFieldDecorator("waterSoilSupervise", {})(
-                    <Input addonAfter="万元" style={{ width: 150 }} />
-                  )}
+                  {getFieldDecorator("waterSoilSupervise", {
+                    initialValue: projectItem.expand.waterSoilSupervise
+                  })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="水土保持监测费">
-                  {getFieldDecorator("waterSoilDetect", {})(
-                    <Input addonAfter="万元" style={{ width: 150 }} />
-                  )}
+                  {getFieldDecorator("waterSoilDetect", {
+                    initialValue: projectItem.expand.waterSoilDetect
+                  })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="水土保持补偿费">
-                  {getFieldDecorator("waterSoilCompensate", {})(
-                    <Input addonAfter="万元" style={{ width: 150 }} />
-                  )}
+                  {getFieldDecorator("waterSoilCompensate", {
+                    initialValue: projectItem.expand.waterSoilCompensate
+                  })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="工程措施设计投资">
-                  {getFieldDecorator("engInvest", {})(
-                    <Input addonAfter="万元" style={{ width: 150 }} />
-                  )}
+                  {getFieldDecorator("engInvest", {
+                    initialValue: projectItem.expand.EngInvest
+                  })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="职位措施设计投资">
-                  {getFieldDecorator("vegInvest", {})(
-                    <Input addonAfter="万元" style={{ width: 150 }} />
-                  )}
+                <Form.Item label="植物措施设计投资">
+                  {getFieldDecorator("vegInvest", {
+                    initialValue: projectItem.expand.vegInvest
+                  })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="临时措施设计投资">
-                  {getFieldDecorator("temInvest", {})(
-                    <Input addonAfter="万元" style={{ width: 150 }} />
-                  )}
+                  {getFieldDecorator("temInvest", {
+                    initialValue: projectItem.expand.temInvest
+                  })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -807,16 +827,16 @@ export default class integrat extends PureComponent {
               <Divider />
               <Col span={12}>
                 <Form.Item label="项目变更信息">
-                  {getFieldDecorator("ctn_code111", {})(
-                    <Input.TextArea autosize />
-                  )}
+                  {getFieldDecorator("ctn_code111", {
+                    initialValue: ""
+                  })(<Input.TextArea autosize />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="变更原因">
-                  {getFieldDecorator("ctn_code1112", {})(
-                    <Input.TextArea autosize />
-                  )}
+                  {getFieldDecorator("ctn_code1112", {
+                    initialValue: ""
+                  })(<Input.TextArea autosize />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -828,7 +848,9 @@ export default class integrat extends PureComponent {
               </Col>
               <Col span={12}>
                 <Form.Item label="原项目名称">
-                  {getFieldDecorator("ctn_code1114", {})(<Input />)}
+                  {getFieldDecorator("ctn_code1114", {
+                    initialValue: ""
+                  })(<Input />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
