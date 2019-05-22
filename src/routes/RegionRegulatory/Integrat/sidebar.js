@@ -437,13 +437,6 @@ export default class integrat extends PureComponent {
     });
   };
 
-  onTreeSelectChange = value => {
-    this.setState({ value });
-  };
-  onTreeSelectChange = value => {
-    this.setState({ value });
-  };
-
   close = () => {
     const { projectEdit } = this.state;
     if (projectEdit) {
@@ -617,7 +610,6 @@ export default class integrat extends PureComponent {
     if (value) {
       const filter = dicList.filter(item => {
         return item.dictTypeName === type && item.value === value;
-        // return item.value === value;
       });
       return filter.map(item => item.id).join(",");
     } else {
@@ -873,7 +865,9 @@ export default class integrat extends PureComponent {
                     emitter.emit("showSiderbarDetail", {
                       show: key !== "project",
                       from: key,
-                      id: item.id
+                      id: item.id,
+                      edit: false,
+                      type: "edit"
                     });
                   }
                   emitter.emit("showTool", {
@@ -1041,6 +1035,7 @@ export default class integrat extends PureComponent {
                   show: true,
                   edit: true,
                   from: "spot",
+                  type: "add",
                   item: { id: "" }
                 });
               }
@@ -2647,19 +2642,20 @@ export default class integrat extends PureComponent {
                       allowClear
                       multiple
                       treeDefaultExpandAll
-                      onChange={this.onTreeSelectChange}
                     >
                       {districtList.map(item => (
                         <TreeSelect.TreeNode
                           value={item.value}
                           title={item.label}
                           key={item.value}
+                          disabled
                         >
                           {(item.children || []).map(ite => (
                             <TreeSelect.TreeNode
                               value={ite.value}
                               title={ite.label}
                               key={ite.value}
+                              disabled
                             >
                               {(ite.children || []).map(i => (
                                 <TreeSelect.TreeNode

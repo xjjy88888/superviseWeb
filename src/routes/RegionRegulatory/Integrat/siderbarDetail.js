@@ -8,8 +8,11 @@ import {
   Input,
   Cascader,
   Upload,
+  notification,
   Modal,
   AutoComplete,
+  Switch,
+  TreeSelect,
   DatePicker,
   Form
 } from "antd";
@@ -42,27 +45,9 @@ export default class siderbarDetail extends PureComponent {
       show: false,
       from: "spot",
       edit: false,
+      isSpotUpdate: true,
       item: { project_id: "" },
-      fileList: [
-        {
-          uid: "-1",
-          name: "xxx.png",
-          status: "done",
-          url: "./img/logo2.jpg"
-        },
-        {
-          uid: "-2",
-          name: "xxx.png",
-          status: "done",
-          url: "./img/spot.jpg"
-        },
-        {
-          uid: "-3",
-          name: "xxx.png",
-          status: "done",
-          url: "./img/spot.jpg"
-        }
-      ]
+      fileList: []
     };
     this.map = null;
   }
@@ -79,9 +64,10 @@ export default class siderbarDetail extends PureComponent {
       this.setState({
         show: data.show,
         edit: data.edit,
-        from: data.from,
+        isSpotUpdate: !data.edit,
+        from: data.from, //spot  point
         item: data.item,
-        type: data.type,
+        type: data.type, //add  edit
         previewVisible_min: false
       });
       if (data.show && data.type !== "add") {
@@ -136,23 +122,97 @@ export default class siderbarDetail extends PureComponent {
     });
   };
 
+  getDictList = type => {
+    const {
+      user: { dicList }
+    } = this.props;
+    if (type) {
+      const filter = dicList.filter(item => {
+        return item.dictTypeName === type;
+      });
+      return filter.map(item => item.value);
+    } else {
+      return [];
+    }
+  };
+
+  getDictKey = (value, type) => {
+    const {
+      user: { dicList }
+    } = this.props;
+    if (value) {
+      const filter = dicList.filter(item => {
+        return item.dictTypeName === type && item.value === value;
+      });
+      return filter.map(item => item.id).join(",");
+    } else {
+      return "";
+    }
+  };
+
+  submit = () => {
+    const {
+      dispatch,
+      spot: { spotInfo }
+    } = this.props;
+    const { type } = this.state;
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        console.log(values);
+        dispatch({
+          type: "spot/spotCreateUpdate",
+          payload: {
+            ...values,
+            interferenceTypeId: this.getDictKey(
+              values.interferenceTypeId,
+              "扰动类型"
+            ),
+            interferenceComplianceId: this.getDictKey(
+              values.interferenceComplianceId,
+              "扰动合规性"
+            ),
+            interferenceVaryTypeId: this.getDictKey(
+              values.interferenceVaryTypeId,
+              "扰动变化类型"
+            ),
+            buildStatusId: this.getDictKey(values.buildStatusId, "建设状态"),
+            id: type === "edit" ? spotInfo.id : ""
+          },
+          callback: (success, response) => {
+            if (success) {
+              emitter.emit("projectCreateUpdateBack", {});
+              notification["success"]({
+                message: `${spotInfo.id ? "编辑" : "新建"}项目成功`
+              });
+            }
+          }
+        });
+      }
+    });
+  };
+
   render() {
     const {
       dispatch,
       form: { getFieldDecorator },
-      spot: { spotItem },
+      spot: { spotInfo },
       point: { pointItem, pointSite },
       user: { districtList }
     } = this.props;
     const {
       show,
       from,
+      type,
       edit,
       fileList,
+      isSpotUpdate,
       previewVisible,
       previewImage,
       previewVisible_min
     } = this.state;
+
+    const spotItem = isSpotUpdate ? spotInfo : {};
+
     return (
       <div
         style={{
@@ -179,9 +239,9 @@ export default class siderbarDetail extends PureComponent {
           }}
           onClick={() => {
             this.setState({ show: !show, showDetail: false });
-            emitter.emit("showSiderbarDetail", {
-              show: !show
-            });
+            // emitter.emit("showSiderbarDetail", {
+            //   show: !show
+            // });
           }}
         />
         <p
@@ -310,14 +370,20 @@ export default class siderbarDetail extends PureComponent {
             }}
           >
             <Form>
-              <Form.Item label="图斑编号" {...formItemLayout}>
+              <Form.Item label="图斑编号" {...formItemLayout} hasFeedback>
                 {getFieldDecorator("mapNum", {
-                  initialValue: spotItem.mapNum
+                  initialValue: spotItem.mapNum,
+                  rules: [
+                    {
+                      required: true,
+                      message: "图斑编号不能为空"
+                    }
+                  ]
                 })(<Input disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="关联项目" {...formItemLayout}>
-                {getFieldDecorator("projectName", {
-                  initialValue: spotItem.projectName
+                {getFieldDecorator("projectId", {
+                  initialValue: spotItem.projectId
                 })(
                   <Input
                     disabled={!edit}
@@ -341,13 +407,13 @@ export default class siderbarDetail extends PureComponent {
                 )}
               </Form.Item>
               <Form.Item label="扰动类型" {...formItemLayout}>
-                {getFieldDecorator("qtype", {
-                  initialValue: spotItem.qtype
+                {getFieldDecorator("interferenceTypeId", {
+                  initialValue: spotItem.interferenceType
                 })(
                   <AutoComplete
                     placeholder="请选择扰动类型"
                     disabled={!edit}
-                    dataSource={config.disturb_type}
+                    dataSource={this.getDictList("扰动类型")}
                     filterOption={(inputValue, option) =>
                       option.props.children
                         .toUpperCase()
@@ -367,13 +433,13 @@ export default class siderbarDetail extends PureComponent {
                 })(<Input disabled={!edit} addonAfter="公顷" />)}
               </Form.Item>
               <Form.Item label="扰动合规性" {...formItemLayout}>
-                {getFieldDecorator("interferenceCompliance", {
+                {getFieldDecorator("interferenceComplianceId", {
                   initialValue: spotItem.interferenceCompliance
                 })(
                   <AutoComplete
                     placeholder="请选择扰动合规性"
                     disabled={!edit}
-                    dataSource={config.compliance}
+                    dataSource={this.getDictList("扰动合规性")}
                     filterOption={(inputValue, option) =>
                       option.props.children
                         .toUpperCase()
@@ -383,13 +449,13 @@ export default class siderbarDetail extends PureComponent {
                 )}
               </Form.Item>
               <Form.Item label="扰动变化类型" {...formItemLayout}>
-                {getFieldDecorator("interferenceVaryType", {
+                {getFieldDecorator("interferenceVaryTypeId", {
                   initialValue: spotItem.interferenceVaryType
                 })(
                   <AutoComplete
                     placeholder="请选择扰动变化类型"
                     disabled={!edit}
-                    dataSource={config.disturb_change_type}
+                    dataSource={this.getDictList("扰动变化类型")}
                     filterOption={(inputValue, option) =>
                       option.props.children
                         .toUpperCase()
@@ -399,13 +465,13 @@ export default class siderbarDetail extends PureComponent {
                 )}
               </Form.Item>
               <Form.Item label="建设状态" {...formItemLayout}>
-                {getFieldDecorator("buildStatus", {
+                {getFieldDecorator("buildStatusId", {
                   initialValue: spotItem.buildStatus
                 })(
                   <AutoComplete
                     placeholder="请选择建设状态"
                     disabled={!edit}
-                    dataSource={config.construct_state}
+                    dataSource={this.getDictList("建设状态")}
                     filterOption={(inputValue, option) =>
                       option.props.children
                         .toUpperCase()
@@ -414,23 +480,67 @@ export default class siderbarDetail extends PureComponent {
                   />
                 )}
               </Form.Item>
-              <Form.Item label="复核状态" {...formItemLayout}>
+              <Form.Item label="是否复核" {...formItemLayout}>
                 {getFieldDecorator("isReview", {
-                  initialValue: spotItem.isReview ? "是" : "否"
-                })(<Input disabled={!edit} />)}
+                  valuePropName: "checked",
+                  initialValue: spotItem.isReview ? true : false
+                })(<Switch />)}
+              </Form.Item>
+              <Form.Item label="涉及县" {...formItemLayout}>
+                {getFieldDecorator("districtCodes", {
+                  valuePropName: "value"
+                })(
+                  <TreeSelect
+                    showSearch
+                    style={{ width: "100%" }}
+                    dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
+                    placeholder="请选择涉及县"
+                    allowClear
+                    multiple
+                    treeDefaultExpandAll
+                  >
+                    {districtList.map(item => (
+                      <TreeSelect.TreeNode
+                        value={item.value}
+                        title={item.label}
+                        key={item.value}
+                        disabled
+                      >
+                        {(item.children || []).map(ite => (
+                          <TreeSelect.TreeNode
+                            value={ite.value}
+                            title={ite.label}
+                            key={ite.value}
+                            disabled
+                          >
+                            {(ite.children || []).map(i => (
+                              <TreeSelect.TreeNode
+                                value={i.value}
+                                title={i.label}
+                                key={i.value}
+                              />
+                            ))}
+                          </TreeSelect.TreeNode>
+                        ))}
+                      </TreeSelect.TreeNode>
+                    ))}
+                  </TreeSelect>
+                )}
               </Form.Item>
               <Form.Item label="所在地区" {...formItemLayout}>
-                <Cascader
-                  disabled={!edit}
-                  placeholder="请选择所在地区"
-                  options={districtList}
-                  changeOnSelect
-                />
+                {getFieldDecorator("diqu", {
+                  // initialValue: ["贵州省", "都柳江", "从江段"]
+                })(
+                  <Cascader
+                    disabled={!edit}
+                    placeholder="请选择所在地区"
+                    options={districtList}
+                    changeOnSelect
+                  />
+                )}
               </Form.Item>
               <Form.Item label="详细地址" {...formItemLayout}>
-                {getFieldDecorator("product_department_id1", {
-                  initialValue: ""
-                })(<Input />)}
+                <Input />
               </Form.Item>
               <Form.Item label="问题" {...formItemLayout}>
                 {getFieldDecorator("problem", {
@@ -471,7 +581,13 @@ export default class siderbarDetail extends PureComponent {
             </Upload>
             {edit ? (
               <span>
-                <Button icon="check" style={{ marginTop: 20 }}>
+                <Button
+                  icon="check"
+                  style={{ marginTop: 20 }}
+                  onClick={() => {
+                    this.submit();
+                  }}
+                >
                   保存
                 </Button>
                 <Button
@@ -495,7 +611,10 @@ export default class siderbarDetail extends PureComponent {
                 </Button>
                 <Button
                   icon="delete"
-                  style={{ marginLeft: 20 }}
+                  style={{
+                    display: type !== "add" ? "block" : "none",
+                    marginLeft: 20
+                  }}
                   onClick={() => {
                     Modal.confirm({
                       title: "删除",

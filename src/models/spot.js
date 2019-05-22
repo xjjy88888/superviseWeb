@@ -12,7 +12,7 @@ export default {
   state: {
     spotList: { totalCount: 0, items: [] },
     projectInfoSpotList: { totalCount: 0, items: [] },
-    spotItem: {}
+    spotInfo: {}
   },
 
   subscriptions: {
@@ -46,7 +46,7 @@ export default {
         data: { success, error, result }
       } = yield call(spotByIdApi, payload.id);
       if (success) {
-        yield put({ type: "save", payload: { spotItem: result } });
+        yield put({ type: "save", payload: { spotInfo: result } });
         if (callback) callback(result);
       } else {
         notification["error"]({
