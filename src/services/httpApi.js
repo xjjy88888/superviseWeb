@@ -121,6 +121,41 @@ export async function spotListApi(params) {
   });
 }
 
+// 图斑信息
+export async function spotByIdApi(id) {
+  return request(`${config.url.spotByIdUrl}?id=${id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 图斑新建编辑
+export async function spotCreateUpdateApi(params) {
+  return request(
+    params.id ? config.url.spotUpdateUrl : config.url.spotCreateUrl,
+    {
+      method: params.id ? "PUT" : "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify(params)
+    }
+  );
+}
+
+// 图斑删除
+export async function spotDeleteApi(payload) {
+  return request(`${config.url.spotDeleteUrl}?id=${payload.id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
 // 标注点列表
 export async function pointListApi(params) {
   return request(
@@ -151,16 +186,6 @@ export async function redLineByProjectIdApi(ProjectId) {
       }
     }
   );
-}
-
-// id查询图斑
-export async function spotByIdApi(id) {
-  return request(`${config.url.spotByIdUrl}?id=${id}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken()}`
-    }
-  });
 }
 
 // id查询标注点

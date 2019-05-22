@@ -1,6 +1,6 @@
 const domain = "http://aj.zkygis.cn/stbc/";
 const imageBaseUrl = "http://10.7.23.178/BasemapService/rest/image";
-// const txKey = "TERBZ-ZU46D-KZT46-HZZIB-RNDMZ-7GFP3";
+const txKey = "TERBZ-ZU46D-KZT46-HZZIB-RNDMZ-7GFP3";
 
 const color_back_spot = "rgba(255,255,0,0.4)"; //背景色-图斑
 const color_back_redLine = "rgba(230,0,0,0.4)"; //背景色-红线
@@ -31,14 +31,23 @@ const config = {
     // 图斑列表
     spotListUrl: `${domain}api/services/app/Spot/GetAllByPost`,
 
+    // 图斑信息
+    spotByIdUrl: `${domain}api/services/app/Spot/Get`,
+
+    // 图斑新建
+    spotCreateUrl: `${domain}api/services/app/Spot/Create`,
+
+    // 图斑编辑
+    spotUpdateUrl: `${domain}api/services/app/Spot/Update`,
+
+    // 图斑删除
+    spotDeleteUrl: `${domain}api/services/app/Spot/Delete`,
+
     // 标注点列表
     pointListUrl: `${domain}api/services/app/MarkingPoint/GetAll`,
 
     // 项目id查询项目红线列表
     redLineByProjectIdUrl: `${domain}api/services/app/ProjectScope/GetAll`,
-
-    // id查询图斑
-    spotByIdUrl: `${domain}api/services/app/Spot/Get`,
 
     // id查询标注点
     pointByIdUrl: `${domain}api/services/app/MarkingPoint/Get`,
@@ -65,8 +74,10 @@ const config = {
     boundaryUrl: `${domain}api/services/app/User/GetBoundAsync`,
 
     // 腾讯地图
-    // txRegionUrl: `https://apis.map.qq.com/ws/district/v1/list?key=${txKey}`,
-    txRegionUrl: `http://api.tianditu.gov.cn/administrative?postStr={"searchWord":"北京","searchType":"1","needSubInfo":"false","needAll":"false","needPolygon":"true","needPre":"true"}&tk=e606f896eaad4c8ab29275f85861af96`,
+    txRegionUrl: `https://apis.map.qq.com/ws/district/v1/list?key=${txKey}`,
+
+    //天地图
+    tdRegionUrl: `http://api.tianditu.gov.cn/administrative?postStr={"searchWord":"北京","searchType":"1","needSubInfo":"false","needAll":"false","needPolygon":"true","needPre":"true"}&tk=e606f896eaad4c8ab29275f85861af96`,
 
     //编辑图斑图形
     updateSpotGraphic: `${domain}api/app/updateSpotGraphic`,
@@ -291,7 +302,7 @@ const config = {
       icon: "border-inner"
     }
   ],
-  imageBaseUrl:imageBaseUrl,
+  imageBaseUrl: imageBaseUrl,
 
   /*----------------------------------地图配置部分-------------------------------------*/
   mapInitParams: {
@@ -313,8 +324,7 @@ const config = {
     {
       label: "监管影像",
       className: "imgType",
-      Url:
-         `${imageBaseUrl}/latest/tile/{z}/{y}/{x}`
+      Url: `${imageBaseUrl}/latest/tile/{z}/{y}/{x}`
     }
   ],
   mapUrl: {
@@ -322,7 +332,7 @@ const config = {
     mapshaper: `./mapshaper/index.html`,
     geoserverUrl: "http://10.7.23.177:8080/geoserver/ZKYGIS",
     //根据地图当前范围获取对应历史影像数据接口
-    getInfoByExtent: `${imageBaseUrl}/latest/getInfoByExtent`,
+    getInfoByExtent: `${imageBaseUrl}/latest/getInfoByExtent`
   },
   mapLayersName: "ZKYGIS:bs_project_scope,ZKYGIS:bs_spot",
   mapProjectLayerName: "ZKYGIS:bs_project_scope",

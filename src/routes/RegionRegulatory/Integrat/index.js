@@ -1393,6 +1393,7 @@ export default class integrat extends PureComponent {
       addGraphLayer.pm.disable();
       let geojson = addGraphLayer.toGeoJSON();
       let polygon = me.geojson2Multipolygon(geojson, 1);
+      //console.log(polygon);
       if (drawGrphic === "addSpot") {
         //新增绘制扰动图斑保存
         me.props.dispatch({

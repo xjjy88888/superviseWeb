@@ -70,7 +70,7 @@ export default {
       }
     },
 
-    // 项目新建-编辑
+    // 项目新建编辑
     *projectCreateUpdate({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result: response }
@@ -87,7 +87,7 @@ export default {
     // 项目删除
     *projectDelete({ payload, callback }, { call, put }) {
       const {
-        data: { success, error, result: response }
+        data: { success, error }
       } = yield call(projectDeleteApi, payload);
       if (callback) callback(success);
       notification[success ? "success" : "error"]({

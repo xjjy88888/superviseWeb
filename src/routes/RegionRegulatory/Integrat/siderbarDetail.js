@@ -20,6 +20,7 @@ import config from "../../../config";
 import { getFile } from "../../../utils/util";
 import jQuery from "jquery";
 
+let self;
 const { TextArea } = Input;
 const dateFormat = "YYYY-MM-DD";
 const formItemLayout = {
@@ -67,6 +68,7 @@ export default class siderbarDetail extends PureComponent {
   }
 
   componentDidMount() {
+    self = this;
     this.eventEmitter = emitter.addListener("siteLocationBack", data => {
       this.props.form.setFieldsValue({
         latitude: data.latitude,
@@ -136,6 +138,7 @@ export default class siderbarDetail extends PureComponent {
 
   render() {
     const {
+      dispatch,
       form: { getFieldDecorator },
       spot: { spotItem },
       point: { pointItem, pointSite },
@@ -501,11 +504,23 @@ export default class siderbarDetail extends PureComponent {
                       okType: "danger",
                       cancelText: "否",
                       onOk() {
-                        console.log("OK");
+                        //delete
+                        dispatch({
+                          type: "spot/spotDelete",
+                          payload: {
+                            id: spotItem.id
+                          },
+                          callback: success => {
+                            if (success) {
+                              self.setState({ show: false });
+                              emitter.emit("deleteSuccess", {
+                                success: true
+                              });
+                            }
+                          }
+                        });
                       },
-                      onCancel() {
-                        console.log("Cancel");
-                      }
+                      onCancel() {}
                     });
                   }}
                 >

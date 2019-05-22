@@ -109,6 +109,16 @@ export default class integrat extends PureComponent {
     this.queryPoint({ SkipCount: 0 });
     this.queryDistrict();
     this.queryDict();
+    this.eventEmitter = emitter.addListener("deleteSuccess", () => {
+      const { key, query_pro, query_spot, query_point } = this.state;
+      const v =
+        key === "project"
+          ? query_pro
+          : key === "spot"
+          ? query_spot
+          : query_point;
+      this.search(v);
+    });
     this.eventEmitter = emitter.addListener("projectCreateUpdateBack", () => {
       this.closeAll();
       this.setState({
@@ -637,6 +647,7 @@ export default class integrat extends PureComponent {
     }
   };
 
+  //删除
   projectDelete = id => {
     const { dispatch } = this.props;
     dispatch({
@@ -647,6 +658,9 @@ export default class integrat extends PureComponent {
       callback: success => {
         if (success) {
           this.setState({ showProjectDetail: false });
+          emitter.emit("deleteSuccess", {
+            success: true
+          });
           emitter.emit("showProjectDetail", {
             show: false,
             edit: false
@@ -654,6 +668,49 @@ export default class integrat extends PureComponent {
         }
       }
     });
+  };
+
+  //search
+  search = v => {
+    const { key, queryInfo } = this.state;
+    this.scrollDom.scrollTop = 0;
+    emitter.emit("checkResult", {
+      show: false,
+      result: []
+    });
+    this.setState({
+      showCheck: false,
+      sort_by: "",
+      sort_key: ""
+    });
+    if (key === "project") {
+      this.setState({
+        query_pro: v,
+        row_pro: 10
+      });
+      this.queryProject({
+        ...queryInfo,
+        SkipCount: 0,
+        ProjectName: v,
+        from: "query"
+      });
+    } else if (key === "spot") {
+      this.setState({ query_spot: v, row_spot: 10 });
+      this.querySpot({
+        ...queryInfo,
+        SkipCount: 0,
+        MapNum: v,
+        from: "query"
+      });
+    } else {
+      this.setState({ query_point: v, row_point: 10 });
+      this.queryPoint({
+        ...queryInfo,
+        SkipCount: 0,
+        ProjectName: v,
+        from: "query"
+      });
+    }
   };
 
   render() {
@@ -942,44 +999,7 @@ export default class integrat extends PureComponent {
             allowClear
             placeholder={`${placeholder}`}
             onSearch={v => {
-              this.scrollDom.scrollTop = 0;
-              emitter.emit("checkResult", {
-                show: false,
-                result: []
-              });
-              this.setState({
-                showCheck: false,
-                sort_by: "",
-                sort_key: ""
-              });
-              if (key === "project") {
-                this.setState({
-                  query_pro: v,
-                  row_pro: 10
-                });
-                this.queryProject({
-                  ...queryInfo,
-                  SkipCount: 0,
-                  ProjectName: v,
-                  from: "query"
-                });
-              } else if (key === "spot") {
-                this.setState({ query_spot: v, row_spot: 10 });
-                this.querySpot({
-                  ...queryInfo,
-                  SkipCount: 0,
-                  MapNum: v,
-                  from: "query"
-                });
-              } else {
-                this.setState({ query_point: v, row_point: 10 });
-                this.queryPoint({
-                  ...queryInfo,
-                  SkipCount: 0,
-                  ProjectName: v,
-                  from: "query"
-                });
-              }
+              this.search(v);
             }}
             style={{ padding: "20px 20px", width: 300 }}
             enterButton
