@@ -7,11 +7,14 @@ import {
   Tag,
   Tree,
   Button,
+  Row,
+  Col,
   notification,
   Input,
   Radio,
   List,
   Spin,
+  Select,
   Upload,
   Modal,
   TreeSelect,
@@ -52,6 +55,7 @@ export default class integrat extends PureComponent {
     super(props);
     this.state = {
       show: true,
+      showCreateDepart: false,
       value: undefined,
       showProjectDetail: false,
       projectEdit: false,
@@ -593,12 +597,25 @@ export default class integrat extends PureComponent {
     const { dispatch } = this.props;
     const { departList } = this.state;
     dispatch({
-      type: "user/queryDepart",
+      type: "user/departVaild",
       payload: {
         name: value
       },
-      callback: data => {
-        this.setState({ departList: [...departList, data] });
+      callback: (isVaild, data) => {
+        if (isVaild) {
+          this.setState({ departList: [...departList, data] });
+        } else {
+          Modal.confirm({
+            title: "查不到该单位，是否去新建单位",
+            content: "",
+            onOk() {
+              this.setState({ showCreateDepart: true });
+            },
+            onCancel() {
+              console.log("Cancel");
+            }
+          });
+        }
       }
     });
   };
@@ -705,6 +722,16 @@ export default class integrat extends PureComponent {
     }
   };
 
+  queryDepartList = v => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "user/departList",
+      payload: {
+        name: v
+      }
+    });
+  };
+
   render() {
     const {
       show,
@@ -725,6 +752,7 @@ export default class integrat extends PureComponent {
       clientHeight,
       previewVisible,
       previewImage,
+      showCreateDepart,
       showCheck,
       showProblem,
       showProjectAllInfo,
@@ -740,13 +768,14 @@ export default class integrat extends PureComponent {
       project: { projectList, projectInfo, projectInfoRedLineList },
       spot: { spotList, projectInfoSpotList },
       point: { pointList },
-      user: { districtList }
+      user: { districtList, departSelectList, departUpdateId }
     } = this.props;
 
     const projectItem = isProjectUpdate
       ? projectInfo
       : {
           projectBase: {},
+          productDepartment: { name: "", id: "" },
           expand: {
             designStartTime: "",
             designCompTime: "",
@@ -1557,11 +1586,11 @@ export default class integrat extends PureComponent {
               >
                 <span>位置：</span>
                 <span>
-                  {projectItem.projectBase.provinceCodes}
+                  {/* {projectItem.projectBase.provinceCodes}
                   {projectItem.projectBase.cityCodes}
                   {projectItem.projectBase.districtCodes}
                   {projectItem.projectBase.town}
-                  {projectItem.projectBase.village}
+                  {projectItem.projectBase.village} */}
                 </span>
                 <Icon
                   type="environment"
@@ -1654,7 +1683,7 @@ export default class integrat extends PureComponent {
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>涉及县：</span>
-                        <span>{projectItem.projectBase.districtCodes}</span>
+                        {/* <span>{projectItem.projectBase.districtCodes}</span> */}
                       </p>
                       <p style={{ textAlign: "justify" }}>
                         <span>备注：</span>
@@ -2485,25 +2514,45 @@ export default class integrat extends PureComponent {
                       projectItem.productDepartment
                     )
                   })(
-                    <Input.TextArea
-                      autosize
+                    <AutoComplete
+                      dataSource={departSelectList}
+                      filterOption={(inputValue, option) =>
+                        option.props.children
+                          .toUpperCase()
+                          .indexOf(inputValue.toUpperCase()) !== -1
+                      }
+                      onChange={this.queryDepartList}
                       onBlur={() => {
                         this.props.form.validateFields((err, v) => {
                           this.getDepartList(v.productDepartmentId);
                         });
                       }}
                     />
+                    // <Input.TextArea
+                    //   autosize
+                    //   onBlur={() => {
+                    //     this.props.form.validateFields((err, v) => {
+                    //       this.getDepartList(v.productDepartmentId);
+                    //     });
+                    //   }}
+                    // />
                   )}
                 </Form.Item>
                 <Form.Item label="监管单位" {...formItemLayout}>
                   {getFieldDecorator("supDepartmentId", {
                     initialValue: this.getDepartName(projectItem.supDepartment)
                   })(
-                    <Input.TextArea
-                      autosize
+                    <AutoComplete
+                      dataSource={departSelectList}
+                      filterOption={(inputValue, option) =>
+                        option.props.children
+                          .toUpperCase()
+                          .indexOf(inputValue.toUpperCase()) !== -1
+                      }
+                      onChange={this.queryDepartList}
                       onBlur={() => {
                         this.props.form.validateFields((err, v) => {
-                          this.getDepartList(v.supDepartmentId);
+                          this.getDepartList(v.replyDepartmentId);
                         });
                       }}
                     />
@@ -2515,8 +2564,14 @@ export default class integrat extends PureComponent {
                       projectItem.replyDepartment
                     )
                   })(
-                    <Input.TextArea
-                      autosize
+                    <AutoComplete
+                      dataSource={departSelectList}
+                      filterOption={(inputValue, option) =>
+                        option.props.children
+                          .toUpperCase()
+                          .indexOf(inputValue.toUpperCase()) !== -1
+                      }
+                      onChange={this.queryDepartList}
                       onBlur={() => {
                         this.props.form.validateFields((err, v) => {
                           this.getDepartList(v.replyDepartmentId);
@@ -2774,6 +2829,100 @@ export default class integrat extends PureComponent {
                 撤销归档
               </Button>
             </div>
+            <Modal
+              title="新建单位"
+              visible={showCreateDepart}
+              onOk={() => {
+                this.props.form.validateFields((err, v) => {
+                  console.log(v);
+                });
+              }}
+              onCancel={() => {
+                this.setState({ showCreateDepart: false });
+              }}
+            >
+              <Form>
+                <Row gutter={24}>
+                  <Col span={12}>
+                    <Form.Item label="单位名称" {...formItemLayout}>
+                      {getFieldDecorator("name", {})(<Input />)}
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="单位地址" {...formItemLayout}>
+                      {getFieldDecorator("address", {})(<Input />)}
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="单位类型" {...formItemLayout}>
+                      {getFieldDecorator("depType", {})(
+                        <Select style={{ width: 120 }}>
+                          <Select.Option value="1">生产建设单位</Select.Option>
+                          <Select.Option value="2">方案编制单位</Select.Option>
+                          <Select.Option value="3">设计单位</Select.Option>
+                          <Select.Option value="4">施工单位</Select.Option>
+                          <Select.Option value="5">监测单位</Select.Option>
+                          <Select.Option value="6">监理单位</Select.Option>
+                          <Select.Option value="7">
+                            验收报告编制单位
+                          </Select.Option>
+                        </Select>
+                      )}
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="单位描述" {...formItemLayout}>
+                      {getFieldDecorator("description", {})(<Input />)}
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="联系电话" {...formItemLayout}>
+                      {getFieldDecorator("phone", {})(<Input />)}
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="单位邮编" {...formItemLayout}>
+                      {getFieldDecorator("zipcode", {})(<Input />)}
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="联系人id" {...formItemLayout}>
+                      {getFieldDecorator("contactId", {})(<Input />)}
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="单位资质" {...formItemLayout}>
+                      {getFieldDecorator("intelligence", {})(<Input />)}
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="法人代表" {...formItemLayout}>
+                      {getFieldDecorator("legal", {})(<Input />)}
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="传真" {...formItemLayout}>
+                      {getFieldDecorator("fax", {})(<Input />)}
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="主要投资方1" {...formItemLayout}>
+                      {getFieldDecorator("investors1", {})(<Input />)}
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="主要投资方2" {...formItemLayout}>
+                      {getFieldDecorator("investors2", {})(<Input />)}
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="主要投资方3" {...formItemLayout}>
+                      {getFieldDecorator("investors3", {})(<Input />)}
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Form>
+            </Modal>
           </div>
         </div>
       </div>

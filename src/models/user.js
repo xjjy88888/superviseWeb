@@ -1,4 +1,11 @@
-import { loginApi, districtApi, dictApi, DepartApi } from "../services/httpApi";
+import {
+  loginApi,
+  districtApi,
+  dictApi,
+  departListApi,
+  departCreateApi,
+  departVaildApi
+} from "../services/httpApi";
 import { routerRedux } from "dva/router";
 import { notification } from "antd";
 
@@ -12,7 +19,9 @@ export default {
       }
     ],
     districtList: [],
-    dicList: []
+    dicList: [],
+    departSelectList: [],
+    departUpdateId: ""
   },
 
   subscriptions: {
@@ -72,18 +81,50 @@ export default {
         });
       }
     },
-    *queryDepart({ payload, callback }, { call, put }) {
+
+    //部门新建
+    *departCreateApi({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(departCreateApi, payload);
+      if (success) {
+      } else {
+        notification["error"]({
+          message: `部门新建失败：${error.message}`
+        });
+      }
+    },
+
+    //部门列表
+    *departList({ payload, callback }, { call, put }) {
+      const {
+        data: {
+          success,
+          error,
+          result: { items: list }
+        }
+      } = yield call(departListApi, payload);
+      const departSelectList = list.map(item => item.name);
+      const departUpdateId = list.length ? list[0].id : "";
+      if (success) {
+        yield put({
+          type: "save",
+          payload: { departSelectList, departUpdateId }
+        });
+      } else {
+        notification["error"]({
+          message: `查询单位列表失败：${error.message}`
+        });
+      }
+    },
+
+    //部门校验
+    *departVaild({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result: response }
-      } = yield call(DepartApi, payload);
+      } = yield call(departVaildApi, payload);
       if (success) {
-        if (response.isVaild) {
-          if (callback) callback(response.department);
-        } else {
-          notification["warning"]({
-            message: `查不到${payload.name}单位，请重新输入`
-          });
-        }
+        if (callback) callback(response.isVaild, response.department);
       } else {
         notification["error"]({
           message: `单位校验失败：${error.message}`

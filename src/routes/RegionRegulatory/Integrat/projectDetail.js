@@ -9,7 +9,7 @@ import {
   Upload,
   Divider,
   Form,
-  Row,
+  Row,Select ,
   Col,
   DatePicker,
   AutoComplete

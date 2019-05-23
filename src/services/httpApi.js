@@ -25,7 +25,7 @@ export async function projectListApi(params) {
     },
     body: JSON.stringify({
       ...params,
-      MaxResultCount: 10,
+      MaxResultCount: params.MaxResultCount || "10",
       ReplyTimeBegin:
         params.ReplyTime && params.ReplyTime.length
           ? dateFormat(params.ReplyTime[0]._d)
@@ -218,9 +218,31 @@ export async function dictApi() {
   });
 }
 
-// 部门
-export async function DepartApi(params) {
-  return request(`${config.url.DepartUrl}?name=${params.name}`, {
+// 部门新建
+export async function departCreateApi(params) {
+  return request(config.url.departCreateUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify(params)
+  });
+}
+
+// 部门列表
+export async function departListApi(params) {
+  return request(`${config.url.departListUrl}?name=${params.name}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 部门校验
+export async function departVaildApi(params) {
+  return request(`${config.url.departVaildUrl}?name=${params.name}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`

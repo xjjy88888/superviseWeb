@@ -154,12 +154,14 @@ export default class siderbarDetail extends PureComponent {
   submit = () => {
     const {
       dispatch,
-      spot: { spotInfo }
+      spot: { spotInfo },
+      project: { projectSelectList, projectUpdateId }
     } = this.props;
     const { type } = this.state;
     this.props.form.validateFields((err, v) => {
       if (!err) {
         console.log(v);
+        console.log(projectSelectList);
         dispatch({
           type: "spot/spotCreateUpdate",
           payload: {
@@ -180,6 +182,7 @@ export default class siderbarDetail extends PureComponent {
             districtCodeId: v.districtCodeId.length
               ? v.districtCodeId.pop()
               : "",
+            projectId: projectUpdateId || spotInfo.projectId,
             id: type === "edit" ? spotInfo.id : ""
           },
           callback: (success, response) => {
@@ -204,9 +207,11 @@ export default class siderbarDetail extends PureComponent {
       dispatch,
       form: { getFieldDecorator },
       spot: { spotInfo },
+      project: { projectSelectList },
       point: { pointItem, pointSite },
       user: { districtList }
     } = this.props;
+    console.log(projectSelectList);
     const {
       show,
       from,
@@ -387,28 +392,76 @@ export default class siderbarDetail extends PureComponent {
                 })(<Input disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="关联项目" {...formItemLayout}>
-                {getFieldDecorator("projectId", {
-                  initialValue: spotItem.projectId
+                {getFieldDecorator("projectName", {
+                  initialValue: spotItem.projectName
                 })(
-                  <Input
+                  <AutoComplete
                     disabled={!edit}
-                    addonAfter={
-                      <Icon
-                        type="link"
-                        style={{
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("showProjectSpotInfo", {
-                            show: true,
-                            edit: false,
-                            from: "project",
-                            id: spotItem.projectId
-                          });
-                        }}
-                      />
+                    dataSource={projectSelectList}
+                    filterOption={(inputValue, option) =>
+                      option.props.children
+                        .toUpperCase()
+                        .indexOf(inputValue.toUpperCase()) !== -1
                     }
+                    // addonAfter={
+                    //   <Icon
+                    //     type="link"
+                    //     style={{
+                    //       color: "#1890ff"
+                    //     }}
+                    //     onClick={() => {
+                    //       emitter.emit("showProjectSpotInfo", {
+                    //         show: true,
+                    //         edit: false,
+                    //         from: "project",
+                    //         id: spotItem.projectId
+                    //       });
+                    //     }}
+                    //   />
+                    // }
+                    onChange={v => {
+                      dispatch({
+                        type: "project/queryProjectSelect",
+                        payload: {
+                          ProjectName: v,
+                          MaxResultCount: 5
+                        }
+                      });
+                    }}
                   />
+                  // <Input
+                  //   disabled={!edit}
+                  //   addonAfter={
+                  //     <Icon
+                  //       type="link"
+                  //       style={{
+                  //         color: "#1890ff"
+                  //       }}
+                  //       onClick={() => {
+                  //         emitter.emit("showProjectSpotInfo", {
+                  //           show: true,
+                  //           edit: false,
+                  //           from: "project",
+                  //           id: spotItem.projectId
+                  //         });
+                  //       }}
+                  //     />
+                  //   }
+                  //   onChange={v => {
+                  //     setTimeout(() => {
+                  //       this.props.form.validateFields((err, v) => {
+                  //         console.log(v.projectName);
+                  //         dispatch({
+                  //           type: "project/queryProjectSelect",
+                  //           payload: {
+                  //             ProjectName: v.projectName,
+                  //             MaxResultCount: 5
+                  //           }
+                  //         });
+                  //       });
+                  //     }, 100);
+                  //   }}
+                  // />
                 )}
               </Form.Item>
               <Form.Item label="扰动类型" {...formItemLayout}>
@@ -491,9 +544,9 @@ export default class siderbarDetail extends PureComponent {
                   initialValue: spotItem.isReview ? true : false
                 })(<Switch disabled={!edit} />)}
               </Form.Item>
-              <Form.Item label="所在地区" {...formItemLayout}>
+              {/* <Form.Item label="所在地区" {...formItemLayout}>
                 {getFieldDecorator("districtCodeId", {
-                  initialValue: spotItem.provinceCityDistrict
+                  initialValue: ["520000", "524100", "524101"]
                 })(
                   <Cascader
                     disabled={!edit}
@@ -502,7 +555,7 @@ export default class siderbarDetail extends PureComponent {
                     changeOnSelect
                   />
                 )}
-              </Form.Item>
+              </Form.Item> */}
               <Form.Item label="详细地址" {...formItemLayout}>
                 {getFieldDecorator("addressInfo", {
                   initialValue: spotItem.addressInfo

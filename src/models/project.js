@@ -21,13 +21,16 @@ export default {
     projectInfoRedLineList: { totalCount: "", items: [] },
     projectInfo: {
       projectBase: {},
+      productDepartment: { name: "", id: "" },
       expand: {
         designStartTime: "",
         designCompTime: "",
         actStartTime: "",
         actCompTime: ""
       }
-    }
+    },
+    projectSelectList: [],
+    projectUpdateId: ""
   },
 
   subscriptions: {
@@ -51,6 +54,29 @@ export default {
       } else {
         notification["error"]({
           message: `查询项目列表失败：${error.message}`
+        });
+      }
+    },
+
+    // 项目下拉列表
+    *queryProjectSelect({ payload, callback }, { call, put }) {
+      const {
+        data: {
+          success,
+          error,
+          result: { items: list }
+        }
+      } = yield call(projectListApi, payload);
+      const projectSelectList = list.map(item => item.projectName);
+      const projectUpdateId = list.length ? list[0].id : "";
+      if (success) {
+        yield put({
+          type: "save",
+          payload: { projectSelectList, projectUpdateId }
+        });
+      } else {
+        notification["error"]({
+          message: `查询关联项目列表失败：${error.message}`
         });
       }
     },

@@ -1279,24 +1279,24 @@ export default class integrat extends PureComponent {
     let bounds = userconfig.geoJsonLayer.getBounds();
     map.setMaxBounds(bounds);
     map.setMinZoom(userconfig.zoom);
-    const projectlayerGroup = L.layerGroup();
-    const spotlayerGroup = L.layerGroup();
+    const projectlayerGroup = userconfig.projectlayerGroup = L.layerGroup();
+    const spotlayerGroup = userconfig.spotlayerGroup =  L.layerGroup();
     //加载项目红线图层wms
     L.tileLayer
-      .wms(config.mapUrl.geoserverUrl + "/wms?", {
-        layers: "ZKYGIS:bs_project_scope", //需要加载的图层
-        format: "image/png", //返回的数据格式
-        transparent: true
-      })
-      .addTo(projectlayerGroup);
+    .wms(config.mapUrl.geoserverUrl + "/wms?", {
+      layers: config.mapProjectLayerName, //需要加载的图层
+      format: "image/png", //返回的数据格式
+      transparent: true
+    })
+    .addTo(projectlayerGroup);
     //加载图斑图层wms
     L.tileLayer
-      .wms(config.mapUrl.geoserverUrl + "/wms?", {
-        layers: "	ZKYGIS:bs_spot", //需要加载的图层
-        format: "image/png", //返回的数据格式
-        transparent: true
-      })
-      .addTo(spotlayerGroup);
+    .wms(config.mapUrl.geoserverUrl + "/wms?", {
+      layers: config.mapSpotLayerName, //需要加载的图层
+      format: "image/png", //返回的数据格式
+      transparent: true
+    })
+    .addTo(spotlayerGroup);
     map.addLayer(projectlayerGroup);
     map.addLayer(spotlayerGroup);
     const overlays = {
@@ -1560,6 +1560,8 @@ export default class integrat extends PureComponent {
       this.removeSideBySide();
       //还原默认底图加载
       map.addLayer(userconfig.baseLayer2);
+      map.addLayer(userconfig.projectlayerGroup);
+      map.addLayer(userconfig.spotlayerGroup);       
     }
   };
   /*
@@ -1583,11 +1585,8 @@ export default class integrat extends PureComponent {
     this.addLRLayers(selectLeftV,selectRightV);
     //卷帘地图效果
     userconfig.sideBySide = L.control
-    .sideBySide(userconfig.leftLayer, userconfig.rightLayer)
+    .sideBySide(userconfig.leftLayers, userconfig.rightLayers)
     .addTo(map);
-    /*userconfig.sideBySide.on("dividermove",(e)=>{
-       console.log(e);
-    })*/
   };
   /*
    * 移除卷帘效果
@@ -1596,47 +1595,97 @@ export default class integrat extends PureComponent {
     if (userconfig.sideBySide) {
         userconfig.sideBySide.remove();
     }
+    //移除地图默认加载底图
     if (map.hasLayer(userconfig.baseLayer1))
         map.removeLayer(userconfig.baseLayer1);
     if (map.hasLayer(userconfig.baseLayer2))
         map.removeLayer(userconfig.baseLayer2);
     if (map.hasLayer(userconfig.baseLayer3))
         map.removeLayer(userconfig.baseLayer3);
-    if (map.hasLayer(userconfig.leftLayer))
-        map.removeLayer(userconfig.leftLayer);
-    if (map.hasLayer(userconfig.rightLayer))
-        map.removeLayer(userconfig.rightLayer);
+    //移除地图默认加载叠加图层组 
+    if(userconfig.projectlayerGroup)
+        map.removeLayer(userconfig.projectlayerGroup);
+    if(userconfig.spotlayerGroup)
+        map.removeLayer(userconfig.spotlayerGroup);        
+    //移除卷帘对比左右边图层列表 
+    this.removeleftrightLayers();
+      
+  };
+  /*
+   *移除卷帘对比左右边图层列表
+   */  
+  removeleftrightLayers = () => {
+    if(userconfig.leftLayers && userconfig.leftLayers.length>0){
+      for(let i =0;i<userconfig.leftLayers.length; i++){
+          let layer = userconfig.leftLayers[i];
+          if(map.hasLayer(layer))
+             map.removeLayer(layer);
+      }
+    }
+    if(userconfig.leftLayers && userconfig.rightLayers.length>0){
+      for(let i =0;i<userconfig.rightLayers.length; i++){
+          let layer = userconfig.rightLayers[i];
+          if(map.hasLayer(layer))
+             map.removeLayer(layer);
+      }
+    }
   };
   onChangeSelectLeft = v => {
     this.setState({ selectLeftV: v });
     const {selectRightV} = this.state;
     this.addLRLayers(v,selectRightV);
-    userconfig.sideBySide.setLeftLayers(userconfig.leftLayer);
-    userconfig.sideBySide.setRightLayers(userconfig.rightLayer);
+    userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
+    userconfig.sideBySide.setRightLayers(userconfig.rightLayers);
 
   };
   addLRLayers = (selectLeftV,selectRightV) => {
-    if (map.hasLayer(userconfig.leftLayer))
-        map.removeLayer(userconfig.leftLayer);
-    if (map.hasLayer(userconfig.rightLayer))
-        map.removeLayer(userconfig.rightLayer);
+    //清空图层
+    this.removeleftrightLayers();
+    userconfig.leftLayers = [];
+    userconfig.rightLayers = [];
+
     let leftLayerUrl =  config.imageBaseUrl + "/" + selectLeftV.replace(/\//g, "-")+"/tile/{z}/{y}/{x}";
-    userconfig.leftLayer = L.tileLayer(
+    let leftImgLayer = L.tileLayer(
       leftLayerUrl
     ); //左侧影像
-    map.addLayer(userconfig.leftLayer);
+    map.addLayer(leftImgLayer);
     let rightLayerUrl =  config.imageBaseUrl + "/" + selectRightV.replace(/\//g, "-")+"/tile/{z}/{y}/{x}";
-    userconfig.rightLayer = L.tileLayer(
+    let rightImgLayer = L.tileLayer(
       rightLayerUrl
     ); //右侧影像
-    map.addLayer(userconfig.rightLayer);
+    map.addLayer(rightImgLayer);
+    //测试部分
+    userconfig.spotwms = L.tileLayer
+    .wms(config.mapUrl.geoserverUrl + "/wms?", {
+      layers: config.mapSpotLayerName, //需要加载的图层
+      format: "image/png", //返回的数据格式
+      transparent: true
+    });
+    userconfig.spotwms1 = L.tileLayer
+    .wms(config.mapUrl.geoserverUrl + "/wms?", {
+      layers: config.mapSpotLayerName, //需要加载的图层
+      format: "image/png", //返回的数据格式
+      transparent: true
+    });
+    userconfig.projectwms = L.tileLayer
+    .wms(config.mapUrl.geoserverUrl + "/wms?", {
+      layers: config.mapProjectLayerName, //需要加载的图层
+      format: "image/png", //返回的数据格式
+      transparent: true
+    });
+    map.addLayer(userconfig.spotwms);
+    map.addLayer(userconfig.spotwms1);
+    //map.addLayer(userconfig.projectwms);
+    userconfig.leftLayers = [userconfig.spotwms,leftImgLayer];
+    userconfig.rightLayers = [userconfig.spotwms1,rightImgLayer];
+
   };
   onChangeSelectRight = v => {
     this.setState({ selectRightV: v });
     const {selectLeftV} = this.state;
     this.addLRLayers(selectLeftV,v);
-    userconfig.sideBySide.setLeftLayers(userconfig.leftLayer);
-    userconfig.sideBySide.setRightLayers(userconfig.rightLayer);
+    userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
+    userconfig.sideBySide.setRightLayers(userconfig.rightLayers);
   };
 
   render() {

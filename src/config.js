@@ -61,8 +61,14 @@ const config = {
     // 字典
     dictUrl: `${domain}api/services/app/DictTable/GetAll`,
 
-    // 部门
-    DepartUrl: `${domain}api/services/app/Department/Vaild`,
+    // 部门新建
+    departCreateUrl: `${domain}api/services/app/SocialDepartmentDto/Create`,
+
+    // 部门列表
+    departListUrl: `${domain}api/services/app/Department/GetAll`,
+
+    // 部门校验
+    departVaildUrl: `${domain}api/services/app/Department/Vaild`,
 
     // 项目位置
     projectPositionUrl: `${domain}api/services/app/Attachment/UploadAsync`,
