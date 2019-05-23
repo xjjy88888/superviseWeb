@@ -609,7 +609,7 @@ export default class integrat extends PureComponent {
             title: "查不到该单位，是否去新建单位",
             content: "",
             onOk() {
-              this.setState({ showCreateDepart: true });
+              self.setState({ showCreateDepart: true });
             },
             onCancel() {
               console.log("Cancel");
@@ -2835,6 +2835,18 @@ export default class integrat extends PureComponent {
               onOk={() => {
                 this.props.form.validateFields((err, v) => {
                   console.log(v);
+                  dispatch({
+                    type: "user/departCreateApi",
+                    payload: v,
+                    callback: (success, result) => {
+                      if (success) {
+                        self.setState({ showCreateDepart: false });
+                        notification["success"]({
+                          message: `单位新建成功`
+                        });
+                      }
+                    }
+                  });
                 });
               }}
               onCancel={() => {

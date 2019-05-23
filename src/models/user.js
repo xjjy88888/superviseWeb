@@ -88,9 +88,10 @@ export default {
         data: { success, error, result }
       } = yield call(departCreateApi, payload);
       if (success) {
+        if (callback) callback(success, result);
       } else {
         notification["error"]({
-          message: `部门新建失败：${error.message}`
+          message: `单位新建失败：${error.message}`
         });
       }
     },
