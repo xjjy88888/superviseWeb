@@ -544,9 +544,9 @@ export default class siderbarDetail extends PureComponent {
                   initialValue: spotItem.isReview ? true : false
                 })(<Switch disabled={!edit} />)}
               </Form.Item>
-              {/* <Form.Item label="所在地区" {...formItemLayout}>
+              <Form.Item label="所在地区" {...formItemLayout}>
                 {getFieldDecorator("districtCodeId", {
-                  initialValue: ["520000", "524100", "524101"]
+                  initialValue: spotItem.provinceCityDistrict
                 })(
                   <Cascader
                     disabled={!edit}
@@ -555,7 +555,7 @@ export default class siderbarDetail extends PureComponent {
                     changeOnSelect
                   />
                 )}
-              </Form.Item> */}
+              </Form.Item>
               <Form.Item label="详细地址" {...formItemLayout}>
                 {getFieldDecorator("addressInfo", {
                   initialValue: spotItem.addressInfo

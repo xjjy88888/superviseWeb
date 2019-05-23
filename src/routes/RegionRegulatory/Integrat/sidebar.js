@@ -123,6 +123,11 @@ export default class integrat extends PureComponent {
           : query_point;
       this.search(v);
     });
+    this.eventEmitter = emitter.addListener("showCreateDepart", v => {
+      this.setState({
+        showCreateDepart: v.show
+      });
+    });
     this.eventEmitter = emitter.addListener("projectCreateUpdateBack", () => {
       this.closeAll();
       this.setState({
@@ -448,7 +453,7 @@ export default class integrat extends PureComponent {
         projectEdit: false
       });
       emitter.emit("showProjectDetail", {
-        show: true,
+        show: false,
         edit: false
       });
     } else {
@@ -593,29 +598,37 @@ export default class integrat extends PureComponent {
     }
   };
 
-  getDepartList = value => {
-    const { dispatch } = this.props;
+  getDepartList = key => {
+    const {
+      dispatch,
+      form: { validateFields, setFieldsValue }
+    } = this.props;
     const { departList } = this.state;
-    dispatch({
-      type: "user/departVaild",
-      payload: {
-        name: value
-      },
-      callback: (isVaild, data) => {
-        if (isVaild) {
-          this.setState({ departList: [...departList, data] });
-        } else {
-          Modal.confirm({
-            title: "查不到该单位，是否去新建单位",
-            content: "",
-            onOk() {
-              self.setState({ showCreateDepart: true });
-            },
-            onCancel() {
-              console.log("Cancel");
+    validateFields((err, v) => {
+      if (v[key]) {
+        dispatch({
+          type: "user/departVaild",
+          payload: {
+            name: v[key]
+          },
+          callback: (isVaild, data) => {
+            if (isVaild) {
+              this.setState({ departList: [...departList, data] });
+            } else {
+              Modal.confirm({
+                title: "查不到该单位，是否去新建单位",
+                content: "",
+                onOk() {
+                  self.setState({ showCreateDepart: true });
+                  setFieldsValue({ [key]: "" });
+                },
+                onCancel() {
+                  console.log("Cancel");
+                }
+              });
             }
-          });
-        }
+          }
+        });
       }
     });
   };
@@ -1586,11 +1599,8 @@ export default class integrat extends PureComponent {
               >
                 <span>位置：</span>
                 <span>
-                  {/* {projectItem.projectBase.provinceCodes}
-                  {projectItem.projectBase.cityCodes}
-                  {projectItem.projectBase.districtCodes}
-                  {projectItem.projectBase.town}
-                  {projectItem.projectBase.village} */}
+                  {projectItem.projectBase.provinceCityDistrictName}
+                  {projectItem.projectBase.addressInfo}
                 </span>
                 <Icon
                   type="environment"
@@ -2523,19 +2533,9 @@ export default class integrat extends PureComponent {
                       }
                       onChange={this.queryDepartList}
                       onBlur={() => {
-                        this.props.form.validateFields((err, v) => {
-                          this.getDepartList(v.productDepartmentId);
-                        });
+                        this.getDepartList("productDepartmentId");
                       }}
                     />
-                    // <Input.TextArea
-                    //   autosize
-                    //   onBlur={() => {
-                    //     this.props.form.validateFields((err, v) => {
-                    //       this.getDepartList(v.productDepartmentId);
-                    //     });
-                    //   }}
-                    // />
                   )}
                 </Form.Item>
                 <Form.Item label="监管单位" {...formItemLayout}>
@@ -2551,9 +2551,7 @@ export default class integrat extends PureComponent {
                       }
                       onChange={this.queryDepartList}
                       onBlur={() => {
-                        this.props.form.validateFields((err, v) => {
-                          this.getDepartList(v.replyDepartmentId);
-                        });
+                        this.getDepartList("supDepartmentId");
                       }}
                     />
                   )}
@@ -2573,9 +2571,7 @@ export default class integrat extends PureComponent {
                       }
                       onChange={this.queryDepartList}
                       onBlur={() => {
-                        this.props.form.validateFields((err, v) => {
-                          this.getDepartList(v.replyDepartmentId);
-                        });
+                        this.getDepartList("replyDepartmentId");
                       }}
                     />
                   )}

@@ -5,11 +5,13 @@ import {
   Icon,
   Button,
   Input,
+  Modal,
   notification,
   Upload,
   Divider,
   Form,
-  Row,Select ,
+  Row,
+  Select,
   Col,
   DatePicker,
   AutoComplete
@@ -19,6 +21,7 @@ import emitter from "../../../utils/event";
 import styles from "./index.less";
 import moment from "moment";
 
+let self;
 let yearDataSource = [];
 
 @connect(({ project, user }) => ({
@@ -31,7 +34,8 @@ export default class integrat extends PureComponent {
     super(props);
     this.state = {
       show: false,
-      edit: false
+      edit: false,
+      departList: []
     };
     this.map = null;
     this.saveRef = ref => {
@@ -40,6 +44,7 @@ export default class integrat extends PureComponent {
   }
 
   componentDidMount() {
+    self = this;
     const { dispatch } = this.props;
     const maxYear = new Date().getFullYear();
     for (let i = maxYear; i >= 1970; i--) {
@@ -123,12 +128,60 @@ export default class integrat extends PureComponent {
     }
   };
 
+  getDepartList = key => {
+    const {
+      dispatch,
+      form: { validateFields, setFieldsValue }
+    } = this.props;
+    const { departList } = this.state;
+    validateFields((err, v) => {
+      if (v[key]) {
+        dispatch({
+          type: "user/departVaild",
+          payload: {
+            name: v[key]
+          },
+          callback: (isVaild, data) => {
+            if (isVaild) {
+              this.setState({ departList: [...departList, data] });
+            } else {
+              Modal.confirm({
+                title: "查不到该单位，是否去新建单位",
+                content: "",
+                onOk() {
+                  setFieldsValue({ [key]: "" });
+                  emitter.emit("showCreateDepart", {
+                    show: true
+                  });
+                },
+                onCancel() {
+                  console.log("Cancel");
+                }
+              });
+            }
+          }
+        });
+      }
+    });
+  };
+
+  queryDepartList = v => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "user/departList",
+      payload: {
+        name: v
+      }
+    });
+  };
+
   render() {
     const { show, edit } = this.state;
 
     const {
+      form: { getFieldDecorator },
       project: { projectInfo },
-      form: { getFieldDecorator }
+      user: { districtList, departSelectList, departUpdateId }
     } = this.props;
 
     const projectItem = projectInfo;
@@ -776,7 +829,20 @@ export default class integrat extends PureComponent {
                     initialValue: this.getDepartName(
                       projectItem.projectDepartment
                     )
-                  })(<Input />)}
+                  })(
+                    <AutoComplete
+                      dataSource={departSelectList}
+                      filterOption={(inputValue, option) =>
+                        option.props.children
+                          .toUpperCase()
+                          .indexOf(inputValue.toUpperCase()) !== -1
+                      }
+                      onChange={this.queryDepartList}
+                      onBlur={() => {
+                        this.getDepartList("projectDepartmentId");
+                      }}
+                    />
+                  )}
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -785,7 +851,20 @@ export default class integrat extends PureComponent {
                     initialValue: this.getDepartName(
                       projectItem.monitorDepartment
                     )
-                  })(<Input />)}
+                  })(
+                    <AutoComplete
+                      dataSource={departSelectList}
+                      filterOption={(inputValue, option) =>
+                        option.props.children
+                          .toUpperCase()
+                          .indexOf(inputValue.toUpperCase()) !== -1
+                      }
+                      onChange={this.queryDepartList}
+                      onBlur={() => {
+                        this.getDepartList("monitorDepartmentId");
+                      }}
+                    />
+                  )}
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -794,7 +873,20 @@ export default class integrat extends PureComponent {
                     initialValue: this.getDepartName(
                       projectItem.SupervisionDepartment
                     )
-                  })(<Input />)}
+                  })(
+                    <AutoComplete
+                      dataSource={departSelectList}
+                      filterOption={(inputValue, option) =>
+                        option.props.children
+                          .toUpperCase()
+                          .indexOf(inputValue.toUpperCase()) !== -1
+                      }
+                      onChange={this.queryDepartList}
+                      onBlur={() => {
+                        this.getDepartList("supervisionDepartmentId");
+                      }}
+                    />
+                  )}
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -803,7 +895,20 @@ export default class integrat extends PureComponent {
                     initialValue: this.getDepartName(
                       projectItem.designDepartment
                     )
-                  })(<Input />)}
+                  })(
+                    <AutoComplete
+                      dataSource={departSelectList}
+                      filterOption={(inputValue, option) =>
+                        option.props.children
+                          .toUpperCase()
+                          .indexOf(inputValue.toUpperCase()) !== -1
+                      }
+                      onChange={this.queryDepartList}
+                      onBlur={() => {
+                        this.getDepartList("designDepartmentId");
+                      }}
+                    />
+                  )}
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -812,7 +917,20 @@ export default class integrat extends PureComponent {
                     initialValue: this.getDepartName(
                       projectItem.constructionDepartment
                     )
-                  })(<Input />)}
+                  })(
+                    <AutoComplete
+                      dataSource={departSelectList}
+                      filterOption={(inputValue, option) =>
+                        option.props.children
+                          .toUpperCase()
+                          .indexOf(inputValue.toUpperCase()) !== -1
+                      }
+                      onChange={this.queryDepartList}
+                      onBlur={() => {
+                        this.getDepartList("constructionDepartmentId");
+                      }}
+                    />
+                  )}
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -821,7 +939,20 @@ export default class integrat extends PureComponent {
                     initialValue: this.getDepartName(
                       projectItem.ReportDepartment
                     )
-                  })(<Input />)}
+                  })(
+                    <AutoComplete
+                      dataSource={departSelectList}
+                      filterOption={(inputValue, option) =>
+                        option.props.children
+                          .toUpperCase()
+                          .indexOf(inputValue.toUpperCase()) !== -1
+                      }
+                      onChange={this.queryDepartList}
+                      onBlur={() => {
+                        this.getDepartList("reportDepartmentId");
+                      }}
+                    />
+                  )}
                 </Form.Item>
               </Col>
               <Divider />
