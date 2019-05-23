@@ -12,7 +12,7 @@ export default {
   state: {
     spotList: { totalCount: 0, items: [] },
     projectInfoSpotList: { totalCount: 0, items: [] },
-    spotInfo: {}
+    spotInfo: { mapNum: "", provinceCityDistrict: [null, null, null] }
   },
 
   subscriptions: {

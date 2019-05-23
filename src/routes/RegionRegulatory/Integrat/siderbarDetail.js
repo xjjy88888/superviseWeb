@@ -4,6 +4,7 @@ import { connect } from "dva";
 import moment from "moment";
 import {
   Icon,
+  message,
   Button,
   Input,
   Cascader,
@@ -156,36 +157,43 @@ export default class siderbarDetail extends PureComponent {
       spot: { spotInfo }
     } = this.props;
     const { type } = this.state;
-    this.props.form.validateFields((err, values) => {
+    this.props.form.validateFields((err, v) => {
       if (!err) {
-        console.log(values);
+        console.log(v);
         dispatch({
           type: "spot/spotCreateUpdate",
           payload: {
-            ...values,
+            ...v,
             interferenceTypeId: this.getDictKey(
-              values.interferenceTypeId,
+              v.interferenceTypeId,
               "扰动类型"
             ),
             interferenceComplianceId: this.getDictKey(
-              values.interferenceComplianceId,
+              v.interferenceComplianceId,
               "扰动合规性"
             ),
             interferenceVaryTypeId: this.getDictKey(
-              values.interferenceVaryTypeId,
+              v.interferenceVaryTypeId,
               "扰动变化类型"
             ),
-            buildStatusId: this.getDictKey(values.buildStatusId, "建设状态"),
+            buildStatusId: this.getDictKey(v.buildStatusId, "建设状态"),
+            districtCodeId: v.districtCodeId.length
+              ? v.districtCodeId.pop()
+              : "",
             id: type === "edit" ? spotInfo.id : ""
           },
           callback: (success, response) => {
             if (success) {
               emitter.emit("projectCreateUpdateBack", {});
               notification["success"]({
-                message: `${spotInfo.id ? "编辑" : "新建"}项目成功`
+                message: `${type === "edit" ? "编辑" : "新建"}图斑成功`
               });
             }
           }
+        });
+      } else {
+        notification["warning"]({
+          message: err.mapNum.errors[0].message
         });
       }
     });
@@ -211,7 +219,9 @@ export default class siderbarDetail extends PureComponent {
       previewVisible_min
     } = this.state;
 
-    const spotItem = isSpotUpdate ? spotInfo : {};
+    const spotItem = isSpotUpdate
+      ? spotInfo
+      : { mapNum: "", provinceCityDistrict: [null, null, null] };
 
     return (
       <div
@@ -373,12 +383,7 @@ export default class siderbarDetail extends PureComponent {
               <Form.Item label="图斑编号" {...formItemLayout} hasFeedback>
                 {getFieldDecorator("mapNum", {
                   initialValue: spotItem.mapNum,
-                  rules: [
-                    {
-                      required: true,
-                      message: "图斑编号不能为空"
-                    }
-                  ]
+                  rules: [{ required: true, message: "图斑编号不能为空" }]
                 })(<Input disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="关联项目" {...formItemLayout}>
@@ -484,52 +489,11 @@ export default class siderbarDetail extends PureComponent {
                 {getFieldDecorator("isReview", {
                   valuePropName: "checked",
                   initialValue: spotItem.isReview ? true : false
-                })(<Switch />)}
-              </Form.Item>
-              <Form.Item label="涉及县" {...formItemLayout}>
-                {getFieldDecorator("districtCodes", {
-                  valuePropName: "value"
-                })(
-                  <TreeSelect
-                    showSearch
-                    style={{ width: "100%" }}
-                    dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
-                    placeholder="请选择涉及县"
-                    allowClear
-                    multiple
-                    treeDefaultExpandAll
-                  >
-                    {districtList.map(item => (
-                      <TreeSelect.TreeNode
-                        value={item.value}
-                        title={item.label}
-                        key={item.value}
-                        disabled
-                      >
-                        {(item.children || []).map(ite => (
-                          <TreeSelect.TreeNode
-                            value={ite.value}
-                            title={ite.label}
-                            key={ite.value}
-                            disabled
-                          >
-                            {(ite.children || []).map(i => (
-                              <TreeSelect.TreeNode
-                                value={i.value}
-                                title={i.label}
-                                key={i.value}
-                              />
-                            ))}
-                          </TreeSelect.TreeNode>
-                        ))}
-                      </TreeSelect.TreeNode>
-                    ))}
-                  </TreeSelect>
-                )}
+                })(<Switch disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="所在地区" {...formItemLayout}>
-                {getFieldDecorator("diqu", {
-                  // initialValue: ["贵州省", "都柳江", "从江段"]
+                {getFieldDecorator("districtCodeId", {
+                  initialValue: spotItem.provinceCityDistrict
                 })(
                   <Cascader
                     disabled={!edit}
@@ -540,7 +504,9 @@ export default class siderbarDetail extends PureComponent {
                 )}
               </Form.Item>
               <Form.Item label="详细地址" {...formItemLayout}>
-                <Input />
+                {getFieldDecorator("addressInfo", {
+                  initialValue: spotItem.addressInfo
+                })(<Input disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="问题" {...formItemLayout}>
                 {getFieldDecorator("problem", {
@@ -612,7 +578,7 @@ export default class siderbarDetail extends PureComponent {
                 <Button
                   icon="delete"
                   style={{
-                    display: type !== "add" ? "block" : "none",
+                    display: type !== "add" ? "inherit" : "none",
                     marginLeft: 20
                   }}
                   onClick={() => {

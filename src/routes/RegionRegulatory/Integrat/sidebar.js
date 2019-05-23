@@ -746,7 +746,7 @@ export default class integrat extends PureComponent {
     const projectItem = isProjectUpdate
       ? projectInfo
       : {
-          projectBase: { name: "" },
+          projectBase: {},
           expand: {
             designStartTime: "",
             designCompTime: "",
@@ -1483,6 +1483,10 @@ export default class integrat extends PureComponent {
                           id: isProjectUpdate ? projectItem.id : ""
                         };
                         emitter.emit("projectCreateUpdate", data);
+                      } else {
+                        notification["warning"]({
+                          message: err.projectName.errors[0].message
+                        });
                       }
                     });
                   } else {
@@ -1553,9 +1557,9 @@ export default class integrat extends PureComponent {
               >
                 <span>位置：</span>
                 <span>
-                  {projectItem.projectBase.provinceCode}
-                  {projectItem.projectBase.cityCode}
-                  {projectItem.projectBase.districtCode}
+                  {projectItem.projectBase.provinceCodes}
+                  {projectItem.projectBase.cityCodes}
+                  {projectItem.projectBase.districtCodes}
                   {projectItem.projectBase.town}
                   {projectItem.projectBase.village}
                 </span>
@@ -2418,12 +2422,13 @@ export default class integrat extends PureComponent {
               <Form style={{ position: "relative", paddingBottom: 10 }}>
                 <Form.Item label="项目名" {...formItemLayout}>
                   {getFieldDecorator("projectName", {
-                    initialValue: projectItem.projectBase.name
+                    initialValue: projectItem.projectBase.name,
+                    rules: [{ required: true, message: "项目名不能为空" }]
                   })(<Input.TextArea autosize />)}
                 </Form.Item>
                 <Form.Item label="所在地区" {...formItemLayout}>
-                  {getFieldDecorator("districtCodes1", {
-                    initialValue: []
+                  {getFieldDecorator("districtCodeId", {
+                    initialValue: projectItem.provinceCityDistrict
                   })(
                     <Cascader
                       placeholder="请选择所在地区"

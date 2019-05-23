@@ -20,7 +20,7 @@ export default {
     projectList: { totalCount: "", items: [] },
     projectInfoRedLineList: { totalCount: "", items: [] },
     projectInfo: {
-      projectBase: { name: "" },
+      projectBase: {},
       expand: {
         designStartTime: "",
         designCompTime: "",
