@@ -115,34 +115,18 @@ export default class siderbarDetail extends PureComponent {
       callback: data => {
         if (data.attachment) {
           this.setState({ ParentId: data.attachment.id });
-          this.queryAttachById(data.attachment.id);
+          const list = data.attachment.child.map(item => {
+            return {
+              uid: item.id,
+              name: item.fileName,
+              status: "done",
+              url: config.url.attachmentPreviewUrl + item.id
+            };
+          });
+          this.setState({ fileList: list });
+        } else {
+          this.setState({ fileList: [] });
         }
-      }
-    });
-  };
-
-  queryAttachById = id => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: "attach/queryAttachById",
-      payload: {
-        id: id
-      },
-      callback: response => {
-        const list = response.map(item => {
-          return {
-            uid: "-1",
-            name: "xxx.png",
-            status: "done",
-            url: `http://aj.zkygis.cn/stbc/api/services/app/Attachment/GetFile?id=${
-              item.id
-            }`,
-            thumbUrl: `http://aj.zkygis.cn/stbc/api/services/app/Attachment/GetFile?id=${
-              item.id
-            }`
-          };
-        });
-        this.setState({ fileList: list });
       }
     });
   };

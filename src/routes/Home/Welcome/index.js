@@ -30,16 +30,18 @@ export default class home2 extends PureComponent {
   // 创建地图
   createMap = () => {
     const me = this;
+    delete L.Icon.Default.prototype._getIconUrl;
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
+      iconUrl: require("leaflet/dist/images/marker-icon.png"),
+      shadowUrl: require("leaflet/dist/images/marker-shadow.png")
+    });
     userconfig.LMap = L.map("LMap", {
       attributionControl: false
     });
     userconfig.RMap = L.map("RMap", {
       attributionControl: false
     });
-    // //监听地图移动完成事件
-    // userconfig.LMap.on("moveend", me.onMoveendMap);
-    // //监听地图移动完成事件
-    // userconfig.RMap.on("moveend", me.onMoveendMap);
     //获取项目区域范围
     me.getRegionGeometry();
   }
@@ -59,6 +61,25 @@ export default class home2 extends PureComponent {
          userconfig.LMap.setView(center,zoom)
     }
   }; 
+  /*
+   *地图鼠标移动监听事件
+  */ 
+  onMoveMap = e => {
+    //console.log(e);
+    if (userconfig.marker) userconfig.marker.remove();
+    let myIcon = L.icon({
+      iconUrl: "./img/hand_pointer.png",
+      iconSize: [17, 23]
+    });
+    if(e.target._container.id === "LMap"){//操作右侧地图
+      userconfig.marker = L.marker(e.latlng, { icon: myIcon }).addTo(userconfig.RMap);
+      //userconfig.marker = L.marker(e.latlng).addTo(userconfig.RMap);
+    }
+    else{//操作左侧地图
+      userconfig.marker = L.marker(e.latlng, { icon: myIcon }).addTo(userconfig.LMap);
+      //userconfig.marker = L.marker(e.latlng).addTo(userconfig.LMap);
+    }
+  };   
   /*
    *获取项目区域范围
    */
@@ -100,6 +121,10 @@ export default class home2 extends PureComponent {
         userconfig.LMap.on("moveend", me.onMoveendMap);
         //监听地图移动完成事件
         userconfig.RMap.on("moveend", me.onMoveendMap);
+        //监听地图移动事件
+        userconfig.LMap.on("mousemove", me.onMoveMap);
+        //监听地图移动事件
+        userconfig.RMap.on("mousemove", me.onMoveMap);
       }, 500);
     }, 500);
   };
