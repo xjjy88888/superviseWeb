@@ -56,7 +56,10 @@ const config = {
     pointSiteByIdUrl: `${domain}api/services/app/MarkingPoint/GetPoint`,
 
     // 上传附件
-    uploadAsyncUrl: `${domain}api/services/app/Attachment/UploadAsync`,
+    attachmentUploadUrl: `${domain}api/services/app/Attachment/UploadAsync`,
+
+    // 附件列表
+    attachmentListUrl: `${domain}api/services/app/Attachment/Get`,
 
     // 字典
     dictUrl: `${domain}api/services/app/DictTable/GetAll`,

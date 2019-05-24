@@ -23,6 +23,7 @@ import "leaflet/dist/leaflet.css";
 import config from "../../../config";
 import { getFile } from "../../../utils/util";
 import jQuery from "jquery";
+import { dateInitFormat, accessToken } from "../../../utils/util";
 
 let self;
 const { TextArea } = Input;
@@ -32,11 +33,12 @@ const formItemLayout = {
   wrapperCol: { span: 16 }
 };
 
-@connect(({ project, spot, point, user }) => ({
+@connect(({ project, spot, point, user, attach }) => ({
   project,
   spot,
   point,
-  user
+  user,
+  attach
 }))
 @createForm()
 export default class siderbarDetail extends PureComponent {
@@ -45,6 +47,7 @@ export default class siderbarDetail extends PureComponent {
     this.state = {
       show: false,
       from: "spot",
+      ParentId: 0,
       edit: false,
       polygon: "",
       isSpotUpdate: true,
@@ -108,6 +111,38 @@ export default class siderbarDetail extends PureComponent {
       type: "spot/querySpotById",
       payload: {
         id: id
+      },
+      callback: data => {
+        if (data.attachment) {
+          this.setState({ ParentId: data.attachment.id });
+          this.queryAttachById(data.attachment.id);
+        }
+      }
+    });
+  };
+
+  queryAttachById = id => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "attach/queryAttachById",
+      payload: {
+        id: id
+      },
+      callback: response => {
+        const list = response.map(item => {
+          return {
+            uid: "-1",
+            name: "xxx.png",
+            status: "done",
+            url: `http://aj.zkygis.cn/stbc/api/services/app/Attachment/GetFile?id=${
+              item.id
+            }`,
+            thumbUrl: `http://aj.zkygis.cn/stbc/api/services/app/Attachment/GetFile?id=${
+              item.id
+            }`
+          };
+        });
+        this.setState({ fileList: list });
       }
     });
   };
@@ -160,21 +195,22 @@ export default class siderbarDetail extends PureComponent {
     }
   };
 
-  submit = () => {
+  submit = isArchive => {
     const {
       dispatch,
       spot: { spotInfo },
       project: { projectSelectList, projectUpdateId }
     } = this.props;
-    const { type, polygon } = this.state;
+    const { type, polygon, archiveTime, ParentId } = this.state;
     this.props.form.validateFields((err, v) => {
       if (!err) {
         console.log(v);
-        console.log(projectSelectList);
         dispatch({
           type: "spot/spotCreateUpdate",
           payload: {
             ...v,
+            archiveTime: isArchive ? archiveTime : null,
+            attachmentId: ParentId,
             polygon: polygon,
             interferenceTypeId: this.getDictKey(
               v.interferenceTypeId,
@@ -215,7 +251,7 @@ export default class siderbarDetail extends PureComponent {
   render() {
     const {
       dispatch,
-      form: { getFieldDecorator, resetFields },
+      form: { getFieldDecorator, resetFields, validateFields },
       user: { districtList },
       project: { projectSelectList },
       spot: { spotInfo },
@@ -225,6 +261,7 @@ export default class siderbarDetail extends PureComponent {
       show,
       from,
       polygon,
+      ParentId,
       type,
       edit,
       fileList,
@@ -288,7 +325,7 @@ export default class siderbarDetail extends PureComponent {
             onClick={() => {
               this.setState({ edit: !edit });
               if (edit) {
-                this.props.form.validateFields((err, v) => {
+                validateFields((err, v) => {
                   if (!err) {
                     console.log("图斑信息", v);
                   }
@@ -588,10 +625,21 @@ export default class siderbarDetail extends PureComponent {
               </Form.Item>
             </Form>
             <Upload
-              style={{ width: 200 }}
-              action="//jsonplaceholder.typicode.com/posts/"
+              action={config.url.attachmentUploadUrl}
+              headers={{ Authorization: `Bearer ${accessToken()}` }}
+              data={{ ParentId: ParentId }}
               listType="picture-card"
               fileList={fileList}
+              onSuccess={v => {
+                if (v.success) {
+                  console.log(v.result);
+                  this.setState({ ParentId: v.result.id });
+                } else {
+                  notification["error"]({
+                    message: `查询项目列表失败：${v.error.message}`
+                  });
+                }
+              }}
               onPreview={file => {
                 this.setState({
                   previewImage: file.url || file.thumbUrl,
@@ -599,7 +647,9 @@ export default class siderbarDetail extends PureComponent {
                 });
                 getFile(file.url);
               }}
-              onChange={({ fileList }) => this.setState({ fileList })}
+              onChange={({ fileList }) => {
+                this.setState({ fileList });
+              }}
             >
               {edit ? (
                 <div>
@@ -614,29 +664,43 @@ export default class siderbarDetail extends PureComponent {
                   icon="check"
                   style={{ marginTop: 20 }}
                   onClick={() => {
-                    this.submit();
+                    this.submit(false);
                   }}
                 >
                   保存
                 </Button>
                 <Button
                   icon="check-circle"
-                  style={{ marginLeft: 20 }}
+                  style={{
+                    display: type !== "add" ? "inherit" : "none",
+                    marginLeft: 20
+                  }}
                   onClick={() => {
                     Modal.confirm({
                       title: "归档保存",
                       content: (
                         <span>
                           归档时间：
-                          {getFieldDecorator("archiveTime", {
-                            initialValue: moment(
-                              spotItem.archiveTime,
-                              dateFormat
-                            )
-                          })(<DatePicker locale={locale} />)}
+                          <DatePicker
+                            locale={locale}
+                            onChange={(date, dateString) => {
+                              console.log(date, dateString);
+                              this.setState({ archiveTime: dateString });
+                            }}
+                          />
                         </span>
                       ),
-                      onOk() {},
+                      onOk() {
+                        const { archiveTime } = self.state;
+                        console.log(archiveTime);
+                        if (archiveTime) {
+                          self.submit(true);
+                        } else {
+                          notification["warning"]({
+                            message: `请选择归档时间`
+                          });
+                        }
+                      },
                       onCancel() {}
                     });
                   }}
@@ -771,7 +835,7 @@ export default class siderbarDetail extends PureComponent {
                             show: false,
                             edit: false
                           });
-                          this.props.form.validateFields((err, values) => {
+                          validateFields((err, values) => {
                             if (!err) {
                               emitter.emit("siteLocation", {
                                 state:

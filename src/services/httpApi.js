@@ -250,6 +250,16 @@ export async function departVaildApi(params) {
   });
 }
 
+// 附件列表
+export async function attachmentListApi(params) {
+  return request(`${config.url.attachmentListUrl}?Id=${params.id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
 // 行政区域
 export async function districtApi() {
   return request(`${config.url.districtUrl}`, {

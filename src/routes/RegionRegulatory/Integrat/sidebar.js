@@ -896,7 +896,7 @@ export default class integrat extends PureComponent {
               <b
                 style={{ cursor: "pointer" }}
                 onClick={() => {
-                  resetFields();
+                  resetFields()
                   //编辑
                   if (key === "project") {
                     this.setState({

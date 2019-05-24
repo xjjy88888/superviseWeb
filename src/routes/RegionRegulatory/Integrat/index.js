@@ -361,6 +361,9 @@ export default class integrat extends PureComponent {
       if (data.draw) {
         me.setState({ drawGrphic: "addSpot", project_id: data.project_id });
         const { addGraphLayer } = me.state;
+        //移除地图监听事件
+        map.off("click");
+        me.clearPlotGraphic();
         if (addGraphLayer) {
           map.removeLayer(addGraphLayer);
           me.setState({ addGraphLayer: null });
@@ -392,7 +395,7 @@ export default class integrat extends PureComponent {
         //编辑图形
         map.on("pm:create", e => {
           me.setState({ addGraphLayer: e.layer });
-          console.log(turf.area(e.layer.toGeoJSON()));
+          //console.log(turf.area(e.layer.toGeoJSON()));
           e.layer.pm.enable({
             allowSelfIntersection: false
           });
@@ -404,6 +407,9 @@ export default class integrat extends PureComponent {
       if (data.draw) {
         me.setState({ drawGrphic: "addDuty" });
         const { addGraphLayer } = me.state;
+        //移除地图监听事件
+        map.off("click");
+        me.clearPlotGraphic();
         if (addGraphLayer) {
           map.removeLayer(addGraphLayer);
           me.setState({ addGraphLayer: null });
@@ -477,8 +483,8 @@ export default class integrat extends PureComponent {
       //显示编辑菜单按钮
       me.setState({ showButton: true });
       //移除地图监听事件
-      //map.off('click contextmenu');
       map.off("click");
+      me.clearPlotGraphic();
       me.clearGeojsonLayer();
       let style = {
         color: "#33CCFF", //#33CCFF #e60000
@@ -1341,6 +1347,26 @@ export default class integrat extends PureComponent {
     measureControl.addTo(map);
   };
   /*
+   *清空绘制图形,避免新增图形以及编辑图形冲突
+  */
+  clearPlotGraphic = () => {
+    //针对编辑图形
+    //禁止编辑图形
+    if(userconfig.projectgeojsonLayer)
+       userconfig.projectgeojsonLayer.pm.disable();
+    this.clearGeojsonLayer();
+
+    //针对新增图形
+    const { addGraphLayer } = this.state;
+    //禁止编辑图形
+    if (addGraphLayer) {
+      addGraphLayer.pm.disable();
+      map.removeLayer(addGraphLayer);
+      this.setState({ addGraphLayer: null });
+    }
+
+  };
+  /*
    * 取消编辑图形
    */
   cancelEditGraphic = () => {
@@ -1356,8 +1382,8 @@ export default class integrat extends PureComponent {
    * 取消新增图形
    */
   cancelAddGraphic = () => {
-    //addGraphLayer.toGeoJSON()
     this.setState({ showButton: false });
+    map.on("click", this.onClickMap);
     const { addGraphLayer } = this.state;
     //禁止编辑图形
     if (addGraphLayer) {
@@ -1389,6 +1415,7 @@ export default class integrat extends PureComponent {
   saveAddGraphic = () => {
     const me = this;
     me.setState({ showButton: false });
+    map.on("click", this.onClickMap);
     const { addGraphLayer, drawGrphic, project_id } = me.state;
     //禁止编辑图形
     if (addGraphLayer) {
@@ -1688,6 +1715,14 @@ export default class integrat extends PureComponent {
         transparent: true
       }
     );
+    userconfig.projectwms1 = L.tileLayer.wms(
+      config.mapUrl.geoserverUrl + "/wms?",
+      {
+        layers: config.mapProjectLayerName, //需要加载的图层
+        format: "image/png", //返回的数据格式
+        transparent: true
+      }
+    );
     map.addLayer(userconfig.spotwms);
     map.addLayer(userconfig.spotwms1);
     //map.addLayer(userconfig.projectwms);
@@ -1885,7 +1920,7 @@ export default class integrat extends PureComponent {
               >
                 <Button icon="bars" />
               </Popover>
-              <Link to="/home/welcome">测试</Link>
+              <Link to="/home/welcome">地图分屏</Link>
             </div>
             {/* 历史对比地图切换 */}
             <div
