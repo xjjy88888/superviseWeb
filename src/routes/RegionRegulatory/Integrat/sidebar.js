@@ -33,7 +33,7 @@ import config from "../../../config";
 import data from "../../../data";
 import { getFile } from "../../../utils/util";
 import jQuery from "jquery";
-import { accessToken } from "../../../utils/util";
+import { dateInitFormat, accessToken } from "../../../utils/util";
 
 let self;
 const { TreeNode } = Tree;
@@ -402,12 +402,14 @@ export default class integrat extends PureComponent {
   queryProjectById = id => {
     const { dispatch } = this.props;
     const { departList } = this.state;
+    this.showSpin(true);
     dispatch({
       type: "project/queryProjectById",
       payload: {
         id: id
       },
       callback: (result, success) => {
+        this.showSpin(false);
         this.setState({ showProjectDetail: success });
         let arr = [];
         if (result.productDepartment) {
@@ -898,6 +900,7 @@ export default class integrat extends PureComponent {
                     this.setState({
                       showProjectDetail: true,
                       isProjectUpdate: true,
+                      projectEdit: false,
                       previewVisible_min_left: false
                     });
                     this.queryProjectById(item.id);
@@ -1450,6 +1453,17 @@ export default class integrat extends PureComponent {
               display: showCompany ? "none" : "block"
             }}
           >
+            <Spin
+              size="large"
+              style={{
+                display: showSpin ? "block" : "none",
+                padding: 100,
+                position: "absolute",
+                top: 300,
+                left: 45,
+                zIndex: 1001
+              }}
+            />
             <p
               style={{
                 width: 150,
@@ -1522,6 +1536,7 @@ export default class integrat extends PureComponent {
                           replyDepartmentId: this.getDepartKey(
                             values.replyDepartmentId
                           ),
+                          districtCodes: values.districtCodes.join(","),
                           id: isProjectUpdate ? projectItem.id : ""
                         };
                         emitter.emit("projectCreateUpdate", data);
@@ -1693,7 +1708,11 @@ export default class integrat extends PureComponent {
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>涉及县：</span>
-                        {/* <span>{projectItem.projectBase.districtCodes}</span> */}
+                        <span>
+                          {(projectItem.projectBase.districtCodes || [])
+                            .map(item => item.name)
+                            .join("，")}
+                        </span>
                       </p>
                       <p style={{ textAlign: "justify" }}>
                         <span>备注：</span>
@@ -2588,7 +2607,7 @@ export default class integrat extends PureComponent {
                 </Form.Item>
                 <Form.Item label="批复时间" {...formItemLayout}>
                   {getFieldDecorator("replyTime", {
-                    initialValue: moment(projectItem.replyTime)
+                    initialValue: dateInitFormat(projectItem.replyTime)
                   })(<DatePicker />)}
                 </Form.Item>
                 <Form.Item label="责任面积" {...formItemLayout}>
@@ -2688,7 +2707,10 @@ export default class integrat extends PureComponent {
                 </Form.Item>
                 <Form.Item label="涉及县" {...formItemLayout}>
                   {getFieldDecorator("districtCodes", {
-                    valuePropName: "value"
+                    valuePropName: "value",
+                    initialValue: (
+                      projectItem.projectBase.districtCodes || []
+                    ).map(item => item.id)
                   })(
                     <TreeSelect
                       showSearch

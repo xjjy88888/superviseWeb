@@ -618,7 +618,12 @@ export default class siderbarDetail extends PureComponent {
                       content: (
                         <span>
                           归档时间：
-                          <DatePicker locale={locale} />
+                          {getFieldDecorator("archiveTime", {
+                            initialValue: moment(
+                              spotItem.archiveTime,
+                              dateFormat
+                            )
+                          })(<DatePicker locale={locale} />)}
                         </span>
                       ),
                       onOk() {},

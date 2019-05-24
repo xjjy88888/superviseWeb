@@ -71,7 +71,7 @@ const config = {
     departVaildUrl: `${domain}api/services/app/Department/Vaild`,
 
     // 项目位置
-    projectPositionUrl: `${domain}api/services/app/Attachment/UploadAsync`,
+    projectPositionUrl: `${domain}api/services/app/Project/GetPoint`,
 
     // 行政区域
     districtUrl: `${domain}api/services/app/User/GetDistrictCodesTree`,

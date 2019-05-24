@@ -4,11 +4,15 @@ import emitter from "./event";
 import jQuery from "jquery";
 
 const dateFormat = v => {
-  return v ? moment(new Date(v).getTime()).format("YYYY-MM-DD") : "";
+  return v ? moment(new Date(v).getTime()).format("YYYY-MM-DD") : null;
+};
+
+const dateInitFormat = v => {
+  return v ? moment(v, "YYYY-MM-DD") : null;
 };
 
 const dateTimeFormat = v => {
-  return v ? moment(new Date(v).getTime()).format("YYYY-MM-DD HH:mm:ss") : "";
+  return v ? moment(new Date(v).getTime()).format("YYYY-MM-DD HH:mm:ss") : null;
 };
 
 const getFile = url => {
@@ -62,4 +66,4 @@ export async function getProjectName(id) {
   });
 }
 
-export { dateFormat, dateTimeFormat, getFile, accessToken };
+export { dateFormat, dateInitFormat,dateTimeFormat, getFile, accessToken };

@@ -20,6 +20,7 @@ import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
 import styles from "./index.less";
 import moment from "moment";
+import { dateInitFormat } from "../../../utils/util";
 
 let self;
 let yearDataSource = [];
@@ -59,12 +60,13 @@ export default class integrat extends PureComponent {
     this.eventEmitter = emitter.addListener("projectCreateUpdate", data => {
       //submit
       this.props.form.validateFields((err, v) => {
+        console.log(v);
         const values = {
           ...v,
-          designStartTime: v.designStartTime._i,
-          designCompTime: v.designCompTime._i,
-          actStartTime: v.actStartTime._i,
-          actCompTime: v.actCompTime._i
+          designStartTime: v.designStartTime ? v.designStartTime._i : null,
+          designCompTime: v.designCompTime ? v.designCompTime._i : null,
+          actStartTime: v.actStartTime ? v.actStartTime._i : null,
+          actCompTime: v.actCompTime ? v.actCompTime._i : null
         };
         dispatch({
           type: "project/projectCreateUpdate",
@@ -519,28 +521,34 @@ export default class integrat extends PureComponent {
               <Col span={12}>
                 <Form.Item label="设计动工时间">
                   {getFieldDecorator("designStartTime", {
-                    initialValue: moment(projectItem.expand.designStartTime)
+                    initialValue: dateInitFormat(
+                      projectItem.expand.designStartTime
+                    )
                   })(<DatePicker placeholder="" style={{ width: 130 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="设计完工时间">
                   {getFieldDecorator("designCompTime", {
-                    initialValue: moment(projectItem.expand.designCompTime)
+                    initialValue: dateInitFormat(
+                      projectItem.expand.designCompTime
+                    )
                   })(<DatePicker placeholder="" style={{ width: 130 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="实际开工时间">
                   {getFieldDecorator("actStartTime", {
-                    initialValue: moment(projectItem.expand.actStartTime)
+                    initialValue: dateInitFormat(
+                      projectItem.expand.actStartTime
+                    )
                   })(<DatePicker placeholder="" style={{ width: 130 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="实际完工时间">
                   {getFieldDecorator("actCompTime", {
-                    initialValue: moment(projectItem.expand.actCompTime)
+                    initialValue: dateInitFormat(projectItem.expand.actCompTime)
                   })(<DatePicker placeholder="" style={{ width: 130 }} />)}
                 </Form.Item>
               </Col>
@@ -704,7 +712,7 @@ export default class integrat extends PureComponent {
               </Col>
               <Col span={12}>
                 <Form.Item label="新增水土流失主要区域">
-                  {getFieldDecorator("newErsnAmt", {
+                  {getFieldDecorator("newArea", {
                     initialValue: projectItem.expand.newArea
                   })(<Input />)}
                 </Form.Item>

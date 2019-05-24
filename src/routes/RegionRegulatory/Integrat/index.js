@@ -175,7 +175,7 @@ export default class integrat extends PureComponent {
         dispatch({
           type: "mapdata/queryProjectPosition",
           payload: {
-            id: data.item.projectId
+            id: data.item.id
           },
           callback: response => {
             //console.log("response", response);
@@ -1561,7 +1561,7 @@ export default class integrat extends PureComponent {
       //还原默认底图加载
       map.addLayer(userconfig.baseLayer2);
       map.addLayer(userconfig.projectlayerGroup);
-      map.addLayer(userconfig.spotlayerGroup);       
+      map.addLayer(userconfig.spotlayerGroup);
     }
   };
   /*
@@ -1602,18 +1602,18 @@ export default class integrat extends PureComponent {
         map.removeLayer(userconfig.baseLayer2);
     if (map.hasLayer(userconfig.baseLayer3))
         map.removeLayer(userconfig.baseLayer3);
-    //移除地图默认加载叠加图层组 
+    //移除地图默认加载叠加图层组
     if(userconfig.projectlayerGroup)
         map.removeLayer(userconfig.projectlayerGroup);
     if(userconfig.spotlayerGroup)
-        map.removeLayer(userconfig.spotlayerGroup);        
-    //移除卷帘对比左右边图层列表 
+        map.removeLayer(userconfig.spotlayerGroup);
+    //移除卷帘对比左右边图层列表
     this.removeleftrightLayers();
-      
+
   };
   /*
    *移除卷帘对比左右边图层列表
-   */  
+   */
   removeleftrightLayers = () => {
     if(userconfig.leftLayers && userconfig.leftLayers.length>0){
       for(let i =0;i<userconfig.leftLayers.length; i++){
