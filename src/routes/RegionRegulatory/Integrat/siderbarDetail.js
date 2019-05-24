@@ -611,7 +611,7 @@ export default class siderbarDetail extends PureComponent {
             <Upload
               action={config.url.attachmentUploadUrl}
               headers={{ Authorization: `Bearer ${accessToken()}` }}
-              data={{ ParentId: ParentId }}
+              data={{ Id: ParentId }}
               listType="picture-card"
               fileList={fileList}
               onSuccess={v => {
