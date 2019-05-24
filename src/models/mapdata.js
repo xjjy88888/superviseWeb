@@ -4,6 +4,7 @@ import {
   projectPositionApi,
   getInfoByExtent
 } from "../services/httpApi";
+import { routerRedux } from "dva/router";
 export default {
   namespace: "mapdata",
 
@@ -16,6 +17,9 @@ export default {
   },
 
   effects: {
+    *gotest({ payload, callback }, { call, put }) {
+      yield put(routerRedux.replace("/home/welcome"));
+    },
     *queryWFSLayer({ payload, callback }, { call, put }) {
       // eslint-disable-line
       //console.log(payload);
@@ -42,7 +46,10 @@ export default {
     *getInfoByExtent({ payload, callback }, { call, put }) {
       const { data: result } = yield call(getInfoByExtent, payload);
       let histories = new Set(result.result.histories);
-      yield put({ type: "save", payload: { histories: [...histories].reverse() } });
+      yield put({
+        type: "save",
+        payload: { histories: [...histories].reverse() }
+      });
       if (callback) callback([...histories].reverse());
     }
   },

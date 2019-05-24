@@ -45,6 +45,9 @@ export default class integrat extends PureComponent {
   }
 
   componentDidMount() {
+    const {
+      form: { resetFields }
+    } = this.props;
     self = this;
     const { dispatch } = this.props;
     const maxYear = new Date().getFullYear();
@@ -52,6 +55,7 @@ export default class integrat extends PureComponent {
       yearDataSource.push(`${i}年`);
     }
     this.eventEmitter = emitter.addListener("showProjectDetail", data => {
+      resetFields();
       this.setState({
         show: data.show,
         edit: data.edit

@@ -96,7 +96,7 @@ export default class siderbarDetail extends PureComponent {
   render() {
     const { show, type } = this.state;
     const {
-      form: { getFieldDecorator },
+      form: { getFieldDecorator, resetFields },
       user: { districtList }
     } = this.props;
 
@@ -148,7 +148,7 @@ export default class siderbarDetail extends PureComponent {
             icon="undo"
             style={{ margin: "20px 60px 0px 75px" }}
             onClick={() => {
-              this.props.form.resetFields();
+              resetFields();
               emitter.emit("queryInfo", {
                 from: type,
                 info: {}

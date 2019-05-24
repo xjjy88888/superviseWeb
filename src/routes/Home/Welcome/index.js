@@ -6,7 +6,10 @@ export default class home2 extends PureComponent {
     return (
       <div>
         <SiderMenu active="101" />
-        <div>首页</div>
+        <div style={{ display: "flex" }}>
+          <div style={{ flex: 1, background: "orange" }}>111</div>
+          <div style={{ flex: 1, background: "#ddd" }}>111</div>
+        </div>
       </div>
     );
   }

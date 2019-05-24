@@ -10,6 +10,7 @@ import {
   notification,
   message
 } from "antd";
+import { Link } from "dva/router";
 import zhCN from "antd/lib/locale-provider/zh_CN";
 import SiderMenu from "../../../components/SiderMenu";
 import Sidebar from "./sidebar";
@@ -746,7 +747,7 @@ export default class integrat extends PureComponent {
     //根据地图当前范围获取对应历史影像数据
     const { showHistoryContrast } = me.state;
     if (showHistoryContrast) {
-      me.getInfoByExtent(zoom, bounds,me.callbackGetInfoByExtent,false);
+      me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
     }
   };
   /*根据地图当前范围获取对应历史影像数据
@@ -757,7 +758,7 @@ export default class integrat extends PureComponent {
    *@param isLoadSideBySide 是否重新加载地图卷帘
    *@return null
    */
-  getInfoByExtent = (zoom, bounds,callback,isLoadSideBySide) => {
+  getInfoByExtent = (zoom, bounds, callback, isLoadSideBySide) => {
     const me = this;
     userconfig.isLoadSideBySide = isLoadSideBySide;
     let urlString = config.mapUrl.getInfoByExtent;
@@ -780,7 +781,7 @@ export default class integrat extends PureComponent {
     me.props.dispatch({
       type: "mapdata/getInfoByExtent",
       payload: { geojsonUrl },
-      callback:callback
+      callback: callback
     });
   };
   /*属性查询图层
@@ -1279,24 +1280,25 @@ export default class integrat extends PureComponent {
     let bounds = userconfig.geoJsonLayer.getBounds();
     map.setMaxBounds(bounds);
     map.setMinZoom(userconfig.zoom);
-    const projectlayerGroup = userconfig.projectlayerGroup = L.layerGroup();
-    const spotlayerGroup = userconfig.spotlayerGroup =  L.layerGroup();
+    const projectlayerGroup = (userconfig.projectlayerGroup = L.layerGroup());
+    const spotlayerGroup = (userconfig.spotlayerGroup = L.layerGroup());
     //加载项目红线图层wms
     L.tileLayer
-    .wms(config.mapUrl.geoserverUrl + "/wms?", {
-      layers: config.mapProjectLayerName, //需要加载的图层
-      format: "image/png", //返回的数据格式
-      transparent: true
-    })
-    .addTo(projectlayerGroup);
+      .wms(config.mapUrl.geoserverUrl + "/wms?", {
+        layers: config.mapProjectLayerName, //需要加载的图层
+        format: "image/png", //返回的数据格式
+        transparent: true
+      })
+      .addTo(projectlayerGroup);
     //加载图斑图层wms
     L.tileLayer
-    .wms(config.mapUrl.geoserverUrl + "/wms?", {
-      layers: config.mapSpotLayerName, //需要加载的图层
-      format: "image/png", //返回的数据格式
-      transparent: true
-    })
-    .addTo(spotlayerGroup);
+      .wms(config.mapUrl.geoserverUrl + "/wms?", {
+        layers: config.mapSpotLayerName, //需要加载的图层
+        format: "image/png", //返回的数据格式
+        transparent: true
+        //cql_filter:"map_num like '%_52_%'"
+      })
+      .addTo(spotlayerGroup);
     map.addLayer(projectlayerGroup);
     map.addLayer(spotlayerGroup);
     const overlays = {
@@ -1393,43 +1395,45 @@ export default class integrat extends PureComponent {
       addGraphLayer.pm.disable();
       let geojson = addGraphLayer.toGeoJSON();
       let polygon = me.geojson2Multipolygon(geojson, 1);
-      //console.log(polygon);
-      if (drawGrphic === "addSpot") {
-        //新增绘制扰动图斑保存
-        me.props.dispatch({
-          type: "project/addSpotGraphic",
-          payload: {
-            spot_tbid: "spot_" + Math.random(),
-            project_id: project_id,
-            geometry: polygon
-          },
-          callback: obj => {
-            map.removeLayer(addGraphLayer);
-            me.setState({ addGraphLayer: null });
-            emitter.emit("showSiderbarDetail", {
-              show: false,
-              from: "spot"
-            });
-          }
-        });
-      } else {
-        //新增绘制项目红线范围保存
-        me.props.dispatch({
-          type: "project/addProjectScopeGraphic",
-          payload: {
-            project_id: "",
-            geometry: polygon
-          },
-          callback: obj => {
-            map.removeLayer(addGraphLayer);
-            me.setState({ addGraphLayer: null });
-            emitter.emit("showSiderbarDetail", {
-              show: false,
-              from: "spot"
-            });
-          }
-        });
-      }
+      emitter.emit("drawSpotBack", {
+        polygon: polygon,
+        state: "add",
+        key: drawGrphic === "addSpot" ? "spot" : "redLine"
+      });
+      // if (drawGrphic === "addSpot") {
+      //   me.props.dispatch({
+      //     type: "project/addSpotGraphic",
+      //     payload: {
+      //       spot_tbid: "spot_" + Math.random(),
+      //       project_id: project_id,
+      //       geometry: polygon
+      //     },
+      //     callback: obj => {
+      //       map.removeLayer(addGraphLayer);
+      //       me.setState({ addGraphLayer: null });
+      //       emitter.emit("showSiderbarDetail", {
+      //         show: false,
+      //         from: "spot"
+      //       });
+      //     }
+      //   });
+      // } else {
+      //   me.props.dispatch({
+      //     type: "project/addProjectScopeGraphic",
+      //     payload: {
+      //       project_id: "",
+      //       geometry: polygon
+      //     },
+      //     callback: obj => {
+      //       map.removeLayer(addGraphLayer);
+      //       me.setState({ addGraphLayer: null });
+      //       emitter.emit("showSiderbarDetail", {
+      //         show: false,
+      //         from: "spot"
+      //       });
+      //     }
+      //   });
+      // }
     }
   };
   /*
@@ -1448,29 +1452,35 @@ export default class integrat extends PureComponent {
 
     let geojson = userconfig.projectgeojsonLayer.toGeoJSON();
     let polygon = me.geojson2Multipolygon(geojson, 0);
-    if (geojson.features[0].properties.spot_tbid) {
-      this.props.dispatch({
-        type: "project/updateSpotGraphic",
-        payload: {
-          spot_tbid: geojson.features[0].properties.spot_tbid,
-          geometry: polygon
-        },
-        callback: obj => {
-          me.clearGeojsonLayer();
-        }
-      });
-    } else {
-      this.props.dispatch({
-        type: "project/updateProjectScopeGraphic",
-        payload: {
-          project_id: geojson.features[0].properties.project_id,
-          geometry: polygon
-        },
-        callback: obj => {
-          me.clearGeojsonLayer();
-        }
-      });
-    }
+
+    emitter.emit("drawSpotBack", {
+      polygon: polygon,
+      state: "edit",
+      key: geojson.features[0].properties.spot_tbid ? "spot" : "redLine"
+    });
+    // if (geojson.features[0].properties.spot_tbid) {
+    //   this.props.dispatch({
+    //     type: "project/updateSpotGraphic",
+    //     payload: {
+    //       spot_tbid: geojson.features[0].properties.spot_tbid,
+    //       geometry: polygon
+    //     },
+    //     callback: obj => {
+    //       me.clearGeojsonLayer();
+    //     }
+    //   });
+    // } else {
+    //   this.props.dispatch({
+    //     type: "project/updateProjectScopeGraphic",
+    //     payload: {
+    //       project_id: geojson.features[0].properties.project_id,
+    //       geometry: polygon
+    //     },
+    //     callback: obj => {
+    //       me.clearGeojsonLayer();
+    //     }
+    //   });
+    // }
   };
   /*
    * 保存屏幕截图
@@ -1554,7 +1564,7 @@ export default class integrat extends PureComponent {
     if (showHistoryContrast) {
       let zoom = map.getZoom();
       let bounds = map.getBounds();
-      this.getInfoByExtent(zoom, bounds,this.callbackGetInfoByExtent,true);
+      this.getInfoByExtent(zoom, bounds, this.callbackGetInfoByExtent, true);
     } else {
       //移除卷帘效果
       this.removeSideBySide();
@@ -1566,9 +1576,12 @@ export default class integrat extends PureComponent {
   };
   /*
    * 根据地图当前范围获取对应历史影像数据回调函数
-  */
+   */
   callbackGetInfoByExtent = data => {
-    if(userconfig.isLoadSideBySide || userconfig.sideBySideZoom !== map.getZoom()){
+    if (
+      userconfig.isLoadSideBySide ||
+      userconfig.sideBySideZoom !== map.getZoom()
+    ) {
       this.setState({ selectLeftV: data[0] });
       this.setState({ selectRightV: data[0] });
       userconfig.sideBySideZoom = map.getZoom();
@@ -1581,109 +1594,110 @@ export default class integrat extends PureComponent {
    * 添加卷帘效果
    */
   addSideBySide = () => {
-    const {selectLeftV, selectRightV} = this.state;
-    this.addLRLayers(selectLeftV,selectRightV);
+    const { selectLeftV, selectRightV } = this.state;
+    this.addLRLayers(selectLeftV, selectRightV);
     //卷帘地图效果
     userconfig.sideBySide = L.control
-    .sideBySide(userconfig.leftLayers, userconfig.rightLayers)
-    .addTo(map);
+      .sideBySide(userconfig.leftLayers, userconfig.rightLayers)
+      .addTo(map);
   };
   /*
    * 移除卷帘效果
    */
   removeSideBySide = () => {
     if (userconfig.sideBySide) {
-        userconfig.sideBySide.remove();
+      userconfig.sideBySide.remove();
     }
     //移除地图默认加载底图
     if (map.hasLayer(userconfig.baseLayer1))
-        map.removeLayer(userconfig.baseLayer1);
+      map.removeLayer(userconfig.baseLayer1);
     if (map.hasLayer(userconfig.baseLayer2))
-        map.removeLayer(userconfig.baseLayer2);
+      map.removeLayer(userconfig.baseLayer2);
     if (map.hasLayer(userconfig.baseLayer3))
-        map.removeLayer(userconfig.baseLayer3);
+      map.removeLayer(userconfig.baseLayer3);
     //移除地图默认加载叠加图层组
-    if(userconfig.projectlayerGroup)
-        map.removeLayer(userconfig.projectlayerGroup);
-    if(userconfig.spotlayerGroup)
-        map.removeLayer(userconfig.spotlayerGroup);
+    if (userconfig.projectlayerGroup)
+      map.removeLayer(userconfig.projectlayerGroup);
+    if (userconfig.spotlayerGroup) map.removeLayer(userconfig.spotlayerGroup);
     //移除卷帘对比左右边图层列表
     this.removeleftrightLayers();
-
   };
   /*
    *移除卷帘对比左右边图层列表
    */
   removeleftrightLayers = () => {
-    if(userconfig.leftLayers && userconfig.leftLayers.length>0){
-      for(let i =0;i<userconfig.leftLayers.length; i++){
-          let layer = userconfig.leftLayers[i];
-          if(map.hasLayer(layer))
-             map.removeLayer(layer);
+    if (userconfig.leftLayers && userconfig.leftLayers.length > 0) {
+      for (let i = 0; i < userconfig.leftLayers.length; i++) {
+        let layer = userconfig.leftLayers[i];
+        if (map.hasLayer(layer)) map.removeLayer(layer);
       }
     }
-    if(userconfig.leftLayers && userconfig.rightLayers.length>0){
-      for(let i =0;i<userconfig.rightLayers.length; i++){
-          let layer = userconfig.rightLayers[i];
-          if(map.hasLayer(layer))
-             map.removeLayer(layer);
+    if (userconfig.leftLayers && userconfig.rightLayers.length > 0) {
+      for (let i = 0; i < userconfig.rightLayers.length; i++) {
+        let layer = userconfig.rightLayers[i];
+        if (map.hasLayer(layer)) map.removeLayer(layer);
       }
     }
   };
   onChangeSelectLeft = v => {
     this.setState({ selectLeftV: v });
-    const {selectRightV} = this.state;
-    this.addLRLayers(v,selectRightV);
+    const { selectRightV } = this.state;
+    this.addLRLayers(v, selectRightV);
     userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
     userconfig.sideBySide.setRightLayers(userconfig.rightLayers);
-
   };
-  addLRLayers = (selectLeftV,selectRightV) => {
+  addLRLayers = (selectLeftV, selectRightV) => {
     //清空图层
     this.removeleftrightLayers();
     userconfig.leftLayers = [];
     userconfig.rightLayers = [];
 
-    let leftLayerUrl =  config.imageBaseUrl + "/" + selectLeftV.replace(/\//g, "-")+"/tile/{z}/{y}/{x}";
-    let leftImgLayer = L.tileLayer(
-      leftLayerUrl
-    ); //左侧影像
+    let leftLayerUrl =
+      config.imageBaseUrl +
+      "/" +
+      selectLeftV.replace(/\//g, "-") +
+      "/tile/{z}/{y}/{x}";
+    let leftImgLayer = L.tileLayer(leftLayerUrl); //左侧影像
     map.addLayer(leftImgLayer);
-    let rightLayerUrl =  config.imageBaseUrl + "/" + selectRightV.replace(/\//g, "-")+"/tile/{z}/{y}/{x}";
-    let rightImgLayer = L.tileLayer(
-      rightLayerUrl
-    ); //右侧影像
+    let rightLayerUrl =
+      config.imageBaseUrl +
+      "/" +
+      selectRightV.replace(/\//g, "-") +
+      "/tile/{z}/{y}/{x}";
+    let rightImgLayer = L.tileLayer(rightLayerUrl); //右侧影像
     map.addLayer(rightImgLayer);
     //测试部分
-    userconfig.spotwms = L.tileLayer
-    .wms(config.mapUrl.geoserverUrl + "/wms?", {
+    userconfig.spotwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
       layers: config.mapSpotLayerName, //需要加载的图层
       format: "image/png", //返回的数据格式
       transparent: true
     });
-    userconfig.spotwms1 = L.tileLayer
-    .wms(config.mapUrl.geoserverUrl + "/wms?", {
-      layers: config.mapSpotLayerName, //需要加载的图层
-      format: "image/png", //返回的数据格式
-      transparent: true
-    });
-    userconfig.projectwms = L.tileLayer
-    .wms(config.mapUrl.geoserverUrl + "/wms?", {
-      layers: config.mapProjectLayerName, //需要加载的图层
-      format: "image/png", //返回的数据格式
-      transparent: true
-    });
+    userconfig.spotwms1 = L.tileLayer.wms(
+      config.mapUrl.geoserverUrl + "/wms?",
+      {
+        layers: config.mapSpotLayerName, //需要加载的图层
+        format: "image/png", //返回的数据格式
+        transparent: true
+      }
+    );
+    userconfig.projectwms = L.tileLayer.wms(
+      config.mapUrl.geoserverUrl + "/wms?",
+      {
+        layers: config.mapProjectLayerName, //需要加载的图层
+        format: "image/png", //返回的数据格式
+        transparent: true
+      }
+    );
     map.addLayer(userconfig.spotwms);
     map.addLayer(userconfig.spotwms1);
     //map.addLayer(userconfig.projectwms);
-    userconfig.leftLayers = [userconfig.spotwms,leftImgLayer];
-    userconfig.rightLayers = [userconfig.spotwms1,rightImgLayer];
-
+    userconfig.leftLayers = [userconfig.spotwms, leftImgLayer];
+    userconfig.rightLayers = [userconfig.spotwms1, rightImgLayer];
   };
   onChangeSelectRight = v => {
     this.setState({ selectRightV: v });
-    const {selectLeftV} = this.state;
-    this.addLRLayers(selectLeftV,v);
+    const { selectLeftV } = this.state;
+    this.addLRLayers(selectLeftV, v);
     userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
     userconfig.sideBySide.setRightLayers(userconfig.rightLayers);
   };
@@ -1697,6 +1711,7 @@ export default class integrat extends PureComponent {
       selectRightV
     } = this.state;
     const {
+      dispatch,
       mapdata: { histories }
     } = this.props;
     return (
@@ -1870,6 +1885,7 @@ export default class integrat extends PureComponent {
               >
                 <Button icon="bars" />
               </Popover>
+              <Link to="/home/welcome">测试</Link>
             </div>
             {/* 历史对比地图切换 */}
             <div

@@ -136,8 +136,8 @@ export default class integrat extends PureComponent {
     });
     this.eventEmitter = emitter.addListener("siteLocationBack", data => {
       this.props.form.setFieldsValue({
-        latitude: data.latitude,
-        longitude: data.longitude
+        pointX: data.longitude, //经度
+        pointY: data.latitude //维度
       });
     });
     this.eventEmitter = emitter.addListener("showSiderbar", data => {
@@ -780,10 +780,11 @@ export default class integrat extends PureComponent {
     } = this.state;
     const {
       dispatch,
+      form: { getFieldDecorator, resetFields },
+      user: { districtList, departSelectList, departUpdateId },
       project: { projectList, projectInfo, projectInfoRedLineList },
       spot: { spotList, projectInfoSpotList },
-      point: { pointList },
-      user: { districtList, departSelectList, departUpdateId }
+      point: { pointList }
     } = this.props;
 
     const projectItem = isProjectUpdate
@@ -798,8 +799,7 @@ export default class integrat extends PureComponent {
             actCompTime: ""
           }
         };
-
-    const { getFieldDecorator } = this.props.form;
+    console.log(projectItem.projectBase);
 
     const showPoint = key === "point";
 
@@ -896,6 +896,8 @@ export default class integrat extends PureComponent {
               <b
                 style={{ cursor: "pointer" }}
                 onClick={() => {
+                  resetFields();
+                  //编辑
                   if (key === "project") {
                     this.setState({
                       showProjectDetail: true,
@@ -1043,6 +1045,7 @@ export default class integrat extends PureComponent {
             style={{ padding: "20px 20px", width: 300 }}
             enterButton
           />
+          {/* 新建 */}
           <Icon
             type={
               key === "project"
@@ -1488,7 +1491,6 @@ export default class integrat extends PureComponent {
               <Button
                 icon={projectEdit ? "check" : "edit"}
                 shape="circle"
-                htmlType="submit"
                 style={{
                   float: "right",
                   color: "#1890ff",
@@ -2501,10 +2503,10 @@ export default class integrat extends PureComponent {
                   })(<Input />)}
                 </Form.Item>
                 <Form.Item label="坐标" {...formItemLayout}>
-                  {getFieldDecorator("longitude", {})(
+                  {getFieldDecorator("pointX", {})(
                     <Input placeholder="经度" style={{ width: 72 }} />
                   )}
-                  {getFieldDecorator("latitude", {})(
+                  {getFieldDecorator("pointY", {})(
                     <Input
                       placeholder="纬度"
                       style={{ width: 110, position: "relative", top: -2 }}
@@ -2523,11 +2525,11 @@ export default class integrat extends PureComponent {
                               if (!err) {
                                 emitter.emit("siteLocation", {
                                   state:
-                                    values.longitude && values.latitude
+                                    values.pointX && values.pointY
                                       ? "end"
                                       : "begin",
-                                  Latitude: values.latitude,
-                                  Longitude: values.longitude
+                                  Longitude: values.pointX,
+                                  Latitude: values.pointY
                                 });
                               }
                             });

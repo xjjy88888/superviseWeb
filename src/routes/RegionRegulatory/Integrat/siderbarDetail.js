@@ -46,6 +46,7 @@ export default class siderbarDetail extends PureComponent {
       show: false,
       from: "spot",
       edit: false,
+      polygon: "",
       isSpotUpdate: true,
       item: { project_id: "" },
       fileList: []
@@ -54,6 +55,9 @@ export default class siderbarDetail extends PureComponent {
   }
 
   componentDidMount() {
+    const {
+      form: { resetFields }
+    } = this.props;
     self = this;
     this.eventEmitter = emitter.addListener("siteLocationBack", data => {
       this.props.form.setFieldsValue({
@@ -61,7 +65,13 @@ export default class siderbarDetail extends PureComponent {
         longitude: data.longitude
       });
     });
+    this.eventEmitter = emitter.addListener("drawSpotBack", v => {
+      this.setState({
+        polygon: v.polygon
+      });
+    });
     this.eventEmitter = emitter.addListener("showSiderbarDetail", data => {
+      resetFields();
       this.setState({
         show: data.show,
         edit: data.edit,
@@ -72,7 +82,6 @@ export default class siderbarDetail extends PureComponent {
         previewVisible_min: false
       });
       if (data.show && data.type !== "add") {
-        this.props.form.resetFields();
         if (data.from === "spot") {
           this.querySpotById(data.id);
         } else if (data.from === "point") {
@@ -157,7 +166,7 @@ export default class siderbarDetail extends PureComponent {
       spot: { spotInfo },
       project: { projectSelectList, projectUpdateId }
     } = this.props;
-    const { type } = this.state;
+    const { type, polygon } = this.state;
     this.props.form.validateFields((err, v) => {
       if (!err) {
         console.log(v);
@@ -166,6 +175,7 @@ export default class siderbarDetail extends PureComponent {
           type: "spot/spotCreateUpdate",
           payload: {
             ...v,
+            polygon: polygon,
             interferenceTypeId: this.getDictKey(
               v.interferenceTypeId,
               "扰动类型"
@@ -205,16 +215,16 @@ export default class siderbarDetail extends PureComponent {
   render() {
     const {
       dispatch,
-      form: { getFieldDecorator },
-      spot: { spotInfo },
+      form: { getFieldDecorator, resetFields },
+      user: { districtList },
       project: { projectSelectList },
-      point: { pointItem, pointSite },
-      user: { districtList }
+      spot: { spotInfo },
+      point: { pointItem, pointSite }
     } = this.props;
-    console.log(projectSelectList);
     const {
       show,
       from,
+      polygon,
       type,
       edit,
       fileList,
