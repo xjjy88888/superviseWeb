@@ -430,7 +430,26 @@ export default class siderbarDetail extends PureComponent {
                   rules: [{ required: true, message: "图斑编号不能为空" }]
                 })(<Input disabled={!edit} />)}
               </Form.Item>
-              <Form.Item label="关联项目" {...formItemLayout}>
+              <Form.Item
+                label={
+                  <a
+                    onClick={() => {
+                      if (spotItem.projectName) {
+                        emitter.emit("showProjectSpotInfo", {
+                          show: true,
+                          edit: type === "add",
+                          from: "project",
+                          state: type,
+                          id: spotItem.projectId
+                        });
+                      }
+                    }}
+                  >
+                    关联项目
+                  </a>
+                }
+                {...formItemLayout}
+              >
                 {getFieldDecorator("projectName", {
                   initialValue: spotItem.projectName
                 })(

@@ -237,7 +237,7 @@ export default class integrat extends PureComponent {
           // showProjectDetail: data.show,
           projectEdit: data.edit
         });
-        if (data.show) {
+        if (data.state === "edit") {
           this.queryProjectById(data.id);
           this.querySpotByProjectId(data.id);
           this.queryRedLineByProjectId(data.id);
