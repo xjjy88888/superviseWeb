@@ -76,6 +76,7 @@ export default class integrat extends PureComponent {
       query_spot: "",
       query_point: "",
       key: "project",
+      createDepartKey: "",
       sort_by: "",
       sort_key: "",
       queryInfo: {},
@@ -125,8 +126,10 @@ export default class integrat extends PureComponent {
       this.search(v);
     });
     this.eventEmitter = emitter.addListener("showCreateDepart", v => {
+      console.log(v);
       this.setState({
-        showCreateDepart: v.show
+        showCreateDepart: v.show,
+        createDepartKey: v.key
       });
     });
     this.eventEmitter = emitter.addListener("projectCreateUpdateBack", () => {
@@ -594,7 +597,6 @@ export default class integrat extends PureComponent {
       const filter = departList.filter(item => {
         return value === item.name;
       });
-      console.log(filter);
       return filter[0].id;
     } else {
       return "";
@@ -607,6 +609,8 @@ export default class integrat extends PureComponent {
       form: { validateFields, setFieldsValue }
     } = this.props;
     const { departList } = this.state;
+
+    const isAdd = key !== "supDepartmentId" && key !== "replyDepartmentId";
     validateFields((err, v) => {
       if (v[key]) {
         dispatch({
@@ -619,15 +623,20 @@ export default class integrat extends PureComponent {
               this.setState({ departList: [...departList, data] });
             } else {
               Modal.confirm({
-                title: "查不到该单位，是否去新建单位",
+                title: `查不到该单位，${
+                  isAdd ? "是否去新建单位" : "请重新输入"
+                }`,
                 content: "",
                 onOk() {
-                  self.setState({ showCreateDepart: true });
+                  if (isAdd) {
+                    self.setState({
+                      showCreateDepart: true,
+                      createDepartKey: key
+                    });
+                  }
                   setFieldsValue({ [key]: "" });
                 },
-                onCancel() {
-                  console.log("Cancel");
-                }
+                onCancel() {}
               });
             }
           }
@@ -771,6 +780,7 @@ export default class integrat extends PureComponent {
       showCreateDepart,
       showCheck,
       showProblem,
+      createDepartKey,
       showProjectAllInfo,
       fileList,
       problem,
@@ -781,7 +791,7 @@ export default class integrat extends PureComponent {
     } = this.state;
     const {
       dispatch,
-      form: { getFieldDecorator, resetFields },
+      form: { getFieldDecorator, resetFields, setFieldsValue },
       user: { districtList, departSelectList, departUpdateId },
       project: { projectList, projectInfo, projectInfoRedLineList },
       spot: { spotList, projectInfoSpotList },
@@ -2873,8 +2883,14 @@ export default class integrat extends PureComponent {
                     callback: (success, result) => {
                       if (success) {
                         self.setState({ showCreateDepart: false });
+                        setFieldsValue({ [createDepartKey]: v.name });
                         notification["success"]({
                           message: `单位新建成功`
+                        });
+
+                        emitter.emit("departNameReset", {
+                          key: createDepartKey,
+                          name: v.name
                         });
                       }
                     }

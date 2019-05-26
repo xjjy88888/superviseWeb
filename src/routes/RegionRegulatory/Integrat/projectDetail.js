@@ -46,7 +46,7 @@ export default class integrat extends PureComponent {
 
   componentDidMount() {
     const {
-      form: { resetFields }
+      form: { resetFields, setFieldsValue }
     } = this.props;
     self = this;
     const { dispatch } = this.props;
@@ -54,6 +54,10 @@ export default class integrat extends PureComponent {
     for (let i = maxYear; i >= 1970; i--) {
       yearDataSource.push(`${i}年`);
     }
+    this.eventEmitter = emitter.addListener("departNameReset", v => {
+      console.log(v);
+      setFieldsValue({ [v.key]: v.name });
+    });
     this.eventEmitter = emitter.addListener("showProjectDetail", data => {
       resetFields();
       this.setState({
@@ -157,7 +161,8 @@ export default class integrat extends PureComponent {
                 onOk() {
                   setFieldsValue({ [key]: "" });
                   emitter.emit("showCreateDepart", {
-                    show: true
+                    show: true,
+                    key: key
                   });
                 },
                 onCancel() {
