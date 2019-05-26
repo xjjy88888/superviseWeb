@@ -251,9 +251,19 @@ export async function departVaildApi(params) {
 }
 
 // 附件列表
-export async function attachmentListApi(params) {
-  return request(`${config.url.attachmentListUrl}?Id=${params.id}`, {
+export async function annexListApi(params) {
+  return request(`${config.url.annexListUrl}?Id=${params.id}`, {
     method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 附件删除
+export async function annexDeleteApi(params) {
+  return request(`${config.url.annexDeleteUrl}?Id=${params.id}`, {
+    method: "DELETE",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }

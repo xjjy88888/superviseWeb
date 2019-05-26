@@ -1348,12 +1348,12 @@ export default class integrat extends PureComponent {
   };
   /*
    *清空绘制图形,避免新增图形以及编辑图形冲突
-  */
+   */
   clearPlotGraphic = () => {
     //针对编辑图形
     //禁止编辑图形
-    if(userconfig.projectgeojsonLayer)
-       userconfig.projectgeojsonLayer.pm.disable();
+    if (userconfig.projectgeojsonLayer)
+      userconfig.projectgeojsonLayer.pm.disable();
     this.clearGeojsonLayer();
 
     //针对新增图形
@@ -1364,7 +1364,6 @@ export default class integrat extends PureComponent {
       map.removeLayer(addGraphLayer);
       this.setState({ addGraphLayer: null });
     }
-
   };
   /*
    * 取消编辑图形
@@ -1427,6 +1426,7 @@ export default class integrat extends PureComponent {
         state: "add",
         key: drawGrphic === "addSpot" ? "spot" : "redLine"
       });
+
       // if (drawGrphic === "addSpot") {
       //   me.props.dispatch({
       //     type: "project/addSpotGraphic",
@@ -1461,6 +1461,10 @@ export default class integrat extends PureComponent {
       //     }
       //   });
       // }
+    } else {
+      notification["warning"]({
+        message: `请绘制图形`
+      });
     }
   };
   /*
@@ -1479,12 +1483,13 @@ export default class integrat extends PureComponent {
 
     let geojson = userconfig.projectgeojsonLayer.toGeoJSON();
     let polygon = me.geojson2Multipolygon(geojson, 0);
-
+    console.log(polygon);
     emitter.emit("drawSpotBack", {
       polygon: polygon,
       state: "edit",
       key: geojson.features[0].properties.spot_tbid ? "spot" : "redLine"
     });
+
     // if (geojson.features[0].properties.spot_tbid) {
     //   this.props.dispatch({
     //     type: "project/updateSpotGraphic",
@@ -1794,16 +1799,18 @@ export default class integrat extends PureComponent {
                     : this.cancelAddGraphic
                 }
               />
-              <Button
-                icon="check"
-                onClick={
-                  drawGrphic === "edit"
-                    ? this.saveEditGraphic
-                    : drawGrphic === "screenshot"
-                    ? this.saveScreenshot
-                    : this.saveAddGraphic
-                }
-              />
+              <Popover content={"第二步：填写图斑信息"}>
+                <Button
+                  icon="check"
+                  onClick={
+                    drawGrphic === "edit"
+                      ? this.saveEditGraphic
+                      : drawGrphic === "screenshot"
+                      ? this.saveScreenshot
+                      : this.saveAddGraphic
+                  }
+                />
+              </Popover>
             </div>
             {/*图标联动按钮 */}
             <div

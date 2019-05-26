@@ -10,6 +10,7 @@ import {
   Row,
   Col,
   notification,
+  Popover,
   Input,
   Radio,
   List,
@@ -799,7 +800,6 @@ export default class integrat extends PureComponent {
             actCompTime: ""
           }
         };
-    console.log(projectItem.projectBase);
 
     const showPoint = key === "point";
 
@@ -896,7 +896,7 @@ export default class integrat extends PureComponent {
               <b
                 style={{ cursor: "pointer" }}
                 onClick={() => {
-                  resetFields()
+                  resetFields();
                   //编辑
                   if (key === "project") {
                     this.setState({
@@ -1046,49 +1046,61 @@ export default class integrat extends PureComponent {
             enterButton
           />
           {/* 新建 */}
-          <Icon
-            type={
+          <Popover
+            content={
               key === "project"
-                ? "plus"
+                ? "新建项目"
                 : key === "spot"
-                ? "radius-upright"
-                : "compass"
+                ? "新建图斑，第一步：绘制图形"
+                : "新建标注点"
             }
-            style={{
-              fontSize: 20,
-              position: "relative",
-              top: 23,
-              cursor: "pointer",
-              color: "#1890ff"
-            }}
-            onClick={() => {
-              if (key === "project") {
-                this.setState({
-                  showProjectDetail: true,
-                  projectEdit: true,
-                  previewVisible_min_left: false,
-                  isProjectUpdate: false
-                });
-                this.props.form.resetFields();
-                emitter.emit("showProjectDetail", {
-                  show: true,
-                  edit: true
-                });
-              } else if (key === "spot") {
-                emitter.emit("drawSpot", {
-                  draw: true,
-                  project_id: "123"
-                });
-                emitter.emit("showSiderbarDetail", {
-                  show: true,
-                  edit: true,
-                  from: "spot",
-                  type: "add",
-                  item: { id: "" }
-                });
+            title=""
+            trigger="hover"
+          >
+            <Icon
+              type={
+                key === "project"
+                  ? "plus"
+                  : key === "spot"
+                  ? "radius-upright"
+                  : "compass"
               }
-            }}
-          />
+              style={{
+                fontSize: 20,
+                position: "relative",
+                top: 23,
+                cursor: "pointer",
+                color: "#1890ff"
+              }}
+              onClick={() => {
+                if (key === "project") {
+                  this.setState({
+                    showProjectDetail: true,
+                    projectEdit: true,
+                    previewVisible_min_left: false,
+                    isProjectUpdate: false
+                  });
+                  this.props.form.resetFields();
+                  emitter.emit("showProjectDetail", {
+                    show: true,
+                    edit: true
+                  });
+                } else if (key === "spot") {
+                  emitter.emit("drawSpot", {
+                    draw: true,
+                    project_id: "123"
+                  });
+                  emitter.emit("showSiderbarDetail", {
+                    show: false,
+                    edit: true,
+                    from: "spot",
+                    type: "add",
+                    item: { id: "" }
+                  });
+                }
+              }}
+            />
+          </Popover>
           <Radio.Group
             buttonStyle="solid"
             style={{ padding: "0px 15px" }}

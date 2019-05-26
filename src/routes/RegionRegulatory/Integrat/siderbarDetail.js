@@ -33,12 +33,12 @@ const formItemLayout = {
   wrapperCol: { span: 16 }
 };
 
-@connect(({ project, spot, point, user, attach }) => ({
+@connect(({ project, spot, point, user, annex }) => ({
   project,
   spot,
   point,
   user,
-  attach
+  annex
 }))
 @createForm()
 export default class siderbarDetail extends PureComponent {
@@ -52,7 +52,7 @@ export default class siderbarDetail extends PureComponent {
       polygon: "",
       isSpotUpdate: true,
       item: { project_id: "" },
-      fileList: []
+      spotFileList: []
     };
     this.map = null;
   }
@@ -71,6 +71,13 @@ export default class siderbarDetail extends PureComponent {
     this.eventEmitter = emitter.addListener("drawSpotBack", v => {
       this.setState({
         polygon: v.polygon
+      });
+      emitter.emit("showSiderbarDetail", {
+        show: true,
+        edit: true,
+        from: "spot",
+        type: "add",
+        item: { id: "" }
       });
     });
     this.eventEmitter = emitter.addListener("showSiderbarDetail", data => {
@@ -120,12 +127,12 @@ export default class siderbarDetail extends PureComponent {
               uid: item.id,
               name: item.fileName,
               status: "done",
-              url: config.url.attachmentPreviewUrl + item.id
+              url: config.url.annexPreviewUrl + item.id
             };
           });
-          this.setState({ fileList: list });
+          this.setState({ spotFileList: list });
         } else {
-          this.setState({ fileList: [] });
+          this.setState({ spotFileList: [] });
         }
       }
     });
@@ -249,6 +256,7 @@ export default class siderbarDetail extends PureComponent {
       type,
       edit,
       fileList,
+      spotFileList,
       isSpotUpdate,
       previewVisible,
       previewImage,
@@ -608,40 +616,65 @@ export default class siderbarDetail extends PureComponent {
                 })(<TextArea autosize={true} disabled={!edit} />)}
               </Form.Item>
             </Form>
-            <Upload
-              action={config.url.attachmentUploadUrl}
-              headers={{ Authorization: `Bearer ${accessToken()}` }}
-              data={{ Id: ParentId }}
-              listType="picture-card"
-              fileList={fileList}
-              onSuccess={v => {
-                if (v.success) {
-                  console.log(v.result);
-                  this.setState({ ParentId: v.result.id });
-                } else {
-                  notification["error"]({
-                    message: `查询项目列表失败：${v.error.message}`
+            <div style={{ minHeight: spotFileList.length ? 120 : 0 }}>
+              <Upload
+                action={config.url.annexUploadUrl}
+                headers={{ Authorization: `Bearer ${accessToken()}` }}
+                data={{ Id: ParentId }}
+                listType="picture-card"
+                fileList={spotFileList}
+                onSuccess={v => {
+                  if (v.success) {
+                    console.log(v.result);
+                    this.setState({ ParentId: v.result.id });
+                  } else {
+                    notification["error"]({
+                      message: `附件上传失败：${v.error.message}`
+                    });
+                  }
+                }}
+                onPreview={file => {
+                  this.setState({
+                    previewImage: file.url || file.thumbUrl,
+                    previewVisible_min: true
                   });
-                }
-              }}
-              onPreview={file => {
-                this.setState({
-                  previewImage: file.url || file.thumbUrl,
-                  previewVisible_min: true
-                });
-                getFile(file.url);
-              }}
-              onChange={({ fileList }) => {
-                this.setState({ fileList });
-              }}
-            >
-              {edit ? (
-                <div>
-                  <Icon type="plus" />
-                  <div className="ant-upload-text">上传</div>
-                </div>
-              ) : null}
-            </Upload>
+                  getFile(file.url);
+                }}
+                onChange={({ fileList }) => {
+                  const data = fileList.map(item => {
+                    return {
+                      ...item,
+                      status: "done"
+                    };
+                  });
+                  this.setState({ spotFileList: data });
+                }}
+                onRemove={file => {
+                  return new Promise((resolve, reject) => {
+                    dispatch({
+                      type: "annex/annexDelete",
+                      payload: {
+                        id: file.uid
+                      },
+                      callback: success => {
+                        if (success) {
+                          resolve();
+                        } else {
+                          reject();
+                        }
+                      }
+                    });
+                  });
+                }}
+              >
+                {edit ? (
+                  <div>
+                    <Icon type="plus" />
+                    <div className="ant-upload-text">上传</div>
+                  </div>
+                ) : null}
+              </Upload>
+            </div>
             {edit ? (
               <span>
                 <Button
@@ -729,7 +762,7 @@ export default class siderbarDetail extends PureComponent {
                 </Button>
               </span>
             ) : (
-              <span>
+              <div>
                 <Button icon="swap" style={{ marginTop: 20 }}>
                   历史查看
                 </Button>
@@ -739,7 +772,7 @@ export default class siderbarDetail extends PureComponent {
                 <Button icon="rollback" style={{ marginTop: 20 }}>
                   撤销归档
                 </Button>
-              </span>
+              </div>
             )}
           </div>
           <div

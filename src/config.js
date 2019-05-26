@@ -56,16 +56,16 @@ const config = {
     pointSiteByIdUrl: `${domain}api/services/app/MarkingPoint/GetPoint`,
 
     // 附件上传
-    attachmentUploadUrl: `${domain}api/services/app/Attachment/UploadAsync`,
+    annexUploadUrl: `${domain}api/services/app/Attachment/UploadAsync`,
 
     // 附件列表
-    attachmentListUrl: `${domain}api/services/app/Attachment/Get`,
-
-    // 附件删除
-    attachmentListUrl1: `${domain}api/services/app/Attachment/Get`,
+    annexListUrl: `${domain}api/services/app/Attachment/Get`,
 
     // 附件预览
-    attachmentPreviewUrl: `${domain}api/services/app/Attachment/GetFile?id=`,
+    annexPreviewUrl: `${domain}api/services/app/Attachment/GetFile?id=`,
+
+    // 附件删除
+    annexDeleteUrl: `${domain}api/services/app/Attachment/Delete`,
 
     // 字典
     dictUrl: `${domain}api/services/app/DictTable/GetAll`,
