@@ -18,7 +18,6 @@ import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
 import config from "../../../config";
 
-const CheckboxGroup = Checkbox.Group;
 const { RangePicker } = DatePicker;
 const formItemLayout = {
   labelCol: { span: 6 },
@@ -36,7 +35,12 @@ const formItemLayoutlong = {
 export default class siderbarDetail extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = { show: false, type: "project", dataSource: [] };
+    this.state = {
+      show: false,
+      type: "project",
+      dataSource: [],
+      showVecType: false
+    };
     this.saveRef = ref => {
       this.refDom = ref;
     };
@@ -66,35 +70,27 @@ export default class siderbarDetail extends PureComponent {
       }));
   };
 
-  renderOption = item => {
-    return (
-      <AutoComplete.Option key={item.category} text={item.category}>
-        {item.query} 在
-        <a
-          href={`https://s.taobao.com/search?q=${item.query}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {item.category}
-        </a>
-        区块中
-        <span className="global-search-item-count">约 {item.count} 个结果</span>
-      </AutoComplete.Option>
-    );
-  };
-
   handleSearch = value => {
     this.setState({
       dataSource: value ? this.searchResult(value) : []
     });
   };
-
-  displayRender = label => {
-    return label[label.length - 1];
+  getDictList = type => {
+    const {
+      user: { dicList }
+    } = this.props;
+    if (type) {
+      const filter = dicList.filter(item => {
+        return item.dictTypeName === type;
+      });
+      return filter.map(item => item.value);
+    } else {
+      return [];
+    }
   };
 
   render() {
-    const { show, type } = this.state;
+    const { show, type, showVecType } = this.state;
     const {
       form: { getFieldDecorator, resetFields },
       user: { districtList }
@@ -222,7 +218,7 @@ export default class siderbarDetail extends PureComponent {
             </Form.Item>
             <Form.Item label="立项级别" {...formItemLayoutlong}>
               {getFieldDecorator("ProjectLevel", { initialValue: [] })(
-                <CheckboxGroup options={config.approval_level} />
+                <Checkbox.Group options={this.getDictList("立项级别")} />
               )}
             </Form.Item>
             <Form.Item label="批复机构" {...formItemLayout}>
@@ -247,7 +243,7 @@ export default class siderbarDetail extends PureComponent {
                   style={{ width: "100%" }}
                   placeholder="请选择项目类型"
                 >
-                  {config.project_type.map(item => (
+                  {this.getDictList("项目类型").map(item => (
                     <Select.Option key={item}>{item}</Select.Option>
                   ))}
                 </Select>
@@ -255,17 +251,17 @@ export default class siderbarDetail extends PureComponent {
             </Form.Item>
             <Form.Item label="项目类别" {...formItemLayout}>
               {getFieldDecorator("ProjectCate", { initialValue: [] })(
-                <CheckboxGroup options={config.project_category} />
+                <Checkbox.Group options={this.getDictList("项目类别")} />
               )}
             </Form.Item>
             <Form.Item label="项目性质" {...formItemLayoutlong}>
               {getFieldDecorator("ProjectNat", { initialValue: [] })(
-                <CheckboxGroup options={config.project_nature} />
+                <Checkbox.Group options={this.getDictList("项目性质")} />
               )}
             </Form.Item>
             <Form.Item label="建设状态" {...formItemLayoutlong}>
               {getFieldDecorator("ProjectStatus", { initialValue: [] })(
-                <CheckboxGroup options={config.construct_state} />
+                <Checkbox.Group options={this.getDictList("建设状态")} />
               )}
             </Form.Item>
             <Form.Item label="项目合规性" {...formItemLayout}>
@@ -275,7 +271,7 @@ export default class siderbarDetail extends PureComponent {
                   style={{ width: "100%" }}
                   placeholder="请选择项目合规性"
                 >
-                  {config.compliance.map(item => (
+                  {this.getDictList("项目合规性").map(item => (
                     <Select.Option key={item}>{item}</Select.Option>
                   ))}
                 </Select>
@@ -283,17 +279,26 @@ export default class siderbarDetail extends PureComponent {
             </Form.Item>
             <Form.Item label="有无红线" {...formItemLayoutlong}>
               {getFieldDecorator("HasScopes", {})(
-                <CheckboxGroup options={["有红线", "无红线"]} />
+                <Checkbox.Group
+                  options={["有红线", "无红线"]}
+                  onChange={v => {
+                    this.setState({ showVecType: v.indexOf("有红线") > -1 });
+                  }}
+                />
               )}
             </Form.Item>
-            <Form.Item label="矢量化类型" {...formItemLayoutlong}>
+            <Form.Item
+              label="矢量化类型"
+              {...formItemLayoutlong}
+              style={{ display: showVecType ? "block" : "none" }}
+            >
               {getFieldDecorator("VecType", { initialValue: [] })(
-                <CheckboxGroup options={config.vectorization_type} />
+                <Checkbox.Group options={this.getDictList("矢量化类型")} />
               )}
             </Form.Item>
             <Form.Item label="有无扰动图斑" {...formItemLayoutlong}>
               {getFieldDecorator("HasSpot", {})(
-                <CheckboxGroup options={["有图斑", "无图斑"]} />
+                <Checkbox.Group options={["有图斑", "无图斑"]} />
               )}
             </Form.Item>
             <Form.Item label="显示归档数据" {...formItemLayoutlong}>
@@ -360,7 +365,7 @@ export default class siderbarDetail extends PureComponent {
             </Form.Item>
             <Form.Item label="扰动类型" {...formItemLayoutlong}>
               {getFieldDecorator("InterferenceType", { initialValue: [] })(
-                <CheckboxGroup options={config.disturb_type} />
+                <Checkbox.Group options={this.getDictList("扰动类型")} />
               )}
             </Form.Item>
             <Form.Item label="扰动合规性" {...formItemLayout}>
@@ -372,7 +377,7 @@ export default class siderbarDetail extends PureComponent {
                   style={{ width: "100%" }}
                   placeholder="请选择扰动合规性"
                 >
-                  {config.compliance.map(item => (
+                  {this.getDictList("扰动合规性").map(item => (
                     <Select.Option key={item}>{item}</Select.Option>
                   ))}
                 </Select>
@@ -380,12 +385,12 @@ export default class siderbarDetail extends PureComponent {
             </Form.Item>
             <Form.Item label="扰动变化类型" {...formItemLayoutlong}>
               {getFieldDecorator("InterferenceVaryType", { initialValue: [] })(
-                <CheckboxGroup options={config.disturb_change_type} />
+                <Checkbox.Group options={this.getDictList("扰动变化类型")} />
               )}
             </Form.Item>
             <Form.Item label="建设状态" {...formItemLayoutlong}>
               {getFieldDecorator("BuildStatus", { initialValue: [] })(
-                <CheckboxGroup options={config.construct_state} />
+                <Checkbox.Group options={this.getDictList("建设状态")} />
               )}
             </Form.Item>
             <Form.Item label="显示归档数据" {...formItemLayoutlong}>

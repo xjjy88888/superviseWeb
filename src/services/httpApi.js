@@ -37,6 +37,7 @@ export async function projectListApi(params) {
       ProjectCate: params.ProjectCate
         ? params.ProjectCate.map(v => v).join(",")
         : "",
+      HasScopes: params.HasScopes ? params.HasScopes.map(v => v).join(",") : "",
       ProjectNat: params.ProjectNat
         ? params.ProjectNat.map(v => v).join(",")
         : "",
