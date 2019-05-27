@@ -1,4 +1,6 @@
 import React, { PureComponent } from "react";
+import { connect } from "dva";
+import { createForm } from "rc-form";
 import { Icon, Button, Radio, notification, Alert, Modal } from "antd";
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
@@ -7,6 +9,14 @@ import config from "../../../config";
 
 const url = "http://aj.zkygis.cn/stbcSys/Template/";
 
+@connect(({ project, spot, point, other, user }) => ({
+  project,
+  spot,
+  point,
+  other,
+  user
+}))
+@createForm()
 export default class siderbarDetail extends PureComponent {
   constructor(props) {
     super(props);
@@ -26,7 +36,8 @@ export default class siderbarDetail extends PureComponent {
       this.setState({
         show: data.show,
         type: data.type,
-        key: data.from
+        key: data.key,
+        checkResult: data.checkResult
       });
     });
     this.eventEmitter = emitter.addListener("checkResult", data => {
@@ -47,6 +58,7 @@ export default class siderbarDetail extends PureComponent {
       funcType,
       funcTypeText
     } = this.state;
+    const { dispatch } = this.props;
     return (
       <div
         style={{
@@ -228,6 +240,26 @@ export default class siderbarDetail extends PureComponent {
             visible={this.state.visibleDelete}
             onOk={() => {
               this.setState({ visibleDelete: false });
+              if (funcTypeText === "删除") {
+                dispatch({
+                  type:
+                    key === "project"
+                      ? "project/projectDeleteMul"
+                      : key === "spot"
+                      ? "spot/spotDeleteMul"
+                      : "",
+                  payload: {
+                    id: checkResult.map(item => item.id).join(",")
+                  },
+                  callback: success => {
+                    if (success) {
+                      emitter.emit("deleteSuccess", {
+                        success: true
+                      });
+                    }
+                  }
+                });
+              }
             }}
             onCancel={() => {
               this.setState({ visibleDelete: false });

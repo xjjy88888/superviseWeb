@@ -4,7 +4,8 @@ import {
   spotByIdApi,
   spotCreateUpdateApi,
   projectListApi,
-  spotDeleteApi
+  spotDeleteApi,
+  spotDeleteMulApi
 } from "../services/httpApi";
 
 export default {
@@ -85,6 +86,19 @@ export default {
       if (callback) callback(success);
       notification[success ? "success" : "error"]({
         message: `删除图斑${success ? "成功" : "失败"}${
+          success ? "" : `：${error.message}`
+        }`
+      });
+    },
+
+    //图斑批量删除
+    *spotDeleteMul({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error }
+      } = yield call(spotDeleteMulApi, payload);
+      if (callback) callback(success);
+      notification[success ? "success" : "error"]({
+        message: `批量删除图斑${success ? "成功" : "失败"}${
           success ? "" : `：${error.message}`
         }`
       });

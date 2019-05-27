@@ -868,7 +868,7 @@ export default class integrat extends PureComponent {
                 emitter.emit("showTool", {
                   show: true,
                   type: "control",
-                  from: key
+                  key: key
                 });
                 emitter.emit("showQuery", {
                   show: false
@@ -887,7 +887,13 @@ export default class integrat extends PureComponent {
                 emitter.emit("showTool", {
                   show: true,
                   type: "tool",
-                  from: key
+                  key: key,
+                  checkResult:
+                    key === "project"
+                      ? projectList.items
+                      : key === "spot"
+                      ? spotList.items
+                      : pointList.items
                 });
                 emitter.emit("showQuery", {
                   show: false

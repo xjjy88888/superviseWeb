@@ -1427,8 +1427,7 @@ export default class integrat extends PureComponent {
         state: "add",
         key: drawGrphic === "addSpot" ? "spot" : "redLine"
       });
-    }
-    else {
+    } else {
       notification["warning"]({
         message: `请绘制图形`
       });
@@ -1744,7 +1743,7 @@ export default class integrat extends PureComponent {
               />
               <Popover content={"第二步：填写图斑信息"}>
                 <Button
-                  icon="check"
+                  icon="arrow-right"
                   onClick={
                     drawGrphic === "edit"
                       ? this.saveEditGraphic

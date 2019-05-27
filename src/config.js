@@ -28,6 +28,9 @@ const config = {
     // 项目删除
     projectDeleteUrl: `${domain}api/services/app/Project/Delete`,
 
+    // 项目批量删除
+    projectDeleteMulUrl: `${domain}api/services/app/Project/DeleteBatch`,
+
     // 图斑列表
     spotListUrl: `${domain}api/services/app/Spot/GetAllByPost`,
 
@@ -42,6 +45,9 @@ const config = {
 
     // 图斑删除
     spotDeleteUrl: `${domain}api/services/app/Spot/Delete`,
+
+    // 图斑批量删除
+    spotDeleteMulUrl: `${domain}api/services/app/Spot/DeleteBatch`,
 
     // 标注点列表
     pointListUrl: `${domain}api/services/app/MarkingPoint/GetAll`,

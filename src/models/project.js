@@ -10,7 +10,8 @@ import {
   redLineByProjectIdApi,
   projectCreateUpdateApi,
   projectDeleteApi,
-  removeProjectScopeGraphic
+  removeProjectScopeGraphic,
+  projectDeleteMulApi
 } from "../services/httpApi";
 
 export default {
@@ -93,6 +94,19 @@ export default {
       if (callback) callback(success);
       notification[success ? "success" : "error"]({
         message: `删除项目${success ? "成功" : "失败"}${
+          success ? "" : `：${error.message}`
+        }`
+      });
+    },
+
+    // 项目批量删除
+    *projectDeleteMul({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error }
+      } = yield call(projectDeleteMulApi, payload);
+      if (callback) callback(success);
+      notification[success ? "success" : "error"]({
+        message: `批量删除项目${success ? "成功" : "失败"}${
           success ? "" : `：${error.message}`
         }`
       });

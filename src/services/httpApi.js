@@ -93,6 +93,16 @@ export async function projectDeleteApi(payload) {
   });
 }
 
+// 项目批量删除
+export async function projectDeleteMulApi(payload) {
+  return request(`${config.url.projectDeleteMulUrl}?ids=${payload.id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
 // 图斑列表
 export async function spotListApi(params) {
   delete params.items;
@@ -149,6 +159,16 @@ export async function spotCreateUpdateApi(params) {
 // 图斑删除
 export async function spotDeleteApi(payload) {
   return request(`${config.url.spotDeleteUrl}?id=${payload.id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 图斑批量删除
+export async function spotDeleteMulApi(payload) {
+  return request(`${config.url.spotDeleteMulUrl}?ids=${payload.id}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${accessToken()}`

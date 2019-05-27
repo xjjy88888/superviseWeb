@@ -121,8 +121,8 @@ export default class siderbarDetail extends PureComponent {
         id: id
       },
       callback: data => {
+        this.setState({ ParentId: data.attachment ? data.attachment.id : 0 });
         if (data.attachment) {
-          this.setState({ ParentId: data.attachment.id });
           const list = data.attachment.child.map(item => {
             return {
               uid: item.id,
