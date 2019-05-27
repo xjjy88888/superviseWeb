@@ -52,11 +52,23 @@ const config = {
     // 标注点列表
     pointListUrl: `${domain}api/services/app/MarkingPoint/GetAll`,
 
+    // 标注点信息
+    pointByIdUrl: `${domain}api/services/app/MarkingPoint/Get`,
+
+    // 标注点新建
+    pointCreateUrl: `${domain}api/services/app/MarkingPoint/Create`,
+
+    // 标注点编辑
+    pointUpdateUrl: `${domain}api/services/app/MarkingPoint/Update`,
+
+    // 标注点删除
+    pointDeleteUrl: `${domain}api/services/app/MarkingPoint/Delete`,
+
+    // 标注点批量删除
+    pointDeleteMulUrl: `${domain}api/services/app/MarkingPoint/DeleteBatch`,
+
     // 项目id查询项目红线列表
     redLineByProjectIdUrl: `${domain}api/services/app/ProjectScope/GetAll`,
-
-    // id查询标注点
-    pointByIdUrl: `${domain}api/services/app/MarkingPoint/Get`,
 
     // id查询标注点经纬度
     pointSiteByIdUrl: `${domain}api/services/app/MarkingPoint/GetPoint`,

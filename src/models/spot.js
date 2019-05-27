@@ -78,7 +78,7 @@ export default {
       }
     },
 
-    //图斑删除
+    // 图斑删除
     *spotDelete({ payload, callback }, { call, put }) {
       const {
         data: { success, error }
@@ -91,7 +91,7 @@ export default {
       });
     },
 
-    //图斑批量删除
+    // 图斑批量删除
     *spotDeleteMul({ payload, callback }, { call, put }) {
       const {
         data: { success, error }

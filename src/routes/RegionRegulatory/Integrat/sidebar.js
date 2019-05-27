@@ -1108,9 +1108,15 @@ export default class integrat extends PureComponent {
                   emitter.emit("showSiderbarDetail", {
                     show: false,
                     edit: true,
-                    from: "spot",
-                    type: "add",
-                    item: { id: "" }
+                    from: key,
+                    type: "add"
+                  });
+                } else {
+                  emitter.emit("showSiderbarDetail", {
+                    show: key !== "project",
+                    edit: true,
+                    from: key,
+                    type: "add"
                   });
                 }
               }}

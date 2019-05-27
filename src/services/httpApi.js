@@ -194,6 +194,51 @@ export async function pointListApi(params) {
   );
 }
 
+// 标注点信息
+export async function pointByIdApi(id) {
+  return request(`${config.url.pointByIdUrl}?id=${id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 标注点新建编辑
+export async function pointCreateUpdateApi(params) {
+  return request(
+    params.id ? config.url.pointUpdateUrl : config.url.pointCreateUrl,
+    {
+      method: params.id ? "PUT" : "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify(params)
+    }
+  );
+}
+
+// 标注点删除
+export async function pointDeleteApi(payload) {
+  return request(`${config.url.pointDeleteUrl}?id=${payload.id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 标注点批量删除
+export async function pointDeleteMulApi(payload) {
+  return request(`${config.url.pointDeleteMulUrl}?ids=${payload.id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
 // 项目id查询项目红线列表
 export async function redLineByProjectIdApi(ProjectId) {
   return request(
@@ -207,16 +252,6 @@ export async function redLineByProjectIdApi(ProjectId) {
       }
     }
   );
-}
-
-// id查询标注点
-export async function pointByIdApi(id) {
-  return request(`${config.url.pointByIdUrl}?id=${id}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken()}`
-    }
-  });
 }
 
 // id查询标注点经纬度
