@@ -77,22 +77,25 @@ export default class siderbarDetail extends PureComponent {
         show: true,
         edit: true,
         from: "spot",
-        type: "add",
-        item: { id: "" }
+        type: v.state,
+        id: ""
       });
     });
     this.eventEmitter = emitter.addListener("showSiderbarDetail", data => {
-      resetFields();
+      console.log(data);
+      if (data.type === "add") {
+        resetFields();
+      }
       this.setState({
         show: data.show,
         edit: data.edit,
-        isSpotUpdate: !data.edit,
+        isSpotUpdate: data.type === "edit",
         from: data.from, //spot  point
         item: data.item,
         type: data.type, //add  edit
         previewVisible_min: false
       });
-      if (data.show && data.type !== "add") {
+      if (data.show && data.type !== "add" && data.id) {
         if (data.from === "spot") {
           this.querySpotById(data.id);
         } else if (data.from === "point") {
