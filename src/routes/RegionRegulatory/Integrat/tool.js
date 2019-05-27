@@ -37,7 +37,7 @@ export default class siderbarDetail extends PureComponent {
         show: data.show,
         type: data.type,
         key: data.key,
-        checkResult: data.checkResult
+        checkResult: data.checkResult || []
       });
     });
     this.eventEmitter = emitter.addListener("checkResult", data => {
