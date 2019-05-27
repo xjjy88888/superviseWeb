@@ -5,7 +5,7 @@ import {
   spotCreateUpdateApi,
   projectListApi,
   spotDeleteApi,
-  spotDeleteMulApi
+  spotDeleteMulApi,
 } from "../services/httpApi";
 
 export default {
@@ -15,7 +15,7 @@ export default {
     spotList: { totalCount: 0, items: [] },
     projectInfoSpotList: { totalCount: 0, items: [] },
     spotInfo: { mapNum: "", provinceCityDistrict: [null, null, null] },
-    projectSelectList: []
+    projectSelectList: [],
   },
 
   subscriptions: {
@@ -143,7 +143,7 @@ export default {
           message: `查询关联项目列表失败：${error.message}`
         });
       }
-    }
+    },
   },
 
   reducers: {

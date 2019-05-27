@@ -11,7 +11,9 @@ import {
   projectCreateUpdateApi,
   projectDeleteApi,
   removeProjectScopeGraphic,
-  projectDeleteMulApi
+  projectDeleteMulApi,
+  departListApi,
+  departCreateApi
 } from "../services/httpApi";
 
 export default {
@@ -29,7 +31,8 @@ export default {
         actStartTime: "",
         actCompTime: ""
       }
-    }
+    },
+    departSelectList: []
   },
 
   subscriptions: {
@@ -63,7 +66,37 @@ export default {
         data: { success, error, result }
       } = yield call(projectByIdApi, payload.id);
       if (success) {
-        yield put({ type: "save", payload: { projectInfo: result } });
+        let departSelectList = [];
+        const list = [
+          "productDepartment",
+          "supDepartment",
+          // "replyDepartment",
+
+          "projectDepartment",
+          "monitorDepartment",
+          "supervisionDepartment",
+
+          "getDepartName",
+          "constructionDepartment",
+          "reportDepartment"
+        ];
+        list.map(item => {
+          if (result[item]) {
+            departSelectList.push({
+              label: result[item].name,
+              value: result[item].id
+            });
+          }
+        });
+        console.log(departSelectList);
+
+        yield put({
+          type: "save",
+          payload: {
+            projectInfo: result,
+            departSelectList: [...new Set(departSelectList)]
+          }
+        });
         if (callback) callback(result, success);
       } else {
         notification["error"]({
@@ -122,6 +155,49 @@ export default {
       } else {
         notification["error"]({
           message: `查询项目关联红线列表失败：${error.message}`
+        });
+      }
+    },
+
+    // 单位列表
+    *departList({ payload, callback }, { call, put }) {
+      const {
+        data: {
+          success,
+          error,
+          result: { items: list }
+        }
+      } = yield call(departListApi, payload);
+      const departSelectList = list.map(item => {
+        return { label: item.name, value: item.id };
+      });
+      if (success) {
+        yield put({
+          type: "save",
+          payload: { departSelectList }
+        });
+      } else {
+        notification["error"]({
+          message: `查询单位列表失败：${error.message}`
+        });
+      }
+    },
+
+    //部门新建
+    *departCreate({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(departCreateApi, payload);
+      if (success) {
+        if (callback) callback(success, result);
+        const departSelectList = [{ label: result.name, value: result.id }];
+        yield put({
+          type: "save",
+          payload: { departSelectList }
+        });
+      } else {
+        notification["error"]({
+          message: `单位新建失败：${error.message}`
         });
       }
     },

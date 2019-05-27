@@ -1049,7 +1049,7 @@ export default class integrat extends PureComponent {
               obj
             )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
               obj
-            )})'>编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+            )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
               obj
             )})' style='display:none'>图形删除</a></div>`
           )
@@ -1059,7 +1059,7 @@ export default class integrat extends PureComponent {
         obj
       )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
               obj
-            )})'>编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+            )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
               obj
             )})' style='display:none'>图形删除</a></div>`
           );

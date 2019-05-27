@@ -163,9 +163,10 @@ export default class siderbarDetail extends PureComponent {
               this.props.form.validateFields((err, v) => {
                 if (!err) {
                   console.log("筛选信息", v);
+                  const d = v.DistrictCodes;
                   emitter.emit("queryInfo", {
                     from: type,
-                    info: v
+                    info: { ...v, DistrictCodes: d[d.length - 1] }
                   });
                 }
               });
@@ -201,7 +202,7 @@ export default class siderbarDetail extends PureComponent {
         >
           <Form>
             <Form.Item label="所在地区" {...formItemLayout}>
-              {getFieldDecorator("diqu", { initialValue: "" })(
+              {getFieldDecorator("DistrictCodes", { initialValue: "" })(
                 <Cascader
                   options={districtList}
                   changeOnSelect
@@ -280,6 +281,11 @@ export default class siderbarDetail extends PureComponent {
                 </Select>
               )}
             </Form.Item>
+            <Form.Item label="有无红线" {...formItemLayoutlong}>
+              {getFieldDecorator("HasScopes", {})(
+                <CheckboxGroup options={["有红线", "无红线"]} />
+              )}
+            </Form.Item>
             <Form.Item label="矢量化类型" {...formItemLayoutlong}>
               {getFieldDecorator("VecType", { initialValue: [] })(
                 <CheckboxGroup options={config.vectorization_type} />
@@ -308,11 +314,13 @@ export default class siderbarDetail extends PureComponent {
         >
           <Form>
             <Form.Item label="所在地区" {...formItemLayout}>
-              <Cascader
-                placeholder="请选择所在地区"
-                options={districtList}
-                changeOnSelect
-              />
+              {getFieldDecorator("DistrictCodes", { initialValue: "" })(
+                <Cascader
+                  options={districtList}
+                  changeOnSelect
+                  placeholder="请选择所在地区"
+                />
+              )}
             </Form.Item>
             <Form.Item label="扰动面积" {...formItemLayoutlong}>
               {getFieldDecorator("InterferenceAreaMin", {})(

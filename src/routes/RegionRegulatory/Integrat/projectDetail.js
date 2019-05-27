@@ -59,7 +59,7 @@ export default class integrat extends PureComponent {
     }
     this.eventEmitter = emitter.addListener("departNameReset", v => {
       console.log(v);
-      setFieldsValue({ [v.key]: v.name });
+      setFieldsValue({ [v.key]: v.id });
     });
     this.eventEmitter = emitter.addListener("showProjectDetail", data => {
       resetFields();
@@ -133,9 +133,9 @@ export default class integrat extends PureComponent {
     }
   };
 
-  getDepartName = obj => {
+  getDepart = (obj, key) => {
     if (obj) {
-      return obj.name;
+      return obj[key];
     } else {
       return "";
     }
@@ -144,45 +144,41 @@ export default class integrat extends PureComponent {
   getDepartList = key => {
     const {
       dispatch,
-      form: { validateFields, setFieldsValue }
+      form: { setFieldsValue }
     } = this.props;
-    const { departList } = this.state;
-    validateFields((err, v) => {
-      if (v[key]) {
-        dispatch({
-          type: "user/departVaild",
-          payload: {
-            name: v[key]
-          },
-          callback: (isVaild, data) => {
-            if (isVaild) {
-              this.setState({ departList: [...departList, data] });
-            } else {
-              Modal.confirm({
-                title: "查不到该单位，是否去新建单位",
-                content: "",
-                onOk() {
-                  setFieldsValue({ [key]: "" });
-                  emitter.emit("showCreateDepart", {
-                    show: true,
-                    key: key
-                  });
-                },
-                onCancel() {
-                  console.log("Cancel");
-                }
-              });
-            }
+    const { departList, departSearch } = this.state;
+    if (departSearch) {
+      dispatch({
+        type: "user/departVaild",
+        payload: {
+          name: departSearch
+        },
+        callback: (isVaild, data) => {
+          if (isVaild) {
+            this.setState({ departList: [...departList, data] });
+          } else {
+            Modal.confirm({
+              title: "查不到该单位，是否去新建单位",
+              content: "",
+              onOk() {
+                setFieldsValue({ [key]: "" });
+                emitter.emit("showCreateDepart", {
+                  show: true,
+                  key: key
+                });
+              },
+              onCancel() {}
+            });
           }
-        });
-      }
-    });
+        }
+      });
+    }
   };
 
   queryDepartList = v => {
     const { dispatch } = this.props;
     dispatch({
-      type: "user/departList",
+      type: "project/departList",
       payload: {
         name: v
       }
@@ -194,8 +190,8 @@ export default class integrat extends PureComponent {
 
     const {
       form: { getFieldDecorator },
-      project: { projectInfo },
-      user: { districtList, departSelectList, departUpdateId }
+      project: { projectInfo, departSelectList },
+      user: { districtList, departUpdateId }
     } = this.props;
 
     const projectItem = projectInfo;
@@ -424,32 +420,41 @@ export default class integrat extends PureComponent {
             </p>
             <p style={{ margin: 10 }}>
               <span>方案编制单位：</span>
-              <span>{this.getDepartName(projectItem.projectDepartment)}</span>
+              <span>
+                {this.getDepart(projectItem.projectDepartment, "name")}
+              </span>
             </p>
             <p style={{ margin: 10 }}>
               <span>监测单位：</span>
-              <span>{this.getDepartName(projectItem.monitorDepartment)}</span>
+              <span>
+                {this.getDepart(projectItem.monitorDepartment, "name")}
+              </span>
             </p>
             <p style={{ margin: 10 }}>
               <span>监理单位：</span>
               <span>
-                {this.getDepartName(projectItem.expand.SupervisionDepartment)}
+                {this.getDepart(
+                  projectItem.expand.SupervisionDepartment,
+                  "name"
+                )}
               </span>
             </p>
             <p style={{ margin: 10 }}>
               <span>设计单位：</span>
-              <span>{this.getDepartName(projectItem.designDepartment)}</span>
+              <span>
+                {this.getDepart(projectItem.designDepartment, "name")}
+              </span>
             </p>
             <p style={{ margin: 10 }}>
               <span>施工单位：</span>
               <span>
-                {this.getDepartName(projectItem.constructionDepartment)}
+                {this.getDepart(projectItem.constructionDepartment, "name")}
               </span>
             </p>
             <p style={{ margin: 10 }}>
               <span>验收报告编制单位：</span>
               <span>
-                {this.getDepartName(projectItem.expand.ReportDepartment)}
+                {this.getDepart(projectItem.expand.ReportDepartment, "name")}
               </span>
             </p>
             <p style={{ margin: 10 }}>
@@ -858,132 +863,216 @@ export default class integrat extends PureComponent {
               <Col span={12}>
                 <Form.Item label="方案编制单位">
                   {getFieldDecorator("projectDepartmentId", {
-                    initialValue: this.getDepartName(
-                      projectItem.projectDepartment
+                    initialValue: this.getDepart(
+                      projectItem.projectDepartment,
+                      "id"
                     )
                   })(
-                    <AutoComplete
-                      dataSource={departSelectList}
-                      filterOption={(inputValue, option) =>
+                    <Select
+                      showSearch
+                      style={{ width: 220 }}
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
                         option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
                       }
-                      onChange={this.queryDepartList}
-                      onBlur={() => {
-                        this.getDepartList("projectDepartmentId");
+                      onSearch={v => {
+                        this.setState({ departSearch: v });
+                        this.queryDepartList(v);
                       }}
-                    />
+                      onBlur={() => {
+                        if (departSelectList.length === 0) {
+                          this.getDepartList("projectDepartmentId");
+                        }
+                      }}
+                    >
+                      {departSelectList.map(item => (
+                        <Select.Option value={item.value} key={item.value}>
+                          {item.label}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="监测单位">
                   {getFieldDecorator("monitorDepartmentId", {
-                    initialValue: this.getDepartName(
-                      projectItem.monitorDepartment
+                    initialValue: this.getDepart(
+                      projectItem.monitorDepartment,
+                      "id"
                     )
                   })(
-                    <AutoComplete
-                      dataSource={departSelectList}
-                      filterOption={(inputValue, option) =>
+                    <Select
+                      showSearch
+                      style={{ width: 220 }}
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
                         option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
                       }
-                      onChange={this.queryDepartList}
-                      onBlur={() => {
-                        this.getDepartList("monitorDepartmentId");
+                      onSearch={v => {
+                        this.setState({ departSearch: v });
+                        this.queryDepartList(v);
                       }}
-                    />
+                      onBlur={() => {
+                        if (departSelectList.length === 0) {
+                          this.getDepartList("monitorDepartmentId");
+                        }
+                      }}
+                    >
+                      {departSelectList.map(item => (
+                        <Select.Option value={item.value} key={item.value}>
+                          {item.label}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="监理单位">
                   {getFieldDecorator("supervisionDepartmentId", {
-                    initialValue: this.getDepartName(
-                      projectItem.SupervisionDepartment
+                    initialValue: this.getDepart(
+                      projectItem.supervisionDepartment,
+                      "id"
                     )
                   })(
-                    <AutoComplete
-                      dataSource={departSelectList}
-                      filterOption={(inputValue, option) =>
+                    <Select
+                      showSearch
+                      style={{ width: 220 }}
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
                         option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
                       }
-                      onChange={this.queryDepartList}
-                      onBlur={() => {
-                        this.getDepartList("supervisionDepartmentId");
+                      onSearch={v => {
+                        this.setState({ departSearch: v });
+                        this.queryDepartList(v);
                       }}
-                    />
+                      onBlur={() => {
+                        if (departSelectList.length === 0) {
+                          this.getDepartList("supervisionDepartmentId");
+                        }
+                      }}
+                    >
+                      {departSelectList.map(item => (
+                        <Select.Option value={item.value} key={item.value}>
+                          {item.label}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="设计单位">
                   {getFieldDecorator("designDepartmentId", {
-                    initialValue: this.getDepartName(
-                      projectItem.designDepartment
+                    initialValue: this.getDepart(
+                      projectItem.designDepartment,
+                      "id"
                     )
                   })(
-                    <AutoComplete
-                      dataSource={departSelectList}
-                      filterOption={(inputValue, option) =>
+                    <Select
+                      showSearch
+                      style={{ width: 220 }}
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
                         option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
                       }
-                      onChange={this.queryDepartList}
-                      onBlur={() => {
-                        this.getDepartList("designDepartmentId");
+                      onSearch={v => {
+                        this.setState({ departSearch: v });
+                        this.queryDepartList(v);
                       }}
-                    />
+                      onBlur={() => {
+                        if (departSelectList.length === 0) {
+                          this.getDepartList("designDepartmentId");
+                        }
+                      }}
+                    >
+                      {departSelectList.map(item => (
+                        <Select.Option value={item.value} key={item.value}>
+                          {item.label}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="施工单位">
                   {getFieldDecorator("constructionDepartmentId", {
-                    initialValue: this.getDepartName(
-                      projectItem.constructionDepartment
+                    initialValue: this.getDepart(
+                      projectItem.constructionDepartment,
+                      "id"
                     )
                   })(
-                    <AutoComplete
-                      dataSource={departSelectList}
-                      filterOption={(inputValue, option) =>
+                    <Select
+                      showSearch
+                      style={{ width: 220 }}
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
                         option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
                       }
-                      onChange={this.queryDepartList}
-                      onBlur={() => {
-                        this.getDepartList("constructionDepartmentId");
+                      onSearch={v => {
+                        this.setState({ departSearch: v });
+                        this.queryDepartList(v);
                       }}
-                    />
+                      onBlur={() => {
+                        if (departSelectList.length === 0) {
+                          this.getDepartList("constructionDepartmentId");
+                        }
+                      }}
+                    >
+                      {departSelectList.map(item => (
+                        <Select.Option value={item.value} key={item.value}>
+                          {item.label}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="验收报告编制单位">
                   {getFieldDecorator("reportDepartmentId", {
-                    initialValue: this.getDepartName(
-                      projectItem.ReportDepartment
+                    initialValue: this.getDepart(
+                      projectItem.reportDepartment,
+                      "id"
                     )
                   })(
-                    <AutoComplete
-                      dataSource={departSelectList}
-                      filterOption={(inputValue, option) =>
+                    <Select
+                      showSearch
+                      style={{ width: 220 }}
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
                         option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
                       }
-                      onChange={this.queryDepartList}
-                      onBlur={() => {
-                        this.getDepartList("reportDepartmentId");
+                      onSearch={v => {
+                        this.setState({ departSearch: v });
+                        this.queryDepartList(v);
                       }}
-                    />
+                      onBlur={() => {
+                        if (departSelectList.length === 0) {
+                          this.getDepartList("reportDepartmentId");
+                        }
+                      }}
+                    >
+                      {departSelectList.map(item => (
+                        <Select.Option value={item.value} key={item.value}>
+                          {item.label}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
               </Col>

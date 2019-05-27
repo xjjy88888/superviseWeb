@@ -82,43 +82,6 @@ export default {
       }
     },
 
-    //部门新建
-    *departCreateApi({ payload, callback }, { call, put }) {
-      const {
-        data: { success, error, result }
-      } = yield call(departCreateApi, payload);
-      if (success) {
-        if (callback) callback(success, result);
-      } else {
-        notification["error"]({
-          message: `单位新建失败：${error.message}`
-        });
-      }
-    },
-
-    //部门列表
-    *departList({ payload, callback }, { call, put }) {
-      const {
-        data: {
-          success,
-          error,
-          result: { items: list }
-        }
-      } = yield call(departListApi, payload);
-      const departSelectList = list.map(item => item.name);
-      const departUpdateId = list.length ? list[0].id : "";
-      if (success) {
-        yield put({
-          type: "save",
-          payload: { departSelectList, departUpdateId }
-        });
-      } else {
-        notification["error"]({
-          message: `查询单位列表失败：${error.message}`
-        });
-      }
-    },
-
     //部门校验
     *departVaild({ payload, callback }, { call, put }) {
       const {

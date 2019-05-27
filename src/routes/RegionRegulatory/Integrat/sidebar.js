@@ -607,41 +607,37 @@ export default class integrat extends PureComponent {
       dispatch,
       form: { validateFields, setFieldsValue }
     } = this.props;
-    const { departList } = this.state;
+    const { departList, departSearch } = this.state;
 
     const isAdd = key !== "supDepartmentId" && key !== "replyDepartmentId";
-    validateFields((err, v) => {
-      if (v[key]) {
-        dispatch({
-          type: "user/departVaild",
-          payload: {
-            name: v[key]
-          },
-          callback: (isVaild, data) => {
-            if (isVaild) {
-              this.setState({ departList: [...departList, data] });
-            } else {
-              Modal.confirm({
-                title: `查不到该单位，${
-                  isAdd ? "是否去新建单位" : "请重新输入"
-                }`,
-                content: "",
-                onOk() {
-                  if (isAdd) {
-                    self.setState({
-                      showCreateDepart: true,
-                      createDepartKey: key
-                    });
-                  }
-                  setFieldsValue({ [key]: "" });
-                },
-                onCancel() {}
-              });
-            }
+    if (departSearch) {
+      dispatch({
+        type: "user/departVaild",
+        payload: {
+          name: departSearch
+        },
+        callback: (isVaild, data) => {
+          if (isVaild) {
+            this.setState({ departList: [...departList, data] });
+          } else {
+            Modal.confirm({
+              title: `查不到该单位，${isAdd ? "是否去新建单位" : "请重新输入"}`,
+              content: "",
+              onOk() {
+                if (isAdd) {
+                  self.setState({
+                    showCreateDepart: true,
+                    createDepartKey: key
+                  });
+                }
+                setFieldsValue({ [key]: "" });
+              },
+              onCancel() {}
+            });
           }
-        });
-      }
-    });
+        }
+      });
+    }
   };
 
   getDictKey = (value, type) => {
@@ -672,9 +668,9 @@ export default class integrat extends PureComponent {
     }
   };
 
-  getDepartName = obj => {
+  getDepart = (obj, key) => {
     if (obj) {
-      return obj.name;
+      return obj[key];
     } else {
       return "";
     }
@@ -749,7 +745,7 @@ export default class integrat extends PureComponent {
   queryDepartList = v => {
     const { dispatch } = this.props;
     dispatch({
-      type: "user/departList",
+      type: "project/departList",
       payload: {
         name: v
       }
@@ -791,8 +787,13 @@ export default class integrat extends PureComponent {
     const {
       dispatch,
       form: { getFieldDecorator, resetFields, setFieldsValue },
-      user: { districtList, departSelectList, departUpdateId },
-      project: { projectList, projectInfo, projectInfoRedLineList },
+      user: { districtList },
+      project: {
+        projectList,
+        projectInfo,
+        projectInfoRedLineList,
+        departSelectList
+      },
       spot: { spotList, projectInfoSpotList },
       point: { pointList }
     } = this.props;
@@ -1556,15 +1557,15 @@ export default class integrat extends PureComponent {
                             values.projectNatId,
                             "项目性质"
                           ),
-                          productDepartmentId: this.getDepartKey(
-                            values.productDepartmentId
-                          ),
-                          supDepartmentId: this.getDepartKey(
-                            values.supDepartmentId
-                          ),
-                          replyDepartmentId: this.getDepartKey(
-                            values.replyDepartmentId
-                          ),
+                          // productDepartmentId: this.getDepartKey(
+                          //   values.productDepartmentId
+                          // ),
+                          // supDepartmentId: this.getDepartKey(
+                          //   values.supDepartmentId
+                          // ),
+                          // replyDepartmentId: this.getDepartKey(
+                          //   values.replyDepartmentId
+                          // ),
                           districtCodes: values.districtCodes.join(","),
                           id: isProjectUpdate ? projectItem.id : ""
                         };
@@ -1679,19 +1680,22 @@ export default class integrat extends PureComponent {
                       <p style={{ marginBottom: 10 }}>
                         <span>建设单位：</span>
                         <span>
-                          {this.getDepartName(projectItem.productDepartment)}
+                          {this.getDepart(
+                            projectItem.productDepartment,
+                            "name"
+                          )}
                         </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>监管单位：</span>
                         <span>
-                          {this.getDepartName(projectItem.supDepartment)}
+                          {this.getDepart(projectItem.supDepartment, "name")}
                         </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>批复机构：</span>
                         <span>
-                          {this.getDepartName(projectItem.replyDepartment)}
+                          {this.getDepart(projectItem.replyDepartment, "name")}
                         </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
@@ -2568,60 +2572,104 @@ export default class integrat extends PureComponent {
                 </Form.Item>
                 <Form.Item label="建设单位" {...formItemLayout}>
                   {getFieldDecorator("productDepartmentId", {
-                    initialValue: this.getDepartName(
-                      projectItem.productDepartment
+                    initialValue: this.getDepart(
+                      projectItem.productDepartment,
+                      "id"
                     )
                   })(
-                    <AutoComplete
-                      dataSource={departSelectList}
-                      filterOption={(inputValue, option) =>
+                    <Select
+                      showSearch
+                      style={{ width: 220 }}
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
                         option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
                       }
-                      onChange={this.queryDepartList}
-                      onBlur={() => {
-                        this.getDepartList("productDepartmentId");
+                      onSearch={v => {
+                        this.setState({ departSearch: v });
+                        this.queryDepartList(v);
                       }}
-                    />
+                      onBlur={() => {
+                        if (departSelectList.length === 0) {
+                          this.getDepartList("productDepartmentId");
+                        }
+                      }}
+                    >
+                      {departSelectList.map(item => (
+                        <Select.Option value={item.value} key={item.value}>
+                          {item.label}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
                 <Form.Item label="监管单位" {...formItemLayout}>
                   {getFieldDecorator("supDepartmentId", {
-                    initialValue: this.getDepartName(projectItem.supDepartment)
+                    initialValue: this.getDepart(
+                      projectItem.supDepartment,
+                      "id"
+                    )
                   })(
-                    <AutoComplete
-                      dataSource={departSelectList}
-                      filterOption={(inputValue, option) =>
+                    <Select
+                      showSearch
+                      style={{ width: 220 }}
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
                         option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
                       }
-                      onChange={this.queryDepartList}
-                      onBlur={() => {
-                        this.getDepartList("supDepartmentId");
+                      onSearch={v => {
+                        this.setState({ departSearch: v });
+                        this.queryDepartList(v);
                       }}
-                    />
+                      onBlur={() => {
+                        if (departSelectList.length === 0) {
+                          this.getDepartList("supDepartmentId");
+                        }
+                      }}
+                    >
+                      {departSelectList.map(item => (
+                        <Select.Option value={item.value} key={item.value}>
+                          {item.label}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
                 <Form.Item label="批复机构" {...formItemLayout}>
                   {getFieldDecorator("replyDepartmentId", {
-                    initialValue: this.getDepartName(
-                      projectItem.replyDepartment
+                    initialValue: this.getDepart(
+                      projectItem.replyDepartment,
+                      "id"
                     )
                   })(
-                    <AutoComplete
-                      dataSource={departSelectList}
-                      filterOption={(inputValue, option) =>
+                    <Select
+                      showSearch
+                      style={{ width: 220 }}
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
                         option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
                       }
-                      onChange={this.queryDepartList}
-                      onBlur={() => {
-                        this.getDepartList("replyDepartmentId");
+                      onSearch={v => {
+                        this.setState({ departSearch: v });
+                        this.queryDepartList(v);
                       }}
-                    />
+                      onBlur={() => {
+                        if (departSelectList.length === 0) {
+                          this.getDepartList("supDepartmentId");
+                        }
+                      }}
+                    >
+                      {departSelectList.map(item => (
+                        <Select.Option value={item.value} key={item.value}>
+                          {item.label}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
                 <Form.Item label="流域管理机构" {...formItemLayout}>
@@ -2883,19 +2931,20 @@ export default class integrat extends PureComponent {
                 this.props.form.validateFields((err, v) => {
                   console.log(v);
                   dispatch({
-                    type: "user/departCreateApi",
+                    type: "project/departCreate",
                     payload: v,
                     callback: (success, result) => {
                       if (success) {
                         self.setState({ showCreateDepart: false });
-                        setFieldsValue({ [createDepartKey]: v.name });
+                        setFieldsValue({ [createDepartKey]: result.id });
                         notification["success"]({
                           message: `单位新建成功`
                         });
 
                         emitter.emit("departNameReset", {
                           key: createDepartKey,
-                          name: v.name
+                          name: result.name,
+                          id: result.id
                         });
                       }
                     }

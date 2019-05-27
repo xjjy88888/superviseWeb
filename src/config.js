@@ -197,7 +197,7 @@ const config = {
   project_nature: ["新建", "扩建", "续建", "改建"],
 
   //矢量化类型
-  vectorization_type: ["防治责任范围", "示意性范围", "无红线"],
+  vectorization_type: ["防治责任范围", "示意性范围"],
 
   //工具箱
   toolbox: [
