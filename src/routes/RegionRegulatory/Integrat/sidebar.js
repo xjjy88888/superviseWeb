@@ -592,7 +592,6 @@ export default class integrat extends PureComponent {
 
   getDepartKey = value => {
     const { departList } = this.state;
-    console.log(departList);
     if (value) {
       const filter = departList.filter(item => {
         return value === item.name;

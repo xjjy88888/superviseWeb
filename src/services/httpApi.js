@@ -250,24 +250,17 @@ export async function departVaildApi(params) {
   });
 }
 
-// 附件列表
-export async function annexListApi(params) {
-  return request(`${config.url.annexListUrl}?Id=${params.id}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken()}`
-    }
-  });
-}
-
 // 附件删除
 export async function annexDeleteApi(params) {
-  return request(`${config.url.annexDeleteUrl}?Id=${params.id}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${accessToken()}`
+  return request(
+    `${config.url.annexDeleteUrl}?FileId=${params.FileId}&Id=${params.Id}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`
+      }
     }
-  });
+  );
 }
 
 // 行政区域

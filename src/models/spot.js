@@ -3,6 +3,7 @@ import {
   spotListApi,
   spotByIdApi,
   spotCreateUpdateApi,
+  projectListApi,
   spotDeleteApi
 } from "../services/httpApi";
 
@@ -12,7 +13,8 @@ export default {
   state: {
     spotList: { totalCount: 0, items: [] },
     projectInfoSpotList: { totalCount: 0, items: [] },
-    spotInfo: { mapNum: "", provinceCityDistrict: [null, null, null] }
+    spotInfo: { mapNum: "", provinceCityDistrict: [null, null, null] },
+    projectSelectList: []
   },
 
   subscriptions: {
@@ -46,7 +48,13 @@ export default {
         data: { success, error, result }
       } = yield call(spotByIdApi, payload.id);
       if (success) {
-        yield put({ type: "save", payload: { spotInfo: result } });
+        const projectSelectList = result.projectName
+          ? [{ label: result.projectName, value: result.projectId }]
+          : [];
+        yield put({
+          type: "save",
+          payload: { spotInfo: result, projectSelectList }
+        });
         if (callback) callback(result);
       } else {
         notification["error"]({
@@ -92,6 +100,33 @@ export default {
       } else {
         notification["error"]({
           message: `查询项目关联图斑列表失败：${error.message}`
+        });
+      }
+    },
+
+    // 项目下拉列表
+    *queryProjectSelect({ payload, callback }, { call, put }) {
+      const {
+        data: {
+          success,
+          error,
+          result: { items: list }
+        }
+      } = yield call(projectListApi, payload);
+      const projectSelectList = list.map(item => {
+        return {
+          label: item.projectName,
+          value: item.id
+        };
+      });
+      if (success) {
+        yield put({
+          type: "save",
+          payload: { projectSelectList }
+        });
+      } else {
+        notification["error"]({
+          message: `查询关联项目列表失败：${error.message}`
         });
       }
     }

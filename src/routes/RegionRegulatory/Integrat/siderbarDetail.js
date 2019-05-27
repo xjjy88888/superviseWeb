@@ -8,6 +8,7 @@ import {
   Button,
   Input,
   Cascader,
+  Select,
   Upload,
   notification,
   Modal,
@@ -189,8 +190,7 @@ export default class siderbarDetail extends PureComponent {
   submit = isArchive => {
     const {
       dispatch,
-      spot: { spotInfo },
-      project: { projectSelectList, projectUpdateId }
+      spot: { spotInfo, projectSelectList }
     } = this.props;
     const { type, polygon, archiveTime, ParentId } = this.state;
     this.props.form.validateFields((err, v) => {
@@ -219,7 +219,6 @@ export default class siderbarDetail extends PureComponent {
             districtCodeId: v.districtCodeId.length
               ? v.districtCodeId.pop()
               : "",
-            projectId: projectUpdateId || spotInfo.projectId,
             id: type === "edit" ? spotInfo.id : ""
           },
           callback: (success, response) => {
@@ -244,8 +243,7 @@ export default class siderbarDetail extends PureComponent {
       dispatch,
       form: { getFieldDecorator, resetFields, validateFields },
       user: { districtList },
-      project: { projectSelectList },
-      spot: { spotInfo },
+      spot: { spotInfo, projectSelectList },
       point: { pointItem, pointSite }
     } = this.props;
     const {
@@ -450,76 +448,35 @@ export default class siderbarDetail extends PureComponent {
                 }
                 {...formItemLayout}
               >
-                {getFieldDecorator("projectName", {
-                  initialValue: spotItem.projectName
+                {getFieldDecorator("projectId", {
+                  initialValue: spotItem.projectId
                 })(
-                  <AutoComplete
+                  <Select
                     disabled={!edit}
-                    dataSource={projectSelectList}
-                    filterOption={(inputValue, option) =>
+                    showSearch
+                    style={{ width: 220 }}
+                    optionFilterProp="children"
+                    filterOption={(input, option) =>
                       option.props.children
-                        .toUpperCase()
-                        .indexOf(inputValue.toUpperCase()) !== -1
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
                     }
-                    // addonAfter={
-                    //   <Icon
-                    //     type="link"
-                    //     style={{
-                    //       color: "#1890ff"
-                    //     }}
-                    //     onClick={() => {
-                    //       emitter.emit("showProjectSpotInfo", {
-                    //         show: true,
-                    //         edit: false,
-                    //         from: "project",
-                    //         id: spotItem.projectId
-                    //       });
-                    //     }}
-                    //   />
-                    // }
-                    onChange={v => {
+                    onSearch={v => {
                       dispatch({
-                        type: "project/queryProjectSelect",
+                        type: "spot/queryProjectSelect",
                         payload: {
                           ProjectName: v,
                           MaxResultCount: 5
                         }
                       });
                     }}
-                  />
-                  // <Input
-                  //   disabled={!edit}
-                  //   addonAfter={
-                  //     <Icon
-                  //       type="link"
-                  //       style={{
-                  //         color: "#1890ff"
-                  //       }}
-                  //       onClick={() => {
-                  //         emitter.emit("showProjectSpotInfo", {
-                  //           show: true,
-                  //           edit: false,
-                  //           from: "project",
-                  //           id: spotItem.projectId
-                  //         });
-                  //       }}
-                  //     />
-                  //   }
-                  //   onChange={v => {
-                  //     setTimeout(() => {
-                  //       this.props.form.validateFields((err, v) => {
-                  //         console.log(v.projectName);
-                  //         dispatch({
-                  //           type: "project/queryProjectSelect",
-                  //           payload: {
-                  //             ProjectName: v.projectName,
-                  //             MaxResultCount: 5
-                  //           }
-                  //         });
-                  //       });
-                  //     }, 100);
-                  //   }}
-                  // />
+                  >
+                    {projectSelectList.map(item => (
+                      <Select.Option value={item.value} key={item.value}>
+                        {item.label}
+                      </Select.Option>
+                    ))}
+                  </Select>
                 )}
               </Form.Item>
               <Form.Item label="扰动类型" {...formItemLayout}>
@@ -669,11 +626,16 @@ export default class siderbarDetail extends PureComponent {
                   this.setState({ spotFileList: data });
                 }}
                 onRemove={file => {
+                  console.log({
+                    FileId: file.uid,
+                    Id: spotItem.attachment.id
+                  });
                   return new Promise((resolve, reject) => {
                     dispatch({
                       type: "annex/annexDelete",
                       payload: {
-                        id: file.uid
+                        FileId: file.uid,
+                        Id: spotItem.attachment.id
                       },
                       callback: success => {
                         if (success) {

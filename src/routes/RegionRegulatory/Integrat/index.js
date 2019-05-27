@@ -1390,6 +1390,7 @@ export default class integrat extends PureComponent {
       map.removeLayer(addGraphLayer);
       this.setState({ addGraphLayer: null });
     }
+    map.pm.disableDraw("Polygon");
     emitter.emit("showSiderbarDetail", {
       show: false,
       from: "spot",
@@ -1413,11 +1414,11 @@ export default class integrat extends PureComponent {
    */
   saveAddGraphic = () => {
     const me = this;
-    me.setState({ showButton: false });
     map.on("click", this.onClickMap);
-    const { addGraphLayer, drawGrphic, project_id } = me.state;
+    const { addGraphLayer, drawGrphic } = me.state;
     //禁止编辑图形
     if (addGraphLayer) {
+      me.setState({ showButton: false });
       addGraphLayer.pm.disable();
       let geojson = addGraphLayer.toGeoJSON();
       let polygon = me.geojson2Multipolygon(geojson, 1);
@@ -1426,42 +1427,8 @@ export default class integrat extends PureComponent {
         state: "add",
         key: drawGrphic === "addSpot" ? "spot" : "redLine"
       });
-
-      // if (drawGrphic === "addSpot") {
-      //   me.props.dispatch({
-      //     type: "project/addSpotGraphic",
-      //     payload: {
-      //       spot_tbid: "spot_" + Math.random(),
-      //       project_id: project_id,
-      //       geometry: polygon
-      //     },
-      //     callback: obj => {
-      //       map.removeLayer(addGraphLayer);
-      //       me.setState({ addGraphLayer: null });
-      //       emitter.emit("showSiderbarDetail", {
-      //         show: false,
-      //         from: "spot"
-      //       });
-      //     }
-      //   });
-      // } else {
-      //   me.props.dispatch({
-      //     type: "project/addProjectScopeGraphic",
-      //     payload: {
-      //       project_id: "",
-      //       geometry: polygon
-      //     },
-      //     callback: obj => {
-      //       map.removeLayer(addGraphLayer);
-      //       me.setState({ addGraphLayer: null });
-      //       emitter.emit("showSiderbarDetail", {
-      //         show: false,
-      //         from: "spot"
-      //       });
-      //     }
-      //   });
-      // }
-    } else {
+    }
+    else {
       notification["warning"]({
         message: `请绘制图形`
       });
@@ -1489,30 +1456,6 @@ export default class integrat extends PureComponent {
       state: "edit",
       key: geojson.features[0].properties.spot_tbid ? "spot" : "redLine"
     });
-
-    // if (geojson.features[0].properties.spot_tbid) {
-    //   this.props.dispatch({
-    //     type: "project/updateSpotGraphic",
-    //     payload: {
-    //       spot_tbid: geojson.features[0].properties.spot_tbid,
-    //       geometry: polygon
-    //     },
-    //     callback: obj => {
-    //       me.clearGeojsonLayer();
-    //     }
-    //   });
-    // } else {
-    //   this.props.dispatch({
-    //     type: "project/updateProjectScopeGraphic",
-    //     payload: {
-    //       project_id: geojson.features[0].properties.project_id,
-    //       geometry: polygon
-    //     },
-    //     callback: obj => {
-    //       me.clearGeojsonLayer();
-    //     }
-    //   });
-    // }
   };
   /*
    * 保存屏幕截图

@@ -18,15 +18,12 @@ export default {
     // 附件删除
     *annexDelete({ payload, callback }, { call, put }) {
       const {
-        data: { success, error, result }
+        data: { success, error }
       } = yield call(annexDeleteApi, payload);
       if (callback) callback(success);
-      if (success) {
-      } else {
-        notification["error"]({
-          message: `附件删除失败：${error.message}`
-        });
-      }
+      notification[success ? "success" : "error"]({
+        message: success ? `附件删除成功` : `附件删除失败：${error.message}`
+      });
     }
   },
 

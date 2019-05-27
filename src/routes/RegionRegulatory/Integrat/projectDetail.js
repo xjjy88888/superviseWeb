@@ -52,7 +52,10 @@ export default class integrat extends PureComponent {
     const { dispatch } = this.props;
     const maxYear = new Date().getFullYear();
     for (let i = maxYear; i >= 1970; i--) {
-      yearDataSource.push(`${i}年`);
+      yearDataSource.push({
+        label: `${i}年`,
+        value: i
+      });
     }
     this.eventEmitter = emitter.addListener("departNameReset", v => {
       console.log(v);
@@ -566,13 +569,25 @@ export default class integrat extends PureComponent {
                   {getFieldDecorator("designLevelYear", {
                     initialValue: projectItem.expand.designLevelYear
                   })(
-                    <AutoComplete
-                      allowClear
-                      dataSource={yearDataSource}
-                      filterOption={(inputValue, option) =>
-                        option.props.children.indexOf(inputValue) !== -1
+                    <Select
+                      showSearch
+                      style={{ width: 150 }}
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        option.props.children
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
                       }
-                    />
+                      onSearch={v => {
+                        console.log(v);
+                      }}
+                    >
+                      {yearDataSource.map(item => (
+                        <Select.Option value={item.value} key={item.value}>
+                          {item.label}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
               </Col>
