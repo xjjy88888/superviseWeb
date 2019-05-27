@@ -89,6 +89,7 @@ export default class integrat extends PureComponent {
     });
     //气泡窗口详情查看
     window.goDetail = obj => {
+      console.log(obj);
       emitter.emit("showProjectSpotInfo", obj);
     };
     //气泡窗口编辑
@@ -973,7 +974,8 @@ export default class integrat extends PureComponent {
       dispatch({
         type: "project/queryProjectById",
         payload: {
-          id: id
+          id: id,
+          refresh: false
         },
         callback: data => {
           resolve(data.projectBase.name);

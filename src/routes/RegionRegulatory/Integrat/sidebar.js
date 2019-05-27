@@ -234,14 +234,12 @@ export default class integrat extends PureComponent {
     this.eventEmitter = emitter.addListener("showProjectSpotInfo", data => {
       if (data.from === "project") {
         this.setState({
-          // showProjectDetail: data.show,
+          showProjectDetail: data.show, //地图跳转到项目详情
           projectEdit: data.edit
         });
-        if (data.state === "edit") {
-          this.queryProjectById(data.id);
-          this.querySpotByProjectId(data.id);
-          this.queryRedLineByProjectId(data.id);
-        }
+        this.queryProjectById(data.id);
+        this.querySpotByProjectId(data.id);
+        this.queryRedLineByProjectId(data.id);
       } else if (data.from === "spot") {
       } else {
       }
@@ -410,7 +408,8 @@ export default class integrat extends PureComponent {
     dispatch({
       type: "project/queryProjectById",
       payload: {
-        id: id
+        id: id,
+        refresh: true
       },
       callback: (result, success) => {
         this.showSpin(false);
