@@ -5,7 +5,7 @@ import {
   spotCreateUpdateApi,
   projectListApi,
   spotDeleteApi,
-  spotDeleteMulApi,
+  spotDeleteMulApi
 } from "../services/httpApi";
 
 export default {
@@ -15,7 +15,7 @@ export default {
     spotList: { totalCount: 0, items: [] },
     projectInfoSpotList: { totalCount: 0, items: [] },
     spotInfo: { mapNum: "", provinceCityDistrict: [null, null, null] },
-    projectSelectList: [],
+    projectSelectList: []
   },
 
   subscriptions: {
@@ -30,16 +30,17 @@ export default {
         data: { success, error, result: spotList }
       } = yield call(spotListApi, payload);
       if (success) {
-        const data = {
+        const response = {
           items: [...items_old, ...spotList.items],
           totalCount: spotList.totalCount
         };
-        yield put({ type: "save", payload: { spotList: data } });
-        if (callback) callback(data);
+        yield put({ type: "save", payload: { spotList: response } });
+        if (callback) callback(success, response);
       } else {
         notification["error"]({
           message: `查询图斑列表失败：${error.message}`
         });
+        if (callback) callback(success);
       }
     },
 
@@ -143,7 +144,7 @@ export default {
           message: `查询关联项目列表失败：${error.message}`
         });
       }
-    },
+    }
   },
 
   reducers: {

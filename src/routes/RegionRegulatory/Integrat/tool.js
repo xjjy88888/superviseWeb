@@ -247,7 +247,7 @@ export default class siderbarDetail extends PureComponent {
                       ? "project/projectDeleteMul"
                       : key === "spot"
                       ? "spot/spotDeleteMul"
-                      : "",
+                      : "point/pointDeleteMul",
                   payload: {
                     id: checkResult.map(item => item.id).join(",")
                   },

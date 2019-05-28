@@ -349,12 +349,14 @@ export default class integrat extends PureComponent {
         polygon: polygon,
         items: items.SkipCount === 0 ? [] : projectList.items
       },
-      callback: data => {
+      callback: (success, response) => {
         this.showSpin(false);
-        emitter.emit("checkResult", {
-          show: false,
-          result: data.items
-        });
+        if (success) {
+          emitter.emit("checkResult", {
+            show: false,
+            result: response.items
+          });
+        }
       }
     });
   };
@@ -373,12 +375,14 @@ export default class integrat extends PureComponent {
         ...items,
         items: items.SkipCount === 0 ? [] : spotList.items
       },
-      callback: data => {
+      callback: (success, response) => {
         this.showSpin(false);
-        emitter.emit("checkResult", {
-          show: false,
-          result: data.items
-        });
+        if (success) {
+          emitter.emit("checkResult", {
+            show: false,
+            result: response.items
+          });
+        }
       }
     });
   };
@@ -395,8 +399,14 @@ export default class integrat extends PureComponent {
         ...items,
         items: items.SkipCount === 0 ? [] : pointList.items
       },
-      callback: data => {
+      callback: (success, response) => {
         this.showSpin(false);
+        if (success) {
+          emitter.emit("checkResult", {
+            show: false,
+            result: response.items
+          });
+        }
       }
     });
   };
@@ -858,50 +868,52 @@ export default class integrat extends PureComponent {
                 : pointList.totalCount}
               条
             </span>
-            <Button
-              icon={showCheck ? "dashboard" : ""}
-              style={{ float: "right" }}
-              onClick={() => {
-                emitter.emit("showSiderbarDetail", {
-                  show: false
-                });
-                emitter.emit("showTool", {
-                  show: true,
-                  type: "control",
-                  key: key
-                });
-                emitter.emit("showQuery", {
-                  show: false
-                });
-              }}
-            >
-              {showCheck ? "" : "仪表盘"}
-            </Button>
-            <Button
-              icon={showCheck ? "shopping" : ""}
-              style={{ float: "right" }}
-              onClick={() => {
-                emitter.emit("showSiderbarDetail", {
-                  show: false
-                });
-                emitter.emit("showTool", {
-                  show: true,
-                  type: "tool",
-                  key: key,
-                  checkResult:
-                    key === "project"
-                      ? projectList.items
-                      : key === "spot"
-                      ? spotList.items
-                      : pointList.items
-                });
-                emitter.emit("showQuery", {
-                  show: false
-                });
-              }}
-            >
-              {showCheck ? "" : "工具箱"}
-            </Button>
+            <span style={{ display: key !== "point" ? "inherit" : "none" }}>
+              <Button
+                icon={showCheck ? "dashboard" : ""}
+                style={{ float: "right" }}
+                onClick={() => {
+                  emitter.emit("showSiderbarDetail", {
+                    show: false
+                  });
+                  emitter.emit("showTool", {
+                    show: true,
+                    type: "control",
+                    key: key
+                  });
+                  emitter.emit("showQuery", {
+                    show: false
+                  });
+                }}
+              >
+                {showCheck ? "" : "仪表盘"}
+              </Button>
+              <Button
+                icon={showCheck ? "shopping" : ""}
+                style={{ float: "right" }}
+                onClick={() => {
+                  emitter.emit("showSiderbarDetail", {
+                    show: false
+                  });
+                  emitter.emit("showTool", {
+                    show: true,
+                    type: "tool",
+                    key: key,
+                    checkResult:
+                      key === "project"
+                        ? projectList.items
+                        : key === "spot"
+                        ? spotList.items
+                        : pointList.items
+                  });
+                  emitter.emit("showQuery", {
+                    show: false
+                  });
+                }}
+              >
+                {showCheck ? "" : "工具箱"}
+              </Button>
+            </span>
           </span>
         ),
         dataIndex: "name",

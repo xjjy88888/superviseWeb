@@ -47,16 +47,17 @@ export default {
         data: { success, error, result: projectList }
       } = yield call(projectListApi, payload);
       if (success) {
-        const data = {
+        const response = {
           items: [...items_old, ...projectList.items],
           totalCount: projectList.totalCount
         };
-        yield put({ type: "save", payload: { projectList: data } });
-        if (callback) callback(data);
+        if (callback) callback(success, response);
+        yield put({ type: "save", payload: { projectList: response } });
       } else {
         notification["error"]({
           message: `查询项目列表失败：${error.message}`
         });
+        if (callback) callback(success);
       }
     },
 
@@ -169,10 +170,10 @@ export default {
           result: { items: list }
         }
       } = yield call(departListApi, payload);
-      const departSelectList = list.map(item => {
-        return { label: item.name, value: item.id };
-      });
       if (success) {
+        const departSelectList = list.map(item => {
+          return { label: item.name, value: item.id };
+        });
         yield put({
           type: "save",
           payload: { departSelectList }

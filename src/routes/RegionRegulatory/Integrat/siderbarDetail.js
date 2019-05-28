@@ -53,7 +53,8 @@ export default class siderbarDetail extends PureComponent {
       polygon: "",
       isSpotUpdate: true,
       item: { project_id: "" },
-      spotFileList: []
+      spotFileList: [],
+      pointFileList: []
     };
     this.map = null;
   }
@@ -82,9 +83,8 @@ export default class siderbarDetail extends PureComponent {
       });
     });
     this.eventEmitter = emitter.addListener("showSiderbarDetail", data => {
-      console.log(data);
+      resetFields();
       if (data.type === "add") {
-        resetFields();
       }
       this.setState({
         show: data.show,
@@ -100,18 +100,28 @@ export default class siderbarDetail extends PureComponent {
           this.querySpotById(data.id);
         } else if (data.from === "point") {
           this.queryPointById(data.id);
-          this.queryPointSiteById(data.id);
         }
       }
     });
     this.eventEmitter = emitter.addListener("showProjectSpotInfo", data => {
-      console.log(data);
-      if (data.from === "spot") {
-        this.setState({
-          show: data.show,
-          edit: data.edit
-        });
-        this.querySpotById(data.id);
+      resetFields();
+      if (data.type === "add") {
+      }
+      this.setState({
+        show: data.show,
+        edit: data.edit,
+        isSpotUpdate: data.type === "edit",
+        from: data.from, //spot  point
+        item: data.item,
+        type: data.type, //add  edit
+        previewVisible_min: false
+      });
+      if (data.show && data.type !== "add" && data.id) {
+        if (data.from === "spot") {
+          this.querySpotById(data.id);
+        } else if (data.from === "point") {
+          this.queryPointById(data.id);
+        }
       }
     });
   }
@@ -148,16 +158,22 @@ export default class siderbarDetail extends PureComponent {
       type: "point/queryPointById",
       payload: {
         id: id
-      }
-    });
-  };
-
-  queryPointSiteById = id => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: "point/queryPointSiteById",
-      payload: {
-        id: id
+      },
+      callback: data => {
+        this.setState({ ParentId: data.attachment ? data.attachment.id : 0 });
+        if (data.attachment) {
+          const list = data.attachment.child.map(item => {
+            return {
+              uid: item.id,
+              name: item.fileName,
+              status: "done",
+              url: config.url.annexPreviewUrl + item.id
+            };
+          });
+          this.setState({ pointFileList: list });
+        } else {
+          this.setState({ pointFileList: [] });
+        }
       }
     });
   };
@@ -193,7 +209,7 @@ export default class siderbarDetail extends PureComponent {
   submit = isArchive => {
     const {
       dispatch,
-      spot: { spotInfo, projectSelectList }
+      spot: { spotInfo }
     } = this.props;
     const { type, polygon, archiveTime, ParentId } = this.state;
     this.props.form.validateFields((err, v) => {
@@ -247,7 +263,7 @@ export default class siderbarDetail extends PureComponent {
       form: { getFieldDecorator, resetFields, validateFields },
       user: { districtList },
       spot: { spotInfo, projectSelectList },
-      point: { pointItem, pointSite }
+      point: { pointInfo, projectSelectListPoint }
     } = this.props;
     const {
       show,
@@ -258,15 +274,23 @@ export default class siderbarDetail extends PureComponent {
       edit,
       fileList,
       spotFileList,
+      pointFileList,
       isSpotUpdate,
       previewVisible,
       previewImage,
       previewVisible_min
     } = this.state;
 
+    const projectSelectListAll = [
+      ...projectSelectList,
+      ...projectSelectListPoint
+    ];
+
     const spotItem = isSpotUpdate
       ? spotInfo
       : { mapNum: "", provinceCityDistrict: [null, null, null] };
+
+    const pointItem = isSpotUpdate ? pointInfo : {};
 
     return (
       <div
@@ -443,6 +467,10 @@ export default class siderbarDetail extends PureComponent {
                           state: type,
                           id: spotItem.projectId
                         });
+                      } else {
+                        notification["info"]({
+                          message: `关联项目为空`
+                        });
                       }
                     }}
                   >
@@ -474,7 +502,7 @@ export default class siderbarDetail extends PureComponent {
                       });
                     }}
                   >
-                    {projectSelectList.map(item => (
+                    {projectSelectListAll.map(item => (
                       <Select.Option value={item.value} key={item.value}>
                         {item.label}
                       </Select.Option>
@@ -629,25 +657,28 @@ export default class siderbarDetail extends PureComponent {
                   this.setState({ spotFileList: data });
                 }}
                 onRemove={file => {
-                  console.log({
-                    FileId: file.uid,
-                    Id: spotItem.attachment.id
-                  });
                   return new Promise((resolve, reject) => {
-                    dispatch({
-                      type: "annex/annexDelete",
-                      payload: {
-                        FileId: file.uid,
-                        Id: spotItem.attachment.id
-                      },
-                      callback: success => {
-                        if (success) {
-                          resolve();
-                        } else {
-                          reject();
+                    if (edit) {
+                      dispatch({
+                        type: "annex/annexDelete",
+                        payload: {
+                          FileId: file.uid,
+                          Id: spotItem.attachment.id
+                        },
+                        callback: success => {
+                          if (success) {
+                            resolve();
+                          } else {
+                            reject();
+                          }
                         }
-                      }
-                    });
+                      });
+                    } else {
+                      reject();
+                      notification["info"]({
+                        message: `请先开始编辑图斑`
+                      });
+                    }
                   });
                 }}
               >
@@ -786,6 +817,10 @@ export default class siderbarDetail extends PureComponent {
                           state: type,
                           id: pointItem.projectId
                         });
+                      } else {
+                        notification["info"]({
+                          message: `关联项目为空`
+                        });
                       }
                     }}
                   >
@@ -795,7 +830,7 @@ export default class siderbarDetail extends PureComponent {
                 {...formItemLayout}
               >
                 {getFieldDecorator("projectId", {
-                  initialValue: pointItem.projectId
+                  initialValue: pointItem.project ? pointItem.project.id : ""
                 })(
                   <Select
                     disabled={!edit}
@@ -817,7 +852,7 @@ export default class siderbarDetail extends PureComponent {
                       });
                     }}
                   >
-                    {projectSelectList.map(item => (
+                    {projectSelectListAll.map(item => (
                       <Select.Option value={item.value} key={item.value}>
                         {item.label}
                       </Select.Option>
@@ -875,27 +910,72 @@ export default class siderbarDetail extends PureComponent {
                 )}
               </Form.Item>
             </Form>
-            <Upload
-              style={{ width: 200 }}
-              action="//jsonplaceholder.typicode.com/posts/"
-              listType="picture-card"
-              fileList={fileList}
-              onPreview={file => {
-                this.setState({
-                  previewImage: file.url || file.thumbUrl,
-                  previewVisible_min: true
-                });
-                getFile(file.url);
-              }}
-              onChange={({ fileList }) => this.setState({ fileList })}
-            >
-              {edit ? (
-                <div>
-                  <Icon type="plus" />
-                  <div className="ant-upload-text">上传</div>
-                </div>
-              ) : null}
-            </Upload>
+            <div style={{ minHeight: pointFileList.length ? 120 : 0 }}>
+              <Upload
+                action={config.url.annexUploadUrl}
+                headers={{ Authorization: `Bearer ${accessToken()}` }}
+                data={{ Id: ParentId }}
+                listType="picture-card"
+                fileList={pointFileList}
+                onSuccess={v => {
+                  if (v.success) {
+                    this.setState({ ParentId: v.result.id });
+                  } else {
+                    notification["error"]({
+                      message: `附件上传失败：${v.error.message}`
+                    });
+                  }
+                }}
+                onPreview={file => {
+                  this.setState({
+                    previewImage: file.url || file.thumbUrl,
+                    previewVisible_min: true
+                  });
+                  getFile(file.url);
+                }}
+                onChange={({ fileList }) => {
+                  const data = fileList.map(item => {
+                    return {
+                      ...item,
+                      status: "done"
+                    };
+                  });
+                  this.setState({ pointFileList: data });
+                }}
+                onRemove={file => {
+                  return new Promise((resolve, reject) => {
+                    if (edit) {
+                      dispatch({
+                        type: "annex/annexDelete",
+                        payload: {
+                          FileId: file.uid,
+                          Id: pointItem.attachment.id
+                        },
+                        callback: success => {
+                          if (success) {
+                            resolve();
+                          } else {
+                            reject();
+                          }
+                        }
+                      });
+                    } else {
+                      reject();
+                      notification["info"]({
+                        message: `请先开始编辑标注点`
+                      });
+                    }
+                  });
+                }}
+              >
+                {edit ? (
+                  <div>
+                    <Icon type="plus" />
+                    <div className="ant-upload-text">上传</div>
+                  </div>
+                ) : null}
+              </Upload>
+            </div>
             {edit ? (
               <span>
                 <Button
@@ -938,20 +1018,21 @@ export default class siderbarDetail extends PureComponent {
                       okType: "danger",
                       cancelText: "否",
                       onOk() {
-                        dispatch({
-                          type: "point/pointDelete",
-                          payload: {
-                            id: pointItem.id
-                          },
-                          callback: success => {
-                            if (success) {
-                              self.setState({ show: false });
-                              emitter.emit("deleteSuccess", {
-                                success: true
-                              });
-                            }
-                          }
-                        });
+                        resetFields();
+                        // dispatch({
+                        //   type: "point/pointDelete",
+                        //   payload: {
+                        //     id: pointItem.id
+                        //   },
+                        //   callback: success => {
+                        //     if (success) {
+                        //       self.setState({ show: false });
+                        //       emitter.emit("deleteSuccess", {
+                        //         success: true
+                        //       });
+                        //     }
+                        //   }
+                        // });
                       },
                       onCancel() {}
                     });

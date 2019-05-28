@@ -13,8 +13,9 @@ export default {
 
   state: {
     pointList: { totalCount: 0, items: [] },
-    pointItem: {},
-    pointSite: {}
+    pointInfo: {},
+    pointSite: {},
+    projectSelectListPoint: []
   },
 
   subscriptions: {
@@ -27,17 +28,18 @@ export default {
       const {
         data: { success, error, result: pointList }
       } = yield call(pointListApi, payload);
-      const data = {
-        items: [...payload.items, ...pointList.items],
-        totalCount: pointList.totalCount
-      };
       if (success) {
-        yield put({ type: "save", payload: { pointList: data } });
-        if (callback) callback(data);
+        const response = {
+          items: [...payload.items, ...pointList.items],
+          totalCount: pointList.totalCount
+        };
+        yield put({ type: "save", payload: { pointList: response } });
+        if (callback) callback(success, response);
       } else {
         notification["error"]({
           message: `查询标注点列表失败：${error.message}`
         });
+        if (callback) callback(success);
       }
     },
 
@@ -47,7 +49,13 @@ export default {
         data: { success, error, result }
       } = yield call(pointByIdApi, payload.id);
       if (success) {
-        yield put({ type: "save", payload: { pointItem: result } });
+        const projectSelectListPoint = result.project
+          ? [{ label: result.project.projectName, value: result.project.id }]
+          : [];
+        yield put({
+          type: "save",
+          payload: { pointInfo: result, projectSelectListPoint }
+        });
         if (callback) callback(result);
       } else {
         notification["error"]({
@@ -94,21 +102,6 @@ export default {
           success ? "" : `：${error.message}`
         }`
       });
-    },
-
-    // id查询标注点经纬度
-    *queryPointSiteById({ payload, callback }, { call, put }) {
-      const {
-        data: { success, error, result }
-      } = yield call(pointSiteByIdApi, payload.id);
-      if (success) {
-        yield put({ type: "save", payload: { pointSite: result } });
-        if (callback) callback(result);
-      } else {
-        notification["error"]({
-          message: `查询标注点经纬度失败：${error.message}`
-        });
-      }
     }
   },
 
