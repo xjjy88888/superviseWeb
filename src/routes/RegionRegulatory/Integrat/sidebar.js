@@ -43,12 +43,13 @@ const formItemLayout = {
   wrapperCol: { span: 16 }
 };
 
-@connect(({ project, spot, point, other, user }) => ({
+@connect(({ project, spot, point, other, user, annex }) => ({
   project,
   spot,
   point,
   other,
-  user
+  user,
+  annex
 }))
 @createForm()
 export default class integrat extends PureComponent {
@@ -66,6 +67,7 @@ export default class integrat extends PureComponent {
       showQuery: false,
       showCheck: false,
       checked: false,
+      ParentId: 0,
       showSpin: true,
       isProjectUpdate: true,
       queryHighlight: false,
@@ -102,7 +104,8 @@ export default class integrat extends PureComponent {
       listData: [],
       previewVisible: false,
       previewImage: "",
-      fileList: []
+      fileList: [],
+      projectFileList: []
     };
     this.map = null;
   }
@@ -434,7 +437,24 @@ export default class integrat extends PureComponent {
         if (result.replyDepartment) {
           arr.push(result.replyDepartment);
         }
-        this.setState({ departList: [...departList, ...arr] });
+        this.setState({
+          departList: [...departList, ...arr],
+          ParentId: result.attachment ? result.attachment.id : 0
+        });
+
+        if (result.attachment) {
+          const list = result.attachment.child.map(item => {
+            return {
+              uid: item.id,
+              name: item.fileName,
+              status: "done",
+              url: config.url.annexPreviewUrl + item.id
+            };
+          });
+          this.setState({ projectFileList: list });
+        } else {
+          this.setState({ projectFileList: [] });
+        }
       }
     });
   };
@@ -770,6 +790,7 @@ export default class integrat extends PureComponent {
       previewVisible_min_left,
       query_pro,
       query_spot,
+      ParentId,
       query_point,
       showCompany,
       placeholder,
@@ -791,7 +812,8 @@ export default class integrat extends PureComponent {
       queryInfo,
       isArchivalSpot,
       sort_by,
-      sort_key
+      sort_key,
+      projectFileList
     } = this.state;
     const {
       dispatch,
@@ -1115,7 +1137,7 @@ export default class integrat extends PureComponent {
                 } else if (key === "spot") {
                   emitter.emit("drawSpot", {
                     draw: true,
-                    project_id: "123"
+                    project_id: ""
                   });
                   emitter.emit("showSiderbarDetail", {
                     show: false,
@@ -1550,6 +1572,7 @@ export default class integrat extends PureComponent {
                         console.log(values);
                         const data = {
                           ...values,
+                          attachmentId: ParentId,
                           projectLevelId: this.getDictKey(
                             values.projectLevelId,
                             "立项级别"
@@ -1931,10 +1954,10 @@ export default class integrat extends PureComponent {
                             e.stopPropagation();
                             emitter.emit("drawSpot", {
                               draw: true,
-                              project_id: "123"
+                              project_id: ""
                             });
                             emitter.emit("showSiderbarDetail", {
-                              show: true,
+                              show: false,
                               edit: true,
                               from: "spot",
                               type: "add"
@@ -2898,12 +2921,27 @@ export default class integrat extends PureComponent {
                 </a>
               </Form>
             </div>
-            <div style={{ marginTop: 20 }}>
+            <div
+              style={{
+                minHeight: projectFileList.length ? 120 : 0,
+                marginTop: 20
+              }}
+            >
               <Upload
-                action={config.url.uploadAsyncUrl}
+                action={config.url.annexUploadUrl}
                 headers={{ Authorization: `Bearer ${accessToken()}` }}
+                data={{ Id: ParentId }}
                 listType="picture-card"
-                fileList={fileList}
+                fileList={projectFileList}
+                onSuccess={v => {
+                  if (v.success) {
+                    this.setState({ ParentId: v.result.id });
+                  } else {
+                    notification["error"]({
+                      message: `附件上传失败：${v.error.message}`
+                    });
+                  }
+                }}
                 onPreview={file => {
                   this.setState({
                     previewImage: file.url || file.thumbUrl,
@@ -2912,8 +2950,38 @@ export default class integrat extends PureComponent {
                   getFile(file.url);
                 }}
                 onChange={({ fileList }) => {
-                  console.log(fileList);
-                  this.setState({ fileList });
+                  const data = fileList.map(item => {
+                    return {
+                      ...item,
+                      status: "done"
+                    };
+                  });
+                  this.setState({ projectFileList: data });
+                }}
+                onRemove={file => {
+                  return new Promise((resolve, reject) => {
+                    if (projectEdit) {
+                      dispatch({
+                        type: "annex/annexDelete",
+                        payload: {
+                          FileId: file.uid,
+                          Id: projectItem.attachment.id
+                        },
+                        callback: success => {
+                          if (success) {
+                            resolve();
+                          } else {
+                            reject();
+                          }
+                        }
+                      });
+                    } else {
+                      reject();
+                      notification["info"]({
+                        message: `请先开始编辑项目`
+                      });
+                    }
+                  });
                 }}
               >
                 {projectEdit ? (

@@ -20,7 +20,6 @@ import {
 } from "antd";
 import locale from "antd/lib/date-picker/locale/zh_CN";
 import emitter from "../../../utils/event";
-import "leaflet/dist/leaflet.css";
 import config from "../../../config";
 import { getFile } from "../../../utils/util";
 import jQuery from "jquery";
