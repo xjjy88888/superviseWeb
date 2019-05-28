@@ -53,10 +53,12 @@ export default {
         const projectSelectList = result.projectName
           ? [{ label: result.projectName, value: result.projectId }]
           : [];
-        yield put({
-          type: "save",
-          payload: { spotInfo: result, projectSelectList }
-        });
+        if (payload.refresh) {
+          yield put({
+            type: "save",
+            payload: { spotInfo: result, projectSelectList }
+          });
+        }
         if (callback) callback(result);
       } else {
         notification["error"]({

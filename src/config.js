@@ -67,8 +67,23 @@ const config = {
     // 标注点批量删除
     pointDeleteMulUrl: `${domain}api/services/app/MarkingPoint/DeleteBatch`,
 
-    // 项目id查询项目红线列表
-    redLineByProjectIdUrl: `${domain}api/services/app/ProjectScope/GetAll`,
+    // 项目红线列表
+    redLineListUrl: `${domain}api/services/app/ProjectScope/GetAll`,
+
+    // 项目红线信息
+    redLineByIdUrl: `${domain}api/services/app/MarkingPoint/Get`,
+
+    // 项目红线新建
+    redLineCreateUrl: `${domain}api/services/app/MarkingPoint/Create`,
+
+    // 项目红线编辑
+    redLineUpdateUrl: `${domain}api/services/app/MarkingPoint/Update`,
+
+    // 项目红线删除
+    redLineDeleteUrl: `${domain}api/services/app/MarkingPoint/Delete`,
+
+    // 项目红线批量删除
+    redLineDeleteMulUrl: `${domain}api/services/app/MarkingPoint/DeleteBatch`,
 
     // id查询标注点经纬度
     pointSiteByIdUrl: `${domain}api/services/app/MarkingPoint/GetPoint`,
@@ -148,8 +163,8 @@ const config = {
     "合规",
     "疑似未批先建",
     "未批先建",
-    "疑似超出防治责任范围",
-    "超出防治责任范围",
+    "疑似超出项目红线",
+    "超出项目红线",
     "疑似建设地点变更",
     "建设地点变更",
     "已批",
@@ -209,7 +224,7 @@ const config = {
   project_nature: ["新建", "扩建", "续建", "改建"],
 
   //矢量化类型
-  vectorization_type: ["防治责任范围", "示意性范围"],
+  vectorization_type: ["项目红线", "示意性范围"],
 
   //工具箱
   toolbox: [

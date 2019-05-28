@@ -7,7 +7,7 @@ import {
   removeSpotGraphic,
   updateProjectScopeGraphic,
   addProjectScopeGraphic,
-  redLineByProjectIdApi,
+  redLineListApi,
   projectCreateUpdateApi,
   projectDeleteApi,
   removeProjectScopeGraphic,
@@ -67,30 +67,28 @@ export default {
         data: { success, error, result }
       } = yield call(projectByIdApi, payload.id);
       if (success) {
-        console.log(payload.refresh);
+        let departSelectList = [];
+        const list = [
+          "productDepartment",
+          "supDepartment",
+          // "replyDepartment",
+
+          "projectDepartment",
+          "monitorDepartment",
+          "supervisionDepartment",
+          "getDepartName",
+          "constructionDepartment",
+          "reportDepartment"
+        ];
+        list.map(item => {
+          if (result[item]) {
+            departSelectList.push({
+              label: result[item].name,
+              value: result[item].id
+            });
+          }
+        });
         if (payload.refresh) {
-          let departSelectList = [];
-          const list = [
-            "productDepartment",
-            "supDepartment",
-            // "replyDepartment",
-
-            "projectDepartment",
-            "monitorDepartment",
-            "supervisionDepartment",
-            "getDepartName",
-            "constructionDepartment",
-            "reportDepartment"
-          ];
-          list.map(item => {
-            if (result[item]) {
-              departSelectList.push({
-                label: result[item].name,
-                value: result[item].id
-              });
-            }
-          });
-
           yield put({
             type: "save",
             payload: {
@@ -145,20 +143,6 @@ export default {
           success ? "" : `：${error.message}`
         }`
       });
-    },
-
-    // 项目id查询项目红线列表
-    *queryRedLineByProjectId({ payload }, { call, put }) {
-      const {
-        data: { success, error, result: projectInfoRedLineList }
-      } = yield call(redLineByProjectIdApi, payload.ProjectId);
-      if (success) {
-        yield put({ type: "save", payload: { projectInfoRedLineList } });
-      } else {
-        notification["error"]({
-          message: `查询项目关联红线列表失败：${error.message}`
-        });
-      }
     },
 
     // 单位列表

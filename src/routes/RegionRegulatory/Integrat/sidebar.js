@@ -43,13 +43,14 @@ const formItemLayout = {
   wrapperCol: { span: 16 }
 };
 
-@connect(({ project, spot, point, other, user, annex }) => ({
+@connect(({ project, spot, point, other, user, annex, redLine }) => ({
   project,
   spot,
   point,
   other,
   user,
-  annex
+  annex,
+  redLine
 }))
 @createForm()
 export default class integrat extends PureComponent {
@@ -242,7 +243,7 @@ export default class integrat extends PureComponent {
         });
         this.queryProjectById(data.id);
         this.querySpotByProjectId(data.id);
-        this.queryRedLineByProjectId(data.id);
+        this.queryRedLineList(data.id);
       } else if (data.from === "spot") {
       } else {
       }
@@ -471,10 +472,11 @@ export default class integrat extends PureComponent {
     });
   };
 
-  queryRedLineByProjectId = id => {
+  queryRedLineList = id => {
+    console.log("项目红线列表1");
     const { dispatch } = this.props;
     dispatch({
-      type: "project/queryRedLineByProjectId",
+      type: "redLine/queryRedLineList",
       payload: {
         ProjectId: id
       }
@@ -822,11 +824,12 @@ export default class integrat extends PureComponent {
       project: {
         projectList,
         projectInfo,
-        projectInfoRedLineList,
+
         departSelectList
       },
       spot: { spotList, projectInfoSpotList },
-      point: { pointList }
+      point: { pointList },
+      redLine: { redLineList }
     } = this.props;
 
     const projectItem = isProjectUpdate
@@ -956,7 +959,7 @@ export default class integrat extends PureComponent {
                     });
                     this.queryProjectById(item.id);
                     this.querySpotByProjectId(item.id);
-                    this.queryRedLineByProjectId(item.id);
+                    this.queryRedLineList(item.id);
                   } else {
                     emitter.emit("showSiderbarDetail", {
                       show: key !== "project",
@@ -2048,7 +2051,7 @@ export default class integrat extends PureComponent {
                   <Collapse.Panel
                     header={
                       <b>
-                        防治责任范围：{projectInfoRedLineList.items.length}
+                        防治责任范围：{redLineList.items.length}
                         <Icon
                           type="plus-circle"
                           style={{
@@ -2074,7 +2077,7 @@ export default class integrat extends PureComponent {
                     }
                     key="3"
                   >
-                    {projectInfoRedLineList.items.map((item, index) => (
+                    {redLineList.items.map((item, index) => (
                       <p
                         key={index}
                         style={{ cursor: "pointer" }}

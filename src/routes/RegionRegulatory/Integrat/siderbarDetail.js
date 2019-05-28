@@ -82,6 +82,7 @@ export default class siderbarDetail extends PureComponent {
       });
     });
     this.eventEmitter = emitter.addListener("showSiderbarDetail", data => {
+      console.log(data);
       resetFields();
       if (data.type === "add") {
       }
@@ -103,6 +104,7 @@ export default class siderbarDetail extends PureComponent {
       }
     });
     this.eventEmitter = emitter.addListener("showProjectSpotInfo", data => {
+      console.log(data);
       if (data.from !== "project") {
         resetFields();
         this.setState({
@@ -130,7 +132,8 @@ export default class siderbarDetail extends PureComponent {
     dispatch({
       type: "spot/querySpotById",
       payload: {
-        id: id
+        id: id,
+        refresh: true
       },
       callback: data => {
         this.setState({ ParentId: data.attachment ? data.attachment.id : 0 });

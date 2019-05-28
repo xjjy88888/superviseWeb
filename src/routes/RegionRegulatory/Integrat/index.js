@@ -89,12 +89,11 @@ export default class integrat extends PureComponent {
     });
     //气泡窗口详情查看
     window.goDetail = obj => {
-      console.log(obj);
-      emitter.emit("showProjectSpotInfo", obj);
+      emitter.emit("showProjectSpotInfo", { ...obj, edit: false });
     };
     //气泡窗口编辑
     window.goEditGraphic = obj => {
-      emitter.emit("showProjectSpotInfo", { ...obj, edit: true, type: "edit" });
+      emitter.emit("showProjectSpotInfo", { ...obj, edit: true });
       me.setState({ drawGrphic: "edit" });
       if (obj.from === "project") {
         me.queryWFSServiceByProperty(
@@ -990,7 +989,8 @@ export default class integrat extends PureComponent {
       dispatch({
         type: "spot/querySpotById",
         payload: {
-          id: id
+          id: id,
+          refresh: false
         },
         callback: data => {
           console.log(data);
@@ -1004,8 +1004,7 @@ export default class integrat extends PureComponent {
     let elements;
     const obj = {
       show: true,
-      edit: false,
-      //id: properties.id || properties.project_id,
+      type: "edit",
       id: properties.map_num ? properties.id : properties.project_id,
       from: properties.map_num ? "spot" : "project"
     };

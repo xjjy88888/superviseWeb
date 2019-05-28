@@ -239,11 +239,11 @@ export async function pointDeleteMulApi(payload) {
   });
 }
 
-// 项目id查询项目红线列表
-export async function redLineByProjectIdApi(ProjectId) {
+// 项目红线列表
+export async function redLineListApi(ProjectId) {
   return request(
     `${
-      config.url.redLineByProjectIdUrl
+      config.url.redLineListUrl
     }?SkipCount=0&MaxResultCount=20&ProjectId=${ProjectId}`,
     {
       method: "GET",
@@ -252,6 +252,51 @@ export async function redLineByProjectIdApi(ProjectId) {
       }
     }
   );
+}
+
+// 项目红线信息
+export async function redLineByIdApi(id) {
+  return request(`${config.url.redLineByIdUrl}?id=${id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 项目红线新建编辑
+export async function redLineCreateUpdateApi(params) {
+  return request(
+    params.id ? config.url.redLineUpdateUrl : config.url.redLineCreateUrl,
+    {
+      method: params.id ? "PUT" : "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify(params)
+    }
+  );
+}
+
+// 项目红线删除
+export async function redLineDeleteApi(payload) {
+  return request(`${config.url.redLineDeleteUrl}?id=${payload.id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 项目红线批量删除
+export async function redLineDeleteMulApi(payload) {
+  return request(`${config.url.redLineDeleteMulUrl}?ids=${payload.id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
 }
 
 // id查询标注点经纬度
