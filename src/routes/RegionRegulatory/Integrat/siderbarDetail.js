@@ -103,23 +103,23 @@ export default class siderbarDetail extends PureComponent {
       }
     });
     this.eventEmitter = emitter.addListener("showProjectSpotInfo", data => {
-      resetFields();
-      if (data.type === "add") {
-      }
-      this.setState({
-        show: data.show,
-        edit: data.edit,
-        isSpotUpdate: data.type === "edit",
-        from: data.from, //spot  point
-        item: data.item,
-        type: data.type, //add  edit
-        previewVisible_min: false
-      });
-      if (data.show && data.type !== "add" && data.id) {
-        if (data.from === "spot") {
-          this.querySpotById(data.id);
-        } else if (data.from === "point") {
-          this.queryPointById(data.id);
+      if (data.from !== "project") {
+        resetFields();
+        this.setState({
+          show: data.show,
+          edit: data.edit,
+          isSpotUpdate: data.type === "edit",
+          from: data.from, //spot  point
+          item: data.item,
+          type: data.type, //add  edit
+          previewVisible_min: false
+        });
+        if (data.show && data.type !== "add" && data.id) {
+          if (data.from === "spot") {
+            this.querySpotById(data.id);
+          } else if (data.from === "point") {
+            this.queryPointById(data.id);
+          }
         }
       }
     });
