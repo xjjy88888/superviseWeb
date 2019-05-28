@@ -15,7 +15,7 @@ export default {
     spotList: { totalCount: 0, items: [] },
     projectInfoSpotList: { totalCount: 0, items: [] },
     spotInfo: { mapNum: "", provinceCityDistrict: [null, null, null] },
-    projectSelectList: []
+    projectSelectListSpot: []
   },
 
   subscriptions: {
@@ -50,13 +50,13 @@ export default {
         data: { success, error, result }
       } = yield call(spotByIdApi, payload.id);
       if (success) {
-        const projectSelectList = result.projectName
+        const projectSelectListSpot = result.projectName
           ? [{ label: result.projectName, value: result.projectId }]
           : [];
         if (payload.refresh) {
           yield put({
             type: "save",
-            payload: { spotInfo: result, projectSelectList }
+            payload: { spotInfo: result, projectSelectListSpot }
           });
         }
         if (callback) callback(result);
@@ -130,7 +130,7 @@ export default {
           result: { items: list }
         }
       } = yield call(projectListApi, payload);
-      const projectSelectList = list.map(item => {
+      const projectSelectListSpot = list.map(item => {
         return {
           label: item.projectName,
           value: item.id
@@ -139,7 +139,7 @@ export default {
       if (success) {
         yield put({
           type: "save",
-          payload: { projectSelectList }
+          payload: { projectSelectListSpot }
         });
       } else {
         notification["error"]({

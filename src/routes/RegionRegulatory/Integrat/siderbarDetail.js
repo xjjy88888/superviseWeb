@@ -33,12 +33,13 @@ const formItemLayout = {
   wrapperCol: { span: 16 }
 };
 
-@connect(({ project, spot, point, user, annex }) => ({
+@connect(({ project, spot, point, user, annex, redLine }) => ({
   project,
   spot,
   point,
   user,
-  annex
+  annex,
+  redLine
 }))
 @createForm()
 export default class siderbarDetail extends PureComponent {
@@ -84,8 +85,6 @@ export default class siderbarDetail extends PureComponent {
     this.eventEmitter = emitter.addListener("showSiderbarDetail", data => {
       console.log(data);
       resetFields();
-      if (data.type === "add") {
-      }
       this.setState({
         show: data.show,
         edit: data.edit,
@@ -95,11 +94,13 @@ export default class siderbarDetail extends PureComponent {
         type: data.type, //add  edit
         previewVisible_min: false
       });
-      if (data.show && data.type !== "add" && data.id) {
+      if (data.type !== "add" && data.id) {
         if (data.from === "spot") {
           this.querySpotById(data.id);
         } else if (data.from === "point") {
           this.queryPointById(data.id);
+        } else if (data.from === "redLine") {
+          this.queryRedLineById(data.id);
         }
       }
     });
@@ -176,6 +177,16 @@ export default class siderbarDetail extends PureComponent {
         } else {
           this.setState({ pointFileList: [] });
         }
+      }
+    });
+  };
+
+  queryRedLineById = id => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "redLine/queryredLineById",
+      payload: {
+        id: id
       }
     });
   };
@@ -264,8 +275,9 @@ export default class siderbarDetail extends PureComponent {
       dispatch,
       form: { getFieldDecorator, resetFields, validateFields },
       user: { districtList },
-      spot: { spotInfo, projectSelectList },
-      point: { pointInfo, projectSelectListPoint }
+      spot: { spotInfo, projectSelectListSpot },
+      point: { pointInfo, projectSelectListPoint },
+      redLine: { redLineInfo, projectSelectListRedLine }
     } = this.props;
     const {
       show,
@@ -284,15 +296,19 @@ export default class siderbarDetail extends PureComponent {
     } = this.state;
 
     const projectSelectListAll = [
-      ...projectSelectList,
-      ...projectSelectListPoint
+      ...projectSelectListSpot,
+      ...projectSelectListPoint,
+      ...projectSelectListRedLine
     ];
+    console.log(projectSelectListAll);
 
     const spotItem = isSpotUpdate
       ? spotInfo
       : { mapNum: "", provinceCityDistrict: [null, null, null] };
 
     const pointItem = isSpotUpdate ? pointInfo : {};
+
+    const redLineItem = isSpotUpdate ? redLineInfo : {};
 
     return (
       <div
@@ -403,24 +419,71 @@ export default class siderbarDetail extends PureComponent {
           </Modal>
           <div
             style={{
-              display: from === "duty" ? "block" : "none"
+              display: from === "redLine" ? "block" : "none"
             }}
           >
             <Form>
               <p>
                 <b>防治责任范围</b>
               </p>
+              <Form.Item label="项目红线id" {...formItemLayout}>
+                {getFieldDecorator("id", {
+                  initialValue: redLineItem.id
+                })(<Input disabled={!edit} />)}
+              </Form.Item>
+              <Form.Item label="设计阶段" {...formItemLayout}>
+                {getFieldDecorator("designStage", {
+                  initialValue: redLineItem.designStage
+                })(<Input disabled={!edit} />)}
+              </Form.Item>
               <Form.Item label="矢量化类型" {...formItemLayout}>
-                <Input defaultValue={`矢量化类型`} disabled={!edit} />
+                {getFieldDecorator("vecType", {
+                  initialValue: redLineItem.vecType
+                })(<Input disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="面积" {...formItemLayout}>
-                <Input disabled={!edit} addonAfter="公顷" />
+                {getFieldDecorator("area", {
+                  initialValue: redLineItem.area
+                })(<Input addonAfter="㎡" disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="组成部分" {...formItemLayout}>
-                <Input defaultValue={`矢量化类型`} disabled={!edit} />
+                {getFieldDecorator("consPart", {
+                  initialValue: redLineItem.consPart
+                })(<Input disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="上图单位" {...formItemLayout}>
-                <Input defaultValue={`矢量化类型`} disabled={!edit} />
+                {getFieldDecorator("upmapDepartment", {
+                  initialValue: redLineItem.upmapDepartment
+                    ? redLineItem.upmapDepartment.id
+                    : ""
+                })(
+                  <Select
+                    disabled={!edit}
+                    showSearch
+                    style={{ width: 220 }}
+                    optionFilterProp="children"
+                    filterOption={(input, option) =>
+                      option.props.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
+                    }
+                    onSearch={v => {
+                      dispatch({
+                        type: "spot/queryProjectSelect",
+                        payload: {
+                          ProjectName: v,
+                          MaxResultCount: 5
+                        }
+                      });
+                    }}
+                  >
+                    {projectSelectListAll.map(item => (
+                      <Select.Option value={item.value} key={item.value}>
+                        {item.label}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                )}
               </Form.Item>
             </Form>
             <Upload

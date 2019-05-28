@@ -2068,8 +2068,8 @@ export default class integrat extends PureComponent {
                             emitter.emit("showSiderbarDetail", {
                               show: true,
                               edit: true,
-                              from: "duty",
-                              item: { id: "" }
+                              from: "redLine",
+                              type: "add"
                             });
                           }}
                         />
@@ -2085,7 +2085,9 @@ export default class integrat extends PureComponent {
                           this.closeAll();
                           emitter.emit("showSiderbarDetail", {
                             show: true,
-                            from: "duty",
+                            edit: false,
+                            from: "redLine",
+                            type: "edit",
                             id: item.id
                           });
                         }}

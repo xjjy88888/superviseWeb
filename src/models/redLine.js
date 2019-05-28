@@ -12,7 +12,8 @@ export default {
 
   state: {
     redLineList: { totalCount: 0, items: [] },
-    redLineInfo: {}
+    redLineInfo: {},
+    projectSelectListRedLine: []
   },
 
   subscriptions: {
@@ -41,12 +42,17 @@ export default {
         data: { success, error, result }
       } = yield call(redLineByIdApi, payload.id);
       if (success) {
-        const projectSelectList = result.projectName
-          ? [{ label: result.projectName, value: result.projectId }]
+        const projectSelectListRedLine = result.upmapDepartment
+          ? [
+              {
+                label: result.upmapDepartment.name,
+                value: result.upmapDepartment.id
+              }
+            ]
           : [];
         yield put({
           type: "save",
-          payload: { redLineInfo: result, projectSelectList }
+          payload: { redLineInfo: result, projectSelectListRedLine }
         });
         if (callback) callback(result);
       } else {

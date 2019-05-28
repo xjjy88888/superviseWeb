@@ -71,22 +71,19 @@ const config = {
     redLineListUrl: `${domain}api/services/app/ProjectScope/GetAll`,
 
     // 项目红线信息
-    redLineByIdUrl: `${domain}api/services/app/MarkingPoint/Get`,
+    redLineByIdUrl: `${domain}api/services/app/ProjectScope/Get`,
 
     // 项目红线新建
-    redLineCreateUrl: `${domain}api/services/app/MarkingPoint/Create`,
+    redLineCreateUrl: `${domain}api/services/app/ProjectScope/Create`,
 
     // 项目红线编辑
-    redLineUpdateUrl: `${domain}api/services/app/MarkingPoint/Update`,
+    redLineUpdateUrl: `${domain}api/services/app/ProjectScope/Update`,
 
     // 项目红线删除
-    redLineDeleteUrl: `${domain}api/services/app/MarkingPoint/Delete`,
+    redLineDeleteUrl: `${domain}api/services/app/ProjectScope/Delete`,
 
     // 项目红线批量删除
-    redLineDeleteMulUrl: `${domain}api/services/app/MarkingPoint/DeleteBatch`,
-
-    // id查询标注点经纬度
-    pointSiteByIdUrl: `${domain}api/services/app/MarkingPoint/GetPoint`,
+    redLineDeleteMulUrl: `${domain}api/services/app/ProjectScope/DeleteBatch`,
 
     // 附件上传
     annexUploadUrl: `${domain}api/services/app/File/UploadAsync`,

@@ -299,16 +299,6 @@ export async function redLineDeleteMulApi(payload) {
   });
 }
 
-// id查询标注点经纬度
-export async function pointSiteByIdApi(id) {
-  return request(`${config.url.pointSiteByIdUrl}?id=${id}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken()}`
-    }
-  });
-}
-
 // 字典
 export async function dictApi() {
   return request(`${config.url.dictUrl}?DictTypeName=`, {

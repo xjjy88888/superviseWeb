@@ -2,7 +2,6 @@ import { notification } from "antd";
 import {
   pointListApi,
   pointByIdApi,
-  pointSiteByIdApi,
   pointCreateUpdateApi,
   pointDeleteApi,
   pointDeleteMulApi
