@@ -129,6 +129,9 @@ export default class integrat extends PureComponent {
           : query_point;
       this.search(v);
     });
+    this.eventEmitter = emitter.addListener("projectInfoRefresh", v => {
+      this.queryRedLineList(v.projectId);
+    });
     this.eventEmitter = emitter.addListener("showCreateDepart", v => {
       console.log(v);
       this.setState({
@@ -1708,10 +1711,7 @@ export default class integrat extends PureComponent {
                   paddingRight: 30
                 }}
               >
-                <Collapse
-                  bordered={false}
-                  defaultActiveKey={["0", "1", "2", "3"]}
-                >
+                <Collapse bordered={false} defaultActiveKey={["0", "2", "3"]}>
                   <Collapse.Panel header={<b>基本信息</b>} key="0">
                     <div
                       style={{
@@ -2063,13 +2063,14 @@ export default class integrat extends PureComponent {
                             e.stopPropagation();
                             emitter.emit("drawDuty", {
                               draw: true,
-                              project_id: "123"
+                              projectId: projectItem.id
                             });
                             emitter.emit("showSiderbarDetail", {
                               show: true,
                               edit: true,
                               from: "redLine",
-                              type: "add"
+                              type: "add",
+                              projectId: projectItem.id
                             });
                           }}
                         />
@@ -2088,7 +2089,8 @@ export default class integrat extends PureComponent {
                             edit: false,
                             from: "redLine",
                             type: "edit",
-                            id: item.id
+                            id: item.id,
+                            projectId: projectItem.id
                           });
                         }}
                       >

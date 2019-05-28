@@ -88,6 +88,7 @@ export default class siderbarDetail extends PureComponent {
       this.setState({
         show: data.show,
         edit: data.edit,
+        projectId: data.projectId,
         isSpotUpdate: data.type === "edit",
         from: data.from, //spot  point
         item: data.item,
@@ -285,6 +286,7 @@ export default class siderbarDetail extends PureComponent {
       polygon,
       ParentId,
       type,
+      projectId,
       edit,
       fileList,
       spotFileList,
@@ -300,7 +302,6 @@ export default class siderbarDetail extends PureComponent {
       ...projectSelectListPoint,
       ...projectSelectListRedLine
     ];
-    console.log(projectSelectListAll);
 
     const spotItem = isSpotUpdate
       ? spotInfo
@@ -426,11 +427,6 @@ export default class siderbarDetail extends PureComponent {
               <p>
                 <b>防治责任范围</b>
               </p>
-              <Form.Item label="项目红线id" {...formItemLayout}>
-                {getFieldDecorator("id", {
-                  initialValue: redLineItem.id
-                })(<Input disabled={!edit} />)}
-              </Form.Item>
               <Form.Item label="设计阶段" {...formItemLayout}>
                 {getFieldDecorator("designStage", {
                   initialValue: redLineItem.designStage
@@ -507,6 +503,80 @@ export default class siderbarDetail extends PureComponent {
                 </div>
               ) : null}
             </Upload>
+            {edit ? (
+              <span>
+                <Button
+                  htmlType="submit"
+                  icon="check"
+                  style={{ marginTop: 20 }}
+                  onClick={() => {
+                    validateFields((err, v) => {
+                      console.log("项目红线信息", v);
+                      dispatch({
+                        type: "redLine/redLineCreateUpdate",
+                        payload: {
+                          ...v,
+                          attachmentId: ParentId,
+                          polygon: polygon,
+                          projectId: projectId,
+                          id: type === "edit" ? redLineInfo.id : ""
+                        },
+                        callback: (success, response) => {
+                          if (success) {
+                            resetFields();
+                            emitter.emit("projectInfoRefresh", {
+                              projectId: projectId
+                            });
+                            notification["success"]({
+                              message: `${
+                                type === "edit" ? "编辑" : "新建"
+                              }项目红线成功`
+                            });
+                          }
+                        }
+                      });
+                    });
+                  }}
+                >
+                  保存
+                </Button>
+                <Button
+                  icon="delete"
+                  style={{
+                    display: type !== "add" ? "inherit" : "none",
+                    marginLeft: 20
+                  }}
+                  onClick={() => {
+                    Modal.confirm({
+                      title: "删除",
+                      content: "是否确定要删除这条项目红线数据？",
+                      okText: "是",
+                      okType: "danger",
+                      cancelText: "否",
+                      onOk() {
+                        dispatch({
+                          type: "redLine/redLineDelete",
+                          payload: {
+                            id: redLineItem.id
+                          },
+                          callback: success => {
+                            if (success) {
+                              self.setState({ show: false });
+                              emitter.emit("deleteSuccess", {
+                                success: true
+                              });
+                            }
+                          }
+                        });
+                      },
+                      onCancel() {}
+                    });
+                  }}
+                >
+                  删除
+                </Button>
+              </span>
+            ) : null}
           </div>
           <div
             style={{
