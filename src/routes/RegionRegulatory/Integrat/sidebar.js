@@ -674,29 +674,28 @@ export default class integrat extends PureComponent {
     }
   };
 
-  getDictKey = (value, type) => {
+  getDictValue = id => {
     const {
       user: { dicList }
     } = this.props;
-    if (value) {
+    if (id) {
       const filter = dicList.filter(item => {
-        return item.dictTypeName === type && item.value === value;
+        return item.id === id;
       });
-      return filter.map(item => item.id).join(",");
+      return filter.map(item => item.value).join(",");
     } else {
       return "";
     }
   };
 
-  getDictList = type => {
+  dictList = type => {
     const {
       user: { dicList }
     } = this.props;
     if (type) {
-      const filter = dicList.filter(item => {
+      return dicList.filter(item => {
         return item.dictTypeName === type;
       });
-      return filter.map(item => item.value);
     } else {
       return [];
     }
@@ -1579,39 +1578,6 @@ export default class integrat extends PureComponent {
                         const data = {
                           ...values,
                           attachmentId: ParentId,
-                          projectLevelId: this.getDictKey(
-                            values.projectLevelId,
-                            "立项级别"
-                          ),
-                          complianceId: this.getDictKey(
-                            values.complianceId,
-                            "扰动范围"
-                          ),
-                          projectCateId: this.getDictKey(
-                            values.projectCateId,
-                            "项目类别"
-                          ),
-                          projectTypeId: this.getDictKey(
-                            values.projectTypeId,
-                            "项目类型"
-                          ),
-                          projectStatusId: this.getDictKey(
-                            values.projectStatusId,
-                            "建设状态"
-                          ),
-                          projectNatId: this.getDictKey(
-                            values.projectNatId,
-                            "项目性质"
-                          ),
-                          // productDepartmentId: this.getDepartKey(
-                          //   values.productDepartmentId
-                          // ),
-                          // supDepartmentId: this.getDepartKey(
-                          //   values.supDepartmentId
-                          // ),
-                          // replyDepartmentId: this.getDepartKey(
-                          //   values.replyDepartmentId
-                          // ),
                           districtCodes: values.districtCodes.join(","),
                           id: isProjectUpdate ? projectItem.id : ""
                         };
@@ -1759,28 +1725,39 @@ export default class integrat extends PureComponent {
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>立项级别：</span>
-                        {/* （01：部级，02：省级，03：市级，04：县级） */}
-                        <span>{projectItem.projectLevel}</span>
+                        <span>
+                          {this.getDictValue(projectItem.projectLevelId)}
+                        </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>扰动合规性：</span>
-                        <span>{projectItem.expand.compliance}</span>
+                        <span>
+                          {this.getDictValue(projectItem.expand.complianceId)}
+                        </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>项目类别：</span>
-                        <span>{projectItem.expand.projectCate}</span>
+                        <span>
+                          {this.getDictValue(projectItem.expand.projectCateId)}
+                        </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>项目类型：</span>
-                        <span>{projectItem.expand.projectType}</span>
+                        <span>
+                          {this.getDictValue(projectItem.expand.projectTypeId)}
+                        </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>建设状态：</span>
-                        <span>{projectItem.projectStatus}</span>
+                        <span>
+                          {this.getDictValue(projectItem.projectStatusId)}
+                        </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>项目性质：</span>
-                        <span>{projectItem.expand.projectNat}</span>
+                        <span>
+                          {this.getDictValue(projectItem.expand.projectNatId)}
+                        </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>涉及县：</span>
@@ -2626,7 +2603,6 @@ export default class integrat extends PureComponent {
                   })(
                     <Select
                       showSearch
-                      style={{ width: 220 }}
                       optionFilterProp="children"
                       filterOption={(input, option) =>
                         option.props.children
@@ -2660,7 +2636,6 @@ export default class integrat extends PureComponent {
                   })(
                     <Select
                       showSearch
-                      style={{ width: 220 }}
                       optionFilterProp="children"
                       filterOption={(input, option) =>
                         option.props.children
@@ -2694,7 +2669,6 @@ export default class integrat extends PureComponent {
                   })(
                     <Select
                       showSearch
-                      style={{ width: 220 }}
                       optionFilterProp="children"
                       filterOption={(input, option) =>
                         option.props.children
@@ -2741,92 +2715,80 @@ export default class integrat extends PureComponent {
                 </Form.Item>
                 <Form.Item label="立项级别" {...formItemLayout}>
                   {getFieldDecorator("projectLevelId", {
-                    initialValue: projectItem.projectLevel
+                    initialValue: projectItem.projectLevelId
                   })(
-                    <AutoComplete
-                      placeholder="请选择立项级别"
-                      dataSource={this.getDictList("立项级别")}
-                      filterOption={(inputValue, option) =>
-                        option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
-                      }
-                    />
+                    <Select showSearch allowClear optionFilterProp="children">
+                      {this.dictList("立项级别").map(item => (
+                        <Select.Option value={item.id} key={item.id}>
+                          {item.value}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
                 <Form.Item label="扰动合规性" {...formItemLayout}>
                   {getFieldDecorator("complianceId", {
-                    initialValue: projectItem.projectBase.name
+                    initialValue: projectItem.expand.complianceId
                   })(
-                    <AutoComplete
-                      placeholder="请选择扰动范围"
-                      dataSource={this.getDictList("扰动合规性")}
-                      filterOption={(inputValue, option) =>
-                        option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
-                      }
-                    />
+                    <Select showSearch allowClear optionFilterProp="children">
+                      {this.dictList("扰动合规性").map(item => (
+                        <Select.Option value={item.id} key={item.id}>
+                          {item.value}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
                 <Form.Item label="项目类别" {...formItemLayout}>
                   {getFieldDecorator("projectCateId", {
-                    initialValue: projectItem.expand.projectCate
+                    initialValue: projectItem.expand.projectCateId
                   })(
-                    <AutoComplete
-                      placeholder="请选择项目类别"
-                      dataSource={this.getDictList("项目类别")}
-                      filterOption={(inputValue, option) =>
-                        option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
-                      }
-                    />
+                    <Select showSearch allowClear optionFilterProp="children">
+                      {this.dictList("项目类别").map(item => (
+                        <Select.Option value={item.id} key={item.id}>
+                          {item.value}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
                 <Form.Item label="项目类型" {...formItemLayout}>
                   {getFieldDecorator("projectTypeId", {
-                    initialValue: projectItem.expand.projectType
+                    initialValue: projectItem.expand.projectTypeId
                   })(
-                    <AutoComplete
-                      placeholder="请选择项目类型"
-                      dataSource={this.getDictList("项目类型")}
-                      filterOption={(inputValue, option) =>
-                        option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
-                      }
-                    />
+                    <Select showSearch allowClear optionFilterProp="children">
+                      {this.dictList("项目类型").map(item => (
+                        <Select.Option value={item.id} key={item.id}>
+                          {item.value}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
                 <Form.Item label="建设状态" {...formItemLayout}>
                   {getFieldDecorator("projectStatusId", {
-                    initialValue: projectItem.projectStatus
+                    initialValue: projectItem.projectStatusId
                   })(
-                    <AutoComplete
-                      placeholder="请选择建设状态"
-                      dataSource={this.getDictList("建设状态")}
-                      filterOption={(inputValue, option) =>
-                        option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
-                      }
-                    />
+                    <Select showSearch allowClear optionFilterProp="children">
+                      {this.dictList("建设状态").map(item => (
+                        <Select.Option value={item.id} key={item.id}>
+                          {item.value}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
                 <Form.Item label="项目性质" {...formItemLayout}>
                   {getFieldDecorator("projectNatId", {
-                    initialValue: projectItem.expand.projectNat
+                    initialValue: projectItem.expand.projectNatId
                   })(
-                    <AutoComplete
-                      placeholder="请选择项目性质"
-                      dataSource={this.getDictList("项目性质")}
-                      filterOption={(inputValue, option) =>
-                        option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
-                      }
-                    />
+                    <Select showSearch allowClear optionFilterProp="children">
+                      {this.dictList("项目性质").map(item => (
+                        <Select.Option value={item.id} key={item.id}>
+                          {item.value}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
                 <Form.Item label="涉及县" {...formItemLayout}>

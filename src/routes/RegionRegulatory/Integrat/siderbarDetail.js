@@ -192,15 +192,14 @@ export default class siderbarDetail extends PureComponent {
     });
   };
 
-  getDictList = type => {
+  dictList = type => {
     const {
       user: { dicList }
     } = this.props;
     if (type) {
-      const filter = dicList.filter(item => {
+      return dicList.filter(item => {
         return item.dictTypeName === type;
       });
-      return filter.map(item => item.value);
     } else {
       return [];
     }
@@ -236,19 +235,19 @@ export default class siderbarDetail extends PureComponent {
             archiveTime: isArchive ? archiveTime : null,
             attachmentId: ParentId,
             polygon: polygon,
-            interferenceTypeId: this.getDictKey(
-              v.interferenceTypeId,
-              "扰动类型"
-            ),
-            interferenceComplianceId: this.getDictKey(
-              v.interferenceComplianceId,
-              "扰动合规性"
-            ),
-            interferenceVaryTypeId: this.getDictKey(
-              v.interferenceVaryTypeId,
-              "扰动变化类型"
-            ),
-            buildStatusId: this.getDictKey(v.buildStatusId, "建设状态"),
+            // interferenceTypeId: this.getDictKey(
+            //   v.interferenceTypeId,
+            //   "扰动类型"
+            // ),
+            // interferenceComplianceId: this.getDictKey(
+            //   v.interferenceComplianceId,
+            //   "扰动合规性"
+            // ),
+            // interferenceVaryTypeId: this.getDictKey(
+            //   v.interferenceVaryTypeId,
+            //   "扰动变化类型"
+            // ),
+            // buildStatusId: this.getDictKey(v.buildStatusId, "建设状态"),
             districtCodeId: v.districtCodeId.length
               ? v.districtCodeId.pop()
               : "",
@@ -428,14 +427,40 @@ export default class siderbarDetail extends PureComponent {
                 <b>防治责任范围</b>
               </p>
               <Form.Item label="设计阶段" {...formItemLayout}>
-                {getFieldDecorator("designStage", {
-                  initialValue: redLineItem.designStage
-                })(<Input disabled={!edit} />)}
+                {getFieldDecorator("designStageId", {
+                  initialValue: redLineItem.designStageId
+                })(
+                  <Select
+                    showSearch
+                    allowClear
+                    disabled={!edit}
+                    optionFilterProp="children"
+                  >
+                    {this.dictList("设计阶段").map(item => (
+                      <Select.Option value={item.id} key={item.id}>
+                        {item.value}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                )}
               </Form.Item>
               <Form.Item label="矢量化类型" {...formItemLayout}>
-                {getFieldDecorator("vecType", {
-                  initialValue: redLineItem.vecType
-                })(<Input disabled={!edit} />)}
+                {getFieldDecorator("vecTypeId", {
+                  initialValue: redLineItem.vecTypeId
+                })(
+                  <Select
+                    showSearch
+                    allowClear
+                    disabled={!edit}
+                    optionFilterProp="children"
+                  >
+                    {this.dictList("矢量化类型").map(item => (
+                      <Select.Option value={item.id} key={item.id}>
+                        {item.value}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                )}
               </Form.Item>
               <Form.Item label="面积" {...formItemLayout}>
                 {getFieldDecorator("area", {
@@ -456,7 +481,6 @@ export default class siderbarDetail extends PureComponent {
                   <Select
                     disabled={!edit}
                     showSearch
-                    style={{ width: 220 }}
                     optionFilterProp="children"
                     filterOption={(input, option) =>
                       option.props.children
@@ -620,7 +644,6 @@ export default class siderbarDetail extends PureComponent {
                   <Select
                     disabled={!edit}
                     showSearch
-                    style={{ width: 220 }}
                     optionFilterProp="children"
                     filterOption={(input, option) =>
                       option.props.children
@@ -647,18 +670,20 @@ export default class siderbarDetail extends PureComponent {
               </Form.Item>
               <Form.Item label="扰动类型" {...formItemLayout}>
                 {getFieldDecorator("interferenceTypeId", {
-                  initialValue: spotItem.interferenceType
+                  initialValue: spotItem.interferenceTypeId
                 })(
-                  <AutoComplete
-                    placeholder="请选择扰动类型"
+                  <Select
+                    showSearch
+                    allowClear
                     disabled={!edit}
-                    dataSource={this.getDictList("扰动类型")}
-                    filterOption={(inputValue, option) =>
-                      option.props.children
-                        .toUpperCase()
-                        .indexOf(inputValue.toUpperCase()) !== -1
-                    }
-                  />
+                    optionFilterProp="children"
+                  >
+                    {this.dictList("扰动类型").map(item => (
+                      <Select.Option value={item.id} key={item.id}>
+                        {item.value}
+                      </Select.Option>
+                    ))}
+                  </Select>
                 )}
               </Form.Item>
               <Form.Item label="扰动面积" {...formItemLayout}>
@@ -673,50 +698,56 @@ export default class siderbarDetail extends PureComponent {
               </Form.Item>
               <Form.Item label="扰动合规性" {...formItemLayout}>
                 {getFieldDecorator("interferenceComplianceId", {
-                  initialValue: spotItem.interferenceCompliance
+                  initialValue: spotItem.interferenceComplianceId
                 })(
-                  <AutoComplete
-                    placeholder="请选择扰动合规性"
+                  <Select
+                    showSearch
+                    allowClear
                     disabled={!edit}
-                    dataSource={this.getDictList("扰动合规性")}
-                    filterOption={(inputValue, option) =>
-                      option.props.children
-                        .toUpperCase()
-                        .indexOf(inputValue.toUpperCase()) !== -1
-                    }
-                  />
+                    optionFilterProp="children"
+                  >
+                    {this.dictList("扰动合规性").map(item => (
+                      <Select.Option value={item.id} key={item.id}>
+                        {item.value}
+                      </Select.Option>
+                    ))}
+                  </Select>
                 )}
               </Form.Item>
               <Form.Item label="扰动变化类型" {...formItemLayout}>
                 {getFieldDecorator("interferenceVaryTypeId", {
-                  initialValue: spotItem.interferenceVaryType
+                  initialValue: spotItem.interferenceVaryTypeId
                 })(
-                  <AutoComplete
-                    placeholder="请选择扰动变化类型"
+                  <Select
+                    showSearch
+                    allowClear
                     disabled={!edit}
-                    dataSource={this.getDictList("扰动变化类型")}
-                    filterOption={(inputValue, option) =>
-                      option.props.children
-                        .toUpperCase()
-                        .indexOf(inputValue.toUpperCase()) !== -1
-                    }
-                  />
+                    optionFilterProp="children"
+                  >
+                    {this.dictList("扰动变化类型").map(item => (
+                      <Select.Option value={item.id} key={item.id}>
+                        {item.value}
+                      </Select.Option>
+                    ))}
+                  </Select>
                 )}
               </Form.Item>
               <Form.Item label="建设状态" {...formItemLayout}>
                 {getFieldDecorator("buildStatusId", {
-                  initialValue: spotItem.buildStatus
+                  initialValue: spotItem.buildStatusId
                 })(
-                  <AutoComplete
-                    placeholder="请选择建设状态"
+                  <Select
+                    showSearch
+                    allowClear
                     disabled={!edit}
-                    dataSource={this.getDictList("建设状态")}
-                    filterOption={(inputValue, option) =>
-                      option.props.children
-                        .toUpperCase()
-                        .indexOf(inputValue.toUpperCase()) !== -1
-                    }
-                  />
+                    optionFilterProp="children"
+                  >
+                    {this.dictList("建设状态").map(item => (
+                      <Select.Option value={item.id} key={item.id}>
+                        {item.value}
+                      </Select.Option>
+                    ))}
+                  </Select>
                 )}
               </Form.Item>
               <Form.Item label="是否复核" {...formItemLayout}>

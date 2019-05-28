@@ -119,15 +119,14 @@ export default class integrat extends PureComponent {
     return children;
   }
 
-  getDictList = type => {
+  dictList = type => {
     const {
       user: { dicList }
     } = this.props;
     if (type) {
-      const filter = dicList.filter(item => {
+      return dicList.filter(item => {
         return item.dictTypeName === type;
       });
-      return filter.map(item => item.value);
     } else {
       return [];
     }
@@ -183,6 +182,20 @@ export default class integrat extends PureComponent {
         name: v
       }
     });
+  };
+
+  getDictValue = id => {
+    const {
+      user: { dicList }
+    } = this.props;
+    if (id) {
+      const filter = dicList.filter(item => {
+        return item.id === id;
+      });
+      return filter.map(item => item.value).join(",");
+    } else {
+      return "";
+    }
   };
 
   render() {
@@ -242,8 +255,7 @@ export default class integrat extends PureComponent {
           <div style={{ float: "left", width: 350, padding: "0 30px" }}>
             <p style={{ margin: 10 }}>
               <span>防治标准：</span>
-              {/* （一级/二级/三级） */}
-              <span>{projectItem.expand.prevenStd}</span>
+              <span>{this.getDictValue(projectItem.expand.prevenStdId)}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>总投资：</span>
@@ -279,26 +291,28 @@ export default class integrat extends PureComponent {
             </p>
             <p style={{ margin: 10 }}>
               <span>防治区类型：</span>
-              {/* （01：预防保护区、02：重点治理区） */}
-              <span>{projectItem.expand.prevenZoneType}</span>
+              <span>
+                {this.getDictValue(projectItem.expand.prevenZoneTypeId)}
+              </span>
             </p>
             <p style={{ margin: 10 }}>
               <span>防治区级别：</span>
-              {/* （国家/省级） */}
-              <span>{projectItem.expand.prevenZoneLevel}</span>
+              <span>
+                {this.getDictValue(projectItem.expand.prevenZoneLevelId)}
+              </span>
             </p>
             <p style={{ margin: 10 }}>
               <span>地貌类型：</span>
               {/* （01：山地、02：丘陵、03：平原） */}
-              <span>{projectItem.expand.landType}</span>
+              <span>{this.getDictValue(projectItem.expand.landTypeId)}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>土壤类型：</span>
-              <span>{projectItem.expand.soilType}</span>
+              <span>{this.getDictValue(projectItem.expand.soilTypeId)}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>植被类型：</span>
-              <span>{projectItem.expand.vegType}</span>
+              <span>{this.getDictValue(projectItem.expand.vegTypeId)}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>——</span>
@@ -500,17 +514,20 @@ export default class integrat extends PureComponent {
               <Col span={12}>
                 <Form.Item label="防治标准">
                   {getFieldDecorator("prevenStdId", {
-                    initialValue: projectItem.expand.prevenStd
+                    initialValue: projectItem.expand.prevenStdId
                   })(
-                    <AutoComplete
-                      placeholder="请选择防治标准"
-                      dataSource={this.getDictList("防治标准")}
-                      filterOption={(inputValue, option) =>
-                        option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
-                      }
-                    />
+                    <Select
+                      style={{ width: 150 }}
+                      showSearch
+                      allowClear
+                      optionFilterProp="children"
+                    >
+                      {this.dictList("防治标准").map(item => (
+                        <Select.Option value={item.id} key={item.id}>
+                          {item.value}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
               </Col>
@@ -599,85 +616,100 @@ export default class integrat extends PureComponent {
               <Col span={12}>
                 <Form.Item label="防治区类型">
                   {getFieldDecorator("prevenZoneTypeId", {
-                    initialValue: projectItem.expand.prevenZoneType
+                    initialValue: projectItem.expand.prevenZoneTypeId
                   })(
-                    <AutoComplete
-                      placeholder="请选择防治区类型"
-                      dataSource={this.getDictList("防治区类型")}
-                      filterOption={(inputValue, option) =>
-                        option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
-                      }
-                    />
+                    <Select
+                      style={{ width: 150 }}
+                      showSearch
+                      allowClear
+                      optionFilterProp="children"
+                    >
+                      {this.dictList("防治区类型").map(item => (
+                        <Select.Option value={item.id} key={item.id}>
+                          {item.value}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="防治区级别">
                   {getFieldDecorator("prevenZoneLevelId", {
-                    initialValue: projectItem.expand.prevenZoneLevel
+                    initialValue: projectItem.expand.prevenZoneLevelId
                   })(
-                    <AutoComplete
-                      placeholder="请选择防治区级别"
-                      dataSource={this.getDictList("防治区级别")}
-                      filterOption={(inputValue, option) =>
-                        option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
-                      }
-                    />
+                    <Select
+                      style={{ width: 150 }}
+                      showSearch
+                      allowClear
+                      optionFilterProp="children"
+                    >
+                      {this.dictList("防治区级别").map(item => (
+                        <Select.Option value={item.id} key={item.id}>
+                          {item.value}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="地貌类型">
                   {getFieldDecorator("landTypeId", {
-                    initialValue: projectItem.expand.landType
+                    initialValue: projectItem.expand.landTypeId
                   })(
-                    <AutoComplete
-                      placeholder="请选择地貌类型"
-                      dataSource={this.getDictList("地貌类型")}
-                      filterOption={(inputValue, option) =>
-                        option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
-                      }
-                    />
+                    <Select
+                      style={{ width: 150 }}
+                      showSearch
+                      allowClear
+                      optionFilterProp="children"
+                    >
+                      {this.dictList("地貌类型").map(item => (
+                        <Select.Option value={item.id} key={item.id}>
+                          {item.value}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="土壤类型">
                   {getFieldDecorator("soilTypeId", {
-                    initialValue: projectItem.expand.soilType
+                    initialValue: projectItem.expand.soilTypeId
                   })(
-                    <AutoComplete
-                      placeholder="请选择土壤类型"
-                      dataSource={this.getDictList("土壤类型")}
-                      filterOption={(inputValue, option) =>
-                        option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
-                      }
-                    />
+                    <Select
+                      style={{ width: 150 }}
+                      showSearch
+                      allowClear
+                      optionFilterProp="children"
+                    >
+                      {this.dictList("土壤类型").map(item => (
+                        <Select.Option value={item.id} key={item.id}>
+                          {item.value}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="植被类型">
                   {getFieldDecorator("vegTypeId", {
-                    initialValue: projectItem.expand.vegType
+                    initialValue: projectItem.expand.vegTypeId
                   })(
-                    <AutoComplete
-                      placeholder="请选择植被类型"
-                      dataSource={this.getDictList("植被类型")}
-                      filterOption={(inputValue, option) =>
-                        option.props.children
-                          .toUpperCase()
-                          .indexOf(inputValue.toUpperCase()) !== -1
-                      }
-                    />
+                    <Select
+                      style={{ width: 150 }}
+                      showSearch
+                      allowClear
+                      optionFilterProp="children"
+                    >
+                      {this.dictList("植被类型").map(item => (
+                        <Select.Option value={item.id} key={item.id}>
+                          {item.value}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   )}
                 </Form.Item>
               </Col>

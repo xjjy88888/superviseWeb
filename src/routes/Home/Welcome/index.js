@@ -331,43 +331,68 @@ export default class home2 extends PureComponent {
       this.setState({ selectRightV: data[0] });
       userconfig.sideBySideZoom = userconfig.LMap.getZoom();
       //移除左右地图的图层列表
-      this.removeLRMapLayers();
-      this.addLRMapLayers();
+      this.removeLMapLayers();
+      this.removeRMapLayers();
+      setTimeout(() => {
+        //添加左右地图的图层列表
+        this.addLMapLayers();
+        this.addRMapLayers();
+      }, 200);
     }
   }; 
   /*
-   * 移除左右地图的图层列表
+   * 移除左地图的图层列表
   */
-  removeLRMapLayers = () => {
-    //移除地图默认加载底图
+  removeLMapLayers = () => {
     if (userconfig.LMap.hasLayer(userconfig.leftImgLayer))
         userconfig.LMap.removeLayer(userconfig.leftImgLayer);
+  }; 
+  /*
+   * 移除右地图的图层列表
+  */
+  removeRMapLayers = () => {
     if (userconfig.RMap.hasLayer(userconfig.rightImgLayer))
         userconfig.RMap.removeLayer(userconfig.rightImgLayer);
   }; 
-    /*
-   * 添加左右地图的图层列表
-   */
-  addLRMapLayers = () => {
-    const { selectLeftV, selectRightV } = this.state;
+  /*
+   * 添加左地图的图层列表
+  */
+  addLMapLayers = () => {
+    const { selectLeftV} = this.state;
     let leftLayerUrl =config.imageBaseUrl +"/" +selectLeftV.replace(/\//g, "-") +"/tile/{z}/{y}/{x}";
     userconfig.leftImgLayer = this.loadMapbaseLayer(userconfig.LMap,leftLayerUrl);//左侧影像
+  };
+  /*
+   * 添加右地图的图层列表
+  */
+  addRMapLayers = () => {
+    const { selectRightV } = this.state;
     let rightLayerUrl =config.imageBaseUrl +"/" +selectRightV.replace(/\//g, "-") +"/tile/{z}/{y}/{x}";
     userconfig.rightImgLayer = this.loadMapbaseLayer(userconfig.RMap,rightLayerUrl);//右侧影像
   };
+  /*
+   * 左地图的影像列表切换
+  */ 
   onChangeSelectLeft = v => {
     this.setState({ selectLeftV: v });
-    if (userconfig.LMap.hasLayer(userconfig.leftImgLayer))
-        userconfig.LMap.removeLayer(userconfig.leftImgLayer);
-    let leftLayerUrl =config.imageBaseUrl +"/" + v.replace(/\//g, "-") +"/tile/{z}/{y}/{x}";
-    userconfig.leftImgLayer = this.loadMapbaseLayer(userconfig.LMap,leftLayerUrl);//左侧影像
+    //移除左地图的图层列表
+    this.removeLMapLayers();
+    //添加左地图的图层列表
+    setTimeout(() => {
+      this.addLMapLayers();
+    }, 200);
   };
+  /*
+   * 右地图的影像列表切换
+  */  
   onChangeSelectRight = v => {
     this.setState({ selectRightV: v });
-    if (userconfig.RMap.hasLayer(userconfig.rightImgLayer))
-        userconfig.RMap.removeLayer(userconfig.rightImgLayer);
-    let rightLayerUrl =config.imageBaseUrl +"/" +v.replace(/\//g, "-") +"/tile/{z}/{y}/{x}";
-    userconfig.rightImgLayer = this.loadMapbaseLayer(userconfig.RMap,rightLayerUrl);//右侧影像
+    //移除右地图的图层列表
+    this.removeRMapLayers();
+    //添加右地图的图层列表
+    setTimeout(() => {
+      this.addRMapLayers();
+    }, 200);
   };
 
   render() {
