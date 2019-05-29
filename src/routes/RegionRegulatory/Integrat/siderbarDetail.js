@@ -71,22 +71,11 @@ export default class siderbarDetail extends PureComponent {
         pointY: data.latitude //维度
       });
     });
-    this.eventEmitter = emitter.addListener("drawSpotBack", v => {
-      this.setState({
-        polygon: v.polygon
-      });
-      emitter.emit("showSiderbarDetail", {
-        show: true,
-        edit: true,
-        from: "spot",
-        type: v.state,
-        id: ""
-      });
-    });
     this.eventEmitter = emitter.addListener("showSiderbarDetail", data => {
       console.log(data);
       resetFields();
       this.setState({
+        polygon: data.polygon,
         show: data.show,
         edit: data.edit,
         projectId: data.projectId,
@@ -944,32 +933,63 @@ export default class siderbarDetail extends PureComponent {
                     marginLeft: 20
                   }}
                   onClick={() => {
-                    Modal.confirm({
-                      title: "归档保存",
-                      content: (
-                        <span>
-                          归档时间：
-                          <DatePicker
-                            locale={locale}
-                            onChange={(date, dateString) => {
-                              console.log(date, dateString);
-                              this.setState({ archiveTime: dateString });
-                            }}
-                          />
-                        </span>
-                      ),
-                      onOk() {
-                        const { archiveTime } = self.state;
-                        console.log(archiveTime);
-                        if (archiveTime) {
-                          self.submit(true);
-                        } else {
-                          notification["warning"]({
-                            message: `请选择归档时间`
-                          });
-                        }
-                      },
-                      onCancel() {}
+                    this.props.form.validateFields((err, v) => {
+                      if (err) {
+                        notification["warning"]({
+                          message: err.mapNum.errors[0].message
+                        });
+                      } else {
+                        this.setState({ archiveTime: "" });
+                        Modal.confirm({
+                          title: "归档保存",
+                          content: (
+                            <div>
+                              {spotItem.archiveTimes.map((item, index) => (
+                                <p key={index} style={{ margin: "5px 0" }}>
+                                  {item}
+                                </p>
+                              ))}
+                              <p>
+                                <span>归档时间：</span>
+                                <DatePicker
+                                  locale={locale}
+                                  onChange={(date, dateString) => {
+                                    console.log(date, dateString);
+                                    this.setState({ archiveTime: dateString });
+                                  }}
+                                />
+                              </p>
+                            </div>
+                          ),
+                          onOk() {
+                            return new Promise((resolve, reject) => {
+                              const { archiveTime } = self.state;
+                              if (archiveTime) {
+                                const t = spotItem.archiveTimes;
+                                if (
+                                  t.length &&
+                                  new Date(archiveTime).getTime() <=
+                                    new Date(spotItem.archiveTimes[0]).getTime()
+                                ) {
+                                  notification["warning"]({
+                                    message: `归档时间早于该图斑上次归档时间，用户重新选择时间`
+                                  });
+                                  reject();
+                                } else {
+                                  self.submit(true);
+                                  resolve();
+                                }
+                              } else {
+                                notification["warning"]({
+                                  message: `请选择归档时间`
+                                });
+                                reject();
+                              }
+                            });
+                          },
+                          onCancel() {}
+                        });
+                      }
                     });
                   }}
                 >
@@ -984,7 +1004,8 @@ export default class siderbarDetail extends PureComponent {
                   onClick={() => {
                     Modal.confirm({
                       title: "删除",
-                      content: "是否确定要删除这条图斑数据？",
+                      content:
+                        "将删除该图斑的图形、属性及附件信息，直接删除将不保存该图斑的历史版本，是否确定删除？",
                       okText: "是",
                       okType: "danger",
                       cancelText: "否",
@@ -1013,7 +1034,7 @@ export default class siderbarDetail extends PureComponent {
               </span>
             ) : (
               <div>
-                <Button icon="swap" style={{ marginTop: 20 }}>
+                {/* <Button icon="swap" style={{ marginTop: 20 }}>
                   历史查看
                 </Button>
                 <Button icon="cloud-download" style={{ marginLeft: 20 }}>
@@ -1021,7 +1042,7 @@ export default class siderbarDetail extends PureComponent {
                 </Button>
                 <Button icon="rollback" style={{ marginTop: 20 }}>
                   撤销归档
-                </Button>
+                </Button> */}
               </div>
             )}
           </div>

@@ -271,7 +271,7 @@ export default class siderbarDetail extends PureComponent {
                   style={{ width: "100%" }}
                   placeholder="请选择项目合规性"
                 >
-                  {this.getDictList("项目合规性").map(item => (
+                  {this.getDictList("扰动合规性").map(item => (
                     <Select.Option key={item}>{item}</Select.Option>
                   ))}
                 </Select>
@@ -305,7 +305,12 @@ export default class siderbarDetail extends PureComponent {
               {getFieldDecorator("ShowArchive", {
                 valuePropName: "checked",
                 initialValue: false
-              })(<Switch  checkedChildren="归档数据" unCheckedChildren="现状数据"/>)}
+              })(
+                <Switch
+                  checkedChildren="归档数据"
+                  unCheckedChildren="现状数据"
+                />
+              )}
             </Form.Item>
           </Form>
         </div>
@@ -397,7 +402,12 @@ export default class siderbarDetail extends PureComponent {
               {getFieldDecorator("ShowArchive", {
                 valuePropName: "checked",
                 initialValue: false
-              })(<Switch  checkedChildren="归档数据" unCheckedChildren="现状数据"/>)}
+              })(
+                <Switch
+                  checkedChildren="归档数据"
+                  unCheckedChildren="现状数据"
+                />
+              )}
             </Form.Item>
           </Form>
         </div>

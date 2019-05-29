@@ -1142,16 +1142,18 @@ export default class integrat extends PureComponent {
                     id: ""
                   });
                 } else if (key === "spot") {
-                  emitter.emit("drawSpot", {
+                  emitter.emit("drawGraphics", {
                     draw: true,
+                    state: "add",
+                    type: "spot",
                     project_id: ""
                   });
-                  emitter.emit("showSiderbarDetail", {
-                    show: false,
-                    edit: true,
-                    from: key,
-                    type: "add"
-                  });
+                  // emitter.emit("showSiderbarDetail", {
+                  //   show: false,
+                  //   edit: true,
+                  //   from: key,
+                  //   type: "add"
+                  // });
                 } else {
                   emitter.emit("showSiderbarDetail", {
                     show: key !== "project",
@@ -1936,16 +1938,18 @@ export default class integrat extends PureComponent {
                           }}
                           onClick={e => {
                             e.stopPropagation();
-                            emitter.emit("drawSpot", {
+                            emitter.emit("drawGraphics", {
                               draw: true,
+                              state: "add",
+                              type: "spot",
                               project_id: ""
                             });
-                            emitter.emit("showSiderbarDetail", {
-                              show: false,
-                              edit: true,
-                              from: "spot",
-                              type: "add"
-                            });
+                            // emitter.emit("showSiderbarDetail", {
+                            //   show: false,
+                            //   edit: true,
+                            //   from: "spot",
+                            //   type: "add"
+                            // });
                           }}
                         />
                         <Icon
@@ -2042,8 +2046,10 @@ export default class integrat extends PureComponent {
                           }}
                           onClick={e => {
                             e.stopPropagation();
-                            emitter.emit("drawDuty", {
+                            emitter.emit("drawGraphics", {
                               draw: true,
+                              type: "redLine",
+                              state: "add",
                               projectId: projectItem.id
                             });
                             emitter.emit("showSiderbarDetail", {
@@ -3055,6 +3061,20 @@ export default class integrat extends PureComponent {
                 style={{
                   display: projectItem.archiveTime ? "block" : "none",
                   marginLeft: 20
+                }}
+                onClick={() => {
+                  dispatch({
+                    type: "project/projectUnArchive",
+                    payload: {
+                      id: projectItem.id
+                    },
+                    callback: success => {
+                      if (success) {
+                        self.setState({ showProjectDetail: false });
+                        emitter.emit("deleteSuccess", {});
+                      }
+                    }
+                  });
                 }}
               >
                 撤销归档

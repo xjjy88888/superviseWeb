@@ -24,7 +24,7 @@ export default class siderbarDetail extends PureComponent {
       show: false,
       checkResult: [],
       showCheck: false,
-      key: "project"
+      key: "project",
     };
     this.charRef = ref => {
       this.chartDom = ref;
@@ -267,7 +267,11 @@ export default class siderbarDetail extends PureComponent {
           >
             <Alert
               type="error"
-              message={`确定要${funcTypeText}吗？`}
+              message={
+                funcTypeText === "删除" && key === "spot"
+                  ? "将删除该图斑的图形、属性及附件信息，直接删除将不保存该图斑的历史版本，是否确定删除？"
+                  : `确定要${funcTypeText}吗？`
+              }
               showIcon
             />
           </Modal>

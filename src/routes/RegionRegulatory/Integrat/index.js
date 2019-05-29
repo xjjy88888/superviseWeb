@@ -62,7 +62,8 @@ export default class integrat extends PureComponent {
       showSiderbarDetail: false,
       showProblem: false,
       showQuery: false,
-      drawGrphic: "edit",
+      drawType: "spot",
+      drawState: "add",
       chartStatus: false,
       selectLeftV: "",
       selectRightV: "",
@@ -93,8 +94,11 @@ export default class integrat extends PureComponent {
     };
     //气泡窗口编辑
     window.goEditGraphic = obj => {
-      emitter.emit("showProjectSpotInfo", { ...obj, edit: true });
-      me.setState({ drawGrphic: "edit" });
+      // emitter.emit("showProjectSpotInfo", { ...obj, edit: true });
+      me.setState({
+        drawState: "edit",
+        drawType: obj.from === "spot" ? "spot" : "redLine"
+      });
       if (obj.from === "project") {
         me.queryWFSServiceByProperty(
           obj.id,
@@ -117,7 +121,6 @@ export default class integrat extends PureComponent {
         title: "你确定要删除该图形?",
         content: "删除之后该图形无法恢复",
         onOk() {
-          me.setState({ drawGrphic: "delete" });
           if (obj.from === "project") {
             me.props.dispatch({
               type: "project/removeProjectScopeGraphic",
@@ -281,7 +284,7 @@ export default class integrat extends PureComponent {
     });
     //屏幕截图
     this.eventEmitter = emitter.addListener("screenshot", data => {
-      me.setState({ drawGrphic: "screenshot" });
+      me.setState({ drawType: "screenshot", drawState: "add" });
       //显示屏幕截图绘制保存取消菜单按钮
       me.setState({ showButton: true });
       //绘制图形之前
@@ -356,10 +359,14 @@ export default class integrat extends PureComponent {
           });
       });
     });
-    //绘制扰动图斑图形
-    this.eventEmitter = emitter.addListener("drawSpot", data => {
+    //绘制图形-新增
+    this.eventEmitter = emitter.addListener("drawGraphics", data => {
       if (data.draw) {
-        me.setState({ drawGrphic: "addSpot", project_id: data.project_id });
+        me.setState({
+          drawState: data.state,
+          drawType: data.type,
+          project_id: data.project_id
+        });
         const { addGraphLayer } = me.state;
         //移除地图监听事件
         map.off("click");
@@ -377,7 +384,8 @@ export default class integrat extends PureComponent {
               map.pm.disableDraw("Polygon");
               emitter.emit("showSiderbarDetail", {
                 show: false,
-                from: "spot",
+                from: me.state.drawType,
+                type: me.state.drawState,
                 item: { id: "" }
               });
               me.setState({ showButton: false });
@@ -402,52 +410,52 @@ export default class integrat extends PureComponent {
         });
       }
     });
-    //绘制项目红线图形
-    this.eventEmitter = emitter.addListener("drawDuty", data => {
-      if (data.draw) {
-        me.setState({ drawGrphic: "addDuty" });
-        const { addGraphLayer } = me.state;
-        //移除地图监听事件
-        map.off("click");
-        me.clearPlotGraphic();
-        if (addGraphLayer) {
-          map.removeLayer(addGraphLayer);
-          me.setState({ addGraphLayer: null });
-        }
-        //绘制图形之前
-        map.on("pm:drawstart", ({ workingLayer }) => {
-          workingLayer.on("pm:vertexadded", e => {
-            let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
-            //if (!turf.booleanContains(userconfig.polygon, turfpoint)) {
-            if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {
-              map.pm.disableDraw("Polygon");
-              emitter.emit("showSiderbarDetail", {
-                show: false,
-                from: "spot",
-                item: { id: "" }
-              });
-              me.setState({ showButton: false });
-              return;
-            }
-          });
-        });
-        map.pm.enableDraw("Polygon", {
-          finishOn: "dblclick",
-          allowSelfIntersection: false,
-          tooltips: false
-        });
-        //显示编辑菜单按钮
-        me.setState({ showButton: true });
-        //编辑图形
-        map.on("pm:create", e => {
-          //console.log(e);
-          me.setState({ addGraphLayer: e.layer });
-          e.layer.pm.enable({
-            allowSelfIntersection: false
-          });
-        });
-      }
-    });
+    //绘制项目红线图形-新增
+    // this.eventEmitter = emitter.addListener("drawGraphics", data => {
+    //   if (data.draw) {
+    //     me.setState({ drawType: data.type, drawState: data.state });
+    //     const { addGraphLayer } = me.state;
+    //     //移除地图监听事件
+    //     map.off("click");
+    //     me.clearPlotGraphic();
+    //     if (addGraphLayer) {
+    //       map.removeLayer(addGraphLayer);
+    //       me.setState({ addGraphLayer: null });
+    //     }
+    //     //绘制图形之前
+    //     map.on("pm:drawstart", ({ workingLayer }) => {
+    //       workingLayer.on("pm:vertexadded", e => {
+    //         let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
+    //         //if (!turf.booleanContains(userconfig.polygon, turfpoint)) {
+    //         if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {
+    //           map.pm.disableDraw("Polygon");
+    //           emitter.emit("showSiderbarDetail", {
+    //             show: false,
+    //             from: "spot",
+    //             item: { id: "" }
+    //           });
+    //           me.setState({ showButton: false });
+    //           return;
+    //         }
+    //       });
+    //     });
+    //     map.pm.enableDraw("Polygon", {
+    //       finishOn: "dblclick",
+    //       allowSelfIntersection: false,
+    //       tooltips: false
+    //     });
+    //     //显示编辑菜单按钮
+    //     me.setState({ showButton: true });
+    //     //编辑图形
+    //     map.on("pm:create", e => {
+    //       //console.log(e);
+    //       me.setState({ addGraphLayer: e.layer });
+    //       e.layer.pm.enable({
+    //         allowSelfIntersection: false
+    //       });
+    //     });
+    //   }
+    // });
     //监听侧边栏显隐
     this.eventEmitter = emitter.addListener("showSiderbar", data => {
       this.setState({
@@ -983,6 +991,20 @@ export default class integrat extends PureComponent {
     });
   };
 
+  getDictValue = id => {
+    const {
+      user: { dicList }
+    } = this.props;
+    if (id) {
+      const filter = dicList.filter(item => {
+        return item.id === id;
+      });
+      return filter.map(item => item.value).join(",");
+    } else {
+      return "";
+    }
+  };
+
   getSpotInfo = id => {
     return new Promise((resolve, reject) => {
       const { dispatch } = this.props;
@@ -994,13 +1016,14 @@ export default class integrat extends PureComponent {
         },
         callback: data => {
           console.log(data);
-          resolve(data.interferenceCompliance);
+          resolve(data.interferenceComplianceId);
         }
       });
     });
   };
 
-  creatElements = (properties, callback, spot) => {
+  creatElements = (properties, callback, spotId) => {
+    const spot = this.getDictValue(spotId);
     let elements;
     const obj = {
       show: true,
@@ -1384,7 +1407,7 @@ export default class integrat extends PureComponent {
   cancelAddGraphic = () => {
     this.setState({ showButton: false });
     map.on("click", this.onClickMap);
-    const { addGraphLayer } = this.state;
+    const { addGraphLayer, drawType, drawState } = this.state;
     //禁止编辑图形
     if (addGraphLayer) {
       addGraphLayer.pm.disable();
@@ -1394,7 +1417,8 @@ export default class integrat extends PureComponent {
     map.pm.disableDraw("Polygon");
     emitter.emit("showSiderbarDetail", {
       show: false,
-      from: "spot",
+      from: drawType,
+      type: drawState,
       item: { id: "" }
     });
   };
@@ -1416,17 +1440,20 @@ export default class integrat extends PureComponent {
   saveAddGraphic = () => {
     const me = this;
     map.on("click", this.onClickMap);
-    const { addGraphLayer, drawGrphic } = me.state;
+    const { addGraphLayer, drawType, drawState } = me.state;
     //禁止编辑图形
     if (addGraphLayer) {
       me.setState({ showButton: false });
       addGraphLayer.pm.disable();
       let geojson = addGraphLayer.toGeoJSON();
       let polygon = me.geojson2Multipolygon(geojson, 1);
-      emitter.emit("drawSpotBack", {
+      emitter.emit("showSiderbarDetail", {
         polygon: polygon,
-        state: "add",
-        key: drawGrphic === "addSpot" ? "spot" : "redLine"
+        show: true,
+        type: "drawState",
+        from: drawType,
+        edit: true,
+        id: ""
       });
     } else {
       notification["warning"]({
@@ -1438,6 +1465,7 @@ export default class integrat extends PureComponent {
    * 保存编辑图形
    */
   saveEditGraphic = e => {
+    const { drawType, drawState } = this.state;
     //console.log(e);
     e.stopPropagation();
     const me = this;
@@ -1450,11 +1478,13 @@ export default class integrat extends PureComponent {
 
     let geojson = userconfig.projectgeojsonLayer.toGeoJSON();
     let polygon = me.geojson2Multipolygon(geojson, 0);
-    console.log(polygon);
-    emitter.emit("drawSpotBack", {
+    emitter.emit("showSiderbarDetail", {
       polygon: polygon,
-      state: "edit",
-      key: geojson.features[0].properties.spot_tbid ? "spot" : "redLine"
+      show: true,
+      from: drawType,
+      type: drawState,
+      edit: true,
+      id: geojson.features[0].properties.id
     });
   };
   /*
@@ -1688,7 +1718,8 @@ export default class integrat extends PureComponent {
   render() {
     const {
       showButton,
-      drawGrphic,
+      drawType,
+      drawState,
       showHistoryContrast,
       selectLeftV,
       selectRightV
@@ -1735,10 +1766,10 @@ export default class integrat extends PureComponent {
               <Button
                 icon="rollback"
                 onClick={
-                  drawGrphic === "edit"
-                    ? this.cancelEditGraphic
-                    : drawGrphic === "screenshot"
+                  drawType === "screenshot"
                     ? this.cancelScreenshot
+                    : drawState === "edit"
+                    ? this.cancelEditGraphic
                     : this.cancelAddGraphic
                 }
               />
@@ -1746,10 +1777,10 @@ export default class integrat extends PureComponent {
                 <Button
                   icon="arrow-right"
                   onClick={
-                    drawGrphic === "edit"
-                      ? this.saveEditGraphic
-                      : drawGrphic === "screenshot"
+                    drawType === "screenshot"
                       ? this.saveScreenshot
+                      : drawState === "edit"
+                      ? this.saveEditGraphic
                       : this.saveAddGraphic
                   }
                 />
