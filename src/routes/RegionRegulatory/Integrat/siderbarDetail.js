@@ -260,6 +260,7 @@ export default class siderbarDetail extends PureComponent {
             id: type === "edit" ? spotInfo.id : ""
           },
           callback: (success, response) => {
+            emitter.emit("deleteDraw", {});
             if (success) {
               emitter.emit("projectCreateUpdateBack", {});
               notification["success"]({
@@ -995,6 +996,19 @@ export default class siderbarDetail extends PureComponent {
                 >
                   归档保存
                 </Button>
+
+              </span>
+            ) : (
+              <div>
+                {/* <Button icon="swap" style={{ marginTop: 20 }}>
+                  历史查看
+                </Button>
+                <Button icon="cloud-download" style={{ marginLeft: 20 }}>
+                  数据归档
+                </Button>
+                <Button icon="rollback" style={{ marginTop: 20 }}>
+                  撤销归档
+                </Button> */}
                 <Button
                   icon="delete"
                   style={{
@@ -1031,18 +1045,6 @@ export default class siderbarDetail extends PureComponent {
                 >
                   删除
                 </Button>
-              </span>
-            ) : (
-              <div>
-                {/* <Button icon="swap" style={{ marginTop: 20 }}>
-                  历史查看
-                </Button>
-                <Button icon="cloud-download" style={{ marginLeft: 20 }}>
-                  数据归档
-                </Button>
-                <Button icon="rollback" style={{ marginTop: 20 }}>
-                  撤销归档
-                </Button> */}
               </div>
             )}
           </div>

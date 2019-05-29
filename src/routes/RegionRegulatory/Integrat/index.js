@@ -151,6 +151,13 @@ export default class integrat extends PureComponent {
         }
       });
     };
+
+    this.eventEmitter = emitter.addListener("deleteDraw", () => {
+      const { addGraphLayer } = this.state;
+      map.removeLayer(addGraphLayer);
+      this.setState({ addGraphLayer: null });
+    });
+
     //获取url参数
     me.initUrlParams();
     // 位置定位
@@ -761,7 +768,10 @@ export default class integrat extends PureComponent {
     //根据地图当前范围获取对应历史影像数据
     const { showHistoryContrast } = me.state;
     if (showHistoryContrast) {
+      //历史影像查询
       me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
+      //历史扰动图斑查询
+      me.queryWFSServiceByExtent(config.mapHistorySpotLayerName,me.callbackgetHistorySpotTimeByExtent);
     }
   };
   /*根据地图当前范围获取对应历史影像数据
@@ -836,12 +846,11 @@ export default class integrat extends PureComponent {
     });
   };
 
-  /*空间查询图层
-   *@method queryWFSServiceByPolygon
-   *@param typeName 图层名称
+  /*空间范围查询图层
+   *@method queryWFSServiceByExtent
    *@return null
    */
-  queryWFSServiceByPolygon = typeName => {
+  queryWFSServiceByExtent = (typeName,callback) => {
     const me = this;
     let bounds = map.getBounds();
     let polygon = bounds.getSouthWest().lng + "," + bounds.getSouthWest().lat;
@@ -878,13 +887,14 @@ export default class integrat extends PureComponent {
     };
     let geojsonUrl = urlString + L.Util.getParamString(param, urlString);
     me.props.dispatch({
-      type: "mapdata/queryWFSLayer",
+      type: "mapdata/getHistorySpotTimeByExtent",
       payload: { geojsonUrl },
-      callback: data => {
-        if (data.features.length > 0) {
-          console.log(data);
-        }
-      }
+      // callback: data => {
+      //   if (data.features.length > 0) {
+      //     console.log(data);
+      //   }
+      // }
+      callback:callback
     });
   };
   /*点选查询图层
@@ -1450,7 +1460,7 @@ export default class integrat extends PureComponent {
       emitter.emit("showSiderbarDetail", {
         polygon: polygon,
         show: true,
-        type: "drawState",
+        type: drawState,
         from: drawType,
         edit: true,
         id: ""
@@ -1595,6 +1605,12 @@ export default class integrat extends PureComponent {
       this.addSideBySide();
     }
   };
+  /*
+   * 根据地图当前范围获取对应历史扰动图斑数据回调函数
+   */
+  callbackgetHistorySpotTimeByExtent = data => {
+    //console.log(data);
+  };  
   /*
    * 添加卷帘效果
    */

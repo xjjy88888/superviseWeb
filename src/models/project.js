@@ -13,7 +13,9 @@ import {
   removeProjectScopeGraphic,
   projectDeleteMulApi,
   departListApi,
-  departCreateApi,projectUnArchiveApi,projectArchiveApi
+  departCreateApi,
+  projectUnArchiveApi,
+  projectArchiveApi
 } from "../services/httpApi";
 
 export default {
@@ -32,7 +34,8 @@ export default {
         actCompTime: ""
       }
     },
-    departSelectList: []
+    departSelectList: [],
+    projectListAdd: []
   },
 
   subscriptions: {
@@ -58,6 +61,21 @@ export default {
           message: `查询项目列表失败：${error.message}`
         });
         if (callback) callback(success);
+      }
+    },
+
+    // 项目列表模糊查询
+    *queryProjectAdd({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(projectListApi, payload);
+      if (success) {
+        const d = result.items.map(item => item.projectName);
+        yield put({ type: "save", payload: { projectListAdd: d } });
+      } else {
+        notification["error"]({
+          message: `新建项目名模糊查询失败：${error.message}`
+        });
       }
     },
 

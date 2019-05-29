@@ -487,32 +487,6 @@ export default class integrat extends PureComponent {
     });
   };
 
-  close = () => {
-    const { projectEdit } = this.state;
-    if (projectEdit) {
-      this.setState({
-        projectEdit: false
-      });
-      emitter.emit("showProjectDetail", {
-        show: false,
-        edit: false
-      });
-    } else {
-      this.setState({
-        showProjectDetail: false,
-        projectEdit: false
-      });
-      emitter.emit("showSiderbarDetail", {
-        show: false,
-        from: "spot"
-      });
-      emitter.emit("showProjectDetail", {
-        show: false,
-        edit: false
-      });
-    }
-  };
-
   switchMenu = e => {
     this.scrollDom.scrollTop = 0;
     emitter.emit("showSiderbarDetail", {
@@ -824,12 +798,7 @@ export default class integrat extends PureComponent {
       dispatch,
       form: { getFieldDecorator, resetFields, setFieldsValue },
       user: { districtList },
-      project: {
-        projectList,
-        projectInfo,
-
-        departSelectList
-      },
+      project: { projectList, projectInfo, projectListAdd, departSelectList },
       spot: { spotList, projectInfoSpotList },
       point: { pointList },
       redLine: { redLineList }
@@ -1135,7 +1104,7 @@ export default class integrat extends PureComponent {
                     previewVisible_min_left: false,
                     isProjectUpdate: false
                   });
-                  this.props.form.resetFields();
+                  resetFields();
                   emitter.emit("showProjectDetail", {
                     show: true,
                     edit: true,
@@ -1562,7 +1531,36 @@ export default class integrat extends PureComponent {
                   fontSize: 18,
                   zIndex: 1
                 }}
-                onClick={this.close}
+                onClick={() => {
+                  const { projectEdit } = this.state;
+                  if (projectEdit) {
+                    Modal.confirm({
+                      title: `确定放弃填写的内容？`,
+                      content: "",
+                      onOk() {
+                        self.setState({ showProjectDetail: false });
+                        emitter.emit("showProjectDetail", {
+                          show: false,
+                          edit: false
+                        });
+                      },
+                      onCancel() {}
+                    });
+                  } else {
+                    this.setState({
+                      showProjectDetail: false,
+                      projectEdit: false
+                    });
+                    emitter.emit("showSiderbarDetail", {
+                      show: false,
+                      from: "spot"
+                    });
+                    emitter.emit("showProjectDetail", {
+                      show: false,
+                      edit: false
+                    });
+                  }
+                }}
               />
               <Button
                 icon={projectEdit ? "check" : "edit"}
@@ -1798,6 +1796,7 @@ export default class integrat extends PureComponent {
                       </a>
                       <a
                         style={{
+                          display: isProjectUpdate ? "inherit" : "none",
                           position: "absolute",
                           right: 0,
                           bottom: 0,
@@ -1942,14 +1941,8 @@ export default class integrat extends PureComponent {
                               draw: true,
                               state: "add",
                               type: "spot",
-                              project_id: ""
+                              projectId: projectItem.id
                             });
-                            // emitter.emit("showSiderbarDetail", {
-                            //   show: false,
-                            //   edit: true,
-                            //   from: "spot",
-                            //   type: "add"
-                            // });
                           }}
                         />
                         <Icon
@@ -1993,7 +1986,8 @@ export default class integrat extends PureComponent {
                             edit: false,
                             from: "spot",
                             type: "edit",
-                            id: item.id
+                            id: item.id,
+                            projectId: projectItem.id
                           });
                         }}
                       >
@@ -2048,15 +2042,8 @@ export default class integrat extends PureComponent {
                             e.stopPropagation();
                             emitter.emit("drawGraphics", {
                               draw: true,
-                              type: "redLine",
                               state: "add",
-                              projectId: projectItem.id
-                            });
-                            emitter.emit("showSiderbarDetail", {
-                              show: true,
-                              edit: true,
-                              from: "redLine",
-                              type: "add",
+                              type: "redLine",
                               projectId: projectItem.id
                             });
                           }}
@@ -2569,7 +2556,27 @@ export default class integrat extends PureComponent {
                   {getFieldDecorator("projectName", {
                     initialValue: projectItem.projectBase.name,
                     rules: [{ required: true, message: "项目名不能为空" }]
-                  })(<Input.TextArea autosize />)}
+                  })(
+                    <AutoComplete
+                      style={{ width: 200 }}
+                      dataSource={projectListAdd}
+                      filterOption={(inputValue, option) =>
+                        option.props.children
+                          .toUpperCase()
+                          .indexOf(inputValue.toUpperCase()) !== -1
+                      }
+                      onChange={v => {
+                        dispatch({
+                          type: "project/queryProjectAdd",
+                          payload: {
+                            SkipCount: 0,
+                            MaxResultCount: 5,
+                            ProjectName: v
+                          }
+                        });
+                      }}
+                    />
+                  )}
                 </Form.Item>
                 <Form.Item label="所在地区" {...formItemLayout}>
                   {getFieldDecorator("districtCodeId", {
@@ -2602,10 +2609,10 @@ export default class integrat extends PureComponent {
                             color: "#1890ff"
                           }}
                           onClick={() => {
-                            emitter.emit("showProjectDetail", {
-                              show: false,
-                              edit: false
-                            });
+                            // emitter.emit("showProjectDetail", {
+                            //   show: false,
+                            //   edit: false
+                            // });
                             this.props.form.validateFields((err, values) => {
                               if (!err) {
                                 emitter.emit("siteLocation", {
@@ -2726,7 +2733,15 @@ export default class integrat extends PureComponent {
                 <Form.Item label="流域管理机构" {...formItemLayout}>
                   {getFieldDecorator("ctn_code111", {
                     initialValue: projectItem.riverBasinOU
-                  })(<Input.TextArea autosize />)}
+                  })(
+                    <Select showSearch allowClear optionFilterProp="children">
+                      {this.dictList("流域管理机构").map(item => (
+                        <Select.Option value={item.id} key={item.id}>
+                          {item.value}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  )}
                 </Form.Item>
                 <Form.Item label="批复文号" {...formItemLayout}>
                   {getFieldDecorator("replyNum", {
@@ -2892,6 +2907,7 @@ export default class integrat extends PureComponent {
                 </a>
                 <a
                   style={{
+                    display: isProjectUpdate ? "inherit" : "none",
                     position: "absolute",
                     right: 0,
                     bottom: 0,

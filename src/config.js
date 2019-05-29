@@ -382,9 +382,10 @@ const config = {
     //根据地图当前范围获取对应历史影像数据接口
     getInfoByExtent: `${imageBaseUrl}/latest/getInfoByExtent`
   },
-  mapLayersName: "ZKYGIS:bs_project_scope,ZKYGIS:bs_spot",
-  mapProjectLayerName: "ZKYGIS:bs_project_scope",
-  mapSpotLayerName: "ZKYGIS:bs_spot",
+  mapLayersName: "ZKYGIS:bs_project_scope,ZKYGIS:bs_spot",//现状库扰动图斑和项目红线
+  mapProjectLayerName: "ZKYGIS:bs_project_scope",//现状库项目红线
+  mapSpotLayerName: "ZKYGIS:bs_spot",//现状库扰动图斑
+  mapHistorySpotLayerName: "ZKYGIS:bs_spot_history",//历史库扰动图斑
   legend: [
     {
       title: "扰动图斑_未关联_未复核",
