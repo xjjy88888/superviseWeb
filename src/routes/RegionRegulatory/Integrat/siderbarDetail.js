@@ -54,7 +54,8 @@ export default class siderbarDetail extends PureComponent {
       isSpotUpdate: true,
       item: { project_id: "" },
       spotFileList: [],
-      pointFileList: []
+      pointFileList: [],
+      redLineFileList: []
     };
     this.map = null;
   }
@@ -188,6 +189,22 @@ export default class siderbarDetail extends PureComponent {
       type: "redLine/queryredLineById",
       payload: {
         id: id
+      },
+      callback: data => {
+        this.setState({ ParentId: data.attachment ? data.attachment.id : 0 });
+        if (data.attachment) {
+          const list = data.attachment.child.map(item => {
+            return {
+              uid: item.id,
+              name: item.fileName,
+              status: "done",
+              url: config.url.annexPreviewUrl + item.id
+            };
+          });
+          this.setState({ redLineFileList: list });
+        } else {
+          this.setState({ redLineFileList: [] });
+        }
       }
     });
   };
@@ -287,8 +304,8 @@ export default class siderbarDetail extends PureComponent {
       type,
       projectId,
       edit,
-      fileList,
       spotFileList,
+      redLineFileList,
       pointFileList,
       isSpotUpdate,
       previewVisible,
@@ -506,27 +523,73 @@ export default class siderbarDetail extends PureComponent {
                 )}
               </Form.Item>
             </Form>
-            <Upload
-              style={{ width: 200 }}
-              action="//jsonplaceholder.typicode.com/posts/"
-              listType="picture-card"
-              fileList={fileList}
-              onPreview={file => {
-                this.setState({
-                  previewImage: file.url || file.thumbUrl,
-                  previewVisible_min: true
-                });
-                getFile(file.url);
-              }}
-              onChange={({ fileList }) => this.setState({ fileList })}
-            >
-              {edit ? (
-                <div>
-                  <Icon type="plus" />
-                  <div className="ant-upload-text">上传</div>
-                </div>
-              ) : null}
-            </Upload>
+            <div style={{ minHeight: redLineFileList.length ? 120 : 0 }}>
+              <Upload
+                action={config.url.annexUploadUrl}
+                headers={{ Authorization: `Bearer ${accessToken()}` }}
+                data={{ Id: ParentId }}
+                listType="picture-card"
+                fileList={redLineFileList}
+                onSuccess={v => {
+                  if (v.success) {
+                    console.log(v.result);
+                    this.setState({ ParentId: v.result.id });
+                  } else {
+                    notification["error"]({
+                      message: `项目红线附件上传失败：${v.error.message}`
+                    });
+                  }
+                }}
+                onPreview={file => {
+                  this.setState({
+                    previewImage: file.url || file.thumbUrl,
+                    previewVisible_min: true
+                  });
+                  getFile(file.url);
+                }}
+                onChange={({ fileList }) => {
+                  const data = fileList.map(item => {
+                    return {
+                      ...item,
+                      status: "done"
+                    };
+                  });
+                  this.setState({ redLineFileList: data });
+                }}
+                onRemove={file => {
+                  return new Promise((resolve, reject) => {
+                    if (edit) {
+                      dispatch({
+                        type: "annex/annexDelete",
+                        payload: {
+                          FileId: file.uid,
+                          Id: redLineItem.attachment.id
+                        },
+                        callback: success => {
+                          if (success) {
+                            resolve();
+                          } else {
+                            reject();
+                          }
+                        }
+                      });
+                    } else {
+                      reject();
+                      notification["info"]({
+                        message: `请先开始编辑项目红线`
+                      });
+                    }
+                  });
+                }}
+              >
+                {edit ? (
+                  <div>
+                    <Icon type="plus" />
+                    <div className="ant-upload-text">上传</div>
+                  </div>
+                ) : null}
+              </Upload>
+            </div>
             {edit ? (
               <span>
                 <Button
@@ -586,8 +649,8 @@ export default class siderbarDetail extends PureComponent {
                           callback: success => {
                             if (success) {
                               self.setState({ show: false });
-                              emitter.emit("deleteSuccess", {
-                                success: true
+                              emitter.emit("projectInfoRefresh", {
+                                projectId: projectId
                               });
                             }
                           }
@@ -802,7 +865,7 @@ export default class siderbarDetail extends PureComponent {
                     this.setState({ ParentId: v.result.id });
                   } else {
                     notification["error"]({
-                      message: `附件上传失败：${v.error.message}`
+                      message: `图斑附件上传失败：${v.error.message}`
                     });
                   }
                 }}
@@ -1088,7 +1151,7 @@ export default class siderbarDetail extends PureComponent {
                     this.setState({ ParentId: v.result.id });
                   } else {
                     notification["error"]({
-                      message: `附件上传失败：${v.error.message}`
+                      message: `标注点附件上传失败：${v.error.message}`
                     });
                   }
                 }}
@@ -1165,6 +1228,9 @@ export default class siderbarDetail extends PureComponent {
                                 type === "edit" ? "编辑" : "新建"
                               }标注点成功`
                             });
+                            emitter.emit("deleteSuccess", {
+                              success: true
+                            });
                           }
                         }
                       });
@@ -1175,7 +1241,10 @@ export default class siderbarDetail extends PureComponent {
                 </Button>
                 <Button
                   icon="delete"
-                  style={{ marginLeft: 20 }}
+                  style={{
+                    display: type !== "add" ? "inherit" : "none",
+                    marginLeft: 20
+                  }}
                   onClick={() => {
                     Modal.confirm({
                       title: "删除",
@@ -1185,20 +1254,20 @@ export default class siderbarDetail extends PureComponent {
                       cancelText: "否",
                       onOk() {
                         resetFields();
-                        // dispatch({
-                        //   type: "point/pointDelete",
-                        //   payload: {
-                        //     id: pointItem.id
-                        //   },
-                        //   callback: success => {
-                        //     if (success) {
-                        //       self.setState({ show: false });
-                        //       emitter.emit("deleteSuccess", {
-                        //         success: true
-                        //       });
-                        //     }
-                        //   }
-                        // });
+                        dispatch({
+                          type: "point/pointDelete",
+                          payload: {
+                            id: pointItem.id
+                          },
+                          callback: success => {
+                            if (success) {
+                              self.setState({ show: false });
+                              emitter.emit("deleteSuccess", {
+                                success: true
+                              });
+                            }
+                          }
+                        });
                       },
                       onCancel() {}
                     });

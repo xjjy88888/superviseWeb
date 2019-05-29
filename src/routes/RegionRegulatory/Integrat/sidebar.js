@@ -2082,11 +2082,31 @@ export default class integrat extends PureComponent {
                           }}
                           onClick={e => {
                             e.stopPropagation();
-                            notification["info"]({
-                              message: "删除防治责任范围"
+                            Modal.confirm({
+                              title: "删除",
+                              content: "是否确定要删除这条项目红线数据？",
+                              okText: "是",
+                              okType: "danger",
+                              cancelText: "否",
+                              onOk() {
+                                dispatch({
+                                  type: "redLine/redLineDelete",
+                                  payload: {
+                                    id: item.id
+                                  },
+                                  callback: success => {
+                                    if (success) {
+                                      emitter.emit("projectInfoRefresh", {
+                                        projectId: projectItem.id
+                                      });
+                                    }
+                                  }
+                                });
+                              },
+                              onCancel() {}
                             });
                           }}
-                        />
+                      />
                         <Icon
                           type="environment"
                           style={{
