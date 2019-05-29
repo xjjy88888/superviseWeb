@@ -301,11 +301,11 @@ export default class siderbarDetail extends PureComponent {
                 <Checkbox.Group options={["有图斑", "无图斑"]} />
               )}
             </Form.Item>
-            <Form.Item label="显示归档数据" {...formItemLayoutlong}>
+            <Form.Item label="显示数据" {...formItemLayoutlong}>
               {getFieldDecorator("ShowArchive", {
                 valuePropName: "checked",
                 initialValue: false
-              })(<Switch />)}
+              })(<Switch  checkedChildren="归档数据" unCheckedChildren="现状数据"/>)}
             </Form.Item>
           </Form>
         </div>
@@ -393,11 +393,11 @@ export default class siderbarDetail extends PureComponent {
                 <Checkbox.Group options={this.getDictList("建设状态")} />
               )}
             </Form.Item>
-            <Form.Item label="显示归档数据" {...formItemLayoutlong}>
+            <Form.Item label="归档数据" {...formItemLayoutlong}>
               {getFieldDecorator("ShowArchive", {
                 valuePropName: "checked",
                 initialValue: false
-              })(<Switch />)}
+              })(<Switch  checkedChildren="归档数据" unCheckedChildren="现状数据"/>)}
             </Form.Item>
           </Form>
         </div>

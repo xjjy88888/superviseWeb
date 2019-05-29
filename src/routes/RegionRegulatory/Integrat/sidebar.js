@@ -27,6 +27,7 @@ import {
   Table,
   Collapse
 } from "antd";
+import locale from "antd/lib/date-picker/locale/zh_CN";
 import moment from "moment";
 import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
@@ -1137,7 +1138,8 @@ export default class integrat extends PureComponent {
                   this.props.form.resetFields();
                   emitter.emit("showProjectDetail", {
                     show: true,
-                    edit: true
+                    edit: true,
+                    id: ""
                   });
                 } else if (key === "spot") {
                   emitter.emit("drawSpot", {
@@ -1263,7 +1265,7 @@ export default class integrat extends PureComponent {
               padding: 100,
               position: "absolute",
               top: 300,
-              left: 45,
+              left: 50,
               zIndex: 1001
             }}
           />
@@ -1594,7 +1596,8 @@ export default class integrat extends PureComponent {
                     });
                     emitter.emit("showProjectDetail", {
                       show: true,
-                      edit: true
+                      edit: true,
+                      id: projectItem.id
                     });
                   }
                 }}
@@ -1784,7 +1787,8 @@ export default class integrat extends PureComponent {
                           });
                           emitter.emit("showProjectDetail", {
                             show: !showProjectAllInfo,
-                            edit: false
+                            edit: false,
+                            id: projectItem.id
                           });
                         }}
                       >
@@ -2106,7 +2110,7 @@ export default class integrat extends PureComponent {
                               onCancel() {}
                             });
                           }}
-                      />
+                        />
                         <Icon
                           type="environment"
                           style={{
@@ -2873,7 +2877,8 @@ export default class integrat extends PureComponent {
                     });
                     emitter.emit("showProjectDetail", {
                       show: !showProjectAllInfo,
-                      edit: true
+                      edit: true,
+                      id: projectItem.id
                     });
                   }}
                 >
@@ -2991,10 +2996,67 @@ export default class integrat extends PureComponent {
               <img alt="example" style={{ width: "100%" }} src={previewImage} />
             </Modal>
             <div>
-              <Button icon="cloud-download" style={{ marginTop: 20 }}>
+              <Button
+                icon="cloud-download"
+                style={{
+                  display: projectItem.archiveTime ? "none" : "block",
+                  marginTop: 20
+                }}
+                onClick={() => {
+                  this.setState({ archiveTime: "" });
+                  Modal.confirm({
+                    title: "项目归档",
+                    content: (
+                      <span>
+                        归档时间：
+                        <DatePicker
+                          locale={locale}
+                          onChange={(date, dateString) => {
+                            console.log(date, dateString);
+                            this.setState({ archiveTime: dateString });
+                          }}
+                        />
+                      </span>
+                    ),
+                    onOk() {
+                      const { archiveTime } = self.state;
+                      return new Promise((resolve, reject) => {
+                        if (archiveTime) {
+                          resolve();
+                          dispatch({
+                            type: "project/projectArchive",
+                            payload: {
+                              id: projectItem.id,
+                              ArchiveTime: archiveTime
+                            },
+                            callback: success => {
+                              if (success) {
+                                self.setState({ showProjectDetail: false });
+                                emitter.emit("deleteSuccess", {});
+                              }
+                            }
+                          });
+                        } else {
+                          notification["warning"]({
+                            message: `请选择归档时间`
+                          });
+                          reject();
+                        }
+                      });
+                    },
+                    onCancel() {}
+                  });
+                }}
+              >
                 项目归档
               </Button>
-              <Button icon="rollback" style={{ marginLeft: 20 }}>
+              <Button
+                icon="rollback"
+                style={{
+                  display: projectItem.archiveTime ? "block" : "none",
+                  marginLeft: 20
+                }}
+              >
                 撤销归档
               </Button>
             </div>

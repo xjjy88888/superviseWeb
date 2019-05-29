@@ -31,6 +31,12 @@ const config = {
     // 项目批量删除
     projectDeleteMulUrl: `${domain}api/services/app/Project/DeleteBatch`,
 
+    // 项目归档
+    projectArchiveUrl: `${domain}api/services/app/Project/Archive`,
+
+    // 项目撤销归档
+    projectUnArchiveUrl: `${domain}api/services/app/Project/UnArchive`,
+
     // 图斑列表
     spotListUrl: `${domain}api/services/app/Spot/GetAllByPost`,
 

@@ -13,7 +13,7 @@ import {
   removeProjectScopeGraphic,
   projectDeleteMulApi,
   departListApi,
-  departCreateApi
+  departCreateApi,projectUnArchiveApi,projectArchiveApi
 } from "../services/httpApi";
 
 export default {
@@ -140,6 +140,32 @@ export default {
       if (callback) callback(success);
       notification[success ? "success" : "error"]({
         message: `批量删除项目${success ? "成功" : "失败"}${
+          success ? "" : `：${error.message}`
+        }`
+      });
+    },
+
+    // 项目归档
+    *projectArchive({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error }
+      } = yield call(projectArchiveApi, payload);
+      if (callback) callback(success);
+      notification[success ? "success" : "error"]({
+        message: `项目归档${success ? "成功" : "失败"}${
+          success ? "" : `：${error.message}`
+        }`
+      });
+    },
+
+    // 项目撤销归档
+    *projectUnArchive({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error }
+      } = yield call(projectUnArchiveApi, payload);
+      if (callback) callback(success);
+      notification[success ? "success" : "error"]({
+        message: `撤销归档${success ? "成功" : "失败"}${
           success ? "" : `：${error.message}`
         }`
       });

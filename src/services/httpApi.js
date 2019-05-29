@@ -104,6 +104,31 @@ export async function projectDeleteMulApi(payload) {
   });
 }
 
+// 项目归档
+export async function projectArchiveApi(params) {
+  return request(
+    `${config.url.projectArchiveUrl}?id=${params.id}&ArchiveTime=${
+      params.ArchiveTime
+    }`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`
+      }
+    }
+  );
+}
+
+// 项目撤销归档
+export async function projectUnArchiveApi(params) {
+  return request(`${config.url.projectUnArchiveUrl}?id=${params.id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
 // 图斑列表
 export async function spotListApi(params) {
   delete params.items;

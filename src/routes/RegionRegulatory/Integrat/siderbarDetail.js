@@ -61,10 +61,10 @@ export default class siderbarDetail extends PureComponent {
   }
 
   componentDidMount() {
+    self = this;
     const {
       form: { resetFields }
     } = this.props;
-    self = this;
     this.eventEmitter = emitter.addListener("siteLocationBack", data => {
       this.props.form.setFieldsValue({
         pointX: data.longitude, //经度
@@ -375,14 +375,21 @@ export default class siderbarDetail extends PureComponent {
               color: "#1890ff"
             }}
             onClick={() => {
-              this.setState({ edit: !edit });
               if (edit) {
-                validateFields((err, v) => {
-                  if (!err) {
-                    console.log("图斑信息", v);
-                  }
-                });
+                if (from === "spot") {
+                  Modal.confirm({
+                    title: `确定放弃已绘制图斑和填写的图斑属性？`,
+                    content: "",
+                    onOk() {
+                      self.setState({ show: false });
+                    },
+                    onCancel() {}
+                  });
+                } else {
+                  this.setState({ edit: !edit });
+                }
               } else {
+                this.setState({ edit: !edit });
               }
             }}
           />
