@@ -154,8 +154,10 @@ export default class integrat extends PureComponent {
 
     this.eventEmitter = emitter.addListener("deleteDraw", () => {
       const { addGraphLayer } = this.state;
-      map.removeLayer(addGraphLayer);
-      this.setState({ addGraphLayer: null });
+      if(addGraphLayer){
+        map.removeLayer(addGraphLayer);
+        this.setState({ addGraphLayer: null });
+      }
     });
 
     //获取url参数
@@ -1929,7 +1931,6 @@ export default class integrat extends PureComponent {
                 zIndex: 1000
               }}
             >
-              {/* <Select defaultValue="2" onChange={this.onChangeSelectLeft}> */}
               <Select
                 value={[selectLeftV]}
                 placeholder="请选择"
@@ -1943,9 +1944,6 @@ export default class integrat extends PureComponent {
                     {item}
                   </Select.Option>
                 ))}
-                {/* <Select.Option value="1">街道图</Select.Option>
-                <Select.Option value="2">影像图</Select.Option>
-                <Select.Option value="3">监管影像</Select.Option> */}
               </Select>
             </div>
             <div
@@ -1957,7 +1955,6 @@ export default class integrat extends PureComponent {
                 zIndex: 1001
               }}
             >
-              {/* <Select defaultValue="1" onChange={this.onChangeSelectRight}> */}
               <Select
                 value={[selectRightV]}
                 placeholder="请选择"
@@ -1971,9 +1968,6 @@ export default class integrat extends PureComponent {
                     {item}
                   </Select.Option>
                 ))}
-                {/* <Select.Option value="1">街道图</Select.Option>
-                <Select.Option value="2">影像图</Select.Option>
-                <Select.Option value="3">监管影像</Select.Option> */}
               </Select>
             </div>
             {/* 底部遮罩层 */}

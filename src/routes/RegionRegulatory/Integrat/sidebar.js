@@ -796,7 +796,7 @@ export default class integrat extends PureComponent {
     } = this.state;
     const {
       dispatch,
-      form: { getFieldDecorator, resetFields, setFieldsValue },
+      form: { getFieldDecorator, resetFields, setFieldsValue, getFieldValue },
       user: { districtList },
       project: { projectList, projectInfo, projectListAdd, departSelectList },
       spot: { spotList, projectInfoSpotList },
@@ -2575,6 +2575,9 @@ export default class integrat extends PureComponent {
                           }
                         });
                       }}
+                      onBlur={() => {
+                        console.log(getFieldValue("projectName"));
+                      }}
                     />
                   )}
                 </Form.Item>
@@ -3021,7 +3024,7 @@ export default class integrat extends PureComponent {
               <Button
                 icon="cloud-download"
                 style={{
-                  display: projectItem.archiveTime ? "none" : "block",
+                  display: projectItem.isArchive ? "none" : "block",
                   marginTop: 20
                 }}
                 onClick={() => {
@@ -3075,7 +3078,7 @@ export default class integrat extends PureComponent {
               <Button
                 icon="rollback"
                 style={{
-                  display: projectItem.archiveTime ? "block" : "none",
+                  display: projectItem.isArchive ? "block" : "none",
                   marginLeft: 20
                 }}
                 onClick={() => {

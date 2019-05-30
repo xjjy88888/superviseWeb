@@ -74,9 +74,11 @@ export default {
       const {
         data: { success, error, result: response }
       } = yield call(spotCreateUpdateApi, payload);
+      console.log(success, error, response);
       if (success) {
         if (callback) callback(success, response);
       } else {
+        if (callback) callback(success);
         notification["error"]({
           message: `${payload.id ? "编辑" : "新建"}图斑失败：${error.message}`
         });

@@ -241,19 +241,6 @@ export default class siderbarDetail extends PureComponent {
             archiveTime: isArchive ? archiveTime : null,
             attachmentId: ParentId,
             polygon: polygon,
-            // interferenceTypeId: this.getDictKey(
-            //   v.interferenceTypeId,
-            //   "扰动类型"
-            // ),
-            // interferenceComplianceId: this.getDictKey(
-            //   v.interferenceComplianceId,
-            //   "扰动合规性"
-            // ),
-            // interferenceVaryTypeId: this.getDictKey(
-            //   v.interferenceVaryTypeId,
-            //   "扰动变化类型"
-            // ),
-            // buildStatusId: this.getDictKey(v.buildStatusId, "建设状态"),
             districtCodeId: v.districtCodeId.length
               ? v.districtCodeId.pop()
               : "",
@@ -920,7 +907,10 @@ export default class siderbarDetail extends PureComponent {
               <span>
                 <Button
                   icon="check"
-                  style={{ marginTop: 20 }}
+                  style={{
+                    display: !spotItem.isArchive ? "inline-block" : "none",
+                    marginTop: 20
+                  }}
                   onClick={() => {
                     this.submit(false);
                   }}
@@ -930,7 +920,10 @@ export default class siderbarDetail extends PureComponent {
                 <Button
                   icon="check-circle"
                   style={{
-                    display: type !== "add" ? "inherit" : "none",
+                    display:
+                      type !== "add" && !spotItem.isArchive
+                        ? "inherit"
+                        : "none",
                     marginLeft: 20
                   }}
                   onClick={() => {
@@ -1006,7 +999,7 @@ export default class siderbarDetail extends PureComponent {
                   icon="cloud-download"
                   style={{
                     display:
-                      type !== "add" && !spotItem.archiveTime
+                      type !== "add" && !spotItem.isArchive
                         ? "inline-block"
                         : "none",
                     marginTop: 20
@@ -1062,7 +1055,7 @@ export default class siderbarDetail extends PureComponent {
                   icon="rollback"
                   style={{
                     display:
-                      type !== "add" && spotItem.archiveTime
+                      type !== "add" && spotItem.isArchive
                         ? "inline-block"
                         : "none",
                     marginTop: 20
@@ -1087,7 +1080,10 @@ export default class siderbarDetail extends PureComponent {
                 <Button
                   icon="delete"
                   style={{
-                    display: type !== "add" ? "inline-block" : "none",
+                    display:
+                      type !== "add" && !spotItem.isArchive
+                        ? "inline-block"
+                        : "none",
                     marginLeft: 20
                   }}
                   onClick={() => {

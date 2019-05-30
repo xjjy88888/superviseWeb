@@ -64,25 +64,27 @@ export default {
         const year = date.getFullYear();
         const month = date.getMonth() + 1;
         const day = date.getDate();
-        const hour = date.getHours();
-        const minute = date.getMinutes();
-        const second = date.getSeconds();    
+        //const hour = date.getHours();
+        //const minute = date.getMinutes();
+        //const second = date.getSeconds();    
         // return [year, month, day].map(formatNumber).join('-') + ' ' + [hour, minute, second].map(formatNumber).join(':');
-        return [year, month, day].map(formatNumber).join('-') + ' ' + [hour, minute, second].map(formatNumber).join(':');
+        // return [year, month, day].map(formatNumber).join('/') + ' ' + [hour, minute, second].map(formatNumber).join(':');
+        return [year, month, day].map(formatNumber).join('/');
       }
       let timeList = [];
       if(result.features.length>0){
           for(let i =0; i< result.features.length;i++){
               let item = result.features[i];
-              let time = item.properties.archive_time + '';
+              let time = item.properties.archive_time;
               time = time.split("T")[0];
+              time = time.replace(/-/g, "/");
               timeList.push(time);
           }
       }
       timeList.push(formatTime(new Date()));
-      //console.log(timeList);
+      console.log(timeList);
       let historiesSpot = new Set(timeList);
-      //console.log([...historiesSpot].reverse());
+      console.log([...historiesSpot].reverse());
       if (callback) callback(result);
     }
   },
