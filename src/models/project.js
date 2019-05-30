@@ -194,7 +194,7 @@ export default {
       const {
         data: { success, error, result }
       } = yield call(projectVerifyApi, payload);
-      if (callback) callback(success,result);
+      if (callback) callback(success, result);
       if (!success) {
         notification["error"]({
           message: `项目重名验证失败${error.message}`
@@ -243,6 +243,14 @@ export default {
           message: `单位新建失败：${error.message}`
         });
       }
+    },
+
+    // 项目统计
+    *projectChart({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(projectListApi, payload);
+      if (callback) callback(success, error, result);
     },
 
     *updateSpotGraphic({ payload, callback }, { call, put }) {

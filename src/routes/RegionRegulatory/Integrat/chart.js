@@ -1,153 +1,27 @@
 import React, { PureComponent } from "react";
-import { Icon, Button, Radio } from "antd";
+import { Icon, Button, Radio, notification } from "antd";
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
 import echarts from "echarts/lib/echarts";
 import "echarts";
+import { connect } from "dva";
 import config from "../../../config";
-
-const optionPie = {
-  tooltip: {
-    trigger: "item",
-    formatter: "{a} <br/>{b}: {c} ({d}%)"
-  },
-  legend: {
-    orient: "vertical",
-    x: "left",
-    data: [
-      "部级",
-      "省级",
-      "市级",
-      "县级"
-    ]
-  },
-  series: [
-    {
-      name: "访问来源",
-      type: "pie",
-      radius: ["0%", "70%"],
-      avoidLabelOverlap: false,
-      label: {
-        normal: {
-          show: false,
-          position: "center"
-        },
-        emphasis: {
-          show: false,
-          textStyle: {
-            fontSize: "30",
-            fontWeight: "bold"
-          }
-        }
-      },
-      labelLine: {
-        normal: {
-          show: false
-        }
-      },
-      data: [
-        { value: 35, name: "部级" },
-        { value: 234, name: "省级" },
-        { value: 310, name: "市级" },
-        { value: 435, name: "县级" }
-      ]
-    }
-  ]
-};
-
-const optionBar = {
-  tooltip: {
-    trigger: "axis",
-    axisPointer: {
-      type: "shadow"
-    }
-  },
-  legend: {
-    data: ["2011年", "2012年"]
-  },
-  xAxis: {
-    type: "value",
-    boundaryGap: [0, 0.01]
-  },
-  yAxis: {
-    type: "category",
-    axisLabel: {
-      interval: 0,
-      rotate: 30
-    },
-    data: config.project_type
-  },
-  series: [
-    {
-      name: "立项级别",
-      type: "bar",
-      itemStyle: {
-        normal: {
-          color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
-            { offset: 0, color: "#83bff6" },
-            { offset: 0.5, color: "#188df0" },
-            { offset: 1, color: "#188df0" }
-          ])
-        },
-        emphasis: {
-          color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
-            { offset: 0, color: "#2378f7" },
-            { offset: 0.7, color: "#2378f7" },
-            { offset: 1, color: "#83bff6" }
-          ])
-        }
-      },
-      data: [
-        35,
-        234,
-        310,
-        435,
-        35,
-        234,
-        310,
-        435,
-        35,
-        234,
-        310,
-        435,
-        35,
-        234,
-        310,
-        435,
-        35,
-        234,
-        310,
-        435,
-        35,
-        234,
-        310,
-        435,
-        35,
-        234,
-        310,
-        435,
-        35,
-        234,
-        310,
-        435,
-        35,
-        234,
-        310,
-        435
-      ]
-    }
-  ]
-};
 
 let myChart;
 
+@connect(({ project }) => ({
+  project
+}))
 export default class siderbarDetail extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
       showTool: false,
       show: false,
-      type: "control"
+      type: "control",
+      state: "pie",
+      chartData: [],
+      queryInfo: {}
     };
     this.charRef = ref => {
       this.chartDom = ref;
@@ -164,13 +38,19 @@ export default class siderbarDetail extends PureComponent {
         type: data.type
       });
     });
-    this.eventEmitter = emitter.addListener("showChart", data => {
+    this.eventEmitter = emitter.addListener("queryInfo", v => {
       this.setState({
-        show: data.show
+        queryInfo: v.info
       });
     });
+    this.eventEmitter = emitter.addListener("showChart", v => {
+      this.setState({
+        show: v.show,
+        title: v.title
+      });
+      this.query(v.type);
+    });
     myChart = echarts.init(this.chartDom);
-    myChart.setOption(optionBar);
     const { clientWidth, clientHeight } = this.refDom;
     this.setState({
       clientHeight: clientHeight,
@@ -178,16 +58,117 @@ export default class siderbarDetail extends PureComponent {
     });
   }
 
-  close = () => {
-    this.setState({ show: false });
+  query = type => {
+    const { dispatch } = this.props;
+    const { state, queryInfo } = this.state;
+    dispatch({
+      type: "project/projectChart",
+      payload: {
+        ...queryInfo,
+        type: type,
+        isChart: true
+      },
+      callback: (success, error, v) => {
+        if (success) {
+          this.setState({ chartData: v });
+          if (state === "pie") {
+            this.drawPie(v);
+          } else {
+            this.drawBar(v);
+          }
+        } else {
+          notification["error"]({
+            message: `项目统计失败：${error.message}`
+          });
+        }
+      }
+    });
   };
 
-  onChange = checkedValues => {
-    console.log("checked = ", checkedValues);
+  drawPie = v => {
+    const { title } = this.state;
+
+    const optionPie = {
+      title: {
+        text: title,
+        left: "center"
+      },
+      tooltip: {
+        trigger: "item",
+        formatter: "{a}<br/>{b}: {c} ({d}%)"
+      },
+      legend: {
+        orient: "vertical",
+        x: "left",
+        data: v.map(item => item.name)
+      },
+      series: [
+        {
+          name: title,
+          type: "pie",
+          radius: ["0%", "70%"],
+          data: v
+        }
+      ]
+    };
+
+    myChart.setOption(optionPie, true);
+  };
+
+  drawBar = v => {
+    const { title } = this.state;
+    const optionBar = {
+      title: {
+        text: title,
+        left: "center"
+      },
+      tooltip: {
+        trigger: "axis",
+        axisPointer: {
+          type: "shadow"
+        }
+      },
+      xAxis: {
+        type: "value",
+        boundaryGap: [0, 0.01]
+      },
+      yAxis: {
+        type: "category",
+        axisLabel: {
+          interval: 0,
+          rotate: 30
+        },
+        data: v.map(item => item.name)
+      },
+      series: [
+        {
+          name: title,
+          type: "bar",
+          itemStyle: {
+            normal: {
+              color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                { offset: 0, color: "#83bff6" },
+                { offset: 0.5, color: "#188df0" },
+                { offset: 1, color: "#188df0" }
+              ])
+            },
+            emphasis: {
+              color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                { offset: 0, color: "#2378f7" },
+                { offset: 0.7, color: "#2378f7" },
+                { offset: 1, color: "#83bff6" }
+              ])
+            }
+          },
+          data: v.map(item => item.value)
+        }
+      ]
+    };
+    myChart.setOption(optionBar, true);
   };
 
   render() {
-    const { show, showTool, type } = this.state;
+    const { show, showTool, type, chartData } = this.state;
     return (
       <div
         ref={this.saveRef}
@@ -217,19 +198,22 @@ export default class siderbarDetail extends PureComponent {
             right: 10,
             top: 10
           }}
-          onClick={this.close}
+          onClick={() => {
+            this.setState({ show: false });
+          }}
         />
 
         <Radio.Group
           name="radiogroup"
           size="small"
-          style={{ position: "relative", left: "47%", margin: 10 }}
-          defaultValue={`bar`}
+          style={{ position: "relative", left: "45%", margin: 10 }}
+          defaultValue={`pie`}
           onChange={e => {
+            this.setState({ state: e.target.value });
             if (e.target.value === "pie") {
-              myChart.setOption(optionPie, true);
+              this.drawPie(chartData);
             } else {
-              myChart.setOption(optionBar, true);
+              this.drawBar(chartData);
             }
           }}
         >

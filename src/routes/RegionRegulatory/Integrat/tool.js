@@ -24,7 +24,7 @@ export default class siderbarDetail extends PureComponent {
       show: false,
       checkResult: [],
       showCheck: false,
-      key: "project",
+      key: "project"
     };
     this.charRef = ref => {
       this.chartDom = ref;
@@ -295,7 +295,9 @@ export default class siderbarDetail extends PureComponent {
                     icon={item.icon}
                     onClick={() => {
                       emitter.emit("showChart", {
-                        show: true
+                        show: true,
+                        type: item.type,
+                        title: item.label
                       });
                     }}
                   >

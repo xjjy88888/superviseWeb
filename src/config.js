@@ -16,6 +16,9 @@ const config = {
     // 项目列表
     projectListUrl: `${domain}api/services/app/Project/GetAllByPost`,
 
+    // 项目列表统计
+    projectChartUrl: `${domain}api/services/app/Project/Statistics`,
+
     // 项目信息
     projectByIdUrl: `${domain}api/services/app/Project/Get`,
 
@@ -158,6 +161,135 @@ const config = {
     queryWFSLayer: `${domain}api/Tool/Forward`
   },
 
+  //工具箱
+  toolbox: [
+    {
+      label: "勾选管理",
+      key: "checklist",
+      icon: "check"
+    },
+    {
+      label: "导出",
+      key: "export",
+      icon: "export"
+    },
+    {
+      label: "归档",
+      key: "archiving",
+      icon: "folder-open"
+    },
+    {
+      label: "删除",
+      key: "delete",
+      icon: "delete"
+    },
+    {
+      label: "模板下载(Shapfile)",
+      key: "download_shapfile",
+      icon: "cloud-download"
+    },
+    {
+      label: "模板下载(Excel)",
+      key: "download_excel",
+      icon: "download"
+    },
+    {
+      label: "模板说明",
+      key: "template_description",
+      icon: "question-circle"
+    },
+    {
+      label: "批量上传(GeoJSON)",
+      key: "upload_shapfile",
+      icon: "cloud-upload"
+    },
+    {
+      label: "批量上传(Excel)",
+      key: "upload_excel",
+      icon: "upload"
+    },
+    {
+      label: "数据抽稀",
+      key: "data_sparse",
+      icon: "font-size"
+    }
+  ],
+
+  //控制台-项目
+  console_project: [
+    {
+      label: "立项级别",
+      value: "level",
+      icon: "schedule",
+      type: 0
+    },
+    {
+      label: "合规性",
+      value: "compliance",
+      icon: "info-circle",
+      type: 1
+    },
+    {
+      label: "项目类型",
+      value: "type",
+      icon: "appstore",
+      type: 2
+    },
+    {
+      label: "项目类别",
+      value: "sort",
+      icon: "ant-design",
+      type: 3
+    },
+    {
+      label: "项目性质",
+      value: "nature",
+      icon: "project",
+      type: 4
+    },
+    {
+      label: "建设状态",
+      value: "state",
+      icon: "thunderbolt",
+      type: 5
+    },
+    {
+      label: "矢量化类型",
+      value: "vector",
+      icon: "profile",
+      type: 6
+    }
+  ],
+
+  //控制台-图斑
+  console_spot: [
+    {
+      label: "现场复核",
+      value: "level",
+      icon: "edit"
+    },
+    {
+      label: "合规性",
+      value: "compliance",
+      icon: "info-circle"
+    },
+    {
+      label: "扰动类型",
+      value: "type",
+      icon: "appstore"
+    },
+    {
+      label: "建设状态",
+      value: "nature",
+      icon: "thunderbolt"
+    },
+    {
+      label: "扰动变化类型",
+      value: "sort",
+      icon: "border-inner"
+    }
+  ],
+
   //扰动类型
   disturb_type: ["弃土（渣）场", "取土（石）场", "其他扰动", "非生产建设项目"],
 
@@ -238,127 +370,6 @@ const config = {
   //矢量化类型
   vectorization_type: ["项目红线", "示意性范围"],
 
-  //工具箱
-  toolbox: [
-    {
-      label: "勾选管理",
-      key: "checklist",
-      icon: "check"
-    },
-    {
-      label: "导出",
-      key: "export",
-      icon: "export"
-    },
-    {
-      label: "归档",
-      key: "archiving",
-      icon: "folder-open"
-    },
-    {
-      label: "删除",
-      key: "delete",
-      icon: "delete"
-    },
-    {
-      label: "模板下载(Shapfile)",
-      key: "download_shapfile",
-      icon: "cloud-download"
-    },
-    {
-      label: "模板下载(Excel)",
-      key: "download_excel",
-      icon: "download"
-    },
-    {
-      label: "模板说明",
-      key: "template_description",
-      icon: "question-circle"
-    },
-    {
-      label: "批量上传(GeoJSON)",
-      key: "upload_shapfile",
-      icon: "cloud-upload"
-    },
-    {
-      label: "批量上传(Excel)",
-      key: "upload_excel",
-      icon: "upload"
-    },
-    {
-      label: "数据抽稀",
-      key: "data_sparse",
-      icon: "font-size"
-    }
-  ],
-
-  //控制台-项目
-  console_project: [
-    {
-      label: "立项级别",
-      value: "level",
-      icon: "schedule"
-    },
-    {
-      label: "合规性",
-      value: "compliance",
-      icon: "info-circle"
-    },
-    {
-      label: "项目类型",
-      value: "type",
-      icon: "appstore"
-    },
-    {
-      label: "项目类别",
-      value: "sort",
-      icon: "ant-design"
-    },
-    {
-      label: "项目性质",
-      value: "nature",
-      icon: "project"
-    },
-    {
-      label: "建设状态",
-      value: "state",
-      icon: "thunderbolt"
-    },
-    {
-      label: "矢量化类型",
-      value: "vector",
-      icon: "profile"
-    }
-  ],
-
-  //控制台-图斑
-  console_spot: [
-    {
-      label: "现场复核",
-      value: "level",
-      icon: "edit"
-    },
-    {
-      label: "合规性",
-      value: "compliance",
-      icon: "info-circle"
-    },
-    {
-      label: "扰动类型",
-      value: "type",
-      icon: "appstore"
-    },
-    {
-      label: "建设状态",
-      value: "nature",
-      icon: "thunderbolt"
-    },
-    {
-      label: "扰动变化类型",
-      value: "sort",
-      icon: "border-inner"
-    }
-  ],
   imageBaseUrl: imageBaseUrl,
 
   /*----------------------------------地图配置部分-------------------------------------*/
