@@ -655,7 +655,16 @@ export default class siderbarDetail extends PureComponent {
             }}
           >
             <Form>
-              <Form.Item label="图斑编号" {...formItemLayout} hasFeedback>
+              <Form.Item
+                label={
+                  <span>
+                    <b style={{ color: "red" }}>*</b>
+                    图斑编号
+                  </span>
+                }
+                {...formItemLayout}
+                hasFeedback
+              >
                 {getFieldDecorator("mapNum", {
                   initialValue: spotItem.mapNum,
                   rules: [{ required: true, message: "图斑编号不能为空" }]

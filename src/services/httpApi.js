@@ -129,6 +129,16 @@ export async function projectUnArchiveApi(params) {
   });
 }
 
+// 项目重名验证
+export async function projectVerifyApi(params) {
+  return request(`${config.url.projectVerifyUrl}?name=${params.name}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
 // 图斑列表
 export async function spotListApi(params) {
   delete params.items;

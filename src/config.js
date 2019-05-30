@@ -37,6 +37,9 @@ const config = {
     // 项目撤销归档
     projectUnArchiveUrl: `${domain}api/services/app/Project/UnArchive`,
 
+    // 项目重名验证
+    projectVerifyUrl: `${domain}api/services/app/Project/VaildProjectName`,
+
     // 图斑列表
     spotListUrl: `${domain}api/services/app/Spot/GetAllByPost`,
 

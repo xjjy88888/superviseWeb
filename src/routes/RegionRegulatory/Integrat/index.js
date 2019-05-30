@@ -1611,7 +1611,7 @@ export default class integrat extends PureComponent {
    * 根据地图当前范围获取对应历史扰动图斑数据回调函数
    */
   callbackgetHistorySpotTimeByExtent = data => {
-    //console.log(data);
+    console.log(data);
   };  
   /*
    * 添加卷帘效果

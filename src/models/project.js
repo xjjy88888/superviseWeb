@@ -7,7 +7,7 @@ import {
   removeSpotGraphic,
   updateProjectScopeGraphic,
   addProjectScopeGraphic,
-  redLineListApi,
+  projectVerifyApi,
   projectCreateUpdateApi,
   projectDeleteApi,
   removeProjectScopeGraphic,
@@ -187,6 +187,19 @@ export default {
           success ? "" : `：${error.message}`
         }`
       });
+    },
+
+    // 项目重名验证
+    *projectVerify({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(projectVerifyApi, payload);
+      if (callback) callback(success,result);
+      if (!success) {
+        notification["error"]({
+          message: `项目重名验证失败${error.message}`
+        });
+      }
     },
 
     // 单位列表

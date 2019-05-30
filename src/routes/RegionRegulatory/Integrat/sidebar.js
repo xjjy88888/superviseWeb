@@ -796,7 +796,13 @@ export default class integrat extends PureComponent {
     } = this.state;
     const {
       dispatch,
-      form: { getFieldDecorator, resetFields, setFieldsValue, getFieldValue },
+      form: {
+        getFieldDecorator,
+        resetFields,
+        setFieldsValue,
+        getFieldValue,
+        setFieldValue
+      },
       user: { districtList },
       project: { projectList, projectInfo, projectListAdd, departSelectList },
       spot: { spotList, projectInfoSpotList },
@@ -2552,7 +2558,15 @@ export default class integrat extends PureComponent {
               }}
             >
               <Form style={{ position: "relative", paddingBottom: 10 }}>
-                <Form.Item label="项目名" {...formItemLayout}>
+                <Form.Item
+                  label={
+                    <span>
+                      <b style={{ color: "red" }}>*</b>
+                      项目名
+                    </span>
+                  }
+                  {...formItemLayout}
+                >
                   {getFieldDecorator("projectName", {
                     initialValue: projectItem.projectBase.name,
                     rules: [{ required: true, message: "项目名不能为空" }]
@@ -2576,7 +2590,32 @@ export default class integrat extends PureComponent {
                         });
                       }}
                       onBlur={() => {
-                        console.log(getFieldValue("projectName"));
+                        const v = getFieldValue("projectName");
+                        dispatch({
+                          type: "project/projectVerify",
+                          payload: {
+                            name: v
+                          },
+                          callback: (success, result) => {
+                            if (!result.isValid) {
+                              setFieldsValue({
+                                projectName: ""
+                              });
+                              if (result.isArchive) {
+                                notification["warning"]({
+                                  message: `该项目名已存在并且已归档，请重新输入`
+                                });
+                              }
+                              notification["warning"]({
+                                message: `该项目名已存在，请重新输入`
+                              });
+                            } else {
+                              notification["success"]({
+                                message: `该项目名可用`
+                              });
+                            }
+                          }
+                        });
                       }}
                     />
                   )}
@@ -2839,7 +2878,15 @@ export default class integrat extends PureComponent {
                     </Select>
                   )}
                 </Form.Item>
-                <Form.Item label="涉及县" {...formItemLayout}>
+                <Form.Item
+                  label={
+                    <span>
+                      <b style={{ color: "red" }}>*</b>
+                      涉及县
+                    </span>
+                  }
+                  {...formItemLayout}
+                >
                   {getFieldDecorator("districtCodes", {
                     valuePropName: "value",
                     initialValue: (
