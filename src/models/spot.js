@@ -5,6 +5,8 @@ import {
   spotCreateUpdateApi,
   projectListApi,
   spotDeleteApi,
+  spotArchiveApi,
+  spotUnArchiveApi,
   spotDeleteMulApi
 } from "../services/httpApi";
 
@@ -102,6 +104,32 @@ export default {
       if (callback) callback(success);
       notification[success ? "success" : "error"]({
         message: `批量删除图斑${success ? "成功" : "失败"}${
+          success ? "" : `：${error.message}`
+        }`
+      });
+    },
+
+    // 图斑归档
+    *spotArchive({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error }
+      } = yield call(spotArchiveApi, payload);
+      if (callback) callback(success);
+      notification[success ? "success" : "error"]({
+        message: `图斑归档${success ? "成功" : "失败"}${
+          success ? "" : `：${error.message}`
+        }`
+      });
+    },
+
+    // 图斑撤销归档
+    *spotUnArchive({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error }
+      } = yield call(spotUnArchiveApi, payload);
+      if (callback) callback(success);
+      notification[success ? "success" : "error"]({
+        message: `图斑撤销归档${success ? "成功" : "失败"}${
           success ? "" : `：${error.message}`
         }`
       });

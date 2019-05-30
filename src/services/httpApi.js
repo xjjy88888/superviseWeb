@@ -202,6 +202,31 @@ export async function spotDeleteMulApi(payload) {
   });
 }
 
+// 图斑归档
+export async function spotArchiveApi(params) {
+  return request(
+    `${config.url.spotArchiveUrl}?id=${params.id}&ArchiveTime=${
+      params.ArchiveTime
+    }`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`
+      }
+    }
+  );
+}
+
+// 图斑撤销归档
+export async function spotUnArchiveApi(params) {
+  return request(`${config.url.spotUnArchiveUrl}?id=${params.id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
 // 标注点列表
 export async function pointListApi(params) {
   return request(
@@ -536,7 +561,6 @@ export async function getHistorySpotTimeByExtent(params) {
   return request(params.geojsonUrl, {
     method: "GET",
     dataType: "json",
-    headers: {
-    }
+    headers: {}
   });
 }

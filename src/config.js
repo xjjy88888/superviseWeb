@@ -55,6 +55,12 @@ const config = {
     // 图斑批量删除
     spotDeleteMulUrl: `${domain}api/services/app/Spot/DeleteBatch`,
 
+    // 图斑归档
+    spotArchiveUrl: `${domain}api/services/app/Spot/Archive`,
+
+    // 图斑撤销归档
+    spotUnArchiveUrl: `${domain}api/services/app/Spot/UnArchive`,
+
     // 标注点列表
     pointListUrl: `${domain}api/services/app/MarkingPoint/GetAll`,
 
@@ -382,10 +388,10 @@ const config = {
     //根据地图当前范围获取对应历史影像数据接口
     getInfoByExtent: `${imageBaseUrl}/latest/getInfoByExtent`
   },
-  mapLayersName: "ZKYGIS:bs_project_scope,ZKYGIS:bs_spot",//现状库扰动图斑和项目红线
-  mapProjectLayerName: "ZKYGIS:bs_project_scope",//现状库项目红线
-  mapSpotLayerName: "ZKYGIS:bs_spot",//现状库扰动图斑
-  mapHistorySpotLayerName: "ZKYGIS:bs_spot_history",//历史库扰动图斑
+  mapLayersName: "ZKYGIS:bs_project_scope,ZKYGIS:bs_spot", //现状库扰动图斑和项目红线
+  mapProjectLayerName: "ZKYGIS:bs_project_scope", //现状库项目红线
+  mapSpotLayerName: "ZKYGIS:bs_spot", //现状库扰动图斑
+  mapHistorySpotLayerName: "ZKYGIS:bs_spot_history", //历史库扰动图斑
   legend: [
     {
       title: "扰动图斑_未关联_未复核",

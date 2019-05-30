@@ -996,23 +996,98 @@ export default class siderbarDetail extends PureComponent {
                 >
                   归档保存
                 </Button>
-
               </span>
             ) : (
               <div>
                 {/* <Button icon="swap" style={{ marginTop: 20 }}>
                   历史查看
-                </Button>
-                <Button icon="cloud-download" style={{ marginLeft: 20 }}>
-                  数据归档
-                </Button>
-                <Button icon="rollback" style={{ marginTop: 20 }}>
-                  撤销归档
                 </Button> */}
+                <Button
+                  icon="cloud-download"
+                  style={{
+                    display:
+                      type !== "add" && !spotItem.archiveTime
+                        ? "inline-block"
+                        : "none",
+                    marginTop: 20
+                  }}
+                  onClick={() => {
+                    this.setState({ archiveTimeSpot: "" });
+                    Modal.confirm({
+                      title: "图斑归档",
+                      content: (
+                        <span>
+                          归档时间：
+                          <DatePicker
+                            locale={locale}
+                            onChange={(date, dateString) => {
+                              this.setState({ archiveTimeSpot: dateString });
+                            }}
+                          />
+                        </span>
+                      ),
+                      onOk() {
+                        const { archiveTimeSpot } = self.state;
+                        return new Promise((resolve, reject) => {
+                          if (archiveTimeSpot) {
+                            resolve();
+                            dispatch({
+                              type: "spot/spotArchive",
+                              payload: {
+                                id: spotItem.id,
+                                ArchiveTime: archiveTimeSpot
+                              },
+                              callback: success => {
+                                if (success) {
+                                  self.setState({ show: false });
+                                  emitter.emit("deleteSuccess", {});
+                                }
+                              }
+                            });
+                          } else {
+                            notification["warning"]({
+                              message: `请选择归档时间`
+                            });
+                            reject();
+                          }
+                        });
+                      },
+                      onCancel() {}
+                    });
+                  }}
+                >
+                  图斑归档
+                </Button>
+                <Button
+                  icon="rollback"
+                  style={{
+                    display:
+                      type !== "add" && spotItem.archiveTime
+                        ? "inline-block"
+                        : "none",
+                    marginTop: 20
+                  }}
+                  onClick={() => {
+                    dispatch({
+                      type: "spot/spotUnArchive",
+                      payload: {
+                        id: spotItem.id
+                      },
+                      callback: success => {
+                        if (success) {
+                          self.setState({ show: false });
+                          emitter.emit("deleteSuccess", {});
+                        }
+                      }
+                    });
+                  }}
+                >
+                  撤销归档
+                </Button>
                 <Button
                   icon="delete"
                   style={{
-                    display: type !== "add" ? "inherit" : "none",
+                    display: type !== "add" ? "inline-block" : "none",
                     marginLeft: 20
                   }}
                   onClick={() => {
