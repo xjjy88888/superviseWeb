@@ -22,11 +22,11 @@ export default {
 
   effects: {
     // 项目红线列表
-    *queryRedLineList({ payload }, { call, put }) {
-      console.log("项目红线列表2");
+    *queryRedLineList({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result: redLineList }
       } = yield call(redLineListApi, payload.ProjectId);
+      if (callback) callback(success);
       if (success) {
         yield put({ type: "save", payload: { redLineList } });
       } else {

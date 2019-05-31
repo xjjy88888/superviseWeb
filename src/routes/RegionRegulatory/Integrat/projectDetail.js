@@ -39,8 +39,10 @@ export default class integrat extends PureComponent {
       show: false,
       edit: false,
       departList: [],
-      projectFileList: [],
-      ParentId: 0
+      expandFileList: [],
+      changeFileList: [],
+      expandParentId: 0,
+      changeParentId: 0
     };
     this.map = null;
     this.saveRef = ref => {
@@ -76,13 +78,14 @@ export default class integrat extends PureComponent {
       }
     });
     this.eventEmitter = emitter.addListener("projectCreateUpdate", data => {
-      const { ParentId } = this.state;
+      const { expandParentId, changeParentId } = this.state;
       //submit
       this.props.form.validateFields((err, v) => {
         console.log(v);
         const values = {
           ...v,
-          expandAttachmentId: ParentId,
+          expandAttachmentId: expandParentId,
+          changeAttachmentId: changeParentId,
           designStartTime: v.designStartTime ? v.designStartTime._i : null,
           designCompTime: v.designCompTime ? v.designCompTime._i : null,
           actStartTime: v.actStartTime ? v.actStartTime._i : null,
@@ -114,7 +117,12 @@ export default class integrat extends PureComponent {
       },
       callback: (result, success) => {
         this.setState({
-          ParentId: result.expand.attachment ? result.expand.attachment.id : 0
+          expandParentId: result.expand.attachment
+            ? result.expand.attachment.id
+            : 0,
+          changeParentId: result.expand.changeAttachment
+            ? result.expand.changeAttachment.id
+            : 0
         });
 
         if (result.expand.attachment) {
@@ -126,9 +134,22 @@ export default class integrat extends PureComponent {
               url: config.url.annexPreviewUrl + item.id
             };
           });
-          this.setState({ projectFileList: list });
+          this.setState({ expandFileList: list });
         } else {
-          this.setState({ projectFileList: [] });
+          this.setState({ expandFileList: [] });
+        }
+        if (result.expand.changeAttachment) {
+          const list = result.expand.changeAttachment.child.map(item => {
+            return {
+              uid: item.id,
+              name: item.fileName,
+              status: "done",
+              url: config.url.annexPreviewUrl + item.id
+            };
+          });
+          this.setState({ changeFileList: list });
+        } else {
+          this.setState({ changeFileList: [] });
         }
       }
     });
@@ -237,28 +258,43 @@ export default class integrat extends PureComponent {
     }
   };
 
-  domUpload = isShow => {
+  domUpload = isChange => {
     const {
       dispatch,
       project: { projectInfo }
     } = this.props;
-    const { projectFileList, ParentId, edit } = this.state;
+    const {
+      expandFileList,
+      changeFileList,
+      changeParentId,
+      expandParentId,
+      edit
+    } = this.state;
     const projectItem = projectInfo;
+    const fileList = isChange ? changeFileList : expandFileList;
+    const parentId = isChange ? changeParentId : expandParentId;
     return (
-      <div style={{ minHeight: projectFileList.length ? 120 : 0 }}>
+      <div style={{ minHeight: fileList.length ? 120 : 0 }}>
         <Upload
           action={config.url.annexUploadUrl}
           headers={{ Authorization: `Bearer ${accessToken()}` }}
-          data={{ Id: ParentId }}
+          data={{ Id: parentId }}
           listType="picture-card"
-          fileList={projectFileList}
+          fileList={fileList}
           onSuccess={v => {
             if (v.success) {
-              console.log(v.result);
-              this.setState({ ParentId: v.result.id });
+              if (isChange) {
+                this.setState({
+                  changeParentId: v.result.id
+                });
+              } else {
+                this.setState({
+                  expandParentId: v.result.id
+                });
+              }
             } else {
               notification["error"]({
-                message: `项目红线附件上传失败：${v.error.message}`
+                message: `水保方案附件上传失败：${v.error.message}`
               });
             }
           }}
@@ -276,16 +312,26 @@ export default class integrat extends PureComponent {
                 status: "done"
               };
             });
-            this.setState({ projectFileList: data });
+            if (isChange) {
+              this.setState({
+                changeFileList: data
+              });
+            } else {
+              this.setState({
+                expandFileList: data
+              });
+            }
           }}
-          onRemove={file => {
+          onRemove={(file, is) => {
             return new Promise((resolve, reject) => {
               if (edit) {
                 dispatch({
                   type: "annex/annexDelete",
                   payload: {
                     FileId: file.uid,
-                    Id: projectItem.attachment.id
+                    Id: is
+                      ? projectItem.expand.changeAttachment.id
+                      : projectItem.expand.attachment.id
                   },
                   callback: success => {
                     if (success) {
@@ -298,7 +344,7 @@ export default class integrat extends PureComponent {
               } else {
                 reject();
                 notification["info"]({
-                  message: `请先开始编辑项目红线`
+                  message: `请先开始编辑项目`
                 });
               }
             });
@@ -316,7 +362,7 @@ export default class integrat extends PureComponent {
   };
 
   render() {
-    const { show, edit, projectFileList, ParentId } = this.state;
+    const { show, edit } = this.state;
 
     const {
       dispatch,
@@ -542,11 +588,7 @@ export default class integrat extends PureComponent {
               <span>临时措施设计投资：</span>
               <span>{projectItem.expand.temInvest}万元</span>
             </p>
-            {this.domUpload()}
-            {/* <p style={{ margin: 10 }}>
-              <span>附件(水保方案)：</span>
-              <span>{projectItem.expand.AttachmentId}</span>
-            </p> */}
+            {this.domUpload(false)}
             <p style={{ margin: 10 }}>
               <span>——</span>
               <span>——</span>
@@ -596,24 +638,21 @@ export default class integrat extends PureComponent {
             </p>
             <p style={{ margin: 10 }}>
               <span>项目变更信息：</span>
-              <span>空</span>
+              <span>{projectItem.expand.changeInfo}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>变更原因：</span>
-              <span>空</span>
+              <span>{projectItem.expand.changeReason}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>变更时间：</span>
-              <span>空</span>
+              <span>{projectItem.expand.changeTime}</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>原项目名称：</span>
-              <span>空</span>
+              <span>{projectItem.expand.originalProjectName}</span>
             </p>
-            <p style={{ margin: 10 }}>
-              <span>附件(变更依据)：</span>
-              <span>空</span>
-            </p>
+            {this.domUpload(true)}
           </div>
         </div>
         <div
@@ -997,20 +1036,7 @@ export default class integrat extends PureComponent {
                   })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
-              {this.domUpload()}
-              {/* <Col span={12}>
-                <Form.Item label="附件">
-                  <Upload
-                    listType="picture"
-                    className={styles.upload_list_inline}
-                  >
-                    <Button>
-                      <Icon type="upload" />
-                      上传
-                    </Button>
-                  </Upload>
-                </Form.Item>
-              </Col> */}
+              {this.domUpload(false)}
               <Divider />
               <Col span={12}>
                 <Form.Item label="方案编制单位">
@@ -1231,42 +1257,33 @@ export default class integrat extends PureComponent {
               <Divider />
               <Col span={12}>
                 <Form.Item label="项目变更信息">
-                  {getFieldDecorator("ctn_code111", {
-                    initialValue: ""
+                  {getFieldDecorator("changeInfo", {
+                    initialValue: projectItem.expand.changeInfo
                   })(<Input.TextArea autosize />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="变更原因">
-                  {getFieldDecorator("ctn_code1112", {
-                    initialValue: ""
+                  {getFieldDecorator("changeReason", {
+                    initialValue: projectItem.expand.changeReason
                   })(<Input.TextArea autosize />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="变更时间">
-                  {getFieldDecorator("ctn_code1113", {})(
-                    <DatePicker placeholder="" style={{ width: 130 }} />
-                  )}
+                  {getFieldDecorator("changeTime", {
+                    initialValue: dateInitFormat(projectItem.expand.changeTime)
+                  })(<DatePicker placeholder="" style={{ width: 130 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="原项目名称">
-                  {getFieldDecorator("ctn_code1114", {
-                    initialValue: ""
+                  {getFieldDecorator("originalProjectName", {
+                    initialValue: projectItem.expand.originalProjectName
                   })(<Input />)}
                 </Form.Item>
               </Col>
-              {/* <Col span={12}>
-                <Form.Item label="附件">
-                  <Upload listType="picture">
-                    <Button>
-                      <Icon type="upload" />
-                      上传
-                    </Button>
-                  </Upload>
-                </Form.Item>
-              </Col> */}
+              {this.domUpload(true)}
             </Row>
           </Form>
         </div>

@@ -132,6 +132,7 @@ export default class integrat extends PureComponent {
     });
     this.eventEmitter = emitter.addListener("projectInfoRefresh", v => {
       this.queryRedLineList(v.projectId);
+      this.querySpotByProjectId(v.projectId);
     });
     this.eventEmitter = emitter.addListener("showCreateDepart", v => {
       console.log(v);
@@ -468,23 +469,30 @@ export default class integrat extends PureComponent {
 
   querySpotByProjectId = id => {
     const { dispatch } = this.props;
+    this.showSpin(true);
     dispatch({
       type: "spot/querySpotByProjectId",
       payload: {
         ProjectId: id,
         MaxResultCount: 1000,
         SkipCount: 0
+      },
+      callback: success => {
+        this.showSpin(false);
       }
     });
   };
 
   queryRedLineList = id => {
-    console.log("项目红线列表1");
     const { dispatch } = this.props;
+    this.showSpin(true);
     dispatch({
       type: "redLine/queryRedLineList",
       payload: {
         ProjectId: id
+      },
+      callback: success => {
+        this.showSpin(false);
       }
     });
   };
@@ -947,6 +955,7 @@ export default class integrat extends PureComponent {
                       from: key,
                       id: item.id,
                       edit: false,
+                      fromList: true,
                       type: "edit"
                     });
                   }
@@ -964,6 +973,7 @@ export default class integrat extends PureComponent {
                   ? item.mapNum
                   : item.createTime}
               </b>
+              {/* 定位 */}
               <Icon
                 type="environment"
                 style={{
@@ -976,11 +986,11 @@ export default class integrat extends PureComponent {
                   e.stopPropagation();
                   if (key === "point") {
                     dispatch({
-                      type: "point/queryPointSiteById",
+                      type: "point/queryPointById",
                       payload: { id: item.id },
-                      callback: data => {
+                      callback: v => {
                         emitter.emit("mapLocation", {
-                          item: data,
+                          item: v,
                           key: key
                         });
                       }
@@ -1095,7 +1105,7 @@ export default class integrat extends PureComponent {
                 key === "project"
                   ? "plus"
                   : key === "spot"
-                  ? "radius-upright"
+                  ? "border-inner"
                   : "compass"
               }
               style={{
@@ -1125,7 +1135,8 @@ export default class integrat extends PureComponent {
                     draw: true,
                     state: "add",
                     type: "spot",
-                    projectId: ""
+                    projectId: "",
+                    fromList: true
                   });
                   emitter.emit("showSiderbarDetail", {
                     show: false,
@@ -1951,6 +1962,7 @@ export default class integrat extends PureComponent {
                               draw: true,
                               state: "add",
                               type: "spot",
+                              fromList: false,
                               projectId: projectItem.id,
                               projectName: projectItem.projectBase.name
                             });
@@ -2004,6 +2016,7 @@ export default class integrat extends PureComponent {
                             from: "spot",
                             type: "edit",
                             id: item.id,
+                            fromList: false,
                             projectId: projectItem.id
                           });
                         }}
@@ -2062,6 +2075,7 @@ export default class integrat extends PureComponent {
                               state: "add",
                               type: "redLine",
                               projectId: projectItem.id,
+                              fromList: false,
                               projectName: projectItem.projectBase.name
                             });
                             emitter.emit("showSiderbarDetail", {

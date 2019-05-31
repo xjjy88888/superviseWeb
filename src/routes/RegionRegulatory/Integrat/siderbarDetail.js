@@ -55,7 +55,8 @@ export default class siderbarDetail extends PureComponent {
       item: { project_id: "" },
       spotFileList: [],
       pointFileList: [],
-      redLineFileList: []
+      redLineFileList: [],
+      fromList: false
     };
     this.map = null;
   }
@@ -86,13 +87,14 @@ export default class siderbarDetail extends PureComponent {
         from: data.from, //spot  point
         item: data.item,
         type: data.type, //add  edit
-        previewVisible_min: false
+        previewVisible_min: false,
+        fromList: data.fromList
       });
       if (data.projectId && data.projectName) {
         this.setState({
           relateProject: [{ label: data.projectName, value: data.projectId }]
         });
-        setFieldsValue({ projectId: data.projectId });
+        setFieldsValue({ projectIdSpot: data.projectId });
       }
       if (data.type !== "add" && data.id) {
         if (data.from === "spot") {
@@ -237,9 +239,17 @@ export default class siderbarDetail extends PureComponent {
   submit = isArchive => {
     const {
       dispatch,
-      spot: { spotInfo }
+      spot: { spotInfo },
+      form: { resetFields }
     } = this.props;
-    const { type, polygon, archiveTime, ParentId } = this.state;
+    const {
+      type,
+      polygon,
+      archiveTime,
+      ParentId,
+      fromList,
+      projectId
+    } = this.state;
     this.props.form.validateFields((err, v) => {
       if (!err) {
         console.log(v);
@@ -247,6 +257,7 @@ export default class siderbarDetail extends PureComponent {
           type: "spot/spotCreateUpdate",
           payload: {
             ...v,
+            projectId: v.projectIdSpot,
             archiveTime: isArchive ? archiveTime : null,
             attachmentId: ParentId,
             polygon: polygon,
@@ -258,13 +269,21 @@ export default class siderbarDetail extends PureComponent {
           callback: (success, response) => {
             emitter.emit("deleteDraw", {});
             if (success) {
-              emitter.emit("projectCreateUpdateBack", {});
               notification["success"]({
                 message: `${type === "edit" ? "编辑" : "新建"}图斑成功`
               });
-              emitter.emit("deleteSuccess", {
-                success: true
-              });
+              if (fromList) {
+                emitter.emit("projectCreateUpdateBack", {});
+                emitter.emit("deleteSuccess", {
+                  success: true
+                });
+              } else {
+                this.setState({ show: false });
+                resetFields();
+                emitter.emit("projectInfoRefresh", {
+                  projectId: projectId
+                });
+              }
             }
           }
         });
@@ -604,6 +623,7 @@ export default class siderbarDetail extends PureComponent {
                         },
                         callback: (success, response) => {
                           if (success) {
+                            this.setState({ show: false });
                             resetFields();
                             emitter.emit("projectInfoRefresh", {
                               projectId: projectId
@@ -613,6 +633,7 @@ export default class siderbarDetail extends PureComponent {
                                 type === "edit" ? "编辑" : "新建"
                               }项目红线成功`
                             });
+                            emitter.emit("deleteDraw", {});
                           }
                         }
                       });
@@ -704,7 +725,7 @@ export default class siderbarDetail extends PureComponent {
                 }
                 {...formItemLayout}
               >
-                {getFieldDecorator("projectId", {
+                {getFieldDecorator("projectIdSpot", {
                   initialValue: spotItem.projectId
                 })(
                   <Select
@@ -1347,6 +1368,7 @@ export default class siderbarDetail extends PureComponent {
                             emitter.emit("deleteSuccess", {
                               success: true
                             });
+                            emitter.emit("deleteDraw", {});
                           }
                         }
                       });

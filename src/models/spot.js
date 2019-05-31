@@ -138,10 +138,11 @@ export default {
     },
 
     // 项目id查图斑列表
-    *querySpotByProjectId({ payload }, { call, put }) {
+    *querySpotByProjectId({ payload,callback }, { call, put }) {
       const {
         data: { success, error, result: projectInfoSpotList }
       } = yield call(spotListApi, payload);
+      if (callback) callback(success);
       if (success) {
         yield put({ type: "save", payload: { projectInfoSpotList } });
       } else {

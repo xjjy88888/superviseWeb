@@ -41,6 +41,7 @@ import "antd-mobile/dist/antd-mobile.css";
 import config from "../../../config";
 import emitter from "../../../utils/event";
 import jQuery from "jquery";
+import { validateId } from "@turf/helpers";
 
 let userconfig = {};
 let map;
@@ -173,7 +174,7 @@ export default class integrat extends PureComponent {
       //     .css({
       //       cursor: "crosshair"
       //     });
-      //   userconfig.state = "begin";
+      //   userconfig.state = "position";
       // } else if (data.state === "end") {
       //   //地图定位点
       //   if (marker) marker.remove();
@@ -181,12 +182,13 @@ export default class integrat extends PureComponent {
       //   marker = L.marker(latLng).addTo(map);
       //   me.automaticToMap(latLng);
       // }
+      userconfig.state = "position";
       //地图获取定位点
       jQuery(userconfig.geoJsonLayer.getPane())
-      .find("path")
-      .css({
-        cursor: "crosshair"
-      });
+        .find("path")
+        .css({
+          cursor: "crosshair"
+        });
     });
     //地图定位
     this.eventEmitter = emitter.addListener("mapLocation", data => {
@@ -264,8 +266,7 @@ export default class integrat extends PureComponent {
         setTimeout(() => {
           me.automaticToMap(latLng);
         }, 500);
-      }
-      else if (data.key === "redLine") {
+      } else if (data.key === "redLine") {
         //防治责任范围定位
         me.queryWFSServiceByProperty(
           data.item.id,
@@ -390,7 +391,8 @@ export default class integrat extends PureComponent {
           drawState: data.state,
           drawType: data.type,
           projectId: data.projectId,
-          projectName: data.projectName
+          projectName: data.projectName,
+          fromList: data.fromList
         });
         const { addGraphLayer } = me.state;
         //移除地图监听事件
@@ -435,52 +437,6 @@ export default class integrat extends PureComponent {
         });
       }
     });
-    //绘制项目红线图形-新增
-    // this.eventEmitter = emitter.addListener("drawGraphics", data => {
-    //   if (data.draw) {
-    //     me.setState({ drawType: data.type, drawState: data.state });
-    //     const { addGraphLayer } = me.state;
-    //     //移除地图监听事件
-    //     map.off("click");
-    //     me.clearPlotGraphic();
-    //     if (addGraphLayer) {
-    //       map.removeLayer(addGraphLayer);
-    //       me.setState({ addGraphLayer: null });
-    //     }
-    //     //绘制图形之前
-    //     map.on("pm:drawstart", ({ workingLayer }) => {
-    //       workingLayer.on("pm:vertexadded", e => {
-    //         let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
-    //         //if (!turf.booleanContains(userconfig.polygon, turfpoint)) {
-    //         if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {
-    //           map.pm.disableDraw("Polygon");
-    //           emitter.emit("showSiderbarDetail", {
-    //             show: false,
-    //             from: "spot",
-    //             item: { id: "" }
-    //           });
-    //           me.setState({ showButton: false });
-    //           return;
-    //         }
-    //       });
-    //     });
-    //     map.pm.enableDraw("Polygon", {
-    //       finishOn: "dblclick",
-    //       allowSelfIntersection: false,
-    //       tooltips: false
-    //     });
-    //     //显示编辑菜单按钮
-    //     me.setState({ showButton: true });
-    //     //编辑图形
-    //     map.on("pm:create", e => {
-    //       //console.log(e);
-    //       me.setState({ addGraphLayer: e.layer });
-    //       e.layer.pm.enable({
-    //         allowSelfIntersection: false
-    //       });
-    //     });
-    //   }
-    // });
     //监听侧边栏显隐
     this.eventEmitter = emitter.addListener("showSiderbar", data => {
       this.setState({
@@ -739,14 +695,14 @@ export default class integrat extends PureComponent {
     }
     userconfig.mapPoint = e.latlng;
 
-    if (userconfig.state === "begin") {
+    if (userconfig.state === "position") {
       //地图获取经纬度
-      userconfig.state = "end";
       jQuery(userconfig.geoJsonLayer.getPane())
         .find("path")
         .css({
           cursor: "pointer"
         });
+      userconfig.state = "";
       emitter.emit("siteLocationBack", {
         latitude: userconfig.mapPoint.lat,
         longitude: userconfig.mapPoint.lng
@@ -1015,8 +971,12 @@ export default class integrat extends PureComponent {
           id: id,
           refresh: false
         },
-        callback: data => {
-          resolve(data.projectBase.name);
+        callback: (result, success) => {
+          if (success && result) {
+            resolve(result.projectBase.name);
+          } else {
+            resolve("");
+          }
         }
       });
     });
@@ -1475,7 +1435,7 @@ export default class integrat extends PureComponent {
       drawType,
       drawState,
       projectId,
-      projectName
+      projectName,fromList
     } = me.state;
     //禁止编辑图形
     if (addGraphLayer) {
@@ -1491,6 +1451,7 @@ export default class integrat extends PureComponent {
         edit: true,
         projectId: projectId,
         projectName: projectName,
+        fromList: fromList,
         id: ""
       });
     } else {
@@ -1503,7 +1464,7 @@ export default class integrat extends PureComponent {
    * 保存编辑图形
    */
   saveEditGraphic = e => {
-    const { drawType, drawState, projectId, projectName } = this.state;
+    const { drawType, drawState, projectId, projectName ,fromList} = this.state;
     //console.log(e);
     e.stopPropagation();
     const me = this;
@@ -1524,6 +1485,7 @@ export default class integrat extends PureComponent {
       edit: true,
       projectId: projectId,
       projectName: projectName,
+      fromList: fromList,
       id: geojson.features[0].properties.id
     });
   };
@@ -1661,10 +1623,6 @@ export default class integrat extends PureComponent {
    * 添加卷帘效果
    */
   addSideBySide = () => {
-    // const {
-    //   mapdata: { historiesSpot }
-    // } = this.props;
-    // console.log(historiesSpot);
     const {
       selectLeftV,
       selectRightV,
@@ -1723,34 +1681,58 @@ export default class integrat extends PureComponent {
   //左侧历史影像切换事件
   onChangeSelectLeft = v => {
     this.setState({ selectLeftV: v });
-    const { selectRightV } = this.state;
-    this.addLRLayers(v, selectRightV);
+    const {
+      // selectLeftV,
+      selectRightV,
+      selectSpotLeftV,
+      selectSpotRightV
+    } = this.state;
+    // const { selectRightV } = this.state;
+    this.addLRLayers(v, selectRightV, selectSpotLeftV, selectSpotRightV);
     userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
     userconfig.sideBySide.setRightLayers(userconfig.rightLayers);
   };
   //左侧历史扰动图斑切换事件
   onChangeSelectSpotLeft = v => {
     this.setState({ selectSpotLeftV: v });
-    // const { selectRightV } = this.state;
-    // this.addLRLayers(v, selectRightV);
-    // userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
-    // userconfig.sideBySide.setRightLayers(userconfig.rightLayers);
+    const {
+      selectLeftV,
+      selectRightV,
+      // selectSpotLeftV,
+      selectSpotRightV
+    } = this.state;
+    // const { selectLeftV } = this.state;
+    this.addLRLayers(selectLeftV, selectRightV, v, selectSpotRightV);
+    userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
+    userconfig.sideBySide.setRightLayers(userconfig.rightLayers);
   };
-  //右侧历史扰动图斑切换事件
+  //右侧历史影像切换事件
   onChangeSelectRight = v => {
     this.setState({ selectRightV: v });
-    const { selectLeftV } = this.state;
-    this.addLRLayers(selectLeftV, v);
+    const {
+      selectLeftV,
+      // selectRightV,
+      selectSpotLeftV,
+      selectSpotRightV
+    } = this.state;
+    // const { selectLeftV } = this.state;
+    this.addLRLayers(selectLeftV, v, selectSpotLeftV, selectSpotRightV);
     userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
     userconfig.sideBySide.setRightLayers(userconfig.rightLayers);
   };
   //右侧历史扰动图斑切换事件
   onChangeSelectSpotRight = v => {
     this.setState({ selectSpotRightV: v });
-    // const { selectRightV } = this.state;
-    // this.addLRLayers(v, selectRightV);
-    // userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
-    // userconfig.sideBySide.setRightLayers(userconfig.rightLayers);
+    const {
+      selectLeftV,
+      selectRightV,
+      selectSpotLeftV
+      // selectSpotRightV
+    } = this.state;
+    // const { selectLeftV } = this.state;
+    this.addLRLayers(selectLeftV, selectRightV, selectSpotLeftV, v);
+    userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
+    userconfig.sideBySide.setRightLayers(userconfig.rightLayers);
   };
   addLRLayers = (
     selectLeftV,
