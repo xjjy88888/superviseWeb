@@ -1121,7 +1121,7 @@ export default class integrat extends PureComponent {
                     draw: true,
                     state: "add",
                     type: "spot",
-                    project_id: ""
+                    projectId: ""
                   });
                   // emitter.emit("showSiderbarDetail", {
                   //   show: false,

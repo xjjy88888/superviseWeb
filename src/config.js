@@ -46,6 +46,9 @@ const config = {
     // 图斑列表
     spotListUrl: `${domain}api/services/app/Spot/GetAllByPost`,
 
+    // 图斑列表统计
+    spotChartUrl: `${domain}api/services/app/Spot/Statistics`,
+
     // 图斑信息
     spotByIdUrl: `${domain}api/services/app/Spot/Get`,
 
@@ -266,27 +269,32 @@ const config = {
     {
       label: "现场复核",
       value: "level",
-      icon: "edit"
+      icon: "edit",
+      type: 0
     },
     {
       label: "合规性",
       value: "compliance",
-      icon: "info-circle"
+      icon: "info-circle",
+      type: 1
     },
     {
       label: "扰动类型",
       value: "type",
-      icon: "appstore"
+      icon: "appstore",
+      type: 2
     },
     {
       label: "建设状态",
       value: "nature",
-      icon: "thunderbolt"
+      icon: "thunderbolt",
+      type: 3
     },
     {
       label: "扰动变化类型",
       value: "sort",
-      icon: "border-inner"
+      icon: "border-inner",
+      type: 4
     }
   ],
 

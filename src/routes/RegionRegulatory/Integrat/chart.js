@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { Icon, Button, Radio, notification } from "antd";
+import { Icon, Button, Radio, notification, Spin } from "antd";
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
 import echarts from "echarts/lib/echarts";
@@ -48,7 +48,7 @@ export default class siderbarDetail extends PureComponent {
         show: v.show,
         title: v.title
       });
-      this.query(v.type);
+      this.query(v.key, v.type);
     });
     myChart = echarts.init(this.chartDom);
     const { clientWidth, clientHeight } = this.refDom;
@@ -58,17 +58,19 @@ export default class siderbarDetail extends PureComponent {
     });
   }
 
-  query = type => {
+  query = (v, t) => {
     const { dispatch } = this.props;
     const { state, queryInfo } = this.state;
+    this.setState({ showSpin: true });
     dispatch({
-      type: "project/projectChart",
+      type: `${t}/${t}Chart`,
       payload: {
         ...queryInfo,
-        type: type,
+        type: v,
         isChart: true
       },
       callback: (success, error, v) => {
+        this.setState({ showSpin: false });
         if (success) {
           this.setState({ chartData: v });
           if (state === "pie") {
@@ -168,7 +170,7 @@ export default class siderbarDetail extends PureComponent {
   };
 
   render() {
-    const { show, showTool, type, chartData } = this.state;
+    const { show, showTool, type, chartData, showSpin } = this.state;
     return (
       <div
         ref={this.saveRef}
@@ -230,6 +232,19 @@ export default class siderbarDetail extends PureComponent {
           style={{
             width: `50vw`,
             height: `72vh`
+          }}
+        />
+        <Spin
+          size="large"
+          style={{
+            display: showSpin ? "block" : "none",
+            padding: 100,
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            zIndex: 1001,
+            background: "transparent",
+            transform: "translate(-50%,-50%)"
           }}
         />
       </div>

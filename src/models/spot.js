@@ -176,6 +176,14 @@ export default {
           message: `查询关联项目列表失败：${error.message}`
         });
       }
+    },
+
+    // 图斑统计
+    *spotChart({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(spotListApi, payload);
+      if (callback) callback(success, error, result);
     }
   },
 

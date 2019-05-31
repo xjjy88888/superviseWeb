@@ -296,7 +296,8 @@ export default class siderbarDetail extends PureComponent {
                     onClick={() => {
                       emitter.emit("showChart", {
                         show: true,
-                        type: item.type,
+                        type: 'project',
+                        key: item.type,
                         title: item.label
                       });
                     }}
@@ -322,7 +323,10 @@ export default class siderbarDetail extends PureComponent {
                     icon={item.icon}
                     onClick={() => {
                       emitter.emit("showChart", {
-                        show: true
+                        show: true,
+                        type: 'spot',
+                        key: item.type,
+                        title: item.label
                       });
                     }}
                   >

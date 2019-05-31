@@ -9,7 +9,7 @@ import { routerRedux } from "dva/router";
 export default {
   namespace: "mapdata",
 
-  state: { histories: [] },
+  state: { histories: [] ,historiesSpot:[]},
 
   subscriptions: {
     setup({ dispatch, history }) {
@@ -72,28 +72,32 @@ export default {
         // return [year, month, day].map(formatNumber).join('-');
       }
       //let timeList = [];
-      let SpotTimeObj = {};
+      let historiesSpot = {};
       if(result.features.length>0){
           for(let i =0; i< result.features.length;i++){
               let item = result.features[i];
               let time = item.properties.archive_time;
               let strtime = time.split("T")[0];
               // strtime = strtime.replace(/-/g, "/");
-              SpotTimeObj[strtime] = time;
+              historiesSpot[strtime] = time;
               //timeList.push(strtime);
           }
       }
       //timeList.push(formatTime(new Date()));
-      SpotTimeObj[formatTime(new Date())] = formatTime(new Date());
+      historiesSpot[formatTime(new Date())] = formatTime(new Date());
       //console.log(timeList);
       //let historiesSpot = new Set(timeList);
       //console.log([...historiesSpot].reverse());
       //console.log(obj);
+      var arr = []
+      for (let i in historiesSpot) {
+          arr.push({id:i,value:historiesSpot[i]})
+      }
       yield put({
         type: "save",
-        payload: { historiesSpot:SpotTimeObj}
+        payload: { historiesSpot:arr}
       });
-      if (callback) callback(SpotTimeObj);
+      if (callback) callback(arr);
     }
   },
 

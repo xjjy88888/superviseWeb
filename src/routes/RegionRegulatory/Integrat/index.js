@@ -66,8 +66,9 @@ export default class integrat extends PureComponent {
       drawState: "add",
       chartStatus: false,
       selectLeftV: "",
+      selectSpotLeftV: "",
       selectRightV: "",
-      project_id: null, //针对新增图形的项目红线id
+      projectId: null, //针对新增图形的项目红线id
       addGraphLayer: null //针对新增图形的图层
     };
     this.map = null;
@@ -154,7 +155,7 @@ export default class integrat extends PureComponent {
 
     this.eventEmitter = emitter.addListener("deleteDraw", () => {
       const { addGraphLayer } = this.state;
-      if(addGraphLayer){
+      if (addGraphLayer) {
         map.removeLayer(addGraphLayer);
         this.setState({ addGraphLayer: null });
       }
@@ -374,7 +375,7 @@ export default class integrat extends PureComponent {
         me.setState({
           drawState: data.state,
           drawType: data.type,
-          project_id: data.project_id
+          projectId: data.projectId
         });
         const { addGraphLayer } = me.state;
         //移除地图监听事件
@@ -771,9 +772,12 @@ export default class integrat extends PureComponent {
     const { showHistoryContrast } = me.state;
     if (showHistoryContrast) {
       //历史影像查询
-      me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
+      //me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
       //历史扰动图斑查询
-      me.queryWFSServiceByExtent(config.mapHistorySpotLayerName,me.callbackgetHistorySpotTimeByExtent);
+      me.queryWFSServiceByExtent(
+        config.mapHistorySpotLayerName,
+        me.callbackgetHistorySpotTimeByExtent
+      );
     }
   };
   /*根据地图当前范围获取对应历史影像数据
@@ -852,7 +856,7 @@ export default class integrat extends PureComponent {
    *@method queryWFSServiceByExtent
    *@return null
    */
-  queryWFSServiceByExtent = (typeName,callback) => {
+  queryWFSServiceByExtent = (typeName, callback) => {
     const me = this;
     let bounds = map.getBounds();
     let polygon = bounds.getSouthWest().lng + "," + bounds.getSouthWest().lat;
@@ -896,7 +900,7 @@ export default class integrat extends PureComponent {
       //     console.log(data);
       //   }
       // }
-      callback:callback
+      callback: callback
     });
   };
   /*点选查询图层
@@ -1338,7 +1342,6 @@ export default class integrat extends PureComponent {
         layers: config.mapSpotLayerName, //需要加载的图层
         format: "image/png", //返回的数据格式
         transparent: true
-        //cql_filter:"map_num like '%_52_%'"
       })
       .addTo(spotlayerGroup);
     map.addLayer(projectlayerGroup);
@@ -1452,7 +1455,7 @@ export default class integrat extends PureComponent {
   saveAddGraphic = () => {
     const me = this;
     map.on("click", this.onClickMap);
-    const { addGraphLayer, drawType, drawState } = me.state;
+    const { addGraphLayer, drawType, drawState, projectId } = me.state;
     //禁止编辑图形
     if (addGraphLayer) {
       me.setState({ showButton: false });
@@ -1465,6 +1468,7 @@ export default class integrat extends PureComponent {
         type: drawState,
         from: drawType,
         edit: true,
+        projectId: projectId,
         id: ""
       });
     } else {
@@ -1477,7 +1481,7 @@ export default class integrat extends PureComponent {
    * 保存编辑图形
    */
   saveEditGraphic = e => {
-    const { drawType, drawState } = this.state;
+    const { drawType, drawState, projectId } = this.state;
     //console.log(e);
     e.stopPropagation();
     const me = this;
@@ -1485,8 +1489,8 @@ export default class integrat extends PureComponent {
     map.on("click", this.onClickMap);
     //禁止编辑图形
     userconfig.projectgeojsonLayer.pm.disable();
-    //禁止移动图形
-    //map.pm.disableGlobalRemovalMode();
+    // 禁止移动图形
+    //map.pm.disableGlobalRemovalMode() ;
 
     let geojson = userconfig.projectgeojsonLayer.toGeoJSON();
     let polygon = me.geojson2Multipolygon(geojson, 0);
@@ -1496,6 +1500,7 @@ export default class integrat extends PureComponent {
       from: drawType,
       type: drawState,
       edit: true,
+      projectId: projectId,
       id: geojson.features[0].properties.id
     });
   };
@@ -1579,15 +1584,18 @@ export default class integrat extends PureComponent {
   showHistoryMap = () => {
     const { showHistoryContrast } = this.state;
     if (showHistoryContrast) {
-      let zoom = map.getZoom();
-      let bounds = map.getBounds();
-      this.getInfoByExtent(zoom, bounds, this.callbackGetInfoByExtent, true);
+      // let zoom = map.getZoom();
+      // let bounds = map.getBounds();
+      // //历史影像查询
+      // this.getInfoByExtent(zoom, bounds, this.callbackGetInfoByExtent, true);
+      //历史扰动图斑查询
+      this.queryWFSServiceByExtent(config.mapHistorySpotLayerName,this.callbackgetHistorySpotTimeByExtent);
     } else {
       //移除卷帘效果
       this.removeSideBySide();
       //还原默认底图加载
       map.addLayer(userconfig.baseLayer2);
-      map.addLayer(userconfig.projectlayerGroup);
+      // map.addLayer(userconfig.projectlayerGroup);
       map.addLayer(userconfig.spotlayerGroup);
     }
   };
@@ -1611,14 +1619,24 @@ export default class integrat extends PureComponent {
    * 根据地图当前范围获取对应历史扰动图斑数据回调函数
    */
   callbackgetHistorySpotTimeByExtent = data => {
-    console.log(data);
-  };  
+    //console.log(data);
+    this.setState({ selectSpotLeftV: data[0].value });
+    this.setState({ selectSpotRightV: data[0].value });
+    let zoom = map.getZoom();
+    let bounds = map.getBounds();
+    //历史影像查询
+    this.getInfoByExtent(zoom, bounds, this.callbackGetInfoByExtent, true);
+  };
   /*
    * 添加卷帘效果
    */
   addSideBySide = () => {
-    const { selectLeftV, selectRightV } = this.state;
-    this.addLRLayers(selectLeftV, selectRightV);
+    // const {
+    //   mapdata: { historiesSpot }
+    // } = this.props;
+    // console.log(historiesSpot);
+    const { selectLeftV, selectRightV, selectSpotLeftV, selectSpotRightV } = this.state;
+    this.addLRLayers(selectLeftV, selectRightV,selectSpotLeftV,selectSpotRightV);
     //卷帘地图效果
     userconfig.sideBySide = L.control
       .sideBySide(userconfig.leftLayers, userconfig.rightLayers)
@@ -1639,8 +1657,8 @@ export default class integrat extends PureComponent {
     if (map.hasLayer(userconfig.baseLayer3))
       map.removeLayer(userconfig.baseLayer3);
     //移除地图默认加载叠加图层组
-    if (userconfig.projectlayerGroup)
-      map.removeLayer(userconfig.projectlayerGroup);
+    // if (userconfig.projectlayerGroup)
+    //   map.removeLayer(userconfig.projectlayerGroup);
     if (userconfig.spotlayerGroup) map.removeLayer(userconfig.spotlayerGroup);
     //移除卷帘对比左右边图层列表
     this.removeleftrightLayers();
@@ -1662,6 +1680,7 @@ export default class integrat extends PureComponent {
       }
     }
   };
+  //左侧历史影像切换事件
   onChangeSelectLeft = v => {
     this.setState({ selectLeftV: v });
     const { selectRightV } = this.state;
@@ -1669,68 +1688,78 @@ export default class integrat extends PureComponent {
     userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
     userconfig.sideBySide.setRightLayers(userconfig.rightLayers);
   };
-  addLRLayers = (selectLeftV, selectRightV) => {
-    //清空图层
-    this.removeleftrightLayers();
-    userconfig.leftLayers = [];
-    userconfig.rightLayers = [];
-
-    let leftLayerUrl =
-      config.imageBaseUrl +
-      "/" +
-      selectLeftV.replace(/\//g, "-") +
-      "/tile/{z}/{y}/{x}";
-    let leftImgLayer = L.tileLayer(leftLayerUrl); //左侧影像
-    map.addLayer(leftImgLayer);
-    let rightLayerUrl =
-      config.imageBaseUrl +
-      "/" +
-      selectRightV.replace(/\//g, "-") +
-      "/tile/{z}/{y}/{x}";
-    let rightImgLayer = L.tileLayer(rightLayerUrl); //右侧影像
-    map.addLayer(rightImgLayer);
-    //测试部分
-    userconfig.spotwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
-      layers: config.mapSpotLayerName, //需要加载的图层
-      format: "image/png", //返回的数据格式
-      transparent: true
-    });
-    userconfig.spotwms1 = L.tileLayer.wms(
-      config.mapUrl.geoserverUrl + "/wms?",
-      {
-        layers: config.mapSpotLayerName, //需要加载的图层
-        format: "image/png", //返回的数据格式
-        transparent: true
-      }
-    );
-    userconfig.projectwms = L.tileLayer.wms(
-      config.mapUrl.geoserverUrl + "/wms?",
-      {
-        layers: config.mapProjectLayerName, //需要加载的图层
-        format: "image/png", //返回的数据格式
-        transparent: true
-      }
-    );
-    userconfig.projectwms1 = L.tileLayer.wms(
-      config.mapUrl.geoserverUrl + "/wms?",
-      {
-        layers: config.mapProjectLayerName, //需要加载的图层
-        format: "image/png", //返回的数据格式
-        transparent: true
-      }
-    );
-    map.addLayer(userconfig.spotwms);
-    map.addLayer(userconfig.spotwms1);
-    //map.addLayer(userconfig.projectwms);
-    userconfig.leftLayers = [userconfig.spotwms, leftImgLayer];
-    userconfig.rightLayers = [userconfig.spotwms1, rightImgLayer];
+  //左侧历史扰动图斑切换事件
+  onChangeSelectSpotLeft = v => {
+    this.setState({ selectSpotLeftV: v });
+    // const { selectRightV } = this.state;
+    // this.addLRLayers(v, selectRightV);
+    // userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
+    // userconfig.sideBySide.setRightLayers(userconfig.rightLayers);
   };
+  //右侧历史扰动图斑切换事件
   onChangeSelectRight = v => {
     this.setState({ selectRightV: v });
     const { selectLeftV } = this.state;
     this.addLRLayers(selectLeftV, v);
     userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
     userconfig.sideBySide.setRightLayers(userconfig.rightLayers);
+  };
+  //右侧历史扰动图斑切换事件
+  onChangeSelectSpotRight = v => {
+    this.setState({ selectSpotRightV: v });
+    // const { selectRightV } = this.state;
+    // this.addLRLayers(v, selectRightV);
+    // userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
+    // userconfig.sideBySide.setRightLayers(userconfig.rightLayers);
+  };
+  addLRLayers = (selectLeftV, selectRightV, selectSpotLeftV, selectSpotRightV) => {
+    //清空图层
+    this.removeleftrightLayers();
+    userconfig.leftLayers = [];
+    userconfig.rightLayers = [];
+    let leftImgLayer = null;
+    let rightImgLayer = null;
+    let spotleftwms = null;
+    let spotrightwms = null;
+    //加载历史影像
+    if(selectLeftV && selectRightV){//历史影像存在
+      let leftLayerUrl =
+      config.imageBaseUrl +
+      "/" +
+      selectLeftV.replace(/\//g, "-") +
+      "/tile/{z}/{y}/{x}";
+      leftImgLayer = L.tileLayer(leftLayerUrl); //左侧影像
+      map.addLayer(leftImgLayer);
+      let rightLayerUrl =
+        config.imageBaseUrl +
+        "/" +
+        selectRightV.replace(/\//g, "-") +
+        "/tile/{z}/{y}/{x}";
+      rightImgLayer = L.tileLayer(rightLayerUrl); //右侧影像
+      map.addLayer(rightImgLayer);
+    }
+    //加载历史扰动图斑
+    if(selectSpotLeftV && selectSpotRightV){//历史扰动图斑存在
+      spotleftwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
+        layers: config.mapHistorySpotLayerName, //需要加载的图层
+        format: "image/png", //返回的数据格式
+        transparent: true,
+        cql_filter:"archive_time = " + selectSpotLeftV
+      });
+      spotrightwms = L.tileLayer.wms(
+        config.mapUrl.geoserverUrl + "/wms?",
+        {
+          layers: config.mapHistorySpotLayerName, //需要加载的图层
+          format: "image/png", //返回的数据格式
+          transparent: true,
+          cql_filter:"archive_time = " + selectSpotRightV
+        }
+      );
+      map.addLayer(spotleftwms);
+      map.addLayer(spotrightwms);
+    }
+    userconfig.leftLayers = [spotleftwms, leftImgLayer];
+    userconfig.rightLayers = [spotrightwms, rightImgLayer];
   };
 
   render() {
@@ -1740,11 +1769,13 @@ export default class integrat extends PureComponent {
       drawState,
       showHistoryContrast,
       selectLeftV,
+      selectSpotLeftV,
+      selectSpotRightV,
       selectRightV
     } = this.state;
     const {
       dispatch,
-      mapdata: { histories }
+      mapdata: { histories,historiesSpot }
     } = this.props;
     return (
       <LocaleProvider locale={zhCN}>
@@ -1931,6 +1962,10 @@ export default class integrat extends PureComponent {
                 zIndex: 1000
               }}
             >
+              {/* 左侧历史影像切换 */}
+              <span style={{
+                  padding:"0 10px"
+                }}>影像:</span>
               <Select
                 value={[selectLeftV]}
                 placeholder="请选择"
@@ -1945,6 +1980,25 @@ export default class integrat extends PureComponent {
                   </Select.Option>
                 ))}
               </Select>
+              {/* 左侧扰动图斑切换 */}
+              <span style={{
+                  marginLeft:10,
+                  padding:"0 10px"
+                }}>图斑:</span>
+              <Select
+                value={[selectSpotLeftV]}
+                placeholder="请选择"
+                onChange={this.onChangeSelectSpotLeft}
+                style={{
+                  width: 150
+                }}
+              >
+                {historiesSpot.map((item, id) => (
+                  <Select.Option key={id} value={item.value}>
+                    {item.id}
+                  </Select.Option>
+                ))}
+              </Select>
             </div>
             <div
               style={{
@@ -1955,6 +2009,10 @@ export default class integrat extends PureComponent {
                 zIndex: 1001
               }}
             >
+              {/* 右侧历史影像切换 */}
+              <span style={{
+                  padding:"0 10px"
+              }}>影像:</span>
               <Select
                 value={[selectRightV]}
                 placeholder="请选择"
@@ -1966,6 +2024,25 @@ export default class integrat extends PureComponent {
                 {histories.map((item, id) => (
                   <Select.Option key={id} value={item}>
                     {item}
+                  </Select.Option>
+                ))}
+              </Select>
+              {/*右侧扰动图斑切换 */}
+               <span style={{
+                  marginLeft:10,
+                  padding:"0 10px"
+                }}>图斑:</span>
+              <Select
+                value={[selectSpotRightV]}
+                placeholder="请选择"
+                onChange={this.onChangeSelectSpotRight}
+                style={{
+                  width: 150
+                }}
+              >
+                {historiesSpot.map((item, id) => (
+                  <Select.Option key={id} value={item.value}>
+                    {item.id}
                   </Select.Option>
                 ))}
               </Select>

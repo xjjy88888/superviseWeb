@@ -398,7 +398,7 @@ export default class siderbarDetail extends PureComponent {
                 <Checkbox.Group options={this.getDictList("建设状态")} />
               )}
             </Form.Item>
-            <Form.Item label="归档数据" {...formItemLayoutlong}>
+            <Form.Item label="显示数据" {...formItemLayoutlong}>
               {getFieldDecorator("ShowArchive", {
                 valuePropName: "checked",
                 initialValue: false

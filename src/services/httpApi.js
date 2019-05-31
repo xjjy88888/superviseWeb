@@ -147,29 +147,32 @@ export async function projectVerifyApi(params) {
 // 图斑列表
 export async function spotListApi(params) {
   delete params.items;
-  return request(`${config.url.spotListUrl}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${accessToken()}`,
-      "Content-Type": "application/json-patch+json"
-    },
-    body: JSON.stringify({
-      ...params,
-      MaxResultCount: params.MaxResultCount || "10",
-      InterferenceType: params.InterferenceType
-        ? params.InterferenceType.map(v => v).join(",")
-        : "",
-      InterferenceCompliance: params.InterferenceCompliance
-        ? params.InterferenceCompliance.map(v => v).join(",")
-        : "",
-      BuildStatus: params.BuildStatus
-        ? params.BuildStatus.map(v => v).join(",")
-        : "",
-      InterferenceVaryType: params.InterferenceVaryType
-        ? params.InterferenceVaryType.map(v => v).join(",")
-        : ""
-    })
-  });
+  return request(
+    params.isChart ? config.url.spotChartUrl : config.url.spotListUrl,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify({
+        ...params,
+        MaxResultCount: params.MaxResultCount || "10",
+        InterferenceType: params.InterferenceType
+          ? params.InterferenceType.map(v => v).join(",")
+          : "",
+        InterferenceCompliance: params.InterferenceCompliance
+          ? params.InterferenceCompliance.map(v => v).join(",")
+          : "",
+        BuildStatus: params.BuildStatus
+          ? params.BuildStatus.map(v => v).join(",")
+          : "",
+        InterferenceVaryType: params.InterferenceVaryType
+          ? params.InterferenceVaryType.map(v => v).join(",")
+          : ""
+      })
+    }
+  );
 }
 
 // 图斑信息
