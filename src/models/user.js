@@ -18,7 +18,7 @@ export default {
         us_name: "请登录"
       }
     ],
-    districtList: [],
+    districtList: [{ children: null ,id:''}],
     dicList: [],
     departSelectList: [],
     departUpdateId: ""

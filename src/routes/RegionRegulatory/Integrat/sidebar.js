@@ -28,7 +28,6 @@ import {
   Collapse
 } from "antd";
 import locale from "antd/lib/date-picker/locale/zh_CN";
-import moment from "moment";
 import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
 import config from "../../../config";
@@ -941,8 +940,8 @@ export default class integrat extends PureComponent {
                   if (key === "project") {
                     this.setState({
                       showProjectDetail: true,
-                      isProjectUpdate: true,
                       projectEdit: false,
+                      isProjectUpdate: true,
                       previewVisible_min_left: false,
                       projectFileList: []
                     });
@@ -1120,8 +1119,8 @@ export default class integrat extends PureComponent {
                   this.setState({
                     showProjectDetail: true,
                     projectEdit: true,
-                    previewVisible_min_left: false,
                     isProjectUpdate: false,
+                    previewVisible_min_left: false,
                     projectFileList: []
                   });
                   resetFields();
@@ -1155,19 +1154,24 @@ export default class integrat extends PureComponent {
               }}
             />
           </Popover>
-          <Radio.Group
+          <Button.Group
             buttonStyle="solid"
             style={{ padding: "0px 15px" }}
             onClick={e => {
               const v = e.target.value;
               const key = v.slice(0, v.length - 1);
               const type = v.charAt(v.length - 1);
-              console.log(v, key, type);
             }}
           >
             {sort.map((item, index) => (
-              <Radio.Button
-                style={{ userSelect: "none" }}
+              <Button
+                style={{
+                  userSelect: "none",
+                  border: "rgb(217, 217, 217) 1px solid",
+                  color:  sort_key === item.key && sort_by ? "#fff" : "#000",
+                  backgroundColor:
+                    sort_key === item.key && sort_by ? "#1890ff" : "#fff"
+                }}
                 key={item.key}
                 value={item.key}
                 onClick={() => {
@@ -1224,9 +1228,9 @@ export default class integrat extends PureComponent {
                     fontSize: 5
                   }}
                 />
-              </Radio.Button>
+              </Button>
             ))}
-          </Radio.Group>
+          </Button.Group>
           <Button
             type={queryHighlight ? "primary" : ""}
             style={{
@@ -1598,6 +1602,12 @@ export default class integrat extends PureComponent {
                     this.props.form.validateFields((err, values) => {
                       if (!err) {
                         console.log(values);
+                        if (values.districtCodes.length === 0) {
+                          notification["warning"]({
+                            message: "请选择涉及县"
+                          });
+                          return;
+                        }
                         const data = {
                           ...values,
                           attachmentId: ParentId,
@@ -1827,7 +1837,7 @@ export default class integrat extends PureComponent {
                           Modal.confirm({
                             title: "是否确定要删除这条项目数据？",
                             content:
-                              "删除之后，项目关联的监督执法记录、防治责任范围、责任点都将被删除，扰动图斑保留。 ",
+                              " 删除项目信息、项目关联的红线、项目关联的责任追究；删除项目关联的扰动图斑里的关联项目ID。 ",
                             okText: "是",
                             okType: "danger",
                             cancelText: "否",
@@ -2269,7 +2279,7 @@ export default class integrat extends PureComponent {
                     key="5"
                   >
                     <p>
-                      截排水沟
+                      截排水沟1
                       <Icon
                         type="environment"
                         style={{
@@ -2844,7 +2854,17 @@ export default class integrat extends PureComponent {
                   {getFieldDecorator("complianceId", {
                     initialValue: projectItem.expand.complianceId
                   })(
-                    <Select showSearch allowClear optionFilterProp="children">
+                    <Select
+                      showSearch
+                      allowClear
+                      optionFilterProp="children"
+                      disabled={
+                        projectInfoSpotList.items.length !== 0 &&
+                        isProjectUpdate
+                          ? true
+                          : false
+                      }
+                    >
                       {this.dictList("扰动合规性").map(item => (
                         <Select.Option value={item.id} key={item.id}>
                           {item.value}
@@ -2916,9 +2936,11 @@ export default class integrat extends PureComponent {
                 >
                   {getFieldDecorator("districtCodes", {
                     valuePropName: "value",
-                    initialValue: (
-                      projectItem.projectBase.districtCodes || []
-                    ).map(item => item.id)
+                    initialValue: districtList[0].children
+                      ? (projectItem.projectBase.districtCodes || []).map(
+                          item => item.id
+                        )
+                      : [districtList[0].value]
                   })(
                     <TreeSelect
                       showSearch
@@ -2934,14 +2956,14 @@ export default class integrat extends PureComponent {
                           value={item.value}
                           title={item.label}
                           key={item.value}
-                          disabled
+                          disabled={item.children ? true : false}
                         >
                           {(item.children || []).map(ite => (
                             <TreeSelect.TreeNode
                               value={ite.value}
                               title={ite.label}
                               key={ite.value}
-                              disabled
+                              disabled={ite.children ? true : false}
                             >
                               {(ite.children || []).map(i => (
                                 <TreeSelect.TreeNode
@@ -2995,7 +3017,8 @@ export default class integrat extends PureComponent {
                       title: "是否确定要删除这条项目数据？",
                       content: (
                         <span>
-                          删除之后，项目关联的监督执法记录、防治责任范围、责任点都将被删除，扰动图斑保留。
+                          删除项目信息、项目关联的红线、项目关联的责任追究；
+                          删除项目关联的扰动图斑里的关联项目ID。
                         </span>
                       ),
                       okText: "是",

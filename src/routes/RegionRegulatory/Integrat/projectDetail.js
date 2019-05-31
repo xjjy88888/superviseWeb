@@ -83,6 +83,7 @@ export default class integrat extends PureComponent {
       this.props.form.validateFields((err, v) => {
         console.log(v);
         const values = {
+          ...data,
           ...v,
           expandAttachmentId: expandParentId,
           changeAttachmentId: changeParentId,
@@ -93,7 +94,7 @@ export default class integrat extends PureComponent {
         };
         dispatch({
           type: "project/projectCreateUpdate",
-          payload: { ...data, ...values },
+          payload: values,
           callback: (success, response) => {
             if (success) {
               emitter.emit("projectCreateUpdateBack", {});
