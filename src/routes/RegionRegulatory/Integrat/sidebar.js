@@ -423,6 +423,7 @@ export default class integrat extends PureComponent {
     const { dispatch } = this.props;
     const { departList } = this.state;
     this.showSpin(true);
+    this.setState({ isProjectUpdate: false });
     dispatch({
       type: "project/queryProjectById",
       payload: {
@@ -431,6 +432,7 @@ export default class integrat extends PureComponent {
       },
       callback: (result, success) => {
         this.showSpin(false);
+        this.setState({ isProjectUpdate: true });
         this.setState({ showProjectDetail: success });
         let arr = [];
         if (result.productDepartment) {
@@ -933,7 +935,8 @@ export default class integrat extends PureComponent {
                       showProjectDetail: true,
                       isProjectUpdate: true,
                       projectEdit: false,
-                      previewVisible_min_left: false
+                      previewVisible_min_left: false,
+                      projectFileList: []
                     });
                     this.queryProjectById(item.id);
                     this.querySpotByProjectId(item.id);
@@ -1108,7 +1111,8 @@ export default class integrat extends PureComponent {
                     showProjectDetail: true,
                     projectEdit: true,
                     previewVisible_min_left: false,
-                    isProjectUpdate: false
+                    isProjectUpdate: false,
+                    projectFileList: []
                   });
                   resetFields();
                   emitter.emit("showProjectDetail", {
@@ -1123,12 +1127,12 @@ export default class integrat extends PureComponent {
                     type: "spot",
                     projectId: ""
                   });
-                  // emitter.emit("showSiderbarDetail", {
-                  //   show: false,
-                  //   edit: true,
-                  //   from: key,
-                  //   type: "add"
-                  // });
+                  emitter.emit("showSiderbarDetail", {
+                    show: false,
+                    edit: true,
+                    from: key,
+                    type: "add"
+                  });
                 } else {
                   emitter.emit("showSiderbarDetail", {
                     show: key !== "project",
@@ -1947,7 +1951,14 @@ export default class integrat extends PureComponent {
                               draw: true,
                               state: "add",
                               type: "spot",
-                              projectId: projectItem.id
+                              projectId: projectItem.id,
+                              projectName: projectItem.projectBase.name
+                            });
+                            emitter.emit("showSiderbarDetail", {
+                              show: false,
+                              edit: true,
+                              from: key,
+                              type: "add"
                             });
                           }}
                         />
@@ -2050,7 +2061,14 @@ export default class integrat extends PureComponent {
                               draw: true,
                               state: "add",
                               type: "redLine",
-                              projectId: projectItem.id
+                              projectId: projectItem.id,
+                              projectName: projectItem.projectBase.name
+                            });
+                            emitter.emit("showSiderbarDetail", {
+                              show: false,
+                              edit: true,
+                              from: key,
+                              type: "add"
                             });
                           }}
                         />
@@ -2655,17 +2673,12 @@ export default class integrat extends PureComponent {
                             //   show: false,
                             //   edit: false
                             // });
-                            this.props.form.validateFields((err, values) => {
-                              if (!err) {
-                                emitter.emit("siteLocation", {
-                                  state:
-                                    values.pointX && values.pointY
-                                      ? "end"
-                                      : "begin",
-                                  Longitude: values.pointX,
-                                  Latitude: values.pointY
-                                });
-                              }
+                            const x = getFieldValue("pointX");
+                            const y = getFieldValue("pointY");
+                            emitter.emit("siteLocation", {
+                              state: "position",
+                              Longitude: x,
+                              Latitude: y
                             });
                           }}
                         />
@@ -3071,7 +3084,8 @@ export default class integrat extends PureComponent {
               <Button
                 icon="cloud-download"
                 style={{
-                  display: projectItem.isArchive ? "none" : "block",
+                  display:
+                    projectItem.isArchive || projectEdit ? "none" : "block",
                   marginTop: 20
                 }}
                 onClick={() => {
@@ -3125,7 +3139,8 @@ export default class integrat extends PureComponent {
               <Button
                 icon="rollback"
                 style={{
-                  display: projectItem.isArchive ? "block" : "none",
+                  display:
+                    projectItem.isArchive || projectEdit ? "block" : "none",
                   marginLeft: 20
                 }}
                 onClick={() => {

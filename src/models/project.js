@@ -85,35 +85,37 @@ export default {
         data: { success, error, result }
       } = yield call(projectByIdApi, payload.id);
       if (success) {
-        let departSelectList = [];
-        const list = [
-          "productDepartment",
-          "supDepartment",
-          // "replyDepartment",
+        if (result) {
+          let departSelectList = [];
+          const list = [
+            "productDepartment",
+            "supDepartment",
+            // "replyDepartment",
 
-          "projectDepartment",
-          "monitorDepartment",
-          "supervisionDepartment",
-          "getDepartName",
-          "constructionDepartment",
-          "reportDepartment"
-        ];
-        list.map(item => {
-          if (result[item]) {
-            departSelectList.push({
-              label: result[item].name,
-              value: result[item].id
-            });
-          }
-        });
-        if (payload.refresh) {
-          yield put({
-            type: "save",
-            payload: {
-              projectInfo: result,
-              departSelectList: [...new Set(departSelectList)]
+            "projectDepartment",
+            "monitorDepartment",
+            "supervisionDepartment",
+            "getDepartName",
+            "constructionDepartment",
+            "reportDepartment"
+          ];
+          list.map(item => {
+            if (result[item]) {
+              departSelectList.push({
+                label: result[item].name,
+                value: result[item].id
+              });
             }
           });
+          if (payload.refresh) {
+            yield put({
+              type: "save",
+              payload: {
+                projectInfo: result,
+                departSelectList: [...new Set(departSelectList)]
+              }
+            });
+          }
         }
         if (callback) callback(result, success);
       } else {

@@ -63,7 +63,7 @@ export default class siderbarDetail extends PureComponent {
   componentDidMount() {
     self = this;
     const {
-      form: { resetFields }
+      form: { resetFields, setFieldsValue }
     } = this.props;
     this.eventEmitter = emitter.addListener("siteLocationBack", data => {
       this.props.form.setFieldsValue({
@@ -75,6 +75,9 @@ export default class siderbarDetail extends PureComponent {
       console.log(data);
       resetFields();
       this.setState({
+        spotFileList: [],
+        pointFileList: [],
+        redLineFileList: [],
         polygon: data.polygon,
         show: data.show,
         edit: data.edit,
@@ -85,6 +88,12 @@ export default class siderbarDetail extends PureComponent {
         type: data.type, //add  edit
         previewVisible_min: false
       });
+      if (data.projectId && data.projectName) {
+        this.setState({
+          relateProject: [{ label: data.projectName, value: data.projectId }]
+        });
+        setFieldsValue({ projectId: data.projectId });
+      }
       if (data.type !== "add" && data.id) {
         if (data.from === "spot") {
           this.querySpotById(data.id);
@@ -253,6 +262,9 @@ export default class siderbarDetail extends PureComponent {
               notification["success"]({
                 message: `${type === "edit" ? "编辑" : "新建"}图斑成功`
               });
+              emitter.emit("deleteSuccess", {
+                success: true
+              });
             }
           }
         });
@@ -267,7 +279,7 @@ export default class siderbarDetail extends PureComponent {
   render() {
     const {
       dispatch,
-      form: { getFieldDecorator, resetFields, validateFields },
+      form: { getFieldDecorator, resetFields, validateFields, getFieldValue },
       user: { districtList },
       spot: { spotInfo, projectSelectListSpot },
       point: { pointInfo, projectSelectListPoint },
@@ -287,7 +299,8 @@ export default class siderbarDetail extends PureComponent {
       isSpotUpdate,
       previewVisible,
       previewImage,
-      previewVisible_min
+      previewVisible_min,
+      relateProject
     } = this.state;
 
     const projectSelectListAll = [
@@ -330,9 +343,6 @@ export default class siderbarDetail extends PureComponent {
           }}
           onClick={() => {
             this.setState({ show: !show, showDetail: false });
-            // emitter.emit("showSiderbarDetail", {
-            //   show: !show
-            // });
           }}
         />
         <p
@@ -716,7 +726,10 @@ export default class siderbarDetail extends PureComponent {
                       });
                     }}
                   >
-                    {projectSelectListAll.map(item => (
+                    {(relateProject
+                      ? relateProject.concat(projectSelectListAll)
+                      : projectSelectListAll
+                    ).map(item => (
                       <Select.Option value={item.value} key={item.value}>
                         {item.label}
                       </Select.Option>
@@ -1228,19 +1241,12 @@ export default class siderbarDetail extends PureComponent {
                           color: "#1890ff"
                         }}
                         onClick={() => {
-                          emitter.emit("showProjectDetail", {
-                            show: false,
-                            edit: false
-                          });
-                          this.props.form.validateFields((err, values) => {
-                            emitter.emit("siteLocation", {
-                              state:
-                                values.pointX && values.pointY
-                                  ? "end"
-                                  : "begin",
-                              Longitude: values.pointX,
-                              Latitude: values.pointY
-                            });
+                          const x = getFieldValue("pointX");
+                          const y = getFieldValue("pointY");
+                          emitter.emit("siteLocation", {
+                            state: "position",
+                            Longitude: x,
+                            Latitude: y
                           });
                         }}
                       />
