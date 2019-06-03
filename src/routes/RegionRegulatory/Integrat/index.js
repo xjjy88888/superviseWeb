@@ -69,6 +69,7 @@ export default class integrat extends PureComponent {
       selectLeftV: "",
       selectSpotLeftV: "",
       selectRightV: "",
+      selectSpotRightV:"",
       projectId: null, //针对新增图形的项目红线id
       addGraphLayer: null //针对新增图形的图层
     };
@@ -1316,7 +1317,8 @@ export default class integrat extends PureComponent {
       .wms(config.mapUrl.geoserverUrl + "/wms?", {
         layers: config.mapSpotLayerName, //需要加载的图层
         format: "image/png", //返回的数据格式
-        transparent: true
+        transparent: true,
+        // cql_filter: "is_deleted == false"
       })
       .addTo(spotlayerGroup);
     map.addLayer(projectlayerGroup);
@@ -1687,6 +1689,7 @@ export default class integrat extends PureComponent {
       selectSpotLeftV,
       selectSpotRightV
     } = this.state;
+    userconfig.setTopLayer = "imgLayer";
     // const { selectRightV } = this.state;
     this.addLRLayers(v, selectRightV, selectSpotLeftV, selectSpotRightV);
     userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
@@ -1701,6 +1704,7 @@ export default class integrat extends PureComponent {
       // selectSpotLeftV,
       selectSpotRightV
     } = this.state;
+    userconfig.setTopLayer = "spotLayer";
     // const { selectLeftV } = this.state;
     this.addLRLayers(selectLeftV, selectRightV, v, selectSpotRightV);
     userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
@@ -1715,6 +1719,7 @@ export default class integrat extends PureComponent {
       selectSpotLeftV,
       selectSpotRightV
     } = this.state;
+    userconfig.setTopLayer = "imgLayer";
     // const { selectLeftV } = this.state;
     this.addLRLayers(selectLeftV, v, selectSpotLeftV, selectSpotRightV);
     userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
@@ -1729,6 +1734,7 @@ export default class integrat extends PureComponent {
       selectSpotLeftV
       // selectSpotRightV
     } = this.state;
+    userconfig.setTopLayer = "spotLayer";
     // const { selectLeftV } = this.state;
     this.addLRLayers(selectLeftV, selectRightV, selectSpotLeftV, v);
     userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
@@ -1768,24 +1774,53 @@ export default class integrat extends PureComponent {
     }
     //加载历史扰动图斑
     if (selectSpotLeftV && selectSpotRightV) {
-      //历史扰动图斑存在
-      spotleftwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
-        layers: config.mapHistorySpotLayerName, //需要加载的图层
-        format: "image/png", //返回的数据格式
-        transparent: true,
-        cql_filter: "archive_time <= " + selectSpotLeftV
-      });
-      spotrightwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
-        layers: config.mapHistorySpotLayerName, //需要加载的图层
-        format: "image/png", //返回的数据格式
-        transparent: true,
-        cql_filter: "archive_time <= " + selectSpotRightV
-      });
+      if(selectSpotLeftV.indexOf("现状") !== -1){
+        //现状扰动图斑
+        spotleftwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
+          layers: config.mapSpotLayerName, //需要加载的图层
+          format: "image/png", //返回的数据格式
+          transparent: true
+        });         
+      }
+      else{
+        //历史扰动图斑
+        spotleftwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
+          layers: config.mapHistorySpotLayerName, //需要加载的图层
+          format: "image/png", //返回的数据格式
+          transparent: true,
+          cql_filter: "archive_time <= " + selectSpotLeftV
+        });
+      }
+      if(selectSpotRightV.indexOf("现状") !== -1){
+        //现状扰动图斑
+        spotrightwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
+          layers: config.mapSpotLayerName, //需要加载的图层
+          format: "image/png", //返回的数据格式
+          transparent: true
+        }); 
+      }
+      else{
+        //历史扰动图斑
+        spotrightwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
+          layers: config.mapHistorySpotLayerName, //需要加载的图层
+          format: "image/png", //返回的数据格式
+          transparent: true,
+          cql_filter: "archive_time <= " + selectSpotRightV
+        });
+      }
       map.addLayer(spotleftwms);
       map.addLayer(spotrightwms);
     }
-    userconfig.leftLayers = [spotleftwms, leftImgLayer];
-    userconfig.rightLayers = [spotrightwms, rightImgLayer];
+
+    if(userconfig.setTopLayer === "spotLayer"){ //历史影像优先历史扰动图斑优先
+      userconfig.leftLayers =  [leftImgLayer,spotleftwms];
+      userconfig.rightLayers = [rightImgLayer,spotrightwms];
+    }
+    else{ //历史影像优先
+      userconfig.leftLayers =  [spotleftwms,leftImgLayer];
+      userconfig.rightLayers = [spotrightwms,rightImgLayer];
+    }
+
   };
 
   render() {

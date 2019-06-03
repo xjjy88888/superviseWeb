@@ -22,7 +22,9 @@ export default class home2 extends PureComponent {
     super(props);
     this.state = {
       selectLeftV: "",
-      selectRightV: ""
+      selectRightV: "",
+      selectSpotLeftV: "",
+      selectSpotRightV:""
     };
     this.map = null;
     this.saveRef = v => {
@@ -79,16 +81,35 @@ export default class home2 extends PureComponent {
     let center = e.target.getCenter();
     let bounds = e.target.getBounds();
     //console.log(center);
+    // setTimeout(() => {
+    //   if(e.target._container.id === "LMap"){
+    //     if(userconfig.RMap.getZoom() !==zoom || (userconfig.RMap.getCenter().lat !==center.lat && userconfig.RMap.getCenter().lng !==center.lng)){
+    //       userconfig.RMap.setView(center,zoom)
+    //     }
+    //   }
+    //   else{
+    //     if(userconfig.LMap.getZoom() !==zoom || (userconfig.LMap.getCenter().lat !==center.lat && userconfig.LMap.getCenter().lng !==center.lng)){
+    //       userconfig.LMap.setView(center,zoom)
+    //     }
+    //   }
+    // }, 200);
+
+    // setTimeout(() => {
+      //根据地图当前范围获取对应历史影像数据
+      me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
+    // }, 400);
+ 
     if(e.target._container.id === "LMap"){
-      if(userconfig.RMap.getZoom() !==zoom || userconfig.RMap.getCenter().lat !==center.lat && userconfig.RMap.getCenter().lng !==center.lng)
-         userconfig.RMap.setView(center,zoom)
+      if(userconfig.RMap.getZoom() !==zoom || Math.abs(userconfig.RMap.getCenter().lat-center.lat)> 0.0001 || Math.abs(userconfig.RMap.getCenter().lng - center.lng)> 0.0001){
+        userconfig.RMap.setView(center,zoom)
+      }
     }
     else{
-      if(userconfig.LMap.getZoom() !==zoom || userconfig.LMap.getCenter().lat !==center.lat && userconfig.LMap.getCenter().lng !==center.lng)
-         userconfig.LMap.setView(center,zoom)
+      if(userconfig.LMap.getZoom() !==zoom || Math.abs(userconfig.LMap.getCenter().lat-center.lat)> 0.0001 || Math.abs(userconfig.LMap.getCenter().lng - center.lng)> 0.0001){
+        userconfig.LMap.setView(center,zoom)
+      }
     }
-    //根据地图当前范围获取对应历史影像数据
-    me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
+    
   }; 
   /*
    *地图鼠标移动监听事件
@@ -211,14 +232,14 @@ export default class home2 extends PureComponent {
       })
       .addTo(map);
     //加载图斑图层wms
-    L.tileLayer
-      .wms(config.mapUrl.geoserverUrl + "/wms?", {
-        layers: config.mapSpotLayerName, //需要加载的图层
-        format: "image/png", //返回的数据格式
-        transparent: true
-        //cql_filter:"map_num like '%_52_%'"
-      })
-      .addTo(map);
+    // L.tileLayer
+    //   .wms(config.mapUrl.geoserverUrl + "/wms?", {
+    //     layers: config.mapSpotLayerName, //需要加载的图层
+    //     format: "image/png", //返回的数据格式
+    //     transparent: true
+    //     //cql_filter:"map_num like '%_52_%'"
+    //   })
+    //   .addTo(map);
   };  
   /*
    * 加载地图模态层效果
@@ -319,6 +340,51 @@ export default class home2 extends PureComponent {
       callback: callback
     });
   };
+   /*空间范围查询图层
+   *@method queryWFSServiceByExtent
+   *@return null
+   */
+  queryWFSServiceByExtent = (typeName, callback) => {
+    const me = this;
+    let bounds = userconfig.LMap.getBounds();
+    let polygon = bounds.getSouthWest().lng + "," + bounds.getSouthWest().lat;
+    polygon +=
+      " " + bounds.getSouthWest().lng + "," + bounds.getNorthEast().lat;
+    polygon +=
+      " " + bounds.getNorthEast().lng + "," + bounds.getNorthEast().lat;
+    polygon +=
+      " " + bounds.getNorthEast().lng + "," + bounds.getSouthWest().lat;
+    polygon +=
+      " " + bounds.getSouthWest().lng + "," + bounds.getSouthWest().lat;
+    let filter =
+      '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
+    filter += "<Intersects>";
+    filter += "<PropertyName>geom</PropertyName>";
+    filter += "<gml:Polygon>";
+    filter += "<gml:outerBoundaryIs>";
+    filter += "<gml:LinearRing>";
+    filter += "<gml:coordinates>" + polygon + "</gml:coordinates>";
+    filter += "</gml:LinearRing>";
+    filter += "</gml:outerBoundaryIs>";
+    filter += "</gml:Polygon>";
+    filter += "</Intersects>";
+    filter += "</Filter>";
+    let urlString = config.mapUrl.geoserverUrl + "/ows";
+    let param = {
+      service: "WFS",
+      version: "1.0.0",
+      request: "GetFeature",
+      typeName: typeName,
+      outputFormat: "application/json",
+      filter: filter
+    };
+    let geojsonUrl = urlString + L.Util.getParamString(param, urlString);
+    me.props.dispatch({
+      type: "mapdata/getHistorySpotTimeByExtent",
+      payload: { geojsonUrl },
+      callback: callback
+    });
+  }; 
   /*
    * 根据地图当前范围获取对应历史影像数据回调函数
    */
@@ -330,45 +396,109 @@ export default class home2 extends PureComponent {
       this.setState({ selectLeftV: data[0] });
       this.setState({ selectRightV: data[0] });
       userconfig.sideBySideZoom = userconfig.LMap.getZoom();
-      //移除左右地图的图层列表
-      this.removeLMapLayers();
-      this.removeRMapLayers();
-      setTimeout(() => {
-        //添加左右地图的图层列表
-        this.addLMapLayers();
-        this.addRMapLayers();
-      }, 200);
+      //历史扰动图斑查询
+      this.queryWFSServiceByExtent(
+        config.mapHistorySpotLayerName,
+        this.callbackgetHistorySpotTimeByExtent
+      );
     }
-  }; 
+  };
+  /*
+   * 根据地图当前范围获取对应历史扰动图斑数据回调函数
+   */
+  callbackgetHistorySpotTimeByExtent = data => {
+    this.setState({ selectSpotLeftV: data[0].value });
+    this.setState({ selectSpotRightV: data[0].value });
+    //移除左右地图的图层列表
+    this.removeLMapLayers();
+    this.removeRMapLayers();
+    setTimeout(() => {
+      //添加左右地图的图层列表
+      this.addLMapLayers();
+      this.addRMapLayers();
+    }, 200);
+  };  
   /*
    * 移除左地图的图层列表
   */
   removeLMapLayers = () => {
-    if (userconfig.LMap.hasLayer(userconfig.leftImgLayer))
+    if (userconfig.leftImgLayer)
         userconfig.LMap.removeLayer(userconfig.leftImgLayer);
+    if (userconfig.leftSpotLayer)
+        userconfig.LMap.removeLayer(userconfig.leftSpotLayer);
   }; 
   /*
    * 移除右地图的图层列表
   */
   removeRMapLayers = () => {
-    if (userconfig.RMap.hasLayer(userconfig.rightImgLayer))
+    if (userconfig.rightImgLayer)
         userconfig.RMap.removeLayer(userconfig.rightImgLayer);
+    if (userconfig.rightSpotLayer)
+        userconfig.RMap.removeLayer(userconfig.rightSpotLayer);        
   }; 
   /*
    * 添加左地图的图层列表
   */
   addLMapLayers = () => {
-    const { selectLeftV} = this.state;
-    let leftLayerUrl =config.imageBaseUrl +"/" +selectLeftV.replace(/\//g, "-") +"/tile/{z}/{y}/{x}";
-    userconfig.leftImgLayer = this.loadMapbaseLayer(userconfig.LMap,leftLayerUrl);//左侧影像
+    const { selectLeftV,selectSpotLeftV} = this.state;
+    if (selectLeftV) {
+      let leftLayerUrl =config.imageBaseUrl +"/" +selectLeftV.replace(/\//g, "-") +"/tile/{z}/{y}/{x}";
+      userconfig.leftImgLayer = this.loadMapbaseLayer(userconfig.LMap,leftLayerUrl);//左侧影像
+    }
+    //加载历史扰动图斑
+    userconfig.leftSpotLayer = null;
+    if (selectSpotLeftV) {
+      if(selectSpotLeftV.indexOf("现状") !== -1){
+        //现状扰动图斑
+        userconfig.leftSpotLayer = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
+          layers: config.mapSpotLayerName, //需要加载的图层
+          format: "image/png", //返回的数据格式
+          transparent: true
+        });         
+      }
+      else{
+        //历史扰动图斑
+        userconfig.leftSpotLayer = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
+          layers: config.mapHistorySpotLayerName, //需要加载的图层
+          format: "image/png", //返回的数据格式
+          transparent: true,
+          cql_filter: "archive_time <= " + selectSpotLeftV
+        });
+      }
+      userconfig.LMap.addLayer(userconfig.leftSpotLayer);
+    } 
   };
   /*
    * 添加右地图的图层列表
   */
   addRMapLayers = () => {
-    const { selectRightV } = this.state;
-    let rightLayerUrl =config.imageBaseUrl +"/" +selectRightV.replace(/\//g, "-") +"/tile/{z}/{y}/{x}";
-    userconfig.rightImgLayer = this.loadMapbaseLayer(userconfig.RMap,rightLayerUrl);//右侧影像
+    const { selectRightV,selectSpotRightV } = this.state;
+    if (selectRightV) {
+      let rightLayerUrl =config.imageBaseUrl +"/" +selectRightV.replace(/\//g, "-") +"/tile/{z}/{y}/{x}";
+      userconfig.rightImgLayer = this.loadMapbaseLayer(userconfig.RMap,rightLayerUrl);//右侧影像
+    }
+    //加载历史扰动图斑
+    userconfig.rightSpotLayer = null;
+    if (selectSpotRightV) {
+      if(selectSpotRightV.indexOf("现状") !== -1){
+        //现状扰动图斑
+        userconfig.rightSpotLayer = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
+          layers: config.mapSpotLayerName, //需要加载的图层
+          format: "image/png", //返回的数据格式
+          transparent: true
+        });         
+      }
+      else{
+        //历史扰动图斑
+        userconfig.rightSpotLayer = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
+          layers: config.mapHistorySpotLayerName, //需要加载的图层
+          format: "image/png", //返回的数据格式
+          transparent: true,
+          cql_filter: "archive_time <= " + selectSpotRightV
+        });
+      }
+      userconfig.RMap.addLayer(userconfig.rightSpotLayer);
+    }
   };
   /*
    * 左地图的影像列表切换
@@ -382,6 +512,16 @@ export default class home2 extends PureComponent {
       this.addLMapLayers();
     }, 200);
   };
+  //左侧历史扰动图斑切换事件
+  onChangeSelectSpotLeft = v => {
+    this.setState({ selectSpotLeftV: v });
+    //移除左地图的图层列表
+    this.removeLMapLayers();
+    //添加左地图的图层列表
+    setTimeout(() => {
+      this.addLMapLayers();
+    }, 200);
+  }; 
   /*
    * 右地图的影像列表切换
   */  
@@ -394,14 +534,26 @@ export default class home2 extends PureComponent {
       this.addRMapLayers();
     }, 200);
   };
+  //右侧历史扰动图斑切换事件
+  onChangeSelectSpotRight = v => {
+    this.setState({ selectSpotRightV: v });
+    //移除左地图的图层列表
+    this.removeRMapLayers();
+    //添加左地图的图层列表
+    setTimeout(() => {
+      this.addRMapLayers();
+    }, 200);
+  };  
 
   render() {
     const {
       selectLeftV,
-      selectRightV
+      selectRightV,
+      selectSpotLeftV,
+      selectSpotRightV
     } = this.state;
     const {
-      mapdata: { histories }
+      mapdata: { histories, historiesSpot }
     } = this.props;
     return (
       <div>
@@ -414,9 +566,18 @@ export default class home2 extends PureComponent {
                 position: "absolute",
                 top: 10,
                 right: 10,
-                zIndex: 1000
+                zIndex: 1000,
+                background: "#fff"
               }}
             >
+              {/* 左侧历史影像切换 */}
+              <span
+                style={{
+                  padding: "0 10px"
+                }}
+              >
+                影像:
+              </span>
               <Select
                 value={[selectLeftV]}
                 placeholder="请选择"
@@ -431,6 +592,29 @@ export default class home2 extends PureComponent {
                   </Select.Option>
                 ))}
               </Select>
+              {/* 左侧扰动图斑切换 */}
+              <span
+                style={{
+                  marginLeft: 10,
+                  padding: "0 10px"
+                }}
+              >
+                图斑:
+              </span>
+              <Select
+                value={[selectSpotLeftV]}
+                placeholder="请选择"
+                onChange={this.onChangeSelectSpotLeft}
+                style={{
+                  width: 150
+                }}
+              >
+                {historiesSpot.map((item, id) => (
+                  <Select.Option key={id} value={item.value}>
+                    {item.id}
+                  </Select.Option>
+                ))}
+              </Select>
             </div>
           </div>
           <div style={{ flex: 1, border:"1px solid #cccccc" }} id="RMap">
@@ -439,9 +623,18 @@ export default class home2 extends PureComponent {
                 position: "absolute",
                 top: 10,
                 left: 10,
-                zIndex: 1000
+                zIndex: 1000,
+                background: "#fff"
               }}
             >
+              {/* 右侧历史影像切换 */}
+              <span
+                style={{
+                  padding: "0 10px"
+                }}
+              >
+                影像:
+              </span>
               <Select
                 value={[selectRightV]}
                 placeholder="请选择"
@@ -453,6 +646,29 @@ export default class home2 extends PureComponent {
                 {histories.map((item, id) => (
                   <Select.Option key={id} value={item}>
                     {item}
+                  </Select.Option>
+                ))}
+              </Select>
+              {/*右侧扰动图斑切换 */}
+              <span
+                style={{
+                  marginLeft: 10,
+                  padding: "0 10px"
+                }}
+              >
+                图斑:
+              </span>
+              <Select
+                value={[selectSpotRightV]}
+                placeholder="请选择"
+                onChange={this.onChangeSelectSpotRight}
+                style={{
+                  width: 150
+                }}
+              >
+                {historiesSpot.map((item, id) => (
+                  <Select.Option key={id} value={item.value}>
+                    {item.id}
                   </Select.Option>
                 ))}
               </Select>

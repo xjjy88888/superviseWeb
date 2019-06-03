@@ -46,7 +46,9 @@ export default class siderbarDetail extends PureComponent {
     this.eventEmitter = emitter.addListener("showChart", v => {
       this.setState({
         show: v.show,
-        title: v.title
+        title: v.title,
+        key: v.key,
+        dataType: v.type
       });
       this.query(v.key, v.type);
     });
@@ -88,7 +90,9 @@ export default class siderbarDetail extends PureComponent {
   };
 
   drawPie = v => {
-    const { title } = this.state;
+    const { title, dataType, key } = this.state;
+
+    const isVector = dataType === "project" && key === 6;
 
     const optionPie = {
       title: {
@@ -102,14 +106,25 @@ export default class siderbarDetail extends PureComponent {
       legend: {
         orient: "vertical",
         x: "left",
-        data: v.map(item => item.name)
+        data: isVector
+          ? [
+              ...v.hasScope.map(item => item.name),
+              ...v.vecType.map(item => item.name)
+            ]
+          : v.map(item => item.name)
       },
       series: [
         {
           name: title,
           type: "pie",
-          radius: ["0%", "70%"],
-          data: v
+          radius: ["0%", isVector ? "30%" : "60%"],
+          data: isVector ? v.hasScope : v
+        },
+        {
+          name: title,
+          type: "pie",
+          radius: ["50%", "70%"],
+          data: isVector ? v.vecType : []
         }
       ]
     };
@@ -118,7 +133,10 @@ export default class siderbarDetail extends PureComponent {
   };
 
   drawBar = v => {
-    const { title } = this.state;
+    const { title, dataType, key } = this.state;
+
+    const isVector = dataType === "project" && key === 6;
+
     const optionBar = {
       title: {
         text: title,
@@ -140,7 +158,12 @@ export default class siderbarDetail extends PureComponent {
           interval: 0,
           rotate: 30
         },
-        data: v.map(item => item.name)
+        data: isVector
+          ? [
+              ...v.hasScope.map(item => item.name),
+              ...v.vecType.map(item => item.name)
+            ]
+          : v.map(item => item.name)
       },
       series: [
         {
@@ -162,7 +185,12 @@ export default class siderbarDetail extends PureComponent {
               ])
             }
           },
-          data: v.map(item => item.value)
+          data: isVector
+            ? [
+                ...v.hasScope.map(item => item.value),
+                ...v.vecType.map(item => item.value)
+              ]
+            : v.map(item => item.value)
         }
       ]
     };
