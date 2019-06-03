@@ -52,14 +52,16 @@ export default {
         data: { success, error, result }
       } = yield call(spotByIdApi, payload.id);
       if (success) {
-        const projectSelectListSpot = result.projectName
-          ? [{ label: result.projectName, value: result.projectId }]
-          : [];
-        if (payload.refresh) {
-          yield put({
-            type: "save",
-            payload: { spotInfo: result, projectSelectListSpot }
-          });
+        if (result) {
+          const projectSelectListSpot = result.projectName
+            ? [{ label: result.projectName, value: result.projectId }]
+            : [];
+          if (payload.refresh) {
+            yield put({
+              type: "save",
+              payload: { spotInfo: result, projectSelectListSpot }
+            });
+          }
         }
         if (callback) callback(result);
       } else {
@@ -138,7 +140,7 @@ export default {
     },
 
     // 项目id查图斑列表
-    *querySpotByProjectId({ payload,callback }, { call, put }) {
+    *querySpotByProjectId({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result: projectInfoSpotList }
       } = yield call(spotListApi, payload);

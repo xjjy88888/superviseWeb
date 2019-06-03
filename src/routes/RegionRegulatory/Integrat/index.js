@@ -69,8 +69,8 @@ export default class integrat extends PureComponent {
       selectLeftV: "",
       selectSpotLeftV: "",
       selectRightV: "",
-      selectSpotRightV:"",
-      spotStatus:"",
+      selectSpotRightV: "",
+      spotStatus: "",
       projectId: null, //针对新增图形的项目红线id
       addGraphLayer: null //针对新增图形的图层
     };
@@ -463,7 +463,7 @@ export default class integrat extends PureComponent {
     //图斑关联
     this.eventEmitter = emitter.addListener("spotRelate", data => {
       this.setState({
-        spotStatus: data.status//start：开始，end：结束
+        spotStatus: data.status //start：开始，end：结束
       });
     });
   }
@@ -557,10 +557,10 @@ export default class integrat extends PureComponent {
       message.warning("项目无可用位置信息", 1);
     }
   };
-   /*
+  /*
    * 点选查询回调函数
    */
-  callbackPointQueryWFSService = (data) => {
+  callbackPointQueryWFSService = data => {
     const me = this;
     if (data.success) {
       data = data.result;
@@ -573,44 +573,42 @@ export default class integrat extends PureComponent {
         fillOpacity: 0.1
       };
       me.loadGeojsonLayer(data, style);
-        if (data.features.length > 0) {
-          let content = "";
-          for (let i = 0; i < data.features.length; i++) {
-            let feature = data.features[i];
-            if (i === data.features.length - 1) {
-              me.getWinContent(feature.properties, data => {
-                content += data[0].innerHTML + "<br><br>";
-              });
-            } else {
-              me.getWinContent(feature.properties, data => {
-                content += data[0].innerHTML + "<br><br>";
-              });
-            }
+      if (data.features.length > 0) {
+        let content = "";
+        for (let i = 0; i < data.features.length; i++) {
+          let feature = data.features[i];
+          if (i === data.features.length - 1) {
+            me.getWinContent(feature.properties, data => {
+              content += data[0].innerHTML + "<br><br>";
+            });
+          } else {
+            me.getWinContent(feature.properties, data => {
+              content += data[0].innerHTML + "<br><br>";
+            });
           }
-          setTimeout(() => {
-            if (map.getZoom() < config.mapInitParams.zoom) {
-              map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
-                maxZoom: 16
-              });
-            }
-            map.openPopup(content, userconfig.mapPoint);
-            // if (isautomaticToMap) {
-            //   me.automaticToMap(
-            //     userconfig.projectgeojsonLayer.getBounds().getCenter()
-            //   );
-            // }
-          }, 500);
         }
-        else {
-          map.closePopup();
-        }
-    }
-    else {
+        setTimeout(() => {
+          if (map.getZoom() < config.mapInitParams.zoom) {
+            map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
+              maxZoom: 16
+            });
+          }
+          map.openPopup(content, userconfig.mapPoint);
+          // if (isautomaticToMap) {
+          //   me.automaticToMap(
+          //     userconfig.projectgeojsonLayer.getBounds().getCenter()
+          //   );
+          // }
+        }, 500);
+      } else {
+        map.closePopup();
+      }
+    } else {
       message.warning("地图匹配不到相关数据", 1);
       map.closePopup();
-    }    
+    }
   };
-  callbackPointQuerySpotWFSService = (data) => {
+  callbackPointQuerySpotWFSService = data => {
     const me = this;
     if (data.success) {
       data = data.result;
@@ -623,12 +621,32 @@ export default class integrat extends PureComponent {
         fillOpacity: 0.1
       };
       me.loadGeojsonLayer(data, style);
-      console.log(data);
-    }
-    else {
+      me.setState({
+        spotStatus: "end" //start：开始，end：结束
+      });
+      if (data.features.length > 0) {
+        let spotIds = [];
+        for (let i = 0; i < data.features.length; i++) {
+          let item = data.features[i];
+          spotIds.push(item.properties.id);
+        }
+        //图斑关联
+        emitter.emit("spotRelate", {
+          status: "end", //start：开始，end：结束
+          spotId: spotIds
+        });
+        // console.log(spotIds);
+      } else {
+        //图斑关联
+        emitter.emit("spotRelate", {
+          status: "end", //start：开始，end：结束
+          spotId: []
+        });
+      }
+    } else {
       message.warning("地图匹配不到相关数据", 1);
       map.closePopup();
-    }    
+    }
   };
   /*
    * 根据方位角获取对应的图片
@@ -794,11 +812,20 @@ export default class integrat extends PureComponent {
     let point = { x: e.latlng.lng, y: e.latlng.lat };
     //图斑关联判断spotStatus
     const { spotStatus } = me.state;
-    if(spotStatus === "start"){//图斑关联点查
-      me.queryWFSServiceByPoint(point, config.mapSpotLayerName, me.callbackPointQuerySpotWFSService);
-    }
-    else{ //普通点查
-      me.queryWFSServiceByPoint(point, config.mapLayersName, me.callbackPointQueryWFSService);
+    if (spotStatus === "start") {
+      //图斑关联点查
+      me.queryWFSServiceByPoint(
+        point,
+        config.mapSpotLayerName,
+        me.callbackPointQuerySpotWFSService
+      );
+    } else {
+      //普通点查
+      me.queryWFSServiceByPoint(
+        point,
+        config.mapLayersName,
+        me.callbackPointQueryWFSService
+      );
     }
   };
   onMoveendMap = e => {
@@ -1046,8 +1073,8 @@ export default class integrat extends PureComponent {
           refresh: false
         },
         callback: data => {
-          console.log(data);
-          resolve(data.interferenceComplianceId);
+          const v = data ? data.interferenceComplianceId : "";
+          resolve(v);
         }
       });
     });
@@ -1356,7 +1383,7 @@ export default class integrat extends PureComponent {
       .wms(config.mapUrl.geoserverUrl + "/wms?", {
         layers: config.mapSpotLayerName, //需要加载的图层
         format: "image/png", //返回的数据格式
-        transparent: true,
+        transparent: true
         // cql_filter: "is_deleted == false"
       })
       .addTo(spotlayerGroup);
@@ -1476,7 +1503,8 @@ export default class integrat extends PureComponent {
       drawType,
       drawState,
       projectId,
-      projectName,fromList
+      projectName,
+      fromList
     } = me.state;
     //禁止编辑图形
     if (addGraphLayer) {
@@ -1505,7 +1533,13 @@ export default class integrat extends PureComponent {
    * 保存编辑图形
    */
   saveEditGraphic = e => {
-    const { drawType, drawState, projectId, projectName ,fromList} = this.state;
+    const {
+      drawType,
+      drawState,
+      projectId,
+      projectName,
+      fromList
+    } = this.state;
     //console.log(e);
     e.stopPropagation();
     const me = this;
@@ -1813,15 +1847,14 @@ export default class integrat extends PureComponent {
     }
     //加载历史扰动图斑
     if (selectSpotLeftV && selectSpotRightV) {
-      if(selectSpotLeftV.indexOf("现状") !== -1){
+      if (selectSpotLeftV.indexOf("现状") !== -1) {
         //现状扰动图斑
         spotleftwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
           layers: config.mapSpotLayerName, //需要加载的图层
           format: "image/png", //返回的数据格式
           transparent: true
-        });         
-      }
-      else{
+        });
+      } else {
         //历史扰动图斑
         spotleftwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
           layers: config.mapHistorySpotLayerName, //需要加载的图层
@@ -1830,15 +1863,14 @@ export default class integrat extends PureComponent {
           cql_filter: "archive_time <= " + selectSpotLeftV
         });
       }
-      if(selectSpotRightV.indexOf("现状") !== -1){
+      if (selectSpotRightV.indexOf("现状") !== -1) {
         //现状扰动图斑
         spotrightwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
           layers: config.mapSpotLayerName, //需要加载的图层
           format: "image/png", //返回的数据格式
           transparent: true
-        }); 
-      }
-      else{
+        });
+      } else {
         //历史扰动图斑
         spotrightwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
           layers: config.mapHistorySpotLayerName, //需要加载的图层
@@ -1851,15 +1883,15 @@ export default class integrat extends PureComponent {
       map.addLayer(spotrightwms);
     }
 
-    if(userconfig.setTopLayer === "spotLayer"){ //历史影像优先历史扰动图斑优先
-      userconfig.leftLayers =  [leftImgLayer,spotleftwms];
-      userconfig.rightLayers = [rightImgLayer,spotrightwms];
+    if (userconfig.setTopLayer === "spotLayer") {
+      //历史影像优先历史扰动图斑优先
+      userconfig.leftLayers = [leftImgLayer, spotleftwms];
+      userconfig.rightLayers = [rightImgLayer, spotrightwms];
+    } else {
+      //历史影像优先
+      userconfig.leftLayers = [spotleftwms, leftImgLayer];
+      userconfig.rightLayers = [spotrightwms, rightImgLayer];
     }
-    else{ //历史影像优先
-      userconfig.leftLayers =  [spotleftwms,leftImgLayer];
-      userconfig.rightLayers = [spotrightwms,rightImgLayer];
-    }
-
   };
 
   render() {
