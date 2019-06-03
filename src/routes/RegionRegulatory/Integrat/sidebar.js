@@ -129,6 +129,11 @@ export default class integrat extends PureComponent {
           : query_point;
       this.search(v);
     });
+    this.eventEmitter = emitter.addListener("spotRelate", v => {
+      if (v.status === "end") {
+        console.log(v);
+      }
+    });
     this.eventEmitter = emitter.addListener("projectInfoRefresh", v => {
       this.queryRedLineList(v.projectId);
       this.querySpotByProjectId(v.projectId);

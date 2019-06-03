@@ -168,22 +168,6 @@ export default class integrat extends PureComponent {
     me.initUrlParams();
     // 位置定位
     this.eventEmitter = emitter.addListener("siteLocation", data => {
-      // console.log(data);
-      // if (data.state === "begin") {
-      //   //地图获取定位点
-      //   jQuery(userconfig.geoJsonLayer.getPane())
-      //     .find("path")
-      //     .css({
-      //       cursor: "crosshair"
-      //     });
-      //   userconfig.state = "position";
-      // } else if (data.state === "end") {
-      //   //地图定位点
-      //   if (marker) marker.remove();
-      //   let latLng = [data.Latitude, data.Longitude];
-      //   marker = L.marker(latLng).addTo(map);
-      //   me.automaticToMap(latLng);
-      // }
       userconfig.state = "position";
       //地图获取定位点
       jQuery(userconfig.geoJsonLayer.getPane())
@@ -254,7 +238,8 @@ export default class integrat extends PureComponent {
           config.mapSpotLayerName,
           this.callbackLocationQueryWFSService
         );
-      } else if (data.key === "point") {
+      }
+      else if (data.key === "point") {
         let latLng = [data.item.pointY, data.item.pointX];
         let turfpoint = turf.point([latLng[1], latLng[0]]);
         if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {
@@ -263,12 +248,20 @@ export default class integrat extends PureComponent {
         }
         //标注点定位
         if (marker) marker.remove();
-        marker = L.marker(latLng).addTo(map);
-        map.setZoom(config.mapInitParams.zoom);
-        setTimeout(() => {
+            marker = L.marker(latLng).addTo(map);
+
+        if (map.getZoom() >= config.mapInitParams.zoom) {
           me.automaticToMap(latLng);
-        }, 500);
-      } else if (data.key === "redLine") {
+        }
+        else {
+          map.setZoom(config.mapInitParams.zoom);
+          setTimeout(() => {
+            me.automaticToMap(latLng);
+          }, 500);
+        }
+
+      }
+      else if (data.key === "redLine") {
         //防治责任范围定位
         me.queryWFSServiceByProperty(
           data.item.id,
