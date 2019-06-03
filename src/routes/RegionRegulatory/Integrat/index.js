@@ -70,6 +70,7 @@ export default class integrat extends PureComponent {
       selectSpotLeftV: "",
       selectRightV: "",
       selectSpotRightV:"",
+      spotStatus:"",
       projectId: null, //针对新增图形的项目红线id
       addGraphLayer: null //针对新增图形的图层
     };
@@ -459,6 +460,12 @@ export default class integrat extends PureComponent {
         showProblem: data.show
       });
     });
+    //图斑关联
+    this.eventEmitter = emitter.addListener("spotRelate", data => {
+      this.setState({
+        spotStatus: data.status//start：开始，end：结束
+      });
+    });
   }
   /*
    * 编辑图形查询回调函数
@@ -549,6 +556,79 @@ export default class integrat extends PureComponent {
     } else {
       message.warning("项目无可用位置信息", 1);
     }
+  };
+   /*
+   * 点选查询回调函数
+   */
+  callbackPointQueryWFSService = (data) => {
+    const me = this;
+    if (data.success) {
+      data = data.result;
+      me.clearGeojsonLayer();
+      let style = {
+        color: "#33CCFF", //#33CCFF #e60000
+        weight: 3,
+        opacity: 1,
+        fillColor: "#e6d933", //#33CCFF #e6d933
+        fillOpacity: 0.1
+      };
+      me.loadGeojsonLayer(data, style);
+        if (data.features.length > 0) {
+          let content = "";
+          for (let i = 0; i < data.features.length; i++) {
+            let feature = data.features[i];
+            if (i === data.features.length - 1) {
+              me.getWinContent(feature.properties, data => {
+                content += data[0].innerHTML + "<br><br>";
+              });
+            } else {
+              me.getWinContent(feature.properties, data => {
+                content += data[0].innerHTML + "<br><br>";
+              });
+            }
+          }
+          setTimeout(() => {
+            if (map.getZoom() < config.mapInitParams.zoom) {
+              map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
+                maxZoom: 16
+              });
+            }
+            map.openPopup(content, userconfig.mapPoint);
+            // if (isautomaticToMap) {
+            //   me.automaticToMap(
+            //     userconfig.projectgeojsonLayer.getBounds().getCenter()
+            //   );
+            // }
+          }, 500);
+        }
+        else {
+          map.closePopup();
+        }
+    }
+    else {
+      message.warning("地图匹配不到相关数据", 1);
+      map.closePopup();
+    }    
+  };
+  callbackPointQuerySpotWFSService = (data) => {
+    const me = this;
+    if (data.success) {
+      data = data.result;
+      me.clearGeojsonLayer();
+      let style = {
+        color: "#33CCFF", //#33CCFF #e60000
+        weight: 3,
+        opacity: 1,
+        fillColor: "#e6d933", //#33CCFF #e6d933
+        fillOpacity: 0.1
+      };
+      me.loadGeojsonLayer(data, style);
+      console.log(data);
+    }
+    else {
+      message.warning("地图匹配不到相关数据", 1);
+      map.closePopup();
+    }    
   };
   /*
    * 根据方位角获取对应的图片
@@ -695,7 +775,7 @@ export default class integrat extends PureComponent {
       return;
     }
     userconfig.mapPoint = e.latlng;
-
+    //地图定位判断
     if (userconfig.state === "position") {
       //地图获取经纬度
       jQuery(userconfig.geoJsonLayer.getPane())
@@ -712,7 +792,14 @@ export default class integrat extends PureComponent {
     }
     //点查WMS图层
     let point = { x: e.latlng.lng, y: e.latlng.lat };
-    me.queryWFSServiceByPoint(point, config.mapLayersName, false);
+    //图斑关联判断spotStatus
+    const { spotStatus } = me.state;
+    if(spotStatus === "start"){//图斑关联点查
+      me.queryWFSServiceByPoint(point, config.mapSpotLayerName, me.callbackPointQuerySpotWFSService);
+    }
+    else{ //普通点查
+      me.queryWFSServiceByPoint(point, config.mapLayersName, me.callbackPointQueryWFSService);
+    }
   };
   onMoveendMap = e => {
     //console.log(map.getZoom());
@@ -879,10 +966,9 @@ export default class integrat extends PureComponent {
    *@method queryWFSServiceByPoint
    *@param point 坐标点
    *@param typeName 图层名称
-   *@param isautomaticToMap 是否自动跳转居中地图不被遮盖
    *@return null
    */
-  queryWFSServiceByPoint = (point, typeName, isautomaticToMap) => {
+  queryWFSServiceByPoint = (point, typeName, callback) => {
     const me = this;
     point = point.x + "," + point.y;
     let filter =
@@ -909,54 +995,7 @@ export default class integrat extends PureComponent {
     me.props.dispatch({
       type: "mapdata/queryWFSLayer",
       payload: { geojsonUrl },
-      callback: data => {
-        if (data.success) {
-          data = data.result;
-          me.clearGeojsonLayer();
-          let style = {
-            color: "#33CCFF", //#33CCFF #e60000
-            weight: 3,
-            opacity: 1,
-            fillColor: "#e6d933", //#33CCFF #e6d933
-            fillOpacity: 0.1
-          };
-          me.loadGeojsonLayer(data, style);
-          if (data.features.length > 0) {
-            let content = "";
-            for (let i = 0; i < data.features.length; i++) {
-              let feature = data.features[i];
-              if (i === data.features.length - 1) {
-                me.getWinContent(feature.properties, data => {
-                  content += data[0].innerHTML + "<br><br>";
-                });
-              } else {
-                me.getWinContent(feature.properties, data => {
-                  content += data[0].innerHTML + "<br><br>";
-                });
-              }
-            }
-            setTimeout(() => {
-              if (map.getZoom() < config.mapInitParams.zoom) {
-                map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
-                  maxZoom: 16
-                });
-              }
-              map.openPopup(content, userconfig.mapPoint);
-              if (isautomaticToMap) {
-                me.automaticToMap(
-                  userconfig.projectgeojsonLayer.getBounds().getCenter()
-                );
-              }
-            }, 500);
-          } else {
-            //message.warning("地图匹配不到相关数据", 1);
-            map.closePopup();
-          }
-        } else {
-          message.warning("地图匹配不到相关数据", 1);
-          map.closePopup();
-        }
-      }
+      callback: callback
     });
   };
   /*

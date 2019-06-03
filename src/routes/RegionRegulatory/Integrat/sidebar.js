@@ -719,7 +719,9 @@ export default class integrat extends PureComponent {
   //search
   search = v => {
     const { key, queryInfo } = this.state;
-    this.scrollDom.scrollTop = 0;
+    if (this.scrollDom) {
+      this.scrollDom.scrollTop = 0;
+    }
     emitter.emit("checkResult", {
       show: false,
       result: []
@@ -1168,7 +1170,7 @@ export default class integrat extends PureComponent {
                 style={{
                   userSelect: "none",
                   border: "rgb(217, 217, 217) 1px solid",
-                  color:  sort_key === item.key && sort_by ? "#fff" : "#000",
+                  color: sort_key === item.key && sort_by ? "#fff" : "#000",
                   backgroundColor:
                     sort_key === item.key && sort_by ? "#1890ff" : "#fff"
                 }}
@@ -1996,7 +1998,7 @@ export default class integrat extends PureComponent {
                             //图斑关联
                             emitter.emit("spotRelate", {
                               status: "start", //start：开始，end：结束
-                              mapNum: ""
+                              spotId: ""
                             });
                           }}
                         />

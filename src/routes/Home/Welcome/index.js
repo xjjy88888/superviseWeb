@@ -80,25 +80,10 @@ export default class home2 extends PureComponent {
     let zoom = e.target.getZoom();
     let center = e.target.getCenter();
     let bounds = e.target.getBounds();
-    //console.log(center);
-    // setTimeout(() => {
-    //   if(e.target._container.id === "LMap"){
-    //     if(userconfig.RMap.getZoom() !==zoom || (userconfig.RMap.getCenter().lat !==center.lat && userconfig.RMap.getCenter().lng !==center.lng)){
-    //       userconfig.RMap.setView(center,zoom)
-    //     }
-    //   }
-    //   else{
-    //     if(userconfig.LMap.getZoom() !==zoom || (userconfig.LMap.getCenter().lat !==center.lat && userconfig.LMap.getCenter().lng !==center.lng)){
-    //       userconfig.LMap.setView(center,zoom)
-    //     }
-    //   }
-    // }, 200);
-
     // setTimeout(() => {
       //根据地图当前范围获取对应历史影像数据
-      me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
+    me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
     // }, 400);
- 
     if(e.target._container.id === "LMap"){
       if(userconfig.RMap.getZoom() !==zoom || Math.abs(userconfig.RMap.getCenter().lat-center.lat)> 0.0001 || Math.abs(userconfig.RMap.getCenter().lng - center.lng)> 0.0001){
         userconfig.RMap.setView(center,zoom)
@@ -109,8 +94,25 @@ export default class home2 extends PureComponent {
         userconfig.LMap.setView(center,zoom)
       }
     }
-    
   }; 
+  onMoveLMap  = e => {
+    const me = this;
+    let zoom = e.target.getZoom();
+    let center = e.target.getCenter();
+    let bounds = e.target.getBounds();
+    //根据地图当前范围获取对应历史影像数据
+    me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
+    userconfig.RMap.setView(center,zoom);
+  }
+  onMoveRMap  = e => {
+    const me = this;
+    let zoom = e.target.getZoom();
+    let center = e.target.getCenter();
+    let bounds = e.target.getBounds();
+    //根据地图当前范围获取对应历史影像数据
+    me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
+    userconfig.LMap.setView(center,zoom);
+  }
   /*
    *地图鼠标移动监听事件
   */ 
@@ -171,6 +173,10 @@ export default class home2 extends PureComponent {
         userconfig.LMap.on("moveend", me.onMoveendMap);
         //监听地图移动完成事件
         userconfig.RMap.on("moveend", me.onMoveendMap);
+        // //监听地图移动完成事件
+        // userconfig.LMap.on("move", me.onMoveLMap);
+        // //监听地图移动完成事件
+        // userconfig.RMap.on("move", me.onMoveRMap);
         //监听地图移动事件
         userconfig.LMap.on("mousemove", me.onMoveMap);
         //监听地图移动事件
