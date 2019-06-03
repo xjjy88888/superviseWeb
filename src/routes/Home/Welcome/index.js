@@ -73,51 +73,9 @@ export default class home2 extends PureComponent {
     me.getRegionGeometry();
   }
   /*
-   *地图范围变化监听事件
-  */ 
-  onMoveendMap = e => {
-    const me = this;
-    let zoom = e.target.getZoom();
-    let center = e.target.getCenter();
-    let bounds = e.target.getBounds();
-    // setTimeout(() => {
-      //根据地图当前范围获取对应历史影像数据
-    me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
-    // }, 400);
-    if(e.target._container.id === "LMap"){
-      if(userconfig.RMap.getZoom() !==zoom || Math.abs(userconfig.RMap.getCenter().lat-center.lat)> 0.0001 || Math.abs(userconfig.RMap.getCenter().lng - center.lng)> 0.0001){
-        userconfig.RMap.setView(center,zoom)
-      }
-    }
-    else{
-      if(userconfig.LMap.getZoom() !==zoom || Math.abs(userconfig.LMap.getCenter().lat-center.lat)> 0.0001 || Math.abs(userconfig.LMap.getCenter().lng - center.lng)> 0.0001){
-        userconfig.LMap.setView(center,zoom)
-      }
-    }
-  }; 
-  onMoveLMap  = e => {
-    const me = this;
-    let zoom = e.target.getZoom();
-    let center = e.target.getCenter();
-    let bounds = e.target.getBounds();
-    //根据地图当前范围获取对应历史影像数据
-    me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
-    userconfig.RMap.setView(center,zoom);
-  }
-  onMoveRMap  = e => {
-    const me = this;
-    let zoom = e.target.getZoom();
-    let center = e.target.getCenter();
-    let bounds = e.target.getBounds();
-    //根据地图当前范围获取对应历史影像数据
-    me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
-    userconfig.LMap.setView(center,zoom);
-  }
-  /*
    *地图鼠标移动监听事件
   */ 
   onMoveMap = e => {
-    //console.log(e);
     if (userconfig.marker) userconfig.marker.remove();
     let myIcon = L.icon({
       iconUrl: "./img/hand_pointer.png",
@@ -170,14 +128,25 @@ export default class home2 extends PureComponent {
       me.loadmodalLayer();
       setTimeout(() => {
         //监听地图移动完成事件
-        userconfig.LMap.on("moveend", me.onMoveendMap);
-        //监听地图移动完成事件
-        userconfig.RMap.on("moveend", me.onMoveendMap);
-        // //监听地图移动完成事件
-        // userconfig.LMap.on("move", me.onMoveLMap);
-        // //监听地图移动完成事件
-        // userconfig.RMap.on("move", me.onMoveRMap);
-        //监听地图移动事件
+        userconfig.maps = [userconfig.LMap,userconfig.RMap];
+        // eslint-disable-next-line array-callback-return
+        userconfig.maps.map( function (t) { 
+          // console.log(t);
+          t.on({drag:maplink,zoom:maplink})  
+        })
+        //地图联动实现  
+        function maplink(e){  
+          var _this = this; 
+          // console.log(e);
+          let zoom = e.target.getZoom();
+          let bounds = e.target.getBounds();
+          me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
+          // eslint-disable-next-line array-callback-return
+          userconfig.maps.map(function (t) {  
+            t.setView(_this.getCenter(),_this.getZoom())  
+          })  
+        }
+        //监听地图移动事件      
         userconfig.LMap.on("mousemove", me.onMoveMap);
         //监听地图移动事件
         userconfig.RMap.on("mousemove", me.onMoveMap);

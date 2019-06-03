@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { Menu, Icon, Dropdown } from "antd";
+import { Menu, Icon, Dropdown, Avatar } from "antd";
 import { connect } from "dva";
 import { Link } from "dva/router";
 import styles from "./index.less";
@@ -172,7 +172,10 @@ export default class SiderMenu extends PureComponent {
           ))}
         </Menu>
         <div className={styles.right} style={{ margin: "0 20px" }}>
-          <Icon type="user" style={{ margin: "0 10px" }} />
+          {/* <Icon type="user" style={{ margin: "0 10px" }} /> */}
+          <Avatar style={{ backgroundColor: "#00a2ae" }}>
+            {user ? username.slice(0, 1) : ""}
+          </Avatar>
           <Dropdown overlay={menu}>
             <span> {user ? username : "请登录"}</span>
           </Dropdown>

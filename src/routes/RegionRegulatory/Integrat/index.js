@@ -238,8 +238,7 @@ export default class integrat extends PureComponent {
           config.mapSpotLayerName,
           this.callbackLocationQueryWFSService
         );
-      }
-      else if (data.key === "point") {
+      } else if (data.key === "point") {
         let latLng = [data.item.pointY, data.item.pointX];
         let turfpoint = turf.point([latLng[1], latLng[0]]);
         if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {
@@ -248,20 +247,17 @@ export default class integrat extends PureComponent {
         }
         //标注点定位
         if (marker) marker.remove();
-            marker = L.marker(latLng).addTo(map);
+        marker = L.marker(latLng).addTo(map);
 
         if (map.getZoom() >= config.mapInitParams.zoom) {
           me.automaticToMap(latLng);
-        }
-        else {
+        } else {
           map.setZoom(config.mapInitParams.zoom);
           setTimeout(() => {
             me.automaticToMap(latLng);
           }, 500);
         }
-
-      }
-      else if (data.key === "redLine") {
+      } else if (data.key === "redLine") {
         //防治责任范围定位
         me.queryWFSServiceByProperty(
           data.item.id,
@@ -2029,6 +2025,10 @@ export default class integrat extends PureComponent {
                 background: "#fff"
               }}
             >
+              <Link to="/home/welcome">
+                <Button icon="column-width" />
+              </Link>
+              <br />
               <Popover content="历史对比" title="" trigger="hover">
                 <Button
                   icon="swap"
@@ -2075,7 +2075,6 @@ export default class integrat extends PureComponent {
               >
                 <Button icon="bars" />
               </Popover>
-              <Link to="/home/welcome">地图分屏</Link>
             </div>
             {/* 历史对比地图切换 */}
             <div
