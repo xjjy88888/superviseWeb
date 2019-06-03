@@ -1156,6 +1156,7 @@ export default class integrat extends PureComponent {
     userconfig.projectgeojsonLayer = L.Proj.geoJson(geojson, {
       style: style
     }).addTo(map);
+    // console.log(turf.area(userconfig.projectgeojsonLayer.toGeoJSON()));
   };
   /*
    * 清空绘制图形函数
@@ -1389,14 +1390,14 @@ export default class integrat extends PureComponent {
       .zoom({ zoomInTitle: "放大", zoomOutTitle: "缩小", position: "topright" })
       .addTo(map);
     //地图视图控件
-    L.control
-      .navbar({
-        center: bounds.getCenter(),
-        forwardTitle: "前视图",
-        backTitle: "后视图",
-        homeTitle: "全图"
-      })
-      .addTo(map);
+    // L.control
+    //   .navbar({
+    //     center: bounds.getCenter(),
+    //     forwardTitle: "前视图",
+    //     backTitle: "后视图",
+    //     homeTitle: "全图"
+    //   })
+    //   .addTo(map);
     //地图比例尺控件
     const scale = L.control
       .scale({ imperial: false, position: "bottomright" })
@@ -2026,7 +2027,9 @@ export default class integrat extends PureComponent {
               }}
             >
               <Link to="/home/welcome">
-                <Button icon="column-width" />
+                <Popover content="地图分屏" title="" trigger="hover">
+                  <Button icon="column-width" />
+                </Popover>
               </Link>
               <br />
               <Popover content="历史对比" title="" trigger="hover">
