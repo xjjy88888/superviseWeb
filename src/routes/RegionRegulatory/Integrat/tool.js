@@ -249,7 +249,7 @@ export default class siderbarDetail extends PureComponent {
                       ? "spot/spotDeleteMul"
                       : "point/pointDeleteMul",
                   payload: {
-                    id: checkResult.map(item => item.id),
+                    id: checkResult.map(item => item.id)
                   },
                   callback: success => {
                     if (success) {
