@@ -4,6 +4,7 @@ import {
   dictApi,
   departListApi,
   departCreateApi,
+  basinOrganizationApi,
   departVaildApi
 } from "../services/httpApi";
 import { routerRedux } from "dva/router";
@@ -18,9 +19,10 @@ export default {
         us_name: "请登录"
       }
     ],
-    districtList: [{ children: null ,id:''}],
+    districtList: [{ children: null, id: "" }],
     dicList: [],
     departSelectList: [],
+    basinOrganList: [],
     departUpdateId: ""
   },
 
@@ -92,6 +94,23 @@ export default {
       } else {
         notification["error"]({
           message: `单位校验失败：${error.message}`
+        });
+      }
+    },
+
+    //流域机构列表
+    *basinOrgan({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result: basinOrganList }
+      } = yield call(basinOrganizationApi, payload);
+      if (success) {
+        yield put({
+          type: "save",
+          payload: { basinOrganList }
+        });
+      } else {
+        notification["error"]({
+          message: `获取流域机构列表失败：${error.message}`
         });
       }
     }

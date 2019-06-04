@@ -194,7 +194,8 @@ body {
 	z-index: 20;
 	position: absolute;
 	top: 0px;
-	right: 0px;
+  /* right: 0px; */
+  left: 0px;
 	display: none;
 	margin: 0 8px 3px 0;	
 }

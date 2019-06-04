@@ -115,6 +115,9 @@ const config = {
     // 附件删除
     annexDeleteUrl: `${domain}api/services/app/File/Delete`,
 
+    // 流域机构列表
+    basinOrganizationUrl: `${domain}api/services/app/Project/GetRiverBasinOU`,
+
     // 字典
     dictUrl: `${domain}api/services/app/DictTable/GetAll`,
 

@@ -119,6 +119,7 @@ export default class integrat extends PureComponent {
     this.queryPoint({ SkipCount: 0 });
     this.queryDistrict();
     this.queryDict();
+    this.queryBasinOrgan();
     this.eventEmitter = emitter.addListener("deleteSuccess", () => {
       const { key, query_pro, query_spot, query_point } = this.state;
       const v =
@@ -345,6 +346,13 @@ export default class integrat extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: "user/queryDict"
+    });
+  };
+
+  queryBasinOrgan = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "user/basinOrgan"
     });
   };
 
@@ -819,7 +827,7 @@ export default class integrat extends PureComponent {
         getFieldValue,
         setFieldValue
       },
-      user: { districtList },
+      user: { districtList, basinOrganList },
       project: { projectList, projectInfo, projectListAdd, departSelectList },
       spot: { spotList, projectInfoSpotList },
       point: { pointList },
@@ -1750,7 +1758,11 @@ export default class integrat extends PureComponent {
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>流域管理机构：</span>
-                        <span>{projectItem.riverBasinOU}</span>
+                        <span>
+                          {projectItem.riverBasinOU
+                            ? projectItem.riverBasinOU.name
+                            : ""}
+                        </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>批复文号：</span>
@@ -2817,13 +2829,15 @@ export default class integrat extends PureComponent {
                   )}
                 </Form.Item>
                 <Form.Item label="流域管理机构" {...formItemLayout}>
-                  {getFieldDecorator("ctn_code111", {
+                  {getFieldDecorator("riverBasinOUId", {
                     initialValue: projectItem.riverBasinOU
+                      ? projectItem.riverBasinOU.id
+                      : ""
                   })(
                     <Select showSearch allowClear optionFilterProp="children">
-                      {this.dictList("流域管理机构").map(item => (
+                      {basinOrganList.map(item => (
                         <Select.Option value={item.id} key={item.id}>
-                          {item.value}
+                          {item.name}
                         </Select.Option>
                       ))}
                     </Select>

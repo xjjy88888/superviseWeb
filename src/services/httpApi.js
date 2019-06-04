@@ -94,18 +94,21 @@ export async function projectDeleteApi(payload) {
   return request(`${config.url.projectDeleteUrl}?id=${payload.id}`, {
     method: "DELETE",
     headers: {
-      Authorization: `Bearer ${accessToken()}`
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
     }
   });
 }
 
 // 项目批量删除
-export async function projectDeleteMulApi(payload) {
-  return request(`${config.url.projectDeleteMulUrl}?ids=${payload.id}`, {
+export async function projectDeleteMulApi(params) {
+  return request(`${config.url.projectDeleteMulUrl}`, {
     method: "DELETE",
     headers: {
-      Authorization: `Bearer ${accessToken()}`
-    }
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify(params.id)
   });
 }
 
@@ -211,12 +214,14 @@ export async function spotDeleteApi(payload) {
 }
 
 // 图斑批量删除
-export async function spotDeleteMulApi(payload) {
-  return request(`${config.url.spotDeleteMulUrl}?ids=${payload.id}`, {
+export async function spotDeleteMulApi(params) {
+  return request(`${config.url.spotDeleteMulUrl}`, {
     method: "DELETE",
     headers: {
-      Authorization: `Bearer ${accessToken()}`
-    }
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify(params.id)
   });
 }
 
@@ -361,6 +366,16 @@ export async function redLineDeleteApi(payload) {
 export async function redLineDeleteMulApi(payload) {
   return request(`${config.url.redLineDeleteMulUrl}?ids=${payload.id}`, {
     method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 流域机构列表
+export async function basinOrganizationApi() {
+  return request(`${config.url.basinOrganizationUrl}`, {
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }

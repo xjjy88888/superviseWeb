@@ -432,7 +432,7 @@ export default class integrat extends PureComponent {
             </p>
             <p style={{ margin: 10 }}>
               <span>项目规模：</span>
-              <span>{projectItem.expand.projectSize}</span>
+              <span>{projectItem.expand.projectSize}m或㎡</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>设计动工时间：</span>

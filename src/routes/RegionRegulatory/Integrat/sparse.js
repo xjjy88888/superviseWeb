@@ -45,8 +45,8 @@ export default class siderbarDetail extends PureComponent {
             top: "50%",
             left: "50%",
             transform: "translate(-50%,-50%)",
-            width: "1000px",
-            height: "600px",
+            // width: "1200px",
+            // height: "600px",
             overflow: "auto"
           }}
         >
@@ -65,8 +65,8 @@ export default class siderbarDetail extends PureComponent {
           <iframe
             title="抽稀"
             height="595px"
-            width="1000px"
-            src="http://aj.zkygis.cn/stbcSys/mapshaper/index.html"
+            width="1200px"
+            src="./mapshaper/index.html"
           />
         </div>
       </div>

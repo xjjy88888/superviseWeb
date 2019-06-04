@@ -249,7 +249,7 @@ export default class siderbarDetail extends PureComponent {
                       ? "spot/spotDeleteMul"
                       : "point/pointDeleteMul",
                   payload: {
-                    id: checkResult.map(item => item.id).join(",")
+                    id: checkResult.map(item => item.id),
                   },
                   callback: success => {
                     if (success) {
@@ -296,7 +296,7 @@ export default class siderbarDetail extends PureComponent {
                     onClick={() => {
                       emitter.emit("showChart", {
                         show: true,
-                        type: 'project',
+                        type: "project",
                         key: item.type,
                         title: item.label
                       });
@@ -324,7 +324,7 @@ export default class siderbarDetail extends PureComponent {
                     onClick={() => {
                       emitter.emit("showChart", {
                         show: true,
-                        type: 'spot',
+                        type: "spot",
                         key: item.type,
                         title: item.label
                       });
