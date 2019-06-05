@@ -159,10 +159,7 @@ export default class siderbarDetail extends PureComponent {
           rotate: 30
         },
         data: isVector
-          ? [
-              ...v.hasScope.map(item => item.name),
-              ...v.vecType.map(item => item.name)
-            ]
+          ? [...v.vecType.map(item => item.name), v.hasScope[0].name]
           : v.map(item => item.name)
       },
       series: [
@@ -186,10 +183,7 @@ export default class siderbarDetail extends PureComponent {
             }
           },
           data: isVector
-            ? [
-                ...v.hasScope.map(item => item.value),
-                ...v.vecType.map(item => item.value)
-              ]
+            ? [...v.vecType.map(item => item.value), v.hasScope[0].value]
             : v.map(item => item.value)
         }
       ]

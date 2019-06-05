@@ -2771,6 +2771,7 @@ export default class integrat extends PureComponent {
                   })(
                     <Select
                       showSearch
+                      allowClear
                       optionFilterProp="children"
                       filterOption={(input, option) =>
                         option.props.children
@@ -2804,6 +2805,7 @@ export default class integrat extends PureComponent {
                   })(
                     <Select
                       showSearch
+                      allowClear
                       optionFilterProp="children"
                       filterOption={(input, option) =>
                         option.props.children
@@ -2836,6 +2838,7 @@ export default class integrat extends PureComponent {
                     )
                   })(
                     <Select
+                      allowClear
                       showSearch
                       optionFilterProp="children"
                       filterOption={(input, option) =>

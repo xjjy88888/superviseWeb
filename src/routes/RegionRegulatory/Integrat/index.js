@@ -163,6 +163,7 @@ export default class integrat extends PureComponent {
         this.setState({ addGraphLayer: null });
       }
       map.pm.disableDraw("Polygon");
+      this.clearGeojsonLayer();
     });
     //获取url参数
     me.initUrlParams();
@@ -1946,7 +1947,7 @@ export default class integrat extends PureComponent {
                     : this.cancelAddGraphic
                 }
               />
-              <Popover content={"第二步：填写图斑信息"}>
+              <Popover content={"第二步：填写属性信息"}>
                 <Button
                   icon="arrow-right"
                   onClick={

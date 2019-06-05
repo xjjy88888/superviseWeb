@@ -458,7 +458,9 @@ export default class siderbarDetail extends PureComponent {
               </p>
               <Form.Item label="设计阶段" {...formItemLayout}>
                 {getFieldDecorator("designStageId", {
-                  initialValue: redLineItem.designStageId
+                  initialValue: redLineItem.designStage
+                    ? redLineItem.designStage.id
+                    : ""
                 })(
                   <Select
                     showSearch
@@ -476,7 +478,9 @@ export default class siderbarDetail extends PureComponent {
               </Form.Item>
               <Form.Item label="矢量化类型" {...formItemLayout}>
                 {getFieldDecorator("vecTypeId", {
-                  initialValue: redLineItem.vecTypeId
+                  initialValue: redLineItem.vecType
+                    ? redLineItem.vecType.id
+                    : ""
                 })(
                   <Select
                     showSearch
@@ -503,7 +507,7 @@ export default class siderbarDetail extends PureComponent {
                 })(<Input disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="上图单位" {...formItemLayout}>
-                {getFieldDecorator("upmapDepartment", {
+                {getFieldDecorator("upmapDepartmentId", {
                   initialValue: redLineItem.upmapDepartment
                     ? redLineItem.upmapDepartment.id
                     : ""

@@ -354,7 +354,9 @@ export default class integrat extends PureComponent {
           {edit ? (
             <div>
               <Icon type="plus" />
-              <div className="ant-upload-text">上传</div>
+              <div className="ant-upload-text">
+                {isChange ? "变更依据" : "水保方案"}上传
+              </div>
             </div>
           ) : null}
         </Upload>
@@ -1049,6 +1051,7 @@ export default class integrat extends PureComponent {
                   })(
                     <Select
                       showSearch
+                      allowClear
                       style={{ width: 220 }}
                       optionFilterProp="children"
                       filterOption={(input, option) =>
@@ -1085,6 +1088,7 @@ export default class integrat extends PureComponent {
                   })(
                     <Select
                       showSearch
+                      allowClear
                       style={{ width: 220 }}
                       optionFilterProp="children"
                       filterOption={(input, option) =>
@@ -1121,6 +1125,7 @@ export default class integrat extends PureComponent {
                   })(
                     <Select
                       showSearch
+                      allowClear
                       style={{ width: 220 }}
                       optionFilterProp="children"
                       filterOption={(input, option) =>
@@ -1157,6 +1162,7 @@ export default class integrat extends PureComponent {
                   })(
                     <Select
                       showSearch
+                      allowClear
                       style={{ width: 220 }}
                       optionFilterProp="children"
                       filterOption={(input, option) =>
@@ -1193,6 +1199,7 @@ export default class integrat extends PureComponent {
                   })(
                     <Select
                       showSearch
+                      allowClear
                       style={{ width: 220 }}
                       optionFilterProp="children"
                       filterOption={(input, option) =>
@@ -1229,6 +1236,7 @@ export default class integrat extends PureComponent {
                   })(
                     <Select
                       showSearch
+                      allowClear
                       style={{ width: 220 }}
                       optionFilterProp="children"
                       filterOption={(input, option) =>
