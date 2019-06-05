@@ -66,6 +66,7 @@ export default class integrat extends PureComponent {
       showCompany: false,
       showProblem: false,
       showQuery: false,
+      isArchivalSpot: false,
       showCheck: false,
       checked: false,
       ParentId: 0,
@@ -113,6 +114,7 @@ export default class integrat extends PureComponent {
 
   componentDidMount() {
     self = this;
+    const { dispatch } = this.props;
     console.log("贵阳至黄平高速公路", "六枝特区平寨镇跃进砂石厂");
     this.queryProject({ SkipCount: 0 });
     this.querySpot({ SkipCount: 0 });
@@ -131,8 +133,25 @@ export default class integrat extends PureComponent {
       this.search(v);
     });
     this.eventEmitter = emitter.addListener("spotRelate", v => {
-      if (v.status === "end") {
+      if (v.status === "end" && v.spotId.length !== 0) {
         console.log(v);
+        v.spotId.map(item => {
+          dispatch({
+            type: "spot/spotCreateUpdate",
+            payload: {
+              id: item,
+              projectId: v.projectId
+            },
+            callback: success => {
+              if (success) {
+                notification["success"]({
+                  message: `关联扰动图斑成功`
+                });
+                this.querySpotByProjectId(v.projectId);
+              }
+            }
+          });
+        });
       }
     });
     this.eventEmitter = emitter.addListener("projectInfoRefresh", v => {
@@ -481,7 +500,8 @@ export default class integrat extends PureComponent {
       payload: {
         ProjectId: id,
         MaxResultCount: 1000,
-        SkipCount: 0
+        SkipCount: 0,
+        ShowArchive: this.state.isArchivalSpot
       },
       callback: success => {
         this.showSpin(false);
@@ -2009,18 +2029,22 @@ export default class integrat extends PureComponent {
                             //图斑关联
                             emitter.emit("spotRelate", {
                               status: "start", //start：开始，end：结束
-                              spotId: ""
+                              spotId: "",
+                              projectId: projectItem.id
                             });
                           }}
                         />
                         <Switch
                           checkedChildren="归档图斑"
-                          unCheckedChildren="归档图斑"
+                          unCheckedChildren="现状数据"
                           style={{ position: "relative", left: 10, top: -2 }}
                           onChange={(v, e) => {
                             e.stopPropagation();
                             console.log(v);
                             this.setState({ isArchivalSpot: v });
+                            setTimeout(() => {
+                              this.querySpotByProjectId(projectItem.id);
+                            }, 100);
                           }}
                         />
                       </b>
@@ -2044,7 +2068,8 @@ export default class integrat extends PureComponent {
                           });
                         }}
                       >
-                        {item.mapNum} {isArchivalSpot ? "2019-05-08" : ""}
+                        {item.mapNum}{" "}
+                        {isArchivalSpot ? item.archiveTime.slice(0, 10) : ""}
                         <Icon
                           type="disconnect"
                           style={{
@@ -2055,8 +2080,22 @@ export default class integrat extends PureComponent {
                           }}
                           onClick={e => {
                             e.stopPropagation();
-                            notification["info"]({
-                              message: "解绑图斑"
+                            dispatch({
+                              type: "project/projectUnbindSpotApi",
+                              payload: {
+                                projectId: projectItem.id,
+                                spotId: item.id
+                              },
+                              callback: (success, error, result) => {
+                                notification[success ? "success" : "error"]({
+                                  message: `取消关联扰动图斑${
+                                    success ? "成功" : "失败"
+                                  }${success ? "" : `：${error.message}`}`
+                                });
+                                if (success) {
+                                  this.querySpotByProjectId(projectItem.id);
+                                }
+                              }
                             });
                           }}
                         />
@@ -2067,7 +2106,7 @@ export default class integrat extends PureComponent {
                             fontSize: 16,
                             cursor: "point",
                             color: "#1890ff",
-                            marginRight: 10
+                            marginRight: isArchivalSpot ? 0 : 10
                           }}
                           onClick={e => {
                             e.stopPropagation();

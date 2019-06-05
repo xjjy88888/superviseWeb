@@ -452,7 +452,8 @@ export default class integrat extends PureComponent {
     //图斑关联
     this.eventEmitter = emitter.addListener("spotRelate", data => {
       this.setState({
-        spotStatus: data.status //start：开始，end：结束
+        spotStatus: data.status, //start：开始，end：结束
+        spotRelateProjectId: data.projectId
       });
     });
   }
@@ -622,7 +623,8 @@ export default class integrat extends PureComponent {
         //图斑关联
         emitter.emit("spotRelate", {
           status: "end", //start：开始，end：结束
-          spotId: spotIds
+          spotId: spotIds,
+          projectId: me.state.spotRelateProjectId
         });
         // console.log(spotIds);
       } else {

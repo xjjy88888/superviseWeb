@@ -15,6 +15,7 @@ import {
   departListApi,
   departCreateApi,
   projectUnArchiveApi,
+  projectUnbindSpotApi,
   projectArchiveApi
 } from "../services/httpApi";
 
@@ -202,6 +203,14 @@ export default {
           message: `项目重名验证失败${error.message}`
         });
       }
+    },
+
+    // 项目取消关联图斑
+    *projectUnbindSpotApi({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(projectUnbindSpotApi, payload);
+      if (callback) callback(success, error, result);
     },
 
     // 单位列表

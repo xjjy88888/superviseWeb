@@ -147,6 +147,21 @@ export async function projectVerifyApi(params) {
   });
 }
 
+// 项目取消关联图斑
+export async function projectUnbindSpotApi(params) {
+  return request(
+    `${config.url.projectUnbindSpotUrl}?projectId=${params.projectId}&spotId=${
+      params.spotId
+    }`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`
+      }
+    }
+  );
+}
+
 // 图斑列表
 export async function spotListApi(params) {
   delete params.items;

@@ -43,6 +43,9 @@ const config = {
     // 项目重名验证
     projectVerifyUrl: `${domain}api/services/app/Project/VaildProjectName`,
 
+    // 项目取消关联图斑
+    projectUnbindSpotUrl: `${domain}api/services/app/Project/UnbindSpot`,
+
     // 图斑列表
     spotListUrl: `${domain}api/services/app/Spot/GetAllByPost`,
 
