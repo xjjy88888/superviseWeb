@@ -131,6 +131,9 @@ export default class integrat extends PureComponent {
           : key === "spot"
           ? query_spot
           : query_point;
+      this.setState({
+        showProjectDetail: false
+      });
       this.search(v);
     });
     this.eventEmitter = emitter.addListener("spotRelate", v => {
@@ -1163,7 +1166,8 @@ export default class integrat extends PureComponent {
                     projectEdit: true,
                     isProjectUpdate: false,
                     previewVisible_min_left: false,
-                    projectFileList: []
+                    projectFileList: [],
+                    ParentId: 0
                   });
                   resetFields();
                   emitter.emit("showProjectDetail", {
@@ -1654,9 +1658,10 @@ export default class integrat extends PureComponent {
                           ...v,
                           attachmentId: ParentId,
                           districtCodes: v.districtCodes.join(","),
-                          districtCodeId: v.districtCodeId.length
-                            ? v.districtCodeId.pop()
-                            : "",
+                          districtCodeId:
+                            v.districtCodeId && v.districtCodeId.length
+                              ? v.districtCodeId.pop()
+                              : "",
                           id: isProjectUpdate ? projectItem.id : ""
                         };
                         emitter.emit("projectCreateUpdate", data);
@@ -2734,7 +2739,7 @@ export default class integrat extends PureComponent {
                 </Form.Item>
                 <Form.Item label="所在地区" {...formItemLayout}>
                   {getFieldDecorator("districtCodeId", {
-                    initialValue: projectItem.provinceCityDistrict
+                    initialValue: projectItem.projectBase.provinceCityDistrict
                   })(
                     <Cascader
                       placeholder="请选择所在地区"

@@ -76,6 +76,7 @@ export default class siderbarDetail extends PureComponent {
     this.eventEmitter = emitter.addListener("showSiderbarDetail", data => {
       resetFields();
       this.setState({
+        ParentId: 0,
         spotFileList: [],
         pointFileList: [],
         redLineFileList: [],
@@ -394,12 +395,13 @@ export default class siderbarDetail extends PureComponent {
             }}
             onClick={() => {
               if (edit) {
-                if (from === "spot") {
+                if (from === "spot" || from === "redLine") {
                   Modal.confirm({
-                    title: `确定放弃已绘制图斑和填写的图斑属性？`,
+                    title: `确定放弃已绘制的图形和填写的属性吗？`,
                     content: "",
                     onOk() {
                       self.setState({ show: false });
+                      emitter.emit("deleteDraw", {});
                     },
                     onCancel() {}
                   });

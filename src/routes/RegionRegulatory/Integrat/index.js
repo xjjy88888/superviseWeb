@@ -157,6 +157,9 @@ export default class integrat extends PureComponent {
     };
     this.eventEmitter = emitter.addListener("deleteDraw", () => {
       this.clearPlotGraphic();
+      setTimeout(() => {
+        this.reDrawWMSLayers();
+      }, 500);
     });
     //获取url参数
     me.initUrlParams();
@@ -1464,6 +1467,16 @@ export default class integrat extends PureComponent {
    *刷新重绘WMS图层
    */
   reDrawWMSLayers = () => {
+    if(userconfig.projectlayerGroup){
+      userconfig.projectlayerGroup.eachLayer(function (layer) {
+        layer.redraw();
+      });
+    }
+    if(userconfig.spotlayerGroup){
+      userconfig.spotlayerGroup.eachLayer(function (layer) {
+        layer.redraw();
+      });
+    }
   };
   /*
    *清空绘制图形,避免新增图形以及编辑图形冲突

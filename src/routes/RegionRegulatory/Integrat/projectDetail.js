@@ -97,7 +97,7 @@ export default class integrat extends PureComponent {
           payload: values,
           callback: (success, response) => {
             if (success) {
-              emitter.emit("projectCreateUpdateBack", {});
+              emitter.emit("deleteSuccess", {});
               notification["success"]({
                 message: `${data.id ? "编辑" : "新建"}项目成功`
               });
