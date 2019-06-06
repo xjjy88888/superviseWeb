@@ -6,6 +6,7 @@ import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
 import "echarts";
 import config from "../../../config";
+import { dateFormat, accessToken } from "../../../utils/util";
 
 const url = "http://aj.zkygis.cn/stbcSys/Template/";
 
@@ -206,15 +207,39 @@ export default class siderbarDetail extends PureComponent {
               });
               if (funcType === "export") {
                 //导出
-                dispatch({
-                  type:
-                    key === "project"
-                      ? "project/exportProject"
-                      : "spot/spotDeleteMul",
-                  payload: {
-                    ids: checkResult.map(item => item.id)
-                  }
-                });
+                // dispatch({
+                //   type:
+                //     key === "project"
+                //       ? "project/exportProject"
+                //       : "spot/spotDeleteMul",
+                //   payload: {
+                //     ids: checkResult.map(item => item.id)
+                //   }
+                // });
+                const downloadUrl =
+                  "http://aj.zkygis.cn/stbc/api/Export/ProjectExport";
+                fetch(downloadUrl, {
+                  method: "POST",
+                  credentials: "include",
+                  body: window.JSON.stringify([0]),
+                  headers: new Headers({
+                    "Content-Type": "application/json-patch+json",
+                    Authorization: `Bearer ${accessToken()}`
+                  })
+                })
+                  .then(response => {
+                    response.blob().then(blob => {
+                      let url = window.URL.createObjectURL(blob);
+                      let a = document.createElement("a");
+                      a.href = url;
+                      a.download = "filename.zip";
+                      a.click();
+                      // window.URL.revokeObjectURL(url);
+                    });
+                  })
+                  .catch(error => {
+                    console.log(error);
+                  });
               } else if (funcType === "attach") {
                 //导出附件
               } else if (funcType === "delete") {

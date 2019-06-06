@@ -56,7 +56,8 @@ export default class siderbarDetail extends PureComponent {
       spotFileList: [],
       pointFileList: [],
       redLineFileList: [],
-      fromList: false
+      fromList: false,
+      showSpotHistory: false
     };
     this.map = null;
   }
@@ -130,7 +131,7 @@ export default class siderbarDetail extends PureComponent {
     });
   }
 
-  querySpotById = id => {
+  querySpotById = (id, isHistory) => {
     const { dispatch } = this.props;
     dispatch({
       type: "spot/querySpotById",
@@ -155,6 +156,12 @@ export default class siderbarDetail extends PureComponent {
         }
       }
     });
+    if (!isHistory) {
+      dispatch({
+        type: "spot/spotHistory",
+        payload: { id: id }
+      });
+    }
   };
 
   queryPointById = id => {
@@ -299,7 +306,7 @@ export default class siderbarDetail extends PureComponent {
       dispatch,
       form: { getFieldDecorator, resetFields, validateFields, getFieldValue },
       user: { districtList },
-      spot: { spotInfo, projectSelectListSpot },
+      spot: { spotInfo, projectSelectListSpot, spotHistoryList },
       point: { pointInfo, projectSelectListPoint },
       redLine: { redLineInfo, projectSelectListRedLine }
     } = this.props;
@@ -319,7 +326,8 @@ export default class siderbarDetail extends PureComponent {
       previewVisible,
       previewImage,
       previewVisible_min,
-      relateProject
+      relateProject,
+      showSpotHistory
     } = this.state;
 
     const projectSelectListAll = [
@@ -980,6 +988,7 @@ export default class siderbarDetail extends PureComponent {
                         });
                       } else {
                         this.setState({ archiveTime: "" });
+                        console.log("spotItem", spotItem);
                         Modal.confirm({
                           title: "归档保存",
                           content: (
@@ -1037,10 +1046,16 @@ export default class siderbarDetail extends PureComponent {
                 </Button>
               </span>
             ) : (
-              <div>
-                {/* <Button icon="swap" style={{ marginTop: 20 }}>
+              <span>
+                <Button
+                  icon="ordered-list"
+                  style={{ marginRight: 15 }}
+                  onClick={() => {
+                    this.setState({ showSpotHistory: !showSpotHistory });
+                  }}
+                >
                   历史查看
-                </Button> */}
+                </Button>
                 <Button
                   icon="cloud-download"
                   style={{
@@ -1130,7 +1145,7 @@ export default class siderbarDetail extends PureComponent {
                       type !== "add" && !spotItem.isArchive
                         ? "inline-block"
                         : "none",
-                    marginLeft: 20
+                    marginLeft: 15
                   }}
                   onClick={() => {
                     Modal.confirm({
@@ -1168,8 +1183,43 @@ export default class siderbarDetail extends PureComponent {
                 >
                   删除
                 </Button>
-              </div>
+              </span>
             )}
+            <div
+              style={{
+                display: showSpotHistory ? "block" : "none",
+                marginTop: 20
+              }}
+            >
+              {spotHistoryList.map((item, index) => (
+                <p
+                  key={index}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    this.querySpotById(item.id, true);
+                  }}
+                >
+                  {item.mapNum}
+                  <Icon
+                    type="environment"
+                    style={{
+                      float: "right",
+                      fontSize: 16,
+                      cursor: "point",
+                      color: "#1890ff",
+                      marginRight: 10
+                    }}
+                    onClick={e => {
+                      e.stopPropagation();
+                      emitter.emit("mapLocation", {
+                        item: item,
+                        key: "spot"
+                      });
+                    }}
+                  />
+                </p>
+              ))}
+            </div>
           </div>
           <div
             style={{

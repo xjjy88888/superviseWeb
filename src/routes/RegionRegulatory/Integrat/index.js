@@ -232,13 +232,23 @@ export default class integrat extends PureComponent {
           message.warning("地图定位不到相关数据", 1);
           return;
         }
-        //扰动图斑
-        this.queryWFSServiceByProperty(
-          data.item.id,
-          "id",
-          config.mapSpotLayerName,
-          this.callbackLocationQueryWFSService
-        );
+
+        if(data.item.isArchive){//历史扰动图斑
+          this.queryWFSServiceByProperty(
+            data.item.id,
+            "id",
+            config.mapHistorySpotLayerName,
+            this.callbackLocationNoPopup
+          );
+        }
+        else{//现状扰动图斑
+          this.queryWFSServiceByProperty(
+            data.item.id,
+            "id",
+            config.mapSpotLayerName,
+            this.callbackLocationQueryWFSService
+          );
+        }
       } else if (data.key === "point") {
         let latLng = [data.item.pointY, data.item.pointX];
         let turfpoint = turf.point([latLng[1], latLng[0]]);
@@ -545,6 +555,42 @@ export default class integrat extends PureComponent {
         message.warning("项目无可用位置信息", 1);
       }
     } else {
+      message.warning("项目无可用位置信息", 1);
+    }
+  };
+  /*
+   * 地图定位查询回调函数-不弹气泡窗口
+   */
+  callbackLocationNoPopup = data => {
+    const me = this;
+    if (data.success) {
+      data = data.result;
+      if (data.features.length > 0) {
+        me.clearGeojsonLayer();
+        let style = {
+          color: "#33CCFF", //#33CCFF #e60000
+          weight: 3,
+          opacity: 1,
+          fillColor: "#e6d933", //#33CCFF #e6d933
+          fillOpacity: 0.1
+        };
+        me.loadGeojsonLayer(data, style);
+        if (map.getZoom() < config.mapInitParams.zoom) {
+          map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
+            maxZoom: 16
+          });
+        }
+        else{
+          me.automaticToMap(
+            userconfig.projectgeojsonLayer.getBounds().getCenter()
+          );          
+        }
+      }
+      else {
+        message.warning("项目无可用位置信息", 1);
+      }
+    }
+    else {
       message.warning("项目无可用位置信息", 1);
     }
   };

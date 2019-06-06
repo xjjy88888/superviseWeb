@@ -265,6 +265,16 @@ export async function spotUnArchiveApi(params) {
   });
 }
 
+// 图斑历史
+export async function spotHistoryApi(params) {
+  return request(`${config.url.spotHistoryUrl}?spotId=${params.id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
 // 标注点列表
 export async function pointListApi(params) {
   return request(

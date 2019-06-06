@@ -73,6 +73,9 @@ const config = {
     // 图斑撤销归档
     spotUnArchiveUrl: `${domain}api/services/app/Spot/UnArchive`,
 
+    // 图斑历史
+    spotHistoryUrl: `${domain}api/services/app/Spot/GetHistorySpots`,
+
     // 标注点列表
     pointListUrl: `${domain}api/services/app/MarkingPoint/GetAll`,
 

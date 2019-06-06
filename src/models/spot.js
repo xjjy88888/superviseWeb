@@ -7,7 +7,8 @@ import {
   spotDeleteApi,
   spotArchiveApi,
   spotUnArchiveApi,
-  spotDeleteMulApi
+  spotDeleteMulApi,
+  spotHistoryApi
 } from "../services/httpApi";
 
 export default {
@@ -17,7 +18,8 @@ export default {
     spotList: { totalCount: 0, items: [] },
     projectInfoSpotList: { totalCount: 0, items: [] },
     spotInfo: { mapNum: "", provinceCityDistrict: [null, null, null] },
-    projectSelectListSpot: []
+    projectSelectListSpot: [],
+    spotHistoryList: []
   },
 
   subscriptions: {
@@ -187,6 +189,23 @@ export default {
         data: { success, error, result }
       } = yield call(spotListApi, payload);
       if (callback) callback(success, error, result);
+    },
+
+    // 图斑历史
+    *spotHistory({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(spotHistoryApi, payload);
+      if (success) {
+        yield put({
+          type: "save",
+          payload: { spotHistoryList: result }
+        });
+      } else {
+        notification["error"]({
+          message: `查询图斑历史失败：${error.message}`
+        });
+      }
     }
   },
 
