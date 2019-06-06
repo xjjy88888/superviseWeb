@@ -64,7 +64,7 @@ export default class siderbarDetail extends PureComponent {
         style={{
           left: show ? 350 : -350,
           width: 240,
-          height: 580,
+          height: 610,
           backgroundColor: `#fff`,
           position: `absolute`,
           zIndex: 1000,
@@ -135,8 +135,9 @@ export default class siderbarDetail extends PureComponent {
                           }模板(Shapfile)成功`
                         });
                         break;
-                      //导出数据-归档数据-删除
+                      //导出数据-导出附件数据-归档数据-删除
                       case "export":
+                      case "attach":
                       case "archiving":
                       case "delete":
                         if (showCheck && checkResult.length === 0) {
@@ -184,9 +185,12 @@ export default class siderbarDetail extends PureComponent {
                   }}
                 >
                   {item.key === "export" ||
+                  item.key === "attach" ||
                   item.key === "archiving" ||
                   item.key === "delete"
-                    ? `${item.label}${showCheck ? "勾选" : "列表"}数据`
+                    ? `${item.label}${showCheck ? "勾选" : "列表"}${
+                        item.key === "attach" ? "附件" : ""
+                      }数据`
                     : item.label}
                 </Button>
                 <br />
@@ -200,7 +204,21 @@ export default class siderbarDetail extends PureComponent {
               this.setState({
                 visible: false
               });
-              if (funcType !== "export") {
+              if (funcType === "export") {
+                //导出
+                dispatch({
+                  type:
+                    key === "project"
+                      ? "project/exportProject"
+                      : "spot/spotDeleteMul",
+                  payload: {
+                    ids: checkResult.map(item => item.id)
+                  }
+                });
+              } else if (funcType === "attach") {
+                //导出附件
+              } else if (funcType === "delete") {
+                //删除
                 this.setState({
                   visibleDelete: true
                 });

@@ -272,13 +272,12 @@ export default class siderbarDetail extends PureComponent {
               notification["success"]({
                 message: `${type === "edit" ? "编辑" : "新建"}图斑成功`
               });
+              this.setState({ show: false });
               if (fromList) {
-                emitter.emit("projectCreateUpdateBack", {});
                 emitter.emit("deleteSuccess", {
                   success: true
                 });
               } else {
-                this.setState({ show: false });
                 resetFields();
                 emitter.emit("projectInfoRefresh", {
                   projectId: projectId
@@ -307,6 +306,7 @@ export default class siderbarDetail extends PureComponent {
     const {
       show,
       from,
+      fromList,
       polygon,
       ParentId,
       type,
@@ -608,81 +608,80 @@ export default class siderbarDetail extends PureComponent {
               </Upload>
             </div>
             {edit ? (
-              <span>
-                <Button
-                  htmlType="submit"
-                  icon="check"
-                  style={{ marginTop: 20 }}
-                  onClick={() => {
-                    validateFields((err, v) => {
-                      console.log("项目红线信息", v);
+              <Button
+                htmlType="submit"
+                icon="check"
+                style={{ marginTop: 20 }}
+                onClick={() => {
+                  validateFields((err, v) => {
+                    console.log("项目红线信息", v);
+                    dispatch({
+                      type: "redLine/redLineCreateUpdate",
+                      payload: {
+                        ...v,
+                        attachmentId: ParentId,
+                        polygon: polygon,
+                        projectId: projectId,
+                        id: type === "edit" ? redLineInfo.id : ""
+                      },
+                      callback: (success, response) => {
+                        if (success) {
+                          this.setState({ show: false });
+                          resetFields();
+                          emitter.emit("projectInfoRefresh", {
+                            projectId: projectId
+                          });
+                          notification["success"]({
+                            message: `${
+                              type === "edit" ? "编辑" : "新建"
+                            }项目红线成功`
+                          });
+                          emitter.emit("deleteDraw", {});
+                        }
+                      }
+                    });
+                  });
+                }}
+              >
+                保存
+              </Button>
+            ) : (
+              <Button
+                icon="delete"
+                style={{
+                  display: type !== "add" ? "inherit" : "none",
+                  marginLeft: 20
+                }}
+                onClick={() => {
+                  Modal.confirm({
+                    title: "删除",
+                    content: "是否确定要删除这条项目红线数据？",
+                    okText: "是",
+                    okType: "danger",
+                    cancelText: "否",
+                    onOk() {
                       dispatch({
-                        type: "redLine/redLineCreateUpdate",
+                        type: "redLine/redLineDelete",
                         payload: {
-                          ...v,
-                          attachmentId: ParentId,
-                          polygon: polygon,
-                          projectId: projectId,
-                          id: type === "edit" ? redLineInfo.id : ""
+                          id: redLineItem.id
                         },
-                        callback: (success, response) => {
+                        callback: success => {
                           if (success) {
-                            this.setState({ show: false });
-                            resetFields();
+                            self.setState({ show: false });
                             emitter.emit("projectInfoRefresh", {
                               projectId: projectId
                             });
-                            notification["success"]({
-                              message: `${
-                                type === "edit" ? "编辑" : "新建"
-                              }项目红线成功`
-                            });
-                            emitter.emit("deleteDraw", {});
                           }
                         }
                       });
-                    });
-                  }}
-                >
-                  保存
-                </Button>
-                <Button
-                  icon="delete"
-                  style={{
-                    display: type !== "add" ? "inherit" : "none",
-                    marginLeft: 20
-                  }}
-                  onClick={() => {
-                    Modal.confirm({
-                      title: "删除",
-                      content: "是否确定要删除这条项目红线数据？",
-                      okText: "是",
-                      okType: "danger",
-                      cancelText: "否",
-                      onOk() {
-                        dispatch({
-                          type: "redLine/redLineDelete",
-                          payload: {
-                            id: redLineItem.id
-                          },
-                          callback: success => {
-                            if (success) {
-                              self.setState({ show: false });
-                              emitter.emit("projectInfoRefresh", {
-                                projectId: projectId
-                              });
-                            }
-                          }
-                        });
-                      },
-                      onCancel() {}
-                    });
-                  }}
-                >
-                  删除
-                </Button>
-              </span>
-            ) : null}
+                    },
+                    onCancel() {}
+                  });
+                }}
+              >
+                删除
+              </Button>
+            )}
           </div>
           <div
             style={{
@@ -1150,9 +1149,15 @@ export default class siderbarDetail extends PureComponent {
                           callback: success => {
                             if (success) {
                               self.setState({ show: false });
-                              emitter.emit("deleteSuccess", {
-                                success: true
-                              });
+                              if (fromList) {
+                                emitter.emit("deleteSuccess", {
+                                  success: true
+                                });
+                              } else {
+                                emitter.emit("projectInfoRefresh", {
+                                  projectId: projectId
+                                });
+                              }
                             }
                           }
                         });
@@ -1177,11 +1182,6 @@ export default class siderbarDetail extends PureComponent {
                   initialValue: pointItem.name
                 })(<Input disabled={!edit} />)}
               </Form.Item>
-              {/* <Form.Item label="标注时间" {...formItemLayout}>
-                {getFieldDecorator("createTime", {
-                  initialValue: moment(pointItem.createTime, dateFormat)
-                })(<DatePicker disabled={!edit} showTime />)}
-              </Form.Item> */}
               <Form.Item
                 label={
                   <a
@@ -1347,78 +1347,77 @@ export default class siderbarDetail extends PureComponent {
               </Upload>
             </div>
             {edit ? (
-              <span>
-                <Button
-                  icon="check"
-                  style={{ marginTop: 20 }}
-                  onClick={() => {
-                    validateFields((err, v) => {
-                      console.log(v);
+              <Button
+                icon="check"
+                style={{ marginTop: 20 }}
+                onClick={() => {
+                  validateFields((err, v) => {
+                    console.log(v);
+                    dispatch({
+                      type: "point/pointCreateUpdate",
+                      payload: {
+                        ...v,
+                        attachmentId: ParentId,
+                        id: type === "edit" ? pointItem.id : ""
+                      },
+                      callback: (success, response) => {
+                        if (success) {
+                          emitter.emit("projectCreateUpdateBack", {});
+                          notification["success"]({
+                            message: `${
+                              type === "edit" ? "编辑" : "新建"
+                            }标注点成功`
+                          });
+                          emitter.emit("deleteSuccess", {
+                            success: true
+                          });
+                          emitter.emit("deleteDraw", {});
+                        }
+                      }
+                    });
+                  });
+                }}
+              >
+                保存
+              </Button>
+            ) : (
+              <Button
+                icon="delete"
+                style={{
+                  display: type !== "add" ? "inherit" : "none",
+                  marginLeft: 20
+                }}
+                onClick={() => {
+                  Modal.confirm({
+                    title: "删除",
+                    content: "是否确定要删除这条标注点数据？",
+                    okText: "是",
+                    okType: "danger",
+                    cancelText: "否",
+                    onOk() {
+                      resetFields();
                       dispatch({
-                        type: "point/pointCreateUpdate",
+                        type: "point/pointDelete",
                         payload: {
-                          ...v,
-                          attachmentId: ParentId,
-                          id: type === "edit" ? pointItem.id : ""
+                          id: pointItem.id
                         },
-                        callback: (success, response) => {
+                        callback: success => {
                           if (success) {
-                            emitter.emit("projectCreateUpdateBack", {});
-                            notification["success"]({
-                              message: `${
-                                type === "edit" ? "编辑" : "新建"
-                              }标注点成功`
-                            });
+                            self.setState({ show: false });
                             emitter.emit("deleteSuccess", {
                               success: true
                             });
-                            emitter.emit("deleteDraw", {});
                           }
                         }
                       });
-                    });
-                  }}
-                >
-                  保存
-                </Button>
-                <Button
-                  icon="delete"
-                  style={{
-                    display: type !== "add" ? "inherit" : "none",
-                    marginLeft: 20
-                  }}
-                  onClick={() => {
-                    Modal.confirm({
-                      title: "删除",
-                      content: "是否确定要删除这条标注点数据？",
-                      okText: "是",
-                      okType: "danger",
-                      cancelText: "否",
-                      onOk() {
-                        resetFields();
-                        dispatch({
-                          type: "point/pointDelete",
-                          payload: {
-                            id: pointItem.id
-                          },
-                          callback: success => {
-                            if (success) {
-                              self.setState({ show: false });
-                              emitter.emit("deleteSuccess", {
-                                success: true
-                              });
-                            }
-                          }
-                        });
-                      },
-                      onCancel() {}
-                    });
-                  }}
-                >
-                  删除
-                </Button>
-              </span>
-            ) : null}
+                    },
+                    onCancel() {}
+                  });
+                }}
+              >
+                删除
+              </Button>
+            )}
           </div>
         </div>
       </div>

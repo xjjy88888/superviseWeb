@@ -90,8 +90,8 @@ export async function projectCreateUpdateApi(params) {
 }
 
 // 项目删除
-export async function projectDeleteApi(payload) {
-  return request(`${config.url.projectDeleteUrl}?id=${payload.id}`, {
+export async function projectDeleteApi(params) {
+  return request(`${config.url.projectDeleteUrl}?id=${params.id}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
@@ -219,8 +219,8 @@ export async function spotCreateUpdateApi(params) {
 }
 
 // 图斑删除
-export async function spotDeleteApi(payload) {
-  return request(`${config.url.spotDeleteUrl}?id=${payload.id}`, {
+export async function spotDeleteApi(params) {
+  return request(`${config.url.spotDeleteUrl}?id=${params.id}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${accessToken()}`
@@ -308,8 +308,8 @@ export async function pointCreateUpdateApi(params) {
 }
 
 // 标注点删除
-export async function pointDeleteApi(payload) {
-  return request(`${config.url.pointDeleteUrl}?id=${payload.id}`, {
+export async function pointDeleteApi(params) {
+  return request(`${config.url.pointDeleteUrl}?id=${params.id}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${accessToken()}`
@@ -318,8 +318,8 @@ export async function pointDeleteApi(payload) {
 }
 
 // 标注点批量删除
-export async function pointDeleteMulApi(payload) {
-  return request(`${config.url.pointDeleteMulUrl}?ids=${payload.id}`, {
+export async function pointDeleteMulApi(params) {
+  return request(`${config.url.pointDeleteMulUrl}?ids=${params.id}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${accessToken()}`
@@ -368,8 +368,8 @@ export async function redLineCreateUpdateApi(params) {
 }
 
 // 项目红线删除
-export async function redLineDeleteApi(payload) {
-  return request(`${config.url.redLineDeleteUrl}?id=${payload.id}`, {
+export async function redLineDeleteApi(params) {
+  return request(`${config.url.redLineDeleteUrl}?id=${params.id}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${accessToken()}`
@@ -378,12 +378,24 @@ export async function redLineDeleteApi(payload) {
 }
 
 // 项目红线批量删除
-export async function redLineDeleteMulApi(payload) {
-  return request(`${config.url.redLineDeleteMulUrl}?ids=${payload.id}`, {
+export async function redLineDeleteMulApi(params) {
+  return request(`${config.url.redLineDeleteMulUrl}?ids=${params.id}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
+  });
+}
+
+// 导出项目
+export async function exportProjectApi(params) {
+  return request(config.url.exportProjectUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify(params.ids)
   });
 }
 

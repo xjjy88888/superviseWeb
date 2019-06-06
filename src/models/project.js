@@ -16,7 +16,8 @@ import {
   departCreateApi,
   projectUnArchiveApi,
   projectUnbindSpotApi,
-  projectArchiveApi
+  projectArchiveApi,
+  exportProjectApi
 } from "../services/httpApi";
 
 export default {
@@ -262,6 +263,12 @@ export default {
         data: { success, error, result }
       } = yield call(projectListApi, payload);
       if (callback) callback(success, error, result);
+    },
+
+    // 项目导出
+    *exportProject({ payload, callback }, { call, put }) {
+      const data = yield call(exportProjectApi, payload);
+      console.log(data);
     },
 
     *updateSpotGraphic({ payload, callback }, { call, put }) {

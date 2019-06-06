@@ -117,8 +117,8 @@ export default class integrat extends PureComponent {
     const { dispatch } = this.props;
     console.log("贵阳至黄平高速公路", "六枝特区平寨镇跃进砂石厂");
     this.queryProject({ SkipCount: 0 });
-    this.querySpot({ SkipCount: 0 });
-    this.queryPoint({ SkipCount: 0 });
+    // this.querySpot({ SkipCount: 0 });
+    // this.queryPoint({ SkipCount: 0 });
     this.queryDistrict();
     this.queryDict();
     this.queryBasinOrgan();
@@ -544,6 +544,13 @@ export default class integrat extends PureComponent {
       result: []
     });
     const k = e.key;
+    if (k === "project") {
+      this.queryProject({ SkipCount: 0 });
+    } else if (k === "spot") {
+      this.querySpot({ SkipCount: 0 });
+    } else {
+      this.queryPoint({ SkipCount: 0 });
+    }
     this.setState({
       showQuery: false,
       showCheck: false,
@@ -1628,19 +1635,22 @@ export default class integrat extends PureComponent {
                 onClick={() => {
                   if (projectEdit) {
                     //submit
-                    this.props.form.validateFields((err, values) => {
+                    this.props.form.validateFields((err, v) => {
                       if (!err) {
-                        console.log(values);
-                        if (values.districtCodes.length === 0) {
+                        console.log(v);
+                        if (v.districtCodes.length === 0) {
                           notification["warning"]({
                             message: "请选择涉及县"
                           });
                           return;
                         }
                         const data = {
-                          ...values,
+                          ...v,
                           attachmentId: ParentId,
-                          districtCodes: values.districtCodes.join(","),
+                          districtCodes: v.districtCodes.join(","),
+                          districtCodeId: v.districtCodeId.length
+                            ? v.districtCodeId.pop()
+                            : "",
                           id: isProjectUpdate ? projectItem.id : ""
                         };
                         emitter.emit("projectCreateUpdate", data);
@@ -2685,31 +2695,33 @@ export default class integrat extends PureComponent {
                       }}
                       onBlur={() => {
                         const v = getFieldValue("projectName");
-                        dispatch({
-                          type: "project/projectVerify",
-                          payload: {
-                            name: v
-                          },
-                          callback: (success, result) => {
-                            if (!result.isValid) {
-                              setFieldsValue({
-                                projectName: ""
-                              });
-                              if (result.isArchive) {
+                        if (v) {
+                          dispatch({
+                            type: "project/projectVerify",
+                            payload: {
+                              name: v
+                            },
+                            callback: (success, result) => {
+                              if (!result.isValid) {
+                                setFieldsValue({
+                                  projectName: ""
+                                });
+                                if (result.isArchive) {
+                                  notification["warning"]({
+                                    message: `该项目名已存在并且已归档，请重新输入`
+                                  });
+                                }
                                 notification["warning"]({
-                                  message: `该项目名已存在并且已归档，请重新输入`
+                                  message: `该项目名已存在，请重新输入`
+                                });
+                              } else {
+                                notification["success"]({
+                                  message: `该项目名可用`
                                 });
                               }
-                              notification["warning"]({
-                                message: `该项目名已存在，请重新输入`
-                              });
-                            } else {
-                              notification["success"]({
-                                message: `该项目名可用`
-                              });
                             }
-                          }
-                        });
+                          });
+                        }
                       }}
                     />
                   )}

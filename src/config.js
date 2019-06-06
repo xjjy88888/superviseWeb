@@ -118,6 +118,18 @@ const config = {
     // 附件删除
     annexDeleteUrl: `${domain}api/services/app/File/Delete`,
 
+    // 导出项目
+    exportProjectUrl: `${domain}api/Export/ProjectExport`,
+
+    // 导出项目附件
+    exportProjectFileUrl: `${domain}api/Export/ProjectFileExport`,
+
+    // 导出图斑
+    exportSpotUrl: `${domain}api/Export/ProjectExport`,
+
+    // 导出图斑附件
+    exportSpotFileUrl: `${domain}api/Export/ProjectFileExport`,
+
     // 流域机构列表
     basinOrganizationUrl: `${domain}api/services/app/Project/GetRiverBasinOU`,
 
@@ -180,7 +192,12 @@ const config = {
     {
       label: "导出",
       key: "export",
-      icon: "export"
+      icon: "cloud-download"
+    },
+    {
+      label: "导出",
+      key: "attach",
+      icon: "cloud-download"
     },
     {
       label: "归档",
@@ -195,7 +212,7 @@ const config = {
     {
       label: "模板下载(Shapfile)",
       key: "download_shapfile",
-      icon: "cloud-download"
+      icon: "download"
     },
     {
       label: "模板下载(Excel)",
@@ -210,7 +227,7 @@ const config = {
     {
       label: "批量上传(GeoJSON)",
       key: "upload_shapfile",
-      icon: "cloud-upload"
+      icon: "upload"
     },
     {
       label: "批量上传(Excel)",
