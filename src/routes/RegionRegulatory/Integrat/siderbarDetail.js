@@ -488,7 +488,15 @@ export default class siderbarDetail extends PureComponent {
                   </Select>
                 )}
               </Form.Item>
-              <Form.Item label="矢量化类型" {...formItemLayout}>
+              <Form.Item
+                label={
+                  <span>
+                    <b style={{ color: "red" }}>*</b>
+                    矢量化类型
+                  </span>
+                }
+                {...formItemLayout}
+              >
                 {getFieldDecorator("vecTypeId", {
                   initialValue: redLineItem.vecType
                     ? redLineItem.vecType.id
@@ -625,6 +633,14 @@ export default class siderbarDetail extends PureComponent {
                 icon="check"
                 style={{ marginTop: 20 }}
                 onClick={() => {
+                  const vecTypeId = getFieldValue("vecTypeId");
+                  //vecTypeId
+                  if (!vecTypeId) {
+                    notification["warning"]({
+                      message: "矢量化类型不能为空"
+                    });
+                    return;
+                  }
                   validateFields((err, v) => {
                     console.log("项目红线信息", v);
                     dispatch({
