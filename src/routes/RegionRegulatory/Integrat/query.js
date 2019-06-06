@@ -147,7 +147,8 @@ export default class siderbarDetail extends PureComponent {
               resetFields();
               emitter.emit("queryInfo", {
                 from: type,
-                info: {}
+                info: {},
+                ShowArchive: false
               });
             }}
           >
@@ -162,7 +163,8 @@ export default class siderbarDetail extends PureComponent {
                   const d = v.DistrictCodes;
                   emitter.emit("queryInfo", {
                     from: type,
-                    info: { ...v, DistrictCodes: d[d.length - 1] }
+                    info: { ...v, DistrictCodes: d[d.length - 1] },
+                    ShowArchive: v.ShowArchive
                   });
                 }
               });

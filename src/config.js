@@ -121,17 +121,11 @@ const config = {
     // 附件删除
     annexDeleteUrl: `${domain}api/services/app/File/Delete`,
 
-    // 导出项目
-    exportProjectUrl: `${domain}api/Export/ProjectExport`,
+    // 导出项目/图斑(附件)数据
+    exportUrl: `${domain}api/services/app/Export/`,
 
-    // 导出项目附件
-    exportProjectFileUrl: `${domain}api/Export/ProjectFileExport`,
-
-    // 导出图斑
-    exportSpotUrl: `${domain}api/Export/ProjectExport`,
-
-    // 导出图斑附件
-    exportSpotFileUrl: `${domain}api/Export/ProjectFileExport`,
+    // 下载导出项目/图斑(附件)数据
+    downloadUrl: `${domain}api/services/app/File/GetExportFile?id=`,
 
     // 流域机构列表
     basinOrganizationUrl: `${domain}api/services/app/Project/GetRiverBasinOU`,

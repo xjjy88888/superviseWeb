@@ -25,6 +25,7 @@ export default class siderbarDetail extends PureComponent {
       show: false,
       checkResult: [],
       showCheck: false,
+      ShowArchive: false,
       key: "project"
     };
     this.charRef = ref => {
@@ -34,10 +35,12 @@ export default class siderbarDetail extends PureComponent {
 
   componentDidMount() {
     this.eventEmitter = emitter.addListener("showTool", data => {
+      console.log(data);
       this.setState({
         show: data.show,
         type: data.type,
         key: data.key,
+        ShowArchive: data.ShowArchive,
         checkResult: data.checkResult || []
       });
     });
@@ -57,7 +60,8 @@ export default class siderbarDetail extends PureComponent {
       checkResult,
       showCheck,
       funcType,
-      funcTypeText
+      funcTypeText,
+      ShowArchive
     } = this.state;
     const { dispatch } = this.props;
     return (
@@ -110,7 +114,6 @@ export default class siderbarDetail extends PureComponent {
                   style={{ margin: `15px 10px 0 10px` }}
                   icon={item.icon}
                   onClick={() => {
-                    console.log(item);
                     switch (item.key) {
                       //勾选管理
                       case "checklist":
@@ -205,43 +208,23 @@ export default class siderbarDetail extends PureComponent {
               this.setState({
                 visible: false
               });
-              if (funcType === "export") {
+              if (funcType === "export" || funcType === "attach") {
                 //导出
-                // dispatch({
-                //   type:
-                //     key === "project"
-                //       ? "project/exportProject"
-                //       : "spot/spotDeleteMul",
-                //   payload: {
-                //     ids: checkResult.map(item => item.id)
-                //   }
-                // });
-                const downloadUrl =
-                  "http://aj.zkygis.cn/stbc/api/Export/ProjectExport";
-                fetch(downloadUrl, {
-                  method: "POST",
-                  credentials: "include",
-                  body: window.JSON.stringify([0]),
-                  headers: new Headers({
-                    "Content-Type": "application/json-patch+json",
-                    Authorization: `Bearer ${accessToken()}`
-                  })
-                })
-                  .then(response => {
-                    response.blob().then(blob => {
-                      let url = window.URL.createObjectURL(blob);
-                      let a = document.createElement("a");
-                      a.href = url;
-                      a.download = "filename.zip";
-                      a.click();
-                      // window.URL.revokeObjectURL(url);
-                    });
-                  })
-                  .catch(error => {
-                    console.log(error);
-                  });
-              } else if (funcType === "attach") {
-                //导出附件
+                dispatch({
+                  type: "annex/export",
+                  payload: {
+                    ids: checkResult.map(item => item.id),
+                    isArchive: ShowArchive,
+                    key: key === "project" ? "Project" : "Spot",
+                    isAttach: funcType === "attach"
+                  },
+                  callback: (success, error, result) => {
+                    if (success) {
+                      console.log(config.url.downloadUrl + result.fileId);
+                      window.open(config.url.downloadUrl + result.fileId);
+                    }
+                  }
+                });
               } else if (funcType === "delete") {
                 //删除
                 this.setState({

@@ -74,7 +74,6 @@ export default class siderbarDetail extends PureComponent {
       });
     });
     this.eventEmitter = emitter.addListener("showSiderbarDetail", data => {
-      console.log(data);
       resetFields();
       this.setState({
         spotFileList: [],
@@ -1187,7 +1186,7 @@ export default class siderbarDetail extends PureComponent {
             )}
             <div
               style={{
-                display: showSpotHistory ? "block" : "none",
+                display: showSpotHistory && !edit ? "block" : "none",
                 marginTop: 20
               }}
             >

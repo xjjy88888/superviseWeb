@@ -73,6 +73,7 @@ export default class integrat extends PureComponent {
       showSpin: true,
       isProjectUpdate: true,
       queryHighlight: false,
+      ShowArchive: false,
       row_pro: 10,
       row_spot: 10,
       row_point: 10,
@@ -206,6 +207,7 @@ export default class integrat extends PureComponent {
     });
     //search
     this.eventEmitter = emitter.addListener("queryInfo", data => {
+      console.log(data);
       this.scrollDom.scrollTop = 0;
       const { query_pro, query_spot, query_point } = this.state;
       emitter.emit("checkResult", {
@@ -219,7 +221,6 @@ export default class integrat extends PureComponent {
           (data.info[i].length || typeof data.info[i] === "number")
         ) {
           queryHighlight = true;
-          console.log(data.info[i]);
         }
       }
       this.setState({
@@ -227,6 +228,7 @@ export default class integrat extends PureComponent {
         sort_by: "",
         sort_key: "",
         queryInfo: data.info,
+        ShowArchive: data.ShowArchive,
         queryHighlight: queryHighlight
       });
       if (data.from === "project") {
@@ -554,6 +556,7 @@ export default class integrat extends PureComponent {
     this.setState({
       showQuery: false,
       showCheck: false,
+      ShowArchive: false,
       key: k,
       placeholder:
         k === "project" ? "项目名称" : k === "spot" ? "图斑编号" : "关联项目",
@@ -836,6 +839,7 @@ export default class integrat extends PureComponent {
       queryInfo,
       isArchivalSpot,
       sort_by,
+      ShowArchive,
       sort_key,
       projectFileList
     } = this.state;
@@ -947,6 +951,7 @@ export default class integrat extends PureComponent {
                     show: true,
                     type: "tool",
                     key: key,
+                    ShowArchive: ShowArchive,
                     checkResult:
                       key === "project"
                         ? projectList.items

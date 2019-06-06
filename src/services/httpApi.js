@@ -397,15 +397,16 @@ export async function redLineDeleteMulApi(params) {
   });
 }
 
-// 导出项目
-export async function exportProjectApi(params) {
-  return request(config.url.exportProjectUrl, {
+// 导出项目/图斑(附件)数据
+export async function exportApi(params) {
+  const url = `${params.key}${params.isAttach ? "File" : ""}Export`;
+  return request(config.url.exportUrl + url, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
       "Content-Type": "application/json-patch+json"
     },
-    body: JSON.stringify(params.ids)
+    body: JSON.stringify(params)
   });
 }
 

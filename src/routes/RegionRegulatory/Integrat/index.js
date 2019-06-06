@@ -155,15 +155,8 @@ export default class integrat extends PureComponent {
         }
       });
     };
-
     this.eventEmitter = emitter.addListener("deleteDraw", () => {
-      const { addGraphLayer } = this.state;
-      if (addGraphLayer) {
-        map.removeLayer(addGraphLayer);
-        this.setState({ addGraphLayer: null });
-      }
-      map.pm.disableDraw("Polygon");
-      this.clearGeojsonLayer();
+      this.clearPlotGraphic();
     });
     //获取url参数
     me.initUrlParams();
@@ -583,7 +576,7 @@ export default class integrat extends PureComponent {
         else{
           me.automaticToMap(
             userconfig.projectgeojsonLayer.getBounds().getCenter()
-          );          
+          );
         }
       }
       else {
@@ -1468,15 +1461,18 @@ export default class integrat extends PureComponent {
     measureControl.addTo(map);
   };
   /*
+   *刷新重绘WMS图层
+   */
+  reDrawWMSLayers = () => {
+  };
+  /*
    *清空绘制图形,避免新增图形以及编辑图形冲突
    */
   clearPlotGraphic = () => {
-    //针对编辑图形
     //禁止编辑图形
     if (userconfig.projectgeojsonLayer)
-      userconfig.projectgeojsonLayer.pm.disable();
+        userconfig.projectgeojsonLayer.pm.disable();
     this.clearGeojsonLayer();
-
     //针对新增图形
     const { addGraphLayer } = this.state;
     //禁止编辑图形
@@ -1485,6 +1481,7 @@ export default class integrat extends PureComponent {
       map.removeLayer(addGraphLayer);
       this.setState({ addGraphLayer: null });
     }
+    map.pm.disableDraw("Polygon");
   };
   /*
    * 取消编辑图形
