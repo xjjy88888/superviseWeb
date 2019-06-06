@@ -444,12 +444,15 @@ export async function departCreateApi(params) {
 
 // 部门列表
 export async function departListApi(params) {
-  return request(`${config.url.departListUrl}?name=${params.name}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken()}`
+  return request(
+    `${config.url.departListUrl}?name=${params.name}&kind=${params.kind}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`
+      }
     }
-  });
+  );
 }
 
 // 部门校验

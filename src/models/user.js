@@ -2,8 +2,6 @@ import {
   loginApi,
   districtApi,
   dictApi,
-  departListApi,
-  departCreateApi,
   basinOrganizationApi,
   departVaildApi
 } from "../services/httpApi";

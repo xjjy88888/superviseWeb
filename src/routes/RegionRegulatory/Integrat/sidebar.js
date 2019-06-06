@@ -798,12 +798,13 @@ export default class integrat extends PureComponent {
     }
   };
 
-  queryDepartList = v => {
+  queryDepartList = (v, t) => {
     const { dispatch } = this.props;
     dispatch({
       type: "project/departList",
       payload: {
-        name: v
+        name: v,
+        kind: t
       }
     });
   };
@@ -2797,7 +2798,7 @@ export default class integrat extends PureComponent {
                       }
                       onSearch={v => {
                         this.setState({ departSearch: v });
-                        this.queryDepartList(v);
+                        this.queryDepartList(v, 2);
                       }}
                       onBlur={() => {
                         if (departSelectList.length === 0) {
@@ -2831,7 +2832,7 @@ export default class integrat extends PureComponent {
                       }
                       onSearch={v => {
                         this.setState({ departSearch: v });
-                        this.queryDepartList(v);
+                        this.queryDepartList(v, 1);
                       }}
                       onBlur={() => {
                         if (departSelectList.length === 0) {
@@ -2865,7 +2866,7 @@ export default class integrat extends PureComponent {
                       }
                       onSearch={v => {
                         this.setState({ departSearch: v });
-                        this.queryDepartList(v);
+                        this.queryDepartList(v, 1);
                       }}
                       onBlur={() => {
                         if (departSelectList.length === 0) {

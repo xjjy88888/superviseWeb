@@ -305,6 +305,7 @@ export default class siderbarDetail extends PureComponent {
       dispatch,
       form: { getFieldDecorator, resetFields, validateFields, getFieldValue },
       user: { districtList },
+      project: { departSelectList },
       spot: { spotInfo, projectSelectListSpot, spotHistoryList },
       point: { pointInfo, projectSelectListPoint },
       redLine: { redLineInfo, projectSelectListRedLine }
@@ -331,7 +332,11 @@ export default class siderbarDetail extends PureComponent {
 
     const projectSelectListAll = [
       ...projectSelectListSpot,
-      ...projectSelectListPoint,
+      ...projectSelectListPoint
+    ];
+
+    const departSelectListAll = [
+      ...departSelectList,
       ...projectSelectListRedLine
     ];
 
@@ -530,15 +535,15 @@ export default class siderbarDetail extends PureComponent {
                     }
                     onSearch={v => {
                       dispatch({
-                        type: "spot/queryProjectSelect",
+                        type: "project/departList",
                         payload: {
-                          ProjectName: v,
-                          MaxResultCount: 5
+                          name: v,
+                          kind: 2
                         }
                       });
                     }}
                   >
-                    {projectSelectListAll.map(item => (
+                    {departSelectListAll.map(item => (
                       <Select.Option value={item.value} key={item.value}>
                         {item.label}
                       </Select.Option>

@@ -240,7 +240,8 @@ export default class integrat extends PureComponent {
     dispatch({
       type: "project/departList",
       payload: {
-        name: v
+        name: v,
+        kind: 2
       }
     });
   };
