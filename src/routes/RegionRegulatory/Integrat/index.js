@@ -661,7 +661,9 @@ export default class integrat extends PureComponent {
         let spotIds = [];
         for (let i = 0; i < data.features.length; i++) {
           let item = data.features[i];
-          spotIds.push(item.properties.id);
+          let spotId = item.properties.id ? item.properties.id : "";
+          let project_id = item.properties.project_id ? item.properties.project_id : "";
+          spotIds.push({spotId:spotId,projectId:project_id});
         }
         //图斑关联
         emitter.emit("spotRelate", {

@@ -137,25 +137,34 @@ export default class integrat extends PureComponent {
       this.search(v);
     });
     this.eventEmitter = emitter.addListener("spotRelate", v => {
-      if (v.status === "end" && v.spotId.length !== 0) {
+      const len = v.spotId.length;
+      if (v.status === "end" && len !== 0) {
         console.log(v);
-        v.spotId.map(item => {
-          dispatch({
-            type: "spot/spotCreateUpdate",
-            payload: {
-              id: item,
-              projectId: v.projectId
-            },
-            callback: success => {
-              if (success) {
-                notification["success"]({
-                  message: `关联扰动图斑成功`
-                });
-                this.querySpotByProjectId(v.projectId);
-              }
-            }
+        if (len === 1) {
+          if (v.spotId[0].projectId && v.spotId[0].projectId === v.projectId) {
+            notification["warning"]({
+              message: `该图斑已关联该项目`
+            });
+          } else if (v.spotId[0].projectId) {
+            Modal.confirm({
+              title: "关联图斑",
+              content: "该图斑已关联项目，是否确定更改关联项目？",
+              okText: "是",
+              okType: "danger",
+              cancelText: "否",
+              onOk() {
+                self.spotRelate(v.spotId[0].spotId, v.projectId);
+              },
+              onCancel() {}
+            });
+          } else {
+            this.spotRelate(v.spotId[0].spotId, v.projectId);
+          }
+        } else {
+          notification["warning"]({
+            message: `每次只能关联1个图斑，请重新选择`
           });
-        });
+        }
       }
     });
     this.eventEmitter = emitter.addListener("projectInfoRefresh", v => {
@@ -354,6 +363,25 @@ export default class integrat extends PureComponent {
       }
     }
   }
+
+  spotRelate = (spotId, projectId) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "spot/spotCreateUpdate",
+      payload: {
+        id: spotId,
+        projectId: projectId
+      },
+      callback: success => {
+        if (success) {
+          notification["success"]({
+            message: `关联扰动图斑成功`
+          });
+          this.querySpotByProjectId(projectId);
+        }
+      }
+    });
+  };
 
   showSpin = state => {
     this.setState({ showSpin: state });
