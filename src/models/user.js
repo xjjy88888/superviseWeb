@@ -21,6 +21,7 @@ export default {
     dicList: [],
     departSelectList: [],
     basinOrganList: [],
+    departList: [],
     departUpdateId: ""
   },
 

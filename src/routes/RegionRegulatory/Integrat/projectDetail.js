@@ -204,10 +204,10 @@ export default class integrat extends PureComponent {
   getDepartList = key => {
     const {
       dispatch,
-      form: { setFieldsValue }
+      form: { setFieldsValue, getFieldValue }
     } = this.props;
-    const { departList, departSearch } = this.state;
-    if (departSearch) {
+    const { departList, departSearch, isSelect } = this.state;
+    if (departSearch && !isSelect) {
       dispatch({
         type: "user/departVaild",
         payload: {
@@ -215,7 +215,10 @@ export default class integrat extends PureComponent {
         },
         callback: (isVaild, data) => {
           if (isVaild) {
-            this.setState({ departList: [...departList, data] });
+            this.setState({
+              departList: [{ label: data.name, value: data.id }]
+            });
+            setFieldsValue({ [key]: data.id });
           } else {
             Modal.confirm({
               title: "查不到该单位，是否去新建单位",
@@ -366,7 +369,7 @@ export default class integrat extends PureComponent {
   };
 
   render() {
-    const { show, edit } = this.state;
+    const { show, edit, departList } = this.state;
 
     const {
       dispatch,
@@ -376,6 +379,7 @@ export default class integrat extends PureComponent {
     } = this.props;
 
     const projectItem = projectInfo;
+    const departSelectListAll = departSelectList.concat(departList);
 
     return (
       <div
@@ -1061,16 +1065,17 @@ export default class integrat extends PureComponent {
                           .indexOf(input.toLowerCase()) >= 0
                       }
                       onSearch={v => {
-                        this.setState({ departSearch: v });
+                        this.setState({ departSearch: v, isSelect: false });
                         this.queryDepartList(v);
                       }}
                       onBlur={() => {
-                        if (departSelectList.length === 0) {
-                          this.getDepartList("projectDepartmentId");
-                        }
+                        this.getDepartList("projectDepartmentId");
+                      }}
+                      onSelect={() => {
+                        this.setState({ isSelect: true });
                       }}
                     >
-                      {departSelectList.map(item => (
+                      {departSelectListAll.map(item => (
                         <Select.Option value={item.value} key={item.value}>
                           {item.label}
                         </Select.Option>
@@ -1098,16 +1103,17 @@ export default class integrat extends PureComponent {
                           .indexOf(input.toLowerCase()) >= 0
                       }
                       onSearch={v => {
-                        this.setState({ departSearch: v });
+                        this.setState({ departSearch: v, isSelect: false });
                         this.queryDepartList(v);
                       }}
                       onBlur={() => {
-                        if (departSelectList.length === 0) {
-                          this.getDepartList("monitorDepartmentId");
-                        }
+                        this.getDepartList("monitorDepartmentId");
+                      }}
+                      onSelect={() => {
+                        this.setState({ isSelect: true });
                       }}
                     >
-                      {departSelectList.map(item => (
+                      {departSelectListAll.map(item => (
                         <Select.Option value={item.value} key={item.value}>
                           {item.label}
                         </Select.Option>
@@ -1135,16 +1141,17 @@ export default class integrat extends PureComponent {
                           .indexOf(input.toLowerCase()) >= 0
                       }
                       onSearch={v => {
-                        this.setState({ departSearch: v });
+                        this.setState({ departSearch: v, isSelect: false });
                         this.queryDepartList(v);
                       }}
                       onBlur={() => {
-                        if (departSelectList.length === 0) {
-                          this.getDepartList("supervisionDepartmentId");
-                        }
+                        this.getDepartList("supervisionDepartmentId");
+                      }}
+                      onSelect={() => {
+                        this.setState({ isSelect: true });
                       }}
                     >
-                      {departSelectList.map(item => (
+                      {departSelectListAll.map(item => (
                         <Select.Option value={item.value} key={item.value}>
                           {item.label}
                         </Select.Option>
@@ -1172,16 +1179,17 @@ export default class integrat extends PureComponent {
                           .indexOf(input.toLowerCase()) >= 0
                       }
                       onSearch={v => {
-                        this.setState({ departSearch: v });
+                        this.setState({ departSearch: v, isSelect: false });
                         this.queryDepartList(v);
                       }}
                       onBlur={() => {
-                        if (departSelectList.length === 0) {
-                          this.getDepartList("designDepartmentId");
-                        }
+                        this.getDepartList("designDepartmentId");
+                      }}
+                      onSelect={() => {
+                        this.setState({ isSelect: true });
                       }}
                     >
-                      {departSelectList.map(item => (
+                      {departSelectListAll.map(item => (
                         <Select.Option value={item.value} key={item.value}>
                           {item.label}
                         </Select.Option>
@@ -1209,16 +1217,17 @@ export default class integrat extends PureComponent {
                           .indexOf(input.toLowerCase()) >= 0
                       }
                       onSearch={v => {
-                        this.setState({ departSearch: v });
+                        this.setState({ departSearch: v, isSelect: false });
                         this.queryDepartList(v);
                       }}
                       onBlur={() => {
-                        if (departSelectList.length === 0) {
-                          this.getDepartList("constructionDepartmentId");
-                        }
+                        this.getDepartList("constructionDepartmentId");
+                      }}
+                      onSelect={() => {
+                        this.setState({ isSelect: true });
                       }}
                     >
-                      {departSelectList.map(item => (
+                      {departSelectListAll.map(item => (
                         <Select.Option value={item.value} key={item.value}>
                           {item.label}
                         </Select.Option>
@@ -1246,16 +1255,17 @@ export default class integrat extends PureComponent {
                           .indexOf(input.toLowerCase()) >= 0
                       }
                       onSearch={v => {
-                        this.setState({ departSearch: v });
+                        this.setState({ departSearch: v, isSelect: false });
                         this.queryDepartList(v);
                       }}
                       onBlur={() => {
-                        if (departSelectList.length === 0) {
-                          this.getDepartList("reportDepartmentId");
-                        }
+                        this.getDepartList("reportDepartmentId");
+                      }}
+                      onSelect={() => {
+                        this.setState({ isSelect: true });
                       }}
                     >
-                      {departSelectList.map(item => (
+                      {departSelectListAll.map(item => (
                         <Select.Option value={item.value} key={item.value}>
                           {item.label}
                         </Select.Option>

@@ -1619,13 +1619,13 @@ export default class integrat extends PureComponent {
    * 保存屏幕截图
    */
   saveScreenshot = e => {
-    console.log(
-      userconfig.dataImgUrl +
-        "\n经度:" +
-        userconfig.imglng +
-        ",纬度" +
-        userconfig.imglat
-    );
+    // console.log(
+    //   userconfig.dataImgUrl +
+    //     "\n经度:" +
+    //     userconfig.imglng +
+    //     ",纬度" +
+    //     userconfig.imglat
+    // );
     emitter.emit("screenshotBack", {
       longitude: userconfig.imglng,
       latitude: userconfig.imglat,
