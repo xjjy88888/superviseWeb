@@ -558,6 +558,7 @@ export default class integrat extends PureComponent {
 
   switchMenu = e => {
     this.scrollDom.scrollTop = 0;
+    emitter.emit("emptyPoint", {});
     emitter.emit("showSiderbarDetail", {
       show: false,
       from: "spot"
