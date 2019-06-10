@@ -161,6 +161,10 @@ export default class integrat extends PureComponent {
         this.reDrawWMSLayers();
       }, 500);
     });
+    this.eventEmitter = emitter.addListener("emptyPoint", () => {
+      //清空标注点
+      if (marker) marker.remove();
+    });
     //获取url参数
     me.initUrlParams();
     // 位置定位
@@ -821,6 +825,7 @@ export default class integrat extends PureComponent {
     map.pm.addControls(options);
   };
   onClickMap = e => {
+    console.log(userconfig.overlays);
     const me = this;
     let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
     //if (!turf.booleanContains(userconfig.polygon, turfpoint)) {
@@ -1426,7 +1431,7 @@ export default class integrat extends PureComponent {
       .addTo(spotlayerGroup);
     map.addLayer(projectlayerGroup);
     map.addLayer(spotlayerGroup);
-    const overlays = {
+    const overlays = userconfig.overlays = {
       项目红线: projectlayerGroup,
       扰动图斑: spotlayerGroup
     };
