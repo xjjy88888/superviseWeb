@@ -478,6 +478,24 @@ export async function annexDeleteApi(params) {
   );
 }
 
+// 附件上传base64
+export async function annexUploadBase64Api(params) {
+  let formData = new FormData();
+  formData.append("Id", params.Id);
+  formData.append("FileBase64.FileName", params["FileBase64.FileName"]);
+  formData.append("FileBase64.Base64", params["FileBase64.Base64"]);
+  formData.append("Longitude", params.Longitude);
+  formData.append("Latitude", params.Latitude);
+
+  return request(config.url.annexUploadUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    },
+    body: formData
+  });
+}
+
 // 行政区域
 export async function districtApi() {
   return request(`${config.url.districtUrl}`, {

@@ -1,5 +1,9 @@
 import { notification } from "antd";
-import { annexDeleteApi, exportApi } from "../services/httpApi";
+import {
+  annexDeleteApi,
+  exportApi,
+  annexUploadBase64Api
+} from "../services/httpApi";
 
 export default {
   namespace: "annex",
@@ -24,6 +28,14 @@ export default {
       notification[success ? "success" : "error"]({
         message: success ? `附件删除成功` : `附件删除失败：${error.message}`
       });
+    },
+
+    // 附件上传base64
+    *annexUploadBase64Api({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(annexUploadBase64Api, payload);
+      if (callback) callback(success, error, result);
     },
 
     // 导出项目

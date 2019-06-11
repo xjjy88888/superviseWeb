@@ -205,8 +205,15 @@ export default class integrat extends PureComponent {
         showProjectAllInfo: !data.hide
       });
     });
-    this.eventEmitter = emitter.addListener("screenshotBack", data => {
-      console.log("屏幕截图", data);
+    this.eventEmitter = emitter.addListener("screenshotBack", v => {
+      console.log("屏幕截图", v);
+      if (v.img) {
+        this.annexUploadBase64(v);
+      } else {
+        notification["warning"]({
+          message: `未获取到数据，请重新截图`
+        });
+      }
     });
     this.eventEmitter = emitter.addListener("chartLinkage", data => {
       this.setState({
@@ -363,6 +370,40 @@ export default class integrat extends PureComponent {
       }
     }
   }
+
+  annexUploadBase64 = v => {
+    const { dispatch } = this.props;
+    const { ParentId, projectFileList } = this.state;
+    dispatch({
+      type: "annex/annexUploadBase64Api",
+      payload: {
+        Id: ParentId,
+        "FileBase64.FileName": Math.random()
+          .toString(36)
+          .substr(2),
+        "FileBase64.Base64": v.img,
+        Longitude: v.longitude,
+        Latitude: v.latitude
+      },
+      callback: (success, error, result) => {
+        if (success) {
+          this.setState({ ParentId: result.id });
+          const item = result.child[0];
+          const obj = {
+            uid: item.id,
+            name: item.fileName,
+            status: "done",
+            url: config.url.annexPreviewUrl + item.id
+          };
+          this.setState({ projectFileList: [...projectFileList, obj] });
+        } else {
+          notification["error"]({
+            message: `屏幕截图上传失败：${error.message}`
+          });
+        }
+      }
+    });
+  };
 
   spotRelate = (spotId, projectId) => {
     const { dispatch } = this.props;
@@ -1569,7 +1610,6 @@ export default class integrat extends PureComponent {
                           listType="picture-card"
                           fileList={fileList}
                           onPreview={file => {
-                            const dom = jQuery(`<img src=${file.url}></img>`);
                             this.setState({
                               previewImage: file.url || file.thumbUrl,
                               previewVisible_min: true
