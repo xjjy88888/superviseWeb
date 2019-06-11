@@ -2784,8 +2784,8 @@ export default class integrat extends PureComponent {
                   )}
                 </Form.Item>
                 <Form.Item label="详细地址" {...formItemLayout}>
-                  {getFieldDecorator("town", {
-                    initialValue: projectItem.product_department_id1
+                  {getFieldDecorator("addressInfo", {
+                    initialValue: projectItem.projectBase.addressInfo
                   })(<Input />)}
                 </Form.Item>
                 <Form.Item label="坐标" {...formItemLayout}>
