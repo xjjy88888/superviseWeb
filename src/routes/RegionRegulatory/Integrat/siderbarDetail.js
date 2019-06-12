@@ -301,6 +301,24 @@ export default class siderbarDetail extends PureComponent {
     });
   };
 
+  find = (arr, v, key) => {
+    let result;
+    if (!arr) {
+      return;
+    }
+    arr.map(item => {
+      if (item.value === v) {
+        result = [item[key]];
+      } else {
+        const child = this.find(item.children, v, key);
+        if (child) {
+          result = [item[key], ...child];
+        }
+      }
+    });
+    return result;
+  };
+
   render() {
     const {
       dispatch,
@@ -623,8 +641,22 @@ export default class siderbarDetail extends PureComponent {
               >
                 {edit ? (
                   <div>
-                    <Icon type="plus" />
-                    <div className="ant-upload-text">上传</div>
+                    <div className="ant-upload-text">
+                      <Button type="div" icon="plus">
+                        上传文件
+                      </Button>
+                      <Button
+                        icon="picture"
+                        onClick={e => {
+                          e.stopPropagation();
+                          emitter.emit("screenshot", {
+                            show: true
+                          });
+                        }}
+                      >
+                        屏幕截图
+                      </Button>
+                    </div>
                   </div>
                 ) : null}
               </Upload>
@@ -697,6 +729,7 @@ export default class siderbarDetail extends PureComponent {
                         },
                         callback: success => {
                           if (success) {
+                            emitter.emit("deleteDraw", {});
                             self.setState({ show: false });
                             emitter.emit("projectInfoRefresh", {
                               projectId: projectId
@@ -881,7 +914,11 @@ export default class siderbarDetail extends PureComponent {
               </Form.Item>
               <Form.Item label="所在地区" {...formItemLayout}>
                 {getFieldDecorator("districtCodeId", {
-                  initialValue: spotItem.provinceCityDistrict
+                  initialValue: this.find(
+                    districtList,
+                    spotItem.districtCodeId,
+                    "value"
+                  )
                 })(
                   <Cascader
                     disabled={!edit}
@@ -1186,6 +1223,7 @@ export default class siderbarDetail extends PureComponent {
                           callback: success => {
                             if (success) {
                               self.setState({ show: false });
+                              emitter.emit("deleteDraw", {});
                               if (fromList) {
                                 emitter.emit("deleteSuccess", {
                                   success: true
@@ -1475,6 +1513,7 @@ export default class siderbarDetail extends PureComponent {
                         },
                         callback: success => {
                           if (success) {
+                            emitter.emit("deleteDraw", {});
                             self.setState({ show: false });
                             emitter.emit("deleteSuccess", {
                               success: true

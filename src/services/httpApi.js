@@ -486,6 +486,7 @@ export async function annexUploadBase64Api(params) {
   formData.append("FileBase64.Base64", params["FileBase64.Base64"]);
   formData.append("Longitude", params.Longitude);
   formData.append("Latitude", params.Latitude);
+  formData.append("Azimuth", params.Azimuth);
 
   return request(config.url.annexUploadUrl, {
     method: "POST",

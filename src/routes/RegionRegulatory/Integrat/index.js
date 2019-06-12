@@ -31,6 +31,7 @@ import "leaflet-navbar";
 import "leaflet-side-by-side";
 import "leaflet-measure/dist/leaflet-measure.css";
 import "leaflet-measure/dist/leaflet-measure.cn";
+import LeaftWMS from "leaflet.wms";
 import shp from "shpjs";
 import * as turf from "@turf/turf";
 import domtoimage from "dom-to-image";
@@ -157,9 +158,7 @@ export default class integrat extends PureComponent {
     };
     this.eventEmitter = emitter.addListener("deleteDraw", () => {
       this.clearPlotGraphic();
-      setTimeout(() => {
-        this.reDrawWMSLayers();
-      }, 500);
+      this.reDrawWMSLayers();
     });
     this.eventEmitter = emitter.addListener("emptyPoint", () => {
       //清空标注点
@@ -312,6 +311,8 @@ export default class integrat extends PureComponent {
     //屏幕截图
     this.eventEmitter = emitter.addListener("screenshot", data => {
       me.setState({ drawType: "screenshot", drawState: "add" });
+      //移除地图监听事件
+      map.off("click");
       //显示屏幕截图绘制保存取消菜单按钮
       me.setState({ showButton: true });
       //绘制图形之前
@@ -328,6 +329,11 @@ export default class integrat extends PureComponent {
         tooltips: false
       });
       map.on("pm:create", e => {
+        //监听地图点击事件
+        map.on("click", me.onClickMap);
+        //截图进度条显示
+        const hide = message.loading('屏幕截图操作进行中...', 0);
+
         userconfig.screenLayer = e.layer;
         //console.log(userconfig.screenLayer.getBounds());
         let northEast = userconfig.screenLayer.getBounds()._northEast;
@@ -362,6 +368,12 @@ export default class integrat extends PureComponent {
         domtoimage
           .toPng(node)
           .then(function(dataUrl) {
+            if(dataUrl.length <= 6){
+               //关闭屏幕截图操作
+               setTimeout(hide, 10);
+               message.warning('屏幕截图结果为空,建议放大地图,重新截图操作试试看', 2);
+               return;            
+            }
             //过渡img图片,为了截取img指定位置的截图需要
             let img = new Image();
             img.src = dataUrl;
@@ -378,7 +390,11 @@ export default class integrat extends PureComponent {
               //保存截图以及中心点经纬度
               userconfig.dataImgUrl = dataUrl;
               userconfig.imglng = centerPoint.lng;
-              userconfig.imglat = centerPoint.lat;
+              userconfig.imglat = centerPoint.lat;             
+              //关闭屏幕截图操作
+              setTimeout(hide, 10);
+              message.success('屏幕截图成功', 2);
+
             };
           })
           .catch(function(error) {
@@ -825,7 +841,6 @@ export default class integrat extends PureComponent {
     map.pm.addControls(options);
   };
   onClickMap = e => {
-    console.log(userconfig.overlays);
     const me = this;
     let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
     //if (!turf.booleanContains(userconfig.polygon, turfpoint)) {
@@ -862,9 +877,29 @@ export default class integrat extends PureComponent {
       );
     } else {
       //普通点查
+      // console.log(userconfig.overlays);
+      let LayersName = "";
+      const { showHistoryContrast } = me.state;
+      if (showHistoryContrast) {//地图卷帘模式下
+        LayersName = config.mapLayersName;//扰动图斑、项目红线勾选
+      }
+      else{//非地图卷帘模式下
+        if(userconfig.overlays.扰动图斑._map && userconfig.overlays.项目红线._map){
+          LayersName = config.mapLayersName;//扰动图斑、项目红线勾选
+        }
+        else if(userconfig.overlays.扰动图斑._map && !userconfig.overlays.项目红线._map){
+          LayersName = config.mapSpotLayerName;//扰动图斑勾选
+        }
+        else if(!userconfig.overlays.扰动图斑._map && userconfig.overlays.项目红线._map){
+          LayersName = config.mapProjectLayerName;//项目红线勾选
+        }
+        else{//扰动图斑、项目红线都不勾选
+          return;
+        }
+      }
       me.queryWFSServiceByPoint(
         point,
-        config.mapLayersName,
+        LayersName,
         me.callbackPointQueryWFSService
       );
     }
@@ -1410,33 +1445,8 @@ export default class integrat extends PureComponent {
     let bounds = userconfig.geoJsonLayer.getBounds();
     map.setMaxBounds(bounds);
     map.setMinZoom(userconfig.zoom);
-    const projectlayerGroup = (userconfig.projectlayerGroup = L.layerGroup());
-    const spotlayerGroup = (userconfig.spotlayerGroup = L.layerGroup());
-    //加载项目红线图层wms
-    L.tileLayer
-      .wms(config.mapUrl.geoserverUrl + "/wms?", {
-        layers: config.mapProjectLayerName, //需要加载的图层
-        format: "image/png", //返回的数据格式
-        transparent: true
-      })
-      .addTo(projectlayerGroup);
-    //加载图斑图层wms
-    L.tileLayer
-      .wms(config.mapUrl.geoserverUrl + "/wms?", {
-        layers: config.mapSpotLayerName, //需要加载的图层
-        format: "image/png", //返回的数据格式
-        transparent: true
-        // cql_filter: "is_deleted == false"
-      })
-      .addTo(spotlayerGroup);
-    map.addLayer(projectlayerGroup);
-    map.addLayer(spotlayerGroup);
-    const overlays = userconfig.overlays = {
-      项目红线: projectlayerGroup,
-      扰动图斑: spotlayerGroup
-    };
-    //底图切换控件
-    L.control.layers(userconfig.baseLayers, overlays).addTo(map);
+    //加载图层控件
+    userconfig.layersControl = this.loadLayersControl();
     //地图缩放控件
     L.control
       .zoom({ zoomInTitle: "放大", zoomOutTitle: "缩小", position: "topright" })
@@ -1471,19 +1481,69 @@ export default class integrat extends PureComponent {
     measureControl.addTo(map);
   };
   /*
+   *加载默认图层控件
+   */
+  loadLayersControl = () => {
+    // if(!userconfig.projectlayerGroup)
+    //     userconfig.projectlayerGroup = L.layerGroup();
+    // if(!userconfig.spotlayerGroup)
+    //     userconfig.spotlayerGroup = L.layerGroup();
+    //加载项目红线图层wms
+    userconfig.projectWmsLayer = L.tileLayer
+      .wms(config.mapUrl.geoserverUrl + "/wms?", {
+        layers: config.mapProjectLayerName, //需要加载的图层
+        format: "image/png", //返回的数据格式
+        transparent: true
+      })
+      // .addTo(userconfig.projectlayerGroup);
+      .addTo(map);
+    //加载图斑图层wms
+    /*userconfig.spotWmsLayer = L.tileLayer
+      .wms(config.mapUrl.geoserverUrl + "/wms?", {
+        layers: config.mapSpotLayerName, //需要加载的图层
+        format: "image/png", //返回的数据格式
+        transparent: true
+        // cql_filter: "is_deleted == false"
+      })
+      // .addTo(userconfig.spotlayerGroup);
+      .addTo(map);*/
+    var options = {
+      layers: config.mapSpotLayerName, //需要加载的图层
+      format: "image/png", //返回的数据格式
+      transparent: true
+      // cql_filter: "is_deleted == false"
+    };
+    userconfig.spotWmsLayer = LeaftWMS.overlay(config.mapUrl.geoserverUrl + "/wms?", options).addTo(map);
+    // userconfig.spotWmsLayer = LeaftWMS.layer(config.mapUrl.geoserverUrl + "/wms?", config.mapSpotLayerName, options).addTo(map);     
+    // map.addLayer(userconfig.projectlayerGroup);
+    // map.addLayer(userconfig.spotlayerGroup);
+    const overlays = userconfig.overlays = {
+      // 项目红线: userconfig.projectlayerGroup,
+      // 扰动图斑: userconfig.spotlayerGroup
+      项目红线: userconfig.projectWmsLayer,
+      扰动图斑: userconfig.spotWmsLayer
+    };
+    //底图切换控件
+    let layersControl = L.control.layers(userconfig.baseLayers, overlays).addTo(map);  
+    return  layersControl;
+  };
+  /*
+   *移除图层控件
+   */
+  removeLayersControl = () => {
+    if(userconfig.layersControl)
+       userconfig.layersControl.remove();
+  };
+  /*
    *刷新重绘WMS图层
    */
   reDrawWMSLayers = () => {
-    if(userconfig.projectlayerGroup){
-      userconfig.projectlayerGroup.eachLayer(function (layer) {
-        layer.redraw();
-      });
-    }
-    if(userconfig.spotlayerGroup){
-      userconfig.spotlayerGroup.eachLayer(function (layer) {
-        layer.redraw();
-      });
-    }
+    //获取地图当前范围中心点
+    let latlng = map.getCenter();
+    latlng.lat = latlng.lat - 0.001;
+    latlng.lng 	 = latlng.lng - 0.001;
+    //通过移动地图来刷新地图
+    map.panTo(latlng);
   };
   /*
    *清空绘制图形,避免新增图形以及编辑图形冲突
@@ -1543,6 +1603,8 @@ export default class integrat extends PureComponent {
     this.setState({ showButton: false });
     map.pm.disableDraw("Rectangle");
     map.off("pm:create");
+    //监听地图点击事件
+    // map.on("click", this.onClickMap);
     if (userconfig.screenLayer) {
       map.removeLayer(userconfig.screenLayer);
       userconfig.screenLayer = null;
@@ -1631,6 +1693,11 @@ export default class integrat extends PureComponent {
     //     ",纬度" +
     //     userconfig.imglat
     // );
+    if(!userconfig.dataImgUrl){
+      message.warning('屏幕截图结果为空,建议放大地图,重新截图操作试试看', 2);
+      return;
+    }
+    this.cancelScreenshot();
     emitter.emit("screenshotBack", {
       longitude: userconfig.imglng,
       latitude: userconfig.imglat,
@@ -1704,18 +1771,18 @@ export default class integrat extends PureComponent {
       let bounds = map.getBounds();
       //历史影像查询
       this.getInfoByExtent(zoom, bounds, this.callbackGetInfoByExtent, true);
-      //历史扰动图斑查询
-      // this.queryWFSServiceByExtent(
-      //   config.mapHistorySpotLayerName,
-      //   this.callbackgetHistorySpotTimeByExtent
-      // );
+      //隐藏图层控件
+      jQuery(userconfig.layersControl.getContainer()).css('display','none'); 
+
     } else {
       //移除卷帘效果
       this.removeSideBySide();
       //还原默认底图加载
       map.addLayer(userconfig.baseLayer2);
-      // map.addLayer(userconfig.projectlayerGroup);
-      map.addLayer(userconfig.spotlayerGroup);
+      // map.addLayer(userconfig.spotlayerGroup);
+      map.addLayer(userconfig.spotWmsLayer);
+      //显示图层控件
+      jQuery(userconfig.layersControl.getContainer()).css('display','block'); 
     }
   };
   /*
@@ -1734,9 +1801,6 @@ export default class integrat extends PureComponent {
         config.mapHistorySpotLayerName,
         this.callbackgetHistorySpotTimeByExtent
       );
-      // //移除卷帘效果
-      // this.removeSideBySide();
-      // this.addSideBySide();
     }
   };
   /*
@@ -1780,15 +1844,14 @@ export default class integrat extends PureComponent {
     }
     //移除地图默认加载底图
     if (map.hasLayer(userconfig.baseLayer1))
-      map.removeLayer(userconfig.baseLayer1);
+        map.removeLayer(userconfig.baseLayer1);
     if (map.hasLayer(userconfig.baseLayer2))
-      map.removeLayer(userconfig.baseLayer2);
+        map.removeLayer(userconfig.baseLayer2);
     if (map.hasLayer(userconfig.baseLayer3))
-      map.removeLayer(userconfig.baseLayer3);
-    //移除地图默认加载叠加图层组
-    // if (userconfig.projectlayerGroup)
-    //   map.removeLayer(userconfig.projectlayerGroup);
-    if (userconfig.spotlayerGroup) map.removeLayer(userconfig.spotlayerGroup);
+        map.removeLayer(userconfig.baseLayer3);
+    //移除地图默认加载叠加图层组;
+    // if (userconfig.spotlayerGroup) map.removeLayer(userconfig.spotlayerGroup);
+    if(userconfig.spotWmsLayer) map.removeLayer(userconfig.spotWmsLayer);
     //移除卷帘对比左右边图层列表
     this.removeleftrightLayers();
   };
@@ -1937,6 +2000,7 @@ export default class integrat extends PureComponent {
       }
       map.addLayer(spotleftwms);
       map.addLayer(spotrightwms);
+
     }
 
     if (userconfig.setTopLayer === "spotLayer") {

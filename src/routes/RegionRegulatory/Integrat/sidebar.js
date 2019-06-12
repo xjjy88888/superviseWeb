@@ -383,7 +383,8 @@ export default class integrat extends PureComponent {
           .substr(2),
         "FileBase64.Base64": v.img,
         Longitude: v.longitude,
-        Latitude: v.latitude
+        Latitude: v.latitude,
+        Azimuth: 0
       },
       callback: (success, error, result) => {
         if (success) {
@@ -393,7 +394,10 @@ export default class integrat extends PureComponent {
             uid: item.id,
             name: item.fileName,
             status: "done",
-            url: config.url.annexPreviewUrl + item.id
+            url: config.url.annexPreviewUrl + item.id,
+            latitude: item.latitude,
+            longitude: item.longitude,
+            azimuth: item.azimuth
           };
           this.setState({ projectFileList: [...projectFileList, obj] });
         } else {
@@ -555,7 +559,10 @@ export default class integrat extends PureComponent {
               uid: item.id,
               name: item.fileName,
               status: "done",
-              url: config.url.annexPreviewUrl + item.id
+              url: config.url.annexPreviewUrl + item.id,
+              latitude: item.latitude,
+              longitude: item.longitude,
+              azimuth: item.azimuth
             };
           });
           this.setState({ projectFileList: list });
@@ -830,8 +837,30 @@ export default class integrat extends PureComponent {
     });
   };
 
+  find = (arr, v, key) => {
+    let result;
+    if (!arr) {
+      return;
+    }
+    arr.map(item => {
+      if (item.value === v) {
+        result = [item[key]];
+      } else {
+        const child = this.find(item.children, v, key);
+        if (child) {
+          result = [item[key], ...child];
+        }
+      }
+    });
+    return result;
+  };
+
   //search
   search = v => {
+    const {
+      user: { districtList }
+    } = this.props;
+
     const { key, queryInfo } = this.state;
     if (this.scrollDom) {
       this.scrollDom.scrollTop = 0;
@@ -1764,7 +1793,8 @@ export default class integrat extends PureComponent {
                 display: previewVisible_min_left ? "block" : "none",
                 position: "fixed",
                 zIndex: 2,
-                width: 305
+                width: 305,
+                height: 305
               }}
             >
               <Icon
@@ -1786,7 +1816,7 @@ export default class integrat extends PureComponent {
               />
               <img
                 alt="example"
-                style={{ width: "100%", cursor: "pointer" }}
+                style={{ width: "100%", height: "100%", cursor: "pointer" }}
                 src={previewImage}
                 onClick={() => {
                   this.setState({
@@ -1815,7 +1845,11 @@ export default class integrat extends PureComponent {
               >
                 <span>位置：</span>
                 <span>
-                  {projectItem.projectBase.provinceCityDistrictName}
+                  {this.find(
+                    districtList,
+                    projectItem.projectBase.districtCodeId,
+                    "label"
+                  )}
                   {projectItem.projectBase.addressInfo}
                 </span>
                 <Icon
@@ -2814,7 +2848,11 @@ export default class integrat extends PureComponent {
                 </Form.Item>
                 <Form.Item label="所在地区" {...formItemLayout}>
                   {getFieldDecorator("districtCodeId", {
-                    initialValue: projectItem.projectBase.provinceCityDistrict
+                    initialValue: this.find(
+                      districtList,
+                      projectItem.projectBase.districtCodeId,
+                      "value"
+                    )
                   })(
                     <Cascader
                       placeholder="请选择所在地区"
@@ -3208,6 +3246,7 @@ export default class integrat extends PureComponent {
                 listType="picture-card"
                 fileList={projectFileList}
                 onSuccess={v => {
+                  console.log(v.result.id);
                   if (v.success) {
                     this.setState({ ParentId: v.result.id });
                   } else {
@@ -3217,13 +3256,24 @@ export default class integrat extends PureComponent {
                   }
                 }}
                 onPreview={file => {
+                  console.log(file);
                   this.setState({
                     previewImage: file.url || file.thumbUrl,
                     previewVisible_min_left: true
                   });
-                  getFile(file.url);
+                  if (file.latitude || file.longitude) {
+                    emitter.emit("imgLocation", {
+                      Latitude: file.latitude,
+                      Longitude: file.longitude,
+                      direction: file.azimuth,
+                      show: true
+                    });
+                  } else {
+                    getFile(file.url);
+                  }
                 }}
                 onChange={({ fileList }) => {
+                  console.log(fileList);
                   const data = fileList.map(item => {
                     return {
                       ...item,
@@ -3233,13 +3283,16 @@ export default class integrat extends PureComponent {
                   this.setState({ projectFileList: data });
                 }}
                 onRemove={file => {
+                  console.log(file);
                   return new Promise((resolve, reject) => {
                     if (projectEdit) {
                       dispatch({
                         type: "annex/annexDelete",
                         payload: {
                           FileId: file.uid,
-                          Id: projectItem.attachment.id
+                          Id: projectItem.attachment
+                            ? projectItem.attachment.id
+                            : ParentId
                         },
                         callback: success => {
                           if (success) {
