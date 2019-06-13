@@ -36,6 +36,7 @@ import { getFile } from "../../../utils/util";
 import { dateInitFormat, accessToken } from "../../../utils/util";
 
 let self;
+let loading = false;
 const { TreeNode } = Tree;
 const formItemLayout = {
   labelCol: { span: 7 },
@@ -336,6 +337,9 @@ export default class integrat extends PureComponent {
       isBottom
     );
     if (isBottom) {
+      if (loading) {
+        return;
+      }
       if (key === "project") {
         if (projectList.items.length < projectList.totalCount) {
           this.queryProject({
@@ -454,6 +458,7 @@ export default class integrat extends PureComponent {
   };
 
   queryProject = items => {
+    loading = true;
     const { polygon, key } = this.state;
     const {
       dispatch,
@@ -468,6 +473,7 @@ export default class integrat extends PureComponent {
         items: items.SkipCount === 0 ? [] : projectList.items
       },
       callback: (success, response) => {
+        loading = false;
         this.showSpin(false);
         if (success && key === "project") {
           emitter.emit("checkResult", {
@@ -480,6 +486,7 @@ export default class integrat extends PureComponent {
   };
 
   querySpot = items => {
+    loading = true;
     const { polygon, key } = this.state;
     const {
       dispatch,
@@ -494,6 +501,7 @@ export default class integrat extends PureComponent {
         items: items.SkipCount === 0 ? [] : spotList.items
       },
       callback: (success, response) => {
+        loading = false;
         this.showSpin(false);
         if (success && key === "spot") {
           emitter.emit("checkResult", {
@@ -506,6 +514,7 @@ export default class integrat extends PureComponent {
   };
 
   queryPoint = items => {
+    loading = true;
     const {
       dispatch,
       point: { pointList }
@@ -518,6 +527,7 @@ export default class integrat extends PureComponent {
         items: items.SkipCount === 0 ? [] : pointList.items
       },
       callback: (success, response) => {
+        loading = false;
         this.showSpin(false);
       }
     });
@@ -558,12 +568,12 @@ export default class integrat extends PureComponent {
             return {
               uid: item.id,
               name: item.fileName,
-              status: "done",
+              fileExtend: item.fileExtend,
               url: config.url.annexPreviewUrl + item.id,
               latitude: item.latitude,
               longitude: item.longitude,
               azimuth: item.azimuth,
-              fileExtend: item.fileExtend
+              status: "done"
             };
           });
           this.setState({ projectFileList: list });
@@ -3260,7 +3270,6 @@ export default class integrat extends PureComponent {
                 listType="picture-card"
                 fileList={projectFileList}
                 onSuccess={v => {
-                  console.log("onSuccess", v.result);
                   this.setState({
                     ParentId: v.result.id,
                     uid: v.result.child[0].id
@@ -3286,7 +3295,6 @@ export default class integrat extends PureComponent {
                   });
                 }}
                 onPreview={file => {
-                  console.log(file.fileExtend, file);
                   switch (file.fileExtend) {
                     case "pdf":
                       window.open(file.url);
@@ -3318,7 +3326,6 @@ export default class integrat extends PureComponent {
                   }
                 }}
                 onChange={({ fileList }) => {
-                  console.log("onChange", fileList);
                   const data = fileList.map(item => {
                     return { ...item, status: "done" };
                   });
@@ -3347,7 +3354,7 @@ export default class integrat extends PureComponent {
                         }
                       });
                     } else {
-                      // reject();
+                      reject();
                       notification["info"]({
                         message: `请先开始编辑项目`
                       });

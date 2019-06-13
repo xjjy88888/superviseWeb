@@ -53,9 +53,7 @@ export default class siderbarDetail extends PureComponent {
       polygon: "",
       isSpotUpdate: true,
       item: { project_id: "" },
-      spotFileList: [],
-      pointFileList: [],
-      redLineFileList: [],
+      fileList: [],
       fromList: false,
       showSpotHistory: false
     };
@@ -67,6 +65,16 @@ export default class siderbarDetail extends PureComponent {
     const {
       form: { resetFields, setFieldsValue }
     } = this.props;
+    this.eventEmitter = emitter.addListener("screenshotBack", v => {
+      console.log("屏幕截图", v);
+      if (v.img) {
+        this.annexUploadBase64(v);
+      } else {
+        notification["warning"]({
+          message: `未获取到数据，请重新截图`
+        });
+      }
+    });
     this.eventEmitter = emitter.addListener("siteLocationBack", data => {
       this.props.form.setFieldsValue({
         pointX: data.longitude, //经度
@@ -77,9 +85,7 @@ export default class siderbarDetail extends PureComponent {
       resetFields();
       this.setState({
         ParentId: 0,
-        spotFileList: [],
-        pointFileList: [],
-        redLineFileList: [],
+        fileList: [],
         polygon: data.polygon,
         show: data.show,
         edit: data.edit,
@@ -131,31 +137,48 @@ export default class siderbarDetail extends PureComponent {
     });
   }
 
-  querySpotById = (id, isHistory) => {
+  annexUploadBase64 = v => {
     const { dispatch } = this.props;
+    const { ParentId, fileList } = this.state;
     dispatch({
-      type: "spot/querySpotById",
+      type: "annex/annexUploadBase64Api",
       payload: {
-        id: id,
-        refresh: true
+        Id: ParentId,
+        "FileBase64.FileName": Math.random()
+          .toString(36)
+          .substr(2),
+        "FileBase64.Base64": v.img,
+        Longitude: v.longitude,
+        Latitude: v.latitude,
+        Azimuth: 0
       },
-      callback: data => {
-        this.setState({ ParentId: data.attachment ? data.attachment.id : 0 });
-        if (data.attachment) {
-          const list = data.attachment.child.map(item => {
-            return {
-              uid: item.id,
-              name: item.fileName,
-              status: "done",
-              url: config.url.annexPreviewUrl + item.id
-            };
-          });
-          this.setState({ spotFileList: list });
+      callback: (success, error, result) => {
+        if (success) {
+          this.setState({ ParentId: result.id });
+          const item = result.child[0];
+          const obj = {
+            uid: item.id,
+            name: item.fileName,
+            url: config.url.annexPreviewUrl + item.id,
+            latitude: item.latitude,
+            longitude: item.longitude,
+            azimuth: item.azimuth,
+            fileExtend: item.fileExtend,
+            status: "done"
+          };
+          this.setState({ fileList: [...fileList, obj] });
         } else {
-          this.setState({ spotFileList: [] });
+          notification["error"]({
+            message: `屏幕截图上传失败：${error.message}`
+          });
         }
       }
     });
+  };
+
+  querySpotById = (id, isHistory) => {
+    const { dispatch } = this.props;
+    this.queryDetail(id, "spot/querySpotById");
     if (!isHistory) {
       dispatch({
         type: "spot/spotHistory",
@@ -165,52 +188,38 @@ export default class siderbarDetail extends PureComponent {
   };
 
   queryPointById = id => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: "point/queryPointById",
-      payload: {
-        id: id
-      },
-      callback: data => {
-        this.setState({ ParentId: data.attachment ? data.attachment.id : 0 });
-        if (data.attachment) {
-          const list = data.attachment.child.map(item => {
-            return {
-              uid: item.id,
-              name: item.fileName,
-              status: "done",
-              url: config.url.annexPreviewUrl + item.id
-            };
-          });
-          this.setState({ pointFileList: list });
-        } else {
-          this.setState({ pointFileList: [] });
-        }
-      }
-    });
+    this.queryDetail(id, "point/queryPointById");
   };
 
   queryRedLineById = id => {
+    this.queryDetail(id, "redLine/queryredLineById");
+  };
+
+  queryDetail = (id, url) => {
     const { dispatch } = this.props;
     dispatch({
-      type: "redLine/queryredLineById",
+      type: url,
       payload: {
         id: id
       },
-      callback: data => {
-        this.setState({ ParentId: data.attachment ? data.attachment.id : 0 });
-        if (data.attachment) {
-          const list = data.attachment.child.map(item => {
+      callback: v => {
+        this.setState({ ParentId: v.attachment ? v.attachment.id : 0 });
+        if (v.attachment) {
+          const list = v.attachment.child.map(item => {
             return {
               uid: item.id,
               name: item.fileName,
-              status: "done",
-              url: config.url.annexPreviewUrl + item.id
+              fileExtend: item.fileExtend,
+              url: config.url.annexPreviewUrl + item.id,
+              latitude: item.latitude,
+              longitude: item.longitude,
+              azimuth: item.azimuth,
+              status: "done"
             };
           });
-          this.setState({ redLineFileList: list });
+          this.setState({ fileList: list });
         } else {
-          this.setState({ redLineFileList: [] });
+          this.setState({ fileList: [] });
         }
       }
     });
@@ -339,9 +348,7 @@ export default class siderbarDetail extends PureComponent {
       type,
       projectId,
       edit,
-      spotFileList,
-      redLineFileList,
-      pointFileList,
+      fileList,
       isSpotUpdate,
       previewVisible,
       previewImage,
@@ -367,6 +374,131 @@ export default class siderbarDetail extends PureComponent {
     const pointItem = isSpotUpdate ? pointInfo : {};
 
     const redLineItem = isSpotUpdate ? redLineInfo : {};
+
+    console.log(this.props);
+
+    const domUpload = (
+      <div style={{ minHeight: fileList.length ? 120 : 0 }}>
+        <Upload
+          action={config.url.annexUploadUrl}
+          headers={{ Authorization: `Bearer ${accessToken()}` }}
+          data={{ Id: ParentId }}
+          listType="picture-card"
+          fileList={fileList}
+          onSuccess={v => {
+            this.setState({
+              ParentId: v.result.id
+            });
+            const item = v.result.child[0];
+            const obj = {
+              uid: item.id,
+              name: item.fileName,
+              url: config.url.annexPreviewUrl + item.id,
+              latitude: item.latitude,
+              longitude: item.longitude,
+              azimuth: item.azimuth,
+              fileExtend: item.fileExtend,
+              status: "done"
+            };
+            this.setState({
+              fileList: [...fileList, obj]
+            });
+          }}
+          onError={(v, response) => {
+            notification["error"]({
+              message: `图斑附件上传失败：${response.error.message}`
+            });
+          }}
+          onPreview={file => {
+            console.log(file.fileExtend, file);
+            switch (file.fileExtend) {
+              case "pdf":
+                window.open(file.url);
+                break;
+              case "doc":
+              case "docx":
+              case "xls":
+              case "xlsx":
+              case "ppt":
+              case "pptx":
+                window.open(file.url + "&isDown=true");
+                break;
+              default:
+                this.setState({
+                  previewImage: file.url || file.thumbUrl,
+                  previewVisible_min: true
+                });
+                if (file.latitude || file.longitude) {
+                  emitter.emit("imgLocation", {
+                    Latitude: file.latitude,
+                    Longitude: file.longitude,
+                    direction: file.azimuth,
+                    show: true
+                  });
+                } else {
+                  getFile(file.url);
+                }
+                break;
+            }
+          }}
+          onChange={({ fileList }) => {
+            const data = fileList.map(item => {
+              return {
+                ...item,
+                status: "done"
+              };
+            });
+            this.setState({ fileList: data });
+          }}
+          onRemove={file => {
+            return new Promise((resolve, reject) => {
+              if (edit) {
+                dispatch({
+                  type: "annex/annexDelete",
+                  payload: {
+                    FileId: file.uid,
+                    Id: spotItem.attachment ? spotItem.attachment.id : ParentId
+                  },
+                  callback: success => {
+                    if (success) {
+                      resolve();
+                    } else {
+                      reject();
+                    }
+                  }
+                });
+              } else {
+                reject();
+                notification["info"]({
+                  message: `请先开始编辑图斑`
+                });
+              }
+            });
+          }}
+        >
+          {edit ? (
+            <div>
+              <div className="ant-upload-text">
+                <Button type="div" icon="plus">
+                  上传文件
+                </Button>
+                <Button
+                  icon="picture"
+                  onClick={e => {
+                    e.stopPropagation();
+                    emitter.emit("screenshot", {
+                      show: true
+                    });
+                  }}
+                >
+                  屏幕截图
+                </Button>
+              </div>
+            </div>
+          ) : null}
+        </Upload>
+      </div>
+    );
 
     return (
       <div
@@ -581,87 +713,7 @@ export default class siderbarDetail extends PureComponent {
                 )}
               </Form.Item>
             </Form>
-            <div style={{ minHeight: redLineFileList.length ? 120 : 0 }}>
-              <Upload
-                action={config.url.annexUploadUrl}
-                headers={{ Authorization: `Bearer ${accessToken()}` }}
-                data={{ Id: ParentId }}
-                listType="picture-card"
-                fileList={redLineFileList}
-                onSuccess={v => {
-                  if (v.success) {
-                    console.log(v.result);
-                    this.setState({ ParentId: v.result.id });
-                  } else {
-                    notification["error"]({
-                      message: `项目红线附件上传失败：${v.error.message}`
-                    });
-                  }
-                }}
-                onPreview={file => {
-                  this.setState({
-                    previewImage: file.url || file.thumbUrl,
-                    previewVisible_min: true
-                  });
-                  getFile(file.url);
-                }}
-                onChange={({ fileList }) => {
-                  const data = fileList.map(item => {
-                    return {
-                      ...item,
-                      status: "done"
-                    };
-                  });
-                  this.setState({ redLineFileList: data });
-                }}
-                onRemove={file => {
-                  return new Promise((resolve, reject) => {
-                    if (edit) {
-                      dispatch({
-                        type: "annex/annexDelete",
-                        payload: {
-                          FileId: file.uid,
-                          Id: redLineItem.attachment.id
-                        },
-                        callback: success => {
-                          if (success) {
-                            resolve();
-                          } else {
-                            reject();
-                          }
-                        }
-                      });
-                    } else {
-                      reject();
-                      notification["info"]({
-                        message: `请先开始编辑项目红线`
-                      });
-                    }
-                  });
-                }}
-              >
-                {edit ? (
-                  <div>
-                    <div className="ant-upload-text">
-                      <Button type="div" icon="plus">
-                        上传文件
-                      </Button>
-                      <Button
-                        icon="picture"
-                        onClick={e => {
-                          e.stopPropagation();
-                          emitter.emit("screenshot", {
-                            show: true
-                          });
-                        }}
-                      >
-                        屏幕截图
-                      </Button>
-                    </div>
-                  </div>
-                ) : null}
-              </Upload>
-            </div>
+            {domUpload}
             {edit ? (
               <Button
                 htmlType="submit"
@@ -950,73 +1002,7 @@ export default class siderbarDetail extends PureComponent {
                 })(<TextArea autosize={true} disabled={!edit} />)}
               </Form.Item>
             </Form>
-            <div style={{ minHeight: spotFileList.length ? 120 : 0 }}>
-              <Upload
-                action={config.url.annexUploadUrl}
-                headers={{ Authorization: `Bearer ${accessToken()}` }}
-                data={{ Id: ParentId }}
-                listType="picture-card"
-                fileList={spotFileList}
-                onSuccess={v => {
-                  if (v.success) {
-                    console.log(v.result);
-                    this.setState({ ParentId: v.result.id });
-                  } else {
-                    notification["error"]({
-                      message: `图斑附件上传失败：${v.error.message}`
-                    });
-                  }
-                }}
-                onPreview={file => {
-                  this.setState({
-                    previewImage: file.url || file.thumbUrl,
-                    previewVisible_min: true
-                  });
-                  getFile(file.url);
-                }}
-                onChange={({ fileList }) => {
-                  const data = fileList.map(item => {
-                    return {
-                      ...item,
-                      status: "done"
-                    };
-                  });
-                  this.setState({ spotFileList: data });
-                }}
-                onRemove={file => {
-                  return new Promise((resolve, reject) => {
-                    if (edit) {
-                      dispatch({
-                        type: "annex/annexDelete",
-                        payload: {
-                          FileId: file.uid,
-                          Id: spotItem.attachment.id
-                        },
-                        callback: success => {
-                          if (success) {
-                            resolve();
-                          } else {
-                            reject();
-                          }
-                        }
-                      });
-                    } else {
-                      reject();
-                      notification["info"]({
-                        message: `请先开始编辑图斑`
-                      });
-                    }
-                  });
-                }}
-              >
-                {edit ? (
-                  <div>
-                    <Icon type="plus" />
-                    <div className="ant-upload-text">上传</div>
-                  </div>
-                ) : null}
-              </Upload>
-            </div>
+            {domUpload}
             {edit ? (
               <span>
                 <Button
@@ -1391,72 +1377,7 @@ export default class siderbarDetail extends PureComponent {
                 )}
               </Form.Item>
             </Form>
-            <div style={{ minHeight: pointFileList.length ? 120 : 0 }}>
-              <Upload
-                action={config.url.annexUploadUrl}
-                headers={{ Authorization: `Bearer ${accessToken()}` }}
-                data={{ Id: ParentId }}
-                listType="picture-card"
-                fileList={pointFileList}
-                onSuccess={v => {
-                  if (v.success) {
-                    this.setState({ ParentId: v.result.id });
-                  } else {
-                    notification["error"]({
-                      message: `标注点附件上传失败：${v.error.message}`
-                    });
-                  }
-                }}
-                onPreview={file => {
-                  this.setState({
-                    previewImage: file.url || file.thumbUrl,
-                    previewVisible_min: true
-                  });
-                  getFile(file.url);
-                }}
-                onChange={({ fileList }) => {
-                  const data = fileList.map(item => {
-                    return {
-                      ...item,
-                      status: "done"
-                    };
-                  });
-                  this.setState({ pointFileList: data });
-                }}
-                onRemove={file => {
-                  return new Promise((resolve, reject) => {
-                    if (edit) {
-                      dispatch({
-                        type: "annex/annexDelete",
-                        payload: {
-                          FileId: file.uid,
-                          Id: pointItem.attachment.id
-                        },
-                        callback: success => {
-                          if (success) {
-                            resolve();
-                          } else {
-                            reject();
-                          }
-                        }
-                      });
-                    } else {
-                      reject();
-                      notification["info"]({
-                        message: `请先开始编辑标注点`
-                      });
-                    }
-                  });
-                }}
-              >
-                {edit ? (
-                  <div>
-                    <Icon type="plus" />
-                    <div className="ant-upload-text">上传</div>
-                  </div>
-                ) : null}
-              </Upload>
-            </div>
+            {domUpload}
             {edit ? (
               <Button
                 icon="check"

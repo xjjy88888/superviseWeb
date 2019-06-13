@@ -1484,42 +1484,37 @@ export default class integrat extends PureComponent {
    *加载默认图层控件
    */
   loadLayersControl = () => {
-    // if(!userconfig.projectlayerGroup)
-    //     userconfig.projectlayerGroup = L.layerGroup();
-    // if(!userconfig.spotlayerGroup)
-    //     userconfig.spotlayerGroup = L.layerGroup();
     //加载项目红线图层wms
-    userconfig.projectWmsLayer = L.tileLayer
+    /*userconfig.projectWmsLayer = L.tileLayer
       .wms(config.mapUrl.geoserverUrl + "/wms?", {
         layers: config.mapProjectLayerName, //需要加载的图层
         format: "image/png", //返回的数据格式
         transparent: true
       })
-      // .addTo(userconfig.projectlayerGroup);
-      .addTo(map);
+      .addTo(map);*/
+    userconfig.projectWmsLayer = LeaftWMS.overlay(config.mapUrl.geoserverUrl + "/wms?", {
+      layers: config.mapProjectLayerName, //需要加载的图层
+      format: "image/png", //返回的数据格式
+      transparent: true
+    }).addTo(map);      
     //加载图斑图层wms
     /*userconfig.spotWmsLayer = L.tileLayer
       .wms(config.mapUrl.geoserverUrl + "/wms?", {
         layers: config.mapSpotLayerName, //需要加载的图层
         format: "image/png", //返回的数据格式
-        transparent: true
+        transparent: true,
         // cql_filter: "is_deleted == false"
       })
-      // .addTo(userconfig.spotlayerGroup);
       .addTo(map);*/
-    var options = {
+
+    userconfig.spotWmsLayer = LeaftWMS.overlay(config.mapUrl.geoserverUrl + "/wms?", {
       layers: config.mapSpotLayerName, //需要加载的图层
       format: "image/png", //返回的数据格式
-      transparent: true
-      // cql_filter: "is_deleted == false"
-    };
-    userconfig.spotWmsLayer = LeaftWMS.overlay(config.mapUrl.geoserverUrl + "/wms?", options).addTo(map);
-    // userconfig.spotWmsLayer = LeaftWMS.layer(config.mapUrl.geoserverUrl + "/wms?", config.mapSpotLayerName, options).addTo(map);     
-    // map.addLayer(userconfig.projectlayerGroup);
-    // map.addLayer(userconfig.spotlayerGroup);
+      transparent: true,
+      // cql_filter: "map_num == 201808_450521_0515"
+    }).addTo(map);
+
     const overlays = userconfig.overlays = {
-      // 项目红线: userconfig.projectlayerGroup,
-      // 扰动图斑: userconfig.spotlayerGroup
       项目红线: userconfig.projectWmsLayer,
       扰动图斑: userconfig.spotWmsLayer
     };
@@ -1779,7 +1774,6 @@ export default class integrat extends PureComponent {
       this.removeSideBySide();
       //还原默认底图加载
       map.addLayer(userconfig.baseLayer2);
-      // map.addLayer(userconfig.spotlayerGroup);
       map.addLayer(userconfig.spotWmsLayer);
       //显示图层控件
       jQuery(userconfig.layersControl.getContainer()).css('display','block'); 
@@ -1850,7 +1844,6 @@ export default class integrat extends PureComponent {
     if (map.hasLayer(userconfig.baseLayer3))
         map.removeLayer(userconfig.baseLayer3);
     //移除地图默认加载叠加图层组;
-    // if (userconfig.spotlayerGroup) map.removeLayer(userconfig.spotlayerGroup);
     if(userconfig.spotWmsLayer) map.removeLayer(userconfig.spotWmsLayer);
     //移除卷帘对比左右边图层列表
     this.removeleftrightLayers();
