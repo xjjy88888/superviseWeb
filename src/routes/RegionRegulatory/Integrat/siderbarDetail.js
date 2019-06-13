@@ -268,9 +268,10 @@ export default class siderbarDetail extends PureComponent {
             archiveTime: isArchive ? archiveTime : null,
             attachmentId: ParentId,
             polygon: polygon,
-            districtCodeId: v.districtCodeId.length
-              ? v.districtCodeId.pop()
-              : "",
+            districtCodeId:
+              v.districtCodeId && v.districtCodeId.length
+                ? v.districtCodeId.pop()
+                : "",
             id: type === "edit" ? spotInfo.id : ""
           },
           callback: (success, response) => {

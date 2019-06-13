@@ -33,7 +33,6 @@ import emitter from "../../../utils/event";
 import config from "../../../config";
 import data from "../../../data";
 import { getFile } from "../../../utils/util";
-import jQuery from "jquery";
 import { dateInitFormat, accessToken } from "../../../utils/util";
 
 let self;
@@ -393,11 +392,12 @@ export default class integrat extends PureComponent {
           const obj = {
             uid: item.id,
             name: item.fileName,
-            status: "done",
             url: config.url.annexPreviewUrl + item.id,
             latitude: item.latitude,
             longitude: item.longitude,
-            azimuth: item.azimuth
+            azimuth: item.azimuth,
+            fileExtend: item.fileExtend,
+            status: "done"
           };
           this.setState({ projectFileList: [...projectFileList, obj] });
         } else {
@@ -562,7 +562,8 @@ export default class integrat extends PureComponent {
               url: config.url.annexPreviewUrl + item.id,
               latitude: item.latitude,
               longitude: item.longitude,
-              azimuth: item.azimuth
+              azimuth: item.azimuth,
+              fileExtend: item.fileExtend
             };
           });
           this.setState({ projectFileList: list });
@@ -949,7 +950,8 @@ export default class integrat extends PureComponent {
       ShowArchive,
       sort_key,
       projectFileList,
-      departList
+      departList,
+      uid
     } = this.state;
     const {
       dispatch,
@@ -1639,11 +1641,23 @@ export default class integrat extends PureComponent {
                           listType="picture-card"
                           fileList={fileList}
                           onPreview={file => {
-                            this.setState({
-                              previewImage: file.url || file.thumbUrl,
-                              previewVisible_min: true
-                            });
-                            getFile(file.url);
+                            console.log(file.fileExtend);
+                            switch (file.fileExtend) {
+                              case "pdf":
+                              case "doc":
+                              case "docx":
+                              case "ppt":
+                              case "pptx":
+                                window.open(file.url);
+                                break;
+                              default:
+                                this.setState({
+                                  previewImage: file.url || file.thumbUrl,
+                                  previewVisible_min: true
+                                });
+                                getFile(file.url);
+                                break;
+                            }
                           }}
                           onChange={({ fileList }) =>
                             this.setState({ fileList })
@@ -3246,44 +3260,74 @@ export default class integrat extends PureComponent {
                 listType="picture-card"
                 fileList={projectFileList}
                 onSuccess={v => {
-                  console.log(v.result.id);
-                  if (v.success) {
-                    this.setState({ ParentId: v.result.id });
-                  } else {
-                    notification["error"]({
-                      message: `附件上传失败：${v.error.message}`
-                    });
-                  }
+                  console.log("onSuccess", v.result);
+                  this.setState({
+                    ParentId: v.result.id,
+                    uid: v.result.child[0].id
+                  });
+                  const item = v.result.child[0];
+                  const obj = {
+                    uid: item.id,
+                    name: item.fileName,
+                    url: config.url.annexPreviewUrl + item.id,
+                    latitude: item.latitude,
+                    longitude: item.longitude,
+                    azimuth: item.azimuth,
+                    fileExtend: item.fileExtend,
+                    status: "done"
+                  };
+                  this.setState({
+                    projectFileList: [...projectFileList, obj]
+                  });
+                }}
+                onError={(v, response) => {
+                  notification["error"]({
+                    message: `附件上传失败：${response.error.message}`
+                  });
                 }}
                 onPreview={file => {
-                  console.log(file);
-                  this.setState({
-                    previewImage: file.url || file.thumbUrl,
-                    previewVisible_min_left: true
-                  });
-                  if (file.latitude || file.longitude) {
-                    emitter.emit("imgLocation", {
-                      Latitude: file.latitude,
-                      Longitude: file.longitude,
-                      direction: file.azimuth,
-                      show: true
-                    });
-                  } else {
-                    getFile(file.url);
+                  console.log(file.fileExtend, file);
+                  switch (file.fileExtend) {
+                    case "pdf":
+                      window.open(file.url);
+                      break;
+                    case "doc":
+                    case "docx":
+                    case "xls":
+                    case "xlsx":
+                    case "ppt":
+                    case "pptx":
+                      window.open(file.url + "&isDown=true");
+                      break;
+                    default:
+                      this.setState({
+                        previewImage: file.url || file.thumbUrl,
+                        previewVisible_min_left: true
+                      });
+                      if (file.latitude || file.longitude) {
+                        emitter.emit("imgLocation", {
+                          Latitude: file.latitude,
+                          Longitude: file.longitude,
+                          direction: file.azimuth,
+                          show: true
+                        });
+                      } else {
+                        getFile(file.url);
+                      }
+                      break;
                   }
                 }}
                 onChange={({ fileList }) => {
-                  console.log(fileList);
+                  console.log("onChange", fileList);
                   const data = fileList.map(item => {
-                    return {
-                      ...item,
-                      status: "done"
-                    };
+                    return { ...item, status: "done" };
                   });
-                  this.setState({ projectFileList: data });
+                  this.setState({
+                    projectFileList: data
+                  });
                 }}
                 onRemove={file => {
-                  console.log(file);
+                  console.log("onRemove", file);
                   return new Promise((resolve, reject) => {
                     if (projectEdit) {
                       dispatch({
@@ -3303,7 +3347,7 @@ export default class integrat extends PureComponent {
                         }
                       });
                     } else {
-                      reject();
+                      // reject();
                       notification["info"]({
                         message: `请先开始编辑项目`
                       });
