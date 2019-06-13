@@ -42,7 +42,7 @@ import "antd-mobile/dist/antd-mobile.css";
 import config from "../../../config";
 import emitter from "../../../utils/event";
 import jQuery from "jquery";
-import { validateId } from "@turf/helpers";
+// import { validateId } from "@turf/helpers";
 
 let userconfig = {};
 let map;
@@ -87,7 +87,6 @@ export default class integrat extends PureComponent {
     dispatch({
       type: "mapdata/GetBoundAsync",
       callback: boundary => {
-        //console.log(boundary);
         userconfig.geojson = JSON.parse(boundary.result);
         // 创建地图
         me.createMap();
@@ -99,7 +98,6 @@ export default class integrat extends PureComponent {
     };
     //气泡窗口编辑
     window.goEditGraphic = obj => {
-      // emitter.emit("showProjectSpotInfo", { ...obj, edit: true });
       me.setState({
         drawState: "edit",
         drawType: obj.from === "spot" ? "spot" : "redLine"
@@ -187,7 +185,6 @@ export default class integrat extends PureComponent {
             id: data.item.id
           },
           callback: response => {
-            //console.log("response", response);
             if (response.success) {
               let point = {
                 x: response.result.pointX,
@@ -335,7 +332,6 @@ export default class integrat extends PureComponent {
         const hide = message.loading('屏幕截图操作进行中...', 0);
 
         userconfig.screenLayer = e.layer;
-        //console.log(userconfig.screenLayer.getBounds());
         let northEast = userconfig.screenLayer.getBounds()._northEast;
         let southWest = userconfig.screenLayer.getBounds()._southWest;
         //框选矩形的中心点
@@ -343,7 +339,6 @@ export default class integrat extends PureComponent {
           (northEast.lat + southWest.lat) / 2.0,
           (northEast.lng + southWest.lng) / 2.0
         );
-        //L.marker(centerPoint).addTo(map);
         //地理坐标转换屏幕坐标
         let northEastPoint = map.latLngToContainerPoint(northEast);
         let southWestPoint = map.latLngToContainerPoint(southWest);
@@ -448,7 +443,6 @@ export default class integrat extends PureComponent {
         //编辑图形
         map.on("pm:create", e => {
           me.setState({ addGraphLayer: e.layer });
-          //console.log(turf.area(e.layer.toGeoJSON()));
           e.layer.pm.enable({
             allowSelfIntersection: false
           });
@@ -544,18 +538,13 @@ export default class integrat extends PureComponent {
         for (let i = 0; i < data.features.length; i++) {
           let feature = data.features[i];
           if (i === data.features.length - 1) {
-            // content += me.getWinContent(feature.properties)[0].innerHTML;
             me.getWinContent(feature.properties, data => {
-              //console.log(data[0].innerHTML);
               content += data[0].innerHTML;
             });
           } else {
             me.getWinContent(feature.properties, data => {
-              //console.log(data[0].innerHTML);
               content += data[0].innerHTML + "<br><br>";
             });
-            // content +=
-            //   me.getWinContent(feature.properties)[0].innerHTML + "<br><br>";
           }
         }
         setTimeout(() => {
@@ -691,7 +680,6 @@ export default class integrat extends PureComponent {
           spotId: spotIds,
           projectId: me.state.spotRelateProjectId
         });
-        // console.log(spotIds);
       } else {
         //图斑关联
         emitter.emit("spotRelate", {
@@ -727,7 +715,6 @@ export default class integrat extends PureComponent {
         : azimuth < 360
         ? "west_north"
         : "north";
-    //console.log(pic);
     return pic;
   };
   /*
@@ -743,7 +730,6 @@ export default class integrat extends PureComponent {
       showProblem
     } = me.state;
     let point = map.latLngToContainerPoint(
-      //userconfig.projectgeojsonLayer.getBounds().getCenter()
       latLng
     );
     const offsetSiderbar = showSiderbar ? 200 : 0;
@@ -877,7 +863,6 @@ export default class integrat extends PureComponent {
       );
     } else {
       //普通点查
-      // console.log(userconfig.overlays);
       let LayersName = "";
       const { showHistoryContrast } = me.state;
       if (showHistoryContrast) {//地图卷帘模式下
@@ -905,7 +890,6 @@ export default class integrat extends PureComponent {
     }
   };
   onMoveendMap = e => {
-    //console.log(map.getZoom());
     const me = this;
     const { chartStatus } = this.state;
     let zoom = map.getZoom();
@@ -928,18 +912,12 @@ export default class integrat extends PureComponent {
         type: "spot",
         polygon: polygon
       });
-      //console.log(polygon);
     }
     //根据地图当前范围获取对应历史影像数据
     const { showHistoryContrast } = me.state;
     if (showHistoryContrast) {
       //历史影像查询
       me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
-      //历史扰动图斑查询
-      // me.queryWFSServiceByExtent(
-      //   config.mapHistorySpotLayerName,
-      //   me.callbackgetHistorySpotTimeByExtent
-      // );
     }
   };
   /*根据地图当前范围获取对应历史影像数据
@@ -1057,11 +1035,6 @@ export default class integrat extends PureComponent {
     me.props.dispatch({
       type: "mapdata/getHistorySpotTimeByExtent",
       payload: { geojsonUrl },
-      // callback: data => {
-      //   if (data.features.length > 0) {
-      //     console.log(data);
-      //   }
-      // }
       callback: callback
     });
   };
@@ -1227,7 +1200,6 @@ export default class integrat extends PureComponent {
   };
 
   getWinContent = (properties, callback) => {
-    //console.log("properties", properties);
     if (properties.map_num) {
       this.getSpotInfo(properties.id).then(spot => {
         this.creatElements(properties, callback, spot);
@@ -1243,7 +1215,6 @@ export default class integrat extends PureComponent {
     userconfig.projectgeojsonLayer = L.Proj.geoJson(geojson, {
       style: style
     }).addTo(map);
-    // console.log(turf.area(userconfig.projectgeojsonLayer.toGeoJSON()));
   };
   /*
    * 清空绘制图形函数
@@ -1498,14 +1469,14 @@ export default class integrat extends PureComponent {
       transparent: true
     }).addTo(map);      
     //加载图斑图层wms
-    /*userconfig.spotWmsLayer = L.tileLayer
-      .wms(config.mapUrl.geoserverUrl + "/wms?", {
-        layers: config.mapSpotLayerName, //需要加载的图层
-        format: "image/png", //返回的数据格式
-        transparent: true,
-        // cql_filter: "is_deleted == false"
-      })
-      .addTo(map);*/
+    // userconfig.spotWmsLayer = L.tileLayer
+    //   .wms(config.mapUrl.geoserverUrl + "/wms?", {
+    //     layers: config.mapSpotLayerName, //需要加载的图层
+    //     format: "image/png", //返回的数据格式
+    //     transparent: true,
+    //     // cql_filter: "is_deleted == false"
+    //   })
+    //   .addTo(map);
 
     userconfig.spotWmsLayer = LeaftWMS.overlay(config.mapUrl.geoserverUrl + "/wms?", {
       layers: config.mapSpotLayerName, //需要加载的图层
@@ -1653,7 +1624,6 @@ export default class integrat extends PureComponent {
       projectName,
       fromList
     } = this.state;
-    //console.log(e);
     e.stopPropagation();
     const me = this;
     this.setState({ showButton: false });
@@ -1681,13 +1651,6 @@ export default class integrat extends PureComponent {
    * 保存屏幕截图
    */
   saveScreenshot = e => {
-    // console.log(
-    //   userconfig.dataImgUrl +
-    //     "\n经度:" +
-    //     userconfig.imglng +
-    //     ",纬度" +
-    //     userconfig.imglat
-    // );
     if(!userconfig.dataImgUrl){
       message.warning('屏幕截图结果为空,建议放大地图,重新截图操作试试看', 2);
       return;
@@ -2019,7 +1982,7 @@ export default class integrat extends PureComponent {
       selectRightV
     } = this.state;
     const {
-      dispatch,
+      // dispatch,
       mapdata: { histories, historiesSpot }
     } = this.props;
     return (
