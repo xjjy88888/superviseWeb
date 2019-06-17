@@ -1,7 +1,16 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
 import { createForm } from "rc-form";
-import { Icon, Button, Radio, notification, Alert, Modal, Upload } from "antd";
+import {
+  Icon,
+  Button,
+  Radio,
+  notification,
+  Alert,
+  Modal,
+  Upload,
+  Spin
+} from "antd";
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
 import "echarts";
@@ -26,7 +35,8 @@ export default class siderbarDetail extends PureComponent {
       checkResult: [],
       showCheck: false,
       ShowArchive: false,
-      key: "project"
+      key: "project",
+      showSpin: false
     };
     this.charRef = ref => {
       this.chartDom = ref;
@@ -61,7 +71,8 @@ export default class siderbarDetail extends PureComponent {
       showCheck,
       funcType,
       funcTypeText,
-      ShowArchive
+      ShowArchive,
+      showSpin
     } = this.state;
     const { dispatch } = this.props;
     return (
@@ -98,6 +109,16 @@ export default class siderbarDetail extends PureComponent {
             emitter.emit("showChart", {
               show: false
             });
+          }}
+        />
+        <Spin
+          size="large"
+          style={{
+            display: showSpin ? "block" : "none",
+            position: "absolute",
+            top: 300,
+            left: 100,
+            zIndex: 1001
           }}
         />
         <div style={{ display: type === "tool" ? "block" : "none" }}>
@@ -309,9 +330,36 @@ export default class siderbarDetail extends PureComponent {
                 : config.url.uploadSpotUrl
             }
             headers={{ Authorization: `Bearer ${accessToken()}` }}
-            onError={(v, response) => {
+            beforeUpload={() => {
+              this.setState({ showSpin: true });
+            }}
+            onSuccess={v => {
+              console.log("onSuccess");
+              this.setState({ showSpin: false });
+              if (v.success && v.result.length === 0) {
+                notification["success"]({
+                  message: `${key === "project" ? "项目" : "图斑"}附件上传成功`
+                });
+              } else {
+                notification["error"]({
+                  message: (
+                    <div>
+                      <p>{key === "project" ? "项目" : "图斑"}附件上传失败：</p>
+                      {v.result.map((item, index) => (
+                        <p key={index}>{item}</p>
+                      ))}
+                    </div>
+                  )
+                });
+              }
+            }}
+            onError={(response, v) => {
+              console.log("onError", v);
+              this.setState({ showSpin: false });
               notification["error"]({
-                message: `附件上传失败：${response.error.message}`
+                message: `${key === "project" ? "项目" : "图斑"}附件上传失败：${
+                  v.error.message
+                }`
               });
             }}
           >
