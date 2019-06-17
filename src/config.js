@@ -127,6 +127,12 @@ const config = {
     // 下载导出项目/图斑(附件)数据
     downloadUrl: `${domain}api/services/app/File/GetExportFile?id=`,
 
+    // 上传项目
+    uploadProjectUrl: `${domain}api/services/app/Import/ProjectImport`,
+
+    // 上传图斑
+    uploadSpotUrl: `${domain}api/services/app/Import/SpotImport`,
+
     // 流域机构列表
     basinOrganizationUrl: `${domain}api/services/app/Project/GetRiverBasinOU`,
 
@@ -221,16 +227,16 @@ const config = {
       key: "template_description",
       icon: "question-circle"
     },
-    {
-      label: "批量上传(GeoJSON)",
-      key: "upload_shapfile",
-      icon: "upload"
-    },
-    {
-      label: "批量上传(Excel)",
-      key: "upload_excel",
-      icon: "upload"
-    },
+    // {
+    //   label: "批量上传(GeoJSON)",
+    //   key: "upload_shapfile",
+    //   icon: "upload"
+    // },
+    // {
+    //   label: "批量上传(Excel)",
+    //   key: "upload_excel",
+    //   icon: "upload"
+    // },
     {
       label: "数据抽稀",
       key: "data_sparse",

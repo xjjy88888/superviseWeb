@@ -636,11 +636,6 @@ export default class integrat extends PureComponent {
             });
           }
           map.openPopup(content, userconfig.mapPoint);
-          // if (isautomaticToMap) {
-          //   me.automaticToMap(
-          //     userconfig.projectgeojsonLayer.getBounds().getCenter()
-          //   );
-          // }
         }, 500);
       } else {
         map.closePopup();

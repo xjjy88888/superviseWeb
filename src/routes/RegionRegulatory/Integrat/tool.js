@@ -1,7 +1,7 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
 import { createForm } from "rc-form";
-import { Icon, Button, Radio, notification, Alert, Modal } from "antd";
+import { Icon, Button, Radio, notification, Alert, Modal, Upload } from "antd";
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
 import "echarts";
@@ -301,6 +301,24 @@ export default class siderbarDetail extends PureComponent {
               showIcon
             />
           </Modal>
+          <Upload
+            showUploadList={false}
+            action={
+              key === "project"
+                ? config.url.uploadProjectUrl
+                : config.url.uploadSpotUrl
+            }
+            headers={{ Authorization: `Bearer ${accessToken()}` }}
+            onError={(v, response) => {
+              notification["error"]({
+                message: `附件上传失败：${response.error.message}`
+              });
+            }}
+          >
+            <Button style={{ margin: `15px 10px 0 10px` }}>
+              <Icon type="upload" /> 批量上传
+            </Button>
+          </Upload>
         </div>
         <div
           style={{

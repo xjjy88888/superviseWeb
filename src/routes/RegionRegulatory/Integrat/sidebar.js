@@ -459,7 +459,7 @@ export default class integrat extends PureComponent {
 
   queryProject = items => {
     loading = true;
-    const { polygon, key } = this.state;
+    const { polygon, key, showCheck } = this.state;
     const {
       dispatch,
       project: { projectList }
@@ -475,7 +475,7 @@ export default class integrat extends PureComponent {
       callback: (success, response) => {
         loading = false;
         this.showSpin(false);
-        if (success && key === "project") {
+        if (!showCheck && success && key === "project") {
           emitter.emit("checkResult", {
             show: false,
             result: response.items
@@ -487,7 +487,7 @@ export default class integrat extends PureComponent {
 
   querySpot = items => {
     loading = true;
-    const { polygon, key } = this.state;
+    const { polygon, key, showCheck } = this.state;
     const {
       dispatch,
       spot: { spotList }
@@ -503,7 +503,7 @@ export default class integrat extends PureComponent {
       callback: (success, response) => {
         loading = false;
         this.showSpin(false);
-        if (success && key === "spot") {
+        if (!showCheck && success && key === "spot") {
           emitter.emit("checkResult", {
             show: false,
             result: response.items
