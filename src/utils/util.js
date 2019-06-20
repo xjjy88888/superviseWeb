@@ -60,10 +60,4 @@ const getFile = url => {
 const accessToken = () =>
   sessionStorage.length > 0 ? JSON.parse(sessionStorage.user).accessToken : "";
 
-export async function getProjectName(id) {
-  return new Promise((resolve, reject) => {
-    resolve(id);
-  });
-}
-
-export { dateFormat, dateInitFormat,dateTimeFormat, getFile, accessToken };
+export { dateFormat, dateInitFormat, dateTimeFormat, getFile, accessToken };
