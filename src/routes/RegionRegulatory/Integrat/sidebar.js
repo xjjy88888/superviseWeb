@@ -32,7 +32,7 @@ import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
 import config from "../../../config";
 import data from "../../../data";
-import { getFile } from "../../../utils/util";
+import { getFile, guid } from "../../../utils/util";
 import { dateInitFormat, accessToken } from "../../../utils/util";
 
 let self;
@@ -1244,6 +1244,7 @@ export default class integrat extends PureComponent {
             allowClear
             placeholder={`${placeholder}`}
             onSearch={v => {
+              console.log(guid());
               this.search(v);
             }}
             style={{ padding: "20px 20px", width: 300 }}
