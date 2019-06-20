@@ -2,6 +2,7 @@ import React, { PureComponent } from "react";
 import { createForm } from "rc-form";
 import { connect } from "dva";
 import { Form, Icon, Input, Button, Checkbox, message } from "antd";
+import { guid } from "../../../utils/util";
 
 @connect(({ user }) => ({
   user
@@ -11,6 +12,7 @@ export default class login extends PureComponent {
   componentDidMount() {
     // To disabled submit button at the beginning.
     this.props.form.validateFields();
+    console.log(guid());
   }
   handleSubmit = e => {
     e.preventDefault();
