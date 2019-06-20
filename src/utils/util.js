@@ -62,7 +62,7 @@ const accessToken = () =>
   sessionStorage.length > 0 ? JSON.parse(sessionStorage.user).accessToken : "";
 
 const guid = () => {
-  const snowflake = /** @class */ (function() {
+  const Snowflake = /** @class */ (function() {
     function Snowflake(_workerId, _dataCenterId, _sequence) {
       // this.twepoch = 1288834974657;
       this.twepoch = 0;
@@ -139,7 +139,7 @@ const guid = () => {
     return Snowflake;
   })();
 
-  return new snowflake(1, 1, 0).nextId();
+  return new Snowflake(1, 1, 0).nextId();
 };
 
 export {
