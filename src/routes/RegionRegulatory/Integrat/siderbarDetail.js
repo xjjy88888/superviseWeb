@@ -200,7 +200,8 @@ export default class siderbarDetail extends PureComponent {
     dispatch({
       type: url,
       payload: {
-        id: id
+        id: id,
+        refresh: true
       },
       callback: v => {
         this.setState({ ParentId: v.attachment ? v.attachment.id : 0 });
