@@ -59,7 +59,9 @@ const getFile = url => {
 };
 
 const accessToken = () =>
-  sessionStorage.length > 0 ? JSON.parse(sessionStorage.user).accessToken : "";
+  sessionStorage.length > 0 && sessionStorage.user
+    ? JSON.parse(sessionStorage.user).accessToken
+    : "";
 
 const guid = () => {
   const Snowflake = /** @class */ (function() {

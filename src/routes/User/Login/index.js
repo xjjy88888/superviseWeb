@@ -11,6 +11,12 @@ export default class login extends PureComponent {
   componentDidMount() {
     // To disabled submit button at the beginning.
     this.props.form.validateFields();
+    console.log(
+      "sessionStorage",
+      sessionStorage.length > 0 && sessionStorage.user
+        ? JSON.parse(sessionStorage.user).accessToken
+        : ""
+    );
   }
   handleSubmit = e => {
     e.preventDefault();
