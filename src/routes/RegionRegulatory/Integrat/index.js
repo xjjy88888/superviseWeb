@@ -1451,34 +1451,36 @@ export default class integrat extends PureComponent {
    */
   loadLayersControl = () => {
     //加载项目红线图层wms
-    /*userconfig.projectWmsLayer = L.tileLayer
+    userconfig.projectWmsLayer = L.tileLayer
       .wms(config.mapUrl.geoserverUrl + "/wms?", {
         layers: config.mapProjectLayerName, //需要加载的图层
         format: "image/png", //返回的数据格式
         transparent: true
       })
-      .addTo(map);*/
-    userconfig.projectWmsLayer = LeaftWMS.overlay(config.mapUrl.geoserverUrl + "/wms?", {
-      layers: config.mapProjectLayerName, //需要加载的图层
-      format: "image/png", //返回的数据格式
-      transparent: true
-    }).addTo(map);      
-    //加载图斑图层wms
-    // userconfig.spotWmsLayer = L.tileLayer
-    //   .wms(config.mapUrl.geoserverUrl + "/wms?", {
-    //     layers: config.mapSpotLayerName, //需要加载的图层
-    //     format: "image/png", //返回的数据格式
-    //     transparent: true,
-    //     // cql_filter: "is_deleted == false"
-    //   })
-    //   .addTo(map);
+      .addTo(map);
+      
+    // userconfig.projectWmsLayer = LeaftWMS.overlay(config.mapUrl.geoserverUrl + "/wms?", {
+    //   layers: config.mapProjectLayerName, //需要加载的图层
+    //   format: "image/png", //返回的数据格式
+    //   transparent: true
+    // }).addTo(map); 
 
-    userconfig.spotWmsLayer = LeaftWMS.overlay(config.mapUrl.geoserverUrl + "/wms?", {
-      layers: config.mapSpotLayerName, //需要加载的图层
-      format: "image/png", //返回的数据格式
-      transparent: true,
-      // cql_filter: "map_num == 201808_450521_0515"
-    }).addTo(map);
+    //加载图斑图层wms
+    userconfig.spotWmsLayer = L.tileLayer
+      .wms(config.mapUrl.geoserverUrl + "/wms?", {
+        layers: config.mapSpotLayerName, //需要加载的图层
+        format: "image/png", //返回的数据格式
+        transparent: true,
+        // cql_filter: "is_deleted == false"
+      })
+      .addTo(map);
+
+    // userconfig.spotWmsLayer = LeaftWMS.overlay(config.mapUrl.geoserverUrl + "/wms?", {
+    //   layers: config.mapSpotLayerName, //需要加载的图层
+    //   format: "image/png", //返回的数据格式
+    //   transparent: true,
+    //   // cql_filter: "map_num == 201808_450521_0515"
+    // }).addTo(map);
 
     const overlays = userconfig.overlays = {
       项目红线: userconfig.projectWmsLayer,
