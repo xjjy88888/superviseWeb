@@ -1,16 +1,17 @@
 import config from "../config";
 import request from "../utils/request";
-// import CryptoJS from "crypto-js";
+import CryptoJS from "crypto-js";
 import { dateFormat, accessToken } from "../utils/util";
 
 // 登录
 export async function loginApi(params) {
+  const passwordMd5 = CryptoJS.MD5(params.password).toString();
   return request(config.url.loginUrl, {
     method: "POST",
     headers: {
       "content-type": "application/json"
     },
-    body: JSON.stringify(params)
+    body: JSON.stringify({ ...params, password: passwordMd5 })
   });
 }
 

@@ -229,15 +229,16 @@ export default class integrat extends PureComponent {
           return;
         }
 
-        if(data.item.isArchive){//历史扰动图斑
+        if (data.item.isArchive) {
+          //历史扰动图斑
           this.queryWFSServiceByProperty(
             data.item.id,
             "id",
             config.mapHistorySpotLayerName,
             this.callbackLocationNoPopup
           );
-        }
-        else{//现状扰动图斑
+        } else {
+          //现状扰动图斑
           this.queryWFSServiceByProperty(
             data.item.id,
             "id",
@@ -329,7 +330,7 @@ export default class integrat extends PureComponent {
         //监听地图点击事件
         map.on("click", me.onClickMap);
         //截图进度条显示
-        const hide = message.loading('屏幕截图操作进行中...', 0);
+        const hide = message.loading("屏幕截图操作进行中...", 0);
 
         userconfig.screenLayer = e.layer;
         let northEast = userconfig.screenLayer.getBounds()._northEast;
@@ -363,11 +364,14 @@ export default class integrat extends PureComponent {
         domtoimage
           .toPng(node)
           .then(function(dataUrl) {
-            if(dataUrl.length <= 6){
-               //关闭屏幕截图操作
-               setTimeout(hide, 10);
-               message.warning('屏幕截图结果为空,建议放大地图,重新截图操作试试看', 2);
-               return;            
+            if (dataUrl.length <= 6) {
+              //关闭屏幕截图操作
+              setTimeout(hide, 10);
+              message.warning(
+                "屏幕截图结果为空,建议放大地图,重新截图操作试试看",
+                2
+              );
+              return;
             }
             //过渡img图片,为了截取img指定位置的截图需要
             let img = new Image();
@@ -385,11 +389,10 @@ export default class integrat extends PureComponent {
               //保存截图以及中心点经纬度
               userconfig.dataImgUrl = dataUrl;
               userconfig.imglng = centerPoint.lng;
-              userconfig.imglat = centerPoint.lat;             
+              userconfig.imglat = centerPoint.lat;
               //关闭屏幕截图操作
               setTimeout(hide, 10);
-              message.success('屏幕截图成功', 2);
-
+              message.success("屏幕截图成功", 2);
             };
           })
           .catch(function(error) {
@@ -547,15 +550,15 @@ export default class integrat extends PureComponent {
             });
           }
         }
-        setTimeout(() => {
-          map.openPopup(
-            content,
-            userconfig.projectgeojsonLayer.getBounds().getCenter()
-          );
-          me.automaticToMap(
-            userconfig.projectgeojsonLayer.getBounds().getCenter()
-          );
-        }, 500);
+        // setTimeout(() => {
+        map.openPopup(
+          content,
+          userconfig.projectgeojsonLayer.getBounds().getCenter()
+        );
+        me.automaticToMap(
+          userconfig.projectgeojsonLayer.getBounds().getCenter()
+        );
+        // }, 500);
       } else {
         message.warning("项目无可用位置信息", 1);
       }
@@ -584,18 +587,15 @@ export default class integrat extends PureComponent {
           map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
             maxZoom: 16
           });
-        }
-        else{
+        } else {
           me.automaticToMap(
             userconfig.projectgeojsonLayer.getBounds().getCenter()
           );
         }
-      }
-      else {
+      } else {
         message.warning("项目无可用位置信息", 1);
       }
-    }
-    else {
+    } else {
       message.warning("项目无可用位置信息", 1);
     }
   };
@@ -629,14 +629,14 @@ export default class integrat extends PureComponent {
             });
           }
         }
-        setTimeout(() => {
-          if (map.getZoom() < config.mapInitParams.zoom) {
-            map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
-              maxZoom: 16
-            });
-          }
-          map.openPopup(content, userconfig.mapPoint);
-        }, 500);
+        // setTimeout(() => {
+        if (map.getZoom() < config.mapInitParams.zoom) {
+          map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
+            maxZoom: 16
+          });
+        }
+        map.openPopup(content, userconfig.mapPoint);
+        // }, 500);
       } else {
         map.closePopup();
       }
@@ -666,8 +666,10 @@ export default class integrat extends PureComponent {
         for (let i = 0; i < data.features.length; i++) {
           let item = data.features[i];
           let spotId = item.properties.id ? item.properties.id : "";
-          let project_id = item.properties.project_id ? item.properties.project_id : "";
-          spotIds.push({spotId:spotId,projectId:project_id});
+          let project_id = item.properties.project_id
+            ? item.properties.project_id
+            : "";
+          spotIds.push({ spotId: spotId, projectId: project_id });
         }
         //图斑关联
         emitter.emit("spotRelate", {
@@ -724,9 +726,7 @@ export default class integrat extends PureComponent {
       showQuery,
       showProblem
     } = me.state;
-    let point = map.latLngToContainerPoint(
-      latLng
-    );
+    let point = map.latLngToContainerPoint(latLng);
     const offsetSiderbar = showSiderbar ? 200 : 0;
     const offsetSiderbarDetail = showSiderbarDetail ? 200 : 0;
     const offsetQuery = showQuery ? 225 : 0;
@@ -860,20 +860,28 @@ export default class integrat extends PureComponent {
       //普通点查
       let LayersName = "";
       const { showHistoryContrast } = me.state;
-      if (showHistoryContrast) {//地图卷帘模式下
-        LayersName = config.mapLayersName;//扰动图斑、项目红线勾选
-      }
-      else{//非地图卷帘模式下
-        if(userconfig.overlays.扰动图斑._map && userconfig.overlays.项目红线._map){
-          LayersName = config.mapLayersName;//扰动图斑、项目红线勾选
-        }
-        else if(userconfig.overlays.扰动图斑._map && !userconfig.overlays.项目红线._map){
-          LayersName = config.mapSpotLayerName;//扰动图斑勾选
-        }
-        else if(!userconfig.overlays.扰动图斑._map && userconfig.overlays.项目红线._map){
-          LayersName = config.mapProjectLayerName;//项目红线勾选
-        }
-        else{//扰动图斑、项目红线都不勾选
+      if (showHistoryContrast) {
+        //地图卷帘模式下
+        LayersName = config.mapLayersName; //扰动图斑、项目红线勾选
+      } else {
+        //非地图卷帘模式下
+        if (
+          userconfig.overlays.扰动图斑._map &&
+          userconfig.overlays.项目红线._map
+        ) {
+          LayersName = config.mapLayersName; //扰动图斑、项目红线勾选
+        } else if (
+          userconfig.overlays.扰动图斑._map &&
+          !userconfig.overlays.项目红线._map
+        ) {
+          LayersName = config.mapSpotLayerName; //扰动图斑勾选
+        } else if (
+          !userconfig.overlays.扰动图斑._map &&
+          userconfig.overlays.项目红线._map
+        ) {
+          LayersName = config.mapProjectLayerName; //项目红线勾选
+        } else {
+          //扰动图斑、项目红线都不勾选
           return;
         }
       }
@@ -970,7 +978,7 @@ export default class integrat extends PureComponent {
     filter += "<Literal>" + propertyValue + "</Literal>";
     filter += "</PropertyIsEqualTo>";
     filter += "</Filter>";
-    let urlString = config.mapUrl.geoserverUrl + "/ows";
+    let urlString = config.mapUrl.geoserverQueryUrl + "/ows";
     let param = {
       service: "WFS",
       version: "1.0.0",
@@ -1051,7 +1059,7 @@ export default class integrat extends PureComponent {
     filter += "</gml:Point>";
     filter += "</Intersects>";
     filter += "</Filter>";
-    let urlString = config.mapUrl.geoserverUrl + "/ows";
+    let urlString = config.mapUrl.geoserverQueryUrl + "/ows";
     let param = {
       service: "WFS",
       version: "1.0.0",
@@ -1073,59 +1081,61 @@ export default class integrat extends PureComponent {
    * 匹配气泡窗口信息模版函数
    */
 
-  getProjectInfo = id => {
-    return new Promise((resolve, reject) => {
-      const { dispatch } = this.props;
-      dispatch({
-        type: "project/queryProjectById",
-        payload: {
-          id: id,
-          refresh: false
-        },
-        callback: (result, success) => {
-          if (success && result) {
-            resolve(result.projectBase.name);
-          } else {
-            resolve("");
-          }
-        }
-      });
-    });
-  };
+  // getProjectInfo = id => {
+  //   return new Promise((resolve, reject) => {
+  //     const { dispatch } = this.props;
+  //     dispatch({
+  //       type: "project/queryProjectById",
+  //       payload: {
+  //         id: id,
+  //         refresh: false
+  //       },
+  //       callback: (result, success) => {
+  //         if (success && result) {
+  //           resolve(result.projectBase.name);
+  //         } else {
+  //           resolve("");
+  //         }
+  //       }
+  //     });
+  //   });
+  // };
 
-  getDictValue = id => {
-    const {
-      user: { dicList }
-    } = this.props;
-    if (id) {
-      const filter = dicList.filter(item => {
-        return item.id === id;
-      });
-      return filter.map(item => item.value).join(",");
-    } else {
-      return "";
-    }
-  };
+  // getDictValue = id => {
+  //   const {
+  //     user: { dicList }
+  //   } = this.props;
+  //   if (id) {
+  //     const filter = dicList.filter(item => {
+  //       return item.id === id;
+  //     });
+  //     return filter.map(item => item.value).join(",");
+  //   } else {
+  //     return "";
+  //   }
+  // };
 
-  getSpotInfo = id => {
-    return new Promise((resolve, reject) => {
-      const { dispatch } = this.props;
-      dispatch({
-        type: "spot/querySpotById",
-        payload: {
-          id: id,
-          refresh: false
-        },
-        callback: data => {
-          const v = data ? data.interferenceComplianceId : "";
-          resolve(v);
-        }
-      });
-    });
-  };
+  // getSpotInfo = id => {
+  //   return new Promise((resolve, reject) => {
+  //     const { dispatch } = this.props;
+  //     dispatch({
+  //       type: "spot/querySpotById",
+  //       payload: {
+  //         id: id,
+  //         refresh: false
+  //       },
+  //       callback: data => {
+  //         const v = data ? data.interferenceComplianceId : "";
+  //         resolve(v);
+  //       }
+  //     });
+  //   });
+  // };
 
-  creatElements = (properties, callback, spotId) => {
-    const spot = this.getDictValue(spotId);
+  creatElements = (properties, callback) => {
+    console.log(properties);
+    // const spot = this.getDictValue(spotId);
+    const spot = "";
     let elements;
     const obj = {
       show: true,
@@ -1133,72 +1143,79 @@ export default class integrat extends PureComponent {
       id: properties.map_num ? properties.id : properties.project_id,
       from: properties.map_num ? "spot" : "project"
     };
-    if (properties.project_id) {
-      this.getProjectInfo(properties.project_id).then(data => {
-        elements = properties.map_num
-          ? jQuery(
-              `<div>图斑编号:${properties.map_num}</br>
-        ${properties.project_id ? "关联项目:" + data + "</br>" : ""}${
-                properties.interference_compliance_id
-                  ? "扰动范围:" + spot + "</br>"
-                  : ""
-              }<a onclick='goDetail(${JSON.stringify(
-                obj
-              )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
-                obj
-              )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
-                obj
-              )})' style='display:none'>图形删除</a></div>`
-            )
-          : jQuery(
-              `<div>项目:${data}</br>
+    // if (properties.project_id) {
+    // this.getProjectInfo(properties.project_id).then(data => {
+    const data = "";
+    elements = properties.map_num
+      ? jQuery(
+          `<div>图斑编号:${properties.map_num}</br>
+        ${
+          properties.project_name
+            ? "关联项目:" + properties.project_name + "</br>"
+            : ""
+        }${
+            properties.interference_compliance
+              ? "扰动范围:" + properties.interference_compliance + "</br>"
+              : ""
+          }<a onclick='goDetail(${JSON.stringify(
+            obj
+          )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
+            obj
+          )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+            obj
+          )})' style='display:none'>图形删除</a></div>`
+        )
+      : jQuery(
+          `<div>项目:${properties.project_name}</br>
           <a onclick='goDetail(${JSON.stringify(
             obj
           )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
-                obj
-              )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
-                obj
-              )})' style='display:none'>图形删除</a></div>`
-            );
-        //console.log(elements);
-        callback(elements);
-      });
-    } else {
-      elements = properties.map_num
-        ? jQuery(
-            `<div>图斑编号:${properties.map_num}</br>
-    ${properties.project_id ? "关联项目:</br>" : ""}${
-              properties.interference_compliance_id
-                ? "扰动范围:" + spot + "</br>"
-                : ""
-            }<a onclick='goDetail(${JSON.stringify(
-              obj
-            )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
-              obj
-            )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
-              obj
-            )})' style='display:none'>图形删除</a></div>`
-          )
-        : jQuery(
-            `<div>项目:</br>
-      <a onclick='goDetail(${JSON.stringify(
-        obj
-      )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
-              obj
-            )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
-              obj
-            )})' style='display:none'>图形删除</a></div>`
-          );
-      //console.log(elements);
-      callback(elements);
-    }
+            obj
+          )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+            obj
+          )})' style='display:none'>图形删除</a></div>`
+        );
+    //console.log(elements);
+    callback(elements);
+    // });
+    // } else {
+    //   elements = properties.map_num
+    //     ? jQuery(
+    //         `<div>图斑编号:${properties.map_num}</br>
+    // ${
+    //   properties.project_name ? `关联项目:${properties.project_name}</br>` : ""
+    // }${
+    //           properties.interference_compliance
+    //             ? "扰动范围:" + properties.interference_compliance + "</br>"
+    //             : ""
+    //         }<a onclick='goDetail(${JSON.stringify(
+    //           obj
+    //         )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
+    //           obj
+    //         )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+    //           obj
+    //         )})' style='display:none'>图形删除</a></div>`
+    //       )
+    //     : jQuery(
+    //         `<div>项目:</br>
+    //   <a onclick='goDetail(${JSON.stringify(
+    //     obj
+    //   )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
+    //           obj
+    //         )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+    //           obj
+    //         )})' style='display:none'>图形删除</a></div>`
+    //       );
+    //   //console.log(elements);
+    //   callback(elements);
+    // }
   };
 
   getWinContent = (properties, callback) => {
     if (properties.map_num) {
-      this.getSpotInfo(properties.id).then(spot => {
-        this.creatElements(properties, callback, spot);
-      });
+      // this.getSpotInfo(properties.id).then(spot => {
+      this.creatElements(properties, callback);
+      // });
     } else {
       this.creatElements(properties, callback, "");
     }
@@ -1458,19 +1475,19 @@ export default class integrat extends PureComponent {
         transparent: true
       })
       .addTo(map);
-      
+
     // userconfig.projectWmsLayer = LeaftWMS.overlay(config.mapUrl.geoserverUrl + "/wms?", {
     //   layers: config.mapProjectLayerName, //需要加载的图层
     //   format: "image/png", //返回的数据格式
     //   transparent: true
-    // }).addTo(map); 
+    // }).addTo(map);
 
     //加载图斑图层wms
     userconfig.spotWmsLayer = L.tileLayer
       .wms(config.mapUrl.geoserverUrl + "/wms?", {
         layers: config.mapSpotLayerName, //需要加载的图层
         format: "image/png", //返回的数据格式
-        transparent: true,
+        transparent: true
         // cql_filter: "is_deleted == false"
       })
       .addTo(map);
@@ -1482,20 +1499,21 @@ export default class integrat extends PureComponent {
     //   // cql_filter: "map_num == 201808_450521_0515"
     // }).addTo(map);
 
-    const overlays = userconfig.overlays = {
+    const overlays = (userconfig.overlays = {
       项目红线: userconfig.projectWmsLayer,
       扰动图斑: userconfig.spotWmsLayer
-    };
+    });
     //底图切换控件
-    let layersControl = L.control.layers(userconfig.baseLayers, overlays).addTo(map);  
-    return  layersControl;
+    let layersControl = L.control
+      .layers(userconfig.baseLayers, overlays)
+      .addTo(map);
+    return layersControl;
   };
   /*
    *移除图层控件
    */
   removeLayersControl = () => {
-    if(userconfig.layersControl)
-       userconfig.layersControl.remove();
+    if (userconfig.layersControl) userconfig.layersControl.remove();
   };
   /*
    *刷新重绘WMS图层
@@ -1504,7 +1522,7 @@ export default class integrat extends PureComponent {
     //获取地图当前范围中心点
     let latlng = map.getCenter();
     latlng.lat = latlng.lat - 0.001;
-    latlng.lng 	 = latlng.lng - 0.001;
+    latlng.lng = latlng.lng - 0.001;
     //通过移动地图来刷新地图
     map.panTo(latlng);
   };
@@ -1514,7 +1532,7 @@ export default class integrat extends PureComponent {
   clearPlotGraphic = () => {
     //禁止编辑图形
     if (userconfig.projectgeojsonLayer)
-        userconfig.projectgeojsonLayer.pm.disable();
+      userconfig.projectgeojsonLayer.pm.disable();
     this.clearGeojsonLayer();
     //针对新增图形
     const { addGraphLayer } = this.state;
@@ -1648,8 +1666,8 @@ export default class integrat extends PureComponent {
    * 保存屏幕截图
    */
   saveScreenshot = e => {
-    if(!userconfig.dataImgUrl){
-      message.warning('屏幕截图结果为空,建议放大地图,重新截图操作试试看', 2);
+    if (!userconfig.dataImgUrl) {
+      message.warning("屏幕截图结果为空,建议放大地图,重新截图操作试试看", 2);
       return;
     }
     this.cancelScreenshot();
@@ -1727,8 +1745,7 @@ export default class integrat extends PureComponent {
       //历史影像查询
       this.getInfoByExtent(zoom, bounds, this.callbackGetInfoByExtent, true);
       //隐藏图层控件
-      jQuery(userconfig.layersControl.getContainer()).css('display','none'); 
-
+      jQuery(userconfig.layersControl.getContainer()).css("display", "none");
     } else {
       //移除卷帘效果
       this.removeSideBySide();
@@ -1736,7 +1753,7 @@ export default class integrat extends PureComponent {
       map.addLayer(userconfig.baseLayer2);
       map.addLayer(userconfig.spotWmsLayer);
       //显示图层控件
-      jQuery(userconfig.layersControl.getContainer()).css('display','block'); 
+      jQuery(userconfig.layersControl.getContainer()).css("display", "block");
     }
   };
   /*
@@ -1798,13 +1815,13 @@ export default class integrat extends PureComponent {
     }
     //移除地图默认加载底图
     if (map.hasLayer(userconfig.baseLayer1))
-        map.removeLayer(userconfig.baseLayer1);
+      map.removeLayer(userconfig.baseLayer1);
     if (map.hasLayer(userconfig.baseLayer2))
-        map.removeLayer(userconfig.baseLayer2);
+      map.removeLayer(userconfig.baseLayer2);
     if (map.hasLayer(userconfig.baseLayer3))
-        map.removeLayer(userconfig.baseLayer3);
+      map.removeLayer(userconfig.baseLayer3);
     //移除地图默认加载叠加图层组;
-    if(userconfig.spotWmsLayer) map.removeLayer(userconfig.spotWmsLayer);
+    if (userconfig.spotWmsLayer) map.removeLayer(userconfig.spotWmsLayer);
     //移除卷帘对比左右边图层列表
     this.removeleftrightLayers();
   };
@@ -1953,7 +1970,6 @@ export default class integrat extends PureComponent {
       }
       map.addLayer(spotleftwms);
       map.addLayer(spotrightwms);
-
     }
 
     if (userconfig.setTopLayer === "spotLayer") {
