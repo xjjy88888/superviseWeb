@@ -1133,9 +1133,9 @@ export default class integrat extends PureComponent {
   // };
 
   creatElements = (properties, callback) => {
-    console.log(properties);
+    // console.log(properties);
     // const spot = this.getDictValue(spotId);
-    const spot = "";
+    // const spot = "";
     let elements;
     const obj = {
       show: true,
@@ -1145,7 +1145,7 @@ export default class integrat extends PureComponent {
     };
     // if (properties.project_id) {
     // this.getProjectInfo(properties.project_id).then(data => {
-    const data = "";
+    // const data = "";
     elements = properties.map_num
       ? jQuery(
           `<div>图斑编号:${properties.map_num}</br>

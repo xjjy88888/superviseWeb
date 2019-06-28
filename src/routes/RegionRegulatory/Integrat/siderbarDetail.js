@@ -1,10 +1,8 @@
 import React, { PureComponent } from "react";
 import { createForm } from "rc-form";
 import { connect } from "dva";
-import moment from "moment";
 import {
   Icon,
-  message,
   Button,
   Input,
   Cascader,
@@ -12,10 +10,9 @@ import {
   Upload,
   notification,
   Modal,
-  AutoComplete,
   Switch,
-  TreeSelect,
   DatePicker,
+  message,
   Form
 } from "antd";
 import locale from "antd/lib/date-picker/locale/zh_CN";
@@ -115,6 +112,9 @@ export default class siderbarDetail extends PureComponent {
     });
     this.eventEmitter = emitter.addListener("showProjectSpotInfo", data => {
       console.log(data);
+      emitter.emit("showSiderbar", {
+        show: true
+      });
       if (data.from !== "project") {
         resetFields();
         this.setState({
@@ -1062,6 +1062,10 @@ export default class siderbarDetail extends PureComponent {
                               const { archiveTime } = self.state;
                               if (archiveTime) {
                                 const t = spotItem.archiveTimes;
+                                console.log(
+                                  archiveTime,
+                                  spotItem.archiveTimes[0]
+                                );
                                 if (
                                   t.length &&
                                   new Date(archiveTime).getTime() <=
@@ -1248,6 +1252,7 @@ export default class siderbarDetail extends PureComponent {
                   }}
                 >
                   {item.mapNum}
+                  <span style={{ marginLeft: 20 }}>{item.archiveTime}</span>
                   <Icon
                     type="environment"
                     style={{

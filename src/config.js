@@ -1,6 +1,6 @@
 const domain = "http://aj.zkygis.cn/stbc/";
 const imageBaseUrl = "http://183.6.178.122/BasemapService/rest/image";
-const imageQueryBaseUrl = "http://10.7.23.178/BasemapService/rest/image";
+const imageQueryBaseUrl = "http://210.36.22.122/BasemapService/rest/image";
 const txKey = "TERBZ-ZU46D-KZT46-HZZIB-RNDMZ-7GFP3";
 
 const color_back_spot = "rgba(255,255,0,0.4)"; //背景色-图斑
@@ -434,7 +434,7 @@ const config = {
     SHP: `./mapfile/SHP/`,
     mapshaper: `./mapshaper/index.html`,
     geoserverUrl: "http://183.6.178.123:8080/geoserver/ZKYGIS",
-    geoserverQueryUrl: "http://10.7.23.177:8080/geoserver/ZKYGIS",
+    geoserverQueryUrl: "http://210.36.22.123:8080/geoserver/ZKYGIS",
     //根据地图当前范围获取对应历史影像数据接口
     // getInfoByExtent: `${imageBaseUrl}/latest/getInfoByExtent`
     getInfoByExtent: `${imageQueryBaseUrl}/latest/getInfoByExtent`

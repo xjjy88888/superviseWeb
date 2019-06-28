@@ -168,8 +168,10 @@ export default class integrat extends PureComponent {
       }
     });
     this.eventEmitter = emitter.addListener("projectInfoRefresh", v => {
-      this.queryRedLineList(v.projectId);
-      this.querySpotByProjectId(v.projectId);
+      if (v.projectId) {
+        this.queryRedLineList(v.projectId);
+        this.querySpotByProjectId(v.projectId);
+      }
     });
     this.eventEmitter = emitter.addListener("showCreateDepart", v => {
       console.log(v);
