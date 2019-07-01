@@ -26,12 +26,12 @@ export default class login extends PureComponent {
     // );
   }
   handleSubmit = e => {
-    sessionStorage.setItem("frequentEdit", false);
+    sessionStorage.setItem("frequentEdit", 0);
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
         // console.log(values);
-        sessionStorage.setItem("frequentEdit", values.frequentEdit);
+        sessionStorage.setItem("frequentEdit", values.frequentEdit ? 1 : 0);
         let lastLogin;
         if (values.remember) {
           lastLogin = {

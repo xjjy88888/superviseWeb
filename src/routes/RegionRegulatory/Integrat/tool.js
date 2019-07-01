@@ -379,7 +379,7 @@ export default class siderbarDetail extends PureComponent {
             }}
           >
             <p style={{ margin: `20px 0 10px 0` }}>控制台 - 项目统计</p>
-            <Radio.Group buttonStyle="solid" defaultValue={`level`}>
+            <Radio.Group buttonstyle="solid" defaultValue={`level`}>
               {config.console_project.map((item, index) => (
                 <div key={index}>
                   <Button
@@ -407,7 +407,7 @@ export default class siderbarDetail extends PureComponent {
             }}
           >
             <p style={{ margin: `20px 0 10px 0` }}>控制台 - 图斑统计</p>
-            <Radio.Group buttonStyle="solid">
+            <Radio.Group buttonstyle="solid">
               {config.console_spot.map((item, index) => (
                 <div key={index}>
                   <Button

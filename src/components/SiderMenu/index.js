@@ -124,7 +124,7 @@ export default class SiderMenu extends PureComponent {
           theme="dark"
           // openindex={this.state.openindex}
           onOpenChange={this.onOpenChange}
-          defaultSelectedindex={this.state.defaultSelectedindex}
+          defaultselectedindex={this.state.defaultSelectedindex}
         >
           {menuList.map(item =>
             item.subMenu.length ? (

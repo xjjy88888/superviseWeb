@@ -1321,7 +1321,7 @@ export default class integrat extends PureComponent {
             />
           </Popover>
           <Button.Group
-            buttonStyle="solid"
+            buttonstyle="solid"
             style={{ padding: "0px 15px" }}
             onClick={e => {
               const v = e.target.value;

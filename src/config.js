@@ -1,4 +1,7 @@
-const domain = "http://www.zkygis.cn/stbc/";
+const isFormal = window.location.href.split("/")[3] === "stbcjg";
+console.log(isFormal ? "正式环境" : "测试环境");
+
+const domain = `http://www.zkygis.cn/stbc${isFormal ? "" : "t"}/`;
 
 const imageBaseUrl = "http://183.6.178.122/BasemapService/rest/image";
 const imageQueryBaseUrl = "http://210.36.22.122/BasemapService/rest/image";

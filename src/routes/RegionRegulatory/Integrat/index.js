@@ -82,8 +82,6 @@ export default class integrat extends PureComponent {
   }
 
   componentDidMount() {
-    const frequentEdit = sessionStorage.getItem("frequentEdit");
-    console.log("是否频繁编辑", frequentEdit);
     const me = this;
     const { dispatch } = this.props;
     dispatch({
@@ -215,7 +213,7 @@ export default class integrat extends PureComponent {
                   marker = L.marker(latLng).addTo(map);
                   map.setZoom(config.mapInitParams.zoom);
                   setTimeout(() => {
-                    me.automaticToMap(latLng);
+                    if (latLng) me.automaticToMap(latLng);
                   }, 500);
                   break;
                 default:
@@ -260,11 +258,11 @@ export default class integrat extends PureComponent {
         marker = L.marker(latLng).addTo(map);
 
         if (map.getZoom() >= config.mapInitParams.zoom) {
-          me.automaticToMap(latLng);
+          if (latLng) me.automaticToMap(latLng);
         } else {
           map.setZoom(config.mapInitParams.zoom);
           setTimeout(() => {
-            me.automaticToMap(latLng);
+            if (latLng) me.automaticToMap(latLng);
           }, 500);
         }
       } else if (data.key === "redLine") {
@@ -292,11 +290,11 @@ export default class integrat extends PureComponent {
           marker = L.marker(latLng, { icon: myIcon }).addTo(map);
           //marker = L.marker(latLng).addTo(map);
           if (map.getZoom() >= config.mapInitParams.zoom) {
-            me.automaticToMap(latLng);
+            if (latLng) me.automaticToMap(latLng);
           } else {
             map.setZoom(config.mapInitParams.zoom);
             setTimeout(() => {
-              me.automaticToMap(latLng);
+              if (latLng) me.automaticToMap(latLng);
             }, 500);
           }
         } else {
@@ -553,16 +551,11 @@ export default class integrat extends PureComponent {
           }
         }
         setTimeout(() => {
-            let latlng = userconfig.projectgeojsonLayer.getBounds().getCenter();
-            if(latlng){
-              map.openPopup(
-                content,
-                userconfig.projectgeojsonLayer.getBounds().getCenter()
-              );
-              me.automaticToMap(
-                userconfig.projectgeojsonLayer.getBounds().getCenter()
-              );
-            }
+          let latlng = userconfig.projectgeojsonLayer.getBounds().getCenter();
+          if (latlng) {
+            map.openPopup(content, latlng);
+            me.automaticToMap(latlng);
+          }
         }, 500);
       } else {
         message.warning("项目无可用位置信息", 1);
@@ -593,9 +586,10 @@ export default class integrat extends PureComponent {
             maxZoom: 16
           });
         } else {
-          me.automaticToMap(
-            userconfig.projectgeojsonLayer.getBounds().getCenter()
-          );
+          let latLng = userconfig.projectgeojsonLayer.getBounds().getCenter();
+          if (latLng) {
+            me.automaticToMap(latLng);
+          }
         }
       } else {
         message.warning("项目无可用位置信息", 1);
@@ -1373,37 +1367,50 @@ export default class integrat extends PureComponent {
    *加载默认图层控件
    */
   loadLayersControl = () => {
-    //加载项目红线图层wms
-    userconfig.projectWmsLayer = L.tileLayer
-      .wms(config.mapUrl.geoserverUrl + "/wms?", {
-        layers: config.mapProjectLayerName, //需要加载的图层
-        format: "image/png", //返回的数据格式
-        transparent: true
-      })
-      .addTo(map);
+    const frequentEdit = sessionStorage.getItem("frequentEdit");
+    console.log("是否频繁编辑", frequentEdit, typeof frequentEdit);
+    if (frequentEdit === "1") {
+      //加载项目红线图层wms
+      userconfig.projectWmsLayer = LeaftWMS.overlay(
+        config.mapUrl.geoserverUrl + "/wms?",
+        {
+          layers: config.mapProjectLayerName, //需要加载的图层
+          format: "image/png", //返回的数据格式
+          transparent: true
+        }
+      ).addTo(map);
 
-    // userconfig.projectWmsLayer = LeaftWMS.overlay(config.mapUrl.geoserverUrl + "/wms?", {
-    //   layers: config.mapProjectLayerName, //需要加载的图层
-    //   format: "image/png", //返回的数据格式
-    //   transparent: true
-    // }).addTo(map);
+      //加载图斑图层wms
+      userconfig.spotWmsLayer = LeaftWMS.overlay(
+        config.mapUrl.geoserverUrl + "/wms?",
+        {
+          layers: config.mapSpotLayerName, //需要加载的图层
+          format: "image/png", //返回的数据格式
+          transparent: true
+          // cql_filter: "map_num == 201808_450521_0515"
+        }
+      ).addTo(map);
+    } else {
+      //默认加载瓦片地图模式
+      //加载项目红线图层wms
+      userconfig.projectWmsLayer = L.tileLayer
+        .wms(config.mapUrl.geoserverUrl + "/wms?", {
+          layers: config.mapProjectLayerName, //需要加载的图层
+          format: "image/png", //返回的数据格式
+          transparent: true
+        })
+        .addTo(map);
 
-    //加载图斑图层wms
-    userconfig.spotWmsLayer = L.tileLayer
-      .wms(config.mapUrl.geoserverUrl + "/wms?", {
-        layers: config.mapSpotLayerName, //需要加载的图层
-        format: "image/png", //返回的数据格式
-        transparent: true
-        // cql_filter: "is_deleted == false"
-      })
-      .addTo(map);
-
-    // userconfig.spotWmsLayer = LeaftWMS.overlay(config.mapUrl.geoserverUrl + "/wms?", {
-    //   layers: config.mapSpotLayerName, //需要加载的图层
-    //   format: "image/png", //返回的数据格式
-    //   transparent: true,
-    //   // cql_filter: "map_num == 201808_450521_0515"
-    // }).addTo(map);
+      //加载图斑图层wms
+      userconfig.spotWmsLayer = L.tileLayer
+        .wms(config.mapUrl.geoserverUrl + "/wms?", {
+          layers: config.mapSpotLayerName, //需要加载的图层
+          format: "image/png", //返回的数据格式
+          transparent: true
+          // cql_filter: "is_deleted == false"
+        })
+        .addTo(map);
+    }
 
     const overlays = (userconfig.overlays = {
       项目红线: userconfig.projectWmsLayer,
