@@ -1,6 +1,5 @@
 import React from "react";
 import { Router, Route, Switch } from "dva/router";
-// import IndexPage from "./routes/IndexPage";
 import Welcome from "./routes/Home/Welcome";
 import Integrat from "./routes/RegionRegulatory/Integrat";
 import SplitScreen from "./routes/RegionRegulatory/SplitScreen";
@@ -16,7 +15,6 @@ function RouterConfig({ history }) {
         <Route path="/" exact component={Login} />
         <Route path="/home/welcome" exact component={Welcome} />
         <Route path="/regionRegulatory/integrat" exact component={Integrat} />
-        <Route path="/regionRegulatory/splitScreen" exact component={SplitScreen} />
         <Route
           path="/regionRegulatory/splitScreen"
           exact
