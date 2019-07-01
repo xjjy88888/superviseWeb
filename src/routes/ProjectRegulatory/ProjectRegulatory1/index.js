@@ -385,8 +385,8 @@ export default class projectRegulatory extends PureComponent {
       <div>
         <SiderMenu active="301" />
         <LocaleProvider locale={zhCN}>
-          <div aaa="111" style={{ padding: 30 }}>
-            <div style={{ textAlign: "right", padding: "15px 25px" }}>
+          <div aaa="111" style={{ padding: "80px 30px 30px 30px" }}>
+            {/* <div style={{ textAlign: "right", padding: "15px 25px" }}>
               <Switch checkedChildren="当前项目" unCheckedChildren="归档项目" />
               <Button style={{ marginLeft: 20 }}>重置</Button>
               <Button icon="shopping" style={{ marginLeft: 20 }}>
@@ -395,13 +395,14 @@ export default class projectRegulatory extends PureComponent {
               <Button icon="desktop" style={{ marginLeft: 20 }}>
                 控制台
               </Button>
-            </div>
+            </div> */}
             <Table
               rowSelection={rowSelection}
               columns={columns}
               dataSource={data}
               onChange={this.handleChange}
               scroll={{ x: "2200px" }}
+              style={{ padding: 20 }}
               pagination={{
                 showQuickJumper: true,
                 showSizeChanger: true,

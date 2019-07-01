@@ -4,6 +4,40 @@ import { connect } from "dva";
 import { Link } from "dva/router";
 import styles from "./index.less";
 
+const menuList = [
+  {
+    title: "首页",
+    index: "1",
+    icon: "home",
+    key: "home/welcome",
+    subMenu: []
+  },
+  {
+    title: "区域监管",
+    index: "2",
+    icon: "environment",
+    subMenu: [
+      {
+        title: "天地一体化",
+        key: "regionRegulatory/integrat",
+        index: "201"
+      },
+      {
+        title: "地图分屏",
+        key: "regionRegulatory/splitScreen",
+        index: "202"
+      }
+    ]
+  },
+  {
+    title: "项目监管",
+    index: "3",
+    icon: "book",
+    key: "projectRegulatory/projectRegulatory1",
+    subMenu: []
+  }
+];
+
 @connect(({ user }) => ({
   user
 }))
@@ -14,22 +48,22 @@ export default class SiderMenu extends PureComponent {
 
     // 状态
     this.state = {
-      openKeys: active ? [active.slice(0, 1)] : ["1"],
-      defaultSelectedKeys: active ? [active] : ["101"]
+      openindex: active ? [active.slice(0, 1)] : ["1"],
+      defaultSelectedindex: active ? [active] : ["101"]
     };
   }
 
-  rootSubmenuKeys = ["1", "2", "3", "4"];
+  rootSubmenuindex = ["1", "2", "3", "4"];
 
-  onOpenChange = openKeys => {
-    const latestOpenKey = openKeys.find(
-      key => this.state.openKeys.indexOf(key) === -1
+  onOpenChange = openindex => {
+    const latestOpenindex = openindex.find(
+      index => this.state.openindex.indexOf(index) === -1
     );
-    if (this.rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
-      this.setState({ openKeys });
+    if (this.rootSubmenuindex.indexOf(latestOpenindex) === -1) {
+      this.setState({ openindex });
     } else {
       this.setState({
-        openKeys: latestOpenKey ? [latestOpenKey] : []
+        openindex: latestOpenindex ? [latestOpenindex] : []
       });
     }
   };
@@ -59,117 +93,76 @@ export default class SiderMenu extends PureComponent {
     );
     const user = JSON.parse(sessionStorage.getItem("user"));
     const username = user ? user.displayName : "请登录";
-    const tabs = [
-      {
-        title: "首页",
-        keys: "1",
-        icon: "home",
-        path: "/home/welcome",
-        items: [
-          {
-            text: "首页",
-            path: "/home/welcome",
-            key: "101"
-          }
-          // {
-          //   text: "首页2",
-          //   path: "/home/home2",
-          //   key: "102"
-          // }
-        ]
-      },
-      {
-        title: "区域监管",
-        keys: "2",
-        icon: "environment",
-        path: "/regionRegulatory/integrat",
-        items: [
-          {
-            text: "天地一体化",
-            path: "/regionRegulatory/integrat",
-            key: "201"
-          }
-          // {
-          //   text: "区域监管2",
-          //   path: "/regionRegulatory/regionRegulatory2",
-          //   key: "202"
-          // }
-        ]
-      },
-      {
-        title: "项目监管",
-        keys: "3",
-        icon: "book",
-        path: "/projectRegulatory/projectRegulatory1",
-        items: [
-          {
-            text: "项目监管",
-            path: "/projectRegulatory/projectRegulatory1",
-            key: "301"
-          }
-          // {
-          //   text: "项目监管2",
-          //   path: "/projectRegulatory/projectRegulatory2",
-          //   key: "302"
-          // }
-        ]
-      }
-      // {
-      //   title: "责任追究",
-      //   keys: "4",
-      //   icon: "bell",
-      //   items: [
-      //     {
-      //       text: "责任追究1",
-      //       path: "/accountability/accountability1",
-      //       key: "401"
-      //     },
-      //     {
-      //       text: "责任追究2",
-      //       path: "/accountability/accountability2",
-      //       key: "402"
-      //     }
-      //   ]
-      // },
-      // {
-      //   title: "目标考核",
-      //   keys: "5",
-      //   icon: "form",
-      //   items: [
-      //     {
-      //       text: "目标考核1",
-      //       path: "/assess/assess1",
-      //       key: "501"
-      //     },
-      //     {
-      //       text: "目标考核2",
-      //       path: "/assess/assess2",
-      //       key: "502"
-      //     }
-      //   ]
-      // }
-    ];
+
     return (
       <div className={styles.main}>
-        <div className={styles.left}>
+        {/* <div className={styles.left}>
           <img src="./img/logo.png" alt="" />
-          <Link className={styles.text} to="/regionRegulatory/integrat">
+          <Link className={styles.title} to="/regionRegulatory/integrat">
             生产建设项目水土保持信息化监管系统
           </Link>
-        </div>
+        </div> */}
+        <span
+          style={{
+            lineHeight: "50px",
+            margin: "0 30px"
+          }}
+        >
+          <Avatar src="./img/logo.png" />
+          <span
+            style={{
+              margin: "0 10px",
+              color: "#fff"
+            }}
+          >
+            生产建设项目水土保持信息化监管系统
+          </span>
+        </span>
         <Menu
           className={styles.menu}
           mode="horizontal"
           theme="dark"
-          // openKeys={this.state.openKeys}
+          // openindex={this.state.openindex}
           onOpenChange={this.onOpenChange}
-          defaultSelectedKeys={this.state.defaultSelectedKeys}
+          defaultSelectedindex={this.state.defaultSelectedindex}
         >
-          {tabs.map(item => (
-            <Menu.Item key={item.keys}>
-              <Link to={item.path}>{item.title}</Link>
-            </Menu.Item>
-          ))}
+          {menuList.map(item =>
+            item.subMenu.length ? (
+              <Menu.SubMenu
+                defaultOpenindex={["administrative"]}
+                key={item.index}
+                title={
+                  <span>
+                    <Icon type={item.icon || "setting"} />
+                    <span>{item.title}</span>
+                  </span>
+                }
+              >
+                {(item.subMenu || []).map(ite =>
+                  ite.subMenu && ite.subMenu.length ? (
+                    <Menu.SubMenu key={ite.index} title={ite.title}>
+                      {(ite.subMenu || []).map(it => (
+                        <Menu.Item key={it.index}>
+                          <Link to={`/${it.key}`}>{it.title}</Link>
+                        </Menu.Item>
+                      ))}
+                    </Menu.SubMenu>
+                  ) : (
+                    <Menu.Item key={ite.index}>
+                      <Link to={`/${ite.key}`}>{ite.title}</Link>
+                    </Menu.Item>
+                  )
+                )}
+              </Menu.SubMenu>
+            ) : (
+              <Menu.Item key={item.index}>
+                <Link to={`/${item.key}`}>
+                  <Icon type={item.icon} />
+                  {item.title}
+                </Link>
+              </Menu.Item>
+            )
+          )}
         </Menu>
         <div className={styles.right} style={{ margin: "0 20px" }}>
           {/* <Icon type="user" style={{ margin: "0 10px" }} /> */}
