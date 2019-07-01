@@ -129,7 +129,6 @@ export default class SiderMenu extends PureComponent {
           {menuList.map(item =>
             item.subMenu.length ? (
               <Menu.SubMenu
-                defaultOpenindex={["administrative"]}
                 key={item.index}
                 title={
                   <span>

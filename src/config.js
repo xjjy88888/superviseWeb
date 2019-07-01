@@ -1,4 +1,5 @@
-const domain = "http://aj.zkygis.cn/stbc/";
+const domain = "http://www.zkygis.cn/stbc/";
+
 const imageBaseUrl = "http://183.6.178.122/BasemapService/rest/image";
 const imageQueryBaseUrl = "http://210.36.22.122/BasemapService/rest/image";
 const txKey = "TERBZ-ZU46D-KZT46-HZZIB-RNDMZ-7GFP3";
@@ -158,12 +159,6 @@ const config = {
     // 获取边界
     boundaryUrl: `${domain}api/services/app/User/GetBoundAsync`,
 
-    // 腾讯地图
-    txRegionUrl: `https://apis.map.qq.com/ws/district/v1/list?key=${txKey}`,
-
-    //天地图
-    tdRegionUrl: `http://api.tianditu.gov.cn/administrative?postStr={"searchWord":"北京","searchType":"1","needSubInfo":"false","needAll":"false","needPolygon":"true","needPre":"true"}&tk=e606f896eaad4c8ab29275f85861af96`,
-
     //编辑图斑图形
     updateSpotGraphic: `${domain}api/app/updateSpotGraphic`,
 
@@ -183,7 +178,13 @@ const config = {
     removeProjectScopeGraphic: `${domain}api/app/removeProjectScopeGraphic`,
 
     //点查地图服务后台接口
-    queryWFSLayer: `${domain}api/Tool/Forward`
+    queryWFSLayer: `${domain}api/Tool/Forward`,
+
+    // 腾讯地图
+    txRegionUrl: `https://apis.map.qq.com/ws/district/v1/list?key=${txKey}`,
+
+    //天地图
+    tdRegionUrl: `http://api.tianditu.gov.cn/administrative?postStr={"searchWord":"北京","searchType":"1","needSubInfo":"false","needAll":"false","needPolygon":"true","needPre":"true"}&tk=e606f896eaad4c8ab29275f85861af96`
   },
 
   //工具箱
