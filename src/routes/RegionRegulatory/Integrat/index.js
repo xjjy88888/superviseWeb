@@ -82,6 +82,8 @@ export default class integrat extends PureComponent {
   }
 
   componentDidMount() {
+    const frequentEdit = sessionStorage.getItem("frequentEdit");
+    console.log("是否频繁编辑", frequentEdit);
     const me = this;
     const { dispatch } = this.props;
     dispatch({
@@ -550,15 +552,18 @@ export default class integrat extends PureComponent {
             });
           }
         }
-        // setTimeout(() => {
-        map.openPopup(
-          content,
-          userconfig.projectgeojsonLayer.getBounds().getCenter()
-        );
-        me.automaticToMap(
-          userconfig.projectgeojsonLayer.getBounds().getCenter()
-        );
-        // }, 500);
+        setTimeout(() => {
+            let latlng = userconfig.projectgeojsonLayer.getBounds().getCenter();
+            if(latlng){
+              map.openPopup(
+                content,
+                userconfig.projectgeojsonLayer.getBounds().getCenter()
+              );
+              me.automaticToMap(
+                userconfig.projectgeojsonLayer.getBounds().getCenter()
+              );
+            }
+        }, 500);
       } else {
         message.warning("项目无可用位置信息", 1);
       }
@@ -897,6 +902,7 @@ export default class integrat extends PureComponent {
     const { chartStatus } = this.state;
     let zoom = map.getZoom();
     let bounds = map.getBounds();
+    // console.log("地图最小级别903",map.getMinZoom());
     if (zoom >= config.mapInitParams.zoom && chartStatus) {
       let polygon = "polygon((";
       polygon +=
@@ -1278,114 +1284,13 @@ export default class integrat extends PureComponent {
       geojson.features[0].geometry.coordinates
     );
     setTimeout(() => {
+      // console.log("地图最小级别1285",map.getMinZoom());
       userconfig.zoom = map.getZoom() + 1;
       //加载geoserver发布的WMS地图服务
       me.overlayWMSLayers();
       //地图模态层效果
       me.loadmodalLayer();
-    }, 500);
-    /*let url = "";
-    if (userconfig.dwdm === "100000") {
-      //admin管理员
-      url = config.mapUrl.SHP + "Country.zip"; //全国
-    } else if (userconfig.dwdm.endsWith("0000")) {
-      url = config.mapUrl.SHP + "Province.zip"; //省
-    } else if (userconfig.dwdm.endsWith("00")) {
-      url = config.mapUrl.SHP + "City.zip"; //市
-    } else {
-      url = config.mapUrl.SHP + "District.zip"; //区县
-    }
-    me.loadSHP(url);*/
-  };
-  /*
-   * 获取SHP图层
-   */
-  loadSHP = url => {
-    const me = this;
-    if (url.length > 0) {
-      shp(url).then(function(data) {
-        if (data && data.features && data.features.length > 0) {
-          let geojson = {
-            type: "FeatureCollection",
-            features: []
-          };
-          let len = data.features.length;
-          for (let i = 0; i < len; i++) {
-            let feature = data.features[i];
-            if (feature.properties.XZQDM === userconfig.dwdm) {
-              geojson.features.push(feature);
-              userconfig.geojson = geojson;
-              // L.Proj.GeoJSON继承于L.GeoJSON，可调样式
-              map.createPane("geoJsonZIndex");
-              map.getPane("geoJsonZIndex").style.zIndex = 1;
-              userconfig.geoJsonLayer = L.Proj.geoJson(geojson, {
-                style: {
-                  color: "#0070FF",
-                  weight: 3,
-                  opacity: 1,
-                  //"fillColor":"",
-                  fillOpacity: 0
-                },
-                pane: "geoJsonZIndex"
-              }).addTo(map);
-              //构造面
-              userconfig.polygon = turf.polygon(feature.geometry.coordinates);
-              let bounds = [
-                [feature.geometry.bbox[3], feature.geometry.bbox[2]],
-                [feature.geometry.bbox[1], feature.geometry.bbox[0]]
-              ];
-              map.fitBounds(bounds);
-              if (userconfig.dwdm === "100000") {
-                //admin管理员
-              } else if (userconfig.dwdm.endsWith("0000")) {
-                userconfig.zoom = map.getZoom() + 1;
-              } else if (userconfig.dwdm.endsWith("00")) {
-                userconfig.zoom = map.getZoom() + 1;
-              } else {
-                userconfig.zoom = map.getZoom() + 1;
-              }
-              //加载geoserver发布的WMS地图服务
-              me.overlayWMSLayers();
-              //当前用户区域范围过滤空间数据
-              let polygon = "";
-              if (userconfig.geojson) {
-                if (userconfig.geojson.features.length > 0) {
-                  if (
-                    userconfig.geojson.features[0].geometry.coordinates.length >
-                    0
-                  ) {
-                    //var polygon = "polygon((103.661122555 24.288901115,103.661122555 29.352674495,110.942772097 29.352674495,110.942772097 24.288901115,103.661122555 24.288901115))";
-                    polygon = "polygon((";
-                    let coordinates =
-                      userconfig.geojson.features[0].geometry.coordinates;
-                    for (let i = 0; i < coordinates.length; i++) {
-                      let coordinate = coordinates[i];
-                      for (let j = 0; j < coordinate.length; j++) {
-                        let xy = coordinate[j];
-                        if (j === coordinate.length - 1) {
-                          polygon += xy[0] + " " + xy[1];
-                        } else {
-                          polygon += xy[0] + " " + xy[1] + ",";
-                        }
-                      }
-                    }
-                    polygon += "))";
-                  }
-                }
-              }
-              //console.log(polygon);
-              emitter.emit("polygon", {
-                polygon: polygon
-              });
-              //地图模态层效果
-              me.loadmodalLayer();
-
-              break;
-            }
-          }
-        }
-      });
-    }
+    }, 800);
   };
   /*
    * 加载地图模态层效果
@@ -1428,6 +1333,7 @@ export default class integrat extends PureComponent {
     let bounds = userconfig.geoJsonLayer.getBounds();
     map.setMaxBounds(bounds);
     map.setMinZoom(userconfig.zoom);
+    // console.log("地图最小级别1334",map.getMinZoom());
     //加载图层控件
     userconfig.layersControl = this.loadLayersControl();
     //地图缩放控件

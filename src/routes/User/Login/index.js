@@ -8,20 +8,30 @@ import { Form, Icon, Input, Button, Checkbox, message } from "antd";
 }))
 @createForm()
 export default class login extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isEasy: true
+    };
+  }
+
   componentDidMount() {
     // To disabled submit button at the beginning.
     this.props.form.validateFields();
-    console.log(
-      "sessionStorage",
-      sessionStorage.length > 0 && sessionStorage.user
-        ? JSON.parse(sessionStorage.user).accessToken
-        : ""
-    );
+    // console.log(
+    //   "sessionStorage",
+    //   sessionStorage.length > 0 && sessionStorage.user
+    //     ? JSON.parse(sessionStorage.user).accessToken
+    //     : ""
+    // );
   }
   handleSubmit = e => {
+    sessionStorage.setItem("frequentEdit", false);
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
+        // console.log(values);
+        sessionStorage.setItem("frequentEdit", values.frequentEdit);
         let lastLogin;
         if (values.remember) {
           lastLogin = {
@@ -114,7 +124,11 @@ export default class login extends PureComponent {
               valuePropName: "checked",
               initialValue: lastLogin ? lastLogin.remember : ""
             })(<Checkbox>记住我</Checkbox>)}
-            <a style={{ float: "right" }}>忘记密码</a>
+            {getFieldDecorator("frequentEdit", {
+              valuePropName: "checked",
+              initialValue: false
+            })(<Checkbox style={{ float: "right" }}>频繁编辑</Checkbox>)}
+            {/* <a style={{ float: "right" }}>忘记密码</a> */}
             <Button
               type="primary"
               htmlType="submit"
@@ -123,7 +137,19 @@ export default class login extends PureComponent {
             >
               登录
             </Button>
-            去 <a>注册</a>
+            <span>
+              去 <a>注册</a>
+            </span>
+            {/* <span style={{ float: "right" }}>
+              去
+              <a
+                onClick={() => {
+                  sessionStorage.setItem("frequentEdit", true);
+                }}
+              >
+                频繁编辑
+              </a>
+            </span> */}
           </Form.Item>
         </Form>
       </div>

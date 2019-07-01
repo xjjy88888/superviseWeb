@@ -376,7 +376,7 @@ export default class siderbarDetail extends PureComponent {
 
     const redLineItem = isSpotUpdate ? redLineInfo : {};
 
-    console.log(this.props);
+    // console.log(this.props);
 
     const domUpload = (
       <div style={{ minHeight: fileList.length ? 120 : 0 }}>

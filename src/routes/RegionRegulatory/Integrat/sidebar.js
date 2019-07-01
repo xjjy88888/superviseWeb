@@ -116,7 +116,7 @@ export default class integrat extends PureComponent {
   componentDidMount() {
     self = this;
     const { dispatch } = this.props;
-    console.log("贵阳至黄平高速公路", "六枝特区平寨镇跃进砂石厂");
+    // console.log("贵阳至黄平高速公路", "六枝特区平寨镇跃进砂石厂");
     this.queryProject({ SkipCount: 0 });
     // this.querySpot({ SkipCount: 0 });
     // this.queryPoint({ SkipCount: 0 });
