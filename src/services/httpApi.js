@@ -80,7 +80,7 @@ export async function projectCreateUpdateApi(params) {
   return request(
     params.id ? config.url.projectUpdateUrl : config.url.projectCreateUrl,
     {
-      method: params.id ? "PUT" : "POST",
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
         "Content-Type": "application/json-patch+json"
@@ -93,7 +93,7 @@ export async function projectCreateUpdateApi(params) {
 // 项目删除
 export async function projectDeleteApi(params) {
   return request(`${config.url.projectDeleteUrl}?id=${params.id}`, {
-    method: "DELETE",
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
       "Content-Type": "application/json-patch+json"
@@ -104,7 +104,7 @@ export async function projectDeleteApi(params) {
 // 项目批量删除
 export async function projectDeleteMulApi(params) {
   return request(`${config.url.projectDeleteMulUrl}`, {
-    method: "DELETE",
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
       "Content-Type": "application/json-patch+json"
@@ -209,7 +209,7 @@ export async function spotCreateUpdateApi(params) {
   return request(
     params.id ? config.url.spotUpdateUrl : config.url.spotCreateUrl,
     {
-      method: params.id ? "PUT" : "POST",
+      method: params.id ? "POST" : "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
         "Content-Type": "application/json-patch+json"
@@ -222,7 +222,7 @@ export async function spotCreateUpdateApi(params) {
 // 图斑删除
 export async function spotDeleteApi(params) {
   return request(`${config.url.spotDeleteUrl}?id=${params.id}`, {
-    method: "DELETE",
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -232,7 +232,7 @@ export async function spotDeleteApi(params) {
 // 图斑批量删除
 export async function spotDeleteMulApi(params) {
   return request(`${config.url.spotDeleteMulUrl}`, {
-    method: "DELETE",
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
       "Content-Type": "application/json-patch+json"
@@ -308,7 +308,7 @@ export async function pointCreateUpdateApi(params) {
   return request(
     params.id ? config.url.pointUpdateUrl : config.url.pointCreateUrl,
     {
-      method: params.id ? "PUT" : "POST",
+      method: params.id ? "POST" : "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
         "Content-Type": "application/json-patch+json"
@@ -321,7 +321,7 @@ export async function pointCreateUpdateApi(params) {
 // 标注点删除
 export async function pointDeleteApi(params) {
   return request(`${config.url.pointDeleteUrl}?id=${params.id}`, {
-    method: "DELETE",
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -331,7 +331,7 @@ export async function pointDeleteApi(params) {
 // 标注点批量删除
 export async function pointDeleteMulApi(params) {
   return request(`${config.url.pointDeleteMulUrl}?ids=${params.id}`, {
-    method: "DELETE",
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -368,7 +368,7 @@ export async function redLineCreateUpdateApi(params) {
   return request(
     params.id ? config.url.redLineUpdateUrl : config.url.redLineCreateUrl,
     {
-      method: params.id ? "PUT" : "POST",
+      method: params.id ? "POST" : "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
         "Content-Type": "application/json-patch+json"
@@ -381,7 +381,7 @@ export async function redLineCreateUpdateApi(params) {
 // 项目红线删除
 export async function redLineDeleteApi(params) {
   return request(`${config.url.redLineDeleteUrl}?id=${params.id}`, {
-    method: "DELETE",
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -391,7 +391,7 @@ export async function redLineDeleteApi(params) {
 // 项目红线批量删除
 export async function redLineDeleteMulApi(params) {
   return request(`${config.url.redLineDeleteMulUrl}?ids=${params.id}`, {
-    method: "DELETE",
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -471,7 +471,7 @@ export async function annexDeleteApi(params) {
   return request(
     `${config.url.annexDeleteUrl}?FileId=${params.FileId}&Id=${params.Id}`,
     {
-      method: "DELETE",
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }

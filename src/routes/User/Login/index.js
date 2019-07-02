@@ -2,6 +2,7 @@ import React, { PureComponent } from "react";
 import { createForm } from "rc-form";
 import { connect } from "dva";
 import { Form, Icon, Input, Button, Checkbox, message } from "antd";
+import config from "../../../config";
 
 @connect(({ user }) => ({
   user
@@ -135,7 +136,7 @@ export default class login extends PureComponent {
               style={{ width: "100%" }}
               disabled={this.hasErrors(getFieldsError())}
             >
-              登录
+              {config.isFormal ? "登录" : "测试环境登录"}
             </Button>
             <span>
               去 <a>注册</a>

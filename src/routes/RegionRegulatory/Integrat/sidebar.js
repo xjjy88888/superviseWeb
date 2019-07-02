@@ -1027,7 +1027,7 @@ export default class integrat extends PureComponent {
     const columnsTable = [
       {
         title: (
-          <span>
+          <span style={{ width: 300 }}>
             <span>
               共有
               {key === "project"
@@ -1043,7 +1043,12 @@ export default class integrat extends PureComponent {
                 : pointList.totalCount}
               条
             </span>
-            <span style={{ display: key !== "point" ? "inherit" : "none" }}>
+            <span
+              style={{
+                display: key !== "point" ? "inherit" : "none",
+                float: "right"
+              }}
+            >
               <Button
                 icon={showCheck ? "dashboard" : ""}
                 style={{ float: "right" }}

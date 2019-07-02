@@ -2,8 +2,7 @@ const isFormal = window.location.href.split("/")[3] === "stbcjg";
 console.log(isFormal ? "正式环境" : "测试环境");
 
 const domain = `http://www.zkygis.cn/stbc${isFormal ? "" : "t"}/`;
-
-const imageBaseUrl = "http://183.6.178.122/BasemapService/rest/image";
+const imageBaseUrl = "http://www.stbcjg.cn/BasemapService/rest/image";
 const imageQueryBaseUrl = "http://210.36.22.122/BasemapService/rest/image";
 const txKey = "TERBZ-ZU46D-KZT46-HZZIB-RNDMZ-7GFP3";
 
@@ -14,6 +13,10 @@ const color_border_spot2 = "#E09A00"; //边框色-图斑-已复核
 const color_border_redLine = "#e60000"; //边框色-红线
 
 const config = {
+  domain: domain,
+  download: `http://www.zkygis.cn/stbcjg/Template/`,
+  isFormal: isFormal,
+
   url: {
     // 登录
     loginUrl: `${domain}api/TokenAuth/Authenticate`,
@@ -437,16 +440,27 @@ const config = {
   mapUrl: {
     SHP: `./mapfile/SHP/`,
     mapshaper: `./mapshaper/index.html`,
-    geoserverUrl: "http://183.6.178.123:8080/geoserver/ZKYGIS",
+    // geoserverUrl: "http://183.6.178.123:8080/geoserver/ZKYGIS",
+    geoserverUrl: "http://www.zkygis.cn:8080/geoserver/ZKYGIS",
     geoserverQueryUrl: "http://210.36.22.123:8080/geoserver/ZKYGIS",
     //根据地图当前范围获取对应历史影像数据接口
-    // getInfoByExtent: `${imageBaseUrl}/latest/getInfoByExtent`
     getInfoByExtent: `${imageQueryBaseUrl}/latest/getInfoByExtent`
   },
-  mapLayersName: "ZKYGIS:bs_project_scope,ZKYGIS:bs_spot", //现状库扰动图斑和项目红线
-  mapProjectLayerName: "ZKYGIS:bs_project_scope", //现状库项目红线
-  mapSpotLayerName: "ZKYGIS:bs_spot", //现状库扰动图斑
-  mapHistorySpotLayerName: "ZKYGIS:bs_spot_history", //历史库扰动图斑
+
+  // mapLayersName: "ZKYGIS:bs_project_scope,ZKYGIS:bs_spot", //现状库扰动图斑和项目红线
+  mapLayersName: isFormal
+    ? "ZKYGIS:bs_project_scope,ZKYGIS:bs_spot"
+    : "ZKYGIS:bs_project_scope_t,ZKYGIS:bs_spot_t", //现状库扰动图斑和项目红线
+  // mapProjectLayerName: "ZKYGIS:bs_project_scope", //现状库项目红线
+  mapProjectLayerName: isFormal
+    ? "ZKYGIS:bs_project_scope"
+    : "ZKYGIS:bs_project_scope_t", //现状库项目红线
+  // mapSpotLayerName: "ZKYGIS:bs_spot", //现状库扰动图斑
+  mapSpotLayerName: isFormal ? "ZKYGIS:bs_spot" : "ZKYGIS:bs_spot_t", //现状库扰动图斑
+  // mapHistorySpotLayerName: "ZKYGIS:bs_spot_history", //历史库扰动图斑
+  mapHistorySpotLayerName: isFormal
+    ? "ZKYGIS:bs_spot_history"
+    : "ZKYGIS:bs_spot_history_t", //历史库扰动图斑
   legend: [
     {
       title: "扰动图斑_未关联_未复核",

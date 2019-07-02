@@ -17,7 +17,7 @@ import "echarts";
 import config from "../../../config";
 import { dateFormat, accessToken } from "../../../utils/util";
 
-const url = "http://aj.zkygis.cn/stbcSys/Template/";
+const url = config.download;
 
 @connect(({ project, spot, point, other, user }) => ({
   project,
@@ -148,6 +148,7 @@ export default class siderbarDetail extends PureComponent {
                         break;
                       //模板下载(Shapfile)
                       case "download_shapfile":
+                        console.log(url);
                         window.open(
                           `${url}Shapefile/${
                             key === "project" ? "项目红线范围" : "扰动图斑"
