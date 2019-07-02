@@ -341,6 +341,9 @@ export default class siderbarDetail extends PureComponent {
                 notification["success"]({
                   message: `${key === "project" ? "项目" : "图斑"}附件上传成功`
                 });
+                emitter.emit("deleteSuccess", {
+                  success: true
+                });
               } else {
                 notification["error"]({
                   message: (

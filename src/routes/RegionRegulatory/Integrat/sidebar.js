@@ -1027,7 +1027,7 @@ export default class integrat extends PureComponent {
     const columnsTable = [
       {
         title: (
-          <span style={{ width: 300 }}>
+          <span style={{}}>
             <span>
               共有
               {key === "project"
@@ -1045,32 +1045,13 @@ export default class integrat extends PureComponent {
             </span>
             <span
               style={{
-                display: key !== "point" ? "inherit" : "none",
-                float: "right"
+                display: key !== "point" ? "inherit" : "none"
+                // float: "right"
               }}
             >
               <Button
-                icon={showCheck ? "dashboard" : ""}
-                style={{ float: "right" }}
-                onClick={() => {
-                  emitter.emit("showSiderbarDetail", {
-                    show: false
-                  });
-                  emitter.emit("showTool", {
-                    show: true,
-                    type: "control",
-                    key: key
-                  });
-                  emitter.emit("showQuery", {
-                    show: false
-                  });
-                }}
-              >
-                {showCheck ? "" : "仪表盘"}
-              </Button>
-              <Button
                 icon={showCheck ? "shopping" : ""}
-                style={{ float: "right" }}
+                style={{ marginLeft: 20 }}
                 onClick={() => {
                   emitter.emit("showSiderbarDetail", {
                     show: false
@@ -1093,6 +1074,25 @@ export default class integrat extends PureComponent {
                 }}
               >
                 {showCheck ? "" : "工具箱"}
+              </Button>
+              <Button
+                icon={showCheck ? "dashboard" : ""}
+                // style={{ float: "right" }}
+                onClick={() => {
+                  emitter.emit("showSiderbarDetail", {
+                    show: false
+                  });
+                  emitter.emit("showTool", {
+                    show: true,
+                    type: "control",
+                    key: key
+                  });
+                  emitter.emit("showQuery", {
+                    show: false
+                  });
+                }}
+              >
+                {showCheck ? "" : "仪表盘"}
               </Button>
             </span>
           </span>
@@ -1227,7 +1227,10 @@ export default class integrat extends PureComponent {
             cursor: "pointer"
           }}
           onClick={() => {
-            this.setState({ show: !show, showProjectDetail: false });
+            this.setState({
+              show: !show
+              //  showProjectDetail: false
+            });
             emitter.emit("showSiderbar", {
               show: !show
             });
@@ -1950,7 +1953,7 @@ export default class integrat extends PureComponent {
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>责任面积：</span>
-                        <span>{projectItem.respArea}m2</span>
+                        <span>{projectItem.expand.respArea}m²</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>立项级别：</span>
@@ -2899,10 +2902,12 @@ export default class integrat extends PureComponent {
                   })(<Input />)}
                 </Form.Item>
                 <Form.Item label="坐标" {...formItemLayout}>
-                  {getFieldDecorator("pointX", {})(
-                    <Input placeholder="经度" style={{ width: 72 }} />
-                  )}
-                  {getFieldDecorator("pointY", {})(
+                  {getFieldDecorator("pointX", {
+                    initialValue: projectItem.projectBase.pointX
+                  })(<Input placeholder="经度" style={{ width: 72 }} />)}
+                  {getFieldDecorator("pointY", {
+                    initialValue: projectItem.projectBase.pointY
+                  })(
                     <Input
                       placeholder="纬度"
                       style={{ width: 110, position: "relative", top: -2 }}
@@ -3061,9 +3066,9 @@ export default class integrat extends PureComponent {
                   })(<DatePicker />)}
                 </Form.Item>
                 <Form.Item label="责任面积" {...formItemLayout}>
-                  {getFieldDecorator("area", {
-                    initialValue: projectItem.respArea
-                  })(<Input addonAfter="m2" />)}
+                  {getFieldDecorator("respArea", {
+                    initialValue: projectItem.expand.respArea
+                  })(<Input addonAfter="m²" />)}
                 </Form.Item>
                 <Form.Item label="立项级别" {...formItemLayout}>
                   {getFieldDecorator("projectLevelId", {
@@ -3208,9 +3213,9 @@ export default class integrat extends PureComponent {
                   )}
                 </Form.Item>
                 <Form.Item label="备注" {...formItemLayout}>
-                  {getFieldDecorator("description", { initialValue: "" })(
-                    <Input.TextArea autosize />
-                  )}
+                  {getFieldDecorator("description", {
+                    initialValue: projectItem.description
+                  })(<Input.TextArea autosize />)}
                 </Form.Item>
                 <a
                   style={{

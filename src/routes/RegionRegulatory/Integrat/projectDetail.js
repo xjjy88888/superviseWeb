@@ -22,7 +22,7 @@ import styles from "./index.less";
 import moment from "moment";
 import config from "../../../config";
 import { getFile } from "../../../utils/util";
-import { dateInitFormat, accessToken } from "../../../utils/util";
+import { dateInitFormat, dateFormat, accessToken } from "../../../utils/util";
 
 let self;
 let yearDataSource = [];
@@ -87,10 +87,14 @@ export default class integrat extends PureComponent {
           ...v,
           expandAttachmentId: expandParentId,
           changeAttachmentId: changeParentId,
-          designStartTime: v.designStartTime ? v.designStartTime._i : null,
-          designCompTime: v.designCompTime ? v.designCompTime._i : null,
-          actStartTime: v.actStartTime ? v.actStartTime._i : null,
-          actCompTime: v.actCompTime ? v.actCompTime._i : null
+          designStartTime: v.designStartTime
+            ? dateFormat(v.designStartTime._d)
+            : null,
+          designCompTime: v.designCompTime
+            ? dateFormat(v.designCompTime._d)
+            : null,
+          actStartTime: v.actStartTime ? dateFormat(v.actStartTime._d) : null,
+          actCompTime: v.actCompTime ? dateFormat(v.actCompTime._d) : null
         };
         dispatch({
           type: "project/projectCreateUpdate",
@@ -101,6 +105,7 @@ export default class integrat extends PureComponent {
               notification["success"]({
                 message: `${data.id ? "编辑" : "新建"}项目成功`
               });
+              this.setState({ show: false });
             }
           }
         });
