@@ -19,6 +19,7 @@ export default class login extends PureComponent {
   }
 
   componentDidMount() {
+    localStorage.key = "";
     // To disabled submit button at the beginning.
     this.props.form.validateFields();
     // console.log(
