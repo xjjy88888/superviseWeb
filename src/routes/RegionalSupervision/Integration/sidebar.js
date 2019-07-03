@@ -3187,25 +3187,25 @@ export default class sider extends PureComponent {
                       multiple
                       treeDefaultExpandAll
                     >
-                      {districtList.map(item => (
+                      {districtList.map((item, index) => (
                         <TreeSelect.TreeNode
                           value={item.value}
                           title={item.label}
-                          key={item.value}
+                          key={index}
                           disabled={item.children ? true : false}
                         >
-                          {(item.children || []).map(ite => (
+                          {(item.children || []).map((ite, idx) => (
                             <TreeSelect.TreeNode
                               value={ite.value}
                               title={ite.label}
-                              key={ite.value}
+                              key={idx}
                               disabled={ite.children ? true : false}
                             >
-                              {(ite.children || []).map(i => (
+                              {(ite.children || []).map((i, j) => (
                                 <TreeSelect.TreeNode
                                   value={i.value}
                                   title={i.label}
-                                  key={i.value}
+                                  key={j}
                                 />
                               ))}
                             </TreeSelect.TreeNode>
