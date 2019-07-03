@@ -2,7 +2,6 @@ import React, { PureComponent } from "react";
 import { Menu, Icon, Dropdown, Avatar, Layout, Typography } from "antd";
 import { connect } from "dva";
 import { Link } from "dva/router";
-import styles from "./Layouts.less";
 import { LocaleProvider } from "antd";
 import zh_CN from "antd/lib/locale-provider/zh_CN";
 
@@ -12,15 +11,14 @@ const { Text, Paragraph, Title } = Typography;
 const menuList = [
   {
     title: "首页",
-    index: "1",
     icon: "home",
     key: "homePage",
     subMenu: []
   },
   {
     title: "区域监管",
-    index: "2",
-    icon: "regionalSupervision",
+    icon: "radar-chart",
+    key: "regionalSupervision",
     subMenu: [
       {
         title: "天地一体化",
@@ -36,9 +34,14 @@ const menuList = [
   },
   {
     title: "项目监管",
-    index: "3",
     icon: "book",
     key: "projectSupervision",
+    subMenu: []
+  },
+  {
+    title: "系统管理",
+    icon: "setting",
+    key: "system",
     subMenu: []
   }
 ];
@@ -56,21 +59,6 @@ export default class layouts extends PureComponent {
       current: active ? active : "product"
     };
   }
-
-  rootSubmenuindex = ["1", "2", "3", "4"];
-
-  // onOpenChange = openindex => {
-  //   const latestOpenindex = openindex.find(
-  //     index => this.state.openindex.indexOf(index) === -1
-  //   );
-  //   if (this.rootSubmenuindex.indexOf(latestOpenindex) === -1) {
-  //     this.setState({ openindex });
-  //   } else {
-  //     this.setState({
-  //       openindex: latestOpenindex ? [latestOpenindex] : []
-  //     });
-  //   }
-  // };
 
   render() {
     const { children } = this.props;
@@ -122,16 +110,14 @@ export default class layouts extends PureComponent {
               </span>
             </span>
             <Menu
-              // className={styles.menu}
               mode="horizontal"
               theme="dark"
-              // onOpenChange={this.onOpenChange}
               selectedKeys={[this.state.current]}
             >
-              {menuList.map(item =>
+              {menuList.map((item, index) =>
                 item.subMenu.length ? (
                   <Menu.SubMenu
-                    key={item.index}
+                    key={item.key}
                     title={
                       <span>
                         <Icon type={item.icon || "setting"} />
@@ -139,24 +125,24 @@ export default class layouts extends PureComponent {
                       </span>
                     }
                   >
-                    {(item.subMenu || []).map(ite =>
+                    {(item.subMenu || []).map((ite, ind) =>
                       ite.subMenu && ite.subMenu.length ? (
-                        <Menu.SubMenu key={ite.index} title={ite.title}>
-                          {(ite.subMenu || []).map(it => (
-                            <Menu.Item key={it.index}>
+                        <Menu.SubMenu key={ite.key} title={ite.title}>
+                          {(ite.subMenu || []).map((it, id) => (
+                            <Menu.Item key={it.key}>
                               <Link to={`/${it.key}`}>{it.title}</Link>
                             </Menu.Item>
                           ))}
                         </Menu.SubMenu>
                       ) : (
-                        <Menu.Item key={ite.index}>
+                        <Menu.Item key={ite.key}>
                           <Link to={`/${ite.key}`}>{ite.title}</Link>
                         </Menu.Item>
                       )
                     )}
                   </Menu.SubMenu>
                 ) : (
-                  <Menu.Item key={item.index}>
+                  <Menu.Item key={item.key}>
                     <Link to={`/${item.key}`}>
                       <Icon type={item.icon} />
                       {item.title}

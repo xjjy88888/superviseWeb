@@ -53,7 +53,7 @@ const formItemLayout = {
   redLine
 }))
 @createForm()
-export default class integrat extends PureComponent {
+export default class sider extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {

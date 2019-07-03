@@ -32,7 +32,7 @@ let yearDataSource = [];
   user
 }))
 @createForm()
-export default class integrat extends PureComponent {
+export default class projectDetail extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {

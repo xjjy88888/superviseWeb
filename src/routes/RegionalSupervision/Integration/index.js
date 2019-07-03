@@ -53,7 +53,7 @@ let marker;
   project,
   spot
 }))
-export default class integrat extends PureComponent {
+export default class integration extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
