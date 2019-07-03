@@ -33,8 +33,9 @@ export default {
     *fetch({ payload }, { call, put }) {
       yield put({ type: "save" });
     },
-    *login({ payload }, { call, put }) {
+    *login({ payload, callback }, { call, put }) {
       const { data: response } = yield call(loginApi, payload);
+      if (callback) callback();
       if (response.success) {
         notification["success"]({
           message: "登录成功"

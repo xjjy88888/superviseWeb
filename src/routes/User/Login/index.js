@@ -1,8 +1,9 @@
 import React, { PureComponent } from "react";
 import { createForm } from "rc-form";
 import { connect } from "dva";
-import { Form, Icon, Input, Button, Checkbox, message } from "antd";
+import { Form, Icon, Input, Button, Checkbox, message, Spin } from "antd";
 import config from "../../../config";
+import Spins from "../../../components/Spins";
 
 @connect(({ user }) => ({
   user
@@ -12,7 +13,8 @@ export default class login extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      isEasy: true
+      isEasy: true,
+      showSpin: false
     };
   }
 
@@ -48,11 +50,15 @@ export default class login extends PureComponent {
           };
         }
         localStorage.setItem("lastLogin", JSON.stringify(lastLogin));
+        this.setState({ showSpin: true });
         this.props.dispatch({
           type: "user/login",
           payload: {
             userName: values.userName,
             password: values.password
+          },
+          callback: () => {
+            this.setState({ showSpin: false });
           }
         });
       } else {
@@ -66,6 +72,7 @@ export default class login extends PureComponent {
   };
   render() {
     const { getFieldDecorator, getFieldsError } = this.props.form;
+    const { showSpin } = this.state;
     const lastLogin = JSON.parse(localStorage.getItem("lastLogin"));
     return (
       <div
@@ -79,6 +86,7 @@ export default class login extends PureComponent {
           borderRadius: 10
         }}
       >
+        <Spins show={showSpin} />
         <Form onSubmit={this.handleSubmit} style={{ maxWidth: 300 }}>
           <Form.Item>
             <img

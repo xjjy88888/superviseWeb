@@ -90,7 +90,7 @@ export default class layouts extends PureComponent {
     return (
       <LocaleProvider locale={zh_CN}>
         <Layout>
-          <Header style={{ position: "relative", height: 46 }}>
+          <Header style={{ position: "relative", height: 46, zIndex: 1 }}>
             <span
               style={{
                 lineHeight: "43px",

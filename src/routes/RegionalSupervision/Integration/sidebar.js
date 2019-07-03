@@ -34,6 +34,7 @@ import config from "../../../config";
 import data from "../../../data";
 import { getFile, guid } from "../../../utils/util";
 import { dateInitFormat, accessToken } from "../../../utils/util";
+import Spins from "../../../components/Spins";
 
 let self;
 let loading = false;
@@ -1431,17 +1432,7 @@ export default class sider extends PureComponent {
           >
             筛选
           </Button>
-          <Spin
-            size="large"
-            style={{
-              display: showSpin ? "block" : "none",
-              padding: 100,
-              position: "absolute",
-              top: 300,
-              left: 50,
-              zIndex: 1001
-            }}
-          />
+          <Spins show={showSpin} />
           <div
             ref={e => (this.scrollDom = e)}
             style={{
@@ -1463,7 +1454,8 @@ export default class sider extends PureComponent {
             display: showProjectDetail ? "block" : "none",
             overflow: "auto",
             padding: 20,
-            height: "100%"
+            height: "100%",
+            backgroundColor: "#fff"
           }}
         >
           <div
@@ -1714,17 +1706,7 @@ export default class sider extends PureComponent {
               display: showCompany ? "none" : "block"
             }}
           >
-            <Spin
-              size="large"
-              style={{
-                display: showSpin ? "block" : "none",
-                padding: 100,
-                position: "absolute",
-                top: 300,
-                left: 45,
-                zIndex: 1001
-              }}
-            />
+            <Spins show={showSpin} />
             <p
               style={{
                 width: 150,
