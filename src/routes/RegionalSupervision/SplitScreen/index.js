@@ -561,7 +561,16 @@ export default class home2 extends PureComponent {
     } = this.props;
     return (
       <Layouts>
-        <div style={{ display: "flex" }}>
+        <div
+          style={{
+            display: "flex",
+            position: "absolute",
+            top: 0,
+            paddingTop: 46,
+            height: "100vh",
+            width: "100vw"
+          }}
+        >
           <div style={{ flex: 1, border: "1px solid #cccccc" }} id="LMap">
             {/*历史影像图切换*/}
             <div

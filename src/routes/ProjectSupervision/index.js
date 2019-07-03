@@ -383,7 +383,7 @@ export default class projectSupervision extends PureComponent {
 
     return (
       <Layouts avtive="projectSupervision">
-        <div aaa="111" style={{ padding: "80px 30px 30px 30px" }}>
+        <div style={{ margin: 20, backgroundColor: "#fff" }}>
           {/* <div style={{ textAlign: "right", padding: "15px 25px" }}>
               <Switch checkedChildren="当前项目" unCheckedChildren="归档项目" />
               <Button style={{ marginLeft: 20 }}>重置</Button>

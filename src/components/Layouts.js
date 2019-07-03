@@ -12,36 +12,34 @@ const menuList = [
   {
     title: "首页",
     icon: "home",
-    key: "homePage",
+    key: "/homePage",
     subMenu: []
   },
   {
     title: "区域监管",
     icon: "radar-chart",
-    key: "regionalSupervision",
+    key: "/regionalSupervision",
     subMenu: [
       {
         title: "天地一体化",
-        key: "regionalSupervision/integration",
-        index: "201"
+        key: "/regionalSupervision/integration"
       },
       {
         title: "地图分屏",
-        key: "regionalSupervision/splitScreen",
-        index: "202"
+        key: "/regionalSupervision/splitScreen"
       }
     ]
   },
   {
     title: "项目监管",
     icon: "book",
-    key: "projectSupervision",
+    key: "/projectSupervision",
     subMenu: []
   },
   {
     title: "系统管理",
     icon: "setting",
-    key: "system",
+    key: "/system",
     subMenu: []
   }
 ];
@@ -100,14 +98,15 @@ export default class layouts extends PureComponent {
               }}
             >
               <Avatar src="./img/logo.png" />/
-              <span
+              <Link
+                to="/regionalSupervision/integration"
                 style={{
                   margin: "0 10px",
                   color: "#fff"
                 }}
               >
                 生产建设项目水土保持信息化监管系统
-              </span>
+              </Link>
             </span>
             <Menu
               mode="horizontal"
@@ -130,20 +129,20 @@ export default class layouts extends PureComponent {
                         <Menu.SubMenu key={ite.key} title={ite.title}>
                           {(ite.subMenu || []).map((it, id) => (
                             <Menu.Item key={it.key}>
-                              <Link to={`/${it.key}`}>{it.title}</Link>
+                              <Link to={it.key}>{it.title}</Link>
                             </Menu.Item>
                           ))}
                         </Menu.SubMenu>
                       ) : (
                         <Menu.Item key={ite.key}>
-                          <Link to={`/${ite.key}`}>{ite.title}</Link>
+                          <Link to={ite.key}>{ite.title}</Link>
                         </Menu.Item>
                       )
                     )}
                   </Menu.SubMenu>
                 ) : (
                   <Menu.Item key={item.key}>
-                    <Link to={`/${item.key}`}>
+                    <Link to={item.key}>
                       <Icon type={item.icon} />
                       {item.title}
                     </Link>

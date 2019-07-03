@@ -2038,7 +2038,7 @@ export default class integration extends PureComponent {
               background: "#fff"
             }}
           >
-            <Link to="/home/welcome">
+            <Link to="/regionalSupervision/splitScreen">
               <Popover content="地图分屏" title="" trigger="hover">
                 <Button icon="column-width" />
               </Popover>
