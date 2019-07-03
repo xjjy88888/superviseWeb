@@ -1,9 +1,9 @@
 import React from "react";
 import { Router, Route, Switch } from "dva/router";
-import Welcome from "./routes/Home/Welcome";
-import Integrat from "./routes/RegionRegulatory/Integrat";
-import SplitScreen from "./routes/RegionRegulatory/SplitScreen";
-import ProjectRegulatory1 from "./routes/ProjectRegulatory/ProjectRegulatory1";
+import HomePage from "./routes/HomePage";
+import Integration from "./routes/RegionalSupervision/Integration";
+import SplitScreen from "./routes/RegionalSupervision/SplitScreen";
+import ProjectSupervision from "./routes/ProjectSupervision";
 import Login from "./routes/User/Login";
 
 function RouterConfig({ history }) {
@@ -11,17 +11,21 @@ function RouterConfig({ history }) {
     <Router history={history}>
       <Switch>
         <Route path="/" exact component={Login} />
-        <Route path="/home/welcome" exact component={Welcome} />
-        <Route path="/regionRegulatory/integrat" exact component={Integrat} />
+        <Route path="/homePage" exact component={HomePage} />
         <Route
-          path="/regionRegulatory/splitScreen"
+          path="/regionalSupervision/integration"
+          exact
+          component={Integration}
+        />
+        <Route
+          path="/regionalSupervision/splitScreen"
           exact
           component={SplitScreen}
         />
         <Route
-          path="/projectRegulatory/projectRegulatory1"
+          path="/projectSupervision"
           exact
-          component={ProjectRegulatory1}
+          component={ProjectSupervision}
         />
         <Route path="/user/login" exact component={Login} />
       </Switch>

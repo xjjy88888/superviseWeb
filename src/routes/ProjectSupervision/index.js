@@ -1,11 +1,11 @@
 import React, { PureComponent } from "react";
 import { Table, Button, Input, Icon, LocaleProvider, Switch } from "antd";
 import zhCN from "antd/lib/locale-provider/zh_CN";
-import SiderMenu from "../../../components/SiderMenu";
 import Highlighter from "react-highlight-words";
-import config from "../../../config";
+import config from "../../config";
+import Layouts from "../../components/Layouts";
 
-export default class projectRegulatory extends PureComponent {
+export default class projectSupervision extends PureComponent {
   state = {
     filteredInfo: null,
     sortedInfo: null,
@@ -382,11 +382,9 @@ export default class projectRegulatory extends PureComponent {
     ];
 
     return (
-      <div>
-        <SiderMenu active="301" />
-        <LocaleProvider locale={zhCN}>
-          <div aaa="111" style={{ padding: "80px 30px 30px 30px" }}>
-            {/* <div style={{ textAlign: "right", padding: "15px 25px" }}>
+      <Layouts avtive="projectSupervision">
+        <div aaa="111" style={{ padding: "80px 30px 30px 30px" }}>
+          {/* <div style={{ textAlign: "right", padding: "15px 25px" }}>
               <Switch checkedChildren="当前项目" unCheckedChildren="归档项目" />
               <Button style={{ marginLeft: 20 }}>重置</Button>
               <Button icon="shopping" style={{ marginLeft: 20 }}>
@@ -396,22 +394,21 @@ export default class projectRegulatory extends PureComponent {
                 控制台
               </Button>
             </div> */}
-            <Table
-              rowSelection={rowSelection}
-              columns={columns}
-              dataSource={data}
-              onChange={this.handleChange}
-              scroll={{ x: "2200px" }}
-              style={{ padding: 20 }}
-              pagination={{
-                showQuickJumper: true,
-                showSizeChanger: true,
-                pageSizeOptions: ["10", "20", "30", "40", "50"]
-              }}
-            />
-          </div>
-        </LocaleProvider>
-      </div>
+          <Table
+            rowSelection={rowSelection}
+            columns={columns}
+            dataSource={data}
+            onChange={this.handleChange}
+            scroll={{ x: "2200px" }}
+            style={{ padding: 20 }}
+            pagination={{
+              showQuickJumper: true,
+              showSizeChanger: true,
+              pageSizeOptions: ["10", "20", "30", "40", "50"]
+            }}
+          />
+        </div>
+      </Layouts>
     );
   }
 }

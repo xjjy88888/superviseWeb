@@ -12,7 +12,6 @@ import {
 } from "antd";
 import { Link } from "dva/router";
 import zhCN from "antd/lib/locale-provider/zh_CN";
-import SiderMenu from "../../../components/SiderMenu";
 import Sidebar from "./sidebar";
 import SidebarDetail from "./siderbarDetail";
 import Tool from "./tool";
@@ -43,6 +42,7 @@ import config from "../../../config";
 import emitter from "../../../utils/event";
 import jQuery from "jquery";
 // import { validateId } from "@turf/helpers";
+import Layouts from "../../../components/Layouts";
 
 let userconfig = {};
 let map;
@@ -1912,298 +1912,298 @@ export default class integrat extends PureComponent {
       mapdata: { histories, historiesSpot }
     } = this.props;
     return (
-      <LocaleProvider locale={zhCN}>
-        <div>
-          <SiderMenu active="401" />
-          <Sidebar />
-          <SidebarDetail />
-          <Tool />
-          <Chart />
-          <Query />
-          <Sparse />
-          <ProjectDetail />
+      <Layouts>
+        <Sidebar />
+        <SidebarDetail />
+        <Tool />
+        <Chart />
+        <Query />
+        <Sparse />
+        <ProjectDetail />
+        <div
+          ref={this.saveRef}
+          style={{
+            position: "absolute",
+            top: 0,
+            paddingTop: 46,
+            height: "100vh",
+            width: "100vw"
+          }}
+        >
           <div
-            ref={this.saveRef}
+            id="map"
             style={{
-              paddingTop: 48
+              boxSizing: "border-box",
+              width: "100%",
+              height: "100%"
+            }}
+          />
+          {/* 编辑图形-保存、取消保存按钮 */}
+          <div
+            style={{
+              display: showButton ? "block" : "none",
+              position: "absolute",
+              top: 65,
+              right: 240,
+              zIndex: 1000
             }}
           >
-            <div
-              id="map"
-              style={{
-                height: "100%",
-                boxSizing: "border-box",
-                position: "relative"
-              }}
+            <Button
+              icon="rollback"
+              onClick={
+                drawType === "screenshot"
+                  ? this.cancelScreenshot
+                  : drawState === "edit"
+                  ? this.cancelEditGraphic
+                  : this.cancelAddGraphic
+              }
             />
-            {/* 编辑图形-保存、取消保存按钮 */}
-            <div
-              style={{
-                display: showButton ? "block" : "none",
-                position: "absolute",
-                top: 65,
-                right: 240,
-                zIndex: 1000
-              }}
-            >
+            <Popover content={"第二步：填写属性信息"}>
               <Button
-                icon="rollback"
+                icon="arrow-right"
                 onClick={
                   drawType === "screenshot"
-                    ? this.cancelScreenshot
+                    ? this.saveScreenshot
                     : drawState === "edit"
-                    ? this.cancelEditGraphic
-                    : this.cancelAddGraphic
+                    ? this.saveEditGraphic
+                    : this.saveAddGraphic
                 }
               />
-              <Popover content={"第二步：填写属性信息"}>
-                <Button
-                  icon="arrow-right"
-                  onClick={
-                    drawType === "screenshot"
-                      ? this.saveScreenshot
-                      : drawState === "edit"
-                      ? this.saveEditGraphic
-                      : this.saveAddGraphic
-                  }
-                />
-              </Popover>
-            </div>
-            {/*图标联动按钮 */}
-            <div
+            </Popover>
+          </div>
+          {/*图标联动按钮 */}
+          <div
+            style={{
+              position: "absolute",
+              top: 65,
+              right: 120,
+              height: 0,
+              zIndex: 1000,
+              background: "transparent"
+            }}
+          >
+            <Switch
+              checkedChildren="图表联动"
+              unCheckedChildren="图表联动"
               style={{
-                position: "absolute",
-                top: 65,
-                right: 120,
-                height: 0,
-                zIndex: 1000,
-                background: "transparent"
+                width: 100
               }}
-            >
-              <Switch
-                checkedChildren="图表联动"
-                unCheckedChildren="图表联动"
-                style={{
-                  width: 100
-                }}
-                onClick={(v, e) => {
-                  e.stopPropagation();
-                  this.setState({ chartStatus: v });
-                  console.log(v, e);
-                  let polygon = "";
-                  if (map.getZoom() >= config.mapInitParams.zoom) {
-                    let bounds = map.getBounds();
-                    polygon = "polygon((";
-                    polygon +=
-                      bounds.getSouthWest().lng +
-                      " " +
-                      bounds.getSouthWest().lat +
-                      ",";
-                    polygon +=
-                      bounds.getSouthWest().lng +
-                      " " +
-                      bounds.getNorthEast().lat +
-                      ",";
-                    polygon +=
-                      bounds.getNorthEast().lng +
-                      " " +
-                      bounds.getNorthEast().lat +
-                      ",";
-                    polygon +=
-                      bounds.getNorthEast().lng +
-                      " " +
-                      bounds.getSouthWest().lat +
-                      ",";
-                    polygon +=
-                      bounds.getSouthWest().lng +
-                      " " +
-                      bounds.getSouthWest().lat;
-                    polygon += "))";
-                    emitter.emit("chartLinkage", {
-                      open: v,
-                      type: "spot",
-                      polygon: v ? polygon : ""
-                    });
-                  }
+              onClick={(v, e) => {
+                e.stopPropagation();
+                this.setState({ chartStatus: v });
+                console.log(v, e);
+                let polygon = "";
+                if (map.getZoom() >= config.mapInitParams.zoom) {
+                  let bounds = map.getBounds();
+                  polygon = "polygon((";
+                  polygon +=
+                    bounds.getSouthWest().lng +
+                    " " +
+                    bounds.getSouthWest().lat +
+                    ",";
+                  polygon +=
+                    bounds.getSouthWest().lng +
+                    " " +
+                    bounds.getNorthEast().lat +
+                    ",";
+                  polygon +=
+                    bounds.getNorthEast().lng +
+                    " " +
+                    bounds.getNorthEast().lat +
+                    ",";
+                  polygon +=
+                    bounds.getNorthEast().lng +
+                    " " +
+                    bounds.getSouthWest().lat +
+                    ",";
+                  polygon +=
+                    bounds.getSouthWest().lng + " " + bounds.getSouthWest().lat;
+                  polygon += "))";
+                  emitter.emit("chartLinkage", {
+                    open: v,
+                    type: "spot",
+                    polygon: v ? polygon : ""
+                  });
+                }
+              }}
+            />
+          </div>
+          {/* 图例说明、历史对比 */}
+          <div
+            style={{
+              position: "absolute",
+              bottom: 50,
+              right: 20,
+              zIndex: 1000,
+              background: "#fff"
+            }}
+          >
+            <Link to="/home/welcome">
+              <Popover content="地图分屏" title="" trigger="hover">
+                <Button icon="column-width" />
+              </Popover>
+            </Link>
+            <br />
+            <Popover content="历史对比" title="" trigger="hover">
+              <Button
+                icon="swap"
+                onClick={() => {
+                  this.setState({
+                    showHistoryContrast: !showHistoryContrast
+                  });
+                  emitter.emit("showSiderbar", {
+                    show: showHistoryContrast
+                  });
+                  setTimeout(() => {
+                    this.showHistoryMap();
+                  }, 200);
                 }}
               />
-            </div>
-            {/* 图例说明、历史对比 */}
-            <div
+            </Popover>
+            <br />
+            <Popover
+              content={
+                <div>
+                  {config.legend.map((item, index) => (
+                    <p key={index}>
+                      <span
+                        style={{
+                          background: item.background,
+                          border: `${index < 2 ? "dotted" : "solid"} 2px ${
+                            item.border
+                          }`,
+                          width: 13,
+                          height: 13,
+                          display: "inline-block",
+                          position: "relative",
+                          top: 2,
+                          right: 6
+                        }}
+                      />
+                      <span>{item.title}</span>
+                    </p>
+                  ))}
+                </div>
+              }
+              title=""
+              trigger="hover"
+            >
+              <Button icon="bars" />
+            </Popover>
+          </div>
+          {/* 历史对比地图切换 */}
+          <div
+            style={{
+              display: showHistoryContrast ? "block" : "none",
+              position: "absolute",
+              top: 65,
+              left: 15,
+              zIndex: 1000
+            }}
+          >
+            {/* 左侧历史影像切换 */}
+            <span
               style={{
-                position: "absolute",
-                bottom: 50,
-                right: 20,
-                zIndex: 1000,
-                background: "#fff"
+                padding: "0 10px"
               }}
             >
-              <Link to="/home/welcome">
-                <Popover content="地图分屏" title="" trigger="hover">
-                  <Button icon="column-width" />
-                </Popover>
-              </Link>
-              <br />
-              <Popover content="历史对比" title="" trigger="hover">
-                <Button
-                  icon="swap"
-                  onClick={() => {
-                    this.setState({
-                      showHistoryContrast: !showHistoryContrast
-                    });
-                    emitter.emit("showSiderbar", {
-                      show: showHistoryContrast
-                    });
-                    setTimeout(() => {
-                      this.showHistoryMap();
-                    }, 200);
-                  }}
-                />
-              </Popover>
-              <br />
-              <Popover
-                content={
-                  <div>
-                    {config.legend.map((item, index) => (
-                      <p key={index}>
-                        <span
-                          style={{
-                            background: item.background,
-                            border: `${index < 2 ? "dotted" : "solid"} 2px ${
-                              item.border
-                            }`,
-                            width: 13,
-                            height: 13,
-                            display: "inline-block",
-                            position: "relative",
-                            top: 2,
-                            right: 6
-                          }}
-                        />
-                        <span>{item.title}</span>
-                      </p>
-                    ))}
-                  </div>
-                }
-                title=""
-                trigger="hover"
-              >
-                <Button icon="bars" />
-              </Popover>
-            </div>
-            {/* 历史对比地图切换 */}
-            <div
+              影像:
+            </span>
+            <Select
+              value={[selectLeftV]}
+              placeholder="请选择"
+              onChange={this.onChangeSelectLeft}
               style={{
-                display: showHistoryContrast ? "block" : "none",
-                position: "absolute",
-                top: 65,
-                left: 15,
-                zIndex: 1000
+                width: 150
               }}
             >
-              {/* 左侧历史影像切换 */}
-              <span
-                style={{
-                  padding: "0 10px"
-                }}
-              >
-                影像:
-              </span>
-              <Select
-                value={[selectLeftV]}
-                placeholder="请选择"
-                onChange={this.onChangeSelectLeft}
-                style={{
-                  width: 150
-                }}
-              >
-                {histories.map((item, id) => (
-                  <Select.Option key={id} value={item}>
-                    {item}
-                  </Select.Option>
-                ))}
-              </Select>
-              {/* 左侧扰动图斑切换 */}
-              <span
-                style={{
-                  marginLeft: 10,
-                  padding: "0 10px"
-                }}
-              >
-                图斑:
-              </span>
-              <Select
-                value={[selectSpotLeftV]}
-                placeholder="请选择"
-                onChange={this.onChangeSelectSpotLeft}
-                style={{
-                  width: 150
-                }}
-              >
-                {historiesSpot.map((item, id) => (
-                  <Select.Option key={id} value={item.value}>
-                    {item.id}
-                  </Select.Option>
-                ))}
-              </Select>
-            </div>
-            <div
+              {histories.map((item, id) => (
+                <Select.Option key={id} value={item}>
+                  {item}
+                </Select.Option>
+              ))}
+            </Select>
+            {/* 左侧扰动图斑切换 */}
+            <span
               style={{
-                display: showHistoryContrast ? "block" : "none",
-                position: "absolute",
-                top: 65,
-                right: 240,
-                zIndex: 1001
+                marginLeft: 10,
+                padding: "0 10px"
               }}
             >
-              {/* 右侧历史影像切换 */}
-              <span
-                style={{
-                  padding: "0 10px"
-                }}
-              >
-                影像:
-              </span>
-              <Select
-                value={[selectRightV]}
-                placeholder="请选择"
-                onChange={this.onChangeSelectRight}
-                style={{
-                  width: 150
-                }}
-              >
-                {histories.map((item, id) => (
-                  <Select.Option key={id} value={item}>
-                    {item}
-                  </Select.Option>
-                ))}
-              </Select>
-              {/*右侧扰动图斑切换 */}
-              <span
-                style={{
-                  marginLeft: 10,
-                  padding: "0 10px"
-                }}
-              >
-                图斑:
-              </span>
-              <Select
-                value={[selectSpotRightV]}
-                placeholder="请选择"
-                onChange={this.onChangeSelectSpotRight}
-                style={{
-                  width: 150
-                }}
-              >
-                {historiesSpot.map((item, id) => (
-                  <Select.Option key={id} value={item.value}>
-                    {item.id}
-                  </Select.Option>
-                ))}
-              </Select>
-            </div>
-            {/* 底部遮罩层 */}
-            {/* <div
+              图斑:
+            </span>
+            <Select
+              value={[selectSpotLeftV]}
+              placeholder="请选择"
+              onChange={this.onChangeSelectSpotLeft}
+              style={{
+                width: 150
+              }}
+            >
+              {historiesSpot.map((item, id) => (
+                <Select.Option key={id} value={item.value}>
+                  {item.id}
+                </Select.Option>
+              ))}
+            </Select>
+          </div>
+          <div
+            style={{
+              display: showHistoryContrast ? "block" : "none",
+              position: "absolute",
+              top: 65,
+              right: 240,
+              zIndex: 1001
+            }}
+          >
+            {/* 右侧历史影像切换 */}
+            <span
+              style={{
+                padding: "0 10px"
+              }}
+            >
+              影像:
+            </span>
+            <Select
+              value={[selectRightV]}
+              placeholder="请选择"
+              onChange={this.onChangeSelectRight}
+              style={{
+                width: 150
+              }}
+            >
+              {histories.map((item, id) => (
+                <Select.Option key={id} value={item}>
+                  {item}
+                </Select.Option>
+              ))}
+            </Select>
+            {/*右侧扰动图斑切换 */}
+            <span
+              style={{
+                marginLeft: 10,
+                padding: "0 10px"
+              }}
+            >
+              图斑:
+            </span>
+            <Select
+              value={[selectSpotRightV]}
+              placeholder="请选择"
+              onChange={this.onChangeSelectSpotRight}
+              style={{
+                width: 150
+              }}
+            >
+              {historiesSpot.map((item, id) => (
+                <Select.Option key={id} value={item.value}>
+                  {item.id}
+                </Select.Option>
+              ))}
+            </Select>
+          </div>
+          {/* 底部遮罩层 */}
+          {/* <div
               style={{
                 position: "absolute",
                 bottom: 0,
@@ -2213,8 +2213,8 @@ export default class integrat extends PureComponent {
                 background: "rgba(0,0,0,.4)"
               }}
             /> */}
-            {/* 历史对比 */}
-            {/* <div
+          {/* 历史对比 */}
+          {/* <div
               style={{
                 display: showHistoryContrast ? "block" : "none",
                 position: "fixed",
@@ -2254,9 +2254,8 @@ export default class integrat extends PureComponent {
               </div>
             </div>
  */}
-          </div>
         </div>
-      </LocaleProvider>
+      </Layouts>
     );
   }
 }

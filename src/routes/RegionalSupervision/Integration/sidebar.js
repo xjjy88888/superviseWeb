@@ -1207,9 +1207,11 @@ export default class integrat extends PureComponent {
         style={{
           left: show ? 0 : "-350px",
           width: 350,
-          backgroundColor: "#fff",
+          backgroundColor: "transparent",
           position: "absolute",
           zIndex: 1000,
+          top: 0,
+          paddingTop: 46,
           height: "100%"
         }}
         ref={e => (this.refDom = e)}
@@ -1240,7 +1242,8 @@ export default class integrat extends PureComponent {
           style={{
             display: showProjectDetail ? "none" : "block",
             height: "100%",
-            overflow: "hidden"
+            overflow: "hidden",
+            backgroundColor: "#fff"
           }}
         >
           <Menu mode="horizontal" defaultSelectedKeys={["project"]}>

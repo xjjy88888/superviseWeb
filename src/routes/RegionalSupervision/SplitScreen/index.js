@@ -1,15 +1,14 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
-import {
-  Select
-} from "antd";
-import SiderMenu from "../../../components/SiderMenu";
+import { Select } from "antd";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import proj4 from "proj4";
 import * as turf from "@turf/turf";
 import config from "../../../config";
 import jQuery from "jquery";
+import Layouts from "../../../components/Layouts";
+
 let userconfig = {};
 @connect(({ user, mapdata, project, spot }) => ({
   user,
@@ -24,7 +23,7 @@ export default class home2 extends PureComponent {
       selectLeftV: "",
       selectRightV: "",
       selectSpotLeftV: "",
-      selectSpotRightV:""
+      selectSpotRightV: ""
     };
     this.map = null;
     this.saveRef = v => {
@@ -59,34 +58,39 @@ export default class home2 extends PureComponent {
     });
     //地图缩放控件
     L.control
-    .zoom({ zoomInTitle: "放大", zoomOutTitle: "缩小", position: "topleft" })
-    .addTo(userconfig.LMap);
+      .zoom({ zoomInTitle: "放大", zoomOutTitle: "缩小", position: "topleft" })
+      .addTo(userconfig.LMap);
     userconfig.RMap = L.map("RMap", {
       zoomControl: false,
       attributionControl: false
     });
     //地图缩放控件
     L.control
-    .zoom({ zoomInTitle: "放大", zoomOutTitle: "缩小", position: "topright" })
-    .addTo(userconfig.RMap);
+      .zoom({ zoomInTitle: "放大", zoomOutTitle: "缩小", position: "topright" })
+      .addTo(userconfig.RMap);
     //获取项目区域范围
     me.getRegionGeometry();
-  }
+  };
   /*
    *地图鼠标移动监听事件
-  */
+   */
   onMoveMap = e => {
     if (userconfig.marker) userconfig.marker.remove();
     let myIcon = L.icon({
       iconUrl: "./img/hand_pointer.png",
       iconSize: [17, 23]
     });
-    if(e.target._container.id === "LMap"){//操作右侧地图
-      userconfig.marker = L.marker(e.latlng, { icon: myIcon }).addTo(userconfig.RMap);
+    if (e.target._container.id === "LMap") {
+      //操作右侧地图
+      userconfig.marker = L.marker(e.latlng, { icon: myIcon }).addTo(
+        userconfig.RMap
+      );
       //userconfig.marker = L.marker(e.latlng).addTo(userconfig.RMap);
-    }
-    else{//操作左侧地图
-      userconfig.marker = L.marker(e.latlng, { icon: myIcon }).addTo(userconfig.LMap);
+    } else {
+      //操作左侧地图
+      userconfig.marker = L.marker(e.latlng, { icon: myIcon }).addTo(
+        userconfig.LMap
+      );
       //userconfig.marker = L.marker(e.latlng).addTo(userconfig.LMap);
     }
   };
@@ -113,8 +117,14 @@ export default class home2 extends PureComponent {
     me.loadMapgeoJsonLayer(userconfig.LMap);
     me.loadMapgeoJsonLayer(userconfig.RMap);
     //加载影像底图
-    userconfig.leftImgLayer = me.loadMapbaseLayer(userconfig.LMap,config.baseMaps[1].Url);
-    userconfig.rightImgLayer = me.loadMapbaseLayer(userconfig.RMap,config.baseMaps[1].Url);
+    userconfig.leftImgLayer = me.loadMapbaseLayer(
+      userconfig.LMap,
+      config.baseMaps[1].Url
+    );
+    userconfig.rightImgLayer = me.loadMapbaseLayer(
+      userconfig.RMap,
+      config.baseMaps[1].Url
+    );
     //构造面
     userconfig.polygon = turf.multiPolygon(
       geojson.features[0].geometry.coordinates
@@ -128,24 +138,23 @@ export default class home2 extends PureComponent {
       me.loadmodalLayer();
       setTimeout(() => {
         //监听地图移动完成事件
-        userconfig.maps = [userconfig.LMap,userconfig.RMap];
+        userconfig.maps = [userconfig.LMap, userconfig.RMap];
         // eslint-disable-next-line array-callback-return
-        userconfig.maps.map( function (t) {
+        userconfig.maps.map(function(t) {
           // console.log(t);
-          t.on({drag:maplink,zoom:maplink})
-        })
-        //地图联动实现  
-        function maplink(e){  
-          var _this = this; 
+          t.on({ drag: maplink, zoom: maplink });
+        }); //地图联动实现
+        function maplink(e) {
+          var _this = this;
           // console.log(e);
           let zoom = e.target.getZoom();
           let bounds = e.target.getBounds();
           me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
           // eslint-disable-next-line array-callback-return
-          userconfig.maps.map(function (t) {  
-            t.setView(_this.getCenter(),_this.getZoom())  
-          })  
-        }
+          userconfig.maps.map(function(t) {
+            t.setView(_this.getCenter(), _this.getZoom());
+          });
+        }
         //监听地图移动事件
         userconfig.LMap.on("mousemove", me.onMoveMap);
         //监听地图移动事件
@@ -160,21 +169,18 @@ export default class home2 extends PureComponent {
   /*
    * 加载地图geoJsonLayer图层
    */
-  loadMapbaseLayer = (map,url) => {
+  loadMapbaseLayer = (map, url) => {
     map.createPane("tileLayerZIndex");
     map.getPane("tileLayerZIndex").style.zIndex = 0;
-    let layer = L.tileLayer(
-      url,
-      {
-        pane: "tileLayerZIndex"
-      }
-    ).addTo(map); //影像图
+    let layer = L.tileLayer(url, {
+      pane: "tileLayerZIndex"
+    }).addTo(map); //影像图
     return layer;
-  }
+  };
   /*
    * 加载地图geoJsonLayer图层
    */
-  loadMapgeoJsonLayer = (map) => {
+  loadMapgeoJsonLayer = map => {
     // L.Proj.GeoJSON继承于L.GeoJSON，可调样式
     map.createPane("geoJsonZIndex");
     map.getPane("geoJsonZIndex").style.zIndex = 1;
@@ -190,11 +196,11 @@ export default class home2 extends PureComponent {
     }).addTo(map);
     let bounds = userconfig.geoJsonLayer.getBounds();
     map.fitBounds(bounds);
-  }
+  };
   /*
    * 加载geoserver发布的WMS地图服务
    */
-  overlayWMSLayers = (map) => {
+  overlayWMSLayers = map => {
     let bounds = userconfig.geoJsonLayer.getBounds();
     map.setMaxBounds(bounds);
     map.setMinZoom(userconfig.zoom);
@@ -248,7 +254,7 @@ export default class home2 extends PureComponent {
       .find("path")
       .css({
         cursor: "not-allowed"
-    });
+      });
 
     let rLayer = L.Proj.geoJson(modalJson, {
       style: {
@@ -263,8 +269,7 @@ export default class home2 extends PureComponent {
       .find("path")
       .css({
         cursor: "not-allowed"
-    });
-
+      });
   };
   /*
    * 获取url参数
@@ -315,7 +320,7 @@ export default class home2 extends PureComponent {
       callback: callback
     });
   };
-   /*空间范围查询图层
+  /*空间范围查询图层
    *@method queryWFSServiceByExtent
    *@return null
    */
@@ -395,89 +400,113 @@ export default class home2 extends PureComponent {
   };
   /*
    * 移除左地图的图层列表
-  */
+   */
   removeLMapLayers = () => {
     if (userconfig.leftImgLayer)
-        userconfig.LMap.removeLayer(userconfig.leftImgLayer);
+      userconfig.LMap.removeLayer(userconfig.leftImgLayer);
     if (userconfig.leftSpotLayer)
-        userconfig.LMap.removeLayer(userconfig.leftSpotLayer);
+      userconfig.LMap.removeLayer(userconfig.leftSpotLayer);
   };
   /*
    * 移除右地图的图层列表
-  */
+   */
   removeRMapLayers = () => {
     if (userconfig.rightImgLayer)
-        userconfig.RMap.removeLayer(userconfig.rightImgLayer);
+      userconfig.RMap.removeLayer(userconfig.rightImgLayer);
     if (userconfig.rightSpotLayer)
-        userconfig.RMap.removeLayer(userconfig.rightSpotLayer);
+      userconfig.RMap.removeLayer(userconfig.rightSpotLayer);
   };
   /*
    * 添加左地图的图层列表
-  */
+   */
   addLMapLayers = () => {
-    const { selectLeftV,selectSpotLeftV} = this.state;
+    const { selectLeftV, selectSpotLeftV } = this.state;
     if (selectLeftV) {
-      let leftLayerUrl =config.imageBaseUrl +"/" +selectLeftV.replace(/\//g, "-") +"/tile/{z}/{y}/{x}";
-      userconfig.leftImgLayer = this.loadMapbaseLayer(userconfig.LMap,leftLayerUrl);//左侧影像
+      let leftLayerUrl =
+        config.imageBaseUrl +
+        "/" +
+        selectLeftV.replace(/\//g, "-") +
+        "/tile/{z}/{y}/{x}";
+      userconfig.leftImgLayer = this.loadMapbaseLayer(
+        userconfig.LMap,
+        leftLayerUrl
+      ); //左侧影像
     }
     //加载历史扰动图斑
     userconfig.leftSpotLayer = null;
     if (selectSpotLeftV) {
-      if(selectSpotLeftV.indexOf("现状") !== -1){
+      if (selectSpotLeftV.indexOf("现状") !== -1) {
         //现状扰动图斑
-        userconfig.leftSpotLayer = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
-          layers: config.mapSpotLayerName, //需要加载的图层
-          format: "image/png", //返回的数据格式
-          transparent: true
-        });
-      }
-      else{
+        userconfig.leftSpotLayer = L.tileLayer.wms(
+          config.mapUrl.geoserverUrl + "/wms?",
+          {
+            layers: config.mapSpotLayerName, //需要加载的图层
+            format: "image/png", //返回的数据格式
+            transparent: true
+          }
+        );
+      } else {
         //历史扰动图斑
-        userconfig.leftSpotLayer = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
-          layers: config.mapHistorySpotLayerName, //需要加载的图层
-          format: "image/png", //返回的数据格式
-          transparent: true,
-          cql_filter: "archive_time <= " + selectSpotLeftV
-        });
+        userconfig.leftSpotLayer = L.tileLayer.wms(
+          config.mapUrl.geoserverUrl + "/wms?",
+          {
+            layers: config.mapHistorySpotLayerName, //需要加载的图层
+            format: "image/png", //返回的数据格式
+            transparent: true,
+            cql_filter: "archive_time <= " + selectSpotLeftV
+          }
+        );
       }
       userconfig.LMap.addLayer(userconfig.leftSpotLayer);
     }
   };
   /*
    * 添加右地图的图层列表
-  */
+   */
   addRMapLayers = () => {
-    const { selectRightV,selectSpotRightV } = this.state;
+    const { selectRightV, selectSpotRightV } = this.state;
     if (selectRightV) {
-      let rightLayerUrl =config.imageBaseUrl +"/" +selectRightV.replace(/\//g, "-") +"/tile/{z}/{y}/{x}";
-      userconfig.rightImgLayer = this.loadMapbaseLayer(userconfig.RMap,rightLayerUrl);//右侧影像
+      let rightLayerUrl =
+        config.imageBaseUrl +
+        "/" +
+        selectRightV.replace(/\//g, "-") +
+        "/tile/{z}/{y}/{x}";
+      userconfig.rightImgLayer = this.loadMapbaseLayer(
+        userconfig.RMap,
+        rightLayerUrl
+      ); //右侧影像
     }
     //加载历史扰动图斑
     userconfig.rightSpotLayer = null;
     if (selectSpotRightV) {
-      if(selectSpotRightV.indexOf("现状") !== -1){
+      if (selectSpotRightV.indexOf("现状") !== -1) {
         //现状扰动图斑
-        userconfig.rightSpotLayer = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
-          layers: config.mapSpotLayerName, //需要加载的图层
-          format: "image/png", //返回的数据格式
-          transparent: true
-        });
-      }
-      else{
+        userconfig.rightSpotLayer = L.tileLayer.wms(
+          config.mapUrl.geoserverUrl + "/wms?",
+          {
+            layers: config.mapSpotLayerName, //需要加载的图层
+            format: "image/png", //返回的数据格式
+            transparent: true
+          }
+        );
+      } else {
         //历史扰动图斑
-        userconfig.rightSpotLayer = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
-          layers: config.mapHistorySpotLayerName, //需要加载的图层
-          format: "image/png", //返回的数据格式
-          transparent: true,
-          cql_filter: "archive_time <= " + selectSpotRightV
-        });
+        userconfig.rightSpotLayer = L.tileLayer.wms(
+          config.mapUrl.geoserverUrl + "/wms?",
+          {
+            layers: config.mapHistorySpotLayerName, //需要加载的图层
+            format: "image/png", //返回的数据格式
+            transparent: true,
+            cql_filter: "archive_time <= " + selectSpotRightV
+          }
+        );
       }
       userconfig.RMap.addLayer(userconfig.rightSpotLayer);
     }
   };
   /*
    * 左地图的影像列表切换
-  */
+   */
   onChangeSelectLeft = v => {
     this.setState({ selectLeftV: v });
     //移除左地图的图层列表
@@ -499,7 +528,7 @@ export default class home2 extends PureComponent {
   };
   /*
    * 右地图的影像列表切换
-  */
+   */
   onChangeSelectRight = v => {
     this.setState({ selectRightV: v });
     //移除右地图的图层列表
@@ -531,10 +560,9 @@ export default class home2 extends PureComponent {
       mapdata: { histories, historiesSpot }
     } = this.props;
     return (
-      <div>
-        <SiderMenu active="101" />
+      <Layouts>
         <div style={{ display: "flex" }}>
-          <div style={{ flex: 1, border:"1px solid #cccccc" }} id="LMap">
+          <div style={{ flex: 1, border: "1px solid #cccccc" }} id="LMap">
             {/*历史影像图切换*/}
             <div
               style={{
@@ -592,8 +620,8 @@ export default class home2 extends PureComponent {
               </Select>
             </div>
           </div>
-          <div style={{ flex: 1, border:"1px solid #cccccc" }} id="RMap">
-          <div
+          <div style={{ flex: 1, border: "1px solid #cccccc" }} id="RMap">
+            <div
               style={{
                 position: "absolute",
                 top: 10,
@@ -650,7 +678,7 @@ export default class home2 extends PureComponent {
             </div>
           </div>
         </div>
-      </div>
+      </Layouts>
     );
   }
 }

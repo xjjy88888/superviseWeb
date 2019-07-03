@@ -44,7 +44,7 @@ export default {
           type: "save",
           payload: { current_user: response.result }
         });
-        yield put(routerRedux.replace("/regionRegulatory/integrat"));
+        yield put(routerRedux.replace("/regionalSupervision/integration"));
       } else {
         notification["error"]({
           message: `登录失败：${response.error.message}`
