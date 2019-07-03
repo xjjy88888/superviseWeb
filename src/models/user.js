@@ -17,7 +17,7 @@ export default {
         us_name: "请登录"
       }
     ],
-    districtList: [{ children: null, id: "" }],
+    districtList: [{ children: null, id: null, value: null }],
     dicList: [],
     departSelectList: [],
     basinOrganList: [],
