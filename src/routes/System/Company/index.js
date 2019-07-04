@@ -1,32 +1,11 @@
 import React, { PureComponent } from "react";
-import {
-  Steps,
-  Form,
-  Icon,
-  Input,
-  Button,
-  Table,
-  TreeSelect,
-  Select,
-  message,
-  DatePicker,
-  Radio,
-  Avatar,
-  Tree,
-  Layout,
-  Modal,
-  Typography
-} from "antd";
+import { Form, Icon, Input, Button, Table, message, Modal } from "antd";
 import { createForm } from "rc-form";
-import moment from "moment";
 import Systems from "../../../components/Systems";
 import Highlighter from "react-highlight-words";
 
-const { Title, Text } = Typography;
-const { Header, Footer, Sider, Content } = Layout;
-
 @createForm()
-export default class review extends PureComponent {
+export default class company extends PureComponent {
   state = {
     state: 0,
     visible: false,
@@ -45,7 +24,6 @@ export default class review extends PureComponent {
           ref={node => {
             this.searchInput = node;
           }}
-          // placeholder={`查询单位名称`}
           value={selectedKeys[0]}
           onChange={e =>
             setSelectedKeys(e.target.value ? [e.target.value] : [])
@@ -126,7 +104,6 @@ export default class review extends PureComponent {
         sorter: (a, b) => a.name.length - b.name.length,
         ...this.getColumnSearchProps("desc")
       },
-
       {
         title: "操作",
         key: "operation",

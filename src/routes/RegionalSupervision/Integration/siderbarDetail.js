@@ -673,7 +673,7 @@ export default class siderbarDetail extends PureComponent {
               <Form.Item label="面积" {...formItemLayout}>
                 {getFieldDecorator("area", {
                   initialValue: redLineItem.area
-                })(<Input addonAfter="㎡" disabled={!edit} />)}
+                })(<Input addonAfter="公顷" disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="组成部分" {...formItemLayout}>
                 {getFieldDecorator("consPart", {

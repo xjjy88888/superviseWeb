@@ -1,7 +1,7 @@
 const isFormal = window.location.href.split("/")[3] === "stbcjg";
 console.log(isFormal ? "正式环境" : "测试环境");
 
-const domain = `http://www.zkygis.cn/stbc${isFormal ? "" : "t"}/`;
+const domain = `https://www.zkygis.cn/stbc${isFormal ? "" : "t"}/`;
 const imageBaseUrl = "http://www.stbcjg.cn/BasemapService/rest/image";
 const imageQueryBaseUrl = "http://210.36.22.122/BasemapService/rest/image";
 const txKey = "TERBZ-ZU46D-KZT46-HZZIB-RNDMZ-7GFP3";
@@ -14,7 +14,7 @@ const color_border_redLine = "#e60000"; //边框色-红线
 
 const config = {
   domain: domain,
-  download: `http://www.zkygis.cn/stbcjg/Template/`,
+  download: `https://www.zkygis.cn/stbcjg/Template/`,
   isFormal: isFormal,
 
   url: {
@@ -221,15 +221,15 @@ const config = {
       icon: "delete"
     },
     {
-      label: "模板下载(Shapfile)",
+      label: "模板下载",
       key: "download_shapfile",
       icon: "download"
     },
-    {
-      label: "模板下载(Excel)",
-      key: "download_excel",
-      icon: "download"
-    },
+    // {
+    //   label: "模板下载(Excel)",
+    //   key: "download_excel",
+    //   icon: "download"
+    // },
     {
       label: "模板说明",
       key: "template_description",
@@ -440,8 +440,7 @@ const config = {
   mapUrl: {
     SHP: `./mapfile/SHP/`,
     mapshaper: `./mapshaper/index.html`,
-    // geoserverUrl: "http://183.6.178.123:8080/geoserver/ZKYGIS",
-    geoserverUrl: "http://www.zkygis.cn:8080/geoserver/ZKYGIS",
+    geoserverUrl: "https://www.zkygis.cn/geoserver/ZKYGIS",
     geoserverQueryUrl: "http://210.36.22.123:8080/geoserver/ZKYGIS",
     //根据地图当前范围获取对应历史影像数据接口
     getInfoByExtent: `${imageQueryBaseUrl}/latest/getInfoByExtent`

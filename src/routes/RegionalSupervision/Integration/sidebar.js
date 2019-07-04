@@ -1938,7 +1938,7 @@ export default class sider extends PureComponent {
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>责任面积：</span>
-                        <span>{projectItem.expand.respArea}m²</span>
+                        <span>{projectItem.expand.respArea}公顷</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>立项级别：</span>
@@ -3053,7 +3053,7 @@ export default class sider extends PureComponent {
                 <Form.Item label="责任面积" {...formItemLayout}>
                   {getFieldDecorator("respArea", {
                     initialValue: projectItem.expand.respArea
-                  })(<Input addonAfter="m²" />)}
+                  })(<Input addonAfter="公顷" />)}
                 </Form.Item>
                 <Form.Item label="立项级别" {...formItemLayout}>
                   {getFieldDecorator("projectLevelId", {

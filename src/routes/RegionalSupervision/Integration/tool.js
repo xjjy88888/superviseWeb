@@ -151,7 +151,7 @@ export default class siderbarDetail extends PureComponent {
                         console.log(url);
                         window.open(
                           `${url}Shapefile/${
-                            key === "project" ? "项目红线范围" : "扰动图斑"
+                            key === "project" ? "项目模板" : "图斑模板"
                           }.zip`,
                           "_blank"
                         );

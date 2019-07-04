@@ -444,7 +444,7 @@ export default class projectDetail extends PureComponent {
             </p>
             <p style={{ margin: 10 }}>
               <span>项目规模：</span>
-              <span>{projectItem.expand.projectSize}m或㎡</span>
+              <span>{projectItem.expand.projectSize}米或公顷</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>设计动工时间：</span>
@@ -497,19 +497,19 @@ export default class projectDetail extends PureComponent {
             </p>
             <p style={{ margin: 10 }}>
               <span>项目建设区面积：</span>
-              <span>{projectItem.expand.consArea}㎡</span>
+              <span>{projectItem.expand.consArea}公顷</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>直接影响区面积：</span>
-              <span>{projectItem.expand.affeArea}㎡</span>
+              <span>{projectItem.expand.affeArea}公顷</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>扰动地表面积：</span>
-              <span>{projectItem.expand.distSurfaceArea}㎡</span>
+              <span>{projectItem.expand.distSurfaceArea}公顷</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>损坏水土保持设施面积：</span>
-              <span>{projectItem.expand.dmgArea}㎡</span>
+              <span>{projectItem.expand.dmgArea}公顷</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>——</span>
@@ -517,11 +517,11 @@ export default class projectDetail extends PureComponent {
             </p>
             <p style={{ margin: 10 }}>
               <span>原地貌土壤侵蚀模数：</span>
-              <span>{projectItem.expand.landErsn}t/k㎡*a</span>
+              <span>{projectItem.expand.landErsn}t/km²*a</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>土壤容许流失量：</span>
-              <span>{projectItem.expand.soilLoss}t/k㎡*a</span>
+              <span>{projectItem.expand.soilLoss}t/km²*a</span>
             </p>
             <p style={{ margin: 10 }}>
               <span>水土流失预测总量：</span>
@@ -720,7 +720,7 @@ export default class projectDetail extends PureComponent {
                 <Form.Item label="项目规模">
                   {getFieldDecorator("projectSize", {
                     initialValue: projectItem.expand.projectSize
-                  })(<Input addonAfter="m或㎡" style={{ width: 150 }} />)}
+                  })(<Input addonAfter="米或公顷" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -889,28 +889,28 @@ export default class projectDetail extends PureComponent {
                 <Form.Item label="项目建设区面积">
                   {getFieldDecorator("consArea", {
                     initialValue: projectItem.expand.consArea
-                  })(<Input addonAfter="㎡" style={{ width: 150 }} />)}
+                  })(<Input addonAfter="公顷" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="直接影响区面积">
                   {getFieldDecorator("affeArea", {
                     initialValue: projectItem.expand.affeArea
-                  })(<Input addonAfter="㎡" style={{ width: 150 }} />)}
+                  })(<Input addonAfter="公顷" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="扰动地表面积">
                   {getFieldDecorator("distSurfaceArea", {
                     initialValue: projectItem.expand.distSurfaceArea
-                  })(<Input addonAfter="㎡" style={{ width: 150 }} />)}
+                  })(<Input addonAfter="公顷" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="损坏水土保持设施面积">
                   {getFieldDecorator("dmgArea", {
                     initialValue: projectItem.expand.dmgArea
-                  })(<Input addonAfter="㎡" style={{ width: 150 }} />)}
+                  })(<Input addonAfter="公顷" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Divider />
@@ -918,14 +918,14 @@ export default class projectDetail extends PureComponent {
                 <Form.Item label="原地貌土壤侵蚀模数">
                   {getFieldDecorator("landErsn", {
                     initialValue: projectItem.expand.landErsn
-                  })(<Input addonAfter="t/k㎡*a" style={{ width: 150 }} />)}
+                  })(<Input addonAfter="t/km²*a" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="土壤容许流失量">
                   {getFieldDecorator("soilLoss", {
                     initialValue: projectItem.expand.soilLoss
-                  })(<Input addonAfter="t/k㎡*a" style={{ width: 150 }} />)}
+                  })(<Input addonAfter="t/km²*a" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>

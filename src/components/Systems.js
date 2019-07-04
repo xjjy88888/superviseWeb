@@ -41,21 +41,15 @@ const menuList = [
     ]
   },
   {
-    title: "行政区划管理",
-    key: "/area",
-    icon: "global",
-    subMenu: []
-  },
-  {
     title: "数据字典",
     key: "/dict",
     icon: "book",
     subMenu: []
   },
   {
-    title: "行政部门管理",
-    key: "/branch",
-    icon: "solution",
+    title: "行政区划管理",
+    key: "/area",
+    icon: "global",
     subMenu: []
   },
   {
@@ -63,7 +57,13 @@ const menuList = [
     key: "/company",
     icon: "bank",
     subMenu: []
-  }
+  },
+  {
+    title: "水保行业单位管理",
+    key: "/branch",
+    icon: "solution",
+    subMenu: []
+  },
 ];
 export default class spins extends PureComponent {
   static defaultProps = {
