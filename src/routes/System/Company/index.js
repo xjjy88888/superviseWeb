@@ -121,7 +121,17 @@ export default class company extends PureComponent {
             </a>
             <a
               onClick={() => {
-                message.success("删除成功");
+                Modal.confirm({
+                  title: "删除",
+                  content: "你是否确定要删除",
+                  okText: "是",
+                  cancelText: "否",
+                  okType: "danger",
+                  onOk() {
+                    message.success(`删除1个单位成功`);
+                  },
+                  onCancel() {}
+                });
               }}
             >
               删除
@@ -160,8 +170,6 @@ export default class company extends PureComponent {
       <Systems>
         <span>
           <Button
-            // type="primary"
-            // shape="round"
             icon="plus"
             style={{ margin: 10 }}
             onClick={() => {
@@ -181,7 +189,17 @@ export default class company extends PureComponent {
                 message.warning("请选择需要删除的单位");
                 return;
               }
-              message.success(`删除${l}个单位成功`);
+              Modal.confirm({
+                title: "删除",
+                content: "你是否确定要删除",
+                okText: "是",
+                cancelText: "否",
+                okType: "danger",
+                onOk() {
+                  message.success(`删除${l}个单位成功`);
+                },
+                onCancel() {}
+              });
             }}
           >
             删除
@@ -211,7 +229,7 @@ export default class company extends PureComponent {
           rowSelection={rowSelection}
         />
         <Modal
-          title="添加建设单位"
+          title="添加单位"
           visible={visible}
           onOk={() => {
             this.props.form.validateFields((err, v) => {

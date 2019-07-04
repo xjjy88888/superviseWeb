@@ -181,18 +181,18 @@ export default class siderbarDetail extends PureComponent {
                         });
                         break;
                       //模板下载(Excel)
-                      case "download_excel":
-                        window.open(
-                          `${url}Excel/项目红线范围（无图形）.xlsx`,
-                          "_blank"
-                        );
-                        notification["success"]({
-                          message: `下载项目模板(Excel)成功`
-                        });
-                        break;
+                      // case "download_excel":
+                      //   window.open(
+                      //     `${url}Excel/项目红线范围（无图形）.xlsx`,
+                      //     "_blank"
+                      //   );
+                      //   notification["success"]({
+                      //     message: `下载项目模板(Excel)成功`
+                      //   });
+                      //   break;
                       //模板说明
                       case "template_description":
-                        window.open(`${url}Shapefile/模板说明.docx`, "_blank");
+                        window.open(config.templateDescription, "_blank");
                         notification["success"]({
                           message: `下载${
                             key === "project" ? "项目" : "图斑"

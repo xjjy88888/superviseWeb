@@ -15,6 +15,7 @@ const color_border_redLine = "#e60000"; //边框色-红线
 const config = {
   domain: domain,
   download: `https://www.zkygis.cn/stbcjg/Template/`,
+  templateDescription: `https://docs.qq.com/doc/DTEV2TGRsU0RNQUV0?coord=DeJxzNFRxNFQxgEAAEUUCWQ`,
   isFormal: isFormal,
 
   url: {

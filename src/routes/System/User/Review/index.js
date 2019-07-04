@@ -1,71 +1,163 @@
 import React, { PureComponent } from "react";
-import {
-  Steps,
-  Form,
-  Icon,
-  Input,
-  Button,
-  Table,
-  TreeSelect,
-  Select,
-  message,
-  DatePicker,
-  Radio,
-  Avatar,
-  Tree,
-  Typography,
-  Layout
-} from "antd";
-import moment from "moment";
+import { Form, Icon, Input, Button, Table, message, Modal } from "antd";
+import { createForm } from "rc-form";
 import Systems from "../../../../components/Systems";
+import Highlighter from "react-highlight-words";
 
-const { Title } = Typography;
-const { Header, Footer, Sider, Content } = Layout;
-
+@createForm()
 export default class review extends PureComponent {
   state = {
     state: 0,
-    showAdd: false
+    visible: false,
+    selectedRows: []
   };
 
-  next = v => {
-    this.setState({ state: v });
+  getColumnSearchProps = dataIndex => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters
+    }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={node => {
+            this.searchInput = node;
+          }}
+          value={selectedKeys[0]}
+          onChange={e =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
+          style={{ width: 188, marginBottom: 8, display: "block" }}
+        />
+        <Button
+          type="primary"
+          onClick={() => this.handleSearch(selectedKeys, confirm)}
+          icon="search"
+          size="small"
+          style={{ width: 90, marginRight: 8 }}
+        >
+          查询
+        </Button>
+        <Button
+          onClick={() => this.handleReset(clearFilters)}
+          size="small"
+          style={{ width: 90 }}
+        >
+          重置
+        </Button>
+      </div>
+    ),
+    filterIcon: filtered => (
+      <Icon type="search" style={{ color: filtered ? "#1890ff" : undefined }} />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex]
+        .toString()
+        .toLowerCase()
+        .includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: visible => {
+      if (visible) {
+        setTimeout(() => this.searchInput.select());
+      }
+    },
+    render: text => (
+      <Highlighter
+        highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+        searchWords={[this.state.searchText]}
+        autoEscape
+        textToHighlight={text.toString()}
+      />
+    )
+  });
+  handleSearch = (selectedKeys, confirm) => {
+    confirm();
+    this.setState({ searchText: selectedKeys[0] });
   };
 
-  showAdd = v => {
-    this.setState({ showAdd: v });
+  handleReset = clearFilters => {
+    clearFilters();
+    this.setState({ searchText: "" });
   };
 
   render() {
-    const { state, showAdd } = this.state;
+    const { visible, selectedRows } = this.state;
+    const { getFieldDecorator, getFieldsError } = this.props.form;
+
     const columns = [
       {
-        title: "序号",
-        dataIndex: "key"
-      },
-      {
         title: "用户名称",
-        dataIndex: "name"
+        dataIndex: "nickname",
+        sorter: (a, b) => a.nickname.length - b.nickname.length,
+        ...this.getColumnSearchProps("nickname")
       },
       {
         title: "登录名",
-        dataIndex: "login"
+        dataIndex: "name",
+        sorter: (a, b) => a.name.length - b.name.length,
+        ...this.getColumnSearchProps("name")
+      },
+      {
+        title: "状态",
+        dataIndex: "state",
+        filters: [
+          {
+            text: "待审核",
+            value: "待审核"
+          },
+          {
+            text: "通过",
+            value: "通过"
+          }
+        ],
+        sorter: (a, b) => a.state.length - b.state.length,
+        onFilter: (value, record) => record.state.indexOf(value) === 0
       },
       {
         title: "联系电话",
-        dataIndex: "phone"
+        dataIndex: "phone",
+        sorter: (a, b) => a.phone - b.phone,
+        ...this.getColumnSearchProps("phone")
       },
       {
         title: "住址",
-        dataIndex: "address"
+        dataIndex: "address",
+        sorter: (a, b) => a.address.length - b.address.length,
+        ...this.getColumnSearchProps("address")
       },
       {
         title: "操作",
         key: "operation",
         render: (item, record) => (
           <span>
-            <a style={{ marginRight: 20 }}>编辑</a>
-            <a>删除</a>
+            <a
+              style={{ marginRight: 20 }}
+              onClick={() => {
+                this.setState({
+                  visible: true
+                });
+              }}
+            >
+              修改
+            </a>
+            <a
+              onClick={() => {
+                Modal.confirm({
+                  title: "通过",
+                  content: "你是否确定要通过",
+                  okText: "是",
+                  cancelText: "否",
+                  okType: "danger",
+                  onOk() {
+                    message.success(`通过1个账号成功`);
+                  },
+                  onCancel() {}
+                });
+              }}
+            >
+              通过
+            </a>
           </span>
         )
       }
@@ -73,62 +165,139 @@ export default class review extends PureComponent {
 
     const data = [
       {
-        key: "1",
-        name: "水利部",
-        login: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
+        index: "1",
+        nickname: "花都区办事员",
+        name: "花都区办事员",
+        state: "待审核",
+        phone: 13555479658,
+        address: "广州市花都区"
       },
       {
-        key: "2",
-        name: "水利部",
-        login: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
+        index: "1",
+        nickname: "天河区办事员",
+        name: "天河区办事员",
+        state: "通过",
+        phone: 16555479658,
+        address: "广州市天河区"
       },
       {
-        key: "3",
-        name: "水利部",
-        login: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
+        index: "1",
+        nickname: "海珠区办事员",
+        name: "海珠区办事员",
+        state: "待审核",
+        phone: 17555479658,
+        address: "广州市海珠区"
+      },
+      {
+        index: "4",
+        nickname: "天河区办事员",
+        name: "天河区办事员",
+        state: "通过",
+        phone: 18555479658,
+        address: "广州市天河区"
       }
     ];
 
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
         console.log(selectedRows);
+        this.setState({ selectedRows: selectedRows });
       }
     };
 
     return (
       <Systems>
-        <span style={{ float: "right" }}>
+        <span>
           <Button
-            type="primary"
-            shape="circle"
             icon="plus"
-            style={{ marginLeft: 10 }}
+            style={{ margin: 10 }}
             onClick={() => {
-              this.props.next(0);
-              this.props.showAdd(true);
+              this.setState({
+                visible: true
+              });
             }}
-          />
+          >
+            添加
+          </Button>
           <Button
-            type="primary"
-            shape="circle"
             icon="delete"
-            style={{ marginLeft: 10 }}
+            style={{ margin: 10 }}
             onClick={() => {
-              message.info("开始删除");
+              const l = selectedRows.length;
+              if (l === 0) {
+                message.warning("请选择需要通过的账号");
+                return;
+              }
+              Modal.confirm({
+                title: "通过",
+                content: "你是否确定要通过",
+                okText: "是",
+                cancelText: "否",
+                okType: "danger",
+                onOk() {
+                  message.success(`通过${l}个账号成功`);
+                },
+                onCancel() {}
+              });
             }}
-          />
+          >
+            通过
+          </Button>
         </span>
         <Table
           columns={columns}
           dataSource={data}
           rowSelection={rowSelection}
         />
+        <Modal
+          title="添加账号"
+          visible={visible}
+          onOk={() => {
+            this.props.form.validateFields((err, v) => {
+              console.log("表单信息", v);
+              if (!v.name) {
+                message.warning("请填写账号名称");
+                return;
+              }
+              this.setState({
+                visible: false
+              });
+              message.success("保存成功");
+            });
+          }}
+          onCancel={() => {
+            this.setState({
+              visible: false
+            });
+          }}
+        >
+          <Form
+            onSubmit={this.handleSubmit}
+            layout="inline"
+            style={{ textAlign: "center" }}
+          >
+            <Form.Item
+              label={
+                <span>
+                  <b style={{ color: "red" }}>*</b>账号名称
+                </span>
+              }
+              hasFeedback
+            >
+              {getFieldDecorator("name", {})(<Input />)}
+            </Form.Item>
+            <Form.Item
+              label={
+                <span>
+                  <b style={{ color: "#fff" }}>*</b>账号描述
+                </span>
+              }
+              hasFeedback
+            >
+              {getFieldDecorator("desc", {})(<Input />)}
+            </Form.Item>
+          </Form>
+        </Modal>
       </Systems>
     );
   }

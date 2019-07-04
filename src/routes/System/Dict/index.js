@@ -18,7 +18,8 @@ import Highlighter from "react-highlight-words";
 export default class dict extends PureComponent {
   state = {
     state: 0,
-    visible: false,
+    visibleType: false,
+    visibleData: false,
     selectedRowsType: [],
     selectedRowsData: []
   };
@@ -93,7 +94,12 @@ export default class dict extends PureComponent {
   };
 
   render() {
-    const { visible, selectedRowsType, selectedRowsData } = this.state;
+    const {
+      visibleType,
+      visibleData,
+      selectedRowsType,
+      selectedRowsData
+    } = this.state;
     const { getFieldDecorator } = this.props.form;
     const columnsType = [
       {
@@ -101,11 +107,11 @@ export default class dict extends PureComponent {
         dataIndex: "name"
       },
       {
-        title: "分组代码",
+        title: "分组编码",
         dataIndex: "code"
       },
       {
-        title: "描述",
+        title: "分组描述",
         dataIndex: "desc"
       },
       {
@@ -117,7 +123,7 @@ export default class dict extends PureComponent {
               style={{ marginRight: 20 }}
               onClick={() => {
                 this.setState({
-                  visible: true
+                  visibleType: true
                 });
               }}
             >
@@ -125,7 +131,17 @@ export default class dict extends PureComponent {
             </a>
             <a
               onClick={() => {
-                message.success("删除成功");
+                Modal.confirm({
+                  title: "删除",
+                  content: "你是否确定要删除",
+                  okText: "是",
+                  cancelText: "否",
+                  okType: "danger",
+                  onOk() {
+                    message.success(`删除1个字典类型成功`);
+                  },
+                  onCancel() {}
+                });
               }}
             >
               删除
@@ -136,15 +152,15 @@ export default class dict extends PureComponent {
     ];
     const columnsData = [
       {
-        title: "字典代码",
+        title: "字典名称",
+        dataIndex: "name"
+      },
+      {
+        title: "字典编码",
         dataIndex: "code"
       },
       {
-        title: "字典值",
-        dataIndex: "value"
-      },
-      {
-        title: "描述",
+        title: "字典描述",
         dataIndex: "desc"
       },
       {
@@ -156,7 +172,7 @@ export default class dict extends PureComponent {
               style={{ marginRight: 20 }}
               onClick={() => {
                 this.setState({
-                  visible: true
+                  visibleData: true
                 });
               }}
             >
@@ -164,7 +180,17 @@ export default class dict extends PureComponent {
             </a>
             <a
               onClick={() => {
-                message.success("删除成功");
+                Modal.confirm({
+                  title: "删除",
+                  content: "你是否确定要删除",
+                  okText: "是",
+                  cancelText: "否",
+                  okType: "danger",
+                  onOk() {
+                    message.success(`删除1个数据字典成功`);
+                  },
+                  onCancel() {}
+                });
               }}
             >
               删除
@@ -193,18 +219,18 @@ export default class dict extends PureComponent {
     ];
     const data = [
       {
+        name: "井采非金属矿",
         code: "XMLX-22",
-        value: "井采非金属矿",
         desc: "井采非金属矿描述"
       },
       {
+        name: "油气开采工程",
         code: "XMLX-23",
-        value: "油气开采工程",
         desc: "油气开采工程描述"
       },
       {
+        name: "工业园区工程",
         code: "XMLX-24",
-        value: "工业园区工程",
         desc: "工业园区工程描述"
       }
     ];
@@ -247,7 +273,7 @@ export default class dict extends PureComponent {
                 style={{ margin: 10 }}
                 onClick={() => {
                   this.setState({
-                    visible: true
+                    visibleType: true
                   });
                 }}
               >
@@ -259,10 +285,20 @@ export default class dict extends PureComponent {
                 onClick={() => {
                   const l = selectedRowsType.length;
                   if (l === 0) {
-                    message.warning("请选择需要删除的单位");
+                    message.warning("请选择需要删除的字典类型");
                     return;
                   }
-                  message.success(`删除${l}个单位成功`);
+                  Modal.confirm({
+                    title: "删除",
+                    content: "你是否确定要删除",
+                    okText: "是",
+                    cancelText: "否",
+                    okType: "danger",
+                    onOk() {
+                      message.success(`删除${l}个字典类型成功`);
+                    },
+                    onCancel() {}
+                  });
                 }}
               >
                 删除
@@ -274,24 +310,28 @@ export default class dict extends PureComponent {
               rowSelection={rowSelectionType}
             />
             <Modal
-              title="添加建设单位"
-              visible={visible}
+              title="添加字典类型"
+              visible={visibleType}
               onOk={() => {
                 this.props.form.validateFields((err, v) => {
-                  console.log("表单信息", v);
+                  console.log("添加字典类型", v);
                   if (!v.name) {
-                    message.warning("请填写单位名称");
+                    message.warning("请填写分组名称");
+                    return;
+                  }
+                  if (!v.code) {
+                    message.warning("请填写分组编码");
                     return;
                   }
                   this.setState({
-                    visible: false
+                    visibleType: false
                   });
                   message.success("保存成功");
                 });
               }}
               onCancel={() => {
                 this.setState({
-                  visible: false
+                  visibleType: false
                 });
               }}
             >
@@ -303,7 +343,7 @@ export default class dict extends PureComponent {
                 <Form.Item
                   label={
                     <span>
-                      <b style={{ color: "red" }}>*</b>单位名称
+                      <b style={{ color: "red" }}>*</b>分组名称
                     </span>
                   }
                   hasFeedback
@@ -313,7 +353,17 @@ export default class dict extends PureComponent {
                 <Form.Item
                   label={
                     <span>
-                      <b style={{ color: "#fff" }}>*</b>单位描述
+                      <b style={{ color: "red" }}>*</b>分组编码
+                    </span>
+                  }
+                  hasFeedback
+                >
+                  {getFieldDecorator("code", {})(<Input />)}
+                </Form.Item>
+                <Form.Item
+                  label={
+                    <span>
+                      <b style={{ color: "#fff" }}>*</b>分组描述
                     </span>
                   }
                   hasFeedback
@@ -341,7 +391,7 @@ export default class dict extends PureComponent {
                 style={{ margin: 10 }}
                 onClick={() => {
                   this.setState({
-                    visible: true
+                    visibleData: true
                   });
                 }}
               >
@@ -353,10 +403,20 @@ export default class dict extends PureComponent {
                 onClick={() => {
                   const l = selectedRowsData.length;
                   if (l === 0) {
-                    message.warning("请选择需要删除的单位");
+                    message.warning("请选择需要删除的数组字典");
                     return;
                   }
-                  message.success(`删除${l}个单位成功`);
+                  Modal.confirm({
+                    title: "删除",
+                    content: "你是否确定要删除",
+                    okText: "是",
+                    cancelText: "否",
+                    okType: "danger",
+                    onOk() {
+                      message.success(`删除${l}个数组字典成功`);
+                    },
+                    onCancel() {}
+                  });
                 }}
               >
                 删除
@@ -367,25 +427,34 @@ export default class dict extends PureComponent {
               dataSource={data}
               rowSelection={rowSelectionData}
             />
+
             <Modal
-              title="添加建设单位"
-              visible={visible}
+              title="添加数组字典"
+              visible={visibleData}
               onOk={() => {
                 this.props.form.validateFields((err, v) => {
-                  console.log("表单信息", v);
+                  console.log("添加数组字典", v);
+                  if (!v.type) {
+                    message.warning("请选择分组名称");
+                    return;
+                  }
                   if (!v.name) {
-                    message.warning("请填写单位名称");
+                    message.warning("请填写字典名称");
+                    return;
+                  }
+                  if (!v.code) {
+                    message.warning("请填写字典编码");
                     return;
                   }
                   this.setState({
-                    visible: false
+                    visibleData: false
                   });
                   message.success("保存成功");
                 });
               }}
               onCancel={() => {
                 this.setState({
-                  visible: false
+                  visibleData: false
                 });
               }}
             >
@@ -397,7 +466,31 @@ export default class dict extends PureComponent {
                 <Form.Item
                   label={
                     <span>
-                      <b style={{ color: "red" }}>*</b>单位名称
+                      <b style={{ color: "red" }}>*</b>分组名称
+                    </span>
+                  }
+                  hasFeedback
+                >
+                  {getFieldDecorator("type", {})(
+                    <Select
+                      showSearch
+                      allowClear
+                      defaultValue="1"
+                      optionFilterProp="children"
+                      style={{ width: 180 }}
+                    >
+                      {selectList.map(item => (
+                        <Select.Option value={item.value}>
+                          {item.text}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  )}
+                </Form.Item>
+                <Form.Item
+                  label={
+                    <span>
+                      <b style={{ color: "red" }}>*</b>字典名称
                     </span>
                   }
                   hasFeedback
@@ -407,7 +500,17 @@ export default class dict extends PureComponent {
                 <Form.Item
                   label={
                     <span>
-                      <b style={{ color: "#fff" }}>*</b>单位描述
+                      <b style={{ color: "red" }}>*</b>字典编码
+                    </span>
+                  }
+                  hasFeedback
+                >
+                  {getFieldDecorator("code", {})(<Input />)}
+                </Form.Item>
+                <Form.Item
+                  label={
+                    <span>
+                      <b style={{ color: "#fff" }}>*</b>字典描述
                     </span>
                   }
                   hasFeedback
