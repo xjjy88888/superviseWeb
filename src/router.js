@@ -1,8 +1,8 @@
 import React from "react";
 import { Router, Route, Switch } from "dva/router";
 import Login from "./routes/User/Login";
+import Register from "./routes/User/Register";
 import HomePage from "./routes/HomePage";
-import System from "./routes/System";
 import ProjectSupervision from "./routes/ProjectSupervision";
 import Integration from "./routes/RegionalSupervision/Integration";
 import SplitScreen from "./routes/RegionalSupervision/SplitScreen";
@@ -22,6 +22,7 @@ function RouterConfig({ history }) {
       <Switch>
         <Route path="/" exact component={Login} />
         <Route path="/user/login" exact component={Login} />
+        <Route path="/user/register" exact component={Register} />
         <Route path="/homePage" exact component={HomePage} />
         <Route
           path="/projectSupervision"

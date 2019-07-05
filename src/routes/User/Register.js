@@ -1,9 +1,10 @@
 import React, { PureComponent } from "react";
 import { createForm } from "rc-form";
 import { connect } from "dva";
-import { Form, Icon, Input, Button, Checkbox, message, Spin } from "antd";
-import config from "../../../config";
-import Spins from "../../../components/Spins";
+import { Form, Icon, Input, Button, Checkbox, message } from "antd";
+import config from "../../config";
+import Spins from "../../components/Spins";
+import { Link } from "dva/router";
 
 @connect(({ user }) => ({
   user
@@ -20,21 +21,13 @@ export default class login extends PureComponent {
 
   componentDidMount() {
     localStorage.key = "";
-    // To disabled submit button at the beginning.
     this.props.form.validateFields();
-    // console.log(
-    //   "sessionStorage",
-    //   sessionStorage.length > 0 && sessionStorage.user
-    //     ? JSON.parse(sessionStorage.user).accessToken
-    //     : ""
-    // );
   }
   handleSubmit = e => {
     sessionStorage.setItem("frequentEdit", 0);
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        // console.log(values);
         sessionStorage.setItem("frequentEdit", values.frequentEdit ? 1 : 0);
         let lastLogin;
         if (values.remember) {
@@ -130,36 +123,20 @@ export default class login extends PureComponent {
             )}
           </Form.Item>
           <Form.Item>
-            {getFieldDecorator("remember", {
-              valuePropName: "checked",
-              initialValue: lastLogin ? lastLogin.remember : ""
-            })(<Checkbox>记住我</Checkbox>)}
-            {getFieldDecorator("frequentEdit", {
-              valuePropName: "checked",
-              initialValue: false
-            })(<Checkbox style={{ float: "right" }}>频繁编辑</Checkbox>)}
-            {/* <a style={{ float: "right" }}>忘记密码</a> */}
             <Button
               type="primary"
               htmlType="submit"
               style={{ width: "100%" }}
               disabled={this.hasErrors(getFieldsError())}
             >
-              {config.isFormal ? "登录" : "测试环境登录"}
+              {config.isFormal ? "注册" : "测试环境注册"}
             </Button>
             <span>
-              去 <a>注册</a>
-            </span>
-            {/* <span style={{ float: "right" }}>
               去
-              <a
-                onClick={() => {
-                  sessionStorage.setItem("frequentEdit", true);
-                }}
-              >
-                频繁编辑
+              <a>
+                <Link to="/user/login">登录</Link>
               </a>
-            </span> */}
+            </span>
           </Form.Item>
         </Form>
       </div>
