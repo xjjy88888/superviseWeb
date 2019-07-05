@@ -23,6 +23,117 @@ import Highlighter from "react-highlight-words";
 const { Header, Footer, Sider, Content } = Layout;
 const { Title } = Typography;
 
+const data = [
+  {
+    index: "2",
+    name: "北京市",
+    up_name: "中国",
+    desc: "110033"
+  },
+  {
+    index: "1",
+    name: "广州市",
+    up_name: "广东",
+    desc: "110000"
+  },
+  {
+    index: "3",
+    name: "花都区",
+    up_name: "广州市",
+    desc: "110022"
+  },
+  {
+    index: "2",
+    name: "北京市",
+    up_name: "中国",
+    desc: "110033"
+  },
+  {
+    index: "1",
+    name: "广州市",
+    up_name: "广东",
+    desc: "110000"
+  },
+  {
+    index: "3",
+    name: "花都区",
+    up_name: "广州市",
+    desc: "110022"
+  },
+  {
+    index: "2",
+    name: "北京市",
+    up_name: "中国",
+    desc: "110033"
+  },
+  {
+    index: "1",
+    name: "广州市",
+    up_name: "广东",
+    desc: "110000"
+  },
+  {
+    index: "3",
+    name: "花都区",
+    up_name: "广州市",
+    desc: "110022"
+  },
+  {
+    index: "2",
+    name: "北京市",
+    up_name: "中国",
+    desc: "110033"
+  },
+  {
+    index: "1",
+    name: "广州市",
+    up_name: "广东",
+    desc: "110000"
+  },
+  {
+    index: "3",
+    name: "花都区",
+    up_name: "广州市",
+    desc: "110022"
+  },
+  {
+    index: "2",
+    name: "北京市",
+    up_name: "中国",
+    desc: "110033"
+  },
+  {
+    index: "1",
+    name: "广州市",
+    up_name: "广东",
+    desc: "110000"
+  },
+  {
+    index: "3",
+    name: "花都区",
+    up_name: "广州市",
+    desc: "110022"
+  },
+  {
+    index: "2",
+    name: "北京市",
+    up_name: "中国",
+    desc: "110033"
+  },
+  {
+    index: "1",
+    name: "广州市",
+    up_name: "广东",
+    desc: "110000"
+  },
+  {
+    index: "3",
+    name: "花都区",
+    up_name: "广州市",
+    desc: "110022"
+  }
+];
+
 @createForm()
 export default class area extends PureComponent {
   state = { visible: false, selectedRows: [] };
@@ -160,27 +271,6 @@ export default class area extends PureComponent {
       }
     ];
 
-    const data = [
-      {
-        index: "2",
-        name: "北京市",
-        up_name: "中国",
-        desc: "110033"
-      },
-      {
-        index: "1",
-        name: "广州市",
-        up_name: "广东",
-        desc: "110000"
-      },
-      {
-        index: "3",
-        name: "花都区",
-        up_name: "广州市",
-        desc: "110022"
-      }
-    ];
-
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
         console.log(selectedRows);
@@ -244,6 +334,7 @@ export default class area extends PureComponent {
                 </Button>
                 <Button
                   icon="delete"
+                  disabled={!selectedRows.length}
                   style={{ margin: 10 }}
                   onClick={() => {
                     const l = selectedRows.length;
@@ -364,7 +455,9 @@ export default class area extends PureComponent {
                   }
                   hasFeedback
                 >
-                  {getFieldDecorator("desc", {})(<Input />)}
+                  {getFieldDecorator("desc", {})(
+                    <Input.TextArea autosize style={{ width: 180 }} />
+                  )}
                 </Form.Item>
               </Form>
             </Modal>

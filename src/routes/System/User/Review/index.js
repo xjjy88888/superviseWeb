@@ -4,6 +4,153 @@ import { createForm } from "rc-form";
 import Systems from "../../../../components/Systems";
 import Highlighter from "react-highlight-words";
 
+const data = [
+  {
+    index: "1",
+    nickname: "花都区办事员",
+    name: "花都区办事员",
+    state: "待审核",
+    phone: 13555479658,
+    address: "广州市花都区"
+  },
+  {
+    index: "1",
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+    state: "通过",
+    phone: 16555479658,
+    address: "广州市天河区"
+  },
+  {
+    index: "1",
+    nickname: "海珠区办事员",
+    name: "海珠区办事员",
+    state: "待审核",
+    phone: 17555479658,
+    address: "广州市海珠区"
+  },
+  {
+    index: "1",
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+    state: "通过",
+    phone: 16555479658,
+    address: "广州市天河区"
+  },
+  {
+    index: "1",
+    nickname: "海珠区办事员",
+    name: "海珠区办事员",
+    state: "待审核",
+    phone: 17555479658,
+    address: "广州市海珠区"
+  },
+  {
+    index: "1",
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+    state: "通过",
+    phone: 16555479658,
+    address: "广州市天河区"
+  },
+  {
+    index: "1",
+    nickname: "海珠区办事员",
+    name: "海珠区办事员",
+    state: "待审核",
+    phone: 17555479658,
+    address: "广州市海珠区"
+  },
+  {
+    index: "1",
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+    state: "通过",
+    phone: 16555479658,
+    address: "广州市天河区"
+  },
+  {
+    index: "1",
+    nickname: "海珠区办事员",
+    name: "海珠区办事员",
+    state: "待审核",
+    phone: 17555479658,
+    address: "广州市海珠区"
+  },
+  {
+    index: "1",
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+    state: "通过",
+    phone: 16555479658,
+    address: "广州市天河区"
+  },
+  {
+    index: "1",
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+    state: "通过",
+    phone: 16555479658,
+    address: "广州市天河区"
+  },
+  {
+    index: "1",
+    nickname: "海珠区办事员",
+    name: "海珠区办事员",
+    state: "待审核",
+    phone: 17555479658,
+    address: "广州市海珠区"
+  },
+  {
+    index: "1",
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+    state: "通过",
+    phone: 16555479658,
+    address: "广州市天河区"
+  },
+  {
+    index: "1",
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+    state: "通过",
+    phone: 16555479658,
+    address: "广州市天河区"
+  },
+  {
+    index: "1",
+    nickname: "海珠区办事员",
+    name: "海珠区办事员",
+    state: "待审核",
+    phone: 17555479658,
+    address: "广州市海珠区"
+  },
+  {
+    index: "1",
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+    state: "通过",
+    phone: 16555479658,
+    address: "广州市天河区"
+  },
+  {
+    index: "1",
+    nickname: "海珠区办事员",
+    name: "海珠区办事员",
+    state: "待审核",
+    phone: 17555479658,
+    address: "广州市海珠区"
+  },
+  {
+    index: "4",
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+    state: "通过",
+    phone: 18555479658,
+    address: "广州市天河区"
+  }
+];
+
 @createForm()
 export default class review extends PureComponent {
   state = {
@@ -93,7 +240,7 @@ export default class review extends PureComponent {
         ...this.getColumnSearchProps("nickname")
       },
       {
-        title: "登录名",
+        title: "登录名称",
         dataIndex: "name",
         sorter: (a, b) => a.name.length - b.name.length,
         ...this.getColumnSearchProps("name")
@@ -141,60 +288,27 @@ export default class review extends PureComponent {
             >
               修改
             </a>
-            <a
-              onClick={() => {
-                Modal.confirm({
-                  title: "通过",
-                  content: "你是否确定要通过",
-                  okText: "是",
-                  cancelText: "否",
-                  okType: "danger",
-                  onOk() {
-                    message.success(`通过1个账号成功`);
-                  },
-                  onCancel() {}
-                });
-              }}
-            >
-              通过
-            </a>
+            {record.state === "待审核" ? (
+              <a
+                onClick={() => {
+                  Modal.confirm({
+                    title: "通过",
+                    content: "你是否确定要通过",
+                    okText: "是",
+                    cancelText: "否",
+                    okType: "danger",
+                    onOk() {
+                      message.success(`通过1个账号成功`);
+                    },
+                    onCancel() {}
+                  });
+                }}
+              >
+                通过
+              </a>
+            ) : null}
           </span>
         )
-      }
-    ];
-
-    const data = [
-      {
-        index: "1",
-        nickname: "花都区办事员",
-        name: "花都区办事员",
-        state: "待审核",
-        phone: 13555479658,
-        address: "广州市花都区"
-      },
-      {
-        index: "1",
-        nickname: "天河区办事员",
-        name: "天河区办事员",
-        state: "通过",
-        phone: 16555479658,
-        address: "广州市天河区"
-      },
-      {
-        index: "1",
-        nickname: "海珠区办事员",
-        name: "海珠区办事员",
-        state: "待审核",
-        phone: 17555479658,
-        address: "广州市海珠区"
-      },
-      {
-        index: "4",
-        nickname: "天河区办事员",
-        name: "天河区办事员",
-        state: "通过",
-        phone: 18555479658,
-        address: "广州市天河区"
       }
     ];
 
@@ -221,6 +335,7 @@ export default class review extends PureComponent {
           </Button>
           <Button
             icon="delete"
+            disabled={!selectedRows.length}
             style={{ margin: 10 }}
             onClick={() => {
               const l = selectedRows.length;
@@ -255,8 +370,24 @@ export default class review extends PureComponent {
           onOk={() => {
             this.props.form.validateFields((err, v) => {
               console.log("表单信息", v);
+              if (!v.nickname) {
+                message.warning("请填写用户名称");
+                return;
+              }
               if (!v.name) {
-                message.warning("请填写账号名称");
+                message.warning("请填写登录名称");
+                return;
+              }
+              if (!v.password) {
+                message.warning("请填写登录密码");
+                return;
+              }
+              if (!v.confirm_password) {
+                message.warning("请填写确认密码");
+                return;
+              }
+              if (v.password !== v.confirm_password) {
+                message.warning("两次密码不一致");
                 return;
               }
               this.setState({
@@ -272,6 +403,7 @@ export default class review extends PureComponent {
           }}
         >
           <Form
+            // {...formItemLayout}
             onSubmit={this.handleSubmit}
             layout="inline"
             style={{ textAlign: "center" }}
@@ -279,7 +411,17 @@ export default class review extends PureComponent {
             <Form.Item
               label={
                 <span>
-                  <b style={{ color: "red" }}>*</b>账号名称
+                  <b style={{ color: "red" }}>*</b>用户名称
+                </span>
+              }
+              hasFeedback
+            >
+              {getFieldDecorator("nickname", {})(<Input />)}
+            </Form.Item>
+            <Form.Item
+              label={
+                <span>
+                  <b style={{ color: "red" }}>*</b>登录名称
                 </span>
               }
               hasFeedback
@@ -289,12 +431,78 @@ export default class review extends PureComponent {
             <Form.Item
               label={
                 <span>
+                  <b style={{ color: "red" }}>*</b>登录密码
+                </span>
+              }
+              hasFeedback
+            >
+              {getFieldDecorator("password", {})(
+                <Input.Password style={{ width: 180 }} />
+              )}
+            </Form.Item>
+            <Form.Item
+              label={
+                <span>
+                  <b style={{ color: "red" }}>*</b>确认密码
+                </span>
+              }
+              hasFeedback
+            >
+              {getFieldDecorator("confirm_password", {})(
+                <Input.Password style={{ width: 180 }} />
+              )}
+            </Form.Item>
+            <Form.Item
+              label={
+                <span>
+                  <b style={{ color: "#fff" }}>*</b>联系电话
+                </span>
+              }
+              hasFeedback
+            >
+              {getFieldDecorator("phone", {})(<Input />)}
+            </Form.Item>
+            <Form.Item
+              label={
+                <span>
+                  <b style={{ color: "#fff" }}>*</b>电子邮箱
+                </span>
+              }
+              hasFeedback
+            >
+              {getFieldDecorator("mail", {})(<Input />)}
+            </Form.Item>
+            <Form.Item
+              label={
+                <span>
+                  <b style={{ color: "#fff" }}>*</b>所属职务
+                </span>
+              }
+              hasFeedback
+            >
+              {getFieldDecorator("post", {})(<Input />)}
+            </Form.Item>
+            <Form.Item
+              label={
+                <span>
+                  <b style={{ color: "#fff" }}>*</b>所在住址
+                </span>
+              }
+              hasFeedback
+            >
+              {getFieldDecorator("address", {})(<Input />)}
+            </Form.Item>
+            <Form.Item
+              label={
+                <span>
                   <b style={{ color: "#fff" }}>*</b>账号描述
                 </span>
               }
               hasFeedback
             >
-              {getFieldDecorator("desc", {})(<Input />)}
+              {getFieldDecorator("desc", {})(
+                <Input.TextArea autosize style={{ width: 180 }} />
+              )}
             </Form.Item>
           </Form>
         </Modal>

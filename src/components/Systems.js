@@ -146,7 +146,7 @@ export default class spins extends PureComponent {
                 )}
               </Menu>
             </Sider>
-            <Content style={{ padding: 20 }}>
+            <Content style={{ padding: 30 }}>
               <div
                 style={{
                   padding: 20,

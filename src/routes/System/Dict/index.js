@@ -14,6 +14,161 @@ import { createForm } from "rc-form";
 import Systems from "../../../components/Systems";
 import Highlighter from "react-highlight-words";
 
+const dataType = [
+  {
+    name: "审核状态",
+    code: "审核状态",
+    desc: "审核状态描述"
+  },
+  {
+    name: "立项级别",
+    code: "立项级别",
+    desc: "立项级别描述"
+  },
+  {
+    name: "项目类别",
+    code: "项目类别",
+    desc: "项目类别描述"
+  },
+  {
+    name: "审核状态",
+    code: "审核状态",
+    desc: "审核状态描述"
+  },
+  {
+    name: "立项级别",
+    code: "立项级别",
+    desc: "立项级别描述"
+  },
+  {
+    name: "项目类别",
+    code: "项目类别",
+    desc: "项目类别描述"
+  },
+  {
+    name: "审核状态",
+    code: "审核状态",
+    desc: "审核状态描述"
+  },
+  {
+    name: "立项级别",
+    code: "立项级别",
+    desc: "立项级别描述"
+  },
+  {
+    name: "项目类别",
+    code: "项目类别",
+    desc: "项目类别描述"
+  },
+  {
+    name: "审核状态",
+    code: "审核状态",
+    desc: "审核状态描述"
+  },
+  {
+    name: "立项级别",
+    code: "立项级别",
+    desc: "立项级别描述"
+  },
+  {
+    name: "项目类别",
+    code: "项目类别",
+    desc: "项目类别描述"
+  },
+  {
+    name: "审核状态",
+    code: "审核状态",
+    desc: "审核状态描述"
+  },
+  {
+    name: "立项级别",
+    code: "立项级别",
+    desc: "立项级别描述"
+  },
+  {
+    name: "项目类别",
+    code: "项目类别",
+    desc: "项目类别描述"
+  }
+];
+const data = [
+  {
+    name: "井采非金属矿",
+    code: "XMLX-22",
+    desc: "井采非金属矿描述"
+  },
+  {
+    name: "油气开采工程",
+    code: "XMLX-23",
+    desc: "油气开采工程描述"
+  },
+  {
+    name: "工业园区工程",
+    code: "XMLX-24",
+    desc: "工业园区工程描述"
+  },
+  {
+    name: "井采非金属矿",
+    code: "XMLX-22",
+    desc: "井采非金属矿描述"
+  },
+  {
+    name: "油气开采工程",
+    code: "XMLX-23",
+    desc: "油气开采工程描述"
+  },
+  {
+    name: "工业园区工程",
+    code: "XMLX-24",
+    desc: "工业园区工程描述"
+  },
+  {
+    name: "井采非金属矿",
+    code: "XMLX-22",
+    desc: "井采非金属矿描述"
+  },
+  {
+    name: "油气开采工程",
+    code: "XMLX-23",
+    desc: "油气开采工程描述"
+  },
+  {
+    name: "工业园区工程",
+    code: "XMLX-24",
+    desc: "工业园区工程描述"
+  },
+  {
+    name: "井采非金属矿",
+    code: "XMLX-22",
+    desc: "井采非金属矿描述"
+  },
+  {
+    name: "油气开采工程",
+    code: "XMLX-23",
+    desc: "油气开采工程描述"
+  },
+  {
+    name: "工业园区工程",
+    code: "XMLX-24",
+    desc: "工业园区工程描述"
+  },
+  {
+    name: "井采非金属矿",
+    code: "XMLX-22",
+    desc: "井采非金属矿描述"
+  },
+  {
+    name: "油气开采工程",
+    code: "XMLX-23",
+    desc: "油气开采工程描述"
+  },
+  {
+    name: "工业园区工程",
+    code: "XMLX-24",
+    desc: "工业园区工程描述"
+  }
+];
+
 @createForm()
 export default class dict extends PureComponent {
   state = {
@@ -200,41 +355,6 @@ export default class dict extends PureComponent {
       }
     ];
 
-    const dataType = [
-      {
-        name: "审核状态",
-        code: "审核状态",
-        desc: "审核状态描述"
-      },
-      {
-        name: "立项级别",
-        code: "立项级别",
-        desc: "立项级别描述"
-      },
-      {
-        name: "项目类别",
-        code: "项目类别",
-        desc: "项目类别描述"
-      }
-    ];
-    const data = [
-      {
-        name: "井采非金属矿",
-        code: "XMLX-22",
-        desc: "井采非金属矿描述"
-      },
-      {
-        name: "油气开采工程",
-        code: "XMLX-23",
-        desc: "油气开采工程描述"
-      },
-      {
-        name: "工业园区工程",
-        code: "XMLX-24",
-        desc: "工业园区工程描述"
-      }
-    ];
-
     const rowSelectionType = {
       onChange: (selectedRowKeys, selectedRows) => {
         console.log(selectedRows);
@@ -281,6 +401,7 @@ export default class dict extends PureComponent {
               </Button>
               <Button
                 icon="delete"
+                disabled={!selectedRowsType.length}
                 style={{ margin: 10 }}
                 onClick={() => {
                   const l = selectedRowsType.length;
@@ -368,7 +489,9 @@ export default class dict extends PureComponent {
                   }
                   hasFeedback
                 >
-                  {getFieldDecorator("desc", {})(<Input />)}
+                  {getFieldDecorator("desc", {})(
+                    <Input.TextArea autosize style={{ width: 180 }} />
+                  )}
                 </Form.Item>
               </Form>
             </Modal>
@@ -399,6 +522,7 @@ export default class dict extends PureComponent {
               </Button>
               <Button
                 icon="delete"
+                disabled={!selectedRowsData.length}
                 style={{ margin: 10 }}
                 onClick={() => {
                   const l = selectedRowsData.length;
@@ -515,7 +639,9 @@ export default class dict extends PureComponent {
                   }
                   hasFeedback
                 >
-                  {getFieldDecorator("desc", {})(<Input />)}
+                  {getFieldDecorator("desc", {})(
+                    <Input.TextArea autosize style={{ width: 180 }} />
+                  )}
                 </Form.Item>
               </Form>
             </Modal>

@@ -4,6 +4,114 @@ import { createForm } from "rc-form";
 import Systems from "../../../components/Systems";
 import Highlighter from "react-highlight-words";
 
+const data = [
+  {
+    index: "1",
+    name: "深圳市宗兴环保科技有限公司",
+    desc: "单位描述7"
+  },
+  {
+    index: "2",
+    name: "珠江水利科学研究院",
+    desc: "单位描述8"
+  },
+  {
+    index: "3",
+    name: "南宁中桂水土保持科技有限公司",
+    desc: "单位描述9"
+  },
+  {
+    index: "1",
+    name: "深圳市宗兴环保科技有限公司",
+    desc: "单位描述7"
+  },
+  {
+    index: "2",
+    name: "珠江水利科学研究院",
+    desc: "单位描述8"
+  },
+  {
+    index: "3",
+    name: "南宁中桂水土保持科技有限公司",
+    desc: "单位描述9"
+  },
+  {
+    index: "1",
+    name: "深圳市宗兴环保科技有限公司",
+    desc: "单位描述7"
+  },
+  {
+    index: "2",
+    name: "珠江水利科学研究院",
+    desc: "单位描述8"
+  },
+  {
+    index: "3",
+    name: "南宁中桂水土保持科技有限公司",
+    desc: "单位描述9"
+  },
+  {
+    index: "1",
+    name: "深圳市宗兴环保科技有限公司",
+    desc: "单位描述7"
+  },
+  {
+    index: "2",
+    name: "珠江水利科学研究院",
+    desc: "单位描述8"
+  },
+  {
+    index: "3",
+    name: "南宁中桂水土保持科技有限公司",
+    desc: "单位描述9"
+  },
+  {
+    index: "1",
+    name: "深圳市宗兴环保科技有限公司",
+    desc: "单位描述7"
+  },
+  {
+    index: "2",
+    name: "珠江水利科学研究院",
+    desc: "单位描述8"
+  },
+  {
+    index: "3",
+    name: "南宁中桂水土保持科技有限公司",
+    desc: "单位描述9"
+  },
+  {
+    index: "1",
+    name: "深圳市宗兴环保科技有限公司",
+    desc: "单位描述7"
+  },
+  {
+    index: "2",
+    name: "珠江水利科学研究院",
+    desc: "单位描述8"
+  },
+  {
+    index: "3",
+    name: "南宁中桂水土保持科技有限公司",
+    desc: "单位描述9"
+  },
+  {
+    index: "1",
+    name: "深圳市宗兴环保科技有限公司",
+    desc: "单位描述7"
+  },
+  {
+    index: "2",
+    name: "珠江水利科学研究院",
+    desc: "单位描述8"
+  },
+  {
+    index: "3",
+    name: "南宁中桂水土保持科技有限公司",
+    desc: "单位描述9"
+  },
+];
+
 @createForm()
 export default class branch extends PureComponent {
   state = {
@@ -141,24 +249,6 @@ export default class branch extends PureComponent {
       }
     ];
 
-    const data = [
-      {
-        index: "1",
-        name: "深圳市宗兴环保科技有限公司",
-        desc: "单位描述7"
-      },
-      {
-        index: "2",
-        name: "珠江水利科学研究院",
-        desc: "单位描述8"
-      },
-      {
-        index: "3",
-        name: "南宁中桂水土保持科技有限公司",
-        desc: "单位描述9"
-      }
-    ];
-
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
         console.log(selectedRows);
@@ -184,6 +274,7 @@ export default class branch extends PureComponent {
           </Button>
           <Button
             icon="delete"
+            disabled={!selectedRows.length}
             style={{ margin: 10 }}
             onClick={() => {
               const l = selectedRows.length;
@@ -275,7 +366,9 @@ export default class branch extends PureComponent {
               }
               hasFeedback
             >
-              {getFieldDecorator("desc", {})(<Input />)}
+              {getFieldDecorator("desc", {})(
+                <Input.TextArea autosize style={{ width: 180 }} />
+              )}
             </Form.Item>
           </Form>
         </Modal>

@@ -4,6 +4,84 @@ import { createForm } from "rc-form";
 import Systems from "../../../components/Systems";
 import Highlighter from "react-highlight-words";
 
+const data = [
+  {
+    index: "1",
+    name: "柳州柳狮建材有限公司",
+    desc: "单位描述7"
+  },
+  {
+    index: "2",
+    name: "广西建工建筑安装技工学校",
+    desc: "单位描述8"
+  },
+  {
+    index: "3",
+    name: "宁乡市国有资产经营有限公司",
+    desc: "单位描述9"
+  },
+  {
+    index: "1",
+    name: "柳州柳狮建材有限公司",
+    desc: "单位描述7"
+  },
+  {
+    index: "2",
+    name: "广西建工建筑安装技工学校",
+    desc: "单位描述8"
+  },
+  {
+    index: "3",
+    name: "宁乡市国有资产经营有限公司",
+    desc: "单位描述9"
+  },
+  {
+    index: "1",
+    name: "柳州柳狮建材有限公司",
+    desc: "单位描述7"
+  },
+  {
+    index: "2",
+    name: "广西建工建筑安装技工学校",
+    desc: "单位描述8"
+  },
+  {
+    index: "3",
+    name: "宁乡市国有资产经营有限公司",
+    desc: "单位描述9"
+  },
+  {
+    index: "1",
+    name: "柳州柳狮建材有限公司",
+    desc: "单位描述7"
+  },
+  {
+    index: "2",
+    name: "广西建工建筑安装技工学校",
+    desc: "单位描述8"
+  },
+  {
+    index: "3",
+    name: "宁乡市国有资产经营有限公司",
+    desc: "单位描述9"
+  },
+  {
+    index: "1",
+    name: "柳州柳狮建材有限公司",
+    desc: "单位描述7"
+  },
+  {
+    index: "2",
+    name: "广西建工建筑安装技工学校",
+    desc: "单位描述8"
+  },
+  {
+    index: "3",
+    name: "宁乡市国有资产经营有限公司",
+    desc: "单位描述9"
+  }
+];
+
 @createForm()
 export default class company extends PureComponent {
   state = {
@@ -141,24 +219,6 @@ export default class company extends PureComponent {
       }
     ];
 
-    const data = [
-      {
-        index: "1",
-        name: "柳州柳狮建材有限公司",
-        desc: "单位描述7"
-      },
-      {
-        index: "2",
-        name: "广西建工建筑安装技工学校",
-        desc: "单位描述8"
-      },
-      {
-        index: "3",
-        name: "宁乡市国有资产经营有限公司",
-        desc: "单位描述9"
-      }
-    ];
-
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
         console.log(selectedRows);
@@ -182,6 +242,7 @@ export default class company extends PureComponent {
           </Button>
           <Button
             icon="delete"
+            disabled={!selectedRows.length}
             style={{ margin: 10 }}
             onClick={() => {
               const l = selectedRows.length;
@@ -273,7 +334,9 @@ export default class company extends PureComponent {
               }
               hasFeedback
             >
-              {getFieldDecorator("desc", {})(<Input />)}
+              {getFieldDecorator("desc", {})(
+                <Input.TextArea autosize style={{ width: 180 }} />
+              )}
             </Form.Item>
           </Form>
         </Modal>
