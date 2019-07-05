@@ -333,12 +333,12 @@ export default class sider extends PureComponent {
       spot: { spotList },
       point: { pointList }
     } = this.props;
-    console.log(
-      clientHeight,
-      scrollHeight,
-      parseInt(scrollTop, 0) + 1,
-      isBottom
-    );
+    // console.log(
+    //   clientHeight,
+    //   scrollHeight,
+    //   parseInt(scrollTop, 0) + 1,
+    //   isBottom
+    // );
     if (isBottom) {
       if (loading) {
         return;
