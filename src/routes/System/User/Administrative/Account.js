@@ -14,9 +14,11 @@ import {
   Avatar,
   Tree,
   Typography,
-  Layout
+  Layout,
+  Modal
 } from "antd";
 import moment from "moment";
+import Highlighter from "react-highlight-words";
 import Systems from "../../../../components/Systems";
 
 const { Title } = Typography;
@@ -57,7 +59,7 @@ export default class account extends PureComponent {
           <div
             style={{
               display: showAdd ? "block" : "none",
-              padding: "10px 40px 0 0"
+              padding: "10px 40px 60px 0"
             }}
           >
             <Button
@@ -95,28 +97,137 @@ export default class account extends PureComponent {
 
 //列表
 class DomList extends PureComponent {
-  state = {};
+  state = { selectedRows: [] };
+  getColumnSearchProps = dataIndex => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters
+    }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={node => {
+            this.searchInput = node;
+          }}
+          value={selectedKeys[0]}
+          onChange={e =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
+          style={{ width: 188, marginBottom: 8, display: "block" }}
+        />
+        <Button
+          type="primary"
+          onClick={() => this.handleSearch(selectedKeys, confirm)}
+          icon="search"
+          size="small"
+          style={{ width: 90, marginRight: 8 }}
+        >
+          查询
+        </Button>
+        <Button
+          onClick={() => this.handleReset(clearFilters)}
+          size="small"
+          style={{ width: 90 }}
+        >
+          重置
+        </Button>
+      </div>
+    ),
+    filterIcon: filtered => (
+      <Icon type="search" style={{ color: filtered ? "#1890ff" : undefined }} />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex]
+        .toString()
+        .toLowerCase()
+        .includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: visible => {
+      if (visible) {
+        setTimeout(() => this.searchInput.select());
+      }
+    },
+    render: text => (
+      <Highlighter
+        highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+        searchWords={[this.state.searchText]}
+        autoEscape
+        textToHighlight={text.toString()}
+      />
+    )
+  });
+  handleSearch = (selectedKeys, confirm) => {
+    confirm();
+    this.setState({ searchText: selectedKeys[0] });
+  };
+
+  handleReset = clearFilters => {
+    clearFilters();
+    this.setState({ searchText: "" });
+  };
   render() {
+    const { selectedRows } = this.state;
+
     const columns = [
       {
-        title: "序号",
-        dataIndex: "key"
-      },
-      {
         title: "用户名称",
-        dataIndex: "name"
+        dataIndex: "nickname",
+        sorter: (a, b) => a.nickname.length - b.nickname.length,
+        ...this.getColumnSearchProps("nickname")
       },
       {
         title: "登录名",
-        dataIndex: "login"
+        dataIndex: "name",
+        sorter: (a, b) => a.name.length - b.name.length,
+        ...this.getColumnSearchProps("nickname")
       },
       {
         title: "联系电话",
-        dataIndex: "phone"
+        dataIndex: "phone",
+        sorter: (a, b) => a.phone - b.phone,
+        ...this.getColumnSearchProps("nickname")
       },
       {
         title: "住址",
-        dataIndex: "address"
+        dataIndex: "address",
+        sorter: (a, b) => a.address.length - b.address.length,
+        ...this.getColumnSearchProps("nickname")
+      },
+      {
+        title: "操作",
+        key: "operation",
+        render: (item, record) => (
+          <span>
+            <a
+              style={{ marginRight: 20 }}
+              onClick={() => {
+                this.setState({
+                  visible: true
+                });
+              }}
+            >
+              修改
+            </a>
+            <a
+              onClick={() => {
+                Modal.confirm({
+                  title: "删除",
+                  content: "你是否确定要删除",
+                  okText: "是",
+                  cancelText: "否",
+                  okType: "danger",
+                  onOk() {
+                    message.success(`删除1个账号成功`);
+                  },
+                  onCancel() {}
+                });
+              }}
+            >
+              删除
+            </a>
+          </span>
+        )
       }
     ];
 
@@ -124,147 +235,147 @@ class DomList extends PureComponent {
       {
         key: "1",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       },
       {
         key: "2",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       },
       {
         key: "3",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       },
       {
         key: "4",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       },
       {
         key: "5",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       },
       {
         key: "6",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       },
       {
         key: "7",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       },
       {
         key: "8",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       },
       {
         key: "9",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       },
       {
         key: "10",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       },
       {
         key: "11",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       },
       {
         key: "12",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       },
       {
         key: "13",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       },
       {
         key: "14",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       },
       {
         key: "15",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       },
       {
         key: "16",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       },
       {
         key: "17",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       },
       {
         key: "18",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       },
       {
         key: "19",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       },
       {
         key: "20",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       },
       {
         key: "21",
         name: "水利部",
-        login: "水利部办事员",
+        nickname: "水利部办事员",
         phone: "135 6666 9999",
         address: "广东省广州市天河区"
       }
@@ -273,11 +384,20 @@ class DomList extends PureComponent {
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
         console.log(selectedRows);
+        this.setState({ selectedRows: selectedRows });
       }
     };
     return (
       <Layout>
-        <Sider width={300} theme="light" style={{ borderRadius: "10px 0 0 0" }}>
+        <Sider
+          width={300}
+          theme="light"
+          style={
+            {
+              // adius: "10px 0 0 0"
+            }
+          }
+        >
           <Title level={4}>部门</Title>
           <Tree.DirectoryTree
             multiple
@@ -305,7 +425,7 @@ class DomList extends PureComponent {
         <Content
           style={{
             // padding: 20,
-            borderRadius: "0 10px 0 0",
+            // borderRadius: "0 10px 0 0",
             background: "#fff"
           }}
         >
@@ -313,33 +433,40 @@ class DomList extends PureComponent {
             用户
             <span style={{ float: "right" }}>
               <Button
-                type="primary"
-                shape="circle"
                 icon="plus"
-                style={{ marginLeft: 10 }}
+                style={{ margin: 10 }}
                 onClick={() => {
                   this.props.next(0);
                   this.props.showAdd(true);
                 }}
-              />
+              >
+                添加
+              </Button>
               <Button
-                type="primary"
-                shape="circle"
-                icon="edit"
-                style={{ marginLeft: 10 }}
-                onClick={() => {
-                  message.info("开始编辑");
-                }}
-              />
-              <Button
-                type="primary"
-                shape="circle"
                 icon="delete"
+                disabled={!selectedRows.length}
                 style={{ marginLeft: 10 }}
                 onClick={() => {
-                  message.info("开始删除");
+                  const l = selectedRows.length;
+                  if (l === 0) {
+                    message.warning("请选择需要删除的账号");
+                    return;
+                  }
+                  Modal.confirm({
+                    title: "删除",
+                    content: "你是否确定要删除",
+                    okText: "是",
+                    cancelText: "否",
+                    okType: "danger",
+                    onOk() {
+                      message.success(`删除${l}个账号成功`);
+                    },
+                    onCancel() {}
+                  });
                 }}
-              />
+              >
+                删除
+              </Button>
             </span>
           </Title>
           <Table
