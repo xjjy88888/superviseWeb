@@ -1,69 +1,69 @@
 import React, { PureComponent } from "react";
 import { createForm } from "rc-form";
 import { connect } from "dva";
-import { Form, Icon, Input, Button, Checkbox, message } from "antd";
+import { Form, Icon, Input, Button, Checkbox, Select } from "antd";
 import config from "../../config";
 import Spins from "../../components/Spins";
 import { Link } from "dva/router";
+
+const formItemLayout = {
+  labelCol: {
+    xs: { span: 24 },
+    sm: { span: 8 }
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    sm: { span: 16 }
+  }
+};
 
 @connect(({ user }) => ({
   user
 }))
 @createForm()
-export default class FormWriteUser extends PureComponent {
+export default class Registers extends PureComponent {
+  render() {
+    return <DomRegister />;
+  }
+}
+
+class register extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = {
-      isEasy: true,
-      showSpin: false
-    };
+    this.state = {};
   }
 
-  componentDidMount() {
-    localStorage.key = "";
-    this.props.form.validateFields();
-  }
+  componentDidMount() {}
   handleSubmit = e => {
-    sessionStorage.setItem("frequentEdit", 0);
     e.preventDefault();
-    this.props.form.validateFields((err, values) => {
-      if (!err) {
-        sessionStorage.setItem("frequentEdit", values.frequentEdit ? 1 : 0);
-        let lastLogin;
-        if (values.remember) {
-          lastLogin = {
-            userName: values.userName,
-            password: values.password,
-            remember: true
-          };
-        } else {
-          lastLogin = {
-            userName: "",
-            password: "",
-            remember: false
-          };
-        }
-        localStorage.setItem("lastLogin", JSON.stringify(lastLogin));
-        this.setState({ showSpin: true });
-        this.props.dispatch({
-          type: "user/login",
-          payload: {
-            userName: values.userName,
-            password: values.password
-          },
-          callback: () => {
-            this.setState({ showSpin: false });
-          }
-        });
-      } else {
-        message.warning("请输入完整");
+    this.props.form.validateFields((err, v) => {
+      if (err) {
+        console.log("注册信息: ", v);
       }
     });
   };
-
-  hasErrors = fieldsError => {
-    return Object.keys(fieldsError).some(field => fieldsError[field]);
+  handleConfirmBlur = e => {
+    const { value } = e.target;
+    this.setState({ confirmDirty: this.state.confirmDirty || value });
   };
+
+  compareToFirstPassword = (rule, value, callback) => {
+    const { form } = this.props;
+    if (value && value == form.getFieldValue("password")) {
+      callback("您输入的两个密码不一致");
+    } else {
+      callback();
+    }
+  };
+
+  validateToNextPassword = (rule, value, callback) => {
+    const { form } = this.props;
+    if (value && this.state.confirmDirty) {
+      form.validateFields(["confirm"], { force: true });
+    }
+    callback();
+  };
+
   render() {
     const { getFieldDecorator, getFieldsError } = this.props.form;
     const { showSpin } = this.state;
@@ -81,53 +81,115 @@ export default class FormWriteUser extends PureComponent {
         }}
       >
         <Spins show={showSpin} />
-        <Form onSubmit={this.handleSubmit} style={{ maxWidth: 300 }}>
-          <Form.Item>
-            <img
-              src="./img/logo.png"
-              alt=""
-              style={{ width: 30, marginRight: 10 }}
-              onClick={() => {}}
-            />
-            注册账号
+        <p>
+          <img
+            src="./img/logo.png"
+            alt=""
+            style={{ width: 30, marginRight: 10 }}
+            onClick={() => {}}
+          />
+          <span>生产建设项目水土保持信息化监管系统</span>
+        </p>
+        <Form
+          // layout="inline"
+          onSubmit={this.handleSubmit}
+          style={{ width: 300 }}
+        >
+          <Form.Item hasFeedback>
+            {getFieldDecorator("nick_name", {
+              rules: [{ required: true, message: "请输入用户名" }],
+              initialValue: ""
+            })(<Input placeholder="用户名" />)}
           </Form.Item>
-          <Form.Item>
-            {getFieldDecorator("userName", {
-              rules: [
-                { required: true, message: "Please input your userName!" }
-              ],
-              initialValue: lastLogin ? lastLogin.userName : ""
-            })(
-              <Input
-                prefix={
-                  <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />
-                }
-                placeholder="账号"
-              />
-            )}
+          <Form.Item hasFeedback>
+            {getFieldDecorator("name", {
+              rules: [{ required: true, message: "请输入登录名" }],
+              initialValue: ""
+            })(<Input placeholder="登录名" />)}
           </Form.Item>
-          <Form.Item>
+          <Form.Item hasFeedback>
             {getFieldDecorator("password", {
               rules: [
-                { required: true, message: "Please input your Password!" }
-              ],
-              initialValue: lastLogin ? lastLogin.password : ""
-            })(
-              <Input
-                prefix={
-                  <Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }} />
+                {
+                  required: true,
+                  message: "请输入登录密码"
+                },
+                {
+                  validator: this.validateToNextPassword
                 }
-                type="password"
-                placeholder="密码"
+              ]
+            })(<Input.Password placeholder="登录密码" />)}
+          </Form.Item>
+          <Form.Item hasFeedback>
+            {getFieldDecorator("confirm_password", {
+              rules: [
+                {
+                  required: true,
+                  message: "请输入确认密码"
+                },
+                {
+                  validator: this.compareToFirstPassword
+                }
+              ]
+            })(
+              <Input.Password
+                onBlur={this.handleConfirmBlur}
+                placeholder="确认密码"
               />
             )}
           </Form.Item>
+          <Form.Item hasFeedback>
+            {getFieldDecorator("desc", {
+              rules: [
+                {
+                  required: true,
+                  message: "请选择职务"
+                }
+              ]
+            })(
+              <Select
+                showSearch
+                allowClear
+                optionFilterProp="children"
+                placeholder="职务"
+                // style={{ width: 200, margin: 10 }}
+              >
+                {[
+                  { text: "管理员", value: 1 },
+                  { text: "办事员", value: 2 },
+                  { text: "负责人", value: 3 }
+                ].map(item => (
+                  <Select.Option value={item.value}>{item.text}</Select.Option>
+                ))}
+              </Select>
+            )}
+          </Form.Item>
+          <Form.Item hasFeedback>
+            {getFieldDecorator("phone", {
+              initialValue: ""
+            })(<Input placeholder="联系电话" />)}
+          </Form.Item>
+          <Form.Item hasFeedback>
+            {getFieldDecorator("mail", {
+              rules: [
+                // {
+                //   type: "email",
+                //   message: "输入的邮箱无效"
+                // },
+                // {
+                //   required: true,
+                //   message: "请输入邮箱"
+                // }
+              ]
+            })(<Input placeholder="邮箱" />)}
+          </Form.Item>
+          <Form.Item hasFeedback>
+            {getFieldDecorator("address", {
+              initialValue: ""
+            })(<Input placeholder="住址" />)}
+          </Form.Item>
           <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              style={{ width: "100%" }}
-            >
+            <Button type="primary" htmlType="submit" style={{ width: "100%" }}>
               注册
             </Button>
             <span>
@@ -142,4 +204,4 @@ export default class FormWriteUser extends PureComponent {
     );
   }
 }
-const DomWriteUser = Form.create({ name: "FormWriteUserName" })(FormWriteUser);
+const DomRegister = Form.create({ name: "registerName" })(register);

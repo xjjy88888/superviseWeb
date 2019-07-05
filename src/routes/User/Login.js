@@ -81,7 +81,7 @@ export default class login extends PureComponent {
         }}
       >
         <Spins show={showSpin} />
-        <Form onSubmit={this.handleSubmit} style={{ maxWidth: 300 }}>
+        <Form onSubmit={this.handleSubmit} style={{ width: 300 }}>
           <Form.Item>
             <img
               src="./img/logo.png"
