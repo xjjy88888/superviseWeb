@@ -9,7 +9,7 @@ const data = [
     index: "1",
     nickname: "花都区办事员",
     name: "花都区办事员",
-    state: "待审核",
+
     phone: 13555479658,
     address: "广州市花都区"
   },
@@ -17,7 +17,7 @@ const data = [
     index: "1",
     nickname: "天河区办事员",
     name: "天河区办事员",
-    state: "通过",
+
     phone: 16555479658,
     address: "广州市天河区"
   },
@@ -25,7 +25,7 @@ const data = [
     index: "1",
     nickname: "海珠区办事员",
     name: "海珠区办事员",
-    state: "待审核",
+
     phone: 17555479658,
     address: "广州市海珠区"
   },
@@ -33,7 +33,7 @@ const data = [
     index: "1",
     nickname: "天河区办事员",
     name: "天河区办事员",
-    state: "通过",
+
     phone: 16555479658,
     address: "广州市天河区"
   },
@@ -41,7 +41,7 @@ const data = [
     index: "1",
     nickname: "海珠区办事员",
     name: "海珠区办事员",
-    state: "待审核",
+
     phone: 17555479658,
     address: "广州市海珠区"
   },
@@ -49,7 +49,7 @@ const data = [
     index: "1",
     nickname: "天河区办事员",
     name: "天河区办事员",
-    state: "通过",
+
     phone: 16555479658,
     address: "广州市天河区"
   },
@@ -57,7 +57,7 @@ const data = [
     index: "1",
     nickname: "海珠区办事员",
     name: "海珠区办事员",
-    state: "待审核",
+
     phone: 17555479658,
     address: "广州市海珠区"
   },
@@ -65,7 +65,7 @@ const data = [
     index: "1",
     nickname: "天河区办事员",
     name: "天河区办事员",
-    state: "通过",
+
     phone: 16555479658,
     address: "广州市天河区"
   },
@@ -73,7 +73,7 @@ const data = [
     index: "1",
     nickname: "海珠区办事员",
     name: "海珠区办事员",
-    state: "待审核",
+
     phone: 17555479658,
     address: "广州市海珠区"
   },
@@ -81,7 +81,7 @@ const data = [
     index: "1",
     nickname: "天河区办事员",
     name: "天河区办事员",
-    state: "通过",
+
     phone: 16555479658,
     address: "广州市天河区"
   },
@@ -89,7 +89,7 @@ const data = [
     index: "1",
     nickname: "天河区办事员",
     name: "天河区办事员",
-    state: "通过",
+
     phone: 16555479658,
     address: "广州市天河区"
   },
@@ -97,7 +97,7 @@ const data = [
     index: "1",
     nickname: "海珠区办事员",
     name: "海珠区办事员",
-    state: "待审核",
+
     phone: 17555479658,
     address: "广州市海珠区"
   },
@@ -105,7 +105,7 @@ const data = [
     index: "1",
     nickname: "天河区办事员",
     name: "天河区办事员",
-    state: "通过",
+
     phone: 16555479658,
     address: "广州市天河区"
   },
@@ -113,7 +113,7 @@ const data = [
     index: "1",
     nickname: "天河区办事员",
     name: "天河区办事员",
-    state: "通过",
+
     phone: 16555479658,
     address: "广州市天河区"
   },
@@ -121,7 +121,7 @@ const data = [
     index: "1",
     nickname: "海珠区办事员",
     name: "海珠区办事员",
-    state: "待审核",
+
     phone: 17555479658,
     address: "广州市海珠区"
   },
@@ -129,7 +129,7 @@ const data = [
     index: "1",
     nickname: "天河区办事员",
     name: "天河区办事员",
-    state: "通过",
+
     phone: 16555479658,
     address: "广州市天河区"
   },
@@ -137,7 +137,7 @@ const data = [
     index: "1",
     nickname: "海珠区办事员",
     name: "海珠区办事员",
-    state: "待审核",
+
     phone: 17555479658,
     address: "广州市海珠区"
   },
@@ -145,7 +145,7 @@ const data = [
     index: "4",
     nickname: "天河区办事员",
     name: "天河区办事员",
-    state: "通过",
+
     phone: 18555479658,
     address: "广州市天河区"
   }
@@ -246,22 +246,6 @@ export default class review extends PureComponent {
         ...this.getColumnSearchProps("name")
       },
       {
-        title: "状态",
-        dataIndex: "state",
-        filters: [
-          {
-            text: "待审核",
-            value: "待审核"
-          },
-          {
-            text: "通过",
-            value: "通过"
-          }
-        ],
-        sorter: (a, b) => a.state.length - b.state.length,
-        onFilter: (value, record) => record.state.indexOf(value) === 0
-      },
-      {
         title: "联系电话",
         dataIndex: "phone",
         sorter: (a, b) => a.phone - b.phone,
@@ -288,25 +272,31 @@ export default class review extends PureComponent {
             >
               修改
             </a>
-            {record.state === "待审核" ? (
-              <a
-                onClick={() => {
-                  Modal.confirm({
-                    title: "通过",
-                    content: "你是否确定要通过",
-                    okText: "是",
-                    cancelText: "否",
-                    okType: "danger",
-                    onOk() {
-                      message.success(`通过1个账号成功`);
-                    },
-                    onCancel() {}
-                  });
-                }}
-              >
-                通过
-              </a>
-            ) : null}
+            <a
+              style={{ marginRight: 20 }}
+              onClick={() => {
+                message.success(`通过1个账号成功`);
+              }}
+            >
+              通过
+            </a>
+            <a
+              onClick={() => {
+                Modal.confirm({
+                  title: "删除",
+                  content: "你是否确定要删除",
+                  okText: "是",
+                  cancelText: "否",
+                  okType: "danger",
+                  onOk() {
+                    message.success(`删除1个账号成功`);
+                  },
+                  onCancel() {}
+                });
+              }}
+            >
+              删除
+            </a>
           </span>
         )
       }
@@ -323,17 +313,6 @@ export default class review extends PureComponent {
       <Systems>
         <span>
           <Button
-            icon="plus"
-            style={{ margin: 10 }}
-            onClick={() => {
-              this.setState({
-                visible: true
-              });
-            }}
-          >
-            添加
-          </Button>
-          <Button
             icon="delete"
             disabled={!selectedRows.length}
             style={{ margin: 10 }}
@@ -343,20 +322,35 @@ export default class review extends PureComponent {
                 message.warning("请选择需要通过的账号");
                 return;
               }
+              message.success(`通过${l}个账号成功`);
+            }}
+          >
+            通过
+          </Button>
+          <Button
+            icon="delete"
+            disabled={!selectedRows.length}
+            style={{ margin: 10 }}
+            onClick={() => {
+              const l = selectedRows.length;
+              if (l === 0) {
+                message.warning("请选择需要删除的账号");
+                return;
+              }
               Modal.confirm({
-                title: "通过",
-                content: "你是否确定要通过",
+                title: "删除",
+                content: "你是否确定要删除",
                 okText: "是",
                 cancelText: "否",
                 okType: "danger",
                 onOk() {
-                  message.success(`通过${l}个账号成功`);
+                  message.success(`删除${l}个账号成功`);
                 },
                 onCancel() {}
               });
             }}
           >
-            通过
+            删除
           </Button>
         </span>
         <Table

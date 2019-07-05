@@ -1,164 +1,103 @@
 import React, { PureComponent } from "react";
-import { Form, Icon, Input, Button, Table, message, Modal } from "antd";
-import { createForm } from "rc-form";
-import Systems from "../../../../components/Systems";
+import {
+  Steps,
+  Form,
+  Icon,
+  Input,
+  Button,
+  Table,
+  TreeSelect,
+  Select,
+  message,
+  DatePicker,
+  Radio,
+  Avatar,
+  Tree,
+  Typography,
+  Layout,
+  Modal
+} from "antd";
+import moment from "moment";
 import Highlighter from "react-highlight-words";
+import Systems from "../../../../components/Systems";
 
-const data = [
-  {
-    index: "1",
-    nickname: "花都区办事员",
-    name: "花都区办事员",
-    state: "待审核",
-    phone: 13555479658,
-    address: "广州市花都区"
-  },
-  {
-    index: "1",
-    nickname: "天河区办事员",
-    name: "天河区办事员",
-    state: "通过",
-    phone: 16555479658,
-    address: "广州市天河区"
-  },
-  {
-    index: "1",
-    nickname: "海珠区办事员",
-    name: "海珠区办事员",
-    state: "待审核",
-    phone: 17555479658,
-    address: "广州市海珠区"
-  },
-  {
-    index: "1",
-    nickname: "天河区办事员",
-    name: "天河区办事员",
-    state: "通过",
-    phone: 16555479658,
-    address: "广州市天河区"
-  },
-  {
-    index: "1",
-    nickname: "海珠区办事员",
-    name: "海珠区办事员",
-    state: "待审核",
-    phone: 17555479658,
-    address: "广州市海珠区"
-  },
-  {
-    index: "1",
-    nickname: "天河区办事员",
-    name: "天河区办事员",
-    state: "通过",
-    phone: 16555479658,
-    address: "广州市天河区"
-  },
-  {
-    index: "1",
-    nickname: "海珠区办事员",
-    name: "海珠区办事员",
-    state: "待审核",
-    phone: 17555479658,
-    address: "广州市海珠区"
-  },
-  {
-    index: "1",
-    nickname: "天河区办事员",
-    name: "天河区办事员",
-    state: "通过",
-    phone: 16555479658,
-    address: "广州市天河区"
-  },
-  {
-    index: "1",
-    nickname: "海珠区办事员",
-    name: "海珠区办事员",
-    state: "待审核",
-    phone: 17555479658,
-    address: "广州市海珠区"
-  },
-  {
-    index: "1",
-    nickname: "天河区办事员",
-    name: "天河区办事员",
-    state: "通过",
-    phone: 16555479658,
-    address: "广州市天河区"
-  },
-  {
-    index: "1",
-    nickname: "天河区办事员",
-    name: "天河区办事员",
-    state: "通过",
-    phone: 16555479658,
-    address: "广州市天河区"
-  },
-  {
-    index: "1",
-    nickname: "海珠区办事员",
-    name: "海珠区办事员",
-    state: "待审核",
-    phone: 17555479658,
-    address: "广州市海珠区"
-  },
-  {
-    index: "1",
-    nickname: "天河区办事员",
-    name: "天河区办事员",
-    state: "通过",
-    phone: 16555479658,
-    address: "广州市天河区"
-  },
-  {
-    index: "1",
-    nickname: "天河区办事员",
-    name: "天河区办事员",
-    state: "通过",
-    phone: 16555479658,
-    address: "广州市天河区"
-  },
-  {
-    index: "1",
-    nickname: "海珠区办事员",
-    name: "海珠区办事员",
-    state: "待审核",
-    phone: 17555479658,
-    address: "广州市海珠区"
-  },
-  {
-    index: "1",
-    nickname: "天河区办事员",
-    name: "天河区办事员",
-    state: "通过",
-    phone: 16555479658,
-    address: "广州市天河区"
-  },
-  {
-    index: "1",
-    nickname: "海珠区办事员",
-    name: "海珠区办事员",
-    state: "待审核",
-    phone: 17555479658,
-    address: "广州市海珠区"
-  },
-  {
-    index: "4",
-    nickname: "天河区办事员",
-    name: "天河区办事员",
-    state: "通过",
-    phone: 18555479658,
-    address: "广州市天河区"
-  }
-];
+const { Title } = Typography;
+const { Header, Footer, Sider, Content } = Layout;
 
-@createForm()
-export default class role extends PureComponent {
+export default class account extends PureComponent {
   state = {
     state: 0,
-    visible: false,
-    selectedRows: []
+    showAdd: false
   };
 
+  next = v => {
+    this.setState({ state: v });
+  };
+
+  showAdd = v => {
+    this.setState({ showAdd: v });
+  };
+
+  render() {
+    const { state, showAdd } = this.state;
+
+    return (
+      <Systems>
+        <div
+          style={{
+            background: "#fff",
+            position: "relative",
+            height: "100%"
+          }}
+        >
+          <div style={{ display: !showAdd ? "block" : "none" }}>
+            <DomList
+              showAdd={this.showAdd.bind(this)}
+              next={this.next.bind(this)}
+            />
+          </div>
+          <div
+            style={{
+              display: showAdd ? "block" : "none",
+              padding: "10px 40px 60px 0"
+            }}
+          >
+            <Button
+              type="primary"
+              shape="circle"
+              icon="close"
+              style={{ position: "absolute", right: -10, top: -10 }}
+              onClick={() => {
+                this.showAdd(false);
+              }}
+            />
+            <Steps current={state} style={{ margin: "0 0 30px 0" }}>
+              <Steps.Step title="填写用户信息" />
+              <Steps.Step title="权限分配" />
+              <Steps.Step title="完成" />
+            </Steps>
+            <div style={{ display: state === 0 ? "block" : "none" }}>
+              <DomWriteUser next={this.next.bind(this)} />
+            </div>
+            <div style={{ display: state === 1 ? "block" : "none" }}>
+              <DomPower next={this.next.bind(this)} />
+            </div>
+            <div style={{ display: state === 2 ? "block" : "none" }}>
+              <DomFinish
+                showAdd={this.showAdd.bind(this)}
+                next={this.next.bind(this)}
+              />
+            </div>
+          </div>
+        </div>
+      </Systems>
+    );
+  }
+}
+
+//列表
+class DomList extends PureComponent {
+  state = { selectedRows: [] };
   getColumnSearchProps = dataIndex => ({
     filterDropdown: ({
       setSelectedKeys,
@@ -227,10 +166,8 @@ export default class role extends PureComponent {
     clearFilters();
     this.setState({ searchText: "" });
   };
-
   render() {
-    const { visible, selectedRows } = this.state;
-    const { getFieldDecorator, getFieldsError } = this.props.form;
+    const { selectedRows } = this.state;
 
     const columns = [
       {
@@ -240,38 +177,22 @@ export default class role extends PureComponent {
         ...this.getColumnSearchProps("nickname")
       },
       {
-        title: "登录名称",
+        title: "登录名",
         dataIndex: "name",
         sorter: (a, b) => a.name.length - b.name.length,
-        ...this.getColumnSearchProps("name")
-      },
-      {
-        title: "状态",
-        dataIndex: "state",
-        filters: [
-          {
-            text: "待审核",
-            value: "待审核"
-          },
-          {
-            text: "通过",
-            value: "通过"
-          }
-        ],
-        sorter: (a, b) => a.state.length - b.state.length,
-        onFilter: (value, record) => record.state.indexOf(value) === 0
+        ...this.getColumnSearchProps("nickname")
       },
       {
         title: "联系电话",
         dataIndex: "phone",
         sorter: (a, b) => a.phone - b.phone,
-        ...this.getColumnSearchProps("phone")
+        ...this.getColumnSearchProps("nickname")
       },
       {
         title: "住址",
         dataIndex: "address",
         sorter: (a, b) => a.address.length - b.address.length,
-        ...this.getColumnSearchProps("address")
+        ...this.getColumnSearchProps("nickname")
       },
       {
         title: "操作",
@@ -288,27 +209,175 @@ export default class role extends PureComponent {
             >
               修改
             </a>
-            {record.state === "待审核" ? (
-              <a
-                onClick={() => {
-                  Modal.confirm({
-                    title: "通过",
-                    content: "你是否确定要通过",
-                    okText: "是",
-                    cancelText: "否",
-                    okType: "danger",
-                    onOk() {
-                      message.success(`通过1个账号成功`);
-                    },
-                    onCancel() {}
-                  });
-                }}
-              >
-                通过
-              </a>
-            ) : null}
+            <a
+              onClick={() => {
+                Modal.confirm({
+                  title: "删除",
+                  content: "你是否确定要删除",
+                  okText: "是",
+                  cancelText: "否",
+                  okType: "danger",
+                  onOk() {
+                    message.success(`删除1个账号成功`);
+                  },
+                  onCancel() {}
+                });
+              }}
+            >
+              删除
+            </a>
           </span>
         )
+      }
+    ];
+
+    const data = [
+      {
+        key: "1",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "2",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "3",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "4",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "5",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "6",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "7",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "8",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "9",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "10",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "11",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "12",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "13",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "14",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "15",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "16",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "17",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "18",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "19",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "20",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "21",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
       }
     ];
 
@@ -318,17 +387,15 @@ export default class role extends PureComponent {
         this.setState({ selectedRows: selectedRows });
       }
     };
-
     return (
-      <Systems>
+      <div>
         <span>
           <Button
             icon="plus"
             style={{ margin: 10 }}
             onClick={() => {
-              this.setState({
-                visible: true
-              });
+              this.props.next(0);
+              this.props.showAdd(true);
             }}
           >
             添加
@@ -336,27 +403,27 @@ export default class role extends PureComponent {
           <Button
             icon="delete"
             disabled={!selectedRows.length}
-            style={{ margin: 10 }}
+            style={{ marginLeft: 10 }}
             onClick={() => {
               const l = selectedRows.length;
               if (l === 0) {
-                message.warning("请选择需要通过的账号");
+                message.warning("请选择需要删除的账号");
                 return;
               }
               Modal.confirm({
-                title: "通过",
-                content: "你是否确定要通过",
+                title: "删除",
+                content: "你是否确定要删除",
                 okText: "是",
                 cancelText: "否",
                 okType: "danger",
                 onOk() {
-                  message.success(`通过${l}个账号成功`);
+                  message.success(`删除${l}个账号成功`);
                 },
                 onCancel() {}
               });
             }}
           >
-            通过
+            删除
           </Button>
         </span>
         <Table
@@ -364,149 +431,309 @@ export default class role extends PureComponent {
           dataSource={data}
           rowSelection={rowSelection}
         />
-        <Modal
-          title="添加账号"
-          visible={visible}
-          onOk={() => {
-            this.props.form.validateFields((err, v) => {
-              console.log("表单信息", v);
-              if (!v.nickname) {
-                message.warning("请填写用户名称");
-                return;
+      </div>
+    );
+  }
+}
+
+//填写用户信息
+class FormWriteUser extends PureComponent {
+  state = {
+    confirmDirty: false,
+    autoCompleteResult: []
+  };
+
+  handleSubmit = e => {
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        console.log("填写用户信息", values);
+        this.props.next(1);
+      }
+    });
+  };
+
+  render() {
+    const { getFieldDecorator } = this.props.form;
+
+    const formItemLayout = {
+      labelCol: {
+        xs: { span: 24 },
+        sm: { span: 8 }
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 16 }
+      }
+    };
+
+    return (
+      <Form
+        onSubmit={this.handleSubmit}
+        {...formItemLayout}
+        style={{ width: 500, margin: "0 auto" }}
+      >
+        <Form.Item label="角色名" hasFeedback>
+          {getFieldDecorator("user", {
+            rules: [
+              {
+                required: true,
+                message: "请输入角色名"
               }
-              if (!v.name) {
-                message.warning("请填写登录名称");
-                return;
-              }
-              if (!v.password) {
-                message.warning("请填写登录密码");
-                return;
-              }
-              if (!v.confirm_password) {
-                message.warning("请填写确认密码");
-                return;
-              }
-              if (v.password !== v.confirm_password) {
-                message.warning("两次密码不一致");
-                return;
-              }
-              this.setState({
-                visible: false
-              });
-              message.success("保存成功");
-            });
-          }}
-          onCancel={() => {
-            this.setState({
-              visible: false
-            });
+            ]
+          })(
+            <Input
+              prefix={<Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />}
+            />
+          )}
+        </Form.Item>
+        <span
+          style={{
+            position: "absolute",
+            bottom: 20,
+            left: "50%",
+            transform: "translateX(-50%)"
           }}
         >
-          <Form
-            // {...formItemLayout}
-            onSubmit={this.handleSubmit}
-            layout="inline"
-            style={{ textAlign: "center" }}
+          <Button type="primary" htmlType="submit">
+            下一步
+          </Button>
+        </span>
+      </Form>
+    );
+  }
+}
+const DomWriteUser = Form.create({ name: "FormWriteUserName" })(FormWriteUser);
+
+//权限分配
+class Power extends PureComponent {
+  state = {
+    value: 1,
+    powerList: [{}]
+  };
+
+  onChange = e => {
+    console.log("radio checked", e.target.value);
+    this.setState({
+      value: e.target.value
+    });
+  };
+
+  handleSubmit = e => {
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        console.log("权限分配", values);
+        this.props.next(2);
+      }
+    });
+  };
+
+  render() {
+    const { getFieldDecorator } = this.props.form;
+    const { powerList } = this.state;
+
+    const radioStyle = {
+      display: "block",
+      height: "30px",
+      lineHeight: "30px"
+    };
+
+    const columns = [
+      {
+        title: "模块名",
+        dataIndex: "name"
+      },
+      {
+        title: "有效期",
+        dataIndex: "timeStart",
+        render: (text, record) => (
+          <span
+            onClick={() => {
+              console.log(record);
+            }}
           >
-            <Form.Item
-              label={
-                <span>
-                  <b style={{ color: "red" }}>*</b>用户名称
-                </span>
-              }
-              hasFeedback
-            >
-              {getFieldDecorator("nickname", {})(<Input />)}
-            </Form.Item>
-            <Form.Item
-              label={
-                <span>
-                  <b style={{ color: "red" }}>*</b>登录名称
-                </span>
-              }
-              hasFeedback
-            >
-              {getFieldDecorator("name", {})(<Input />)}
-            </Form.Item>
-            <Form.Item
-              label={
-                <span>
-                  <b style={{ color: "red" }}>*</b>登录密码
-                </span>
-              }
-              hasFeedback
-            >
-              {getFieldDecorator("password", {})(
-                <Input.Password style={{ width: 180 }} />
-              )}
-            </Form.Item>
-            <Form.Item
-              label={
-                <span>
-                  <b style={{ color: "red" }}>*</b>确认密码
-                </span>
-              }
-              hasFeedback
-            >
-              {getFieldDecorator("confirm_password", {})(
-                <Input.Password style={{ width: 180 }} />
-              )}
-            </Form.Item>
-            <Form.Item
-              label={
-                <span>
-                  <b style={{ color: "#fff" }}>*</b>联系电话
-                </span>
-              }
-              hasFeedback
-            >
-              {getFieldDecorator("phone", {})(<Input />)}
-            </Form.Item>
-            <Form.Item
-              label={
-                <span>
-                  <b style={{ color: "#fff" }}>*</b>电子邮箱
-                </span>
-              }
-              hasFeedback
-            >
-              {getFieldDecorator("mail", {})(<Input />)}
-            </Form.Item>
-            <Form.Item
-              label={
-                <span>
-                  <b style={{ color: "#fff" }}>*</b>所属职务
-                </span>
-              }
-              hasFeedback
-            >
-              {getFieldDecorator("post", {})(<Input />)}
-            </Form.Item>
-            <Form.Item
-              label={
-                <span>
-                  <b style={{ color: "#fff" }}>*</b>所在住址
-                </span>
-              }
-              hasFeedback
-            >
-              {getFieldDecorator("address", {})(<Input />)}
-            </Form.Item>
-            <Form.Item
-              label={
-                <span>
-                  <b style={{ color: "#fff" }}>*</b>账号描述
-                </span>
-              }
-              hasFeedback
-            >
-              {getFieldDecorator("desc", {})(
-                <Input.TextArea autosize style={{ width: 180 }} />
-              )}
-            </Form.Item>
-          </Form>
-        </Modal>
-      </Systems>
+            <DatePicker.RangePicker
+              defaultValue={[moment(record.timeStart), moment(record.timeEnd)]}
+            />
+            {/* {record.timeStart} 至 {record.timeEnd} */}
+          </span>
+        )
+      }
+    ];
+    const data = [
+      {
+        key: "1",
+        name: "区域监管",
+        timeStart: "2018-01-01",
+        timeEnd: "2018-04-01"
+      },
+      {
+        key: "2",
+        name: "项目监管",
+        timeStart: "2019-01-01",
+        timeEnd: "2019-04-01"
+      },
+      {
+        key: "3",
+        name: "责任追究",
+        timeStart: "2020-01-01",
+        timeEnd: "2020-04-01"
+      },
+      {
+        key: "4",
+        name: "责任追究",
+        timeStart: "2021-01-01",
+        timeEnd: "2021-04-01"
+      },
+      {
+        key: "5",
+        name: "责任追究",
+        timeStart: "2022-01-01",
+        timeEnd: "2022-04-01"
+      },
+      {
+        key: "6",
+        name: "责任追究",
+        timeStart: "2020-01-01",
+        timeEnd: "2020-04-01"
+      },
+      {
+        key: "7",
+        name: "责任追究",
+        timeStart: "2020-01-01",
+        timeEnd: "2020-04-01"
+      },
+      {
+        key: "8",
+        name: "责任追究",
+        timeStart: "2020-01-01",
+        timeEnd: "2020-04-01"
+      },
+      {
+        key: "9",
+        name: "责任追究",
+        timeStart: "2020-01-01",
+        timeEnd: "2020-04-01"
+      },
+      {
+        key: "10",
+        name: "责任追究",
+        timeStart: "2020-01-01",
+        timeEnd: "2020-04-01"
+      },
+      {
+        key: "11",
+        name: "责任追究",
+        timeStart: "2020-01-01",
+        timeEnd: "2020-04-01"
+      },
+      {
+        key: "12",
+        name: "责任追究",
+        timeStart: "2020-01-01",
+        timeEnd: "2020-04-01"
+      }
+    ];
+
+    const rowSelection = {
+      onChange: (selectedRowKeys, selectedRows) => {
+        console.log(selectedRows);
+      }
+    };
+
+    return (
+      <div
+        style={{
+          overflow: "auto"
+        }}
+      >
+        <Table
+          rowSelection={rowSelection}
+          columns={columns}
+          dataSource={data}
+          // pagination={{ pageSize: 9 }}
+          size="small"
+        />
+        <span
+          style={{
+            position: "absolute",
+            bottom: 20,
+            left: "50%",
+            transform: "translateX(-50%)"
+          }}
+        >
+          <Button
+            type="primary"
+            style={{ marginRight: 20 }}
+            onClick={() => {
+              this.props.next(0);
+            }}
+          >
+            上一步
+          </Button>
+          <Button
+            type="primary"
+            onClick={() => {
+              this.props.next(2);
+            }}
+          >
+            下一步
+          </Button>
+        </span>
+      </div>
+    );
+  }
+}
+const DomPower = Form.create({ name: "PowerName" })(Power);
+
+//完成
+class DomFinish extends PureComponent {
+  render() {
+    return (
+      <div>
+        <div style={{ textAlign: "center" }}>
+          <Avatar
+            style={{ backgroundColor: "#87d068" }}
+            icon="check"
+            size={80}
+          />
+          <p style={{ margin: 30, fontSize: 30 }}>创建成功</p>
+          <div>
+            <p>
+              <b>角色名：</b>
+              <span>admin</span>
+            </p>
+          </div>
+        </div>
+        <span
+          style={{
+            position: "absolute",
+            bottom: 20,
+            left: "50%",
+            transform: "translateX(-50%)"
+          }}
+        >
+          <Button
+            type="primary"
+            style={{ marginRight: 20 }}
+            onClick={() => {
+              this.props.next(0);
+            }}
+          >
+            再建一个
+          </Button>
+          <Button
+            type="primary"
+            htmlType="submit"
+            onClick={() => {
+              this.props.showAdd(false);
+            }}
+          >
+            查看用户列表
+          </Button>
+        </span>
+      </div>
     );
   }
 }

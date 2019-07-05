@@ -15,7 +15,10 @@ import {
   Tree,
   Typography,
   Layout,
-  Modal
+  Modal,
+  Checkbox,
+  Row,
+  Col
 } from "antd";
 import moment from "moment";
 import Highlighter from "react-highlight-words";
@@ -544,65 +547,6 @@ class FormWriteUser extends PureComponent {
             />
           )}
         </Form.Item>
-        <Form.Item label="用户密码" hasFeedback>
-          {getFieldDecorator("password", {
-            rules: [
-              {
-                required: true,
-                message: "请输入用户密码"
-              }
-            ]
-          })(
-            <Input.Password
-              prefix={<Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }} />}
-            />
-          )}
-        </Form.Item>
-        <Form.Item label="确认密码" hasFeedback>
-          {getFieldDecorator("confirm_password", {
-            rules: [
-              {
-                required: true,
-                message: "请输入确认密码"
-              },
-              {
-                validator: this.compareToFirstPassword
-              }
-            ]
-          })(
-            <Input.Password
-              prefix={<Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }} />}
-              onBlur={this.handleConfirmBlur}
-            />
-          )}
-        </Form.Item>
-        <Form.Item label="用户单位" hasFeedback>
-          {getFieldDecorator("department", {
-            rules: [
-              {
-                required: true,
-                message: "请选择用户单位"
-              }
-            ]
-          })(
-            <TreeSelect
-              showSearch
-              dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
-              allowClear
-              treeDefaultExpandAll
-              onChange={this.onChange}
-            >
-              <TreeSelect.TreeNode value="广东" title="广东" key="广东">
-                <TreeSelect.TreeNode value="广州" title="广州" key="广州">
-                  <TreeSelect.TreeNode value="天河" title="天河" key="天河" />
-                  <TreeSelect.TreeNode value="越秀" title="越秀" key="越秀" />
-                </TreeSelect.TreeNode>
-                <TreeSelect.TreeNode value="佛山" title="佛山" key="佛山" />
-              </TreeSelect.TreeNode>
-              <TreeSelect.TreeNode value="北京" title="北京" key="北京" />
-            </TreeSelect>
-          )}
-        </Form.Item>
         <span
           style={{
             position: "absolute",
@@ -764,27 +708,23 @@ class Power extends PureComponent {
           overflow: "hidden"
         }}
       >
-        <Radio.Group
-          onChange={this.onChange}
-          value={this.state.value}
-          style={{ float: "left", width: 300 }}
-        >
-          <Radio style={radioStyle} value={1}>
-            Web端试用角色
-          </Radio>
-          <Radio style={radioStyle} value={2}>
-            Web端付费角色
-          </Radio>
-          <Radio style={radioStyle} value={3}>
-            移动端试用角色
-          </Radio>
-          <Radio style={radioStyle} value={4}>
-            移动端付费角色
-          </Radio>
-          <Radio style={radioStyle} value={5}>
-            管理员
-          </Radio>
-        </Radio.Group>
+        <Checkbox.Group style={{ width: 200, float: "left" }}>
+          <Row>
+            {[
+              "Web端试用角色",
+              "Web端付费角色",
+              "移动端试用角色",
+              "移动端付费角色",
+              "管理员",
+              "超级管理员"
+            ].map((item, index) => (
+              <Col span={24} key={index}>
+                <Checkbox value={item}>{item}</Checkbox>
+                <br />
+              </Col>
+            ))}
+          </Row>
+        </Checkbox.Group>
         <div
           style={{
             overflow: "auto"

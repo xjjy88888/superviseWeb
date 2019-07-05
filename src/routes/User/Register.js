@@ -1,207 +1,844 @@
 import React, { PureComponent } from "react";
-import { createForm } from "rc-form";
-import { connect } from "dva";
-import { Form, Icon, Input, Button, Checkbox, Select } from "antd";
-import config from "../../config";
-import Spins from "../../components/Spins";
+import {
+  Steps,
+  Form,
+  Icon,
+  Input,
+  Button,
+  Table,
+  TreeSelect,
+  Select,
+  message,
+  DatePicker,
+  Radio,
+  Avatar,
+  Tree,
+  Typography,
+  Layout,
+  Modal,
+  Checkbox,
+  Row,
+  Col
+} from "antd";
+import moment from "moment";
 import { Link } from "dva/router";
+import Highlighter from "react-highlight-words";
 
-const formItemLayout = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 8 }
-  },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 16 }
-  }
-};
+const { Title } = Typography;
+const { Header, Footer, Sider, Content } = Layout;
 
-@connect(({ user }) => ({
-  user
-}))
-@createForm()
-export default class Registers extends PureComponent {
-  render() {
-    return <DomRegister />;
-  }
-}
-
-class register extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  componentDidMount() {}
-  handleSubmit = e => {
-    e.preventDefault();
-    this.props.form.validateFields((err, v) => {
-      if (err) {
-        console.log("注册信息: ", v);
-      }
-    });
-  };
-  handleConfirmBlur = e => {
-    const { value } = e.target;
-    this.setState({ confirmDirty: this.state.confirmDirty || value });
+export default class account extends PureComponent {
+  state = {
+    state: 0,
+    showAdd: false
   };
 
-  compareToFirstPassword = (rule, value, callback) => {
-    const { form } = this.props;
-    if (value && value == form.getFieldValue("password")) {
-      callback("您输入的两个密码不一致");
-    } else {
-      callback();
-    }
+  next = v => {
+    this.setState({ state: v });
   };
 
-  validateToNextPassword = (rule, value, callback) => {
-    const { form } = this.props;
-    if (value && this.state.confirmDirty) {
-      form.validateFields(["confirm"], { force: true });
-    }
-    callback();
+  showAdd = v => {
+    this.setState({ showAdd: v });
   };
 
   render() {
-    const { getFieldDecorator, getFieldsError } = this.props.form;
-    const { showSpin } = this.state;
-    const lastLogin = JSON.parse(localStorage.getItem("lastLogin"));
+    const { state, showAdd } = this.state;
+
     return (
-      <div
+      <Layout
         style={{
+          transform: " translate(-50%,-50%)",
           position: "absolute",
           top: "50%",
           left: "50%",
-          transform: "translate(-50%,-50%)",
           background: "#fff",
+          width: 1000,
+          height: "85%",
           padding: 50,
           borderRadius: 10
         }}
       >
-        <Spins show={showSpin} />
-        <p>
-          <img
-            src="./img/logo.png"
-            alt=""
-            style={{ width: 30, marginRight: 10 }}
+        <Link to="/user/login">
+          <Button
+            type="primary"
+            shape="circle"
+            icon="close"
+            style={{ position: "absolute", right: 20, top: 20 }}
             onClick={() => {}}
           />
-          <span>生产建设项目水土保持信息化监管系统</span>
-        </p>
-        <Form
-          // layout="inline"
-          onSubmit={this.handleSubmit}
-          style={{ width: 300 }}
+        </Link>
+        <Header style={{ background: "#fff", margin: "0 0 30px 0" }}>
+          <Steps
+            current={state}
+            style={{ background: "#fff", margin: "0 0 30px 0" }}
+          >
+            <Steps.Step title="填写用户信息" />
+            <Steps.Step title="权限分配" />
+            <Steps.Step title="完成" />
+          </Steps>
+        </Header>
+        <Content style={{ position: "relative" }}>
+          <div style={{ display: state === 0 ? "block" : "none" }}>
+            <DomWriteUser next={this.next.bind(this)} />
+          </div>
+          <div style={{ display: state === 1 ? "block" : "none" }}>
+            <DomPower next={this.next.bind(this)} />
+          </div>
+          <div style={{ display: state === 2 ? "block" : "none" }}>
+            <DomFinish
+              showAdd={this.showAdd.bind(this)}
+              next={this.next.bind(this)}
+            />
+          </div>
+        </Content>
+      </Layout>
+    );
+  }
+}
+
+//列表
+class DomList extends PureComponent {
+  state = { selectedRows: [] };
+  getColumnSearchProps = dataIndex => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters
+    }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={node => {
+            this.searchInput = node;
+          }}
+          value={selectedKeys[0]}
+          onChange={e =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
+          style={{ width: 188, marginBottom: 8, display: "block" }}
+        />
+        <Button
+          type="primary"
+          onClick={() => this.handleSearch(selectedKeys, confirm)}
+          icon="search"
+          size="small"
+          style={{ width: 90, marginRight: 8 }}
         >
-          <Form.Item hasFeedback>
-            {getFieldDecorator("nick_name", {
-              rules: [{ required: true, message: "请输入用户名" }],
-              initialValue: ""
-            })(<Input placeholder="用户名" />)}
-          </Form.Item>
-          <Form.Item hasFeedback>
-            {getFieldDecorator("name", {
-              rules: [{ required: true, message: "请输入登录名" }],
-              initialValue: ""
-            })(<Input placeholder="登录名" />)}
-          </Form.Item>
-          <Form.Item hasFeedback>
-            {getFieldDecorator("password", {
-              rules: [
-                {
-                  required: true,
-                  message: "请输入登录密码"
-                },
-                {
-                  validator: this.validateToNextPassword
-                }
-              ]
-            })(<Input.Password placeholder="登录密码" />)}
-          </Form.Item>
-          <Form.Item hasFeedback>
-            {getFieldDecorator("confirm_password", {
-              rules: [
-                {
-                  required: true,
-                  message: "请输入确认密码"
-                },
-                {
-                  validator: this.compareToFirstPassword
-                }
-              ]
-            })(
-              <Input.Password
-                onBlur={this.handleConfirmBlur}
-                placeholder="确认密码"
-              />
-            )}
-          </Form.Item>
-          <Form.Item hasFeedback>
-            {getFieldDecorator("desc", {
-              rules: [
-                {
-                  required: true,
-                  message: "请选择职务"
-                }
-              ]
-            })(
-              <Select
-                showSearch
-                allowClear
-                optionFilterProp="children"
-                placeholder="职务"
-                // style={{ width: 200, margin: 10 }}
+          查询
+        </Button>
+        <Button
+          onClick={() => this.handleReset(clearFilters)}
+          size="small"
+          style={{ width: 90 }}
+        >
+          重置
+        </Button>
+      </div>
+    ),
+    filterIcon: filtered => (
+      <Icon type="search" style={{ color: filtered ? "#1890ff" : undefined }} />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex]
+        .toString()
+        .toLowerCase()
+        .includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: visible => {
+      if (visible) {
+        setTimeout(() => this.searchInput.select());
+      }
+    },
+    render: text => (
+      <Highlighter
+        highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+        searchWords={[this.state.searchText]}
+        autoEscape
+        textToHighlight={text.toString()}
+      />
+    )
+  });
+  handleSearch = (selectedKeys, confirm) => {
+    confirm();
+    this.setState({ searchText: selectedKeys[0] });
+  };
+
+  handleReset = clearFilters => {
+    clearFilters();
+    this.setState({ searchText: "" });
+  };
+  render() {
+    const { selectedRows } = this.state;
+
+    const columns = [
+      {
+        title: "用户名称",
+        dataIndex: "nickname",
+        sorter: (a, b) => a.nickname.length - b.nickname.length,
+        ...this.getColumnSearchProps("nickname")
+      },
+      {
+        title: "登录名",
+        dataIndex: "name",
+        sorter: (a, b) => a.name.length - b.name.length,
+        ...this.getColumnSearchProps("nickname")
+      },
+      {
+        title: "联系电话",
+        dataIndex: "phone",
+        sorter: (a, b) => a.phone - b.phone,
+        ...this.getColumnSearchProps("nickname")
+      },
+      {
+        title: "住址",
+        dataIndex: "address",
+        sorter: (a, b) => a.address.length - b.address.length,
+        ...this.getColumnSearchProps("nickname")
+      },
+      {
+        title: "操作",
+        key: "operation",
+        render: (item, record) => (
+          <span>
+            <a
+              style={{ marginRight: 20 }}
+              onClick={() => {
+                this.setState({
+                  visible: true
+                });
+              }}
+            >
+              修改
+            </a>
+            <a
+              onClick={() => {
+                Modal.confirm({
+                  title: "删除",
+                  content: "你是否确定要删除",
+                  okText: "是",
+                  cancelText: "否",
+                  okType: "danger",
+                  onOk() {
+                    message.success(`删除1个账号成功`);
+                  },
+                  onCancel() {}
+                });
+              }}
+            >
+              删除
+            </a>
+          </span>
+        )
+      }
+    ];
+
+    const data = [
+      {
+        key: "1",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "2",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "3",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "4",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "5",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "6",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "7",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "8",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "9",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "10",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "11",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "12",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "13",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "14",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "15",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "16",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "17",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "18",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "19",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "20",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      },
+      {
+        key: "21",
+        name: "水利部",
+        nickname: "水利部办事员",
+        phone: "135 6666 9999",
+        address: "广东省广州市天河区"
+      }
+    ];
+
+    const rowSelection = {
+      onChange: (selectedRowKeys, selectedRows) => {
+        console.log(selectedRows);
+        this.setState({ selectedRows: selectedRows });
+      }
+    };
+    return (
+      <Layout>
+        <Sider
+          width={300}
+          theme="light"
+          style={
+            {
+              // adius: "10px 0 0 0"
+            }
+          }
+        >
+          <Title level={4}>部门</Title>
+          <Tree.DirectoryTree
+            multiple
+            defaultExpandAll
+            onSelect={(keys, event) => {
+              console.log("Trigger Select", keys, event);
+            }}
+          >
+            <Tree.TreeNode title="中华人民共和国水利部" key="0-0">
+              <Tree.TreeNode title="贵州省水利厅" key="0-0-0">
+                <Tree.TreeNode title="贵阳市水务管理局" key="0-0-0-0" isLeaf />
+                <Tree.TreeNode title="遵义市水务局" key="0-0-0-1" isLeaf />
+                <Tree.TreeNode title="毕节市水务局" key="0-0-0-2" isLeaf />
+              </Tree.TreeNode>
+              <Tree.TreeNode title="广东省水利厅" key="0-0-1">
+                <Tree.TreeNode title="广州市水务局" key="0-0-1-0" isLeaf />
+              </Tree.TreeNode>
+              <Tree.TreeNode title="广西壮族自治区水利厅" key="0-0-2">
+                <Tree.TreeNode title="南宁市水务局" key="0-0-2-0" isLeaf />
+                <Tree.TreeNode title="北海市水务局" key="0-0-2-1" isLeaf />
+              </Tree.TreeNode>
+            </Tree.TreeNode>
+          </Tree.DirectoryTree>
+        </Sider>
+        <Content
+          style={{
+            // padding: 20,
+            // borderRadius: "0 10px 0 0",
+            background: "#fff"
+          }}
+        >
+          <Title level={4}>
+            用户
+            <span style={{ float: "right" }}>
+              <Button
+                icon="plus"
+                style={{ margin: 10 }}
+                onClick={() => {
+                  this.props.next(0);
+                  this.props.showAdd(true);
+                }}
               >
-                {[
-                  { text: "管理员", value: 1 },
-                  { text: "办事员", value: 2 },
-                  { text: "负责人", value: 3 }
-                ].map(item => (
-                  <Select.Option value={item.value}>{item.text}</Select.Option>
-                ))}
-              </Select>
-            )}
-          </Form.Item>
-          <Form.Item hasFeedback>
-            {getFieldDecorator("phone", {
-              initialValue: ""
-            })(<Input placeholder="联系电话" />)}
-          </Form.Item>
-          <Form.Item hasFeedback>
-            {getFieldDecorator("mail", {
-              rules: [
-                // {
-                //   type: "email",
-                //   message: "输入的邮箱无效"
-                // },
-                // {
-                //   required: true,
-                //   message: "请输入邮箱"
-                // }
-              ]
-            })(<Input placeholder="邮箱" />)}
-          </Form.Item>
-          <Form.Item hasFeedback>
-            {getFieldDecorator("address", {
-              initialValue: ""
-            })(<Input placeholder="住址" />)}
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ width: "100%" }}>
-              注册
-            </Button>
-            <span>
-              去
-              <a>
-                <Link to="/user/login">登录</Link>
-              </a>
+                添加
+              </Button>
+              <Button
+                icon="delete"
+                disabled={!selectedRows.length}
+                style={{ marginLeft: 10 }}
+                onClick={() => {
+                  const l = selectedRows.length;
+                  if (l === 0) {
+                    message.warning("请选择需要删除的账号");
+                    return;
+                  }
+                  Modal.confirm({
+                    title: "删除",
+                    content: "你是否确定要删除",
+                    okText: "是",
+                    cancelText: "否",
+                    okType: "danger",
+                    onOk() {
+                      message.success(`删除${l}个账号成功`);
+                    },
+                    onCancel() {}
+                  });
+                }}
+              >
+                删除
+              </Button>
             </span>
-          </Form.Item>
-        </Form>
+          </Title>
+          <Table
+            columns={columns}
+            dataSource={data}
+            rowSelection={rowSelection}
+          />
+        </Content>
+      </Layout>
+    );
+  }
+}
+
+//填写用户信息
+class FormWriteUser extends PureComponent {
+  state = {
+    confirmDirty: false,
+    autoCompleteResult: []
+  };
+
+  handleSubmit = e => {
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        console.log("填写用户信息", values);
+        this.props.next(1);
+      }
+    });
+  };
+
+  compareToFirstPassword = (rule, value, callback) => {
+    const form = this.props.form;
+    if (value && value !== form.getFieldValue("password")) {
+      callback("您输入的两个密码不一致！");
+    } else {
+      callback();
+    }
+  };
+  handleConfirmBlur = e => {
+    const value = e.target.value;
+    this.setState({ confirmDirty: this.state.confirmDirty || !!value });
+  };
+
+  render() {
+    const { getFieldDecorator } = this.props.form;
+
+    const formItemLayout = {
+      labelCol: {
+        xs: { span: 24 },
+        sm: { span: 8 }
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 16 }
+      }
+    };
+
+    return (
+      <Form
+        onSubmit={this.handleSubmit}
+        {...formItemLayout}
+        style={{ width: 500, margin: "0 auto" }}
+      >
+        <Form.Item label="用户名" hasFeedback>
+          {getFieldDecorator("user", {
+            rules: [
+              {
+                required: true,
+                message: "请输入用户名"
+              }
+            ]
+          })(
+            <Input
+              prefix={<Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />}
+            />
+          )}
+        </Form.Item>
+        <Form.Item label="用户名" hasFeedback>
+          {getFieldDecorator("user", {
+            rules: [
+              {
+                required: true,
+                message: "请选择用户类型"
+              }
+            ]
+          })(
+            <Select
+              showSearch
+              allowClear
+              optionFilterProp="children"
+              placeholder="用户类型"
+            >
+              {[
+                { text: "管理员", value: 1 },
+                { text: "社会用户", value: 2 },
+                { text: "行政用户", value: 3 }
+              ].map(item => (
+                <Select.Option value={item.value}>{item.text}</Select.Option>
+              ))}
+            </Select>
+          )}
+        </Form.Item>
+        <span
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: "50%",
+            transform: "translateX(-50%)"
+          }}
+        >
+          <Button type="primary" htmlType="submit">
+            下一步
+          </Button>
+        </span>
+      </Form>
+    );
+  }
+}
+const DomWriteUser = Form.create({ name: "FormWriteUserName" })(FormWriteUser);
+
+//权限分配
+class Power extends PureComponent {
+  state = {
+    value: 1,
+    powerList: [{}]
+  };
+
+  onChange = e => {
+    console.log("radio checked", e.target.value);
+    this.setState({
+      value: e.target.value
+    });
+  };
+
+  handleSubmit = e => {
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        console.log("权限分配", values);
+        this.props.next(2);
+      }
+    });
+  };
+
+  render() {
+    const { getFieldDecorator } = this.props.form;
+    const { powerList } = this.state;
+
+    const radioStyle = {
+      display: "block",
+      height: "30px",
+      lineHeight: "30px"
+    };
+
+    const columns = [
+      {
+        title: "模块名",
+        dataIndex: "name"
+      },
+      {
+        title: "有效期",
+        dataIndex: "timeStart",
+        render: (text, record) => (
+          <span
+            onClick={() => {
+              console.log(record);
+            }}
+          >
+            <DatePicker.RangePicker
+              defaultValue={[moment(record.timeStart), moment(record.timeEnd)]}
+            />
+            {/* {record.timeStart} 至 {record.timeEnd} */}
+          </span>
+        )
+      }
+    ];
+    const data = [
+      {
+        key: "1",
+        name: "区域监管",
+        timeStart: "2018-01-01",
+        timeEnd: "2018-04-01"
+      },
+      {
+        key: "2",
+        name: "项目监管",
+        timeStart: "2019-01-01",
+        timeEnd: "2019-04-01"
+      },
+      {
+        key: "3",
+        name: "责任追究",
+        timeStart: "2020-01-01",
+        timeEnd: "2020-04-01"
+      },
+      {
+        key: "4",
+        name: "责任追究",
+        timeStart: "2021-01-01",
+        timeEnd: "2021-04-01"
+      },
+      {
+        key: "5",
+        name: "责任追究",
+        timeStart: "2022-01-01",
+        timeEnd: "2022-04-01"
+      },
+      {
+        key: "6",
+        name: "责任追究",
+        timeStart: "2020-01-01",
+        timeEnd: "2020-04-01"
+      },
+      {
+        key: "7",
+        name: "责任追究",
+        timeStart: "2020-01-01",
+        timeEnd: "2020-04-01"
+      },
+      {
+        key: "8",
+        name: "责任追究",
+        timeStart: "2020-01-01",
+        timeEnd: "2020-04-01"
+      },
+      {
+        key: "9",
+        name: "责任追究",
+        timeStart: "2020-01-01",
+        timeEnd: "2020-04-01"
+      },
+      {
+        key: "10",
+        name: "责任追究",
+        timeStart: "2020-01-01",
+        timeEnd: "2020-04-01"
+      },
+      {
+        key: "11",
+        name: "责任追究",
+        timeStart: "2020-01-01",
+        timeEnd: "2020-04-01"
+      },
+      {
+        key: "12",
+        name: "责任追究",
+        timeStart: "2020-01-01",
+        timeEnd: "2020-04-01"
+      }
+    ];
+
+    const rowSelection = {
+      onChange: (selectedRowKeys, selectedRows) => {
+        console.log(selectedRows);
+      }
+    };
+
+    return (
+      <div
+        style={{
+          overflow: "hidden"
+        }}
+      >
+        <Checkbox.Group style={{ width: 200, float: "left" }}>
+          <Row>
+            {[
+              "Web端试用角色",
+              "Web端付费角色",
+              "移动端试用角色",
+              "移动端付费角色",
+              "管理员",
+              "超级管理员"
+            ].map((item, index) => (
+              <Col span={24} key={index}>
+                <Checkbox value={item}>{item}</Checkbox>
+                <br />
+              </Col>
+            ))}
+          </Row>
+        </Checkbox.Group>
+        <div
+          style={{
+            overflow: "auto"
+          }}
+        >
+          <Table
+            rowSelection={rowSelection}
+            columns={columns}
+            dataSource={data}
+            // pagination={{ pageSize: 9 }}
+            size="small"
+          />
+          <span
+            style={{
+              position: "absolute",
+              bottom: 20,
+              left: "50%",
+              transform: "translateX(-50%)"
+            }}
+          >
+            <Button
+              type="primary"
+              style={{ marginRight: 20 }}
+              onClick={() => {
+                this.props.next(0);
+              }}
+            >
+              上一步
+            </Button>
+            <Button
+              type="primary"
+              onClick={() => {
+                this.props.next(2);
+              }}
+            >
+              下一步
+            </Button>
+          </span>
+        </div>
       </div>
     );
   }
 }
-const DomRegister = Form.create({ name: "registerName" })(register);
+const DomPower = Form.create({ name: "PowerName" })(Power);
+
+//完成
+class DomFinish extends PureComponent {
+  render() {
+    return (
+      <div>
+        <div style={{ textAlign: "center" }}>
+          <Avatar
+            style={{ backgroundColor: "#87d068" }}
+            icon="check"
+            size={80}
+          />
+          <p style={{ margin: 30, fontSize: 30 }}>创建成功</p>
+          <div>
+            <p>
+              <b>用户名：</b>
+              <span>描述内容详细内容</span>
+            </p>
+            <p>
+              <b>用户名：</b>
+              <span>描述内容详细内容</span>
+            </p>
+            <p>
+              <b>用户名：</b>
+              <span>描述内容详细内容</span>
+            </p>
+          </div>
+        </div>
+        <span
+          style={{
+            position: "absolute",
+            bottom: 20,
+            left: "50%",
+            transform: "translateX(-50%)"
+          }}
+        >
+          <Button
+            type="primary"
+            style={{ marginRight: 20 }}
+            onClick={() => {
+              this.props.next(0);
+            }}
+          >
+            再建一个
+          </Button>
+        </span>
+      </div>
+    );
+  }
+}

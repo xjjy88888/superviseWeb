@@ -21,11 +21,11 @@ const menuList = [
         key: "/user/manager"
       },
       {
-        title: "社会用户账号",
+        title: "社会用户",
         key: "/user/society"
       },
       {
-        title: "行政部门账号",
+        title: "行政用户",
         key: "/user/administrative",
         subMenu: [
           {
