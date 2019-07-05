@@ -10,7 +10,7 @@ import { Link } from "dva/router";
   user
 }))
 @createForm()
-export default class login extends PureComponent {
+export default class FormWriteUser extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -89,7 +89,7 @@ export default class login extends PureComponent {
               style={{ width: 30, marginRight: 10 }}
               onClick={() => {}}
             />
-            生产建设项目水土保持信息化监管系统
+            注册账号
           </Form.Item>
           <Form.Item>
             {getFieldDecorator("userName", {
@@ -127,9 +127,8 @@ export default class login extends PureComponent {
               type="primary"
               htmlType="submit"
               style={{ width: "100%" }}
-              disabled={this.hasErrors(getFieldsError())}
             >
-              {config.isFormal ? "注册" : "测试环境注册"}
+              注册
             </Button>
             <span>
               去
@@ -143,3 +142,4 @@ export default class login extends PureComponent {
     );
   }
 }
+const DomWriteUser = Form.create({ name: "FormWriteUserName" })(FormWriteUser);
