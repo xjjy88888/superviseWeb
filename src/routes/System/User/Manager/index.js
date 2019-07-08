@@ -2,6 +2,7 @@ import React, { PureComponent } from "react";
 import { Form, Icon, Input, Button, Table, message, Modal } from "antd";
 import { createForm } from "rc-form";
 import Systems from "../../../../components/Systems";
+import { Link } from "dva/router";
 import Highlighter from "react-highlight-words";
 
 const data = [
@@ -265,12 +266,12 @@ export default class manager extends PureComponent {
             <a
               style={{ marginRight: 20 }}
               onClick={() => {
-                this.setState({
-                  visible: true
-                });
+                // this.setState({
+                //   visible: true
+                // });
               }}
             >
-              修改
+              <Link to="/user/register">修改</Link>
             </a>
             <a
               onClick={() => {
@@ -307,13 +308,13 @@ export default class manager extends PureComponent {
           <Button
             icon="plus"
             style={{ margin: 10 }}
-            onClick={() => {
-              this.setState({
-                visible: true
-              });
-            }}
+            // onClick={() => {
+            //   this.setState({
+            //     visible: true
+            //   });
+            // }}
           >
-            添加
+            <Link to="/user/register">添加</Link>
           </Button>
           <Button
             icon="delete"

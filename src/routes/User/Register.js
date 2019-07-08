@@ -20,6 +20,7 @@ import {
   Row,
   Col
 } from "antd";
+import { connect } from "dva";
 import moment from "moment";
 import { Link } from "dva/router";
 import Highlighter from "react-highlight-words";
@@ -27,6 +28,9 @@ import Highlighter from "react-highlight-words";
 const { Title } = Typography;
 const { Header, Footer, Sider, Content } = Layout;
 
+@connect(({ user }) => ({
+  user
+}))
 export default class account extends PureComponent {
   state = {
     state: 0,
@@ -58,15 +62,17 @@ export default class account extends PureComponent {
           borderRadius: 10
         }}
       >
-        <Link to="/user/login">
-          <Button
-            type="primary"
-            shape="circle"
-            icon="close"
-            style={{ position: "absolute", right: 20, top: 20 }}
-            onClick={() => {}}
-          />
-        </Link>
+        <Button
+          type="primary"
+          shape="circle"
+          icon="close"
+          style={{ position: "absolute", right: 20, top: 20 }}
+          onClick={() => {
+            this.props.dispatch({
+              type: "user/goBack"
+            });
+          }}
+        />
         <Header style={{ background: "#fff", margin: "0 0 30px 0" }}>
           <Steps
             current={state}

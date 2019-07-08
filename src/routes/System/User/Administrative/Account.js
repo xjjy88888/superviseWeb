@@ -22,6 +22,7 @@ import {
 } from "antd";
 import moment from "moment";
 import Highlighter from "react-highlight-words";
+import { Link } from "dva/router";
 import Systems from "../../../../components/Systems";
 
 const { Title } = Typography;
@@ -210,7 +211,7 @@ class DomList extends PureComponent {
                 });
               }}
             >
-              修改
+              <Link to="/user/register">修改</Link>
             </a>
             <a
               onClick={() => {
@@ -443,7 +444,7 @@ class DomList extends PureComponent {
                   this.props.showAdd(true);
                 }}
               >
-                添加
+                <Link to="/user/register">添加</Link>
               </Button>
               <Button
                 icon="delete"

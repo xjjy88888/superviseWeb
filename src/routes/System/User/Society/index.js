@@ -3,6 +3,7 @@ import { Form, Icon, Input, Button, Table, message, Modal } from "antd";
 import { createForm } from "rc-form";
 import Systems from "../../../../components/Systems";
 import Highlighter from "react-highlight-words";
+import { Link } from "dva/router";
 
 const data = [
   {
@@ -264,13 +265,13 @@ export default class manager extends PureComponent {
           <span>
             <a
               style={{ marginRight: 20 }}
-              onClick={() => {
-                this.setState({
-                  visible: true
-                });
-              }}
+              // onClick={() => {
+              //   this.setState({
+              //     visible: true
+              //   });
+              // }}
             >
-              修改
+              <Link to="/user/register">修改</Link>
             </a>
             <a
               onClick={() => {
@@ -307,13 +308,13 @@ export default class manager extends PureComponent {
           <Button
             icon="plus"
             style={{ margin: 10 }}
-            onClick={() => {
-              this.setState({
-                visible: true
-              });
-            }}
+            // onClick={() => {
+            //   this.setState({
+            //     visible: true
+            //   });
+            // }}
           >
-            添加
+            <Link to="/user/register">添加</Link>
           </Button>
           <Button
             icon="delete"

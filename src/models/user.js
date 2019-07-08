@@ -30,6 +30,9 @@ export default {
   },
 
   effects: {
+    *goBack({ payload }, { call, put }) {
+      yield put(routerRedux.goBack());
+    },
     *fetch({ payload }, { call, put }) {
       yield put({ type: "save" });
     },
