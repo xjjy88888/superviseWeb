@@ -155,7 +155,8 @@ export default class login extends PureComponent {
                 <a
                   onClick={() => {
                     emitter.emit("showRegister", {
-                      show: true
+                      show: true,
+                      type: "all"
                     });
                   }}
                 >

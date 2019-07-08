@@ -281,7 +281,8 @@ export default class account extends PureComponent {
               style={{ marginRight: 20 }}
               onClick={() => {
                 emitter.emit("showRegister", {
-                  show: true
+                  show: true,
+                  type: "account"
                 });
               }}
             >
@@ -362,7 +363,8 @@ export default class account extends PureComponent {
                   style={{ margin: 10 }}
                   onClick={() => {
                     emitter.emit("showRegister", {
-                      show: true
+                      show: true,
+                      type: "account"
                     });
                   }}
                 >

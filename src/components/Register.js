@@ -8,7 +8,6 @@ import {
   Table,
   TreeSelect,
   Select,
-  message,
   DatePicker,
   Radio,
   Avatar,
@@ -25,9 +24,21 @@ import moment from "moment";
 import { Link } from "dva/router";
 import Highlighter from "react-highlight-words";
 import emitter from "../utils/event";
+import { LocaleProvider } from "antd";
+import zh_CN from "antd/lib/locale-provider/zh_CN";
 
 const { Title } = Typography;
 const { Header, Footer, Sider, Content } = Layout;
+const formItemLayout = {
+  labelCol: {
+    xs: { span: 24 },
+    sm: { span: 8 }
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    sm: { span: 16 }
+  }
+};
 
 @connect(({ user }) => ({
   user
@@ -36,11 +47,19 @@ export default class register extends PureComponent {
   state = {
     show: false,
     state: 0,
-    showAdd: false
+    type: "all"
+    //all: 注册
+    //manager: 管理员
+    //society: 社会用户
+    //account: 行政用户
+    //role: 行政角色
   };
   componentDidMount() {
     this.eventEmitter = emitter.addListener("showRegister", v => {
-      this.setState({ show: v.show });
+      this.setState({
+        show: v.show,
+        type: v.type
+      });
     });
   }
 
@@ -48,12 +67,17 @@ export default class register extends PureComponent {
     this.setState({ state: v });
   };
 
+  setType = v => {
+    console.log(v);
+    this.setState(v);
+  };
+
   showAdd = v => {
     this.setState({ showAdd: v });
   };
 
   render() {
-    const { show, state, showAdd } = this.state;
+    const { show, state, type } = this.state;
 
     return (
       <Layout
@@ -102,404 +126,24 @@ export default class register extends PureComponent {
           </Header>
           <Content style={{ position: "relative" }}>
             <div style={{ display: state === 0 ? "block" : "none" }}>
-              <DomWriteUser next={this.next.bind(this)} />
+              <DomWriteUser
+                type={type}
+                next={this.next.bind(this)}
+                setType={this.setType.bind(this)}
+              />
             </div>
             <div style={{ display: state === 1 ? "block" : "none" }}>
-              <DomPower next={this.next.bind(this)} />
+              <DomPower type={type} next={this.next.bind(this)} />
             </div>
             <div style={{ display: state === 2 ? "block" : "none" }}>
               <DomFinish
+                type={type}
                 showAdd={this.showAdd.bind(this)}
                 next={this.next.bind(this)}
               />
             </div>
           </Content>
         </Layout>
-      </Layout>
-    );
-  }
-}
-
-//列表
-class DomList extends PureComponent {
-  state = { selectedRows: [] };
-  getColumnSearchProps = dataIndex => ({
-    filterDropdown: ({
-      setSelectedKeys,
-      selectedKeys,
-      confirm,
-      clearFilters
-    }) => (
-      <div style={{ padding: 8 }}>
-        <Input
-          ref={node => {
-            this.searchInput = node;
-          }}
-          value={selectedKeys[0]}
-          onChange={e =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
-          onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
-          style={{ width: 188, marginBottom: 8, display: "block" }}
-        />
-        <Button
-          type="primary"
-          onClick={() => this.handleSearch(selectedKeys, confirm)}
-          icon="search"
-          size="small"
-          style={{ width: 90, marginRight: 8 }}
-        >
-          查询
-        </Button>
-        <Button
-          onClick={() => this.handleReset(clearFilters)}
-          size="small"
-          style={{ width: 90 }}
-        >
-          重置
-        </Button>
-      </div>
-    ),
-    filterIcon: filtered => (
-      <Icon type="search" style={{ color: filtered ? "#1890ff" : undefined }} />
-    ),
-    onFilter: (value, record) =>
-      record[dataIndex]
-        .toString()
-        .toLowerCase()
-        .includes(value.toLowerCase()),
-    onFilterDropdownVisibleChange: visible => {
-      if (visible) {
-        setTimeout(() => this.searchInput.select());
-      }
-    },
-    render: text => (
-      <Highlighter
-        highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-        searchWords={[this.state.searchText]}
-        autoEscape
-        textToHighlight={text.toString()}
-      />
-    )
-  });
-  handleSearch = (selectedKeys, confirm) => {
-    confirm();
-    this.setState({ searchText: selectedKeys[0] });
-  };
-
-  handleReset = clearFilters => {
-    clearFilters();
-    this.setState({ searchText: "" });
-  };
-  render() {
-    const { selectedRows } = this.state;
-
-    const columns = [
-      {
-        title: "用户名称",
-        dataIndex: "nickname",
-        sorter: (a, b) => a.nickname.length - b.nickname.length,
-        ...this.getColumnSearchProps("nickname")
-      },
-      {
-        title: "登录名",
-        dataIndex: "name",
-        sorter: (a, b) => a.name.length - b.name.length,
-        ...this.getColumnSearchProps("nickname")
-      },
-      {
-        title: "联系电话",
-        dataIndex: "phone",
-        sorter: (a, b) => a.phone - b.phone,
-        ...this.getColumnSearchProps("nickname")
-      },
-      {
-        title: "住址",
-        dataIndex: "address",
-        sorter: (a, b) => a.address.length - b.address.length,
-        ...this.getColumnSearchProps("nickname")
-      },
-      {
-        title: "操作",
-        key: "operation",
-        render: (item, record) => (
-          <span>
-            <a
-              style={{ marginRight: 20 }}
-              onClick={() => {
-                this.setState({
-                  visible: true
-                });
-              }}
-            >
-              修改
-            </a>
-            <a
-              onClick={() => {
-                Modal.confirm({
-                  title: "删除",
-                  content: "你是否确定要删除",
-                  okText: "是",
-                  cancelText: "否",
-                  okType: "danger",
-                  onOk() {
-                    message.success(`删除1个账号成功`);
-                  },
-                  onCancel() {}
-                });
-              }}
-            >
-              删除
-            </a>
-          </span>
-        )
-      }
-    ];
-
-    const data = [
-      {
-        key: "1",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "2",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "3",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "4",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "5",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "6",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "7",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "8",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "9",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "10",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "11",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "12",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "13",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "14",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "15",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "16",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "17",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "18",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "19",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "20",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "21",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      }
-    ];
-
-    const rowSelection = {
-      onChange: (selectedRowKeys, selectedRows) => {
-        console.log(selectedRows);
-        this.setState({ selectedRows: selectedRows });
-      }
-    };
-    return (
-      <Layout>
-        <Sider
-          width={300}
-          theme="light"
-          style={
-            {
-              // adius: "10px 0 0 0"
-            }
-          }
-        >
-          <Title level={4}>部门</Title>
-          <Tree.DirectoryTree
-            multiple
-            defaultExpandAll
-            onSelect={(keys, event) => {
-              console.log("Trigger Select", keys, event);
-            }}
-          >
-            <Tree.TreeNode title="中华人民共和国水利部" key="0-0">
-              <Tree.TreeNode title="贵州省水利厅" key="0-0-0">
-                <Tree.TreeNode title="贵阳市水务管理局" key="0-0-0-0" isLeaf />
-                <Tree.TreeNode title="遵义市水务局" key="0-0-0-1" isLeaf />
-                <Tree.TreeNode title="毕节市水务局" key="0-0-0-2" isLeaf />
-              </Tree.TreeNode>
-              <Tree.TreeNode title="广东省水利厅" key="0-0-1">
-                <Tree.TreeNode title="广州市水务局" key="0-0-1-0" isLeaf />
-              </Tree.TreeNode>
-              <Tree.TreeNode title="广西壮族自治区水利厅" key="0-0-2">
-                <Tree.TreeNode title="南宁市水务局" key="0-0-2-0" isLeaf />
-                <Tree.TreeNode title="北海市水务局" key="0-0-2-1" isLeaf />
-              </Tree.TreeNode>
-            </Tree.TreeNode>
-          </Tree.DirectoryTree>
-        </Sider>
-        <Content
-          style={{
-            // padding: 20,
-            // borderRadius: "0 10px 0 0",
-            background: "#fff"
-          }}
-        >
-          <Title level={4}>
-            用户
-            <span style={{ float: "right" }}>
-              <Button
-                icon="plus"
-                style={{ margin: 10 }}
-                onClick={() => {
-                  this.props.next(0);
-                  this.props.showAdd(true);
-                }}
-              >
-                添加
-              </Button>
-              <Button
-                icon="delete"
-                disabled={!selectedRows.length}
-                style={{ marginLeft: 10 }}
-                onClick={() => {
-                  const l = selectedRows.length;
-                  if (l === 0) {
-                    message.warning("请选择需要删除的账号");
-                    return;
-                  }
-                  Modal.confirm({
-                    title: "删除",
-                    content: "你是否确定要删除",
-                    okText: "是",
-                    cancelText: "否",
-                    okType: "danger",
-                    onOk() {
-                      message.success(`删除${l}个账号成功`);
-                    },
-                    onCancel() {}
-                  });
-                }}
-              >
-                删除
-              </Button>
-            </span>
-          </Title>
-          <Table
-            columns={columns}
-            dataSource={data}
-            rowSelection={rowSelection}
-          />
-        </Content>
       </Layout>
     );
   }
@@ -512,12 +156,17 @@ class FormWriteUser extends PureComponent {
     autoCompleteResult: []
   };
 
+  componentDidMount() {
+    console.log("componentDidMount");
+  }
+
   handleSubmit = e => {
     e.preventDefault();
-    this.props.form.validateFields((err, values) => {
+    this.props.form.validateFields((err, v) => {
       if (!err) {
-        console.log("填写用户信息", values);
+        console.log("填写用户信息", v);
         this.props.next(1);
+        this.props.setType({ type: v.user_type });
       }
     });
   };
@@ -536,84 +185,171 @@ class FormWriteUser extends PureComponent {
   };
 
   render() {
-    const { getFieldDecorator } = this.props.form;
-
-    const formItemLayout = {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 8 }
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 16 }
-      }
-    };
+    const { getFieldDecorator, resetFields } = this.props.form;
+    const { type } = this.props;
 
     return (
-      <Form
-        onSubmit={this.handleSubmit}
-        {...formItemLayout}
-        style={{ width: 500, margin: "0 auto" }}
-      >
-        <Form.Item label="用户名" hasFeedback>
-          {getFieldDecorator("user", {
-            rules: [
-              {
-                required: true,
-                message: "请输入用户名"
-              }
-            ]
-          })(
-            <Input
-              prefix={<Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />}
-            />
-          )}
-        </Form.Item>
-        <Form.Item label="用户名" hasFeedback>
-          {getFieldDecorator("user", {
-            rules: [
-              {
-                required: true,
-                message: "请选择用户类型"
-              }
-            ]
-          })(
-            <Select
-              showSearch
-              allowClear
-              optionFilterProp="children"
-              placeholder="用户类型"
+      <LocaleProvider locale={zh_CN}>
+        <Layout style={{ backgroundColor: "#fff" }}>
+          <Content>
+            <Form
+              onSubmit={this.handleSubmit}
+              {...formItemLayout}
+              style={{ width: 500, margin: "0 auto" }}
             >
-              {[
-                { text: "管理员", value: 1 },
-                { text: "社会用户", value: 2 },
-                { text: "行政用户", value: 3 }
-              ].map(item => (
-                <Select.Option value={item.value}>{item.text}</Select.Option>
-              ))}
-            </Select>
-          )}
-        </Form.Item>
-        <span
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: "50%",
-            transform: "translateX(-50%)"
-          }}
-        >
-          <Button type="primary" htmlType="submit">
-            下一步
-          </Button>
-        </span>
-      </Form>
+              <Form.Item label="用户名" hasFeedback>
+                {getFieldDecorator("user", {
+                  rules: [
+                    {
+                      required: true,
+                      message: "请输入用户名"
+                    }
+                  ]
+                })(<Input />)}
+              </Form.Item>
+              <Form.Item label="密码" hasFeedback>
+                {getFieldDecorator("password", {
+                  rules: [
+                    {
+                      required: true,
+                      message: "请输入密码"
+                    },
+                    {
+                      validator: this.validateToNextPassword
+                    }
+                  ]
+                })(<Input.Password />)}
+              </Form.Item>
+              <Form.Item label="确认密码" hasFeedback>
+                {getFieldDecorator("confirm", {
+                  rules: [
+                    {
+                      required: true,
+                      message: "请输入确认密码"
+                    },
+                    {
+                      validator: this.compareToFirstPassword
+                    }
+                  ]
+                })(<Input.Password onBlur={this.handleConfirmBlur} />)}
+              </Form.Item>
+              <Form.Item
+                label="用户类型"
+                hasFeedback
+                style={{ display: type === "all" ? "block" : "none" }}
+              >
+                {getFieldDecorator("user_type", {
+                  rules: [
+                    {
+                      required: type === "all",
+                      message: "请选择用户类型"
+                    }
+                  ]
+                })(
+                  <Select showSearch allowClear optionFilterProp="children">
+                    {[
+                      { text: "管理员", value: "manager" },
+                      { text: "社会用户", value: "society" },
+                      { text: "行政用户", value: "account" }
+                    ].map((item, index) => (
+                      <Select.Option value={item.value} key={index}>
+                        {item.text}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                )}
+              </Form.Item>
+              <Form.Item label="时效性" hasFeedback>
+                {getFieldDecorator("time", {
+                  rules: [
+                    {
+                      required: true,
+                      message: "请选择起止日期"
+                    }
+                  ]
+                })(<DatePicker.RangePicker />)}
+              </Form.Item>
+              <Form.Item
+                label="行政区划单位"
+                hasFeedback
+                style={{ display: type === "account" ? "block" : "none" }}
+              >
+                {getFieldDecorator("area", {
+                  rules: [
+                    {
+                      required: type === "account",
+                      message: "请选择行政区划单位"
+                    }
+                  ]
+                })(
+                  <TreeSelect
+                    showSearch
+                    value={this.state.value}
+                    dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
+                    allowClear
+                    treeDefaultExpandAll
+                    onChange={this.onChange}
+                  >
+                    <TreeSelect.TreeNode
+                      value="parent 1"
+                      title="parent 1"
+                      key="0-1"
+                    >
+                      <TreeSelect.TreeNode
+                        value="parent 1-0"
+                        title="parent 1-0"
+                        key="0-1-1"
+                      >
+                        <TreeSelect.TreeNode
+                          value="leaf1"
+                          title="my leaf"
+                          key="random"
+                        />
+                        <TreeSelect.TreeNode
+                          value="leaf2"
+                          title="your leaf"
+                          key="random1"
+                        />
+                      </TreeSelect.TreeNode>
+                      <TreeSelect.TreeNode
+                        value="parent 1-1"
+                        title="parent 1-1"
+                        key="random2"
+                      >
+                        <TreeSelect.TreeNode
+                          value="sss"
+                          title={<b style={{ color: "#08c" }}>sss</b>}
+                          key="random3"
+                        />
+                      </TreeSelect.TreeNode>
+                    </TreeSelect.TreeNode>
+                  </TreeSelect>
+                )}
+              </Form.Item>
+              <Footer
+                style={{
+                  backgroundColor: "transparent",
+                  position: "absolute",
+                  bottom: 0,
+                  left: "50%",
+                  transform: "translateX(-50%)"
+                }}
+              >
+                <Button type="primary" htmlType="submit">
+                  下一步
+                </Button>
+              </Footer>
+            </Form>
+          </Content>
+        </Layout>
+      </LocaleProvider>
     );
   }
 }
 const DomWriteUser = Form.create({ name: "FormWriteUserName" })(FormWriteUser);
 
 //权限分配
-class Power extends PureComponent {
+class power extends PureComponent {
   state = {
     value: 1,
     powerList: [{}]
@@ -639,6 +375,8 @@ class Power extends PureComponent {
   render() {
     const { getFieldDecorator } = this.props.form;
     const { powerList } = this.state;
+    const { type } = this.props;
+    console.log(type);
 
     const radioStyle = {
       display: "block",
@@ -750,79 +488,129 @@ class Power extends PureComponent {
     };
 
     return (
-      <div
-        style={{
-          overflow: "hidden"
-        }}
-      >
-        <Checkbox.Group style={{ width: 200, float: "left" }}>
-          <Row>
-            {[
-              "Web端试用角色",
-              "Web端付费角色",
-              "移动端试用角色",
-              "移动端付费角色",
-              "管理员",
-              "超级管理员"
-            ].map((item, index) => (
-              <Col span={24} key={index}>
-                <Checkbox value={item}>{item}</Checkbox>
-                <br />
-              </Col>
-            ))}
-          </Row>
-        </Checkbox.Group>
-        <div
+      <Layout style={{ backgroundColor: "#fff" }}>
+        <Sider
+          theme="light"
           style={{
-            overflow: "auto"
+            display: type === "account" ? "block" : "none"
           }}
         >
+          <Checkbox.Group>
+            <Row>
+              {[
+                "Web端试用角色",
+                "Web端付费角色",
+                "移动端试用角色",
+                "移动端付费角色",
+                "管理员",
+                "超级管理员"
+              ].map((item, index) => (
+                <Col span={24} key={index}>
+                  <Checkbox value={item}>{item}</Checkbox>
+                  <br />
+                </Col>
+              ))}
+            </Row>
+          </Checkbox.Group>
+        </Sider>
+        <Content>
+          <Form
+            onSubmit={this.handleSubmit}
+            {...formItemLayout}
+            style={{ width: 500, margin: "0 auto" }}
+          >
+            <Form.Item
+              label="所属项目"
+              hasFeedback
+              style={{ display: type === "society" ? "block" : "none" }}
+            >
+              {getFieldDecorator("project", {
+                rules: [
+                  {
+                    required: type === "society",
+                    message: "请输入所属项目"
+                  }
+                ]
+              })(<Input />)}
+            </Form.Item>
+            <Form.Item
+              label="单位类型"
+              hasFeedback
+              style={{ display: type === "society" ? "block" : "none" }}
+            >
+              {getFieldDecorator("company_type", {
+                rules: [
+                  {
+                    required: type === "society",
+                    message: "请选择单位类型"
+                  }
+                ]
+              })(
+                <Select showSearch allowClear optionFilterProp="children">
+                  {[
+                    { text: "建设单位", value: 1 },
+                    { text: "方案编制单位", value: 2 },
+                    { text: "监测单位", value: 3 },
+                    { text: "监理单位", value: 4 },
+                    { text: "设计单位", value: 5 },
+                    { text: "施工单位", value: 6 },
+                    { text: "验收报告单位", value: 7 }
+                  ].map((item, index) => (
+                    <Select.Option value={item.value} key={index}>
+                      {item.text}
+                    </Select.Option>
+                  ))}
+                </Select>
+              )}
+            </Form.Item>
+            <Footer
+              style={{
+                backgroundColor: "transparent",
+                position: "absolute",
+                bottom: 0,
+                left: "50%",
+                transform: "translateX(-50%)"
+              }}
+            >
+              <Button
+                type="primary"
+                style={{ marginRight: 20 }}
+                onClick={() => {
+                  this.props.next(0);
+                }}
+              >
+                上一步
+              </Button>
+              <Button type="primary" htmlType="submit">
+                下一步
+              </Button>
+            </Footer>
+          </Form>
+
           <Table
+            style={{
+              display: type === "account" || type === "role" ? "block" : "none"
+            }}
             rowSelection={rowSelection}
             columns={columns}
             dataSource={data}
-            // pagination={{ pageSize: 9 }}
+            // pagination={{ pageSize: 8 }}
             size="small"
           />
-          <span
-            style={{
-              position: "absolute",
-              bottom: 20,
-              left: "50%",
-              transform: "translateX(-50%)"
-            }}
-          >
-            <Button
-              type="primary"
-              style={{ marginRight: 20 }}
-              onClick={() => {
-                this.props.next(0);
-              }}
-            >
-              上一步
-            </Button>
-            <Button
-              type="primary"
-              onClick={() => {
-                this.props.next(2);
-              }}
-            >
-              下一步
-            </Button>
-          </span>
-        </div>
-      </div>
+        </Content>
+      </Layout>
     );
   }
 }
-const DomPower = Form.create({ name: "PowerName" })(Power);
+const DomPower = Form.create({ name: "PowerName" })(power);
 
 //完成
-class DomFinish extends PureComponent {
+class finish extends PureComponent {
   render() {
+    const { resetFields } = this.props.form;
     return (
-      <div>
-        <div style={{ textAlign: "center" }}>
+      <Layout style={{ backgroundColor: "#fff" }}>
+        <Content style={{ textAlign: "center" }}>
           <Avatar
             style={{ backgroundColor: "#87d068" }}
             icon="check"
@@ -843,9 +631,10 @@ class DomFinish extends PureComponent {
               <span>描述内容详细内容</span>
             </p>
           </div>
-        </div>
-        <span
+        </Content>
+        <Footer
           style={{
+            backgroundColor: "transparent",
             position: "absolute",
             bottom: 20,
             left: "50%",
@@ -856,13 +645,15 @@ class DomFinish extends PureComponent {
             type="primary"
             style={{ marginRight: 20 }}
             onClick={() => {
+              // resetFields();
               this.props.next(0);
             }}
           >
             再建一个
           </Button>
-        </span>
-      </div>
+        </Footer>
+      </Layout>
     );
   }
 }
+const DomFinish = Form.create({ name: "finishName" })(finish);
