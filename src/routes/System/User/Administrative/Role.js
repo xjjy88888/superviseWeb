@@ -1,103 +1,163 @@
 import React, { PureComponent } from "react";
-import {
-  Steps,
-  Form,
-  Icon,
-  Input,
-  Button,
-  Table,
-  TreeSelect,
-  Select,
-  message,
-  DatePicker,
-  Radio,
-  Avatar,
-  Tree,
-  Typography,
-  Layout,
-  Modal
-} from "antd";
-import moment from "moment";
-import Highlighter from "react-highlight-words";
+import { Icon, Input, Button, Table, message, Modal } from "antd";
 import Systems from "../../../../components/Systems";
+import Register from "../../../../components/Register";
+import emitter from "../../../../utils/event";
+import Highlighter from "react-highlight-words";
 
-const { Title } = Typography;
-const { Header, Footer, Sider, Content } = Layout;
+const data = [
+  {
+    index: "1",
+    nickname: "花都区办事员",
+    name: "花都区办事员",
 
-export default class account extends PureComponent {
+    phone: 13555479658,
+    address: "广州市花都区"
+  },
+  {
+    index: "1",
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+
+    phone: 16555479658,
+    address: "广州市天河区"
+  },
+  {
+    index: "1",
+    nickname: "海珠区办事员",
+    name: "海珠区办事员",
+
+    phone: 17555479658,
+    address: "广州市海珠区"
+  },
+  {
+    index: "1",
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+
+    phone: 16555479658,
+    address: "广州市天河区"
+  },
+  {
+    index: "1",
+    nickname: "海珠区办事员",
+    name: "海珠区办事员",
+
+    phone: 17555479658,
+    address: "广州市海珠区"
+  },
+  {
+    index: "1",
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+
+    phone: 16555479658,
+    address: "广州市天河区"
+  },
+  {
+    index: "1",
+    nickname: "海珠区办事员",
+    name: "海珠区办事员",
+
+    phone: 17555479658,
+    address: "广州市海珠区"
+  },
+  {
+    index: "1",
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+
+    phone: 16555479658,
+    address: "广州市天河区"
+  },
+  {
+    index: "1",
+    nickname: "海珠区办事员",
+    name: "海珠区办事员",
+
+    phone: 17555479658,
+    address: "广州市海珠区"
+  },
+  {
+    index: "1",
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+
+    phone: 16555479658,
+    address: "广州市天河区"
+  },
+  {
+    index: "1",
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+
+    phone: 16555479658,
+    address: "广州市天河区"
+  },
+  {
+    index: "1",
+    nickname: "海珠区办事员",
+    name: "海珠区办事员",
+
+    phone: 17555479658,
+    address: "广州市海珠区"
+  },
+  {
+    index: "1",
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+
+    phone: 16555479658,
+    address: "广州市天河区"
+  },
+  {
+    index: "1",
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+
+    phone: 16555479658,
+    address: "广州市天河区"
+  },
+  {
+    index: "1",
+    nickname: "海珠区办事员",
+    name: "海珠区办事员",
+
+    phone: 17555479658,
+    address: "广州市海珠区"
+  },
+  {
+    index: "1",
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+
+    phone: 16555479658,
+    address: "广州市天河区"
+  },
+  {
+    index: "1",
+    nickname: "海珠区办事员",
+    name: "海珠区办事员",
+
+    phone: 17555479658,
+    address: "广州市海珠区"
+  },
+  {
+    index: "4",
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+
+    phone: 18555479658,
+    address: "广州市天河区"
+  }
+];
+
+export default class manager extends PureComponent {
   state = {
     state: 0,
-    showAdd: false
+    selectedRows: []
   };
 
-  next = v => {
-    this.setState({ state: v });
-  };
-
-  showAdd = v => {
-    this.setState({ showAdd: v });
-  };
-
-  render() {
-    const { state, showAdd } = this.state;
-
-    return (
-      <Systems>
-        <div
-          style={{
-            background: "#fff",
-            position: "relative",
-            height: "100%"
-          }}
-        >
-          <div style={{ display: !showAdd ? "block" : "none" }}>
-            <DomList
-              showAdd={this.showAdd.bind(this)}
-              next={this.next.bind(this)}
-            />
-          </div>
-          <div
-            style={{
-              display: showAdd ? "block" : "none",
-              padding: "10px 40px 60px 0"
-            }}
-          >
-            <Button
-              type="primary"
-              shape="circle"
-              icon="close"
-              style={{ position: "absolute", right: -10, top: -10 }}
-              onClick={() => {
-                this.showAdd(false);
-              }}
-            />
-            <Steps current={state} style={{ margin: "0 0 30px 0" }}>
-              <Steps.Step title="填写用户信息" />
-              <Steps.Step title="权限分配" />
-              <Steps.Step title="完成" />
-            </Steps>
-            <div style={{ display: state === 0 ? "block" : "none" }}>
-              <DomWriteUser next={this.next.bind(this)} />
-            </div>
-            <div style={{ display: state === 1 ? "block" : "none" }}>
-              <DomPower next={this.next.bind(this)} />
-            </div>
-            <div style={{ display: state === 2 ? "block" : "none" }}>
-              <DomFinish
-                showAdd={this.showAdd.bind(this)}
-                next={this.next.bind(this)}
-              />
-            </div>
-          </div>
-        </div>
-      </Systems>
-    );
-  }
-}
-
-//列表
-class DomList extends PureComponent {
-  state = { selectedRows: [] };
   getColumnSearchProps = dataIndex => ({
     filterDropdown: ({
       setSelectedKeys,
@@ -157,6 +217,7 @@ class DomList extends PureComponent {
       />
     )
   });
+
   handleSearch = (selectedKeys, confirm) => {
     confirm();
     this.setState({ searchText: selectedKeys[0] });
@@ -166,6 +227,7 @@ class DomList extends PureComponent {
     clearFilters();
     this.setState({ searchText: "" });
   };
+
   render() {
     const { selectedRows } = this.state;
 
@@ -177,22 +239,22 @@ class DomList extends PureComponent {
         ...this.getColumnSearchProps("nickname")
       },
       {
-        title: "登录名",
+        title: "登录名称",
         dataIndex: "name",
         sorter: (a, b) => a.name.length - b.name.length,
-        ...this.getColumnSearchProps("nickname")
+        ...this.getColumnSearchProps("name")
       },
       {
         title: "联系电话",
         dataIndex: "phone",
         sorter: (a, b) => a.phone - b.phone,
-        ...this.getColumnSearchProps("nickname")
+        ...this.getColumnSearchProps("phone")
       },
       {
         title: "住址",
         dataIndex: "address",
         sorter: (a, b) => a.address.length - b.address.length,
-        ...this.getColumnSearchProps("nickname")
+        ...this.getColumnSearchProps("address")
       },
       {
         title: "操作",
@@ -202,8 +264,8 @@ class DomList extends PureComponent {
             <a
               style={{ marginRight: 20 }}
               onClick={() => {
-                this.setState({
-                  visible: true
+                emitter.emit("showRegister", {
+                  show: true
                 });
               }}
             >
@@ -218,7 +280,7 @@ class DomList extends PureComponent {
                   cancelText: "否",
                   okType: "danger",
                   onOk() {
-                    message.success(`删除1个账号成功`);
+                    message.success(`删除1个角色成功`);
                   },
                   onCancel() {}
                 });
@@ -231,171 +293,24 @@ class DomList extends PureComponent {
       }
     ];
 
-    const data = [
-      {
-        key: "1",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "2",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "3",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "4",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "5",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "6",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "7",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "8",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "9",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "10",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "11",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "12",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "13",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "14",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "15",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "16",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "17",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "18",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "19",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "20",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      },
-      {
-        key: "21",
-        name: "水利部",
-        nickname: "水利部办事员",
-        phone: "135 6666 9999",
-        address: "广东省广州市天河区"
-      }
-    ];
-
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
         console.log(selectedRows);
         this.setState({ selectedRows: selectedRows });
       }
     };
+
     return (
-      <div>
+      <Systems>
+        <Register />
         <span>
           <Button
             icon="plus"
             style={{ margin: 10 }}
             onClick={() => {
-              this.props.next(0);
-              this.props.showAdd(true);
+              emitter.emit("showRegister", {
+                show: true
+              });
             }}
           >
             添加
@@ -403,11 +318,11 @@ class DomList extends PureComponent {
           <Button
             icon="delete"
             disabled={!selectedRows.length}
-            style={{ marginLeft: 10 }}
+            style={{ margin: 10 }}
             onClick={() => {
               const l = selectedRows.length;
               if (l === 0) {
-                message.warning("请选择需要删除的账号");
+                message.warning("请选择需要删除的角色");
                 return;
               }
               Modal.confirm({
@@ -417,7 +332,7 @@ class DomList extends PureComponent {
                 cancelText: "否",
                 okType: "danger",
                 onOk() {
-                  message.success(`删除${l}个账号成功`);
+                  message.success(`删除${l}个角色成功`);
                 },
                 onCancel() {}
               });
@@ -431,309 +346,7 @@ class DomList extends PureComponent {
           dataSource={data}
           rowSelection={rowSelection}
         />
-      </div>
-    );
-  }
-}
-
-//填写用户信息
-class FormWriteUser extends PureComponent {
-  state = {
-    confirmDirty: false,
-    autoCompleteResult: []
-  };
-
-  handleSubmit = e => {
-    e.preventDefault();
-    this.props.form.validateFields((err, values) => {
-      if (!err) {
-        console.log("填写用户信息", values);
-        this.props.next(1);
-      }
-    });
-  };
-
-  render() {
-    const { getFieldDecorator } = this.props.form;
-
-    const formItemLayout = {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 8 }
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 16 }
-      }
-    };
-
-    return (
-      <Form
-        onSubmit={this.handleSubmit}
-        {...formItemLayout}
-        style={{ width: 500, margin: "0 auto" }}
-      >
-        <Form.Item label="角色名" hasFeedback>
-          {getFieldDecorator("user", {
-            rules: [
-              {
-                required: true,
-                message: "请输入角色名"
-              }
-            ]
-          })(
-            <Input
-              prefix={<Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />}
-            />
-          )}
-        </Form.Item>
-        <span
-          style={{
-            position: "absolute",
-            bottom: 20,
-            left: "50%",
-            transform: "translateX(-50%)"
-          }}
-        >
-          <Button type="primary" htmlType="submit">
-            下一步
-          </Button>
-        </span>
-      </Form>
-    );
-  }
-}
-const DomWriteUser = Form.create({ name: "FormWriteUserName" })(FormWriteUser);
-
-//权限分配
-class Power extends PureComponent {
-  state = {
-    value: 1,
-    powerList: [{}]
-  };
-
-  onChange = e => {
-    console.log("radio checked", e.target.value);
-    this.setState({
-      value: e.target.value
-    });
-  };
-
-  handleSubmit = e => {
-    e.preventDefault();
-    this.props.form.validateFields((err, values) => {
-      if (!err) {
-        console.log("权限分配", values);
-        this.props.next(2);
-      }
-    });
-  };
-
-  render() {
-    const { getFieldDecorator } = this.props.form;
-    const { powerList } = this.state;
-
-    const radioStyle = {
-      display: "block",
-      height: "30px",
-      lineHeight: "30px"
-    };
-
-    const columns = [
-      {
-        title: "模块名",
-        dataIndex: "name"
-      },
-      {
-        title: "有效期",
-        dataIndex: "timeStart",
-        render: (text, record) => (
-          <span
-            onClick={() => {
-              console.log(record);
-            }}
-          >
-            <DatePicker.RangePicker
-              defaultValue={[moment(record.timeStart), moment(record.timeEnd)]}
-            />
-            {/* {record.timeStart} 至 {record.timeEnd} */}
-          </span>
-        )
-      }
-    ];
-    const data = [
-      {
-        key: "1",
-        name: "区域监管",
-        timeStart: "2018-01-01",
-        timeEnd: "2018-04-01"
-      },
-      {
-        key: "2",
-        name: "项目监管",
-        timeStart: "2019-01-01",
-        timeEnd: "2019-04-01"
-      },
-      {
-        key: "3",
-        name: "责任追究",
-        timeStart: "2020-01-01",
-        timeEnd: "2020-04-01"
-      },
-      {
-        key: "4",
-        name: "责任追究",
-        timeStart: "2021-01-01",
-        timeEnd: "2021-04-01"
-      },
-      {
-        key: "5",
-        name: "责任追究",
-        timeStart: "2022-01-01",
-        timeEnd: "2022-04-01"
-      },
-      {
-        key: "6",
-        name: "责任追究",
-        timeStart: "2020-01-01",
-        timeEnd: "2020-04-01"
-      },
-      {
-        key: "7",
-        name: "责任追究",
-        timeStart: "2020-01-01",
-        timeEnd: "2020-04-01"
-      },
-      {
-        key: "8",
-        name: "责任追究",
-        timeStart: "2020-01-01",
-        timeEnd: "2020-04-01"
-      },
-      {
-        key: "9",
-        name: "责任追究",
-        timeStart: "2020-01-01",
-        timeEnd: "2020-04-01"
-      },
-      {
-        key: "10",
-        name: "责任追究",
-        timeStart: "2020-01-01",
-        timeEnd: "2020-04-01"
-      },
-      {
-        key: "11",
-        name: "责任追究",
-        timeStart: "2020-01-01",
-        timeEnd: "2020-04-01"
-      },
-      {
-        key: "12",
-        name: "责任追究",
-        timeStart: "2020-01-01",
-        timeEnd: "2020-04-01"
-      }
-    ];
-
-    const rowSelection = {
-      onChange: (selectedRowKeys, selectedRows) => {
-        console.log(selectedRows);
-      }
-    };
-
-    return (
-      <div
-        style={{
-          overflow: "auto"
-        }}
-      >
-        <Table
-          rowSelection={rowSelection}
-          columns={columns}
-          dataSource={data}
-          // pagination={{ pageSize: 9 }}
-          size="small"
-        />
-        <span
-          style={{
-            position: "absolute",
-            bottom: 20,
-            left: "50%",
-            transform: "translateX(-50%)"
-          }}
-        >
-          <Button
-            type="primary"
-            style={{ marginRight: 20 }}
-            onClick={() => {
-              this.props.next(0);
-            }}
-          >
-            上一步
-          </Button>
-          <Button
-            type="primary"
-            onClick={() => {
-              this.props.next(2);
-            }}
-          >
-            下一步
-          </Button>
-        </span>
-      </div>
-    );
-  }
-}
-const DomPower = Form.create({ name: "PowerName" })(Power);
-
-//完成
-class DomFinish extends PureComponent {
-  render() {
-    return (
-      <div>
-        <div style={{ textAlign: "center" }}>
-          <Avatar
-            style={{ backgroundColor: "#87d068" }}
-            icon="check"
-            size={80}
-          />
-          <p style={{ margin: 30, fontSize: 30 }}>创建成功</p>
-          <div>
-            <p>
-              <b>角色名：</b>
-              <span>admin</span>
-            </p>
-          </div>
-        </div>
-        <span
-          style={{
-            position: "absolute",
-            bottom: 20,
-            left: "50%",
-            transform: "translateX(-50%)"
-          }}
-        >
-          <Button
-            type="primary"
-            style={{ marginRight: 20 }}
-            onClick={() => {
-              this.props.next(0);
-            }}
-          >
-            再建一个
-          </Button>
-          <Button
-            type="primary"
-            htmlType="submit"
-            onClick={() => {
-              this.props.showAdd(false);
-            }}
-          >
-            查看用户列表
-          </Button>
-        </span>
-      </div>
+      </Systems>
     );
   }
 }

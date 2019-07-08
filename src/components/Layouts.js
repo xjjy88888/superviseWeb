@@ -70,15 +70,11 @@ export default class layouts extends PureComponent {
           <Icon type="setting" />
           个人设置
         </Menu.Item>
-        <Menu.Item
-          onClick={() => {
-            this.props.dispatch({
-              type: "user/loginOut"
-            });
-          }}
-        >
-          <Icon type="logout" />
-          退出登录
+        <Menu.Item>
+          <Link to="/login">
+            <Icon type="logout" style={{ marginRight: 10 }} />
+            退出登录
+          </Link>
         </Menu.Item>
       </Menu>
     );

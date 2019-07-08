@@ -24,6 +24,7 @@ import { connect } from "dva";
 import moment from "moment";
 import { Link } from "dva/router";
 import Highlighter from "react-highlight-words";
+import emitter from "../utils/event";
 
 const { Title } = Typography;
 const { Header, Footer, Sider, Content } = Layout;
@@ -31,11 +32,17 @@ const { Header, Footer, Sider, Content } = Layout;
 @connect(({ user }) => ({
   user
 }))
-export default class account extends PureComponent {
+export default class register extends PureComponent {
   state = {
+    show: false,
     state: 0,
     showAdd: false
   };
+  componentDidMount() {
+    this.eventEmitter = emitter.addListener("showRegister", v => {
+      this.setState({ show: v.show });
+    });
+  }
 
   next = v => {
     this.setState({ state: v });
@@ -46,57 +53,68 @@ export default class account extends PureComponent {
   };
 
   render() {
-    const { state, showAdd } = this.state;
+    const { show, state, showAdd } = this.state;
 
     return (
       <Layout
         style={{
-          transform: " translate(-50%,-50%)",
+          display: show ? "block" : "none",
           position: "absolute",
-          top: "50%",
-          left: "50%",
-          background: "#fff",
-          width: 1000,
-          height: "85%",
-          padding: 50,
-          borderRadius: 10
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          backgroundColor: "rgba(0,0,0,.5)",
+          zIndex: 2
         }}
       >
-        <Button
-          type="primary"
-          shape="circle"
-          icon="close"
-          style={{ position: "absolute", right: 20, top: 20 }}
-          onClick={() => {
-            this.props.dispatch({
-              type: "user/goBack"
-            });
+        <Layout
+          style={{
+            transform: " translate(-50%,-50%)",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            background: "#fff",
+            width: 1000,
+            height: "85%",
+            padding: 50,
+            borderRadius: 10
           }}
-        />
-        <Header style={{ background: "#fff", margin: "0 0 30px 0" }}>
-          <Steps
-            current={state}
-            style={{ background: "#fff", margin: "0 0 30px 0" }}
-          >
-            <Steps.Step title="填写用户信息" />
-            <Steps.Step title="权限分配" />
-            <Steps.Step title="完成" />
-          </Steps>
-        </Header>
-        <Content style={{ position: "relative" }}>
-          <div style={{ display: state === 0 ? "block" : "none" }}>
-            <DomWriteUser next={this.next.bind(this)} />
-          </div>
-          <div style={{ display: state === 1 ? "block" : "none" }}>
-            <DomPower next={this.next.bind(this)} />
-          </div>
-          <div style={{ display: state === 2 ? "block" : "none" }}>
-            <DomFinish
-              showAdd={this.showAdd.bind(this)}
-              next={this.next.bind(this)}
-            />
-          </div>
-        </Content>
+        >
+          <Button
+            type="primary"
+            shape="circle"
+            icon="close"
+            style={{ position: "absolute", right: 20, top: 20 }}
+            onClick={() => {
+              this.setState({ show: false });
+            }}
+          />
+          <Header style={{ background: "#fff", margin: "0 0 30px 0" }}>
+            <Steps
+              current={state}
+              style={{ background: "#fff", margin: "0 0 30px 0" }}
+            >
+              <Steps.Step title="填写用户信息" />
+              <Steps.Step title="权限分配" />
+              <Steps.Step title="完成" />
+            </Steps>
+          </Header>
+          <Content style={{ position: "relative" }}>
+            <div style={{ display: state === 0 ? "block" : "none" }}>
+              <DomWriteUser next={this.next.bind(this)} />
+            </div>
+            <div style={{ display: state === 1 ? "block" : "none" }}>
+              <DomPower next={this.next.bind(this)} />
+            </div>
+            <div style={{ display: state === 2 ? "block" : "none" }}>
+              <DomFinish
+                showAdd={this.showAdd.bind(this)}
+                next={this.next.bind(this)}
+              />
+            </div>
+          </Content>
+        </Layout>
       </Layout>
     );
   }

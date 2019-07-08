@@ -65,7 +65,7 @@ export default {
       });
     },
     *loginOut({ payload }, { call, put }) {
-      yield put(routerRedux.replace("/user/login"));
+      yield put(routerRedux.replace("/login"));
     },
     *queryDict({ payload }, { call, put }) {
       const {
