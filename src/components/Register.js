@@ -25,6 +25,7 @@ import { Link } from "dva/router";
 import Highlighter from "react-highlight-words";
 import emitter from "../utils/event";
 import { LocaleProvider } from "antd";
+import { createForm } from "rc-form";
 import zh_CN from "antd/lib/locale-provider/zh_CN";
 
 const { Title } = Typography;
@@ -43,6 +44,7 @@ const formItemLayout = {
 @connect(({ user }) => ({
   user
 }))
+@createForm()
 export default class register extends PureComponent {
   state = {
     show: false,
@@ -56,7 +58,9 @@ export default class register extends PureComponent {
   };
   componentDidMount() {
     this.eventEmitter = emitter.addListener("showRegister", v => {
+      this.props.form.resetFields();
       this.setState({
+        state: 0,
         show: v.show,
         type: v.type
       });
@@ -183,6 +187,13 @@ class FormWriteUser extends PureComponent {
     const value = e.target.value;
     this.setState({ confirmDirty: this.state.confirmDirty || !!value });
   };
+  validateToNextPassword = (rule, value, callback) => {
+    const { form } = this.props;
+    if (value && this.state.confirmDirty) {
+      form.validateFields(["confirm"], { force: true });
+    }
+    callback();
+  };
 
   render() {
     const { getFieldDecorator, resetFields } = this.props.form;
@@ -199,6 +210,7 @@ class FormWriteUser extends PureComponent {
             >
               <Form.Item label="用户名" hasFeedback>
                 {getFieldDecorator("user", {
+                  initialValue: "",
                   rules: [
                     {
                       required: true,
@@ -209,6 +221,7 @@ class FormWriteUser extends PureComponent {
               </Form.Item>
               <Form.Item label="密码" hasFeedback>
                 {getFieldDecorator("password", {
+                  initialValue: "",
                   rules: [
                     {
                       required: true,
@@ -222,6 +235,7 @@ class FormWriteUser extends PureComponent {
               </Form.Item>
               <Form.Item label="确认密码" hasFeedback>
                 {getFieldDecorator("confirm", {
+                  initialValue: "",
                   rules: [
                     {
                       required: true,
@@ -239,6 +253,7 @@ class FormWriteUser extends PureComponent {
                 style={{ display: type === "all" ? "block" : "none" }}
               >
                 {getFieldDecorator("user_type", {
+                  initialValue: "",
                   rules: [
                     {
                       required: type === "all",
@@ -261,6 +276,7 @@ class FormWriteUser extends PureComponent {
               </Form.Item>
               <Form.Item label="时效性" hasFeedback>
                 {getFieldDecorator("time", {
+                  initialValue: "",
                   rules: [
                     {
                       required: true,
@@ -275,6 +291,7 @@ class FormWriteUser extends PureComponent {
                 style={{ display: type === "account" ? "block" : "none" }}
               >
                 {getFieldDecorator("area", {
+                  initialValue: "",
                   rules: [
                     {
                       required: type === "account",
@@ -284,11 +301,9 @@ class FormWriteUser extends PureComponent {
                 })(
                   <TreeSelect
                     showSearch
-                    value={this.state.value}
                     dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
                     allowClear
                     treeDefaultExpandAll
-                    onChange={this.onChange}
                   >
                     <TreeSelect.TreeNode
                       value="parent 1"
