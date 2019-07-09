@@ -10,7 +10,6 @@ const data = [
     key: "1",
     nickname: "花都区办事员",
     name: "花都区办事员",
-
     phone: 13555479658,
     address: "广州市花都区"
   },
@@ -18,7 +17,6 @@ const data = [
     key: "2",
     nickname: "天河区办事员",
     name: "天河区办事员",
-
     phone: 16555479658,
     address: "广州市天河区"
   },
@@ -26,7 +24,6 @@ const data = [
     key: "3",
     nickname: "海珠区办事员",
     name: "海珠区办事员",
-
     phone: 17555479658,
     address: "广州市海珠区"
   }

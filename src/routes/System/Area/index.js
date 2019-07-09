@@ -25,109 +25,19 @@ const { Title } = Typography;
 
 const data = [
   {
-    index: "2",
+    key: "1",
     name: "北京市",
     up_name: "中国",
     desc: "110033"
   },
   {
-    index: "1",
+    key: "2",
     name: "广州市",
     up_name: "广东",
     desc: "110000"
   },
   {
-    index: "3",
-    name: "花都区",
-    up_name: "广州市",
-    desc: "110022"
-  },
-  {
-    index: "2",
-    name: "北京市",
-    up_name: "中国",
-    desc: "110033"
-  },
-  {
-    index: "1",
-    name: "广州市",
-    up_name: "广东",
-    desc: "110000"
-  },
-  {
-    index: "3",
-    name: "花都区",
-    up_name: "广州市",
-    desc: "110022"
-  },
-  {
-    index: "2",
-    name: "北京市",
-    up_name: "中国",
-    desc: "110033"
-  },
-  {
-    index: "1",
-    name: "广州市",
-    up_name: "广东",
-    desc: "110000"
-  },
-  {
-    index: "3",
-    name: "花都区",
-    up_name: "广州市",
-    desc: "110022"
-  },
-  {
-    index: "2",
-    name: "北京市",
-    up_name: "中国",
-    desc: "110033"
-  },
-  {
-    index: "1",
-    name: "广州市",
-    up_name: "广东",
-    desc: "110000"
-  },
-  {
-    index: "3",
-    name: "花都区",
-    up_name: "广州市",
-    desc: "110022"
-  },
-  {
-    index: "2",
-    name: "北京市",
-    up_name: "中国",
-    desc: "110033"
-  },
-  {
-    index: "1",
-    name: "广州市",
-    up_name: "广东",
-    desc: "110000"
-  },
-  {
-    index: "3",
-    name: "花都区",
-    up_name: "广州市",
-    desc: "110022"
-  },
-  {
-    index: "2",
-    name: "北京市",
-    up_name: "中国",
-    desc: "110033"
-  },
-  {
-    index: "1",
-    name: "广州市",
-    up_name: "广东",
-    desc: "110000"
-  },
-  {
-    index: "3",
+    key: "3",
     name: "花都区",
     up_name: "广州市",
     desc: "110022"
@@ -212,9 +122,9 @@ export default class area extends PureComponent {
     const columns = [
       {
         title: "序号",
-        dataIndex: "index",
-        sorter: (a, b) => a.index - b.index,
-        ...this.getColumnSearchProps("index")
+        dataIndex: "key",
+        sorter: (a, b) => a.key - b.key,
+        ...this.getColumnSearchProps("key")
       },
       {
         title: "行政区名称",
@@ -411,7 +321,6 @@ export default class area extends PureComponent {
                     <Select
                       showSearch
                       allowClear
-                      defaultValue="1"
                       optionFilterProp="children"
                       style={{ width: 180 }}
                     >
@@ -419,8 +328,8 @@ export default class area extends PureComponent {
                         { value: "111", text: "中国" },
                         { value: "222", text: "北京" },
                         { value: "333", text: "广东" }
-                      ].map(item => (
-                        <Select.Option value={item.value}>
+                      ].map((item, index) => (
+                        <Select.Option value={item.value} key={index}>
                           {item.text}
                         </Select.Option>
                       ))}

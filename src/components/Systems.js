@@ -16,10 +16,10 @@ const menuList = [
         title: "待审核账号",
         key: "/user/review"
       },
-      {
-        title: "管理员账号",
-        key: "/user/manager"
-      },
+      // {
+      //   title: "管理员账号",
+      //   key: "/user/manager"
+      // },
       {
         title: "社会用户",
         key: "/user/society"

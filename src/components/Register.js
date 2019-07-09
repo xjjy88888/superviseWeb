@@ -51,7 +51,7 @@ export default class register extends PureComponent {
     state: 0,
     type: "all"
     //all: 注册
-    //manager: 管理员
+    //review: 管理员
     //society: 社会用户
     //account: 行政用户
     //role: 行政角色
@@ -263,7 +263,7 @@ class FormWriteUser extends PureComponent {
                 })(
                   <Select showSearch allowClear optionFilterProp="children">
                     {[
-                      { text: "管理员", value: "manager" },
+                      // { text: "管理员", value: "manager" },
                       { text: "社会用户", value: "society" },
                       { text: "行政用户", value: "account" }
                     ].map((item, index) => (

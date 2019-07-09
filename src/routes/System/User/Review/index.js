@@ -2,6 +2,8 @@ import React, { PureComponent } from "react";
 import { Form, Icon, Input, Button, Table, message, Modal } from "antd";
 import { createForm } from "rc-form";
 import Systems from "../../../../components/Systems";
+import emitter from "../../../../utils/event";
+import Register from "../../../../components/Register";
 import Highlighter from "react-highlight-words";
 
 const data = [
@@ -142,8 +144,9 @@ export default class review extends PureComponent {
             <a
               style={{ marginRight: 20 }}
               onClick={() => {
-                this.setState({
-                  visible: true
+                emitter.emit("showRegister", {
+                  show: true,
+                  type: "review"
                 });
               }}
             >
@@ -188,6 +191,7 @@ export default class review extends PureComponent {
 
     return (
       <Systems>
+        <Register />
         <span>
           <Button
             icon="delete"
@@ -235,148 +239,6 @@ export default class review extends PureComponent {
           dataSource={data}
           rowSelection={rowSelection}
         />
-        <Modal
-          title="添加账号"
-          visible={visible}
-          onOk={() => {
-            this.props.form.validateFields((err, v) => {
-              console.log("表单信息", v);
-              if (!v.nickname) {
-                message.warning("请填写用户名称");
-                return;
-              }
-              if (!v.name) {
-                message.warning("请填写登录名称");
-                return;
-              }
-              if (!v.password) {
-                message.warning("请填写登录密码");
-                return;
-              }
-              if (!v.confirm_password) {
-                message.warning("请填写确认密码");
-                return;
-              }
-              if (v.password !== v.confirm_password) {
-                message.warning("两次密码不一致");
-                return;
-              }
-              this.setState({
-                visible: false
-              });
-              message.success("保存成功");
-            });
-          }}
-          onCancel={() => {
-            this.setState({
-              visible: false
-            });
-          }}
-        >
-          <Form
-            // {...formItemLayout}
-            onSubmit={this.handleSubmit}
-            layout="inline"
-            style={{ textAlign: "center" }}
-          >
-            <Form.Item
-              label={
-                <span>
-                  <b style={{ color: "red" }}>*</b>用户名称
-                </span>
-              }
-              hasFeedback
-            >
-              {getFieldDecorator("nickname", {})(<Input />)}
-            </Form.Item>
-            <Form.Item
-              label={
-                <span>
-                  <b style={{ color: "red" }}>*</b>登录名称
-                </span>
-              }
-              hasFeedback
-            >
-              {getFieldDecorator("name", {})(<Input />)}
-            </Form.Item>
-            <Form.Item
-              label={
-                <span>
-                  <b style={{ color: "red" }}>*</b>登录密码
-                </span>
-              }
-              hasFeedback
-            >
-              {getFieldDecorator("password", {})(
-                <Input.Password style={{ width: 180 }} />
-              )}
-            </Form.Item>
-            <Form.Item
-              label={
-                <span>
-                  <b style={{ color: "red" }}>*</b>确认密码
-                </span>
-              }
-              hasFeedback
-            >
-              {getFieldDecorator("confirm_password", {})(
-                <Input.Password style={{ width: 180 }} />
-              )}
-            </Form.Item>
-            <Form.Item
-              label={
-                <span>
-                  <b style={{ color: "#fff" }}>*</b>联系电话
-                </span>
-              }
-              hasFeedback
-            >
-              {getFieldDecorator("phone", {})(<Input />)}
-            </Form.Item>
-            <Form.Item
-              label={
-                <span>
-                  <b style={{ color: "#fff" }}>*</b>电子邮箱
-                </span>
-              }
-              hasFeedback
-            >
-              {getFieldDecorator("mail", {})(<Input />)}
-            </Form.Item>
-            <Form.Item
-              label={
-                <span>
-                  <b style={{ color: "#fff" }}>*</b>所属职务
-                </span>
-              }
-              hasFeedback
-            >
-              {getFieldDecorator("post", {})(<Input />)}
-            </Form.Item>
-            <Form.Item
-              label={
-                <span>
-                  <b style={{ color: "#fff" }}>*</b>所在住址
-                </span>
-              }
-              hasFeedback
-            >
-              {getFieldDecorator("address", {})(<Input />)}
-            </Form.Item>
-            <Form.Item
-              label={
-                <span>
-                  <b style={{ color: "#fff" }}>*</b>账号描述
-                </span>
-              }
-              hasFeedback
-            >
-              {getFieldDecorator("desc", {})(
-                <Input.TextArea autosize style={{ width: 180 }} />
-              )}
-            </Form.Item>
-          </Form>
-        </Modal>
       </Systems>
     );
   }
