@@ -1206,14 +1206,14 @@ export default class sider extends PureComponent {
     return (
       <div
         style={{
-          left: show ? 0 : "-350px",
-          width: 350,
-          backgroundColor: "transparent",
           position: "absolute",
-          zIndex: 1000,
+          left: show ? 0 : "-350px",
           top: 0,
+          zIndex: 1000,
+          width: 350,
+          height: "100%",
           paddingTop: 46,
-          height: "100%"
+          backgroundColor: "transparent"
         }}
         ref={e => (this.refDom = e)}
       >
@@ -1466,7 +1466,7 @@ export default class sider extends PureComponent {
           >
             <p
               style={{
-                position: "fixed",
+                position: "absolute",
                 top: 62,
                 left: 256
               }}
@@ -1714,7 +1714,7 @@ export default class sider extends PureComponent {
                 left: 173,
                 top: 62,
                 zIndex: 1,
-                position: "fixed"
+                position: "absolute"
               }}
             >
               <Button

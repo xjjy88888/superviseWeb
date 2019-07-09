@@ -507,9 +507,12 @@ export default class siderbarDetail extends PureComponent {
           left: show ? 350 : -4000,
           width: 400,
           backgroundColor: `#fff`,
-          position: `absolute`,
+          borderLeft: `solid 1px #ddd`,
+          position: "absolute",
           zIndex: 1000,
-          borderLeft: `solid 1px #ddd`
+          top: 0,
+          paddingTop: 46,
+          height: "100%"
         }}
       >
         <Icon
@@ -534,7 +537,7 @@ export default class siderbarDetail extends PureComponent {
             float: "right",
             position: "absolute",
             right: 25,
-            top: 60,
+            top: 56,
             zIndex: 1
           }}
         >
@@ -566,7 +569,13 @@ export default class siderbarDetail extends PureComponent {
             }}
           />
         </p>
-        <div style={{ height: "100%", overflow: `auto`, padding: 23 }}>
+        <div
+          style={{
+            height: "100%",
+            overflow: `auto`,
+            padding: 23
+          }}
+        >
           <div
             style={{
               display: previewVisible_min ? "block" : "none",

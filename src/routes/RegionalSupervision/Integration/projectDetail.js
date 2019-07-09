@@ -389,12 +389,14 @@ export default class projectDetail extends PureComponent {
     return (
       <div
         style={{
+          position: "absolute",
           left: show ? 350 : -4000,
-          width: 800,
-          backgroundColor: `#fff`,
-          position: `absolute`,
+          top: 0,
           zIndex: 1000,
-          height: `100%`,
+          width: 800,
+          height: "100%",
+          paddingTop: 46,
+          backgroundColor: `#fff`,
           borderLeft: `solid 1px #ddd`
         }}
         ref={this.saveRef}
@@ -671,7 +673,7 @@ export default class projectDetail extends PureComponent {
         <div
           style={{
             display: edit ? "block" : "none",
-            height: `100%`,
+            height: "100%",
             padding: 30,
             overflow: "auto"
           }}
