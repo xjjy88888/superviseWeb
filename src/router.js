@@ -6,7 +6,6 @@ import ProjectSupervision from "./routes/ProjectSupervision";
 import Integration from "./routes/RegionalSupervision/Integration";
 import SplitScreen from "./routes/RegionalSupervision/SplitScreen";
 import Review from "./routes/System/User/Review";
-import Manager from "./routes/System/User/Manager";
 import Society from "./routes/System/User/Society";
 import Account from "./routes/System/User/Administrative/Account";
 import Role from "./routes/System/User/Administrative/Role";
@@ -39,7 +38,6 @@ function RouterConfig({ history }) {
         />
         <Route path="/system" exact component={Review} />
         <Route path="/system/user/review" component={Review} exact />
-        <Route path="/system/user/manager" component={Manager} exact />
         <Route path="/system/user/society" component={Society} exact />
         <Route
           path="/system/user/administrative/account"

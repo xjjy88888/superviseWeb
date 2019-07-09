@@ -21,150 +21,27 @@ const { Header, Footer, Sider, Content } = Layout;
 const data = [
   {
     key: "1",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
+    nickname: "花都区办事员",
+    name: "花都区办事员",
+    phone: 13555479658,
+    time: "2019-12-31",
+    surplus: 10
   },
   {
     key: "2",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
+    nickname: "天河区办事员",
+    name: "天河区办事员",
+    phone: 16555479658,
+    time: "2020-12-31",
+    surplus: 20
   },
   {
     key: "3",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
-  },
-  {
-    key: "4",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
-  },
-  {
-    key: "5",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
-  },
-  {
-    key: "6",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
-  },
-  {
-    key: "7",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
-  },
-  {
-    key: "8",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
-  },
-  {
-    key: "9",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
-  },
-  {
-    key: "10",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
-  },
-  {
-    key: "11",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
-  },
-  {
-    key: "12",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
-  },
-  {
-    key: "13",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
-  },
-  {
-    key: "14",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
-  },
-  {
-    key: "15",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
-  },
-  {
-    key: "16",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
-  },
-  {
-    key: "17",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
-  },
-  {
-    key: "18",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
-  },
-  {
-    key: "19",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
-  },
-  {
-    key: "20",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
-  },
-  {
-    key: "21",
-    name: "水利部",
-    nickname: "水利部办事员",
-    phone: "135 6666 9999",
-    address: "广东省广州市天河区"
+    nickname: "海珠区办事员",
+    name: "海珠区办事员",
+    phone: 17555479658,
+    time: "2091-12-31",
+    surplus: 30
   }
 ];
 
@@ -249,28 +126,34 @@ export default class account extends PureComponent {
 
     const columns = [
       {
-        title: "用户名称",
+        title: "账号",
         dataIndex: "nickname",
         sorter: (a, b) => a.nickname.length - b.nickname.length,
         ...this.getColumnSearchProps("nickname")
       },
       {
-        title: "登录名",
+        title: "姓名",
         dataIndex: "name",
         sorter: (a, b) => a.name.length - b.name.length,
-        ...this.getColumnSearchProps("nickname")
+        ...this.getColumnSearchProps("name")
       },
       {
-        title: "联系电话",
+        title: "电话",
         dataIndex: "phone",
         sorter: (a, b) => a.phone - b.phone,
-        ...this.getColumnSearchProps("nickname")
+        ...this.getColumnSearchProps("phone")
       },
       {
-        title: "住址",
-        dataIndex: "address",
-        sorter: (a, b) => a.address.length - b.address.length,
-        ...this.getColumnSearchProps("nickname")
+        title: "有效期至",
+        dataIndex: "time",
+        sorter: (a, b) => a.time.length - b.time.length,
+        ...this.getColumnSearchProps("time")
+      },
+      {
+        title: "剩余天数",
+        dataIndex: "surplus",
+        sorter: (a, b) => a.surplus - b.surplus,
+        ...this.getColumnSearchProps("surplus")
       },
       {
         title: "操作",

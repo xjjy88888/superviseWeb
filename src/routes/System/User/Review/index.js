@@ -12,21 +12,24 @@ const data = [
     nickname: "花都区办事员",
     name: "花都区办事员",
     phone: 13555479658,
-    address: "广州市花都区"
+    time: "2019-12-31",
+    surplus: 10
   },
   {
     key: "2",
     nickname: "天河区办事员",
     name: "天河区办事员",
     phone: 16555479658,
-    address: "广州市天河区"
+    time: "2020-12-31",
+    surplus: 20
   },
   {
     key: "3",
     nickname: "海珠区办事员",
     name: "海珠区办事员",
     phone: 17555479658,
-    address: "广州市海珠区"
+    time: "2091-12-31",
+    surplus: 30
   }
 ];
 
@@ -113,28 +116,34 @@ export default class review extends PureComponent {
 
     const columns = [
       {
-        title: "用户名称",
+        title: "账号",
         dataIndex: "nickname",
         sorter: (a, b) => a.nickname.length - b.nickname.length,
         ...this.getColumnSearchProps("nickname")
       },
       {
-        title: "登录名称",
+        title: "姓名",
         dataIndex: "name",
         sorter: (a, b) => a.name.length - b.name.length,
         ...this.getColumnSearchProps("name")
       },
       {
-        title: "联系电话",
+        title: "电话",
         dataIndex: "phone",
         sorter: (a, b) => a.phone - b.phone,
         ...this.getColumnSearchProps("phone")
       },
       {
-        title: "住址",
-        dataIndex: "address",
-        sorter: (a, b) => a.address.length - b.address.length,
-        ...this.getColumnSearchProps("address")
+        title: "有效期至",
+        dataIndex: "time",
+        sorter: (a, b) => a.time.length - b.time.length,
+        ...this.getColumnSearchProps("time")
+      },
+      {
+        title: "剩余天数",
+        dataIndex: "surplus",
+        sorter: (a, b) => a.surplus - b.surplus,
+        ...this.getColumnSearchProps("surplus")
       },
       {
         title: "操作",

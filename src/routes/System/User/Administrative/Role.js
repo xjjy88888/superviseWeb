@@ -32,7 +32,7 @@ const data = [
   }
 ];
 
-export default class manager extends PureComponent {
+export default class role extends PureComponent {
   state = {
     state: 0,
     selectedRows: []
@@ -113,28 +113,10 @@ export default class manager extends PureComponent {
 
     const columns = [
       {
-        title: "用户名称",
+        title: "角色名",
         dataIndex: "nickname",
         sorter: (a, b) => a.nickname.length - b.nickname.length,
         ...this.getColumnSearchProps("nickname")
-      },
-      {
-        title: "登录名称",
-        dataIndex: "name",
-        sorter: (a, b) => a.name.length - b.name.length,
-        ...this.getColumnSearchProps("name")
-      },
-      {
-        title: "联系电话",
-        dataIndex: "phone",
-        sorter: (a, b) => a.phone - b.phone,
-        ...this.getColumnSearchProps("phone")
-      },
-      {
-        title: "住址",
-        dataIndex: "address",
-        sorter: (a, b) => a.address.length - b.address.length,
-        ...this.getColumnSearchProps("address")
       },
       {
         title: "操作",

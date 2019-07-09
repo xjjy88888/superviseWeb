@@ -208,13 +208,13 @@ class FormWriteUser extends PureComponent {
               {...formItemLayout}
               style={{ width: 500, margin: "0 auto" }}
             >
-              <Form.Item label="用户名" hasFeedback>
-                {getFieldDecorator("user", {
+              <Form.Item label="账号" hasFeedback>
+                {getFieldDecorator("name", {
                   initialValue: "",
                   rules: [
                     {
                       required: true,
-                      message: "请输入用户名"
+                      message: "请输入账号"
                     }
                   ]
                 })(<Input />)}
@@ -247,6 +247,28 @@ class FormWriteUser extends PureComponent {
                   ]
                 })(<Input.Password onBlur={this.handleConfirmBlur} />)}
               </Form.Item>
+              <Form.Item label="姓名" hasFeedback>
+                {getFieldDecorator("full_name", {
+                  initialValue: "",
+                  rules: [
+                    {
+                      required: true,
+                      message: "请输入姓名"
+                    }
+                  ]
+                })(<Input />)}
+              </Form.Item>
+              <Form.Item label="电话" hasFeedback>
+                {getFieldDecorator("phone", {
+                  initialValue: "",
+                  rules: [
+                    {
+                      required: true,
+                      message: "请输入电话"
+                    }
+                  ]
+                })(<Input />)}
+              </Form.Item>
               <Form.Item
                 label="用户类型"
                 hasFeedback
@@ -263,7 +285,6 @@ class FormWriteUser extends PureComponent {
                 })(
                   <Select showSearch allowClear optionFilterProp="children">
                     {[
-                      // { text: "管理员", value: "manager" },
                       { text: "社会用户", value: "society" },
                       { text: "行政用户", value: "account" }
                     ].map((item, index) => (
@@ -274,16 +295,16 @@ class FormWriteUser extends PureComponent {
                   </Select>
                 )}
               </Form.Item>
-              <Form.Item label="时效性" hasFeedback>
+              <Form.Item label="有效期至" hasFeedback>
                 {getFieldDecorator("time", {
                   initialValue: "",
                   rules: [
                     {
                       required: true,
-                      message: "请选择起止日期"
+                      message: "请选择有效期"
                     }
                   ]
-                })(<DatePicker.RangePicker />)}
+                })(<DatePicker style={{ width: 330 }} />)}
               </Form.Item>
               <Form.Item
                 label="行政区划单位"
