@@ -188,7 +188,8 @@ export async function spotListApi(params) {
           : "",
         InterferenceVaryType: params.InterferenceVaryType
           ? params.InterferenceVaryType.map(v => v).join(",")
-          : ""
+          : "",
+        IsReview: params.IsReview ? params.IsReview.map(v => v).join(",") : ""
       })
     }
   );

@@ -99,13 +99,15 @@ export default class siderbarDetail extends PureComponent {
     return (
       <div
         style={{
-          left: show ? 350 : -550,
-          borderLeft: "solid 1px #ddd",
-          width: 450,
-          backgroundColor: `#fff`,
           position: `absolute`,
-          zIndex: 1001,
-          height: `100%`
+          top: 0,
+          left: show ? 350 : -550,
+          zIndex: 1000,
+          width: 450,
+          height: `100%`,
+          paddingTop: 46,
+          borderLeft: "solid 1px #ddd",
+          backgroundColor: `#fff`
         }}
         ref={this.saveRef}
       >
@@ -133,16 +135,19 @@ export default class siderbarDetail extends PureComponent {
           style={{
             position: "absolute",
             color: "#1890ff",
-            right: 66,
+            left: 0,
             top: 42,
-            width: "78%",
+            width: 382,
             height: 62,
-            zIndex: 1
+            zIndex: 1,
+            padding: "0 78px",
+            boxSizing: "border-box",
+            backgroundColor: `#fff`
           }}
         >
           <Button
             icon="undo"
-            style={{ margin: "20px 60px 0px 75px" }}
+            style={{ margin: "20px 40px 0px 20px" }}
             onClick={() => {
               resetFields();
               emitter.emit("queryInfo", {
@@ -410,6 +415,11 @@ export default class siderbarDetail extends PureComponent {
                   unCheckedChildren="现状数据"
                 />
               )}
+            </Form.Item>
+            <Form.Item label="是否复核" {...formItemLayoutlong}>
+              {getFieldDecorator("IsReview", {
+                initialValue: []
+              })(<Checkbox.Group options={["是", "否"]} />)}
             </Form.Item>
           </Form>
         </div>
