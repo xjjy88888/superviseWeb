@@ -25,7 +25,8 @@ import {
   DatePicker,
   AutoComplete,
   Table,
-  Collapse
+  Collapse,
+  Divider
 } from "antd";
 import locale from "antd/lib/date-picker/locale/zh_CN";
 import "leaflet/dist/leaflet.css";
@@ -759,8 +760,8 @@ export default class sider extends PureComponent {
     const { departList, departSearch, isSelect } = this.state;
 
     const isAdd = key !== "supDepartmentId" && key !== "replyDepartmentId";
-    console.log(isSelect);
-    if (departSearch && !isSelect) {
+    console.log(departSearch);
+    if (departSearch) {
       dispatch({
         type: "user/departVaild",
         payload: {
@@ -1890,7 +1891,7 @@ export default class sider extends PureComponent {
                   paddingRight: 30
                 }}
               >
-                <Collapse bordered={false} defaultActiveKey={["0", "2", "3"]}>
+                <Collapse bordered={false} defaultActiveKey={["0"]}>
                   <Collapse.Panel header={<b>基本信息</b>} key="0">
                     <div
                       style={{
@@ -2943,9 +2944,28 @@ export default class sider extends PureComponent {
                       onBlur={() => {
                         this.getDepartList("productDepartmentId");
                       }}
-                      onSelect={() => {
-                        this.setState({ isSelect: true });
+                      onSelect={(v, e) => {
+                        this.setState({ departSearch: e.props.children });
                       }}
+                      dropdownRender={menu => (
+                        <div>
+                          {menu}
+                          <Divider style={{ margin: "4px 0" }} />
+                          <div
+                            style={{ padding: "8px", cursor: "pointer" }}
+                            onClick={() => {
+                              console.log(`添加单位`);
+                              self.setState({
+                                showCreateDepart: true,
+                                createDepartKey: "productDepartmentId"
+                              });
+                              setFieldsValue({ productDepartmentId: "" });
+                            }}
+                          >
+                            <Icon type="plus" /> 添加单位1
+                          </div>
+                        </div>
+                      )}
                     >
                       {departSelectListAll.map(item => (
                         <Select.Option value={item.value} key={item.value}>
