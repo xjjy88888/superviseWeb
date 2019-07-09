@@ -276,6 +276,16 @@ export async function spotHistoryApi(params) {
   });
 }
 
+// 图斑同步旧系统附件
+export async function spotOldImgApi(params) {
+  return request(`${config.url.spotOldImgUrl}?Id=${params.id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
 // 标注点列表
 export async function pointListApi(params) {
   return request(

@@ -8,7 +8,8 @@ import {
   spotArchiveApi,
   spotUnArchiveApi,
   spotDeleteMulApi,
-  spotHistoryApi
+  spotHistoryApi,
+  spotOldImgApi
 } from "../services/httpApi";
 
 export default {
@@ -206,6 +207,14 @@ export default {
           message: `查询图斑历史失败：${error.message}`
         });
       }
+    },
+
+    // 图斑同步旧系统附件
+    *spotOldImg({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(spotOldImgApi, payload);
+      if (callback) callback(success, error, result);
     }
   },
 

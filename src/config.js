@@ -85,6 +85,9 @@ const config = {
     // 图斑历史
     spotHistoryUrl: `${domain}api/services/app/Spot/GetHistorySpots`,
 
+    // 图斑同步旧系统附件
+    spotOldImgUrl: `${domain}api/services/app/File/ImgSyn`,
+
     // 标注点列表
     pointListUrl: `${domain}api/services/app/MarkingPoint/GetAll`,
 

@@ -1244,6 +1244,32 @@ export default class siderbarDetail extends PureComponent {
                 >
                   删除
                 </Button>
+                <Button
+                  icon="retweet"
+                  style={{
+                    marginTop: 20
+                  }}
+                  onClick={() => {
+                    dispatch({
+                      type: "spot/spotOldImg",
+                      payload: {
+                        id: spotItem.id
+                      },
+                      callback: (success, error, result) => {
+                        notification[success ? "success" : "error"]({
+                          message: `同步旧系统附件${success ? "成功" : "失败"}${
+                            success ? "" : `：${error.message}`
+                          }`
+                        });
+                        if (success) {
+                          self.querySpotById(spotItem.id);
+                        }
+                      }
+                    });
+                  }}
+                >
+                  同步旧系统附件
+                </Button>
               </span>
             )}
             <div
