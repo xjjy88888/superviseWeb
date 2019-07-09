@@ -1,12 +1,13 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
-import { Select } from "antd";
+import { Select, Popover, Button } from "antd";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import proj4 from "proj4";
 import * as turf from "@turf/turf";
 import config from "../../../config";
 import jQuery from "jquery";
+import { Link } from "dva/router";
 import Layouts from "../../../components/Layouts";
 
 let userconfig = {};
@@ -16,7 +17,7 @@ let userconfig = {};
   project,
   spot
 }))
-export default class home2 extends PureComponent {
+export default class splitScreen extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -685,6 +686,21 @@ export default class home2 extends PureComponent {
                 ))}
               </Select>
             </div>
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              bottom: 20,
+              right: 20,
+              zIndex: 1000,
+              background: "#fff"
+            }}
+          >
+            <Link to="/regionalSupervision/integration">
+              <Popover content="天地一体化" title="" trigger="hover">
+                <Button icon="rollback" />
+              </Popover>
+            </Link>
           </div>
         </div>
       </Layouts>

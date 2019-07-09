@@ -2032,7 +2032,7 @@ export default class integration extends PureComponent {
           <div
             style={{
               position: "absolute",
-              bottom: 50,
+              bottom: 40,
               right: 20,
               zIndex: 1000,
               background: "#fff"
