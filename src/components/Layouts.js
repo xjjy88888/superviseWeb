@@ -79,7 +79,8 @@ export default class layouts extends PureComponent {
       </Menu>
     );
     const user = JSON.parse(sessionStorage.getItem("user"));
-    const username = user ? user.displayName : "请登录";
+    const displayName = user ? user.displayName : "";
+    const departmentName = user ? user.departmentName : "";
 
     return (
       <LocaleProvider locale={zh_CN}>
@@ -151,17 +152,18 @@ export default class layouts extends PureComponent {
               style={{
                 margin: "0 20px",
                 position: "absolute",
-                right: 30,
+                right: 0,
                 top: -10,
                 color: "#fff"
               }}
             >
               <Avatar style={{ backgroundColor: "#00a2ae" }}>
-                {user ? username.slice(0, 1) : ""}
+                {user ? displayName.slice(0, 1) : ""}
               </Avatar>
               <Dropdown overlay={menu}>
-                <span> {user ? username : "请登录"}</span>
+                <span> {user ? displayName : "请登录"}</span>
               </Dropdown>
+              <span> {user ? `（${departmentName}）` : ""}</span>
             </span>
           </Header>
           <Content>{children}</Content>
