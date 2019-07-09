@@ -774,20 +774,20 @@ export default class sider extends PureComponent {
             });
             setFieldsValue({ [key]: data.id });
           } else {
-            Modal.confirm({
-              title: `查不到该单位，${isAdd ? "是否去新建单位" : "请重新输入"}`,
-              content: "",
-              onOk() {
-                if (isAdd) {
-                  self.setState({
-                    showCreateDepart: true,
-                    createDepartKey: key
-                  });
-                }
-                setFieldsValue({ [key]: "" });
-              },
-              onCancel() {}
-            });
+            // Modal.confirm({
+            //   title: `查不到该单位，${isAdd ? "是否去新建单位" : "请重新输入"}`,
+            //   content: "",
+            //   onOk() {
+            //     if (isAdd) {
+            //       self.setState({
+            //         showCreateDepart: true,
+            //         createDepartKey: key
+            //       });
+            //     }
+            //     setFieldsValue({ [key]: "" });
+            //   },
+            //   onCancel() {}
+            // });
           }
         }
       });
@@ -2932,6 +2932,8 @@ export default class sider extends PureComponent {
                       showSearch
                       allowClear
                       optionFilterProp="children"
+                      addonBefore="Http://"
+                      addonAfter={<Icon type="setting" />}
                       filterOption={(input, option) =>
                         option.props.children
                           .toLowerCase()
@@ -2953,8 +2955,7 @@ export default class sider extends PureComponent {
                           <Divider style={{ margin: "4px 0" }} />
                           <div
                             style={{ padding: "8px", cursor: "pointer" }}
-                            onClick={() => {
-                              console.log(`添加单位`);
+                            onClick={e => {
                               self.setState({
                                 showCreateDepart: true,
                                 createDepartKey: "productDepartmentId"
@@ -2962,7 +2963,7 @@ export default class sider extends PureComponent {
                               setFieldsValue({ productDepartmentId: "" });
                             }}
                           >
-                            <Icon type="plus" /> 添加单位1
+                            <Icon type="plus" /> 添加单位
                           </div>
                         </div>
                       )}
