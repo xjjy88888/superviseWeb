@@ -1881,6 +1881,12 @@ export default class sider extends PureComponent {
                     fontSize: 18,
                     zIndex: 1
                   }}
+                  onClick={() => {
+                    emitter.emit("mapLocation", {
+                      item: projectItem,
+                      key: key
+                    });
+                  }}
                 />
               </p>
 
