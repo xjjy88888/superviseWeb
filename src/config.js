@@ -1,7 +1,16 @@
-const isFormal = window.location.href.split("/")[3] === "stbcjg";
-console.log(isFormal ? "正式环境" : "测试环境");
+const l = window.location;
+const isFormal = l.href.split("/")[3] === "stbcjg";
+const isLocal = l.hostname === "localhost";
+console.log(isLocal ? "本地环境" : isFormal ? "正式环境" : "测试环境");
 
-const domain = `https://www.zkygis.cn/stbc${isFormal ? "" : "t"}/`;
+//origin: "http://www.zkygis.cn"
+//hostname  www.zkygis.cn
+//pathname  /stbcjgt/
+
+const domain = isLocal
+  ? "http://www.zkygis.cn/stbct/"
+  : `${l.origin}/stbc${isFormal ? "" : "t"}/`;
+
 const imageBaseUrl = "http://www.stbcjg.cn/BasemapService/rest/image";
 const imageQueryBaseUrl = "http://210.36.22.122/BasemapService/rest/image";
 const txKey = "TERBZ-ZU46D-KZT46-HZZIB-RNDMZ-7GFP3";
@@ -14,8 +23,10 @@ const color_border_redLine = "#e60000"; //边框色-红线
 
 const config = {
   domain: domain,
-  download: `https://www.zkygis.cn/stbcjg/Template/`,
-  templateDescription: `https://docs.qq.com/doc/DTEV2TGRsU0RNQUV0?coord=DeJxzNFRxNFQxgEAAEUUCWQ`,
+  // download: `https://www.zkygis.cn/stbcjg/Template/`,
+  download: `http://www.zkygis.cn/stbcjg/Template/`,
+  // templateDescription: `https://docs.qq.com/doc/DTEV2TGRsU0RNQUV0?coord=DeJxzNFRxNFQxgEAAEUUCWQ`,
+  templateDescription: `http://docs.qq.com/doc/DTEV2TGRsU0RNQUV0?coord=DeJxzNFRxNFQxgEAAEUUCWQ`,
   isFormal: isFormal,
 
   url: {
@@ -444,8 +455,11 @@ const config = {
   mapUrl: {
     SHP: `./mapfile/SHP/`,
     mapshaper: `./mapshaper/index.html`,
-    geoserverUrl: "https://www.zkygis.cn/geoserver/ZKYGIS",
-    geoserverQueryUrl: "http://210.36.22.123:8080/geoserver/ZKYGIS",
+    // geoserverUrl: "https://www.zkygis.cn/geoserver/ZKYGIS",
+    geoserverUrl: `${
+      isLocal ? "http://www.zkygis.cn" : l.origin
+    }/geoserver/ZKYGIS`,
+    geoserverQueryUrl: "http://localhost:8080/geoserver/ZKYGIS",
     //根据地图当前范围获取对应历史影像数据接口
     getInfoByExtent: `${imageQueryBaseUrl}/latest/getInfoByExtent`
   },
