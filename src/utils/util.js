@@ -144,11 +144,18 @@ const guid = () => {
   return new Snowflake(1, 1, 0).nextId();
 };
 
+const unique = (arr, k) => {
+  const key = k || "value";
+  const res = new Map();
+  return arr.filter(a => !res.has(a[key]) && res.set(a[key], 1));
+};
+
 export {
   dateFormat,
   dateInitFormat,
   dateTimeFormat,
   getFile,
   accessToken,
-  guid
+  guid,
+  unique
 };

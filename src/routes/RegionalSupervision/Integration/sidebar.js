@@ -33,7 +33,7 @@ import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
 import config from "../../../config";
 import data from "../../../data";
-import { getFile, guid } from "../../../utils/util";
+import { getFile, guid, unique } from "../../../utils/util";
 import { dateInitFormat, accessToken } from "../../../utils/util";
 import Spins from "../../../components/Spins";
 
@@ -982,7 +982,7 @@ export default class sider extends PureComponent {
       point: { pointList },
       redLine: { redLineList }
     } = this.props;
-    const departSelectListAll = departSelectList.concat(departList);
+    const departSelectListAll = unique(departSelectList.concat(departList));
 
     const projectItem = isProjectUpdate
       ? projectInfo
@@ -2921,7 +2921,27 @@ export default class sider extends PureComponent {
                     />
                   )}
                 </Form.Item>
-                <Form.Item label="建设单位" {...formItemLayout}>
+                <Form.Item
+                  label={
+                    <span style={{ userSelect: "none" }}>
+                      建设单位
+                      <Icon
+                        type="plus"
+                        style={{
+                          color: "#1890ff"
+                        }}
+                        onClick={() => {
+                          this.setState({
+                            showCreateDepart: true,
+                            createDepartKey: "productDepartmentId"
+                          });
+                          setFieldsValue({ productDepartmentId: "" });
+                        }}
+                      />
+                    </span>
+                  }
+                  {...formItemLayout}
+                >
                   {getFieldDecorator("productDepartmentId", {
                     initialValue: this.getDepart(
                       projectItem.productDepartment,
@@ -2949,24 +2969,6 @@ export default class sider extends PureComponent {
                       onSelect={(v, e) => {
                         this.setState({ departSearch: e.props.children });
                       }}
-                      dropdownRender={menu => (
-                        <div>
-                          {menu}
-                          <Divider style={{ margin: "4px 0" }} />
-                          <div
-                            style={{ padding: "8px", cursor: "pointer" }}
-                            onClick={e => {
-                              self.setState({
-                                showCreateDepart: true,
-                                createDepartKey: "productDepartmentId"
-                              });
-                              setFieldsValue({ productDepartmentId: "" });
-                            }}
-                          >
-                            <Icon type="plus" /> 添加单位
-                          </div>
-                        </div>
-                      )}
                     >
                       {departSelectListAll.map(item => (
                         <Select.Option value={item.value} key={item.value}>

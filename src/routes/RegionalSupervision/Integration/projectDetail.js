@@ -21,7 +21,7 @@ import emitter from "../../../utils/event";
 import styles from "./index.less";
 import moment from "moment";
 import config from "../../../config";
-import { getFile } from "../../../utils/util";
+import { getFile, unique } from "../../../utils/util";
 import { dateInitFormat, dateFormat, accessToken } from "../../../utils/util";
 
 let self;
@@ -212,7 +212,7 @@ export default class projectDetail extends PureComponent {
       form: { setFieldsValue, getFieldValue }
     } = this.props;
     const { departList, departSearch, isSelect } = this.state;
-    if (departSearch && !isSelect) {
+    if (departSearch) {
       dispatch({
         type: "user/departVaild",
         payload: {
@@ -225,18 +225,18 @@ export default class projectDetail extends PureComponent {
             });
             setFieldsValue({ [key]: data.id });
           } else {
-            Modal.confirm({
-              title: "查不到该单位，是否去新建单位",
-              content: "",
-              onOk() {
-                setFieldsValue({ [key]: "" });
-                emitter.emit("showCreateDepart", {
-                  show: true,
-                  key: key
-                });
-              },
-              onCancel() {}
-            });
+            // Modal.confirm({
+            //   title: "查不到该单位，是否去新建单位",
+            //   content: "",
+            //   onOk() {
+            //     setFieldsValue({ [key]: "" });
+            //     emitter.emit("showCreateDepart", {
+            //       show: true,
+            //       key: key
+            //     });
+            //   },
+            //   onCancel() {}
+            // });
           }
         }
       });
@@ -375,16 +375,15 @@ export default class projectDetail extends PureComponent {
 
   render() {
     const { show, edit, departList } = this.state;
-
     const {
       dispatch,
-      form: { getFieldDecorator },
+      form: { getFieldDecorator, setFieldsValue },
       project: { projectInfo, departSelectList },
       user: { districtList, departUpdateId }
     } = this.props;
 
     const projectItem = projectInfo;
-    const departSelectListAll = departSelectList.concat(departList);
+    const departSelectListAll = unique(departSelectList.concat(departList));
 
     return (
       <div
@@ -1054,7 +1053,26 @@ export default class projectDetail extends PureComponent {
               {this.domUpload(false)}
               <Divider />
               <Col span={12}>
-                <Form.Item label="方案编制单位">
+                <Form.Item
+                  label={
+                    <span style={{ userSelect: "none" }}>
+                      方案编制单位
+                      <Icon
+                        type="plus"
+                        style={{
+                          color: "#1890ff"
+                        }}
+                        onClick={() => {
+                          emitter.emit("showCreateDepart", {
+                            show: true,
+                            key: "projectDepartmentId"
+                          });
+                          setFieldsValue({ projectDepartmentId: "" });
+                        }}
+                      />
+                    </span>
+                  }
+                >
                   {getFieldDecorator("projectDepartmentId", {
                     initialValue: this.getDepart(
                       projectItem.projectDepartment,
@@ -1092,7 +1110,26 @@ export default class projectDetail extends PureComponent {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="监测单位">
+                <Form.Item
+                  label={
+                    <span style={{ userSelect: "none" }}>
+                      监测单位
+                      <Icon
+                        type="plus"
+                        style={{
+                          color: "#1890ff"
+                        }}
+                        onClick={() => {
+                          emitter.emit("showCreateDepart", {
+                            show: true,
+                            key: "monitorDepartmentId"
+                          });
+                          setFieldsValue({ monitorDepartmentId: "" });
+                        }}
+                      />
+                    </span>
+                  }
+                >
                   {getFieldDecorator("monitorDepartmentId", {
                     initialValue: this.getDepart(
                       projectItem.monitorDepartment,
@@ -1130,7 +1167,26 @@ export default class projectDetail extends PureComponent {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="监理单位">
+                <Form.Item
+                  label={
+                    <span style={{ userSelect: "none" }}>
+                      监理单位
+                      <Icon
+                        type="plus"
+                        style={{
+                          color: "#1890ff"
+                        }}
+                        onClick={() => {
+                          emitter.emit("showCreateDepart", {
+                            show: true,
+                            key: "supervisionDepartmentId"
+                          });
+                          setFieldsValue({ supervisionDepartmentId: "" });
+                        }}
+                      />
+                    </span>
+                  }
+                >
                   {getFieldDecorator("supervisionDepartmentId", {
                     initialValue: this.getDepart(
                       projectItem.supervisionDepartment,
@@ -1168,7 +1224,26 @@ export default class projectDetail extends PureComponent {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="设计单位">
+                <Form.Item
+                  label={
+                    <span style={{ userSelect: "none" }}>
+                      设计单位
+                      <Icon
+                        type="plus"
+                        style={{
+                          color: "#1890ff"
+                        }}
+                        onClick={() => {
+                          emitter.emit("showCreateDepart", {
+                            show: true,
+                            key: "designDepartmentId"
+                          });
+                          setFieldsValue({ designDepartmentId: "" });
+                        }}
+                      />
+                    </span>
+                  }
+                >
                   {getFieldDecorator("designDepartmentId", {
                     initialValue: this.getDepart(
                       projectItem.designDepartment,
@@ -1206,7 +1281,26 @@ export default class projectDetail extends PureComponent {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="施工单位">
+                <Form.Item
+                  label={
+                    <span style={{ userSelect: "none" }}>
+                      施工单位
+                      <Icon
+                        type="plus"
+                        style={{
+                          color: "#1890ff"
+                        }}
+                        onClick={() => {
+                          emitter.emit("showCreateDepart", {
+                            show: true,
+                            key: "constructionDepartmentId"
+                          });
+                          setFieldsValue({ constructionDepartmentId: "" });
+                        }}
+                      />
+                    </span>
+                  }
+                >
                   {getFieldDecorator("constructionDepartmentId", {
                     initialValue: this.getDepart(
                       projectItem.constructionDepartment,
@@ -1244,7 +1338,26 @@ export default class projectDetail extends PureComponent {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="验收报告单位">
+                <Form.Item
+                  label={
+                    <span style={{ userSelect: "none" }}>
+                      验收报告单位
+                      <Icon
+                        type="plus"
+                        style={{
+                          color: "#1890ff"
+                        }}
+                        onClick={() => {
+                          emitter.emit("showCreateDepart", {
+                            show: true,
+                            key: "reportDepartmentId"
+                          });
+                          setFieldsValue({ reportDepartmentId: "" });
+                        }}
+                      />
+                    </span>
+                  }
+                >
                   {getFieldDecorator("reportDepartmentId", {
                     initialValue: this.getDepart(
                       projectItem.reportDepartment,
