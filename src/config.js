@@ -456,9 +456,10 @@ const config = {
     SHP: `./mapfile/SHP/`,
     mapshaper: `./mapshaper/index.html`,
     // geoserverUrl: "https://www.zkygis.cn/geoserver/ZKYGIS",
-    geoserverUrl: `${
-      isLocal ? "http://www.zkygis.cn" : l.origin
-    }/geoserver/ZKYGIS`,
+    geoserverUrl: "https://www.zkygis.cn:8143/geoserver/ZKYGIS",
+    // geoserverUrl: `${
+    //   isLocal ? "http://www.zkygis.cn" : l.origin
+    // }/geoserver/ZKYGIS`,
     geoserverQueryUrl: "http://localhost:8080/geoserver/ZKYGIS",
     //根据地图当前范围获取对应历史影像数据接口
     getInfoByExtent: `${imageQueryBaseUrl}/latest/getInfoByExtent`
