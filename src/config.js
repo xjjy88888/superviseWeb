@@ -3,17 +3,12 @@ const isFormal = l.href.split("/")[3] === "stbcjg";
 const isLocal = l.hostname === "localhost";
 console.log(isLocal ? "本地环境" : isFormal ? "正式环境" : "测试环境");
 
-//origin: "http://www.zkygis.cn"
-//hostname  www.zkygis.cn
-//pathname  /stbcjgt/
-
 const domain = isLocal
-  ? "http://www.zkygis.cn/stbct/"
+  ? "http://183.6.178.124:8001/stbct/"
   : `${l.origin}/stbc${isFormal ? "" : "t"}/`;
 
 const imageBaseUrl = "http://www.stbcjg.cn/BasemapService/rest/image";
 const imageQueryBaseUrl = "http://210.36.22.122/BasemapService/rest/image";
-const txKey = "TERBZ-ZU46D-KZT46-HZZIB-RNDMZ-7GFP3";
 
 const color_back_spot = "rgba(255,255,0,0.4)"; //背景色-图斑
 const color_back_redLine = "rgba(230,0,0,0.4)"; //背景色-红线
@@ -23,9 +18,7 @@ const color_border_redLine = "#e60000"; //边框色-红线
 
 const config = {
   domain: domain,
-  // download: `https://www.zkygis.cn/stbcjg/Template/`,
   download: `http://www.zkygis.cn/stbcjg/Template/`,
-  // templateDescription: `https://docs.qq.com/doc/DTEV2TGRsU0RNQUV0?coord=DeJxzNFRxNFQxgEAAEUUCWQ`,
   templateDescription: `http://docs.qq.com/doc/DTEV2TGRsU0RNQUV0?coord=DeJxzNFRxNFQxgEAAEUUCWQ`,
   isFormal: isFormal,
 
@@ -201,11 +194,14 @@ const config = {
     //点查地图服务后台接口
     queryWFSLayer: `${domain}api/Tool/Forward`,
 
-    // 腾讯地图
-    txRegionUrl: `https://apis.map.qq.com/ws/district/v1/list?key=${txKey}`,
+    // 字典类型_列表
+    dictTypeListUrl: `${domain}api/services/app/DictType/GetAll`,
 
-    //天地图
-    tdRegionUrl: `http://api.tianditu.gov.cn/administrative?postStr={"searchWord":"北京","searchType":"1","needSubInfo":"false","needAll":"false","needPolygon":"true","needPre":"true"}&tk=e606f896eaad4c8ab29275f85861af96`
+    // 字典类型_新建修改
+    dictTypeCreateUpdateUrl: `${domain}api/services/app/DictType/`,
+
+    // 字典类型_删除
+    dictTypeDeleteUrl: `${domain}api/services/app/DictType/Delete`
   },
 
   //工具箱
@@ -456,10 +452,12 @@ const config = {
     SHP: `./mapfile/SHP/`,
     mapshaper: `./mapshaper/index.html`,
     // geoserverUrl: "https://www.zkygis.cn/geoserver/ZKYGIS",
-    geoserverUrl: "https://www.zkygis.cn:8143/geoserver/ZKYGIS",
-    // geoserverUrl: `${
-    //   isLocal ? "http://www.zkygis.cn" : l.origin
-    // }/geoserver/ZKYGIS`,
+    //geoserverUrl: "https://www.zkygis.cn:8143/geoserver/ZKYGIS",
+    geoserverUrl: `${
+      isLocal
+        ? "http://183.6.178.124:8143"
+        : `${l.protocol}//${l.hostname}:8143`
+    }/geoserver/ZKYGIS`,
     geoserverQueryUrl: "http://localhost:8080/geoserver/ZKYGIS",
     //根据地图当前范围获取对应历史影像数据接口
     getInfoByExtent: `${imageQueryBaseUrl}/latest/getInfoByExtent`

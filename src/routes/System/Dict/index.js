@@ -1,4 +1,5 @@
 import React, { PureComponent } from "react";
+import { connect } from "dva";
 import {
   Form,
   Icon,
@@ -8,175 +9,51 @@ import {
   message,
   Modal,
   Tabs,
-  Select
+  Select,
+  notification
 } from "antd";
 import { createForm } from "rc-form";
 import Systems from "../../../components/Systems";
 import Highlighter from "react-highlight-words";
-
-const dataType = [
-  {
-    name: "审核状态",
-    code: "审核状态",
-    desc: "审核状态描述"
-  },
-  {
-    name: "立项级别",
-    code: "立项级别",
-    desc: "立项级别描述"
-  },
-  {
-    name: "项目类别",
-    code: "项目类别",
-    desc: "项目类别描述"
-  },
-  {
-    name: "审核状态",
-    code: "审核状态",
-    desc: "审核状态描述"
-  },
-  {
-    name: "立项级别",
-    code: "立项级别",
-    desc: "立项级别描述"
-  },
-  {
-    name: "项目类别",
-    code: "项目类别",
-    desc: "项目类别描述"
-  },
-  {
-    name: "审核状态",
-    code: "审核状态",
-    desc: "审核状态描述"
-  },
-  {
-    name: "立项级别",
-    code: "立项级别",
-    desc: "立项级别描述"
-  },
-  {
-    name: "项目类别",
-    code: "项目类别",
-    desc: "项目类别描述"
-  },
-  {
-    name: "审核状态",
-    code: "审核状态",
-    desc: "审核状态描述"
-  },
-  {
-    name: "立项级别",
-    code: "立项级别",
-    desc: "立项级别描述"
-  },
-  {
-    name: "项目类别",
-    code: "项目类别",
-    desc: "项目类别描述"
-  },
-  {
-    name: "审核状态",
-    code: "审核状态",
-    desc: "审核状态描述"
-  },
-  {
-    name: "立项级别",
-    code: "立项级别",
-    desc: "立项级别描述"
-  },
-  {
-    name: "项目类别",
-    code: "项目类别",
-    desc: "项目类别描述"
-  }
-];
 const data = [
   {
+    key: "1",
     name: "井采非金属矿",
     code: "XMLX-22",
     desc: "井采非金属矿描述"
   },
   {
+    key: "2",
     name: "油气开采工程",
     code: "XMLX-23",
     desc: "油气开采工程描述"
-  },
-  {
-    name: "工业园区工程",
-    code: "XMLX-24",
-    desc: "工业园区工程描述"
-  },
-  {
-    name: "井采非金属矿",
-    code: "XMLX-22",
-    desc: "井采非金属矿描述"
-  },
-  {
-    name: "油气开采工程",
-    code: "XMLX-23",
-    desc: "油气开采工程描述"
-  },
-  {
-    name: "工业园区工程",
-    code: "XMLX-24",
-    desc: "工业园区工程描述"
-  },
-  {
-    name: "井采非金属矿",
-    code: "XMLX-22",
-    desc: "井采非金属矿描述"
-  },
-  {
-    name: "油气开采工程",
-    code: "XMLX-23",
-    desc: "油气开采工程描述"
-  },
-  {
-    name: "工业园区工程",
-    code: "XMLX-24",
-    desc: "工业园区工程描述"
-  },
-  {
-    name: "井采非金属矿",
-    code: "XMLX-22",
-    desc: "井采非金属矿描述"
-  },
-  {
-    name: "油气开采工程",
-    code: "XMLX-23",
-    desc: "油气开采工程描述"
-  },
-  {
-    name: "工业园区工程",
-    code: "XMLX-24",
-    desc: "工业园区工程描述"
-  },
-  {
-    name: "井采非金属矿",
-    code: "XMLX-22",
-    desc: "井采非金属矿描述"
-  },
-  {
-    name: "油气开采工程",
-    code: "XMLX-23",
-    desc: "油气开采工程描述"
-  },
-  {
-    name: "工业园区工程",
-    code: "XMLX-24",
-    desc: "工业园区工程描述"
   }
 ];
+let self;
 
 @createForm()
+@connect(({ dict }) => ({ dict }))
 export default class dict extends PureComponent {
-  state = {
-    state: 0,
-    visibleType: false,
-    visibleData: false,
-    selectedRowsType: [],
-    selectedRowsData: []
+  constructor(props) {
+    super(props);
+    this.state = {
+      state: 0,
+      visibleType: false,
+      visibleData: false,
+      selectedRowsType: [],
+      selectedRowsData: [],
+      id: null
+    };
+  }
+
+  componentDidMount() {
+    self = this;
+    this.dictTypeList();
+  }
+
+  dictTypeList = () => {
+    const { dispatch } = this.props;
+    dispatch({ type: "dict/dictTypeList" });
   };
 
   getColumnSearchProps = dataIndex => ({
@@ -238,6 +115,7 @@ export default class dict extends PureComponent {
       />
     )
   });
+
   handleSearch = (selectedKeys, confirm) => {
     confirm();
     this.setState({ searchText: selectedKeys[0] });
@@ -253,9 +131,16 @@ export default class dict extends PureComponent {
       visibleType,
       visibleData,
       selectedRowsType,
-      selectedRowsData
+      selectedRowsData,
+      id
     } = this.state;
-    const { getFieldDecorator } = this.props.form;
+
+    const {
+      dispatch,
+      form: { getFieldDecorator, resetFields, setFieldsValue },
+      dict: { dictTypeList }
+    } = this.props;
+
     const columnsType = [
       {
         title: "分组名称",
@@ -263,11 +148,11 @@ export default class dict extends PureComponent {
       },
       {
         title: "分组编码",
-        dataIndex: "code"
+        dataIndex: "key"
       },
       {
         title: "分组描述",
-        dataIndex: "desc"
+        dataIndex: "description"
       },
       {
         title: "操作",
@@ -277,8 +162,15 @@ export default class dict extends PureComponent {
             <a
               style={{ marginRight: 20 }}
               onClick={() => {
+                console.log(record);
+                this.props.form.setFieldsValue({
+                  name: record.name,
+                  key: record.key,
+                  description: record.description
+                });
                 this.setState({
-                  visibleType: true
+                  visibleType: true,
+                  id: record.id
                 });
               }}
             >
@@ -293,7 +185,23 @@ export default class dict extends PureComponent {
                   cancelText: "否",
                   okType: "danger",
                   onOk() {
-                    message.success(`删除1个字典类型成功`);
+                    dispatch({
+                      type: "dict/dictTypeDelete",
+                      payload: record.id,
+                      callback: (success, error, result) => {
+                        if (success) {
+                          self.setState({
+                            visibleType: false
+                          });
+                          self.dictTypeList();
+                        }
+                        notification[success ? "success" : "error"]({
+                          message: `删除字典类型${success ? "成功" : "失败"}${
+                            success ? "" : `：${error.message}`
+                          }`
+                        });
+                      }
+                    });
                   },
                   onCancel() {}
                 });
@@ -392,8 +300,10 @@ export default class dict extends PureComponent {
                 icon="plus"
                 style={{ margin: 10 }}
                 onClick={() => {
+                  resetFields();
                   this.setState({
-                    visibleType: true
+                    visibleType: true,
+                    id: null
                   });
                 }}
               >
@@ -427,7 +337,7 @@ export default class dict extends PureComponent {
             </span>
             <Table
               columns={columnsType}
-              dataSource={dataType}
+              dataSource={dictTypeList.items}
               rowSelection={rowSelectionType}
             />
             <Modal
@@ -440,14 +350,31 @@ export default class dict extends PureComponent {
                     message.warning("请填写分组名称");
                     return;
                   }
-                  if (!v.code) {
+                  if (!v.key) {
                     message.warning("请填写分组编码");
                     return;
                   }
-                  this.setState({
-                    visibleType: false
+                  dispatch({
+                    type: "dict/dictTypeCreateUpdate",
+                    payload: { ...v, id: id },
+                    callback: (success, error, result) => {
+                      if (success) {
+                        this.setState({
+                          visibleType: false
+                        });
+                        notification["success"]({
+                          message: `${id ? "编辑" : "新建"}字典类型成功`
+                        });
+                        this.dictTypeList();
+                      } else {
+                        notification["error"]({
+                          message: `${id ? "编辑" : "新建"}字典类型失败：${
+                            error.message
+                          }`
+                        });
+                      }
+                    }
                   });
-                  message.success("保存成功");
                 });
               }}
               onCancel={() => {
@@ -479,7 +406,7 @@ export default class dict extends PureComponent {
                   }
                   hasFeedback
                 >
-                  {getFieldDecorator("code", {})(<Input />)}
+                  {getFieldDecorator("key", {})(<Input />)}
                 </Form.Item>
                 <Form.Item
                   label={
@@ -489,7 +416,7 @@ export default class dict extends PureComponent {
                   }
                   hasFeedback
                 >
-                  {getFieldDecorator("desc", {})(
+                  {getFieldDecorator("description", {})(
                     <Input.TextArea autosize style={{ width: 180 }} />
                   )}
                 </Form.Item>
@@ -599,7 +526,6 @@ export default class dict extends PureComponent {
                     <Select
                       showSearch
                       allowClear
-                      defaultValue="1"
                       optionFilterProp="children"
                       style={{ width: 180 }}
                     >

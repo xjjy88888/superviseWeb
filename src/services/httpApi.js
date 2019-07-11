@@ -630,6 +630,7 @@ export async function removeProjectScopeGraphic(project_id) {
     }
   });
 }*/
+
 export async function queryWFSLayer(params) {
   //console.log(params);
   return request(`${config.url.queryWFSLayer}`, {
@@ -645,6 +646,7 @@ export async function queryWFSLayer(params) {
     })
   });
 }
+
 //根据地图当前范围获取对应历史影像数据接口
 export async function getInfoByExtent(params) {
   //return request(`${config.mapUrl.getInfoByExtent}`, {
@@ -661,11 +663,48 @@ export async function getInfoByExtent(params) {
     })
   });
 }
+
 //根据地图当前范围获取对应历史扰动图斑数据接口
 export async function getHistorySpotTimeByExtent(params) {
   return request(params.geojsonUrl, {
     method: "GET",
     dataType: "json",
     headers: {}
+  });
+}
+
+// 字典类型_列表
+export async function dictTypeListApi() {
+  return request(`${config.url.dictTypeListUrl}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 字典类型_新建修改
+export async function dictTypeCreateUpdateApi(params) {
+  return request(
+    `${config.url.dictTypeCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify(params)
+    }
+  );
+}
+
+// 字典类型_删除
+export async function dictTypeDeleteApi(id) {
+  return request(`${config.url.dictTypeDeleteUrl}?id=${id}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    }
   });
 }
