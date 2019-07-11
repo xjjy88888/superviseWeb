@@ -52,7 +52,8 @@ export default class siderbarDetail extends PureComponent {
       item: { project_id: "" },
       fileList: [],
       fromList: false,
-      showSpotHistory: false
+      showSpotHistory: false,
+      spotHistoryId: ""
     };
     this.map = null;
   }
@@ -180,6 +181,7 @@ export default class siderbarDetail extends PureComponent {
     const { dispatch } = this.props;
     this.queryDetail(id, "spot/querySpotById");
     if (!isHistory) {
+      this.setState({ spotHistoryId: id });
       dispatch({
         type: "spot/spotHistory",
         payload: { id: id }
@@ -355,7 +357,8 @@ export default class siderbarDetail extends PureComponent {
       previewImage,
       previewVisible_min,
       relateProject,
-      showSpotHistory
+      showSpotHistory,
+      spotHistoryId
     } = this.state;
 
     const projectSelectListAll = [
@@ -1112,6 +1115,9 @@ export default class siderbarDetail extends PureComponent {
                   style={{ marginRight: 15 }}
                   onClick={() => {
                     this.setState({ showSpotHistory: !showSpotHistory });
+                    if (showSpotHistory) {
+                      this.querySpotById(spotHistoryId, true);
+                    }
                   }}
                 >
                   历史查看
