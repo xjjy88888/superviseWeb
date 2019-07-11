@@ -83,7 +83,7 @@ export default class siderbarDetail extends PureComponent {
       const filter = dicList.filter(item => {
         return item.dictTypeName === type;
       });
-      return filter.map(item => item.value);
+      return filter.map(item => item.dictTableValue);
     } else {
       return [];
     }

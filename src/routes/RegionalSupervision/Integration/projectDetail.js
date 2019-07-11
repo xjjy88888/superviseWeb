@@ -262,7 +262,7 @@ export default class projectDetail extends PureComponent {
       const filter = dicList.filter(item => {
         return item.id === id;
       });
-      return filter.map(item => item.value).join(",");
+      return filter.map(item => item.dictTableValue).join(",");
     } else {
       return "";
     }

@@ -141,14 +141,20 @@ export default class dict extends PureComponent {
       dict: { dictTypeList }
     } = this.props;
 
+    const dataSourceType = dictTypeList.items.map(item => {
+      return { ...item, key: item.id };
+    });
+
     const columnsType = [
       {
         title: "分组名称",
-        dataIndex: "name"
+        dataIndex: "dictTypeName",
+        ...this.getColumnSearchProps("dictTypeName")
       },
       {
         title: "分组编码",
-        dataIndex: "key"
+        dataIndex: "dictTypeKey",
+        ...this.getColumnSearchProps("dictTypeKey")
       },
       {
         title: "分组描述",
@@ -162,10 +168,9 @@ export default class dict extends PureComponent {
             <a
               style={{ marginRight: 20 }}
               onClick={() => {
-                console.log(record);
                 this.props.form.setFieldsValue({
-                  name: record.name,
-                  key: record.key,
+                  dictTypeName: record.dictTypeName,
+                  dictTypeKey: record.dictTypeKey,
                   description: record.description
                 });
                 this.setState({
@@ -174,7 +179,7 @@ export default class dict extends PureComponent {
                 });
               }}
             >
-              修改
+              编辑
             </a>
             <a
               onClick={() => {
@@ -239,7 +244,7 @@ export default class dict extends PureComponent {
                 });
               }}
             >
-              修改
+              编辑
             </a>
             <a
               onClick={() => {
@@ -337,7 +342,7 @@ export default class dict extends PureComponent {
             </span>
             <Table
               columns={columnsType}
-              dataSource={dictTypeList.items}
+              dataSource={dataSourceType}
               rowSelection={rowSelectionType}
             />
             <Modal
@@ -346,11 +351,11 @@ export default class dict extends PureComponent {
               onOk={() => {
                 this.props.form.validateFields((err, v) => {
                   console.log("添加字典类型", v);
-                  if (!v.name) {
+                  if (!v.dictTypeName) {
                     message.warning("请填写分组名称");
                     return;
                   }
-                  if (!v.key) {
+                  if (!v.dictTypeKey) {
                     message.warning("请填写分组编码");
                     return;
                   }
@@ -396,7 +401,7 @@ export default class dict extends PureComponent {
                   }
                   hasFeedback
                 >
-                  {getFieldDecorator("name", {})(<Input />)}
+                  {getFieldDecorator("dictTypeName", {})(<Input />)}
                 </Form.Item>
                 <Form.Item
                   label={
@@ -406,7 +411,7 @@ export default class dict extends PureComponent {
                   }
                   hasFeedback
                 >
-                  {getFieldDecorator("key", {})(<Input />)}
+                  {getFieldDecorator("dictTypeKey", {})(<Input />)}
                 </Form.Item>
                 <Form.Item
                   label={
@@ -431,8 +436,10 @@ export default class dict extends PureComponent {
               optionFilterProp="children"
               style={{ width: 200, margin: 10 }}
             >
-              {selectList.map(item => (
-                <Select.Option value={item.value}>{item.text}</Select.Option>
+              {selectList.map((item, index) => (
+                <Select.Option value={item.value} key={index}>
+                  {item.text}
+                </Select.Option>
               ))}
             </Select>
             <span>
@@ -529,8 +536,8 @@ export default class dict extends PureComponent {
                       optionFilterProp="children"
                       style={{ width: 180 }}
                     >
-                      {selectList.map(item => (
-                        <Select.Option value={item.value}>
+                      {selectList.map((item, index) => (
+                        <Select.Option value={item.value} key={index}>
                           {item.text}
                         </Select.Option>
                       ))}

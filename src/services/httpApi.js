@@ -434,7 +434,7 @@ export async function basinOrganizationApi() {
 
 // 字典
 export async function dictApi() {
-  return request(`${config.url.dictUrl}?DictTypeName=`, {
+  return request(`${config.url.dictUrl}?SkipCount=0&MaxResultCount=10000`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
@@ -675,12 +675,15 @@ export async function getHistorySpotTimeByExtent(params) {
 
 // 字典类型_列表
 export async function dictTypeListApi() {
-  return request(`${config.url.dictTypeListUrl}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken()}`
+  return request(
+    `${config.url.dictTypeListUrl}?SkipCount=0&MaxResultCount=1000`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`
+      }
     }
-  });
+  );
 }
 
 // 字典类型_新建修改

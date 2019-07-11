@@ -75,6 +75,7 @@ export default {
           result: { items: dicList }
         }
       } = yield call(dictApi, payload);
+      console.log("dicList", dicList);
       if (success) {
         yield put({
           type: "save",

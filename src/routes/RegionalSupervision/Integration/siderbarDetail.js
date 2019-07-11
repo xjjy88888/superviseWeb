@@ -247,7 +247,7 @@ export default class siderbarDetail extends PureComponent {
     } = this.props;
     if (value) {
       const filter = dicList.filter(item => {
-        return item.dictTypeName === type && item.value === value;
+        return item.dictTypeName === type && item.dictTableValue === value;
       });
       return filter.map(item => item.id).join(",");
     } else {
