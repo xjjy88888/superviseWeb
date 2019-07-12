@@ -7488,7 +7488,7 @@ slider drag end
     function getHistory() {
       var hist;
       try {
-        hist = JSON.parse(sessionStorage.getItem("console_history"));
+        hist = JSON.parse(localStorage.getItem("console_history"));
       } catch (e) {}
       return hist && hist.length > 0 ? hist : [];
     }
@@ -7496,7 +7496,7 @@ slider drag end
     function saveHistory(history) {
       try {
         history = history.filter(Boolean); // TODO: fix condition that leaves a blank line on the history
-        sessionStorage.setItem(
+        localStorage.setItem(
           "console_history",
           JSON.stringify(history.slice(-50))
         );

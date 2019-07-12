@@ -744,7 +744,7 @@ export default class integration extends PureComponent {
    * 获取url参数
    */
   initUrlParams = () => {
-    let userParams = JSON.parse(sessionStorage.getItem("user"));
+    let userParams = JSON.parse(localStorage.getItem("user"));
     if (!userParams) {
       this.props.dispatch({
         type: "user/loginOut"
@@ -1367,7 +1367,7 @@ export default class integration extends PureComponent {
    *加载默认图层控件
    */
   loadLayersControl = () => {
-    const frequentEdit = sessionStorage.getItem("frequentEdit");
+    const frequentEdit = localStorage.getItem("frequentEdit");
     console.log("是否频繁编辑", frequentEdit, typeof frequentEdit);
     if (frequentEdit === "1") {
       //加载项目红线图层wms

@@ -9,7 +9,7 @@ import Review from "./routes/System/User/Review";
 import Society from "./routes/System/User/Society";
 import Account from "./routes/System/User/Administrative/Account";
 import Role from "./routes/System/User/Administrative/Role";
-import Area from "./routes/System/Area";
+import District from "./routes/System/District";
 import Dict from "./routes/System/Dict";
 import Branch from "./routes/System/Branch";
 import Company from "./routes/System/Company";
@@ -47,7 +47,7 @@ function RouterConfig({ history }) {
         <Route path="/system/user/administrative/role" component={Role} exact />
         <Route path="/system/dict" component={Dict} exact />
         <Route path="/system/company" component={Company} exact />
-        <Route path="/system/area" component={Area} exact />
+        <Route path="/system/district" component={District} exact />
         <Route path="/system/branch" component={Branch} exact />
       </Switch>
     </Router>

@@ -59,8 +59,8 @@ const getFile = url => {
 };
 
 const accessToken = () =>
-  sessionStorage.length > 0 && sessionStorage.user
-    ? JSON.parse(sessionStorage.user).accessToken
+  localStorage.length > 0 && localStorage.user
+    ? JSON.parse(localStorage.user).accessToken
     : "";
 
 const guid = () => {

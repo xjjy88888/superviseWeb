@@ -17,7 +17,6 @@ export default {
         us_name: "请登录"
       }
     ],
-    districtList: [{ children: null, id: null, value: null }],
     dicList: [],
     departSelectList: [],
     basinOrganList: [],
@@ -43,7 +42,7 @@ export default {
         notification["success"]({
           message: "登录成功"
         });
-        sessionStorage.setItem("user", JSON.stringify(response.result));
+        localStorage.setItem("user", JSON.stringify(response.result));
         yield put({
           type: "save",
           payload: { current_user: response.result }
@@ -54,15 +53,6 @@ export default {
           message: `登录失败：${response.error.message}`
         });
       }
-    },
-    *queryDistrict({ payload }, { call, put }) {
-      const {
-        data: { result: districtList }
-      } = yield call(districtApi);
-      yield put({
-        type: "save",
-        payload: { districtList: [districtList] }
-      });
     },
     *loginOut({ payload }, { call, put }) {
       yield put(routerRedux.replace("/login"));

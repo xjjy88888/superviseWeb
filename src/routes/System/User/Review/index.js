@@ -42,7 +42,7 @@ export default class review extends PureComponent {
   };
 
   componentDidMount() {
-    sessionStorage.setItem("key", "/user/review");
+    localStorage.setItem("key", "/user/review");
   }
 
   getColumnSearchProps = dataIndex => ({

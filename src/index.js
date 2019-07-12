@@ -16,6 +16,7 @@ app.model(require("./models/spot").default);
 app.model(require("./models/redLine").default);
 app.model(require("./models/annex").default);
 app.model(require("./models/dict").default);
+app.model(require("./models/district").default);
 
 // 4. Router
 app.router(require("./router").default);

@@ -78,7 +78,7 @@ export default class layouts extends PureComponent {
         </Menu.Item>
       </Menu>
     );
-    const user = JSON.parse(sessionStorage.getItem("user"));
+    const user = JSON.parse(localStorage.getItem("user"));
     const displayName = user ? user.displayName : "";
     const departmentName = user ? user.departmentName : "";
 

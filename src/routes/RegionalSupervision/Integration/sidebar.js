@@ -45,14 +45,15 @@ const formItemLayout = {
   wrapperCol: { span: 16 }
 };
 
-@connect(({ project, spot, point, other, user, annex, redLine }) => ({
+@connect(({ project, spot, point, other, user, annex, redLine, district }) => ({
   project,
   spot,
   point,
   other,
   user,
   annex,
-  redLine
+  redLine,
+  district
 }))
 @createForm()
 export default class sider extends PureComponent {
@@ -443,7 +444,7 @@ export default class sider extends PureComponent {
   queryDistrict = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: "user/queryDistrict"
+      type: "district/districtList"
     });
   };
 
@@ -873,7 +874,7 @@ export default class sider extends PureComponent {
   //search
   search = v => {
     const {
-      user: { districtList }
+      district: { districtList }
     } = this.props;
 
     const { key, queryInfo } = this.state;
@@ -976,7 +977,8 @@ export default class sider extends PureComponent {
         getFieldValue,
         setFieldValue
       },
-      user: { districtList, basinOrganList },
+      district: { districtList },
+      user: { basinOrganList },
       project: { projectList, projectInfo, projectListAdd, departSelectList },
       spot: { spotList, projectInfoSpotList },
       point: { pointList },

@@ -167,9 +167,6 @@ const config = {
     // 项目位置
     projectPositionUrl: `${domain}api/services/app/Project/GetPoint`,
 
-    // 行政区域
-    districtUrl: `${domain}api/services/app/User/GetDistrictCodesTree`,
-
     // 获取边界
     boundaryUrl: `${domain}api/services/app/User/GetBoundAsync`,
 
@@ -211,6 +208,15 @@ const config = {
 
     // 字典数据_删除
     dictDataDeleteUrl: `${domain}api/services/app/DictTable/Delete`,
+
+    // 行政区划_列表
+    districtListUrl: `${domain}api/services/app/User/GetDistrictCodesTree`,
+
+    // 字典数据_新建修改
+    districtCreateUpdateUrl: `${domain}api/services/app/DistrictCode/`,
+
+    // 字典数据_删除
+    districtDeleteUrl: `${domain}api/services/app/DistrictCode/Delete`
   },
 
   //工具箱

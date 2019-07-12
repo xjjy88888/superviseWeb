@@ -509,16 +509,6 @@ export async function annexUploadBase64Api(params) {
   });
 }
 
-// 行政区域
-export async function districtApi() {
-  return request(`${config.url.districtUrl}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken()}`
-    }
-  });
-}
-
 // 项目位置
 export async function projectPositionApi(id) {
   return request(`${config.url.projectPositionUrl}?id=${id}`, {
@@ -745,6 +735,42 @@ export async function dictDataCreateUpdateApi(params) {
 // 字典数据_删除
 export async function dictDataDeleteApi(id) {
   return request(`${config.url.dictDataDeleteUrl}?id=${id}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    }
+  });
+}
+
+// 行政区域_列表
+export async function districtListApi() {
+  return request(`${config.url.districtListUrl}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 行政区域_新建编辑
+export async function districtCreateUpdateApi(params) {
+  return request(
+    `${config.url.districtCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify(params)
+    }
+  );
+}
+
+// 行政区域_删除
+export async function districtDeleteApi(id) {
+  return request(`${config.url.districtDeleteUrl}?id=${id}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,

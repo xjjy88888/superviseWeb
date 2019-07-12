@@ -44,7 +44,7 @@ const menuList = [
   },
   {
     title: "行政区划管理",
-    key: "/area",
+    key: "/district",
     icon: "global",
     subMenu: []
   },
@@ -77,7 +77,7 @@ export default class spins extends PureComponent {
               style={{
                 height: window.innerHeight - 46
               }}
-              selectedKeys={[sessionStorage.getItem("key")]}
+              selectedKeys={[localStorage.getItem("key")]}
               defaultOpenKeys={["/user"]}
               defaultSelectedKeys={["/user/review"]}
             >
@@ -102,7 +102,7 @@ export default class spins extends PureComponent {
                                 to={`/system${it.key}`}
                                 onClick={() => {
                                   console.log(it.key);
-                                  sessionStorage.setItem("key", it.key);
+                                  localStorage.setItem("key", it.key);
                                 }}
                               >
                                 {it.title}
@@ -116,7 +116,7 @@ export default class spins extends PureComponent {
                             to={`/system${ite.key}`}
                             onClick={() => {
                               console.log(ite.key);
-                              sessionStorage.setItem("key", ite.key);
+                              localStorage.setItem("key", ite.key);
                             }}
                           >
                             {ite.title}
@@ -131,7 +131,7 @@ export default class spins extends PureComponent {
                       to={`/system${item.key}`}
                       onClick={() => {
                         console.log(item.key);
-                        sessionStorage.setItem("key", item.key);
+                        localStorage.setItem("key", item.key);
                       }}
                     >
                       <Icon type={item.icon} />

@@ -276,7 +276,7 @@ export default class splitScreen extends PureComponent {
    * 获取url参数
    */
   initUrlParams = () => {
-    let userParams = JSON.parse(sessionStorage.getItem("user"));
+    let userParams = JSON.parse(localStorage.getItem("user"));
     if (!userParams) {
       this.props.dispatch({
         type: "user/loginOut"

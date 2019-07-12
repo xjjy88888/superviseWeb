@@ -20,15 +20,15 @@ export default class login extends PureComponent {
   }
 
   componentDidMount() {
-    sessionStorage.setItem("key", "");
+    localStorage.setItem("key", "");
     this.props.form.validateFields();
   }
   handleSubmit = e => {
-    sessionStorage.setItem("frequentEdit", 0);
+    localStorage.setItem("frequentEdit", 0);
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        sessionStorage.setItem("frequentEdit", values.frequentEdit ? 1 : 0);
+        localStorage.setItem("frequentEdit", values.frequentEdit ? 1 : 0);
         let lastLogin;
         if (values.remember) {
           lastLogin = {
@@ -43,7 +43,7 @@ export default class login extends PureComponent {
             remember: false
           };
         }
-        sessionStorage.setItem("lastLogin", JSON.stringify(lastLogin));
+        localStorage.setItem("lastLogin", JSON.stringify(lastLogin));
         this.setState({ showSpin: true });
         this.props.dispatch({
           type: "user/login",
@@ -67,7 +67,7 @@ export default class login extends PureComponent {
   render() {
     const { getFieldDecorator, getFieldsError } = this.props.form;
     const { showSpin } = this.state;
-    const lastLogin = JSON.parse(sessionStorage.getItem("lastLogin"));
+    const lastLogin = JSON.parse(localStorage.getItem("lastLogin"));
     return (
       <div
         style={{
