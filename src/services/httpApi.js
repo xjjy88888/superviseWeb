@@ -686,7 +686,7 @@ export async function dictTypeListApi() {
   );
 }
 
-// 字典类型_新建修改
+// 字典类型_新建编辑
 export async function dictTypeCreateUpdateApi(params) {
   return request(
     `${config.url.dictTypeCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
@@ -704,6 +704,47 @@ export async function dictTypeCreateUpdateApi(params) {
 // 字典类型_删除
 export async function dictTypeDeleteApi(id) {
   return request(`${config.url.dictTypeDeleteUrl}?id=${id}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    }
+  });
+}
+
+// 字典数据_列表
+export async function dictDataListApi(id) {
+  return request(
+    `${
+      config.url.dictDataListUrl
+    }?SkipCount=0&MaxResultCount=1000&DictTypeId=${id}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`
+      }
+    }
+  );
+}
+
+// 字典数据_新建编辑
+export async function dictDataCreateUpdateApi(params) {
+  return request(
+    `${config.url.dictDataCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify(params)
+    }
+  );
+}
+
+// 字典数据_删除
+export async function dictDataDeleteApi(id) {
+  return request(`${config.url.dictDataDeleteUrl}?id=${id}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,

@@ -21,7 +21,7 @@ export default class login extends PureComponent {
   }
 
   componentDidMount() {
-    localStorage.key = "";
+    sessionStorage.setItem("key", "");
     this.props.form.validateFields();
   }
   handleSubmit = e => {
@@ -44,7 +44,7 @@ export default class login extends PureComponent {
             remember: false
           };
         }
-        localStorage.setItem("lastLogin", JSON.stringify(lastLogin));
+        sessionStorage.setItem("lastLogin", JSON.stringify(lastLogin));
         this.setState({ showSpin: true });
         this.props.dispatch({
           type: "user/login",
@@ -68,7 +68,7 @@ export default class login extends PureComponent {
   render() {
     const { getFieldDecorator, getFieldsError } = this.props.form;
     const { showSpin } = this.state;
-    const lastLogin = JSON.parse(localStorage.getItem("lastLogin"));
+    const lastLogin = JSON.parse(sessionStorage.getItem("lastLogin"));
     return (
       <Layout
         style={{

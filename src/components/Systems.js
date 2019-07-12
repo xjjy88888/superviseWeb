@@ -77,7 +77,7 @@ export default class spins extends PureComponent {
               style={{
                 height: window.innerHeight - 46
               }}
-              selectedKeys={[localStorage.getItem("key")]}
+              selectedKeys={[sessionStorage.getItem("key")]}
               defaultOpenKeys={["/user"]}
               defaultSelectedKeys={["/user/review"]}
             >
@@ -102,7 +102,7 @@ export default class spins extends PureComponent {
                                 to={`/system${it.key}`}
                                 onClick={() => {
                                   console.log(it.key);
-                                  localStorage.setItem("key", it.key);
+                                  sessionStorage.setItem("key", it.key);
                                 }}
                               >
                                 {it.title}
@@ -116,7 +116,7 @@ export default class spins extends PureComponent {
                             to={`/system${ite.key}`}
                             onClick={() => {
                               console.log(ite.key);
-                              localStorage.setItem("key", ite.key);
+                              sessionStorage.setItem("key", ite.key);
                             }}
                           >
                             {ite.title}
@@ -131,7 +131,7 @@ export default class spins extends PureComponent {
                       to={`/system${item.key}`}
                       onClick={() => {
                         console.log(item.key);
-                        localStorage.setItem("key", item.key);
+                        sessionStorage.setItem("key", item.key);
                       }}
                     >
                       <Icon type={item.icon} />

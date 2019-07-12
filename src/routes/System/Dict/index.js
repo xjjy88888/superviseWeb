@@ -15,20 +15,6 @@ import {
 import { createForm } from "rc-form";
 import Systems from "../../../components/Systems";
 import Highlighter from "react-highlight-words";
-const data = [
-  {
-    key: "1",
-    name: "井采非金属矿",
-    code: "XMLX-22",
-    desc: "井采非金属矿描述"
-  },
-  {
-    key: "2",
-    name: "油气开采工程",
-    code: "XMLX-23",
-    desc: "油气开采工程描述"
-  }
-];
 let self;
 
 @createForm()
@@ -42,7 +28,9 @@ export default class dict extends PureComponent {
       visibleData: false,
       selectedRowsType: [],
       selectedRowsData: [],
-      id: null
+      id: null,
+      selectDefaultValue: null,
+      isEdit: false
     };
   }
 
@@ -53,7 +41,20 @@ export default class dict extends PureComponent {
 
   dictTypeList = () => {
     const { dispatch } = this.props;
-    dispatch({ type: "dict/dictTypeList" });
+    dispatch({
+      type: "dict/dictTypeList",
+      callback: (success, error, result) => {
+        if (success && result.items) {
+          this.dictDataList(result.items[0].id);
+          this.setState({ selectDefaultValue: result.items[0].id });
+        }
+      }
+    });
+  };
+
+  dictDataList = id => {
+    const { dispatch } = this.props;
+    dispatch({ type: "dict/dictDataList", payload: id || "" });
   };
 
   getColumnSearchProps = dataIndex => ({
@@ -132,16 +133,22 @@ export default class dict extends PureComponent {
       visibleData,
       selectedRowsType,
       selectedRowsData,
-      id
+      id,
+      selectDefaultValue,
+      isEdit
     } = this.state;
 
     const {
       dispatch,
       form: { getFieldDecorator, resetFields, setFieldsValue },
-      dict: { dictTypeList }
+      dict: { dictTypeList, dictDataList }
     } = this.props;
 
     const dataSourceType = dictTypeList.items.map(item => {
+      return { ...item, key: item.id };
+    });
+
+    const dataSourceData = dictDataList.items.map(item => {
       return { ...item, key: item.id };
     });
 
@@ -221,15 +228,22 @@ export default class dict extends PureComponent {
     const columnsData = [
       {
         title: "字典名称",
-        dataIndex: "name"
+        dataIndex: "dictTableValue",
+        ...this.getColumnSearchProps("dictTableValue")
       },
       {
         title: "字典编码",
-        dataIndex: "code"
+        dataIndex: "dictTableKey",
+        ...this.getColumnSearchProps("dictTableKey")
+      },
+      {
+        title: "字典分组",
+        dataIndex: "dictTypeName",
+        ...this.getColumnSearchProps("dictTypeName")
       },
       {
         title: "字典描述",
-        dataIndex: "desc"
+        dataIndex: "description"
       },
       {
         title: "操作",
@@ -239,8 +253,16 @@ export default class dict extends PureComponent {
             <a
               style={{ marginRight: 20 }}
               onClick={() => {
+                this.props.form.setFieldsValue({
+                  dictTypeId: record.dictTypeId,
+                  dictTableValue: record.dictTableValue,
+                  dictTableKey: record.dictTableKey,
+                  description: record.description
+                });
                 this.setState({
-                  visibleData: true
+                  visibleData: true,
+                  id: record.id,
+                  isEdit: true
                 });
               }}
             >
@@ -255,7 +277,23 @@ export default class dict extends PureComponent {
                   cancelText: "否",
                   okType: "danger",
                   onOk() {
-                    message.success(`删除1个数据字典成功`);
+                    dispatch({
+                      type: "dict/dictDataDelete",
+                      payload: record.id,
+                      callback: (success, error, result) => {
+                        if (success) {
+                          self.setState({
+                            visibleType: false
+                          });
+                          self.dictDataList(selectDefaultValue);
+                        }
+                        notification[success ? "success" : "error"]({
+                          message: `删除字典数据${success ? "成功" : "失败"}${
+                            success ? "" : `：${error.message}`
+                          }`
+                        });
+                      }
+                    });
                   },
                   onCancel() {}
                 });
@@ -299,7 +337,7 @@ export default class dict extends PureComponent {
     return (
       <Systems>
         <Tabs defaultActiveKey="1">
-          <Tabs.TabPane tab="字典类型分组" key="1">
+          <Tabs.TabPane tab="字典分组" key="1">
             <span>
               <Button
                 icon="plus"
@@ -346,7 +384,7 @@ export default class dict extends PureComponent {
               rowSelection={rowSelectionType}
             />
             <Modal
-              title="添加字典类型"
+              title="添加字典分组"
               visible={visibleType}
               onOk={() => {
                 this.props.form.validateFields((err, v) => {
@@ -368,12 +406,12 @@ export default class dict extends PureComponent {
                           visibleType: false
                         });
                         notification["success"]({
-                          message: `${id ? "编辑" : "新建"}字典类型成功`
+                          message: `${id ? "编辑" : "添加"}字典类型成功`
                         });
                         this.dictTypeList();
                       } else {
                         notification["error"]({
-                          message: `${id ? "编辑" : "新建"}字典类型失败：${
+                          message: `${id ? "编辑" : "添加"}字典类型失败：${
                             error.message
                           }`
                         });
@@ -428,17 +466,21 @@ export default class dict extends PureComponent {
               </Form>
             </Modal>
           </Tabs.TabPane>
-          <Tabs.TabPane tab="数组字典管理" key="2">
+          <Tabs.TabPane tab="字典数据" key="2">
             <Select
               showSearch
               allowClear
-              defaultValue="1"
+              value={selectDefaultValue}
               optionFilterProp="children"
               style={{ width: 200, margin: 10 }}
+              onChange={v => {
+                this.dictDataList(v || "");
+                this.setState({ selectDefaultValue: v });
+              }}
             >
-              {selectList.map((item, index) => (
-                <Select.Option value={item.value} key={index}>
-                  {item.text}
+              {dataSourceType.map((item, index) => (
+                <Select.Option value={item.id} key={index}>
+                  {item.dictTypeName}
                 </Select.Option>
               ))}
             </Select>
@@ -447,8 +489,11 @@ export default class dict extends PureComponent {
                 icon="plus"
                 style={{ margin: 10 }}
                 onClick={() => {
+                  resetFields();
                   this.setState({
-                    visibleData: true
+                    visibleData: true,
+                    id: null,
+                    isEdit: false
                   });
                 }}
               >
@@ -482,35 +527,53 @@ export default class dict extends PureComponent {
             </span>
             <Table
               columns={columnsData}
-              dataSource={data}
+              dataSource={dataSourceData}
               rowSelection={rowSelectionData}
             />
 
             <Modal
-              title="添加数组字典"
+              title="添加字典数据"
               visible={visibleData}
               onOk={() => {
                 this.props.form.validateFields((err, v) => {
                   console.log("添加数组字典", v);
-                  if (!v.type) {
+                  if (!v.dictTypeId) {
                     message.warning("请选择分组名称");
                     return;
                   }
-                  if (!v.name) {
+                  if (!v.dictTableValue) {
                     message.warning("请填写字典名称");
                     return;
                   }
-                  if (!v.code) {
+                  if (!v.dictTableKey) {
                     message.warning("请填写字典编码");
                     return;
                   }
-                  this.setState({
-                    visibleData: false
+                  dispatch({
+                    type: "dict/dictDataCreateUpdate",
+                    payload: { ...v, id: id },
+                    callback: (success, error, result) => {
+                      if (success) {
+                        this.setState({
+                          visibleData: false
+                        });
+                        notification["success"]({
+                          message: `${id ? "编辑" : "添加"}字典数据成功`
+                        });
+                        this.dictDataList(selectDefaultValue);
+                      } else {
+                        notification["error"]({
+                          message: `${id ? "编辑" : "添加"}字典数据失败：${
+                            error.message
+                          }`
+                        });
+                      }
+                    }
                   });
-                  message.success("保存成功");
                 });
               }}
               onCancel={() => {
+                this.dictDataList(selectDefaultValue);
                 this.setState({
                   visibleData: false
                 });
@@ -529,16 +592,22 @@ export default class dict extends PureComponent {
                   }
                   hasFeedback
                 >
-                  {getFieldDecorator("type", {})(
+                  {getFieldDecorator("dictTypeId", {
+                    initialValue: selectDefaultValue
+                  })(
                     <Select
                       showSearch
                       allowClear
                       optionFilterProp="children"
+                      disabled={isEdit}
                       style={{ width: 180 }}
+                      onChange={v => {
+                        this.setState({ selectDefaultValue: v });
+                      }}
                     >
-                      {selectList.map((item, index) => (
-                        <Select.Option value={item.value} key={index}>
-                          {item.text}
+                      {dataSourceType.map((item, index) => (
+                        <Select.Option value={item.id} key={index}>
+                          {item.dictTypeName}
                         </Select.Option>
                       ))}
                     </Select>
@@ -552,7 +621,7 @@ export default class dict extends PureComponent {
                   }
                   hasFeedback
                 >
-                  {getFieldDecorator("name", {})(<Input />)}
+                  {getFieldDecorator("dictTableValue", {})(<Input />)}
                 </Form.Item>
                 <Form.Item
                   label={
@@ -562,7 +631,7 @@ export default class dict extends PureComponent {
                   }
                   hasFeedback
                 >
-                  {getFieldDecorator("code", {})(<Input />)}
+                  {getFieldDecorator("dictTableKey", {})(<Input />)}
                 </Form.Item>
                 <Form.Item
                   label={
@@ -572,7 +641,7 @@ export default class dict extends PureComponent {
                   }
                   hasFeedback
                 >
-                  {getFieldDecorator("desc", {})(
+                  {getFieldDecorator("description", {})(
                     <Input.TextArea autosize style={{ width: 180 }} />
                   )}
                 </Form.Item>

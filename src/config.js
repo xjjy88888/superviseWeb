@@ -201,7 +201,16 @@ const config = {
     dictTypeCreateUpdateUrl: `${domain}api/services/app/DictType/`,
 
     // 字典类型_删除
-    dictTypeDeleteUrl: `${domain}api/services/app/DictType/Delete`
+    dictTypeDeleteUrl: `${domain}api/services/app/DictType/Delete`,
+
+    // 字典数据_列表
+    dictDataListUrl: `${domain}api/services/app/DictTable/GetAll`,
+
+    // 字典数据_新建修改
+    dictDataCreateUpdateUrl: `${domain}api/services/app/DictTable/`,
+
+    // 字典数据_删除
+    dictDataDeleteUrl: `${domain}api/services/app/DictTable/Delete`,
   },
 
   //工具箱

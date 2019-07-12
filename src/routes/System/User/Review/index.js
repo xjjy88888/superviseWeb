@@ -41,6 +41,10 @@ export default class review extends PureComponent {
     selectedRows: []
   };
 
+  componentDidMount() {
+    sessionStorage.setItem("key", "/user/review");
+  }
+
   getColumnSearchProps = dataIndex => ({
     filterDropdown: ({
       setSelectedKeys,

@@ -1,10 +1,13 @@
 import { notification } from "antd";
 import {
   dictTypeListApi,
-  dictTypeByIdApi,
   dictTypeCreateUpdateApi,
   dictTypeDeleteApi,
-  dictTypeDeleteMulApi
+  dictDataListApi,
+  dictDataCreateUpdateApi,
+  dictDataDeleteApi,
+  dictTypeDeleteMulApi,
+  dictTypeByIdApi
 } from "../services/httpApi";
 
 export default {
@@ -12,7 +15,7 @@ export default {
 
   state: {
     dictTypeList: { totalCount: 0, items: [] },
-    dictTypeInfo: {}
+    dictDataList: { totalCount: 0, items: [] },
   },
 
   subscriptions: {
@@ -20,7 +23,7 @@ export default {
   },
 
   effects: {
-    // 字典类型列表
+    // 字典类型_列表
     *dictTypeList({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result }
@@ -35,7 +38,7 @@ export default {
       }
     },
 
-    // 字典类型新建编辑
+    // 字典类型_新建编辑
     *dictTypeCreateUpdate({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result }
@@ -43,11 +46,42 @@ export default {
       if (callback) callback(success, error, result);
     },
 
-    // 字典类型删除
+    // 字典类型_删除
     *dictTypeDelete({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result }
       } = yield call(dictTypeDeleteApi, payload);
+      if (callback) callback(success, error, result);
+    },
+
+    // 字典数据_列表
+    *dictDataList({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(dictDataListApi, payload);
+      if (callback) callback(success, error, result);
+      if (success) {
+        yield put({ type: "save", payload: { dictDataList: result } });
+      } else {
+        notification["error"]({
+          message: `查询字典数据列表失败：${error.message}`
+        });
+      }
+    },
+
+    // 字典数据_新建编辑
+    *dictDataCreateUpdate({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(dictDataCreateUpdateApi, payload);
+      if (callback) callback(success, error, result);
+    },
+
+    // 字典数据_删除
+    *dictDataDelete({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(dictDataDeleteApi, payload);
       if (callback) callback(success, error, result);
     },
 
