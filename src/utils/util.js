@@ -150,6 +150,26 @@ const unique = (arr, k) => {
   return arr.filter(a => !res.has(a[key]) && res.set(a[key], 1));
 };
 
+const tree = v => {
+  let child = v.children,
+    arr = [];
+  arr.push({
+    label: v.label,
+    value: v.value
+  });
+  // if (child) {
+  //   child.map(item => {
+  //     arr = arr.concat(tree(child));
+  //   });
+  // }
+  if (child) {
+    child.forEach(function(node) {
+      arr = arr.concat(tree(node));
+    });
+  }
+  return arr;
+};
+
 export {
   dateFormat,
   dateInitFormat,
@@ -157,5 +177,6 @@ export {
   getFile,
   accessToken,
   guid,
-  unique
+  unique,
+  tree
 };

@@ -336,7 +336,7 @@ export default class siderbarDetail extends PureComponent {
     const {
       dispatch,
       form: { getFieldDecorator, resetFields, validateFields, getFieldValue },
-      user: { districtList },
+      user: { districtTree },
       project: { departSelectList },
       spot: { spotInfo, projectSelectListSpot, spotHistoryList },
       point: { pointInfo, projectSelectListPoint },
@@ -981,7 +981,7 @@ export default class siderbarDetail extends PureComponent {
               <Form.Item label="所在地区" {...formItemLayout}>
                 {getFieldDecorator("districtCodeId", {
                   initialValue: this.find(
-                    districtList,
+                    districtTree,
                     spotItem.districtCodeId,
                     "value"
                   )
@@ -989,7 +989,7 @@ export default class siderbarDetail extends PureComponent {
                   <Cascader
                     disabled={!edit}
                     placeholder="请选择所在地区"
-                    options={districtList}
+                    options={districtTree}
                     changeOnSelect
                   />
                 )}

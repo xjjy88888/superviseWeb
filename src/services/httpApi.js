@@ -744,8 +744,8 @@ export async function dictDataDeleteApi(id) {
 }
 
 // 行政区域_列表
-export async function districtListApi() {
-  return request(`${config.url.districtListUrl}`, {
+export async function districtTreeApi() {
+  return request(`${config.url.districtTreeUrl}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`

@@ -1,16 +1,17 @@
 import { notification } from "antd";
 import {
-  districtListApi,
+  districtTreeApi,
   districtCreateUpdateApi,
   districtDeleteApi,
   districtDeleteMulApi
 } from "../services/httpApi";
+import { dateTimeFormat, tree } from "../utils/util";
 
 export default {
   namespace: "district",
 
   state: {
-    districtList: [{ children: null, id: null, value: null }]
+    districtTree: [{ children: null, id: null, value: null }]
   },
 
   subscriptions: {
@@ -19,34 +20,26 @@ export default {
 
   effects: {
     // 行政区划_列表
-    *districtList({ payload }, { call, put }) {
-      let arr = [];
-      let arr2 = [];
+    *districtTree({ payload }, { call, put }) {
       const {
-        data: { result: districtList }
-      } = yield call(districtListApi);
-      console.log(districtList);
-      districtList.children.map(item => {
-        arr.push({ ...item, parent: districtList.label });
-        // item.children.map(ite => {
-        //   arr.push({ ...ite, parent: item.label });
-        // });
-      });
-      console.log(arr);
+        data: { result: districtTree }
+      } = yield call(districtTreeApi);
+      console.log(districtTree);
+      console.log(tree(districtTree));
       yield put({
         type: "save",
-        payload: { districtList: [districtList] }
+        payload: { districtTree: [districtTree] }
       });
     },
 
     // 行政区划_列表
-    *districtList_({ payload, callback }, { call, put }) {
+    *districtTree_({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result }
-      } = yield call(districtListApi, payload);
+      } = yield call(districtTreeApi, payload);
       if (callback) callback(success, error, result);
       if (success) {
-        yield put({ type: "save", payload: { districtList: result } });
+        yield put({ type: "save", payload: { districtTree: result } });
       } else {
         notification["error"]({
           message: `查询行政区划列表失败：${error.message}`

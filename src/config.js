@@ -210,7 +210,7 @@ const config = {
     dictDataDeleteUrl: `${domain}api/services/app/DictTable/Delete`,
 
     // 行政区划_列表
-    districtListUrl: `${domain}api/services/app/User/GetDistrictCodesTree`,
+    districtTreeUrl: `${domain}api/services/app/User/GetDistrictCodesTree`,
 
     // 字典数据_新建修改
     districtCreateUpdateUrl: `${domain}api/services/app/DistrictCode/`,

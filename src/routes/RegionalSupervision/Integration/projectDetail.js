@@ -379,7 +379,7 @@ export default class projectDetail extends PureComponent {
       dispatch,
       form: { getFieldDecorator, setFieldsValue },
       project: { projectInfo, departSelectList },
-      user: { districtList, departUpdateId }
+      user: { districtTree, departUpdateId }
     } = this.props;
 
     const projectItem = projectInfo;

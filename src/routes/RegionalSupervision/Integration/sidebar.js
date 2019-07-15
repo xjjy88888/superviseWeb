@@ -33,8 +33,14 @@ import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
 import config from "../../../config";
 import data from "../../../data";
-import { getFile, guid, unique } from "../../../utils/util";
-import { dateInitFormat, accessToken } from "../../../utils/util";
+import {
+  dateInitFormat,
+  accessToken,
+  getFile,
+  guid,
+  unique,
+  tree
+} from "../../../utils/util";
 import Spins from "../../../components/Spins";
 
 let self;
@@ -444,7 +450,7 @@ export default class sider extends PureComponent {
   queryDistrict = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: "district/districtList"
+      type: "district/districtTree"
     });
   };
 
@@ -874,7 +880,7 @@ export default class sider extends PureComponent {
   //search
   search = v => {
     const {
-      district: { districtList }
+      district: { districtTree }
     } = this.props;
 
     const { key, queryInfo } = this.state;
@@ -977,7 +983,7 @@ export default class sider extends PureComponent {
         getFieldValue,
         setFieldValue
       },
-      district: { districtList },
+      district: { districtTree },
       user: { basinOrganList },
       project: { projectList, projectInfo, projectListAdd, departSelectList },
       spot: { spotList, projectInfoSpotList },
@@ -985,6 +991,8 @@ export default class sider extends PureComponent {
       redLine: { redLineList }
     } = this.props;
     const departSelectListAll = unique(departSelectList.concat(departList));
+
+    // console.log(tree(districtTree));
 
     const projectItem = isProjectUpdate
       ? projectInfo
@@ -1869,7 +1877,7 @@ export default class sider extends PureComponent {
                 <span>位置：</span>
                 <span>
                   {this.find(
-                    districtList,
+                    districtTree,
                     projectItem.projectBase.districtCodeId,
                     "label"
                   )}
@@ -2878,14 +2886,14 @@ export default class sider extends PureComponent {
                 <Form.Item label="所在地区" {...formItemLayout}>
                   {getFieldDecorator("districtCodeId", {
                     initialValue: this.find(
-                      districtList,
+                      districtTree,
                       projectItem.projectBase.districtCodeId,
                       "value"
                     )
                   })(
                     <Cascader
                       placeholder="请选择所在地区"
-                      options={districtList}
+                      options={districtTree}
                       changeOnSelect
                     />
                   )}
@@ -3185,11 +3193,11 @@ export default class sider extends PureComponent {
                 >
                   {getFieldDecorator("districtCodes", {
                     valuePropName: "value",
-                    initialValue: districtList[0].children
+                    initialValue: districtTree[0].children
                       ? (projectItem.projectBase.districtCodes || []).map(
                           item => item.id
                         )
-                      : [districtList[0].value]
+                      : [districtTree[0].value]
                   })(
                     <TreeSelect
                       showSearch
@@ -3200,7 +3208,7 @@ export default class sider extends PureComponent {
                       multiple
                       treeDefaultExpandAll
                     >
-                      {districtList.map((item, index) => (
+                      {districtTree.map((item, index) => (
                         <TreeSelect.TreeNode
                           value={item.value}
                           title={item.label}

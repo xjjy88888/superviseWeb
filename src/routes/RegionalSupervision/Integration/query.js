@@ -93,7 +93,7 @@ export default class siderbarDetail extends PureComponent {
     const { show, type, showVecType } = this.state;
     const {
       form: { getFieldDecorator, resetFields },
-      user: { districtList }
+      user: { districtTree }
     } = this.props;
 
     return (
@@ -207,7 +207,7 @@ export default class siderbarDetail extends PureComponent {
             <Form.Item label="所在地区" {...formItemLayout}>
               {getFieldDecorator("DistrictCodes", { initialValue: "" })(
                 <Cascader
-                  options={districtList}
+                  options={districtTree}
                   changeOnSelect
                   placeholder="请选择所在地区"
                 />
@@ -333,7 +333,7 @@ export default class siderbarDetail extends PureComponent {
             <Form.Item label="所在地区" {...formItemLayout}>
               {getFieldDecorator("DistrictCodes", { initialValue: "" })(
                 <Cascader
-                  options={districtList}
+                  options={districtTree}
                   changeOnSelect
                   placeholder="请选择所在地区"
                 />

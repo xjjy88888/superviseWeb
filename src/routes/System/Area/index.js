@@ -1,5 +1,4 @@
 import React, { PureComponent } from "react";
-import { connect } from "dva";
 import { createForm } from "rc-form";
 import Systems from "../../../components/Systems";
 import {
@@ -8,9 +7,11 @@ import {
   Input,
   Button,
   Table,
+  TreeSelect,
   Select,
   message,
   DatePicker,
+  Radio,
   Avatar,
   Tree,
   Typography,
@@ -43,20 +44,9 @@ const data = [
   }
 ];
 
-@connect(({ district }) => ({ district }))
 @createForm()
 export default class area extends PureComponent {
   state = { visible: false, selectedRows: [] };
-
-  componentDidMount() {
-    this.districtTree();
-  }
-
-  districtTree = () => {
-    const { dispatch } = this.props;
-    dispatch({ type: "district/districtTree" });
-  };
-
   getColumnSearchProps = dataIndex => ({
     filterDropdown: ({
       setSelectedKeys,
@@ -116,7 +106,6 @@ export default class area extends PureComponent {
       />
     )
   });
-
   handleSearch = (selectedKeys, confirm) => {
     confirm();
     this.setState({ searchText: selectedKeys[0] });
@@ -128,11 +117,7 @@ export default class area extends PureComponent {
   };
   render() {
     const { visible, selectedRows } = this.state;
-    const {
-      form: { getFieldDecorator, getFieldsError },
-      district: { districtTree }
-    } = this.props;
-    console.log(districtTree);
+    const { getFieldDecorator, getFieldsError } = this.props.form;
 
     const columns = [
       {
@@ -206,34 +191,34 @@ export default class area extends PureComponent {
       <Systems>
         <Layout>
           <Sider
-            style={{
-              borderRadius: "10px 0 0 0",
-              height: window.innerHeight - 150,
-              overflow: "auto"
-            }}
             width={300}
             theme="light"
+            style={{ borderRadius: "10px 0 0 0" }}
           >
             {/* <Title level={4}>部门</Title> */}
             <Tree.DirectoryTree
               multiple
-              autoExpandParent
-              defaultExpandAll={true}
+              defaultExpandAll
               onSelect={(keys, event) => {
                 console.log("Trigger Select", keys, event);
               }}
             >
-              {districtTree.map(item => (
-                <Tree.TreeNode title={item.label} key={item.value}>
-                  {(item.children || []).map(ite => (
-                    <Tree.TreeNode title={ite.label} key={ite.value}>
-                      {(ite.children || []).map(it => (
-                        <Tree.TreeNode title={it.label} key={it.value} isLeaf />
-                      ))}
-                    </Tree.TreeNode>
-                  ))}
+              <Tree.TreeNode title="全国" key="0-0">
+                <Tree.TreeNode title="贵州省" key="0-0-0">
+                  <Tree.TreeNode title="贵阳市" key="0-0-0-0" isLeaf />
+                  <Tree.TreeNode title="遵义市" key="0-0-0-1" isLeaf />
+                  <Tree.TreeNode title="毕节市" key="0-0-0-2" isLeaf />
                 </Tree.TreeNode>
-              ))}
+                <Tree.TreeNode title="广东省" key="0-0-1">
+                  <Tree.TreeNode title="广州市" key="0-0-1">
+                    <Tree.TreeNode title="天河区" key="0-0-1-0-1" isLeaf />
+                  </Tree.TreeNode>
+                </Tree.TreeNode>
+                <Tree.TreeNode title="广西壮族自治区" key="0-0-2">
+                  <Tree.TreeNode title="南宁市" key="0-0-2-0" isLeaf />
+                  <Tree.TreeNode title="北海市" key="0-0-2-1" isLeaf />
+                </Tree.TreeNode>
+              </Tree.TreeNode>
             </Tree.DirectoryTree>
           </Sider>
           <Content
