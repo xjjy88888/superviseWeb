@@ -218,11 +218,11 @@ const config = {
     // 行政区划_列表
     districtTreeUrl: `${domain}api/services/app/User/GetDistrictCodesTree`,
 
-    // 字典数据_新建修改
+    // 行政区划_新建修改
     districtCreateUpdateUrl: `${domain}api/services/app/DistrictCode/`,
 
-    // 字典数据_删除
-    districtDeleteUrl: `${domain}api/services/app/DistrictCode/Delete`
+    // 行政区划_删除
+    districtDeleteUrl: `${domain}api/services/app/DistrictCode/Delete`,
   },
 
   //工具箱

@@ -140,7 +140,7 @@ export default class dict extends PureComponent {
 
     const {
       dispatch,
-      form: { getFieldDecorator, resetFields, setFieldsValue },
+      form: { getFieldDecorator, resetFields },
       dict: { dictTypeList, dictDataList }
     } = this.props;
 
@@ -208,9 +208,9 @@ export default class dict extends PureComponent {
                           self.dictTypeList();
                         }
                         notification[success ? "success" : "error"]({
-                          message: `删除1条字典类型${success ? "成功" : "失败"}${
-                            success ? "" : `：${error.message}`
-                          }`
+                          message: `删除1条字典类型${
+                            success ? "成功" : "失败"
+                          }${success ? "" : `：${error.message}`}`
                         });
                       }
                     });
@@ -288,9 +288,9 @@ export default class dict extends PureComponent {
                           self.dictDataList(selectDefaultValue);
                         }
                         notification[success ? "success" : "error"]({
-                          message: `删除1条字典数据${success ? "成功" : "失败"}${
-                            success ? "" : `：${error.message}`
-                          }`
+                          message: `删除1条字典数据${
+                            success ? "成功" : "失败"
+                          }${success ? "" : `：${error.message}`}`
                         });
                       }
                     });
@@ -350,7 +350,7 @@ export default class dict extends PureComponent {
                   });
                 }}
               >
-                添加
+                新增
               </Button>
               <Button
                 icon="delete"
@@ -400,11 +400,11 @@ export default class dict extends PureComponent {
               rowSelection={rowSelectionType}
             />
             <Modal
-              title="添加字典分组"
+              title="新增字典分组"
               visible={visibleType}
               onOk={() => {
                 this.props.form.validateFields((err, v) => {
-                  console.log("添加字典类型", v);
+                  console.log("新增字典类型", v);
                   if (!v.dictTypeName) {
                     message.warning("请填写分组名称");
                     return;
@@ -422,12 +422,12 @@ export default class dict extends PureComponent {
                           visibleType: false
                         });
                         notification["success"]({
-                          message: `${id ? "编辑" : "添加"}字典类型成功`
+                          message: `${id ? "编辑" : "新增"}字典类型成功`
                         });
                         this.dictTypeList();
                       } else {
                         notification["error"]({
-                          message: `${id ? "编辑" : "添加"}字典类型失败：${
+                          message: `${id ? "编辑" : "新增"}字典类型失败：${
                             error.message
                           }`
                         });
@@ -513,7 +513,7 @@ export default class dict extends PureComponent {
                   });
                 }}
               >
-                添加
+                新增
               </Button>
               <Button
                 icon="delete"
@@ -564,11 +564,11 @@ export default class dict extends PureComponent {
             />
 
             <Modal
-              title="添加字典数据"
+              title="新增字典数据"
               visible={visibleData}
               onOk={() => {
                 this.props.form.validateFields((err, v) => {
-                  console.log("添加数组字典", v);
+                  console.log("新增数组字典", v);
                   if (!v.dictTypeId) {
                     message.warning("请选择分组名称");
                     return;
@@ -590,12 +590,12 @@ export default class dict extends PureComponent {
                           visibleData: false
                         });
                         notification["success"]({
-                          message: `${id ? "编辑" : "添加"}字典数据成功`
+                          message: `${id ? "编辑" : "新增"}字典数据成功`
                         });
                         this.dictDataList(selectDefaultValue);
                       } else {
                         notification["error"]({
-                          message: `${id ? "编辑" : "添加"}字典数据失败：${
+                          message: `${id ? "编辑" : "新增"}字典数据失败：${
                             error.message
                           }`
                         });

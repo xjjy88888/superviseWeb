@@ -150,17 +150,21 @@ const unique = (arr, k) => {
   return arr.filter(a => !res.has(a[key]) && res.set(a[key], 1));
 };
 
-const treeToList = (v, parent) => {
+const treeToList = (v, parent_name = "", parent_code = "", parent_id = "") => {
   let child = v.children,
     arr = [];
   arr.push({
-    label: v.label,
-    value: v.value,
-    parent: parent
+    name: v.label,
+    code: v.code,
+    id: v.value,
+    parent_name: parent_name,
+    parent_code: parent_code,
+    parent_id: parent_id,
+    description: v.description
   });
   if (child) {
     child.forEach(function(node) {
-      arr = arr.concat(treeToList(node, v.label));
+      arr = arr.concat(treeToList(node, v.label, v.code, v.value));
     });
   }
   return arr;

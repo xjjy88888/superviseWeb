@@ -15,7 +15,8 @@ import {
   Tree,
   Typography,
   Layout,
-  Modal
+  Modal,
+  notification
 } from "antd";
 import Highlighter from "react-highlight-words";
 
@@ -42,13 +43,15 @@ const data = [
     desc: "110022"
   }
 ];
+let self;
 
 @connect(({ district }) => ({ district }))
 @createForm()
 export default class area extends PureComponent {
-  state = { visible: false, selectedRows: [] };
+  state = { visible: false, selectedRows: [], id: null };
 
   componentDidMount() {
+    self = this;
     this.districtTree();
   }
 
@@ -127,9 +130,10 @@ export default class area extends PureComponent {
     this.setState({ searchText: "" });
   };
   render() {
-    const { visible, selectedRows } = this.state;
+    const { visible, selectedRows, id } = this.state;
     const {
-      form: { getFieldDecorator, getFieldsError },
+      dispatch,
+      form: { getFieldDecorator, resetFields },
       district: { districtTree, districtList }
     } = this.props;
 
@@ -139,28 +143,28 @@ export default class area extends PureComponent {
 
     const columns = [
       {
-        title: "序号",
-        dataIndex: "key",
-        sorter: (a, b) => a.key - b.key,
-        ...this.getColumnSearchProps("key")
-      },
-      {
         title: "行政区名称",
-        dataIndex: "label",
-        sorter: (a, b) => a.label.length - b.label.length,
-        ...this.getColumnSearchProps("label")
+        dataIndex: "name",
+        sorter: (a, b) => a.name.length - b.name.length,
+        ...this.getColumnSearchProps("name")
       },
       {
-        title: "行政区代码",
-        dataIndex: "value",
-        sorter: (a, b) => a.value - b.value,
-        ...this.getColumnSearchProps("value")
+        title: "行政区编码",
+        dataIndex: "code",
+        sorter: (a, b) => a.code - b.code,
+        ...this.getColumnSearchProps("code")
       },
       {
         title: "上级行政区",
-        dataIndex: "parent",
-        sorter: (a, b) => a.parent.length - b.parent.length,
-        ...this.getColumnSearchProps("parent")
+        dataIndex: "parent_name",
+        sorter: (a, b) => a.parent_name.length - b.parent_name.length,
+        ...this.getColumnSearchProps("parent_name")
+      },
+      {
+        title: "上级行政区编码",
+        dataIndex: "parent_code",
+        sorter: (a, b) => a.parent_code - b.parent_code,
+        ...this.getColumnSearchProps("parent_code")
       },
       {
         title: "操作",
@@ -170,12 +174,20 @@ export default class area extends PureComponent {
             <a
               style={{ marginRight: 20 }}
               onClick={() => {
+                console.log(record);
+                this.props.form.setFieldsValue({
+                  parentId: record.parent_id,
+                  name: record.name,
+                  code: record.code,
+                  description: record.description
+                });
                 this.setState({
-                  visible: true
+                  visible: true,
+                  id: record.id
                 });
               }}
             >
-              修改
+              编辑
             </a>
             <a
               onClick={() => {
@@ -186,7 +198,23 @@ export default class area extends PureComponent {
                   cancelText: "否",
                   okType: "danger",
                   onOk() {
-                    message.success(`删除1个行政区成功`);
+                    dispatch({
+                      type: "district/districtDelete",
+                      payload: record.id,
+                      callback: (success, error, result) => {
+                        if (success) {
+                          self.setState({
+                            visible: false
+                          });
+                          self.districtTree();
+                        }
+                        notification[success ? "success" : "error"]({
+                          message: `删除1条行政区划${
+                            success ? "成功" : "失败"
+                          }${success ? "" : `：${error.message}`}`
+                        });
+                      }
+                    });
                   },
                   onCancel() {}
                 });
@@ -217,7 +245,6 @@ export default class area extends PureComponent {
             width={300}
             theme="light"
           >
-            {/* <Title level={4}>部门</Title> */}
             <Tree.DirectoryTree
               multiple
               autoExpandParent
@@ -241,24 +268,23 @@ export default class area extends PureComponent {
           </Sider>
           <Content
             style={{
-              // padding: 20,
               borderRadius: "0 10px 0 0",
               background: "#fff"
             }}
           >
             <Title level={4}>
-              {/* 用户 */}
               <span>
                 <Button
                   icon="plus"
                   style={{ margin: 10 }}
                   onClick={() => {
+                    resetFields();
                     this.setState({
                       visible: true
                     });
                   }}
                 >
-                  添加
+                  新增
                 </Button>
                 <Button
                   icon="delete"
@@ -293,12 +319,12 @@ export default class area extends PureComponent {
               rowSelection={rowSelection}
             />
             <Modal
-              title="添加行政区"
+              title="新增行政区"
               visible={visible}
               onOk={() => {
                 this.props.form.validateFields((err, v) => {
-                  console.log("添加行政区", v);
-                  if (!v.up_name) {
+                  console.log("新增行政区", v);
+                  if (!v.parentId) {
                     message.warning("请选择上级行政区");
                     return;
                   }
@@ -310,10 +336,27 @@ export default class area extends PureComponent {
                     message.warning("请填写行政区编码");
                     return;
                   }
-                  this.setState({
-                    visible: false
+                  dispatch({
+                    type: "district/districtCreateUpdate",
+                    payload: { ...v, id: id },
+                    callback: (success, error, result) => {
+                      if (success) {
+                        this.setState({
+                          visible: false
+                        });
+                        notification["success"]({
+                          message: `${id ? "编辑" : "新增"}字典类型成功`
+                        });
+                        this.districtTree();
+                      } else {
+                        notification["error"]({
+                          message: `${id ? "编辑" : "新增"}字典类型失败：${
+                            error.message
+                          }`
+                        });
+                      }
+                    }
                   });
-                  message.success("保存成功");
                 });
               }}
               onCancel={() => {
@@ -335,20 +378,16 @@ export default class area extends PureComponent {
                   }
                   hasFeedback
                 >
-                  {getFieldDecorator("up_name", {})(
+                  {getFieldDecorator("parentId", {})(
                     <Select
                       showSearch
                       allowClear
                       optionFilterProp="children"
                       style={{ width: 180 }}
                     >
-                      {[
-                        { value: "111", text: "中国" },
-                        { value: "222", text: "北京" },
-                        { value: "333", text: "广东" }
-                      ].map((item, index) => (
-                        <Select.Option value={item.value} key={index}>
-                          {item.text}
+                      {districtList.map((item, index) => (
+                        <Select.Option value={item.id} key={index}>
+                          {item.name}
                         </Select.Option>
                       ))}
                     </Select>
@@ -382,7 +421,7 @@ export default class area extends PureComponent {
                   }
                   hasFeedback
                 >
-                  {getFieldDecorator("desc", {})(
+                  {getFieldDecorator("description", {})(
                     <Input.TextArea autosize style={{ width: 180 }} />
                   )}
                 </Form.Item>

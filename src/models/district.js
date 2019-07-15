@@ -5,7 +5,7 @@ import {
   districtDeleteApi,
   districtDeleteMulApi
 } from "../services/httpApi";
-import { dateTimeFormat, treeToList } from "../utils/util";
+import { treeToList } from "../utils/util";
 
 export default {
   namespace: "district",
@@ -25,9 +25,7 @@ export default {
       const {
         data: { result: districtTree }
       } = yield call(districtTreeApi);
-      const districtList = treeToList(districtTree, "");
-      console.log(districtTree);
-      console.log(districtList);
+      const districtList = treeToList(districtTree);
       yield put({
         type: "save",
         payload: { districtTree: [districtTree], districtList }
@@ -51,6 +49,8 @@ export default {
 
     // 行政区划_新建编辑
     *districtCreateUpdate({ payload, callback }, { call, put }) {
+      const data1 = yield call(districtCreateUpdateApi, payload);
+      console.log("data1", data1);
       const {
         data: { success, error, result }
       } = yield call(districtCreateUpdateApi, payload);
