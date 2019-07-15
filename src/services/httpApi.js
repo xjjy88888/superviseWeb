@@ -814,3 +814,60 @@ export async function districtDeleteMulApi(params) {
     body: JSON.stringify(params.id)
   });
 }
+
+// 单位_列表
+export async function companyListApi(params) {
+  return request(
+    `${config.url.companyListUrl}?SkipCount=${
+      params.SkipCount
+    }&MaxResultCount=${params.MaxResultCount}&Name=${params.Name || ""}${
+      params.isBuild
+        ? "&DepTypes=1"
+        : "&DepTypes=2&DepTypes=3&DepTypes=4&DepTypes=5&DepTypes=6&DepTypes=7"
+    }`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`
+      }
+    }
+  );
+}
+
+// 单位_新建编辑
+export async function companyCreateUpdateApi(params) {
+  return request(
+    `${config.url.companyCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify(params)
+    }
+  );
+}
+
+// 单位_删除
+export async function companyDeleteApi(id) {
+  return request(`${config.url.companyDeleteUrl}?id=${id}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    }
+  });
+}
+
+// 单位_批量删除
+export async function companyDeleteMulApi(params) {
+  return request(`${config.url.companyDeleteMulUrl}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify(params.id)
+  });
+}

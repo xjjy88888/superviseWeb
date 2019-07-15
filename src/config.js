@@ -226,6 +226,18 @@ const config = {
 
     // 行政区划_删除
     districtDeleteMulUrl: `${domain}api/services/app/DistrictCode/DeleteBatch`,
+
+    // 单位_列表
+    companyListUrl: `${domain}api/services/app/SocialDepartment/GetAll`,
+
+    // 单位_新建修改
+    companyCreateUpdateUrl: `${domain}api/services/app/SocialDepartment/`,
+
+    // 单位_删除
+    companyDeleteUrl: `${domain}api/services/app/SocialDepartment/Delete`,
+
+    // 单位_批量删除
+    companyDeleteMulUrl: `${domain}api/services/app/SocialDepartment/DeleteBatch`
   },
 
   //工具箱

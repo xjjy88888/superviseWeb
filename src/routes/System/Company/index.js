@@ -2,92 +2,57 @@ import React, { PureComponent } from "react";
 import { Form, Icon, Input, Button, Table, message, Modal } from "antd";
 import { createForm } from "rc-form";
 import Systems from "../../../components/Systems";
+import { connect } from "dva";
 import Highlighter from "react-highlight-words";
 
-const data = [
-  {
-    index: "1",
-    name: "柳州柳狮建材有限公司",
-    desc: "单位描述7"
-  },
-  {
-    index: "2",
-    name: "广西建工建筑安装技工学校",
-    desc: "单位描述8"
-  },
-  {
-    index: "3",
-    name: "宁乡市国有资产经营有限公司",
-    desc: "单位描述9"
-  },
-  {
-    index: "1",
-    name: "柳州柳狮建材有限公司",
-    desc: "单位描述7"
-  },
-  {
-    index: "2",
-    name: "广西建工建筑安装技工学校",
-    desc: "单位描述8"
-  },
-  {
-    index: "3",
-    name: "宁乡市国有资产经营有限公司",
-    desc: "单位描述9"
-  },
-  {
-    index: "1",
-    name: "柳州柳狮建材有限公司",
-    desc: "单位描述7"
-  },
-  {
-    index: "2",
-    name: "广西建工建筑安装技工学校",
-    desc: "单位描述8"
-  },
-  {
-    index: "3",
-    name: "宁乡市国有资产经营有限公司",
-    desc: "单位描述9"
-  },
-  {
-    index: "1",
-    name: "柳州柳狮建材有限公司",
-    desc: "单位描述7"
-  },
-  {
-    index: "2",
-    name: "广西建工建筑安装技工学校",
-    desc: "单位描述8"
-  },
-  {
-    index: "3",
-    name: "宁乡市国有资产经营有限公司",
-    desc: "单位描述9"
-  },
-  {
-    index: "1",
-    name: "柳州柳狮建材有限公司",
-    desc: "单位描述7"
-  },
-  {
-    index: "2",
-    name: "广西建工建筑安装技工学校",
-    desc: "单位描述8"
-  },
-  {
-    index: "3",
-    name: "宁乡市国有资产经营有限公司",
-    desc: "单位描述9"
-  }
-];
-
 @createForm()
+@connect(({ company }) => ({ company }))
 export default class company extends PureComponent {
-  state = {
-    state: 0,
-    visible: false,
-    selectedRows: []
+  constructor(props) {
+    super(props);
+    this.state = {
+      state: 0,
+      visible: false,
+      selectedRows: [],
+      dataSource: [],
+      pagination: {},
+      loading: false
+    };
+  }
+
+  componentDidMount() {
+    this.companyList({ isBuild: true, SkipCount: 0, MaxResultCount: 10 });
+  }
+
+  companyList = (params = {}) => {
+    const { dispatch } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: "company/companyList",
+      payload: params,
+      callback: (success, error, result) => {
+        const pagination = { ...this.state.pagination };
+        pagination.total = result.totalCount;
+        this.setState({
+          loading: false,
+          dataSource: result.items,
+          pagination
+        });
+      }
+    });
+  };
+
+  handleTableChange = (pagination, filters, sorter) => {
+    console.log(pagination, filters);
+    this.setState({
+      pagination: pagination
+    });
+    this.companyList({
+      isBuild: true,
+      SkipCount: (pagination.current - 1) * pagination.pageSize,
+      MaxResultCount: pagination.pageSize,
+      Name: filters.name
+    });
   };
 
   getColumnSearchProps = dataIndex => ({
@@ -149,6 +114,7 @@ export default class company extends PureComponent {
       />
     )
   });
+
   handleSearch = (selectedKeys, confirm) => {
     confirm();
     this.setState({ searchText: selectedKeys[0] });
@@ -160,27 +126,24 @@ export default class company extends PureComponent {
   };
 
   render() {
-    const { visible, selectedRows } = this.state;
-    const { getFieldDecorator, getFieldsError } = this.props.form;
+    const {
+      visible,
+      selectedRows,
+      loading,
+      pagination,
+      dataSource
+    } = this.state;
+    const { getFieldDecorator } = this.props.form;
 
     const columns = [
       {
-        title: "序号",
-        dataIndex: "index",
-        sorter: (a, b) => a.index - b.index,
-        ...this.getColumnSearchProps("index")
-      },
-      {
         title: "单位名称",
         dataIndex: "name",
-        sorter: (a, b) => a.name.length - b.name.length,
         ...this.getColumnSearchProps("name")
       },
       {
         title: "单位描述",
-        dataIndex: "desc",
-        sorter: (a, b) => a.name.length - b.name.length,
-        ...this.getColumnSearchProps("desc")
+        dataIndex: "description"
       },
       {
         title: "操作",
@@ -286,8 +249,12 @@ export default class company extends PureComponent {
         </span>
         <Table
           columns={columns}
-          dataSource={data}
           rowSelection={rowSelection}
+          rowKey={record => record.id}
+          dataSource={dataSource}
+          pagination={pagination}
+          loading={loading}
+          onChange={this.handleTableChange}
         />
         <Modal
           title="添加单位"
