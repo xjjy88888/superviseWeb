@@ -193,7 +193,7 @@ export default class area extends PureComponent {
                           self.districtTree();
                         }
                         notification[success ? "success" : "error"]({
-                          message: `删除1条行政区划${
+                          message: `删除1条行政区划数据${
                             success ? "成功" : "失败"
                           }${success ? "" : `：${error.message}`}`
                         });
