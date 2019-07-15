@@ -22,7 +22,7 @@ export default {
     // 行政区划_列表
     *districtTree({ payload }, { call, put }) {
       const {
-        data: { result: districtTree }
+      data: { result: districtTree }
       } = yield call(districtTreeApi);
       console.log(districtTree);
       console.log(tree(districtTree));

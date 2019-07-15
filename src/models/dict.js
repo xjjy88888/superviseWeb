@@ -15,7 +15,7 @@ export default {
 
   state: {
     dictTypeList: { totalCount: 0, items: [] },
-    dictDataList: { totalCount: 0, items: [] },
+    dictDataList: { totalCount: 0, items: [] }
   },
 
   subscriptions: {
@@ -54,6 +54,14 @@ export default {
       if (callback) callback(success, error, result);
     },
 
+    // 字典类型_批量删除
+    *dictTypeDeleteMul({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(dictTypeDeleteMulApi, payload);
+      if (callback) callback(success, error, result);
+    },
+
     // 字典数据_列表
     *dictDataList({ payload, callback }, { call, put }) {
       const {
@@ -83,19 +91,6 @@ export default {
         data: { success, error, result }
       } = yield call(dictDataDeleteApi, payload);
       if (callback) callback(success, error, result);
-    },
-
-    // 字典类型批量删除
-    *dictTypeDeleteMul({ payload, callback }, { call, put }) {
-      const {
-        data: { success, error }
-      } = yield call(dictTypeDeleteMulApi, payload);
-      if (callback) callback(success);
-      notification[success ? "success" : "error"]({
-        message: `批量删除字典类型${success ? "成功" : "失败"}${
-          success ? "" : `：${error.message}`
-        }`
-      });
     },
 
     // 字典类型信息

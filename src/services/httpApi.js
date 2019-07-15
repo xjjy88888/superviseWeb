@@ -702,6 +702,18 @@ export async function dictTypeDeleteApi(id) {
   });
 }
 
+// 字典类型_批量删除
+export async function dictTypeDeleteMulApi(params) {
+  return request(`${config.url.dictTypeDeleteMulUrl}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify(params.id)
+  });
+}
+
 // 字典数据_列表
 export async function dictDataListApi(id) {
   return request(

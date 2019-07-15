@@ -369,7 +369,23 @@ export default class dict extends PureComponent {
                     cancelText: "否",
                     okType: "danger",
                     onOk() {
-                      message.success(`删除${l}个字典类型成功`);
+                      dispatch({
+                        type: "dict/dictTypeDeleteMul",
+                        payload: { id: selectedRowsType.map(item => item.id) },
+                        callback: (success, error, result) => {
+                          if (success) {
+                            self.setState({
+                              visibleType: false
+                            });
+                            self.dictTypeList();
+                          }
+                          notification[success ? "success" : "error"]({
+                            message: `删除${l}条字典类型${
+                              success ? "成功" : "失败"
+                            }${success ? "" : `：${error.message}`}`
+                          });
+                        }
+                      });
                     },
                     onCancel() {}
                   });

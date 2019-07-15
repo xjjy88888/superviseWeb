@@ -200,6 +200,9 @@ const config = {
     // 字典类型_删除
     dictTypeDeleteUrl: `${domain}api/services/app/DictType/Delete`,
 
+    // 字典类型_批量删除
+    dictTypeDeleteMulUrl: `${domain}api/services/app/DictType/DeleteBatch`,
+
     // 字典数据_列表
     dictDataListUrl: `${domain}api/services/app/DictTable/GetAll`,
 
