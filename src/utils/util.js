@@ -150,21 +150,17 @@ const unique = (arr, k) => {
   return arr.filter(a => !res.has(a[key]) && res.set(a[key], 1));
 };
 
-const tree = v => {
+const treeToList = (v, parent) => {
   let child = v.children,
     arr = [];
   arr.push({
     label: v.label,
-    value: v.value
+    value: v.value,
+    parent: parent
   });
-  // if (child) {
-  //   child.map(item => {
-  //     arr = arr.concat(tree(child));
-  //   });
-  // }
   if (child) {
     child.forEach(function(node) {
-      arr = arr.concat(tree(node));
+      arr = arr.concat(treeToList(node, v.label));
     });
   }
   return arr;
@@ -178,5 +174,5 @@ export {
   accessToken,
   guid,
   unique,
-  tree
+  treeToList
 };

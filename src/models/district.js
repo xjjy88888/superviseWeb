@@ -5,13 +5,14 @@ import {
   districtDeleteApi,
   districtDeleteMulApi
 } from "../services/httpApi";
-import { dateTimeFormat, tree } from "../utils/util";
+import { dateTimeFormat, treeToList } from "../utils/util";
 
 export default {
   namespace: "district",
 
   state: {
-    districtTree: [{ children: null, id: null, value: null }]
+    districtTree: [{ children: null, id: null, value: null }],
+    districtList: []
   },
 
   subscriptions: {
@@ -22,13 +23,14 @@ export default {
     // 行政区划_列表
     *districtTree({ payload }, { call, put }) {
       const {
-      data: { result: districtTree }
+        data: { result: districtTree }
       } = yield call(districtTreeApi);
+      const districtList = treeToList(districtTree, "");
       console.log(districtTree);
-      console.log(tree(districtTree));
+      console.log(districtList);
       yield put({
         type: "save",
-        payload: { districtTree: [districtTree] }
+        payload: { districtTree: [districtTree], districtList }
       });
     },
 

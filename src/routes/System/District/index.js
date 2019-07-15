@@ -130,9 +130,12 @@ export default class area extends PureComponent {
     const { visible, selectedRows } = this.state;
     const {
       form: { getFieldDecorator, getFieldsError },
-      district: { districtTree }
+      district: { districtTree, districtList }
     } = this.props;
-    console.log(districtTree);
+
+    const dataSource = districtList.map((item, index) => {
+      return { ...item, key: index };
+    });
 
     const columns = [
       {
@@ -143,21 +146,21 @@ export default class area extends PureComponent {
       },
       {
         title: "行政区名称",
-        dataIndex: "name",
-        sorter: (a, b) => a.name.length - b.name.length,
-        ...this.getColumnSearchProps("name")
+        dataIndex: "label",
+        sorter: (a, b) => a.label.length - b.label.length,
+        ...this.getColumnSearchProps("label")
       },
       {
         title: "行政区代码",
-        dataIndex: "desc",
-        sorter: (a, b) => a.desc - b.desc,
-        ...this.getColumnSearchProps("desc")
+        dataIndex: "value",
+        sorter: (a, b) => a.value - b.value,
+        ...this.getColumnSearchProps("value")
       },
       {
         title: "上级行政区",
-        dataIndex: "up_name",
-        sorter: (a, b) => a.up_name.length - b.up_name.length,
-        ...this.getColumnSearchProps("up_name")
+        dataIndex: "parent",
+        sorter: (a, b) => a.parent.length - b.parent.length,
+        ...this.getColumnSearchProps("parent")
       },
       {
         title: "操作",
@@ -286,7 +289,7 @@ export default class area extends PureComponent {
             </Title>
             <Table
               columns={columns}
-              dataSource={data}
+              dataSource={dataSource}
               rowSelection={rowSelection}
             />
             <Modal
