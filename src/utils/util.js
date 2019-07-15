@@ -157,10 +157,10 @@ const treeToList = (v, parent_name = "", parent_code = "", parent_id = "") => {
     name: v.label,
     code: v.code,
     id: v.value,
+    description: v.description,
     parent_name: parent_name,
     parent_code: parent_code,
-    parent_id: parent_id,
-    description: v.description
+    parent_id: parent_id
   });
   if (child) {
     child.forEach(function(node) {

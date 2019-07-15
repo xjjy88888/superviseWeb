@@ -10,8 +10,6 @@ import {
   Table,
   Select,
   message,
-  DatePicker,
-  Avatar,
   Tree,
   Typography,
   Layout,
@@ -20,29 +18,9 @@ import {
 } from "antd";
 import Highlighter from "react-highlight-words";
 
-const { Header, Footer, Sider, Content } = Layout;
+const { Sider, Content } = Layout;
 const { Title } = Typography;
 
-const data = [
-  {
-    key: "1",
-    name: "北京市",
-    up_name: "中国",
-    desc: "110033"
-  },
-  {
-    key: "2",
-    name: "广州市",
-    up_name: "广东",
-    desc: "110000"
-  },
-  {
-    key: "3",
-    name: "花都区",
-    up_name: "广州市",
-    desc: "110022"
-  }
-];
 let self;
 
 @connect(({ district }) => ({ district }))
@@ -137,8 +115,8 @@ export default class area extends PureComponent {
       district: { districtTree, districtList }
     } = this.props;
 
-    const dataSource = districtList.map((item, index) => {
-      return { ...item, key: index };
+    const dataSource = districtList.map(item => {
+      return { ...item, key: item.id };
     });
 
     const columns = [
@@ -165,6 +143,12 @@ export default class area extends PureComponent {
         dataIndex: "parent_code",
         sorter: (a, b) => a.parent_code - b.parent_code,
         ...this.getColumnSearchProps("parent_code")
+      },
+      {
+        title: "备注",
+        dataIndex: "description",
+        sorter: (a, b) => a.description.length - b.description.length,
+        ...this.getColumnSearchProps("description")
       },
       {
         title: "操作",
@@ -247,7 +231,7 @@ export default class area extends PureComponent {
           >
             <Tree.DirectoryTree
               multiple
-              autoExpandParent
+              // autoExpandParent
               defaultExpandAll={true}
               onSelect={(keys, event) => {
                 console.log("Trigger Select", keys, event);
@@ -280,7 +264,8 @@ export default class area extends PureComponent {
                   onClick={() => {
                     resetFields();
                     this.setState({
-                      visible: true
+                      visible: true,
+                      id: null
                     });
                   }}
                 >
@@ -303,7 +288,23 @@ export default class area extends PureComponent {
                       cancelText: "否",
                       okType: "danger",
                       onOk() {
-                        message.success(`删除${l}个行政区成功`);
+                        dispatch({
+                          type: "district/districtDeleteMul",
+                          payload: { id: selectedRows.map(item => item.id) },
+                          callback: (success, error, result) => {
+                            if (success) {
+                              self.setState({
+                                visible: false
+                              });
+                              self.districtTree();
+                            }
+                            notification[success ? "success" : "error"]({
+                              message: `删除${l}条行政区划数据${
+                                success ? "成功" : "失败"
+                              }${success ? "" : `：${error.message}`}`
+                            });
+                          }
+                        });
                       },
                       onCancel() {}
                     });

@@ -802,3 +802,15 @@ export async function districtDeleteApi(id) {
     }
   });
 }
+
+// 行政区域_批量删除
+export async function districtDeleteMulApi(params) {
+  return request(`${config.url.districtDeleteMulUrl}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify(params.id)
+  });
+}

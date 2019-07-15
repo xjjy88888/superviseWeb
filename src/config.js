@@ -223,6 +223,9 @@ const config = {
 
     // 行政区划_删除
     districtDeleteUrl: `${domain}api/services/app/DistrictCode/Delete`,
+
+    // 行政区划_删除
+    districtDeleteMulUrl: `${domain}api/services/app/DistrictCode/DeleteBatch`,
   },
 
   //工具箱

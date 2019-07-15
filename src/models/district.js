@@ -49,8 +49,6 @@ export default {
 
     // 行政区划_新建编辑
     *districtCreateUpdate({ payload, callback }, { call, put }) {
-      const data1 = yield call(districtCreateUpdateApi, payload);
-      console.log("data1", data1);
       const {
         data: { success, error, result }
       } = yield call(districtCreateUpdateApi, payload);
@@ -68,14 +66,9 @@ export default {
     // 行政区划批量删除
     *districtDeleteMul({ payload, callback }, { call, put }) {
       const {
-        data: { success, error }
+        data: { success, error, result }
       } = yield call(districtDeleteMulApi, payload);
-      if (callback) callback(success);
-      notification[success ? "success" : "error"]({
-        message: `批量删除行政区划${success ? "成功" : "失败"}${
-          success ? "" : `：${error.message}`
-        }`
-      });
+      if (callback) callback(success, error, result);
     }
   },
 
