@@ -231,7 +231,6 @@ export default class area extends PureComponent {
           >
             <Tree.DirectoryTree
               multiple
-              // autoExpandParent
               defaultExpandAll={true}
               onSelect={(keys, event) => {
                 console.log("Trigger Select", keys, event);
