@@ -208,7 +208,7 @@ export default class dict extends PureComponent {
                           self.dictTypeList();
                         }
                         notification[success ? "success" : "error"]({
-                          message: `删除字典类型${success ? "成功" : "失败"}${
+                          message: `删除1条字典类型${success ? "成功" : "失败"}${
                             success ? "" : `：${error.message}`
                           }`
                         });
@@ -288,7 +288,7 @@ export default class dict extends PureComponent {
                           self.dictDataList(selectDefaultValue);
                         }
                         notification[success ? "success" : "error"]({
-                          message: `删除字典数据${success ? "成功" : "失败"}${
+                          message: `删除1条字典数据${success ? "成功" : "失败"}${
                             success ? "" : `：${error.message}`
                           }`
                         });
@@ -532,7 +532,23 @@ export default class dict extends PureComponent {
                     cancelText: "否",
                     okType: "danger",
                     onOk() {
-                      message.success(`删除${l}个数组字典成功`);
+                      dispatch({
+                        type: "dict/dictDataDeleteMul",
+                        payload: { id: selectedRowsData.map(item => item.id) },
+                        callback: (success, error, result) => {
+                          if (success) {
+                            self.setState({
+                              visibleType: false
+                            });
+                            self.dictDataList(selectDefaultValue);
+                          }
+                          notification[success ? "success" : "error"]({
+                            message: `删除${l}条字典数据${
+                              success ? "成功" : "失败"
+                            }${success ? "" : `：${error.message}`}`
+                          });
+                        }
+                      });
                     },
                     onCancel() {}
                   });

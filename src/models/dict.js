@@ -7,7 +7,8 @@ import {
   dictDataCreateUpdateApi,
   dictDataDeleteApi,
   dictTypeDeleteMulApi,
-  dictTypeByIdApi
+  dictTypeByIdApi,
+  dictDataDeleteMulApi
 } from "../services/httpApi";
 
 export default {
@@ -90,6 +91,14 @@ export default {
       const {
         data: { success, error, result }
       } = yield call(dictDataDeleteApi, payload);
+      if (callback) callback(success, error, result);
+    },
+
+    // 字典数据_批量删除
+    *dictDataDeleteMul({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(dictDataDeleteMulApi, payload);
       if (callback) callback(success, error, result);
     },
 

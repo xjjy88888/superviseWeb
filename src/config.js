@@ -212,6 +212,9 @@ const config = {
     // 字典数据_删除
     dictDataDeleteUrl: `${domain}api/services/app/DictTable/Delete`,
 
+    // 字典数据_批量删除
+    dictDataDeleteMulUrl: `${domain}api/services/app/DictTable/DeleteBatch`,
+
     // 行政区划_列表
     districtTreeUrl: `${domain}api/services/app/User/GetDistrictCodesTree`,
 

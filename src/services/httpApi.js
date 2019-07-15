@@ -755,6 +755,18 @@ export async function dictDataDeleteApi(id) {
   });
 }
 
+// 字典数据_批量删除
+export async function dictDataDeleteMulApi(params) {
+  return request(`${config.url.dictDataDeleteMulUrl}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify(params.id)
+  });
+}
+
 // 行政区域_列表
 export async function districtTreeApi() {
   return request(`${config.url.districtTreeUrl}`, {
