@@ -614,6 +614,7 @@ export default class siderbarDetail extends PureComponent {
             />
           </div>
           <Modal
+            width={"50vw"}
             visible={previewVisible}
             footer={null}
             onCancel={() => {

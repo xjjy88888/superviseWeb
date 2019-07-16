@@ -380,7 +380,7 @@ class power extends PureComponent {
   };
 
   componentDidMount() {
-    this.powerList();
+    // this.powerList();
   }
 
   powerList = () => {

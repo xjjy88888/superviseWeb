@@ -14,6 +14,7 @@ import Sidebar from "./sidebar";
 import SidebarDetail from "./siderbarDetail";
 import Tool from "./tool";
 import Sparse from "./sparse";
+import Panorama from "./panorama";
 import Chart from "./chart";
 import Query from "./query";
 import ProjectDetail from "./projectDetail";
@@ -169,6 +170,18 @@ export default class integration extends PureComponent {
         .find("path")
         .css({
           cursor: "crosshair"
+        });
+    });
+    //全景定位
+    this.eventEmitter = emitter.addListener("fullViewLocation", () => {
+      console.log("fullViewLocation");
+      //标注点定位
+      if (marker) marker.remove();
+      let latLng = [23.4437, 113.2368];
+      marker = L.marker(latLng)
+        .addTo(map)
+        .on("click", function(e) {
+          console.log("marker", e);
         });
     });
     //地图定位
@@ -1916,6 +1929,7 @@ export default class integration extends PureComponent {
         <Chart />
         <Query />
         <Sparse />
+        <Panorama />
         <ProjectDetail />
         <div
           ref={this.saveRef}

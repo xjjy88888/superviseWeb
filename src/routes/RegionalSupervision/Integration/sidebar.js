@@ -2619,6 +2619,49 @@ export default class sider extends PureComponent {
                       />
                     </p>
                   </Collapse.Panel>
+                  <Collapse.Panel
+                    header={
+                      <b>
+                        全景图：1
+                        <Icon
+                          type="plus-circle"
+                          style={{
+                            marginLeft: 10,
+                            fontSize: 16,
+                            color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            notification["info"]({
+                              message: "添加全景图"
+                            });
+                          }}
+                        />
+                      </b>
+                    }
+                    key="7"
+                  >
+                    <p>
+                      珠江委全景图
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                        onClick={() => {
+                          emitter.emit("showPanorama", {
+                            show: true
+                          });
+                          emitter.emit("fullViewLocation", {
+                            // type: "fullview",
+                          });
+                        }}
+                      />
+                    </p>
+                  </Collapse.Panel>
                   {/* <Collapse.Panel
                     header={
                       <b>
@@ -3399,6 +3442,7 @@ export default class sider extends PureComponent {
               </Upload>
             </div>
             <Modal
+              width={"50vw"}
               visible={previewVisible}
               footer={null}
               onCancel={() => {
