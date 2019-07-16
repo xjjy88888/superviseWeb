@@ -1,9 +1,20 @@
 import React, { PureComponent } from "react";
-import { Form, Icon, Input, Button, Table, message, Modal } from "antd";
+import {
+  Form,
+  Icon,
+  Input,
+  Button,
+  Table,
+  message,
+  Modal,
+  notification
+} from "antd";
 import { createForm } from "rc-form";
 import Systems from "../../../components/Systems";
 import { connect } from "dva";
 import Highlighter from "react-highlight-words";
+
+let self;
 
 @createForm()
 @connect(({ company }) => ({ company }))
@@ -16,15 +27,19 @@ export default class company extends PureComponent {
       selectedRows: [],
       dataSource: [],
       pagination: {},
-      loading: false
+      loading: false,
+      id: null
     };
   }
 
   componentDidMount() {
-    this.companyList({ isBuild: true, SkipCount: 0, MaxResultCount: 10 });
+    self = this;
+    this.companyList();
   }
 
-  companyList = (params = {}) => {
+  companyList = (
+    params = { isBuild: true, SkipCount: 0, MaxResultCount: 10 }
+  ) => {
     const { dispatch } = this.props;
     this.setState({ loading: true });
     dispatch({
@@ -131,9 +146,13 @@ export default class company extends PureComponent {
       selectedRows,
       loading,
       pagination,
-      dataSource
+      dataSource,
+      id
     } = this.state;
-    const { getFieldDecorator } = this.props.form;
+    const {
+      dispatch,
+      form: { getFieldDecorator, resetFields }
+    } = this.props;
 
     const columns = [
       {
@@ -153,12 +172,17 @@ export default class company extends PureComponent {
             <a
               style={{ marginRight: 20 }}
               onClick={() => {
+                this.props.form.setFieldsValue({
+                  name: record.name,
+                  description: record.description
+                });
                 this.setState({
-                  visible: true
+                  visible: true,
+                  id: record.id
                 });
               }}
             >
-              修改
+              编辑
             </a>
             <a
               onClick={() => {
@@ -169,7 +193,23 @@ export default class company extends PureComponent {
                   cancelText: "否",
                   okType: "danger",
                   onOk() {
-                    message.success(`删除1个单位成功`);
+                    dispatch({
+                      type: "company/companyDelete",
+                      payload: record.id,
+                      callback: (success, error, result) => {
+                        if (success) {
+                          self.setState({
+                            visible: false
+                          });
+                          self.companyList();
+                        }
+                        notification[success ? "success" : "error"]({
+                          message: `删除1条单位数据${
+                            success ? "成功" : "失败"
+                          }${success ? "" : `：${error.message}`}`
+                        });
+                      }
+                    });
                   },
                   onCancel() {}
                 });
@@ -196,12 +236,14 @@ export default class company extends PureComponent {
             icon="plus"
             style={{ margin: 10 }}
             onClick={() => {
+              resetFields();
               this.setState({
-                visible: true
+                visible: true,
+                id: null
               });
             }}
           >
-            添加
+            新增
           </Button>
           <Button
             icon="delete"
@@ -220,7 +262,23 @@ export default class company extends PureComponent {
                 cancelText: "否",
                 okType: "danger",
                 onOk() {
-                  message.success(`删除${l}个单位成功`);
+                  dispatch({
+                    type: "company/companyDeleteMul",
+                    payload: { id: selectedRows.map(item => item.id) },
+                    callback: (success, error, result) => {
+                      if (success) {
+                        self.setState({
+                          visible: false
+                        });
+                        self.companyList();
+                      }
+                      notification[success ? "success" : "error"]({
+                        message: `删除${l}条单位数据${
+                          success ? "成功" : "失败"
+                        }${success ? "" : `：${error.message}`}`
+                      });
+                    }
+                  });
                 },
                 onCancel() {}
               });
@@ -257,7 +315,7 @@ export default class company extends PureComponent {
           onChange={this.handleTableChange}
         />
         <Modal
-          title="添加单位"
+          title="新增单位"
           visible={visible}
           onOk={() => {
             this.props.form.validateFields((err, v) => {
@@ -266,10 +324,27 @@ export default class company extends PureComponent {
                 message.warning("请填写单位名称");
                 return;
               }
-              this.setState({
-                visible: false
+              dispatch({
+                type: "company/companyCreateUpdate",
+                payload: { ...v, id: id, depType: 1 },
+                callback: (success, error, result) => {
+                  if (success) {
+                    this.setState({
+                      visible: false
+                    });
+                    notification["success"]({
+                      message: `${id ? "编辑" : "新增"}单位成功`
+                    });
+                    this.companyList();
+                  } else {
+                    notification["error"]({
+                      message: `${id ? "编辑" : "新增"}单位失败：${
+                        error.message
+                      }`
+                    });
+                  }
+                }
               });
-              message.success("保存成功");
             });
           }}
           onCancel={() => {
@@ -301,7 +376,7 @@ export default class company extends PureComponent {
               }
               hasFeedback
             >
-              {getFieldDecorator("desc", {})(
+              {getFieldDecorator("description", {})(
                 <Input.TextArea autosize style={{ width: 180 }} />
               )}
             </Form.Item>

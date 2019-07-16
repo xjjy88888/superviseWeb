@@ -1,123 +1,74 @@
 import React, { PureComponent } from "react";
-import { Form, Icon, Input, Button, Table, message, Modal } from "antd";
+import {
+  Form,
+  Icon,
+  Input,
+  Button,
+  Table,
+  message,
+  Modal,
+  notification,
+  Select
+} from "antd";
 import { createForm } from "rc-form";
 import Systems from "../../../components/Systems";
+import { connect } from "dva";
 import Highlighter from "react-highlight-words";
 
-const data = [
-  {
-    index: "1",
-    name: "深圳市宗兴环保科技有限公司",
-    desc: "单位描述7"
-  },
-  {
-    index: "2",
-    name: "珠江水利科学研究院",
-    desc: "单位描述8"
-  },
-  {
-    index: "3",
-    name: "南宁中桂水土保持科技有限公司",
-    desc: "单位描述9"
-  },
-  {
-    index: "1",
-    name: "深圳市宗兴环保科技有限公司",
-    desc: "单位描述7"
-  },
-  {
-    index: "2",
-    name: "珠江水利科学研究院",
-    desc: "单位描述8"
-  },
-  {
-    index: "3",
-    name: "南宁中桂水土保持科技有限公司",
-    desc: "单位描述9"
-  },
-  {
-    index: "1",
-    name: "深圳市宗兴环保科技有限公司",
-    desc: "单位描述7"
-  },
-  {
-    index: "2",
-    name: "珠江水利科学研究院",
-    desc: "单位描述8"
-  },
-  {
-    index: "3",
-    name: "南宁中桂水土保持科技有限公司",
-    desc: "单位描述9"
-  },
-  {
-    index: "1",
-    name: "深圳市宗兴环保科技有限公司",
-    desc: "单位描述7"
-  },
-  {
-    index: "2",
-    name: "珠江水利科学研究院",
-    desc: "单位描述8"
-  },
-  {
-    index: "3",
-    name: "南宁中桂水土保持科技有限公司",
-    desc: "单位描述9"
-  },
-  {
-    index: "1",
-    name: "深圳市宗兴环保科技有限公司",
-    desc: "单位描述7"
-  },
-  {
-    index: "2",
-    name: "珠江水利科学研究院",
-    desc: "单位描述8"
-  },
-  {
-    index: "3",
-    name: "南宁中桂水土保持科技有限公司",
-    desc: "单位描述9"
-  },
-  {
-    index: "1",
-    name: "深圳市宗兴环保科技有限公司",
-    desc: "单位描述7"
-  },
-  {
-    index: "2",
-    name: "珠江水利科学研究院",
-    desc: "单位描述8"
-  },
-  {
-    index: "3",
-    name: "南宁中桂水土保持科技有限公司",
-    desc: "单位描述9"
-  },
-  {
-    index: "1",
-    name: "深圳市宗兴环保科技有限公司",
-    desc: "单位描述7"
-  },
-  {
-    index: "2",
-    name: "珠江水利科学研究院",
-    desc: "单位描述8"
-  },
-  {
-    index: "3",
-    name: "南宁中桂水土保持科技有限公司",
-    desc: "单位描述9"
-  },
-];
+let self;
 
 @createForm()
-export default class branch extends PureComponent {
-  state = {
-    state: 0,
-    visible: false,
-    selectedRows: []
+@connect(({ company }) => ({ company }))
+export default class company extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      state: 0,
+      visible: false,
+      selectedRows: [],
+      dataSource: [],
+      pagination: {},
+      loading: false,
+      id: null
+    };
+  }
+
+  componentDidMount() {
+    self = this;
+    this.companyList();
+  }
+
+  companyList = (
+    params = { isBuild: false, SkipCount: 0, MaxResultCount: 10 }
+  ) => {
+    const { dispatch } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: "company/companyList",
+      payload: params,
+      callback: (success, error, result) => {
+        const pagination = { ...this.state.pagination };
+        pagination.total = result.totalCount;
+        this.setState({
+          loading: false,
+          dataSource: result.items,
+          pagination
+        });
+      }
+    });
+  };
+
+  handleTableChange = (pagination, filters, sorter) => {
+    console.log(pagination, filters);
+    this.setState({
+      pagination: pagination
+    });
+    this.companyList({
+      isBuild: false,
+      SkipCount: (pagination.current - 1) * pagination.pageSize,
+      MaxResultCount: pagination.pageSize,
+      Name: filters.name
+    });
   };
 
   getColumnSearchProps = dataIndex => ({
@@ -179,6 +130,7 @@ export default class branch extends PureComponent {
       />
     )
   });
+
   handleSearch = (selectedKeys, confirm) => {
     confirm();
     this.setState({ searchText: selectedKeys[0] });
@@ -190,27 +142,46 @@ export default class branch extends PureComponent {
   };
 
   render() {
-    const { visible, selectedRows } = this.state;
-    const { getFieldDecorator, getFieldsError } = this.props.form;
+    const {
+      visible,
+      selectedRows,
+      loading,
+      pagination,
+      dataSource,
+      id
+    } = this.state;
+    const {
+      dispatch,
+      form: { getFieldDecorator, resetFields }
+    } = this.props;
 
     const columns = [
       {
-        title: "序号",
-        dataIndex: "index",
-        sorter: (a, b) => a.index - b.index,
-        ...this.getColumnSearchProps("index")
-      },
-      {
         title: "单位名称",
         dataIndex: "name",
-        sorter: (a, b) => a.name.length - b.name.length,
         ...this.getColumnSearchProps("name")
       },
       {
+        title: "单位类型",
+        dataIndex: "depType",
+        render: item =>
+          item === 2
+            ? "方案编制单位"
+            : item === 3
+            ? "设计单位"
+            : item === 4
+            ? "施工单位"
+            : item === 5
+            ? "监测单位"
+            : item === 6
+            ? "监理单位"
+            : item === 7
+            ? "验收报告编制单位"
+            : ""
+      },
+      {
         title: "单位描述",
-        dataIndex: "desc",
-        sorter: (a, b) => a.name.length - b.name.length,
-        ...this.getColumnSearchProps("desc")
+        dataIndex: "description"
       },
       {
         title: "操作",
@@ -220,12 +191,18 @@ export default class branch extends PureComponent {
             <a
               style={{ marginRight: 20 }}
               onClick={() => {
+                this.props.form.setFieldsValue({
+                  name: record.name,
+                  depType: record.depType,
+                  description: record.description
+                });
                 this.setState({
-                  visible: true
+                  visible: true,
+                  id: record.id
                 });
               }}
             >
-              修改
+              编辑
             </a>
             <a
               onClick={() => {
@@ -236,7 +213,23 @@ export default class branch extends PureComponent {
                   cancelText: "否",
                   okType: "danger",
                   onOk() {
-                    message.success(`删除1个单位成功`);
+                    dispatch({
+                      type: "company/companyDelete",
+                      payload: record.id,
+                      callback: (success, error, result) => {
+                        if (success) {
+                          self.setState({
+                            visible: false
+                          });
+                          self.companyList();
+                        }
+                        notification[success ? "success" : "error"]({
+                          message: `删除1条单位数据${
+                            success ? "成功" : "失败"
+                          }${success ? "" : `：${error.message}`}`
+                        });
+                      }
+                    });
                   },
                   onCancel() {}
                 });
@@ -260,17 +253,17 @@ export default class branch extends PureComponent {
       <Systems>
         <span>
           <Button
-            // type="primary"
-            // shape="round"
             icon="plus"
             style={{ margin: 10 }}
             onClick={() => {
+              resetFields();
               this.setState({
-                visible: true
+                visible: true,
+                id: null
               });
             }}
           >
-            添加
+            新增
           </Button>
           <Button
             icon="delete"
@@ -289,7 +282,23 @@ export default class branch extends PureComponent {
                 cancelText: "否",
                 okType: "danger",
                 onOk() {
-                  message.success(`删除${l}个单位成功`);
+                  dispatch({
+                    type: "company/companyDeleteMul",
+                    payload: { id: selectedRows.map(item => item.id) },
+                    callback: (success, error, result) => {
+                      if (success) {
+                        self.setState({
+                          visible: false
+                        });
+                        self.companyList();
+                      }
+                      notification[success ? "success" : "error"]({
+                        message: `删除${l}条单位数据${
+                          success ? "成功" : "失败"
+                        }${success ? "" : `：${error.message}`}`
+                      });
+                    }
+                  });
                 },
                 onCancel() {}
               });
@@ -318,11 +327,15 @@ export default class branch extends PureComponent {
         </span>
         <Table
           columns={columns}
-          dataSource={data}
           rowSelection={rowSelection}
+          rowKey={record => record.id}
+          dataSource={dataSource}
+          pagination={pagination}
+          loading={loading}
+          onChange={this.handleTableChange}
         />
         <Modal
-          title="添加单位"
+          title="新增单位"
           visible={visible}
           onOk={() => {
             this.props.form.validateFields((err, v) => {
@@ -331,10 +344,31 @@ export default class branch extends PureComponent {
                 message.warning("请填写单位名称");
                 return;
               }
-              this.setState({
-                visible: false
+              if (!v.depType) {
+                message.warning("请选择单位类型");
+                return;
+              }
+              dispatch({
+                type: "company/companyCreateUpdate",
+                payload: { ...v, id: id },
+                callback: (success, error, result) => {
+                  if (success) {
+                    this.setState({
+                      visible: false
+                    });
+                    notification["success"]({
+                      message: `${id ? "编辑" : "新增"}单位成功`
+                    });
+                    this.companyList();
+                  } else {
+                    notification["error"]({
+                      message: `${id ? "编辑" : "新增"}单位失败：${
+                        error.message
+                      }`
+                    });
+                  }
+                }
               });
-              message.success("保存成功");
             });
           }}
           onCancel={() => {
@@ -361,12 +395,42 @@ export default class branch extends PureComponent {
             <Form.Item
               label={
                 <span>
+                  <b style={{ color: "red" }}>*</b>单位类型
+                </span>
+              }
+              hasFeedback
+            >
+              {getFieldDecorator("depType", {})(
+                <Select
+                  showSearch
+                  allowClear
+                  optionFilterProp="children"
+                  style={{ width: 180 }}
+                >
+                  {[
+                    { text: "方案编制单位", value: 2 },
+                    { text: "设计单位", value: 3 },
+                    { text: "施工单位", value: 4 },
+                    { text: "监测单位", value: 5 },
+                    { text: "监理单位", value: 6 },
+                    { text: "验收报告编制单位", value: 7 }
+                  ].map((item, index) => (
+                    <Select.Option value={item.value} key={index}>
+                      {item.text}
+                    </Select.Option>
+                  ))}
+                </Select>
+              )}
+            </Form.Item>
+            <Form.Item
+              label={
+                <span>
                   <b style={{ color: "#fff" }}>*</b>单位描述
                 </span>
               }
               hasFeedback
             >
-              {getFieldDecorator("desc", {})(
+              {getFieldDecorator("description", {})(
                 <Input.TextArea autosize style={{ width: 180 }} />
               )}
             </Form.Item>
