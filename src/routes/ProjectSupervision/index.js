@@ -1,6 +1,5 @@
 import React, { PureComponent } from "react";
-import { Table, Button, Input, Icon, LocaleProvider, Switch } from "antd";
-import zhCN from "antd/lib/locale-provider/zh_CN";
+import { Table, Button, Input, Icon } from "antd";
 import Highlighter from "react-highlight-words";
 import config from "../../config";
 import Layouts from "../../components/Layouts";

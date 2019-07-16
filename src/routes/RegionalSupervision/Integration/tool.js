@@ -15,7 +15,7 @@ import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
 import "echarts";
 import config from "../../../config";
-import { dateFormat, accessToken } from "../../../utils/util";
+import {  accessToken } from "../../../utils/util";
 
 const url = config.download;
 

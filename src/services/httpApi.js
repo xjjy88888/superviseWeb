@@ -871,3 +871,13 @@ export async function companyDeleteMulApi(params) {
     body: JSON.stringify(params.id)
   });
 }
+
+// 权限列表
+export async function powerListApi() {
+  return request(`${config.url.powerListUrl}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}

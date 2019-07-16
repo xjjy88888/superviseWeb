@@ -11,12 +11,10 @@ import {
   Switch,
   Checkbox,
   DatePicker,
-  Form,
-  AutoComplete
+  Form
 } from "antd";
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
-import config from "../../../config";
 
 const { RangePicker } = DatePicker;
 const formItemLayout = {

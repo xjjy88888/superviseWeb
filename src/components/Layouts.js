@@ -66,9 +66,13 @@ export default class layouts extends PureComponent {
           <Icon type="user" />
           个人中心
         </Menu.Item>
-        <Menu.Item>
-          <Icon type="setting" />
-          个人设置
+        <Menu.Item
+          onClick={() => {
+            window.open("https://docs.qq.com/doc/DTEV2TGRsU0RNQUV0");
+          }}
+        >
+          <Icon type="question-circle" />
+          使用手册
         </Menu.Item>
         <Menu.Item>
           <Link to="/login">

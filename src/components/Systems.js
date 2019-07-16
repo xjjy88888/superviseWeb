@@ -1,10 +1,9 @@
 import React, { PureComponent } from "react";
-import { Spin, Layout, Typography, Menu, Avatar, Icon } from "antd";
+import {  Layout, Menu, Icon } from "antd";
 import Layouts from "./Layouts";
-import { withRouter, Link } from "dva/router";
+import { Link } from "dva/router";
 
-const { Header, Footer, Sider, Content } = Layout;
-const { Text, Paragraph, Title } = Typography;
+const {  Sider, Content } = Layout;
 
 const menuList = [
   {

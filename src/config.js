@@ -237,7 +237,10 @@ const config = {
     companyDeleteUrl: `${domain}api/services/app/SocialDepartment/Delete`,
 
     // 单位_批量删除
-    companyDeleteMulUrl: `${domain}api/services/app/SocialDepartment/DeleteBatch`
+    companyDeleteMulUrl: `${domain}api/services/app/SocialDepartment/DeleteBatch`,
+
+    // 权限列表
+    powerListUrl: `${domain}api/services/app/Role/GetAllPermissions`
   },
 
   //工具箱

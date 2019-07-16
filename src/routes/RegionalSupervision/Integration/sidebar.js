@@ -14,7 +14,6 @@ import {
   Input,
   Radio,
   List,
-  Spin,
   Select,
   Upload,
   Modal,
@@ -25,8 +24,7 @@ import {
   DatePicker,
   AutoComplete,
   Table,
-  Collapse,
-  Divider
+  Collapse
 } from "antd";
 import locale from "antd/lib/date-picker/locale/zh_CN";
 import "leaflet/dist/leaflet.css";
@@ -38,8 +36,7 @@ import {
   accessToken,
   getFile,
   guid,
-  unique,
-  tree
+  unique
 } from "../../../utils/util";
 import Spins from "../../../components/Spins";
 
@@ -124,7 +121,6 @@ export default class sider extends PureComponent {
 
   componentDidMount() {
     self = this;
-    const { dispatch } = this.props;
     // console.log("贵阳至黄平高速公路", "六枝特区平寨镇跃进砂石厂");
     this.queryProject({ SkipCount: 0 });
     // this.querySpot({ SkipCount: 0 });
@@ -762,11 +758,11 @@ export default class sider extends PureComponent {
   getDepartList = key => {
     const {
       dispatch,
-      form: { validateFields, setFieldsValue }
+      form: { setFieldsValue }
     } = this.props;
-    const { departList, departSearch, isSelect } = this.state;
+    const { departSearch } = this.state;
 
-    const isAdd = key !== "supDepartmentId" && key !== "replyDepartmentId";
+    // const isAdd = key !== "supDepartmentId" && key !== "replyDepartmentId";
     console.log(departSearch);
     if (departSearch) {
       dispatch({
@@ -879,10 +875,6 @@ export default class sider extends PureComponent {
 
   //search
   search = v => {
-    const {
-      district: { districtTree }
-    } = this.props;
-
     const { key, queryInfo } = this.state;
     if (this.scrollDom) {
       this.scrollDom.scrollTop = 0;
@@ -971,18 +963,11 @@ export default class sider extends PureComponent {
       ShowArchive,
       sort_key,
       projectFileList,
-      departList,
-      uid
+      departList
     } = this.state;
     const {
       dispatch,
-      form: {
-        getFieldDecorator,
-        resetFields,
-        setFieldsValue,
-        getFieldValue,
-        setFieldValue
-      },
+      form: { getFieldDecorator, resetFields, setFieldsValue, getFieldValue },
       district: { districtTree },
       user: { basinOrganList },
       project: { projectList, projectInfo, projectListAdd, departSelectList },
@@ -1343,15 +1328,7 @@ export default class sider extends PureComponent {
               }}
             />
           </Popover>
-          <Button.Group
-            buttonstyle="solid"
-            style={{ padding: "0px 15px" }}
-            onClick={e => {
-              const v = e.target.value;
-              const key = v.slice(0, v.length - 1);
-              const type = v.charAt(v.length - 1);
-            }}
-          >
+          <Button.Group buttonstyle="solid" style={{ padding: "0px 15px" }}>
             {sort.map((item, index) => (
               <Button
                 style={{

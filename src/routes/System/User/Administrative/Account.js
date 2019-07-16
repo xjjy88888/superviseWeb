@@ -16,7 +16,7 @@ import Register from "../../../../components/Register";
 import Systems from "../../../../components/Systems";
 
 const { Title } = Typography;
-const { Header, Footer, Sider, Content } = Layout;
+const {  Sider, Content } = Layout;
 
 const data = [
   {

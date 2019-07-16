@@ -2,7 +2,6 @@ import React, { PureComponent } from "react";
 import { connect } from "dva";
 import {
   Button,
-  LocaleProvider,
   Switch,
   Popover,
   Modal,
@@ -11,7 +10,6 @@ import {
   message
 } from "antd";
 import { Link } from "dva/router";
-import zhCN from "antd/lib/locale-provider/zh_CN";
 import Sidebar from "./sidebar";
 import SidebarDetail from "./siderbarDetail";
 import Tool from "./tool";
@@ -31,7 +29,6 @@ import "leaflet-side-by-side";
 import "leaflet-measure/dist/leaflet-measure.css";
 import "leaflet-measure/dist/leaflet-measure.cn";
 import LeaftWMS from "leaflet.wms";
-import shp from "shpjs";
 import * as turf from "@turf/turf";
 import domtoimage from "dom-to-image";
 //import '@h21-map/leaflet-path-drag';

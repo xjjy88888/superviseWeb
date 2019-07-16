@@ -2,33 +2,25 @@ import React, { PureComponent } from "react";
 import {
   Steps,
   Form,
-  Icon,
   Input,
   Button,
   Table,
   TreeSelect,
   Select,
   DatePicker,
-  Radio,
   Avatar,
-  Tree,
-  Typography,
   Layout,
-  Modal,
   Checkbox,
   Row,
   Col
 } from "antd";
 import { connect } from "dva";
 import moment from "moment";
-import { Link } from "dva/router";
-import Highlighter from "react-highlight-words";
 import emitter from "../utils/event";
 import { LocaleProvider } from "antd";
 import { createForm } from "rc-form";
 import zh_CN from "antd/lib/locale-provider/zh_CN";
 
-const { Title } = Typography;
 const { Header, Footer, Sider, Content } = Layout;
 const formItemLayout = {
   labelCol: {
@@ -49,7 +41,7 @@ export default class register extends PureComponent {
   state = {
     show: false,
     state: 0,
-    type: "all"
+    type: "account"
     //all: 注册
     //review: 管理员
     //society: 社会用户
@@ -160,9 +152,7 @@ class FormWriteUser extends PureComponent {
     autoCompleteResult: []
   };
 
-  componentDidMount() {
-    console.log("componentDidMount");
-  }
+  componentDidMount() {}
 
   handleSubmit = e => {
     e.preventDefault();
@@ -196,7 +186,7 @@ class FormWriteUser extends PureComponent {
   };
 
   render() {
-    const { getFieldDecorator, resetFields } = this.props.form;
+    const { getFieldDecorator } = this.props.form;
     const { type } = this.props;
 
     return (
@@ -275,7 +265,6 @@ class FormWriteUser extends PureComponent {
                 style={{ display: type === "all" ? "block" : "none" }}
               >
                 {getFieldDecorator("user_type", {
-                  initialValue: "",
                   rules: [
                     {
                       required: type === "all",
@@ -297,12 +286,8 @@ class FormWriteUser extends PureComponent {
               </Form.Item>
               <Form.Item label="有效期至" hasFeedback>
                 {getFieldDecorator("time", {
-                  initialValue: "",
                   rules: [
-                    {
-                      required: true,
-                      message: "请选择有效期"
-                    }
+                    { type: "object", required: true, message: "请选择有效期" }
                   ]
                 })(<DatePicker style={{ width: 330 }} />)}
               </Form.Item>
@@ -385,10 +370,22 @@ class FormWriteUser extends PureComponent {
 const DomWriteUser = Form.create({ name: "FormWriteUserName" })(FormWriteUser);
 
 //权限分配
+@connect(({ user }) => ({
+  user
+}))
 class power extends PureComponent {
   state = {
     value: 1,
     powerList: [{}]
+  };
+
+  componentDidMount() {
+    this.powerList();
+  }
+
+  powerList = () => {
+    const { dispatch } = this.props;
+    dispatch({ type: "user/powerList" });
   };
 
   onChange = e => {
@@ -410,110 +407,41 @@ class power extends PureComponent {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { powerList } = this.state;
-    const { type } = this.props;
-    console.log(type);
+    const {
+      type,
+      user: { powerList }
+    } = this.props;
 
-    const radioStyle = {
-      display: "block",
-      height: "30px",
-      lineHeight: "30px"
-    };
+    const dataSource = powerList.map(item => {
+      return { ...item, key: item.name, time: "2019-08-08" };
+    });
 
     const columns = [
       {
         title: "模块名",
-        dataIndex: "name"
+        dataIndex: "displayName"
       },
       {
         title: "有效期",
-        dataIndex: "timeStart",
+        dataIndex: "time",
         render: (text, record) => (
           <span
             onClick={() => {
               console.log(record);
             }}
           >
-            <DatePicker.RangePicker
-              defaultValue={[moment(record.timeStart), moment(record.timeEnd)]}
+            <DatePicker
+              defaultValue={moment(
+                new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1e3),
+                "YYYY-MM-DD"
+              )}
             />
-            {/* {record.timeStart} 至 {record.timeEnd} */}
           </span>
         )
-      }
-    ];
-    const data = [
-      {
-        key: "1",
-        name: "区域监管",
-        timeStart: "2018-01-01",
-        timeEnd: "2018-04-01"
       },
       {
-        key: "2",
-        name: "项目监管",
-        timeStart: "2019-01-01",
-        timeEnd: "2019-04-01"
-      },
-      {
-        key: "3",
-        name: "责任追究",
-        timeStart: "2020-01-01",
-        timeEnd: "2020-04-01"
-      },
-      {
-        key: "4",
-        name: "责任追究",
-        timeStart: "2021-01-01",
-        timeEnd: "2021-04-01"
-      },
-      {
-        key: "5",
-        name: "责任追究",
-        timeStart: "2022-01-01",
-        timeEnd: "2022-04-01"
-      },
-      {
-        key: "6",
-        name: "责任追究",
-        timeStart: "2020-01-01",
-        timeEnd: "2020-04-01"
-      },
-      {
-        key: "7",
-        name: "责任追究",
-        timeStart: "2020-01-01",
-        timeEnd: "2020-04-01"
-      },
-      {
-        key: "8",
-        name: "责任追究",
-        timeStart: "2020-01-01",
-        timeEnd: "2020-04-01"
-      },
-      {
-        key: "9",
-        name: "责任追究",
-        timeStart: "2020-01-01",
-        timeEnd: "2020-04-01"
-      },
-      {
-        key: "10",
-        name: "责任追究",
-        timeStart: "2020-01-01",
-        timeEnd: "2020-04-01"
-      },
-      {
-        key: "11",
-        name: "责任追究",
-        timeStart: "2020-01-01",
-        timeEnd: "2020-04-01"
-      },
-      {
-        key: "12",
-        name: "责任追究",
-        timeStart: "2020-01-01",
-        timeEnd: "2020-04-01"
+        title: "描述",
+        dataIndex: "description"
       }
     ];
 
@@ -629,8 +557,7 @@ class power extends PureComponent {
             }}
             rowSelection={rowSelection}
             columns={columns}
-            dataSource={data}
-            // pagination={{ pageSize: 8 }}
+            dataSource={dataSource}
             size="small"
           />
         </Content>
@@ -643,7 +570,6 @@ const DomPower = Form.create({ name: "PowerName" })(power);
 //完成
 class finish extends PureComponent {
   render() {
-    const { resetFields } = this.props.form;
     return (
       <Layout style={{ backgroundColor: "#fff" }}>
         <Content style={{ textAlign: "center" }}>

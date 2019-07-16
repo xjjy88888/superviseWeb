@@ -319,21 +319,6 @@ export default class dict extends PureComponent {
       }
     };
 
-    const selectList = [
-      {
-        value: "1",
-        text: "项目类型"
-      },
-      {
-        value: "2",
-        text: "防治标准"
-      },
-      {
-        value: "3",
-        text: "建设状态"
-      }
-    ];
-
     return (
       <Systems>
         <Tabs defaultActiveKey="1">

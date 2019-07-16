@@ -12,19 +12,16 @@ import {
   Modal,
   Switch,
   DatePicker,
-  message,
   Form
 } from "antd";
 import locale from "antd/lib/date-picker/locale/zh_CN";
 import emitter from "../../../utils/event";
 import config from "../../../config";
 import { getFile } from "../../../utils/util";
-import jQuery from "jquery";
-import { dateInitFormat, accessToken } from "../../../utils/util";
+import { accessToken } from "../../../utils/util";
 
 let self;
 const { TextArea } = Input;
-const dateFormat = "YYYY-MM-DD";
 const formItemLayout = {
   labelCol: { span: 7 },
   wrapperCol: { span: 16 }

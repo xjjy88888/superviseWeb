@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { Form, Icon, Input, Button, Table, message, Modal } from "antd";
+import { Icon, Input, Button, Table, message, Modal } from "antd";
 import { createForm } from "rc-form";
 import Systems from "../../../../components/Systems";
 import emitter from "../../../../utils/event";
@@ -22,14 +22,6 @@ const data = [
     phone: 16555479658,
     time: "2020-12-31",
     surplus: 20
-  },
-  {
-    key: "3",
-    nickname: "海珠区办事员",
-    name: "海珠区办事员",
-    phone: 17555479658,
-    time: "2091-12-31",
-    surplus: 30
   }
 ];
 
@@ -115,8 +107,7 @@ export default class review extends PureComponent {
   };
 
   render() {
-    const { visible, selectedRows } = this.state;
-    const { getFieldDecorator, getFieldsError } = this.props.form;
+    const { selectedRows } = this.state;
 
     const columns = [
       {
