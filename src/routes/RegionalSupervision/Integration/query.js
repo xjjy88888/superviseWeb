@@ -95,8 +95,6 @@ export default class Query extends PureComponent {
       district: { districtTree }
     } = this.props;
 
-    console.log(districtTree);
-
     return (
       <div
         style={{

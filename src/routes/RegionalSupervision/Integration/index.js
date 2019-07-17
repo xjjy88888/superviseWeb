@@ -1382,7 +1382,7 @@ export default class integration extends PureComponent {
    */
   loadLayersControl = () => {
     const frequentEdit = localStorage.getItem("frequentEdit");
-    console.log("是否频繁编辑", frequentEdit, typeof frequentEdit);
+    // console.log("是否频繁编辑", frequentEdit, typeof frequentEdit);
     if (frequentEdit === "1") {
       //加载项目红线图层wms
       userconfig.projectWmsLayer = LeaftWMS.overlay(

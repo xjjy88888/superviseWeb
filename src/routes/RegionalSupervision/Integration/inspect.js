@@ -1,31 +1,13 @@
 import React, { PureComponent } from "react";
 import { createForm } from "rc-form";
 import { connect } from "dva";
-import {
-  Icon,
-  Button,
-  Select,
-  Input,
-  InputNumber,
-  Cascader,
-  Switch,
-  Checkbox,
-  DatePicker,
-  Form,
-  Radio,
-  Modal
-} from "antd";
+import { Icon, Button, Input, Checkbox, Form, Radio, Modal } from "antd";
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
 
 let self;
 
-const { RangePicker } = DatePicker;
 const formItemLayout = {
-  labelCol: { span: 6 },
-  wrapperCol: { span: 15 }
-};
-const formItemLayoutlong = {
   labelCol: { span: 6 },
   wrapperCol: { span: 15 }
 };
@@ -35,6 +17,11 @@ const data = [
     type: "input",
     title: "项目名称",
     name: "project"
+  },
+  {
+    type: "textArea",
+    title: "备注",
+    name: "mark"
   },
   {
     type: "radio",
@@ -73,10 +60,9 @@ export default class Inspect extends PureComponent {
   }
 
   render() {
-    const { show, type, showVecType } = this.state;
+    const { show } = this.state;
     const {
-      form: { getFieldDecorator, resetFields },
-      district: { districtTree }
+      form: { getFieldDecorator }
     } = this.props;
 
     return (
@@ -150,9 +136,11 @@ export default class Inspect extends PureComponent {
             <Form.Item label={item.title} {...formItemLayout} key={index}>
               {item.type === "input"
                 ? getFieldDecorator(item.name)(<Input allowClear />)
+                : item.type === "textArea"
+                ? getFieldDecorator(item.name)(<Input.TextArea autosize />)
                 : item.type === "radio"
                 ? getFieldDecorator(item.name)(
-                    <Radio.Group name="radiogroup" defaultValue={1}>
+                    <Radio.Group name="radiogroup">
                       {item.data.map((item, index) => (
                         <Radio value={item} key={index}>
                           {item}
