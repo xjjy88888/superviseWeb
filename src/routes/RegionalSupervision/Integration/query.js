@@ -31,7 +31,7 @@ const formItemLayoutlong = {
   user,
   district
 }))
-export default class siderbarDetail extends PureComponent {
+export default class Query extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {

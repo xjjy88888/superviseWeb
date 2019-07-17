@@ -17,6 +17,7 @@ import Sparse from "./sparse";
 import Panorama from "./panorama";
 import Chart from "./chart";
 import Query from "./query";
+import Inspect from "./inspect";
 import ProjectDetail from "./projectDetail";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -1934,6 +1935,7 @@ export default class integration extends PureComponent {
         <Sparse />
         <Panorama />
         <ProjectDetail />
+        <Inspect />
         <div
           ref={this.saveRef}
           style={{

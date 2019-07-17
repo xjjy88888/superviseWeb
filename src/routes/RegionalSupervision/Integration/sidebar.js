@@ -2032,6 +2032,28 @@ export default class sider extends PureComponent {
                   <Collapse.Panel
                     header={
                       <b>
+                        检查记录：0
+                        <Icon
+                          type="plus-circle"
+                          style={{
+                            marginLeft: 10,
+                            fontSize: 16,
+                            color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            emitter.emit("showInspect", {
+                              show: true
+                            });
+                          }}
+                        />
+                      </b>
+                    }
+                    key="8"
+                  />
+                  <Collapse.Panel
+                    header={
+                      <b>
                         监督执法记录：2
                         <Icon
                           type="plus-circle"
@@ -2368,174 +2390,6 @@ export default class sider extends PureComponent {
                       </p>
                     ))}
                   </Collapse.Panel>
-                  {/* <Collapse.Panel
-                    header={
-                      <b>
-                        设计分区：5
-                        <Icon
-                          type="plus-circle"
-                          style={{
-                            marginLeft: 10,
-                            fontSize: 16,
-                            color: "#1890ff"
-                          }}
-                          onClick={e => {
-                            e.stopPropagation();
-                            notification["info"]({
-                              message: "添加设计分区"
-                            });
-                          }}
-                        />
-                      </b>
-                    }
-                    key="4"
-                  >
-                    <p>
-                      主体功能区
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                    <p>
-                      生产生活区
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                    <p>
-                      连接道路区
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                    <p>
-                      弃渣场
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                    <p>
-                      取土场
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                  </Collapse.Panel>
-                  */}
-                  {/* <Collapse.Panel
-                    header={
-                      <b>
-                        设计措施：5
-                        <Icon
-                          type="plus-circle"
-                          style={{
-                            marginLeft: 10,
-                            fontSize: 16,
-                            color: "#1890ff"
-                          }}
-                          onClick={e => {
-                            e.stopPropagation();
-                            notification["info"]({
-                              message: "添加设计措施"
-                            });
-                          }}
-                        />
-                      </b>
-                    }
-                    key="5"
-                  >
-                    <p>
-                      截排水沟1
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                    <p>
-                      沉沙池
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                    <p>
-                      植树
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                    <p>
-                      种草
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                    <p>
-                      浆砌石拦挡
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                  </Collapse.Panel>
-                  */}
                   <Collapse.Panel
                     header={
                       <b>
@@ -2659,174 +2513,6 @@ export default class sider extends PureComponent {
                       />
                     </p>
                   </Collapse.Panel>
-                  {/* <Collapse.Panel
-                    header={
-                      <b>
-                        实施措施：5
-                        <Icon
-                          type="plus-circle"
-                          style={{
-                            marginLeft: 10,
-                            fontSize: 16,
-                            color: "#1890ff"
-                          }}
-                          onClick={e => {
-                            e.stopPropagation();
-                            notification["info"]({
-                              message: "添加实施措施"
-                            });
-                          }}
-                        />
-                      </b>
-                    }
-                    key="7"
-                  >
-                    <p>
-                      截排水沟
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                    <p>
-                      沉沙池
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                    <p>
-                      植树
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                    <p>
-                      种草
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                    <p>
-                      浆砌石拦挡
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                  </Collapse.Panel>
-                  */}
-                  {/* <Collapse.Panel
-                    header={
-                      <b>
-                        问题地块：5
-                        <Icon
-                          type="plus-circle"
-                          style={{
-                            marginLeft: 10,
-                            fontSize: 16,
-                            color: "#1890ff"
-                          }}
-                          onClick={e => {
-                            e.stopPropagation();
-                            notification["info"]({
-                              message: "添加问题地块"
-                            });
-                          }}
-                        />
-                      </b>
-                    }
-                    key="8"
-                  >
-                    <p>
-                      某渣场坡面
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                    <p>
-                      某大型坡面
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                    <p>
-                      施工区东北侧
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                    <p>
-                      临时道路
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                    <p>
-                      隧道出口
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                      />
-                    </p>
-                  </Collapse.Panel>
-                */}
                 </Collapse>
               </List>
             </div>
