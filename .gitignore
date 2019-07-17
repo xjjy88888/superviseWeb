@@ -4,10 +4,16 @@
 /node_modules
 
 # production
-/dist
+/dist/mapfile
+/dist/mapshaper
+/dist/Template
+/dist/vtour
 
 # public
-/public
+/public/mapfile
+/public/mapshaper
+/public/Template
+/public/vtour
 
 # misc
 .DS_Store
