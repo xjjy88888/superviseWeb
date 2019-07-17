@@ -64,7 +64,7 @@ export default class siderbarDetail extends PureComponent {
             title="抽稀"
             height="595px"
             width="1200px"
-            src="./mapshaper/index.html"
+            src="./vtour/tour.html"
           />
         </div>
       </div>

@@ -181,7 +181,10 @@ export default class integration extends PureComponent {
       marker = L.marker(latLng)
         .addTo(map)
         .on("click", function(e) {
-          console.log("marker", e);
+          //console.log("marker", e);
+          emitter.emit("showPanorama", {
+            show: true
+          });
         });
     });
     //地图定位

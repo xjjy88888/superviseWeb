@@ -2652,9 +2652,6 @@ export default class sider extends PureComponent {
                           color: "#1890ff"
                         }}
                         onClick={() => {
-                          emitter.emit("showPanorama", {
-                            show: true
-                          });
                           emitter.emit("fullViewLocation", {
                             // type: "fullview",
                           });
