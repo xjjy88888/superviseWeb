@@ -27,8 +27,9 @@ const formItemLayoutlong = {
 };
 
 @createForm()
-@connect(({ user }) => ({
-  user
+@connect(({ user, district }) => ({
+  user,
+  district
 }))
 export default class siderbarDetail extends PureComponent {
   constructor(props) {
@@ -91,8 +92,10 @@ export default class siderbarDetail extends PureComponent {
     const { show, type, showVecType } = this.state;
     const {
       form: { getFieldDecorator, resetFields },
-      user: { districtTree }
+      district: { districtTree }
     } = this.props;
+
+    console.log(districtTree);
 
     return (
       <div

@@ -27,13 +27,14 @@ const formItemLayout = {
   wrapperCol: { span: 16 }
 };
 
-@connect(({ project, spot, point, user, annex, redLine }) => ({
+@connect(({ project, spot, point, user, annex, redLine, district }) => ({
   project,
   spot,
   point,
   user,
   annex,
-  redLine
+  redLine,
+  district
 }))
 @createForm()
 export default class siderbarDetail extends PureComponent {
@@ -333,7 +334,7 @@ export default class siderbarDetail extends PureComponent {
     const {
       dispatch,
       form: { getFieldDecorator, resetFields, validateFields, getFieldValue },
-      user: { districtTree },
+      district: { districtTree },
       project: { departSelectList },
       spot: { spotInfo, projectSelectListSpot, spotHistoryList },
       point: { pointInfo, projectSelectListPoint },
@@ -375,8 +376,6 @@ export default class siderbarDetail extends PureComponent {
     const pointItem = isSpotUpdate ? pointInfo : {};
 
     const redLineItem = isSpotUpdate ? redLineInfo : {};
-
-    // console.log(this.props);
 
     const domUpload = (
       <div style={{ minHeight: fileList.length ? 120 : 0 }}>
@@ -646,7 +645,7 @@ export default class siderbarDetail extends PureComponent {
                   >
                     {this.dictList("设计阶段").map(item => (
                       <Select.Option value={item.id} key={item.id}>
-                        {item.value}
+                        {item.dictTableValue}
                       </Select.Option>
                     ))}
                   </Select>
@@ -674,7 +673,7 @@ export default class siderbarDetail extends PureComponent {
                   >
                     {this.dictList("矢量化类型").map(item => (
                       <Select.Option value={item.id} key={item.id}>
-                        {item.value}
+                        {item.dictTableValue}
                       </Select.Option>
                     ))}
                   </Select>
@@ -900,7 +899,7 @@ export default class siderbarDetail extends PureComponent {
                   >
                     {this.dictList("扰动类型").map(item => (
                       <Select.Option value={item.id} key={item.id}>
-                        {item.value}
+                        {item.dictTableValue}
                       </Select.Option>
                     ))}
                   </Select>
@@ -928,7 +927,7 @@ export default class siderbarDetail extends PureComponent {
                   >
                     {this.dictList("扰动合规性").map(item => (
                       <Select.Option value={item.id} key={item.id}>
-                        {item.value}
+                        {item.dictTableValue}
                       </Select.Option>
                     ))}
                   </Select>
@@ -946,7 +945,7 @@ export default class siderbarDetail extends PureComponent {
                   >
                     {this.dictList("扰动变化类型").map(item => (
                       <Select.Option value={item.id} key={item.id}>
-                        {item.value}
+                        {item.dictTableValue}
                       </Select.Option>
                     ))}
                   </Select>
@@ -964,7 +963,7 @@ export default class siderbarDetail extends PureComponent {
                   >
                     {this.dictList("建设状态").map(item => (
                       <Select.Option value={item.id} key={item.id}>
-                        {item.value}
+                        {item.dictTableValue}
                       </Select.Option>
                     ))}
                   </Select>

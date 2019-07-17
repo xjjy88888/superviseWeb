@@ -27,9 +27,10 @@ import { dateInitFormat, dateFormat, accessToken } from "../../../utils/util";
 let self;
 let yearDataSource = [];
 
-@connect(({ project, user }) => ({
+@connect(({ project, user, district }) => ({
   project,
-  user
+  user,
+  district
 }))
 @createForm()
 export default class projectDetail extends PureComponent {
@@ -376,10 +377,8 @@ export default class projectDetail extends PureComponent {
   render() {
     const { show, edit, departList } = this.state;
     const {
-      dispatch,
       form: { getFieldDecorator, setFieldsValue },
-      project: { projectInfo, departSelectList },
-      user: { districtTree, departUpdateId }
+      project: { projectInfo, departSelectList }
     } = this.props;
 
     const projectItem = projectInfo;
@@ -696,7 +695,7 @@ export default class projectDetail extends PureComponent {
                     >
                       {this.dictList("防治标准").map(item => (
                         <Select.Option value={item.id} key={item.id}>
-                          {item.value}
+                          {item.dictTableValue}
                         </Select.Option>
                       ))}
                     </Select>
@@ -798,7 +797,7 @@ export default class projectDetail extends PureComponent {
                     >
                       {this.dictList("防治区类型").map(item => (
                         <Select.Option value={item.id} key={item.id}>
-                          {item.value}
+                          {item.dictTableValue}
                         </Select.Option>
                       ))}
                     </Select>
@@ -818,7 +817,7 @@ export default class projectDetail extends PureComponent {
                     >
                       {this.dictList("防治区级别").map(item => (
                         <Select.Option value={item.id} key={item.id}>
-                          {item.value}
+                          {item.dictTableValue}
                         </Select.Option>
                       ))}
                     </Select>
@@ -838,7 +837,7 @@ export default class projectDetail extends PureComponent {
                     >
                       {this.dictList("地貌类型").map(item => (
                         <Select.Option value={item.id} key={item.id}>
-                          {item.value}
+                          {item.dictTableValue}
                         </Select.Option>
                       ))}
                     </Select>
@@ -858,7 +857,7 @@ export default class projectDetail extends PureComponent {
                     >
                       {this.dictList("土壤类型").map(item => (
                         <Select.Option value={item.id} key={item.id}>
-                          {item.value}
+                          {item.dictTableValue}
                         </Select.Option>
                       ))}
                     </Select>
@@ -878,7 +877,7 @@ export default class projectDetail extends PureComponent {
                     >
                       {this.dictList("植被类型").map(item => (
                         <Select.Option value={item.id} key={item.id}>
-                          {item.value}
+                          {item.dictTableValue}
                         </Select.Option>
                       ))}
                     </Select>
