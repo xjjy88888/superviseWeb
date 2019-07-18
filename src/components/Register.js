@@ -12,7 +12,8 @@ import {
   Layout,
   Checkbox,
   Row,
-  Col
+  Col,
+  Cascader
 } from "antd";
 import { connect } from "dva";
 import moment from "moment";
@@ -33,8 +34,9 @@ const formItemLayout = {
   }
 };
 
-@connect(({ user }) => ({
-  user
+@connect(({ user, district }) => ({
+  user,
+  district
 }))
 @createForm()
 export default class register extends PureComponent {
@@ -151,6 +153,10 @@ export default class register extends PureComponent {
 }
 
 //填写用户信息
+@connect(({ user, district }) => ({
+  user,
+  district
+}))
 class FormWriteUser extends PureComponent {
   state = {
     confirmDirty: false,
@@ -158,7 +164,16 @@ class FormWriteUser extends PureComponent {
     showDistrict: false
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    const {
+      form: { resetFields }
+    } = this.props;
+    this.eventEmitter = emitter.addListener("resetFields", v => {
+      console.log(111111);
+      resetFields();
+      this.setState({ showDistrict: false });
+    });
+  }
 
   handleSubmit = e => {
     console.log(this.props);
@@ -196,8 +211,10 @@ class FormWriteUser extends PureComponent {
     const {
       type,
       isLogin,
-      form: { getFieldDecorator }
+      form: { getFieldDecorator },
+      district: { districtTree }
     } = this.props;
+    console.log(this.props);
     const { showDistrict } = this.state;
 
     return (
@@ -309,6 +326,27 @@ class FormWriteUser extends PureComponent {
                 ]
               })(<DatePicker style={{ width: 330 }} />)}
             </Form.Item>
+            {/* <Form.Item
+              label="行政区划单位"
+              hasFeedback
+              style={{ display: showDistrict ? "block" : "none" }}
+            >
+              {getFieldDecorator("area", {
+                initialValue: "",
+                rules: [
+                  {
+                    required: showDistrict,
+                    message: "请选择行政区划单位"
+                  }
+                ]
+              })(
+                <Cascader
+                  options={districtTree}
+                  changeOnSelect
+                  placeholder="请选择所在地区"
+                />
+              )}
+            </Form.Item> */}
             <Form.Item
               label="行政区划单位"
               hasFeedback
@@ -331,33 +369,33 @@ class FormWriteUser extends PureComponent {
                 >
                   <TreeSelect.TreeNode
                     value="parent 1"
-                    title="parent 1"
+                    title="珠江水利厅"
                     key="0-1"
                   >
                     <TreeSelect.TreeNode
                       value="parent 1-0"
-                      title="parent 1-0"
+                      title="珠江水利科学研究院"
                       key="0-1-1"
                     >
                       <TreeSelect.TreeNode
                         value="leaf1"
-                        title="my leaf"
+                        title="珠江水利科学研究院遥感所"
                         key="random"
                       />
                       <TreeSelect.TreeNode
                         value="leaf2"
-                        title="your leaf"
+                        title="珠江水利科学研究院中心站"
                         key="random1"
                       />
                     </TreeSelect.TreeNode>
                     <TreeSelect.TreeNode
                       value="parent 1-1"
-                      title="parent 1-1"
+                      title="珠江水利科学研究院监测站"
                       key="random2"
                     >
                       <TreeSelect.TreeNode
                         value="sss"
-                        title={<b style={{ color: "#08c" }}>sss</b>}
+                        title="珠江水利科学研究院办公室"
                         key="random3"
                       />
                     </TreeSelect.TreeNode>
@@ -624,8 +662,8 @@ class finish extends PureComponent {
             type="primary"
             style={{ marginRight: 20 }}
             onClick={() => {
-              // resetFields();
               this.props.next(0);
+              emitter.emit("resetFields", {});
             }}
           >
             再建一个

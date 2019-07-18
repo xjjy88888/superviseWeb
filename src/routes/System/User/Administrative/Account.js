@@ -16,7 +16,7 @@ import Register from "../../../../components/Register";
 import Systems from "../../../../components/Systems";
 
 const { Title } = Typography;
-const {  Sider, Content } = Layout;
+const { Sider, Content } = Layout;
 
 const data = [
   {
@@ -251,7 +251,7 @@ export default class account extends PureComponent {
                     });
                   }}
                 >
-                  添加
+                  新增
                 </Button>
                 <Button
                   icon="delete"
