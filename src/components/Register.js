@@ -51,10 +51,12 @@ export default class register extends PureComponent {
   componentDidMount() {
     this.eventEmitter = emitter.addListener("showRegister", v => {
       this.props.form.resetFields();
+      const h = window.location.hash;
       this.setState({
         state: 0,
         show: v.show,
-        type: v.type
+        type: v.type,
+        isLogin: h === "#/login" || h === "#/"
       });
     });
   }
@@ -73,74 +75,77 @@ export default class register extends PureComponent {
   };
 
   render() {
-    const { show, state, type } = this.state;
+    const { show, state, type, isLogin } = this.state;
 
     return (
-      <Layout
-        style={{
-          display: show ? "block" : "none",
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-          backgroundColor: "rgba(0,0,0,.5)",
-          zIndex: 2
-        }}
-      >
+      <LocaleProvider locale={zh_CN}>
         <Layout
           style={{
-            transform: " translate(-50%,-50%)",
+            display: show ? "block" : "none",
             position: "absolute",
-            top: "50%",
-            left: "50%",
-            background: "#fff",
-            width: 1000,
-            height: "85%",
-            padding: 50,
-            borderRadius: 10
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0,0,0,.5)",
+            zIndex: 2
           }}
         >
-          <Button
-            type="primary"
-            shape="circle"
-            icon="close"
-            style={{ position: "absolute", right: 20, top: 20 }}
-            onClick={() => {
-              this.setState({ show: false });
+          <Layout
+            style={{
+              transform: " translate(-50%,-50%)",
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              background: "#fff",
+              width: 1000,
+              height: "85%",
+              padding: 50,
+              borderRadius: 10
             }}
-          />
-          <Header style={{ background: "#fff", margin: "0 0 30px 0" }}>
-            <Steps
-              current={state}
-              style={{ background: "#fff", margin: "0 0 30px 0" }}
-            >
-              <Steps.Step title="填写用户信息" />
-              <Steps.Step title="权限分配" />
-              <Steps.Step title="完成" />
-            </Steps>
-          </Header>
-          <Content style={{ position: "relative" }}>
-            <div style={{ display: state === 0 ? "block" : "none" }}>
-              <DomWriteUser
-                type={type}
-                next={this.next.bind(this)}
-                setType={this.setType.bind(this)}
-              />
-            </div>
-            <div style={{ display: state === 1 ? "block" : "none" }}>
-              <DomPower type={type} next={this.next.bind(this)} />
-            </div>
-            <div style={{ display: state === 2 ? "block" : "none" }}>
-              <DomFinish
-                type={type}
-                showAdd={this.showAdd.bind(this)}
-                next={this.next.bind(this)}
-              />
-            </div>
-          </Content>
+          >
+            <Button
+              type="primary"
+              shape="circle"
+              icon="close"
+              style={{ position: "absolute", right: 20, top: 20 }}
+              onClick={() => {
+                this.setState({ show: false });
+              }}
+            />
+            <Header style={{ background: "#fff", margin: "0 0 30px 0" }}>
+              <Steps
+                current={state}
+                style={{ background: "#fff", margin: "0 0 30px 0" }}
+              >
+                <Steps.Step title="填写用户信息" />
+                <Steps.Step title="权限分配" />
+                <Steps.Step title="完成" />
+              </Steps>
+            </Header>
+            <Content style={{ position: "relative" }}>
+              <div style={{ display: state === 0 ? "block" : "none" }}>
+                <DomWriteUser
+                  type={type}
+                  isLogin={isLogin}
+                  next={this.next.bind(this)}
+                  setType={this.setType.bind(this)}
+                />
+              </div>
+              <div style={{ display: state === 1 ? "block" : "none" }}>
+                <DomPower type={type} next={this.next.bind(this)} />
+              </div>
+              <div style={{ display: state === 2 ? "block" : "none" }}>
+                <DomFinish
+                  type={type}
+                  showAdd={this.showAdd.bind(this)}
+                  next={this.next.bind(this)}
+                />
+              </div>
+            </Content>
+          </Layout>
         </Layout>
-      </Layout>
+      </LocaleProvider>
     );
   }
 }
@@ -149,18 +154,20 @@ export default class register extends PureComponent {
 class FormWriteUser extends PureComponent {
   state = {
     confirmDirty: false,
-    autoCompleteResult: []
+    autoCompleteResult: [],
+    showDistrict: false
   };
 
   componentDidMount() {}
 
   handleSubmit = e => {
+    console.log(this.props);
     e.preventDefault();
     this.props.form.validateFields((err, v) => {
       if (!err) {
         console.log("填写用户信息", v);
         this.props.next(1);
-        this.props.setType({ type: v.user_type });
+        this.props.setType({ type: v.user_type || this.props.type });
       }
     });
   };
@@ -186,184 +193,194 @@ class FormWriteUser extends PureComponent {
   };
 
   render() {
-    const { getFieldDecorator } = this.props.form;
-    const { type } = this.props;
+    const {
+      type,
+      isLogin,
+      form: { getFieldDecorator }
+    } = this.props;
+    const { showDistrict } = this.state;
 
     return (
-      <LocaleProvider locale={zh_CN}>
-        <Layout style={{ backgroundColor: "#fff" }}>
-          <Content>
-            <Form
-              onSubmit={this.handleSubmit}
-              {...formItemLayout}
-              style={{ width: 500, margin: "0 auto" }}
+      <Layout style={{ backgroundColor: "#fff" }}>
+        <Content>
+          <Form
+            onSubmit={this.handleSubmit}
+            {...formItemLayout}
+            style={{ width: 500, margin: "0 auto" }}
+          >
+            <Form.Item label="账号" hasFeedback>
+              {getFieldDecorator("name", {
+                initialValue: "",
+                rules: [
+                  {
+                    required: true,
+                    message: "请输入账号"
+                  }
+                ]
+              })(<Input />)}
+            </Form.Item>
+            <Form.Item label="密码" hasFeedback>
+              {getFieldDecorator("password", {
+                initialValue: "",
+                rules: [
+                  {
+                    required: true,
+                    message: "请输入密码"
+                  },
+                  {
+                    validator: this.validateToNextPassword
+                  }
+                ]
+              })(<Input.Password />)}
+            </Form.Item>
+            <Form.Item label="确认密码" hasFeedback>
+              {getFieldDecorator("confirm", {
+                initialValue: "",
+                rules: [
+                  {
+                    required: true,
+                    message: "请输入确认密码"
+                  },
+                  {
+                    validator: this.compareToFirstPassword
+                  }
+                ]
+              })(<Input.Password onBlur={this.handleConfirmBlur} />)}
+            </Form.Item>
+            <Form.Item label="姓名" hasFeedback>
+              {getFieldDecorator("full_name", {
+                initialValue: "",
+                rules: [
+                  {
+                    required: true,
+                    message: "请输入姓名"
+                  }
+                ]
+              })(<Input />)}
+            </Form.Item>
+            <Form.Item label="电话" hasFeedback>
+              {getFieldDecorator("phone", {
+                initialValue: "",
+                rules: [
+                  {
+                    required: true,
+                    message: "请输入电话"
+                  }
+                ]
+              })(<Input />)}
+            </Form.Item>
+            <Form.Item
+              label="用户类型"
+              hasFeedback
+              style={{ display: isLogin ? "block" : "none" }}
             >
-              <Form.Item label="账号" hasFeedback>
-                {getFieldDecorator("name", {
-                  initialValue: "",
-                  rules: [
-                    {
-                      required: true,
-                      message: "请输入账号"
-                    }
-                  ]
-                })(<Input />)}
-              </Form.Item>
-              <Form.Item label="密码" hasFeedback>
-                {getFieldDecorator("password", {
-                  initialValue: "",
-                  rules: [
-                    {
-                      required: true,
-                      message: "请输入密码"
-                    },
-                    {
-                      validator: this.validateToNextPassword
-                    }
-                  ]
-                })(<Input.Password />)}
-              </Form.Item>
-              <Form.Item label="确认密码" hasFeedback>
-                {getFieldDecorator("confirm", {
-                  initialValue: "",
-                  rules: [
-                    {
-                      required: true,
-                      message: "请输入确认密码"
-                    },
-                    {
-                      validator: this.compareToFirstPassword
-                    }
-                  ]
-                })(<Input.Password onBlur={this.handleConfirmBlur} />)}
-              </Form.Item>
-              <Form.Item label="姓名" hasFeedback>
-                {getFieldDecorator("full_name", {
-                  initialValue: "",
-                  rules: [
-                    {
-                      required: true,
-                      message: "请输入姓名"
-                    }
-                  ]
-                })(<Input />)}
-              </Form.Item>
-              <Form.Item label="电话" hasFeedback>
-                {getFieldDecorator("phone", {
-                  initialValue: "",
-                  rules: [
-                    {
-                      required: true,
-                      message: "请输入电话"
-                    }
-                  ]
-                })(<Input />)}
-              </Form.Item>
-              <Form.Item
-                label="用户类型"
-                hasFeedback
-                style={{ display: type === "all" ? "block" : "none" }}
-              >
-                {getFieldDecorator("user_type", {
-                  rules: [
-                    {
-                      required: type === "all",
-                      message: "请选择用户类型"
-                    }
-                  ]
-                })(
-                  <Select showSearch allowClear optionFilterProp="children">
-                    {[
-                      { text: "社会用户", value: "society" },
-                      { text: "行政用户", value: "account" }
-                    ].map((item, index) => (
-                      <Select.Option value={item.value} key={index}>
-                        {item.text}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                )}
-              </Form.Item>
-              <Form.Item label="有效期至" hasFeedback>
-                {getFieldDecorator("time", {
-                  rules: [
-                    { type: "object", required: true, message: "请选择有效期" }
-                  ]
-                })(<DatePicker style={{ width: 330 }} />)}
-              </Form.Item>
-              <Form.Item
-                label="行政区划单位"
-                hasFeedback
-                style={{ display: type === "account" ? "block" : "none" }}
-              >
-                {getFieldDecorator("area", {
-                  initialValue: "",
-                  rules: [
-                    {
-                      required: type === "account",
-                      message: "请选择行政区划单位"
-                    }
-                  ]
-                })(
-                  <TreeSelect
-                    showSearch
-                    dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
-                    allowClear
-                    treeDefaultExpandAll
+              {getFieldDecorator("user_type", {
+                rules: [
+                  {
+                    required: isLogin,
+                    message: "请选择用户类型"
+                  }
+                ]
+              })(
+                <Select
+                  showSearch
+                  allowClear
+                  optionFilterProp="children"
+                  onChange={e => {
+                    console.log(e);
+                    this.setState({ showDistrict: e === "account" });
+                  }}
+                >
+                  {[
+                    { text: "社会用户", value: "society" },
+                    { text: "行政用户", value: "account" }
+                  ].map((item, index) => (
+                    <Select.Option value={item.value} key={index}>
+                      {item.text}
+                    </Select.Option>
+                  ))}
+                </Select>
+              )}
+            </Form.Item>
+            <Form.Item label="有效期至" hasFeedback>
+              {getFieldDecorator("time", {
+                rules: [
+                  { type: "object", required: true, message: "请选择有效期" }
+                ]
+              })(<DatePicker style={{ width: 330 }} />)}
+            </Form.Item>
+            <Form.Item
+              label="行政区划单位"
+              hasFeedback
+              style={{ display: showDistrict ? "block" : "none" }}
+            >
+              {getFieldDecorator("area", {
+                initialValue: "",
+                rules: [
+                  {
+                    required: showDistrict,
+                    message: "请选择行政区划单位"
+                  }
+                ]
+              })(
+                <TreeSelect
+                  showSearch
+                  dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
+                  allowClear
+                  treeDefaultExpandAll
+                >
+                  <TreeSelect.TreeNode
+                    value="parent 1"
+                    title="parent 1"
+                    key="0-1"
                   >
                     <TreeSelect.TreeNode
-                      value="parent 1"
-                      title="parent 1"
-                      key="0-1"
+                      value="parent 1-0"
+                      title="parent 1-0"
+                      key="0-1-1"
                     >
                       <TreeSelect.TreeNode
-                        value="parent 1-0"
-                        title="parent 1-0"
-                        key="0-1-1"
-                      >
-                        <TreeSelect.TreeNode
-                          value="leaf1"
-                          title="my leaf"
-                          key="random"
-                        />
-                        <TreeSelect.TreeNode
-                          value="leaf2"
-                          title="your leaf"
-                          key="random1"
-                        />
-                      </TreeSelect.TreeNode>
+                        value="leaf1"
+                        title="my leaf"
+                        key="random"
+                      />
                       <TreeSelect.TreeNode
-                        value="parent 1-1"
-                        title="parent 1-1"
-                        key="random2"
-                      >
-                        <TreeSelect.TreeNode
-                          value="sss"
-                          title={<b style={{ color: "#08c" }}>sss</b>}
-                          key="random3"
-                        />
-                      </TreeSelect.TreeNode>
+                        value="leaf2"
+                        title="your leaf"
+                        key="random1"
+                      />
                     </TreeSelect.TreeNode>
-                  </TreeSelect>
-                )}
-              </Form.Item>
-              <Footer
-                style={{
-                  backgroundColor: "transparent",
-                  position: "absolute",
-                  bottom: 0,
-                  left: "50%",
-                  transform: "translateX(-50%)"
-                }}
-              >
-                <Button type="primary" htmlType="submit">
-                  下一步
-                </Button>
-              </Footer>
-            </Form>
-          </Content>
-        </Layout>
-      </LocaleProvider>
+                    <TreeSelect.TreeNode
+                      value="parent 1-1"
+                      title="parent 1-1"
+                      key="random2"
+                    >
+                      <TreeSelect.TreeNode
+                        value="sss"
+                        title={<b style={{ color: "#08c" }}>sss</b>}
+                        key="random3"
+                      />
+                    </TreeSelect.TreeNode>
+                  </TreeSelect.TreeNode>
+                </TreeSelect>
+              )}
+            </Form.Item>
+            <Footer
+              style={{
+                backgroundColor: "transparent",
+                position: "absolute",
+                bottom: 0,
+                left: "50%",
+                transform: "translateX(-50%)"
+              }}
+            >
+              <Button type="primary" htmlType="submit">
+                下一步
+              </Button>
+            </Footer>
+          </Form>
+        </Content>
+      </Layout>
     );
   }
 }

@@ -3,9 +3,7 @@ import { connect } from "dva";
 import { createForm } from "rc-form";
 import {
   Icon,
-  Button,
   Input,
-  Modal,
   notification,
   Upload,
   Divider,
@@ -13,19 +11,16 @@ import {
   Row,
   Select,
   Col,
-  DatePicker,
-  AutoComplete
+  DatePicker
 } from "antd";
 import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
-import styles from "./index.less";
-import moment from "moment";
 import config from "../../../config";
 import { getFile, unique } from "../../../utils/util";
 import { dateInitFormat, dateFormat, accessToken } from "../../../utils/util";
 
-let self;
 let yearDataSource = [];
+let self;
 
 @connect(({ project, user, district }) => ({
   project,
@@ -210,9 +205,9 @@ export default class projectDetail extends PureComponent {
   getDepartList = key => {
     const {
       dispatch,
-      form: { setFieldsValue, getFieldValue }
+      form: { setFieldsValue }
     } = this.props;
-    const { departList, departSearch, isSelect } = this.state;
+    const { departSearch } = this.state;
     if (departSearch) {
       dispatch({
         type: "user/departVaild",
