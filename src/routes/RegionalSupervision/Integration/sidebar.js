@@ -2804,7 +2804,7 @@ export default class sider extends PureComponent {
                     <Select showSearch allowClear optionFilterProp="children">
                       {this.dictList("立项级别").map(item => (
                         <Select.Option value={item.id} key={item.id}>
-                          {item.value}
+                          {item.dictTableValue}
                         </Select.Option>
                       ))}
                     </Select>
@@ -2827,7 +2827,7 @@ export default class sider extends PureComponent {
                     >
                       {this.dictList("扰动合规性").map(item => (
                         <Select.Option value={item.id} key={item.id}>
-                          {item.value}
+                          {item.dictTableValue}
                         </Select.Option>
                       ))}
                     </Select>
@@ -2840,7 +2840,7 @@ export default class sider extends PureComponent {
                     <Select showSearch allowClear optionFilterProp="children">
                       {this.dictList("项目类别").map(item => (
                         <Select.Option value={item.id} key={item.id}>
-                          {item.value}
+                          {item.dictTableValue}
                         </Select.Option>
                       ))}
                     </Select>
@@ -2853,7 +2853,7 @@ export default class sider extends PureComponent {
                     <Select showSearch allowClear optionFilterProp="children">
                       {this.dictList("项目类型").map(item => (
                         <Select.Option value={item.id} key={item.id}>
-                          {item.value}
+                          {item.dictTableValue}
                         </Select.Option>
                       ))}
                     </Select>
@@ -2866,7 +2866,7 @@ export default class sider extends PureComponent {
                     <Select showSearch allowClear optionFilterProp="children">
                       {this.dictList("建设状态").map(item => (
                         <Select.Option value={item.id} key={item.id}>
-                          {item.value}
+                          {item.dictTableValue}
                         </Select.Option>
                       ))}
                     </Select>
@@ -2879,7 +2879,7 @@ export default class sider extends PureComponent {
                     <Select showSearch allowClear optionFilterProp="children">
                       {this.dictList("项目性质").map(item => (
                         <Select.Option value={item.id} key={item.id}>
-                          {item.value}
+                          {item.dictTableValue}
                         </Select.Option>
                       ))}
                     </Select>
