@@ -18,7 +18,9 @@ import {
   projectUnbindSpotApi,
   projectArchiveApi,
   inspectInfoApi,
-  inspectCreateUpdateApi
+  inspectCreateUpdateApi,
+  inspectListApi,
+  inspectDeleteApi
 } from "../services/httpApi";
 
 export default {
@@ -39,7 +41,8 @@ export default {
     },
     departSelectList: [],
     projectListAdd: [],
-    inspectInfo: []
+    inspectInfo: [],
+    inspectList: []
   },
 
   subscriptions: {
@@ -344,6 +347,29 @@ export default {
       const {
         data: { success, error, result }
       } = yield call(inspectCreateUpdateApi, payload);
+      if (callback) callback(success, error, result);
+    },
+
+    // 检查表_项目id查询列表
+    *inspectList({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(inspectListApi, payload);
+      if (callback) callback(success, error, result);
+      if (success) {
+        yield put({ type: "save", payload: { inspectList: result.items } });
+      } else {
+        notification["error"]({
+          message: `查询检查表列表失败：${error.message}`
+        });
+      }
+    },
+
+    //检查表_删除
+    *inspectDelete({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(inspectDeleteApi, payload);
       if (callback) callback(success, error, result);
     }
   },

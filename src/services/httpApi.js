@@ -882,6 +882,17 @@ export async function powerListApi() {
   });
 }
 
+// 检查表_项目id查询列表
+export async function inspectListApi(params) {
+  console.log(params);
+  return request(`${config.url.inspectListUrl}?ProjectId=${params.ProjectId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
 // 检查表内容
 export async function inspectInfoApi(params) {
   return request(`${config.url.inspectInfoUrl}?region=${params.region}`, {
@@ -905,4 +916,15 @@ export async function inspectCreateUpdateApi(params) {
       body: JSON.stringify(params)
     }
   );
+}
+
+// 检查表_删除1
+export async function inspectDeleteApi(params) {
+  return request(`${config.url.inspectDeleteUrl}?id=${params.id}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    }
+  });
 }

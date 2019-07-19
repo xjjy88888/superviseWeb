@@ -246,7 +246,13 @@ const config = {
     inspectInfoUrl: `${domain}api/services/app/MonitorCheck/GetFormStructure`,
 
     // 检查表_新增修改
-    inspectCreateUpdateUrl: `${domain}api/services/app/MonitorCheck/`
+    inspectCreateUpdateUrl: `${domain}api/services/app/MonitorCheck/`,
+
+    // 检查表_项目id查询列表
+    inspectListUrl: `${domain}api/services/app/MonitorCheck/GetAll`,
+
+    // 检查表_删除
+    inspectDeleteUrl: `${domain}api/services/app/MonitorCheck/Delete`,
   },
 
   //工具箱

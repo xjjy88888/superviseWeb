@@ -43,7 +43,8 @@ export default class Inspect extends PureComponent {
       this.inspectInfo("长沙");
       this.setState({
         show: v.show,
-        projectId: v.projectId
+        projectId: v.projectId,
+        id: v.id
       });
     });
   }
@@ -134,16 +135,20 @@ export default class Inspect extends PureComponent {
                 dispatch({
                   type: "project/inspectCreateUpdate",
                   payload: {
+                    id: id,
                     projectId: projectId,
                     checkInfoLists: checkInfoLists
                   },
                   callback: (success, error, result) => {
                     if (success) {
+                      emitter.emit("projectInfoRefresh", {
+                        projectId: projectId
+                      });
+                      notification["success"]({
+                        message: `${id ? "编辑" : "新增"}检查表成功`
+                      });
                       this.setState({ show: false });
                     }
-                    notification["success"]({
-                      message: `${id ? "编辑" : "新增"}检查表成功`
-                    });
                   }
                 });
               });
@@ -204,7 +209,7 @@ export default class Inspect extends PureComponent {
                       })}
                     />
                   )
-                : getFieldDecorator(item.key)(<Input allowClear />)}
+                : getFieldDecorator(item.key)(<div>无数据</div>)}
             </Form.Item>
           ))}
         </Form>

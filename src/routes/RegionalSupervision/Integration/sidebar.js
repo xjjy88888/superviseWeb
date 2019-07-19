@@ -173,9 +173,11 @@ export default class sider extends PureComponent {
       }
     });
     this.eventEmitter = emitter.addListener("projectInfoRefresh", v => {
+      console.log(v);
       if (v.projectId) {
-        this.queryRedLineList(v.projectId);
         this.querySpotByProjectId(v.projectId);
+        this.queryRedLineList(v.projectId);
+        this.inspectList(v.projectId);
       }
     });
     this.eventEmitter = emitter.addListener("showCreateDepart", v => {
@@ -301,6 +303,7 @@ export default class sider extends PureComponent {
         this.queryProjectById(data.id);
         this.querySpotByProjectId(data.id);
         this.queryRedLineList(data.id);
+        this.inspectList(data.id);
       } else if (data.from === "spot") {
       } else {
       }
@@ -618,6 +621,16 @@ export default class sider extends PureComponent {
       },
       callback: success => {
         this.showSpin(false);
+      }
+    });
+  };
+
+  inspectList = id => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "project/inspectList",
+      payload: {
+        ProjectId: id
       }
     });
   };
@@ -970,7 +983,13 @@ export default class sider extends PureComponent {
       form: { getFieldDecorator, resetFields, setFieldsValue, getFieldValue },
       district: { districtTree },
       user: { basinOrganList },
-      project: { projectList, projectInfo, projectListAdd, departSelectList },
+      project: {
+        projectList,
+        projectInfo,
+        projectListAdd,
+        departSelectList,
+        inspectList
+      },
       spot: { spotList, projectInfoSpotList },
       point: { pointList },
       redLine: { redLineList }
@@ -1114,6 +1133,7 @@ export default class sider extends PureComponent {
                     this.queryProjectById(item.id);
                     this.querySpotByProjectId(item.id);
                     this.queryRedLineList(item.id);
+                    this.inspectList(item.id);
                   } else {
                     emitter.emit("showSiderbarDetail", {
                       show: key !== "project",
@@ -1884,7 +1904,7 @@ export default class sider extends PureComponent {
                   paddingRight: 30
                 }}
               >
-                <Collapse bordered={false} defaultActiveKey={["0"]}>
+                <Collapse bordered={false} defaultActiveKey={["0", "8"]}>
                   <Collapse.Panel header={<b>基本信息</b>} key="0">
                     <div
                       style={{
@@ -2032,7 +2052,7 @@ export default class sider extends PureComponent {
                   <Collapse.Panel
                     header={
                       <b>
-                        检查记录：0
+                        检查记录：{inspectList.length}
                         <Icon
                           type="plus-circle"
                           style={{
@@ -2051,7 +2071,59 @@ export default class sider extends PureComponent {
                       </b>
                     }
                     key="8"
-                  />
+                  >
+                    {inspectList.map((item, index) => (
+                      <p
+                        key={index}
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          this.closeAll();
+                          emitter.emit("showInspect", {
+                            show: true,
+                            id: item.id,
+                            projectId: projectItem.id
+                          });
+                        }}
+                      >
+                        {item.id}
+                        <Icon
+                          type="delete"
+                          style={{
+                            float: "right",
+                            fontSize: 18,
+                            cursor: "point",
+                            color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            Modal.confirm({
+                              title: "删除",
+                              content: "是否确定要删除这条检查记录？",
+                              okText: "是",
+                              okType: "danger",
+                              cancelText: "否",
+                              onOk() {
+                                dispatch({
+                                  type: "project/inspectDelete",
+                                  payload: {
+                                    id: item.id
+                                  },
+                                  callback: success => {
+                                    if (success) {
+                                      emitter.emit("projectInfoRefresh", {
+                                        projectId: projectItem.id
+                                      });
+                                    }
+                                  }
+                                });
+                              },
+                              onCancel() {}
+                            });
+                          }}
+                        />
+                      </p>
+                    ))}
+                  </Collapse.Panel>
                   <Collapse.Panel
                     header={
                       <b>
