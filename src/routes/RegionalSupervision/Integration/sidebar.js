@@ -2043,7 +2043,8 @@ export default class sider extends PureComponent {
                           onClick={e => {
                             e.stopPropagation();
                             emitter.emit("showInspect", {
-                              show: true
+                              show: true,
+                              projectId: projectItem.id
                             });
                           }}
                         />

@@ -1,7 +1,16 @@
 import React, { PureComponent } from "react";
 import { createForm } from "rc-form";
 import { connect } from "dva";
-import { Icon, Button, Input, Checkbox, Form, Radio, Modal } from "antd";
+import {
+  Icon,
+  Button,
+  Input,
+  Checkbox,
+  Form,
+  Radio,
+  Modal,
+  notification
+} from "antd";
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
 
@@ -22,16 +31,19 @@ export default class Inspect extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      show: false
+      show: false,
+      id: null,
+      projectId: null
     };
   }
 
   componentDidMount() {
     self = this;
-    this.eventEmitter = emitter.addListener("showInspect", data => {
+    this.eventEmitter = emitter.addListener("showInspect", v => {
       this.inspectInfo("长沙");
       this.setState({
-        show: data.show
+        show: v.show,
+        projectId: v.projectId
       });
     });
   }
@@ -42,8 +54,9 @@ export default class Inspect extends PureComponent {
   };
 
   render() {
-    const { show } = this.state;
+    const { show, id, projectId } = this.state;
     const {
+      dispatch,
       form: { getFieldDecorator, validateFields },
       project: { inspectInfo }
     } = this.props;
@@ -99,10 +112,41 @@ export default class Inspect extends PureComponent {
               fontSize: 18
             }}
             onClick={() => {
+              let data = [];
               validateFields((err, v) => {
                 console.log(v);
+                for (let i in v) {
+                  if (v[i]) {
+                    const type = i.split("_")[0];
+                    if (type === "checkbox") {
+                      data = data.concat(v[i]);
+                    } else if (type === "radio") {
+                      data.push(v[i]);
+                    }
+                  }
+                }
+                console.log(data);
+                const checkInfoLists = data.map(item => {
+                  return {
+                    checkInfoItemId: item
+                  };
+                });
+                dispatch({
+                  type: "project/inspectCreateUpdate",
+                  payload: {
+                    projectId: projectId,
+                    checkInfoLists: checkInfoLists
+                  },
+                  callback: (success, error, result) => {
+                    if (success) {
+                      this.setState({ show: false });
+                    }
+                    notification["success"]({
+                      message: `${id ? "编辑" : "新增"}检查表成功`
+                    });
+                  }
+                });
               });
-              this.setState({ show: false });
             }}
           />
           <Button
@@ -134,11 +178,13 @@ export default class Inspect extends PureComponent {
           {inspectInfo.map((item, index) => (
             <Form.Item label={item.title} {...formItemLayout} key={index}>
               {item.type === "input"
-                ? getFieldDecorator(item.title)(<Input allowClear />)
+                ? getFieldDecorator(`input_${item.key}`)(<Input allowClear />)
                 : item.type === "textArea"
-                ? getFieldDecorator(item.title)(<Input.TextArea autosize />)
+                ? getFieldDecorator(`textArea_${item.key}`)(
+                    <Input.TextArea autosize />
+                  )
                 : item.type === "radio"
-                ? getFieldDecorator(item.title)(
+                ? getFieldDecorator(`radio_${item.key}`)(
                     <Radio.Group name="radiogroup">
                       {item.data.map((item, index) => (
                         <Radio value={item.value} key={index}>
@@ -148,7 +194,7 @@ export default class Inspect extends PureComponent {
                     </Radio.Group>
                   )
                 : item.type === "checkbox"
-                ? getFieldDecorator(item.title)(
+                ? getFieldDecorator(`checkbox_${item.key}`)(
                     <Checkbox.Group
                       options={item.data.map(item => {
                         return {
@@ -158,7 +204,7 @@ export default class Inspect extends PureComponent {
                       })}
                     />
                   )
-                : getFieldDecorator(item.title)(<Input allowClear />)}
+                : getFieldDecorator(item.key)(<Input allowClear />)}
             </Form.Item>
           ))}
         </Form>

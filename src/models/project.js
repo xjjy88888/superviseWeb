@@ -17,7 +17,8 @@ import {
   projectUnArchiveApi,
   projectUnbindSpotApi,
   projectArchiveApi,
-  inspectInfoApi
+  inspectInfoApi,
+  inspectCreateUpdateApi
 } from "../services/httpApi";
 
 export default {
@@ -37,7 +38,8 @@ export default {
       }
     },
     departSelectList: [],
-    projectListAdd: [],inspectInfo:[]
+    projectListAdd: [],
+    inspectInfo: []
   },
 
   subscriptions: {
@@ -335,6 +337,14 @@ export default {
           message: `查询检查表内容失败：${error.message}`
         });
       }
+    },
+
+    // 字典数据_新建编辑
+    *inspectCreateUpdate({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(inspectCreateUpdateApi, payload);
+      if (callback) callback(success, error, result);
     }
   },
 

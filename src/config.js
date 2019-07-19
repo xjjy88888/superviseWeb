@@ -243,7 +243,10 @@ const config = {
     powerListUrl: `${domain}api/services/app/Role/GetAllPermissions`,
 
     // 检查表内容
-    inspectInfoUrl: `${domain}api/services/app/MonitorCheck/GetFormStructure`
+    inspectInfoUrl: `${domain}api/services/app/MonitorCheck/GetFormStructure`,
+
+    // 检查表_新增修改
+    inspectCreateUpdateUrl: `${domain}api/services/app/MonitorCheck/`
   },
 
   //工具箱

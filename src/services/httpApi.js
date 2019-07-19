@@ -891,3 +891,18 @@ export async function inspectInfoApi(params) {
     }
   });
 }
+
+// 检查表_新增修改
+export async function inspectCreateUpdateApi(params) {
+  return request(
+    `${config.url.inspectCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify(params)
+    }
+  );
+}
