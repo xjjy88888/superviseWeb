@@ -240,7 +240,10 @@ const config = {
     companyDeleteMulUrl: `${domain}api/services/app/SocialDepartment/DeleteBatch`,
 
     // 权限列表
-    powerListUrl: `${domain}api/services/app/Role/GetAllPermissions`
+    powerListUrl: `${domain}api/services/app/Role/GetAllPermissions`,
+
+    // 检查表内容
+    inspectInfoUrl: `${domain}api/services/app/MonitorCheck/GetFormStructure`
   },
 
   //工具箱

@@ -16,7 +16,8 @@ import {
   departCreateApi,
   projectUnArchiveApi,
   projectUnbindSpotApi,
-  projectArchiveApi
+  projectArchiveApi,
+  inspectInfoApi
 } from "../services/httpApi";
 
 export default {
@@ -36,7 +37,7 @@ export default {
       }
     },
     departSelectList: [],
-    projectListAdd: []
+    projectListAdd: [],inspectInfo:[]
   },
 
   subscriptions: {
@@ -319,6 +320,21 @@ export default {
       });
       yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);
+    },
+
+    // 检查表内容
+    *inspectInfo({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(inspectInfoApi, payload);
+      if (callback) callback(success, error, result);
+      if (success) {
+        yield put({ type: "save", payload: { inspectInfo: result } });
+      } else {
+        notification["error"]({
+          message: `查询检查表内容失败：${error.message}`
+        });
+      }
     }
   },
 

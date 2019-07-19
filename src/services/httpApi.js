@@ -881,3 +881,13 @@ export async function powerListApi() {
     }
   });
 }
+
+// 检查表内容
+export async function inspectInfoApi(params) {
+  return request(`${config.url.inspectInfoUrl}?region=${params.region}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}

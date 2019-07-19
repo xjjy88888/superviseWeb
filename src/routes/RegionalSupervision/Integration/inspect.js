@@ -8,39 +8,15 @@ import "leaflet/dist/leaflet.css";
 let self;
 
 const formItemLayout = {
-  labelCol: { span: 6 },
-  wrapperCol: { span: 15 }
+  labelCol: { span: 7 },
+  wrapperCol: { span: 16 }
 };
 
-const data = [
-  {
-    type: "input",
-    title: "项目名称",
-    name: "project"
-  },
-  {
-    type: "textArea",
-    title: "备注",
-    name: "mark"
-  },
-  {
-    type: "radio",
-    title: "是否复核",
-    name: "fuhe",
-    data: ["是", "否"]
-  },
-  {
-    type: "checkbox",
-    title: "建设状态",
-    name: "state",
-    data: ["未开工", "已完工"]
-  }
-];
-
 @createForm()
-@connect(({ user, district }) => ({
+@connect(({ user, district, project }) => ({
   user,
-  district
+  district,
+  project
 }))
 export default class Inspect extends PureComponent {
   constructor(props) {
@@ -53,16 +29,23 @@ export default class Inspect extends PureComponent {
   componentDidMount() {
     self = this;
     this.eventEmitter = emitter.addListener("showInspect", data => {
+      this.inspectInfo("长沙");
       this.setState({
         show: data.show
       });
     });
   }
 
+  inspectInfo = region => {
+    const { dispatch } = this.props;
+    dispatch({ type: "project/inspectInfo", payload: { region: region } });
+  };
+
   render() {
     const { show } = this.state;
     const {
-      form: { getFieldDecorator }
+      form: { getFieldDecorator, validateFields },
+      project: { inspectInfo }
     } = this.props;
 
     return (
@@ -70,9 +53,9 @@ export default class Inspect extends PureComponent {
         style={{
           position: `absolute`,
           top: 0,
-          left: show ? 350 : -550,
+          left: show ? 350 : -1000,
           zIndex: 1000,
-          width: 450,
+          width: 800,
           height: `100%`,
           paddingTop: 100,
           borderLeft: "solid 1px #ddd",
@@ -111,13 +94,24 @@ export default class Inspect extends PureComponent {
           <Button
             icon="check"
             shape="circle"
+            style={{
+              color: "#1890ff",
+              fontSize: 18
+            }}
             onClick={() => {
+              validateFields((err, v) => {
+                console.log(v);
+              });
               this.setState({ show: false });
             }}
           />
           <Button
             icon="rollback"
             shape="circle"
+            style={{
+              color: "#1890ff",
+              fontSize: 18
+            }}
             onClick={() => {
               Modal.confirm({
                 title: `确定放弃填写检查表吗？`,
@@ -131,28 +125,40 @@ export default class Inspect extends PureComponent {
             }}
           />
         </span>
-        <Form>
-          {data.map((item, index) => (
+        <Form
+          style={{
+            height: window.innerHeight - 100,
+            overflow: "auto"
+          }}
+        >
+          {inspectInfo.map((item, index) => (
             <Form.Item label={item.title} {...formItemLayout} key={index}>
               {item.type === "input"
-                ? getFieldDecorator(item.name)(<Input allowClear />)
+                ? getFieldDecorator(item.title)(<Input allowClear />)
                 : item.type === "textArea"
-                ? getFieldDecorator(item.name)(<Input.TextArea autosize />)
+                ? getFieldDecorator(item.title)(<Input.TextArea autosize />)
                 : item.type === "radio"
-                ? getFieldDecorator(item.name)(
+                ? getFieldDecorator(item.title)(
                     <Radio.Group name="radiogroup">
                       {item.data.map((item, index) => (
-                        <Radio value={item} key={index}>
-                          {item}
+                        <Radio value={item.value} key={index}>
+                          {item.key}
                         </Radio>
                       ))}
                     </Radio.Group>
                   )
                 : item.type === "checkbox"
-                ? getFieldDecorator(item.name)(
-                    <Checkbox.Group options={item.data} />
+                ? getFieldDecorator(item.title)(
+                    <Checkbox.Group
+                      options={item.data.map(item => {
+                        return {
+                          label: item.key,
+                          value: item.value
+                        };
+                      })}
+                    />
                   )
-                : getFieldDecorator(item.name)(<Input allowClear />)}
+                : getFieldDecorator(item.title)(<Input allowClear />)}
             </Form.Item>
           ))}
         </Form>
