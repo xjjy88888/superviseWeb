@@ -339,7 +339,7 @@ export default {
       }
     },
 
-    // 字典数据_新建编辑
+    // 检查表_新建编辑
     *inspectCreateUpdate({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result }
