@@ -882,9 +882,9 @@ export async function powerListApi() {
   });
 }
 
-// 检查表_项目id查询列表
-export async function inspectListApi(params) {
-  return request(`${config.url.inspectListUrl}?ProjectId=${params.ProjectId}`, {
+// 检查表_模板
+export async function inspectFormApi(params) {
+  return request(`${config.url.inspectFormUrl}?region=${params.region}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
@@ -892,9 +892,9 @@ export async function inspectListApi(params) {
   });
 }
 
-// 检查表_模板
-export async function inspectFormApi(params) {
-  return request(`${config.url.inspectFormUrl}?region=${params.region}`, {
+// 检查表_项目id查询列表
+export async function inspectListApi(params) {
+  return request(`${config.url.inspectListUrl}?ProjectId=${params.ProjectId}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`

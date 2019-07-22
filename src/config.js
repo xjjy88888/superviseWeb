@@ -245,11 +245,11 @@ const config = {
     // 检查表_模板
     inspectFormUrl: `${domain}api/services/app/MonitorCheck/GetFormStructure`,
 
-    // 检查表_新增修改
-    inspectCreateUpdateUrl: `${domain}api/services/app/MonitorCheck/`,
-
     // 检查表_项目id查询列表
     inspectListUrl: `${domain}api/services/app/MonitorCheck/GetAll`,
+
+    // 检查表_新增修改
+    inspectCreateUpdateUrl: `${domain}api/services/app/MonitorCheck/`,
 
     // 检查表_删除
     inspectDeleteUrl: `${domain}api/services/app/MonitorCheck/Delete`,
