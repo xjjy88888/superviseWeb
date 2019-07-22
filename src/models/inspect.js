@@ -36,19 +36,6 @@ export default {
       }
     },
 
-    // 检查表_新建编辑
-    *inspectCreateUpdate({ payload, callback }, { call, put }) {
-      const {
-        data: { success, error, result }
-      } = yield call(inspectCreateUpdateApi, payload);
-      if (callback) callback(success, error, result);
-      notification[success ? "success" : "error"]({
-        message: `${payload.id ? "编辑" : "新增"}检查表${
-          success ? "成功" : "失败"
-        }`
-      });
-    },
-
     // 检查表_项目id查询列表
     *inspectList({ payload, callback }, { call, put }) {
       const {
@@ -62,6 +49,19 @@ export default {
           message: `查询检查表列表失败：${error.message}`
         });
       }
+    },
+
+    // 检查表_新建编辑
+    *inspectCreateUpdate({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(inspectCreateUpdateApi, payload);
+      if (callback) callback(success, error, result);
+      notification[success ? "success" : "error"]({
+        message: `${payload.id ? "编辑" : "新增"}检查表${
+          success ? "成功" : "失败"
+        }`
+      });
     },
 
     //检查表_删除
