@@ -214,7 +214,6 @@ class FormWriteUser extends PureComponent {
       form: { getFieldDecorator },
       district: { districtTree }
     } = this.props;
-    console.log(this.props);
     const { showDistrict } = this.state;
 
     return (

@@ -45,7 +45,7 @@ export default class Inspect extends PureComponent {
     } = this.props;
     this.eventEmitter = emitter.addListener("showInspect", v => {
       resetFields();
-      this.inspectForm({ region: "长沙", id: v.id });
+      this.inspectForm({ ...v, region: "长沙" });
       this.setState({
         show: v.show,
         projectId: v.projectId,
@@ -61,15 +61,15 @@ export default class Inspect extends PureComponent {
       payload: { region: params.region },
       callback: (success, error, result) => {
         if (success) {
-          this.inspectById(params.id);
+          this.inspectById(params);
         }
       }
     });
   };
 
-  inspectById = id => {
+  inspectById = params => {
     const { dispatch } = this.props;
-    dispatch({ type: "inspect/inspectById", payload: { id: id } });
+    dispatch({ type: "inspect/inspectById", payload: params });
   };
 
   getInitialValue = (type, key) => {
@@ -77,17 +77,18 @@ export default class Inspect extends PureComponent {
       inspect: { inspectInfo }
     } = this.props;
     if (inspectInfo.checkInfoLists) {
-      if (type === "checkbox") {
-        const list = inspectInfo.checkInfoLists.filter(
-          item => item.checkTypeId === key
-        );
-        if (list.length !== 0) {
+      const list = inspectInfo.checkInfoLists.filter(
+        item => item.checkTypeId === key
+      );
+      if (list.length !== 0) {
+        if (type === "checkbox") {
           const initialValue = list[0].value.map(item => {
             return item.checkInfoItemId;
           });
           return initialValue;
+        } else if (type === "radio") {
+          return list[0].value[0].checkInfoItemId;
         }
-        return [];
       }
     }
   };
@@ -160,7 +161,9 @@ export default class Inspect extends PureComponent {
                     if (type === "checkbox") {
                       data = data.concat(v[i]);
                     } else if (type === "radio") {
-                      data.push(v[i]);
+                      if (v[i].length !== 0) {
+                        data.push(v[i]);
+                      }
                     }
                   }
                 }
@@ -224,7 +227,9 @@ export default class Inspect extends PureComponent {
                     <Input.TextArea autosize />
                   )
                 : item.type === "radio"
-                ? getFieldDecorator(`radio_${item.key}`, {})(
+                ? getFieldDecorator(`radio_${item.key}`, {
+                    initialValue: this.getInitialValue("radio", item.key)
+                  })(
                     <Radio.Group name="radiogroup">
                       {item.data.map((item, index) => (
                         <Radio value={item.value} key={index}>

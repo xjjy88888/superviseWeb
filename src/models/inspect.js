@@ -77,16 +77,24 @@ export default {
 
     //检查表_详情
     *inspectById({ payload, callback }, { call, put }) {
-      const {
-        data: { success, error, result }
-      } = yield call(inspectByIdApi, payload);
-      if (callback) callback(success, error, result);
-      if (success) {
-        yield put({ type: "save", payload: { inspectInfo: result } });
-      } else {
-        notification["error"]({
-          message: `查询检查表详情失败`
+      console.log(payload);
+      if (payload.from === "add") {
+        yield put({
+          type: "save",
+          payload: { inspectInfo: { checkInfoLists: null } }
         });
+      } else {
+        const {
+          data: { success, error, result }
+        } = yield call(inspectByIdApi, payload);
+        if (callback) callback(success, error, result);
+        if (success) {
+          yield put({ type: "save", payload: { inspectInfo: result } });
+        } else {
+          notification["error"]({
+            message: `查询检查表详情失败`
+          });
+        }
       }
     }
   },

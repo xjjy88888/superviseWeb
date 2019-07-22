@@ -186,7 +186,6 @@ export default class sider extends PureComponent {
       }
     });
     this.eventEmitter = emitter.addListener("projectInfoRefresh", v => {
-      console.log(v);
       if (v.projectId) {
         this.querySpotByProjectId(v.projectId);
         this.queryRedLineList(v.projectId);
@@ -2070,7 +2069,8 @@ export default class sider extends PureComponent {
                             e.stopPropagation();
                             emitter.emit("showInspect", {
                               show: true,
-                              projectId: projectItem.id
+                              projectId: projectItem.id,
+                              from: "add"
                             });
                           }}
                         />
@@ -2087,7 +2087,8 @@ export default class sider extends PureComponent {
                           emitter.emit("showInspect", {
                             show: true,
                             id: item.id,
-                            projectId: projectItem.id
+                            projectId: projectItem.id,
+                            from: "edit"
                           });
                         }}
                       >

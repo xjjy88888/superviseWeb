@@ -45,7 +45,6 @@ export default class siderbarDetail extends PureComponent {
 
   componentDidMount() {
     this.eventEmitter = emitter.addListener("showTool", data => {
-      console.log(data);
       this.setState({
         show: data.show,
         type: data.type,

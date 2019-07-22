@@ -884,7 +884,6 @@ export async function powerListApi() {
 
 // 检查表_项目id查询列表
 export async function inspectListApi(params) {
-  console.log(params);
   return request(`${config.url.inspectListUrl}?ProjectId=${params.ProjectId}`, {
     method: "GET",
     headers: {
