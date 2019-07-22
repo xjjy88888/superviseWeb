@@ -894,8 +894,8 @@ export async function inspectListApi(params) {
 }
 
 // 检查表_模板
-export async function inspectInfoApi(params) {
-  return request(`${config.url.inspectInfoUrl}?region=${params.region}`, {
+export async function inspectFormApi(params) {
+  return request(`${config.url.inspectFormUrl}?region=${params.region}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`

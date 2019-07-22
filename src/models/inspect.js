@@ -1,6 +1,6 @@
 import { notification } from "antd";
 import {
-  inspectInfoApi,
+  inspectFormApi,
   inspectCreateUpdateApi,
   inspectListApi,
   inspectDeleteApi,
@@ -11,8 +11,9 @@ export default {
   namespace: "inspect",
 
   state: {
-    inspectInfo: [],
-    inspectList: []
+    inspectForm: [],
+    inspectList: [],
+    inspectInfo: { checkInfoLists: null }
   },
 
   subscriptions: {
@@ -21,13 +22,13 @@ export default {
 
   effects: {
     // 检查表_模板
-    *inspectInfo({ payload, callback }, { call, put }) {
+    *inspectForm({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result }
-      } = yield call(inspectInfoApi, payload);
+      } = yield call(inspectFormApi, payload);
       if (callback) callback(success, error, result);
       if (success) {
-        yield put({ type: "save", payload: { inspectInfo: result } });
+        yield put({ type: "save", payload: { inspectForm: result } });
       } else {
         notification["error"]({
           message: `查询检查表模板失败：${error.message}`
@@ -81,7 +82,7 @@ export default {
       } = yield call(inspectByIdApi, payload);
       if (callback) callback(success, error, result);
       if (success) {
-        // yield put({ type: "save", payload: { inspectInfo: result } });
+        yield put({ type: "save", payload: { inspectInfo: result } });
       } else {
         notification["error"]({
           message: `查询检查表详情失败`
