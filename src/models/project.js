@@ -16,11 +16,7 @@ import {
   departCreateApi,
   projectUnArchiveApi,
   projectUnbindSpotApi,
-  projectArchiveApi,
-  inspectInfoApi,
-  inspectCreateUpdateApi,
-  inspectListApi,
-  inspectDeleteApi
+  projectArchiveApi
 } from "../services/httpApi";
 
 export default {
@@ -40,9 +36,7 @@ export default {
       }
     },
     departSelectList: [],
-    projectListAdd: [],
-    inspectInfo: [],
-    inspectList: []
+    projectListAdd: []
   },
 
   subscriptions: {
@@ -325,52 +319,6 @@ export default {
       });
       yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);
-    },
-
-    // 检查表内容
-    *inspectInfo({ payload, callback }, { call, put }) {
-      const {
-        data: { success, error, result }
-      } = yield call(inspectInfoApi, payload);
-      if (callback) callback(success, error, result);
-      if (success) {
-        yield put({ type: "save", payload: { inspectInfo: result } });
-      } else {
-        notification["error"]({
-          message: `查询检查表内容失败：${error.message}`
-        });
-      }
-    },
-
-    // 检查表_新建编辑
-    *inspectCreateUpdate({ payload, callback }, { call, put }) {
-      const {
-        data: { success, error, result }
-      } = yield call(inspectCreateUpdateApi, payload);
-      if (callback) callback(success, error, result);
-    },
-
-    // 检查表_项目id查询列表
-    *inspectList({ payload, callback }, { call, put }) {
-      const {
-        data: { success, error, result }
-      } = yield call(inspectListApi, payload);
-      if (callback) callback(success, error, result);
-      if (success) {
-        yield put({ type: "save", payload: { inspectList: result.items } });
-      } else {
-        notification["error"]({
-          message: `查询检查表列表失败：${error.message}`
-        });
-      }
-    },
-
-    //检查表_删除
-    *inspectDelete({ payload, callback }, { call, put }) {
-      const {
-        data: { success, error, result }
-      } = yield call(inspectDeleteApi, payload);
-      if (callback) callback(success, error, result);
     }
   },
 

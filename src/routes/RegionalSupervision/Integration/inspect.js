@@ -22,10 +22,11 @@ const formItemLayout = {
 };
 
 @createForm()
-@connect(({ user, district, project }) => ({
+@connect(({ user, district, project, inspect }) => ({
   user,
   district,
-  project
+  project,
+  inspect
 }))
 export default class Inspect extends PureComponent {
   constructor(props) {
@@ -40,7 +41,7 @@ export default class Inspect extends PureComponent {
   componentDidMount() {
     self = this;
     this.eventEmitter = emitter.addListener("showInspect", v => {
-      this.inspectInfo("长沙");
+      this.inspectInfo({ region: "长沙", id: v.id });
       this.setState({
         show: v.show,
         projectId: v.projectId,
@@ -49,9 +50,22 @@ export default class Inspect extends PureComponent {
     });
   }
 
-  inspectInfo = region => {
+  inspectInfo = params => {
     const { dispatch } = this.props;
-    dispatch({ type: "project/inspectInfo", payload: { region: region } });
+    dispatch({
+      type: "inspect/inspectInfo",
+      payload: { region: params.region },
+      callback: (success, error, result) => {
+        if (success) {
+          this.inspectById(params.id);
+        }
+      }
+    });
+  };
+
+  inspectById = id => {
+    const { dispatch } = this.props;
+    dispatch({ type: "inspect/inspectById", payload: { id: id } });
   };
 
   render() {
@@ -59,7 +73,7 @@ export default class Inspect extends PureComponent {
     const {
       dispatch,
       form: { getFieldDecorator, validateFields },
-      project: { inspectInfo }
+      inspect: { inspectInfo }
     } = this.props;
 
     return (
@@ -133,7 +147,7 @@ export default class Inspect extends PureComponent {
                   };
                 });
                 dispatch({
-                  type: "project/inspectCreateUpdate",
+                  type: "inspect/inspectCreateUpdate",
                   payload: {
                     id: id,
                     projectId: projectId,
@@ -143,9 +157,6 @@ export default class Inspect extends PureComponent {
                     if (success) {
                       emitter.emit("projectInfoRefresh", {
                         projectId: projectId
-                      });
-                      notification["success"]({
-                        message: `${id ? "编辑" : "新增"}检查表成功`
                       });
                       this.setState({ show: false });
                     }
@@ -189,7 +200,9 @@ export default class Inspect extends PureComponent {
                     <Input.TextArea autosize />
                   )
                 : item.type === "radio"
-                ? getFieldDecorator(`radio_${item.key}`)(
+                ? getFieldDecorator(`radio_${item.key}`, {
+                    nitialValue: "600080131090610012"
+                  })(
                     <Radio.Group name="radiogroup">
                       {item.data.map((item, index) => (
                         <Radio value={item.value} key={index}>
@@ -199,7 +212,9 @@ export default class Inspect extends PureComponent {
                     </Radio.Group>
                   )
                 : item.type === "checkbox"
-                ? getFieldDecorator(`checkbox_${item.key}`)(
+                ? getFieldDecorator(`checkbox_${item.key}`, {
+                    initialValue: ["600080131090610012"]
+                  })(
                     <Checkbox.Group
                       options={item.data.map(item => {
                         return {

@@ -48,16 +48,29 @@ const formItemLayout = {
   wrapperCol: { span: 16 }
 };
 
-@connect(({ project, spot, point, other, user, annex, redLine, district }) => ({
-  project,
-  spot,
-  point,
-  other,
-  user,
-  annex,
-  redLine,
-  district
-}))
+@connect(
+  ({
+    project,
+    spot,
+    point,
+    other,
+    user,
+    annex,
+    redLine,
+    district,
+    inspect
+  }) => ({
+    project,
+    spot,
+    point,
+    other,
+    user,
+    annex,
+    redLine,
+    district,
+    inspect
+  })
+)
 @createForm()
 export default class sider extends PureComponent {
   constructor(props) {
@@ -628,7 +641,7 @@ export default class sider extends PureComponent {
   inspectList = id => {
     const { dispatch } = this.props;
     dispatch({
-      type: "project/inspectList",
+      type: "inspect/inspectList",
       payload: {
         ProjectId: id
       }
@@ -983,20 +996,13 @@ export default class sider extends PureComponent {
       form: { getFieldDecorator, resetFields, setFieldsValue, getFieldValue },
       district: { districtTree },
       user: { basinOrganList },
-      project: {
-        projectList,
-        projectInfo,
-        projectListAdd,
-        departSelectList,
-        inspectList
-      },
+      project: { projectList, projectInfo, projectListAdd, departSelectList },
       spot: { spotList, projectInfoSpotList },
       point: { pointList },
-      redLine: { redLineList }
+      redLine: { redLineList },
+      inspect: { inspectList }
     } = this.props;
     const departSelectListAll = unique(departSelectList.concat(departList));
-
-    // console.log(tree(districtTree));
 
     const projectItem = isProjectUpdate
       ? projectInfo
@@ -2104,7 +2110,7 @@ export default class sider extends PureComponent {
                               cancelText: "否",
                               onOk() {
                                 dispatch({
-                                  type: "project/inspectDelete",
+                                  type: "inspect/inspectDelete",
                                   payload: {
                                     id: item.id
                                   },

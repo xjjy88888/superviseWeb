@@ -242,7 +242,7 @@ const config = {
     // 权限列表
     powerListUrl: `${domain}api/services/app/Role/GetAllPermissions`,
 
-    // 检查表内容
+    // 检查表_模板
     inspectInfoUrl: `${domain}api/services/app/MonitorCheck/GetFormStructure`,
 
     // 检查表_新增修改
@@ -253,6 +253,9 @@ const config = {
 
     // 检查表_删除
     inspectDeleteUrl: `${domain}api/services/app/MonitorCheck/Delete`,
+
+    // 检查表_详情
+    inspectByIdUrl: `${domain}api/services/app/MonitorCheck/Get`,
   },
 
   //工具箱

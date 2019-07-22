@@ -893,7 +893,7 @@ export async function inspectListApi(params) {
   });
 }
 
-// 检查表内容
+// 检查表_模板
 export async function inspectInfoApi(params) {
   return request(`${config.url.inspectInfoUrl}?region=${params.region}`, {
     method: "GET",
@@ -918,13 +918,23 @@ export async function inspectCreateUpdateApi(params) {
   );
 }
 
-// 检查表_删除1
+// 检查表_删除
 export async function inspectDeleteApi(params) {
   return request(`${config.url.inspectDeleteUrl}?id=${params.id}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
       "Content-Type": "application/json-patch+json"
+    }
+  });
+}
+
+// 检查表_详情
+export async function inspectByIdApi(params) {
+  return request(`${config.url.inspectByIdUrl}?Id=${params.id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
     }
   });
 }

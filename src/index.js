@@ -18,6 +18,7 @@ app.model(require("./models/annex").default);
 app.model(require("./models/dict").default);
 app.model(require("./models/district").default);
 app.model(require("./models/company").default);
+app.model(require("./models/inspect").default);
 
 // 4. Router
 app.router(require("./router").default);
