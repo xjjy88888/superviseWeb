@@ -44,13 +44,15 @@ export default class Inspect extends PureComponent {
       form: { resetFields }
     } = this.props;
     this.eventEmitter = emitter.addListener("showInspect", v => {
-      resetFields();
-      this.inspectForm({ ...v, region: "长沙" });
       this.setState({
         show: v.show,
         projectId: v.projectId,
         id: v.id
       });
+      if (v.show) {
+        resetFields();
+        this.inspectForm({ ...v, region: "长沙" });
+      }
     });
   }
 

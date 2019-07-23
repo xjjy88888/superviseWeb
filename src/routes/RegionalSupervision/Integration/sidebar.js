@@ -766,6 +766,9 @@ export default class sider extends PureComponent {
       show: false,
       edit: false
     });
+    emitter.emit("showInspect", {
+      show: false
+    });
   };
 
   getDepartKey = value => {
@@ -1747,10 +1750,7 @@ export default class sider extends PureComponent {
                       content: "",
                       onOk() {
                         self.setState({ showProjectDetail: false });
-                        emitter.emit("showProjectDetail", {
-                          show: false,
-                          edit: false
-                        });
+                        self.closeAll();
                       },
                       onCancel() {}
                     });
@@ -1767,6 +1767,7 @@ export default class sider extends PureComponent {
                       show: false,
                       edit: false
                     });
+                    self.closeAll();
                   }
                 }}
               />
