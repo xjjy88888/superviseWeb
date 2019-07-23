@@ -9,7 +9,8 @@ import {
   Form,
   Radio,
   Modal,
-  notification
+  DatePicker,
+  Select
 } from "antd";
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
@@ -51,7 +52,7 @@ export default class Inspect extends PureComponent {
       });
       if (v.show) {
         resetFields();
-        this.inspectForm({ ...v, region: "长沙" });
+        this.inspectForm({ ...v });
       }
     });
   }
@@ -220,6 +221,22 @@ export default class Inspect extends PureComponent {
             overflow: "auto"
           }}
         >
+          <Form.Item label="核查日期" {...formItemLayout}>
+            {getFieldDecorator("time", {})(<DatePicker />)}
+          </Form.Item>
+          <Form.Item label="编号" {...formItemLayout}>
+            {getFieldDecorator("number1", {})(
+              <Input
+                style={{ width: 200 }}
+                addonBefore={getFieldDecorator("number2", {})(
+                  <Select style={{ width: 100 }}>
+                    <Select.Option value="86">2019</Select.Option>
+                    <Select.Option value="87">2018</Select.Option>
+                  </Select>
+                )}
+              />
+            )}
+          </Form.Item>
           {inspectForm.map((item, index) => (
             <Form.Item label={item.title} {...formItemLayout} key={index}>
               {item.type === "input"

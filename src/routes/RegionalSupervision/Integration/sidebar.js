@@ -2093,42 +2093,47 @@ export default class sider extends PureComponent {
                           });
                         }}
                       >
-                        {item.id}
-                        <Icon
-                          type="delete"
-                          style={{
-                            float: "right",
-                            fontSize: 18,
-                            cursor: "point",
-                            color: "#1890ff"
-                          }}
-                          onClick={e => {
-                            e.stopPropagation();
-                            Modal.confirm({
-                              title: "删除",
-                              content: "是否确定要删除这条检查记录？",
-                              okText: "是",
-                              okType: "danger",
-                              cancelText: "否",
-                              onOk() {
-                                dispatch({
-                                  type: "inspect/inspectDelete",
-                                  payload: {
-                                    id: item.id
-                                  },
-                                  callback: success => {
-                                    if (success) {
-                                      emitter.emit("projectInfoRefresh", {
-                                        projectId: projectItem.id
-                                      });
+                        <p style={{ margin: 0 }}>
+                          {item.id}
+                          <Icon
+                            type="delete"
+                            style={{
+                              float: "right",
+                              fontSize: 18,
+                              cursor: "point",
+                              color: "#1890ff"
+                            }}
+                            onClick={e => {
+                              e.stopPropagation();
+                              Modal.confirm({
+                                title: "删除",
+                                content: "是否确定要删除这条检查记录？",
+                                okText: "是",
+                                okType: "danger",
+                                cancelText: "否",
+                                onOk() {
+                                  dispatch({
+                                    type: "inspect/inspectDelete",
+                                    payload: {
+                                      id: item.id
+                                    },
+                                    callback: success => {
+                                      if (success) {
+                                        emitter.emit("projectInfoRefresh", {
+                                          projectId: projectItem.id
+                                        });
+                                      }
                                     }
-                                  }
-                                });
-                              },
-                              onCancel() {}
-                            });
-                          }}
-                        />
+                                  });
+                                },
+                                onCancel() {}
+                              });
+                            }}
+                          />
+                        </p>
+                        <p style={{ margin: 0, padding: "0 30px" }}>问题点1</p>
+                        <p style={{ margin: 0, padding: "0 30px" }}>问题点1</p>
+                        <p style={{ margin: 0, padding: "0 30px" }}>问题点1</p>
                       </p>
                     ))}
                   </Collapse.Panel>

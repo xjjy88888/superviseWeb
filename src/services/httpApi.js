@@ -884,7 +884,7 @@ export async function powerListApi() {
 
 // 检查表_模板
 export async function inspectFormApi(params) {
-  return request(`${config.url.inspectFormUrl}?region=${params.region}`, {
+  return request(`${config.url.inspectFormUrl}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
