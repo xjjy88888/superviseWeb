@@ -791,7 +791,6 @@ export default class sider extends PureComponent {
     const { departSearch } = this.state;
 
     // const isAdd = key !== "supDepartmentId" && key !== "replyDepartmentId";
-    console.log(departSearch);
     if (departSearch) {
       dispatch({
         type: "user/departVaild",
