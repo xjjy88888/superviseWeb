@@ -10,7 +10,8 @@ import {
   Radio,
   Modal,
   DatePicker,
-  Select
+  Select,
+  notification
 } from "antd";
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
@@ -63,7 +64,7 @@ export default class Inspect extends PureComponent {
       }
     });
     for (let i = year; i > year - 30; i--) {
-      yearSelect.push(i);
+      yearSelect.push(String(i));
     }
   }
 
@@ -177,6 +178,18 @@ export default class Inspect extends PureComponent {
               let data = [];
               validateFields((error, v) => {
                 console.log(v);
+                if (!v.checkDate) {
+                  notification["warning"]({
+                    message: `请选择核查日期`
+                  });
+                  return;
+                }
+                if (!v.number || !v.numberYear) {
+                  notification["warning"]({
+                    message: `请输入编号`
+                  });
+                  return;
+                }
                 for (let i in v) {
                   if (v[i]) {
                     const type = i.split("_")[0];
@@ -189,12 +202,12 @@ export default class Inspect extends PureComponent {
                     }
                   }
                 }
-                console.log(data);
                 const checkInfoLists = data.map(item => {
                   return {
                     checkInfoItemId: item
                   };
                 });
+                this.setState({ showSpin: true });
                 dispatch({
                   type: "inspect/inspectCreateUpdate",
                   payload: {
@@ -212,7 +225,7 @@ export default class Inspect extends PureComponent {
                       emitter.emit("projectInfoRefresh", {
                         projectId: projectId
                       });
-                      this.setState({ show: false });
+                      this.setState({ show: false, showSpin: false });
                     }
                   }
                 });

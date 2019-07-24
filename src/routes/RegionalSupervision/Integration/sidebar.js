@@ -2111,12 +2111,14 @@ export default class sider extends PureComponent {
                                 okType: "danger",
                                 cancelText: "否",
                                 onOk() {
+                                  self.showSpin(true);
                                   dispatch({
                                     type: "inspect/inspectDelete",
                                     payload: {
                                       id: item.id
                                     },
                                     callback: success => {
+                                      self.showSpin(false);
                                       if (success) {
                                         emitter.emit("projectInfoRefresh", {
                                           projectId: projectItem.id
@@ -2138,6 +2140,7 @@ export default class sider extends PureComponent {
                               marginRight: 20
                             }}
                             onClick={e => {
+                              this.showSpin(true);
                               e.stopPropagation();
                               dispatch({
                                 type: "inspect/inspectExport",
@@ -2145,6 +2148,7 @@ export default class sider extends PureComponent {
                                   id: item.id
                                 },
                                 callback: (success, error, result) => {
+                                  this.showSpin(false);
                                   if (success) {
                                     window.open(
                                       `${config.export}?fileName=${result}`,
@@ -2191,7 +2195,7 @@ export default class sider extends PureComponent {
                         this.closeAll();
                       }}
                     >
-                      2019/3/22 检查记录
+                      2019/3/22 监督执法记录
                       <Icon
                         type="delete"
                         style={{
@@ -2231,7 +2235,7 @@ export default class sider extends PureComponent {
                         this.closeAll();
                       }}
                     >
-                      2019/3/22 检查记录
+                      2019/3/22 监督执法记录
                       <Icon
                         type="delete"
                         style={{
@@ -2317,7 +2321,6 @@ export default class sider extends PureComponent {
                           style={{ position: "relative", left: 10, top: -2 }}
                           onChange={(v, e) => {
                             e.stopPropagation();
-                            console.log(v);
                             this.setState({ isArchivalSpot: v });
                             setTimeout(() => {
                               this.querySpotByProjectId(projectItem.id);
