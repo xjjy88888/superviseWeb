@@ -938,7 +938,7 @@ export async function inspectByIdApi(params) {
   });
 }
 
-// 检查表_导出1
+// 检查表_导出
 export async function inspectExportApi(params) {
   return request(`${config.url.inspectExportUrl}?id=${params.id}`, {
     method: "GET",
