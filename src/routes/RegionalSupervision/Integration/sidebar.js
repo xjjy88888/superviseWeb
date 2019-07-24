@@ -2100,7 +2100,6 @@ export default class sider extends PureComponent {
                             style={{
                               float: "right",
                               fontSize: 18,
-                              cursor: "point",
                               color: "#1890ff"
                             }}
                             onClick={e => {
@@ -2127,6 +2126,32 @@ export default class sider extends PureComponent {
                                   });
                                 },
                                 onCancel() {}
+                              });
+                            }}
+                          />
+                          <Icon
+                            type="download"
+                            style={{
+                              float: "right",
+                              fontSize: 18,
+                              color: "#1890ff",
+                              marginRight: 20
+                            }}
+                            onClick={e => {
+                              e.stopPropagation();
+                              dispatch({
+                                type: "inspect/inspectExport",
+                                payload: {
+                                  id: item.id
+                                },
+                                callback: (success, error, result) => {
+                                  if (success) {
+                                    window.open(
+                                      `${config.export}?fileName=${result}`,
+                                      `_self`
+                                    );
+                                  }
+                                }
                               });
                             }}
                           />

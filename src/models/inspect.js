@@ -4,7 +4,8 @@ import {
   inspectCreateUpdateApi,
   inspectListApi,
   inspectDeleteApi,
-  inspectByIdApi
+  inspectByIdApi,
+  inspectExportApi
 } from "../services/httpApi";
 
 export default {
@@ -96,6 +97,17 @@ export default {
           });
         }
       }
+    },
+
+    //检查表_导出
+    *inspectExport({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(inspectExportApi, payload);
+      if (callback) callback(success, error, result);
+      notification[success ? "success" : "error"]({
+        message: `导出检查表${success ? "成功" : "失败"}`
+      });
     }
   },
 

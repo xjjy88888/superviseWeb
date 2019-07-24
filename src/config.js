@@ -19,6 +19,7 @@ const color_border_redLine = "#e60000"; //边框色-红线
 const config = {
   domain: domain,
   download: `http://www.zkygis.cn/stbcjg/Template/`,
+  export: `${domain}api/services/app/File/GetTempFile`,
   templateDescription: `http://docs.qq.com/doc/DTEV2TGRsU0RNQUV0?coord=DeJxzNFRxNFQxgEAAEUUCWQ`,
   isFormal: isFormal,
 
@@ -255,7 +256,10 @@ const config = {
     inspectDeleteUrl: `${domain}api/services/app/MonitorCheck/Delete`,
 
     // 检查表_详情
-    inspectByIdUrl: `${domain}api/services/app/MonitorCheck/Get`
+    inspectByIdUrl: `${domain}api/services/app/MonitorCheck/Get`,
+
+    // 检查表_导出
+    inspectExportUrl: `${domain}api/services/app/MonitorCheck/Print`
   },
 
   //工具箱

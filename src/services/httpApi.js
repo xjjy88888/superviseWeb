@@ -937,3 +937,13 @@ export async function inspectByIdApi(params) {
     }
   });
 }
+
+// 检查表_导出1
+export async function inspectExportApi(params) {
+  return request(`${config.url.inspectExportUrl}?id=${params.id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
