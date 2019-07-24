@@ -77,12 +77,12 @@ export default {
 
     //检查表_详情
     *inspectById({ payload, callback }, { call, put }) {
-      console.log(payload);
       if (payload.from === "add") {
         yield put({
           type: "save",
           payload: { inspectInfo: { checkInfoLists: null } }
         });
+        if (callback) callback();
       } else {
         const {
           data: { success, error, result }

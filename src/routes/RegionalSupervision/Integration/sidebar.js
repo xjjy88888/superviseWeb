@@ -2070,6 +2070,7 @@ export default class sider extends PureComponent {
                             e.stopPropagation();
                             emitter.emit("showInspect", {
                               show: true,
+                              id: null,
                               projectId: projectItem.id,
                               from: "add"
                             });

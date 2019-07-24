@@ -14,8 +14,13 @@ import {
 } from "antd";
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
+import moment from "moment";
+import Spins from "../../../components/Spins";
 
 let self;
+let yearSelect = [];
+
+const year = new Date().getFullYear();
 
 const formItemLayout = {
   labelCol: { span: 7 },
@@ -35,7 +40,8 @@ export default class Inspect extends PureComponent {
     this.state = {
       show: false,
       id: null,
-      projectId: null
+      projectId: null,
+      showSpin: false
     };
   }
 
@@ -52,9 +58,13 @@ export default class Inspect extends PureComponent {
       });
       if (v.show) {
         resetFields();
+        this.setState({ showSpin: true });
         this.inspectForm({ ...v });
       }
     });
+    for (let i = year; i > year - 30; i--) {
+      yearSelect.push(i);
+    }
   }
 
   inspectForm = params => {
@@ -65,6 +75,8 @@ export default class Inspect extends PureComponent {
       callback: (success, error, result) => {
         if (success) {
           this.inspectById(params);
+        } else {
+          this.setState({ showSpin: false });
         }
       }
     });
@@ -72,7 +84,13 @@ export default class Inspect extends PureComponent {
 
   inspectById = params => {
     const { dispatch } = this.props;
-    dispatch({ type: "inspect/inspectById", payload: params });
+    dispatch({
+      type: "inspect/inspectById",
+      payload: params,
+      callback: () => {
+        this.setState({ showSpin: false });
+      }
+    });
   };
 
   getInitialValue = (type, key) => {
@@ -97,11 +115,11 @@ export default class Inspect extends PureComponent {
   };
 
   render() {
-    const { show, id, projectId } = this.state;
+    const { show, id, projectId, showSpin } = this.state;
     const {
       dispatch,
       form: { getFieldDecorator, validateFields },
-      inspect: { inspectForm }
+      inspect: { inspectForm, inspectInfo }
     } = this.props;
 
     return (
@@ -113,12 +131,13 @@ export default class Inspect extends PureComponent {
           zIndex: 1000,
           width: 800,
           height: `100%`,
-          paddingTop: 100,
+          paddingTop: 60,
           borderLeft: "solid 1px #ddd",
           backgroundColor: `#fff`
         }}
         ref={this.saveRef}
       >
+        <Spins show={showSpin} />
         <Icon
           type="left"
           style={{
@@ -156,7 +175,7 @@ export default class Inspect extends PureComponent {
             }}
             onClick={() => {
               let data = [];
-              validateFields((err, v) => {
+              validateFields((error, v) => {
                 console.log(v);
                 for (let i in v) {
                   if (v[i]) {
@@ -181,6 +200,11 @@ export default class Inspect extends PureComponent {
                   payload: {
                     id: id,
                     projectId: projectId,
+                    numberYear: v.numberYear,
+                    number: v.number,
+                    checkDate: v.checkDate
+                      ? v.checkDate.format("YYYY-MM-DD")
+                      : "",
                     checkInfoLists: checkInfoLists
                   },
                   callback: (success, error, result) => {
@@ -215,25 +239,39 @@ export default class Inspect extends PureComponent {
             }}
           />
         </span>
+        <b style={{ fontSize: 16, padding: "0 50px" }}>
+          {id ? `编辑${id}` : `新增`}检查记录
+        </b>
         <Form
           style={{
             height: window.innerHeight - 100,
+            paddingTop: 10,
             overflow: "auto"
           }}
         >
           <Form.Item label="核查日期" {...formItemLayout}>
-            {getFieldDecorator("time", {})(<DatePicker />)}
+            {getFieldDecorator("checkDate", {
+              initialValue: inspectInfo.checkDate
+                ? moment(inspectInfo.checkDate)
+                : ""
+            })(<DatePicker style={{ width: 240 }} />)}
           </Form.Item>
           <Form.Item label="编号" {...formItemLayout}>
-            {getFieldDecorator("number1", {})(
+            {getFieldDecorator("number", { initialValue: inspectInfo.number })(
               <Input
-                style={{ width: 200 }}
-                addonBefore={getFieldDecorator("number2", {})(
+                style={{ width: 240 }}
+                addonBefore={getFieldDecorator("numberYear", {
+                  initialValue: inspectInfo.numberYear
+                })(
                   <Select style={{ width: 100 }}>
-                    <Select.Option value="86">2019</Select.Option>
-                    <Select.Option value="87">2018</Select.Option>
+                    {yearSelect.map((item, index) => (
+                      <Select.Option key={index} value={item}>
+                        {item}年
+                      </Select.Option>
+                    ))}
                   </Select>
                 )}
+                addonAfter={`号`}
               />
             )}
           </Form.Item>
