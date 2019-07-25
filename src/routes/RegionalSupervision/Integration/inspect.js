@@ -11,12 +11,15 @@ import {
   Modal,
   DatePicker,
   Select,
-  notification
+  notification,
+  Upload
 } from "antd";
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
 import moment from "moment";
 import Spins from "../../../components/Spins";
+import config from "../../../config";
+import { getFile, accessToken } from "../../../utils/util";
 
 let self;
 let yearSelect = [];
@@ -42,7 +45,9 @@ export default class Inspect extends PureComponent {
       show: false,
       id: null,
       projectId: null,
-      showSpin: false
+      showSpin: false,
+      fileList: [],
+      ParentId: 0
     };
   }
 
@@ -88,8 +93,23 @@ export default class Inspect extends PureComponent {
     dispatch({
       type: "inspect/inspectById",
       payload: params,
-      callback: () => {
-        this.setState({ showSpin: false });
+      callback: (success, error, result) => {
+        this.setState({ showSpin: false, fileList: [] });
+        if (success && result.attachment) {
+          const list = result.attachment.child.map(item => {
+            return {
+              uid: item.id,
+              name: item.fileName,
+              fileExtend: item.fileExtend,
+              url: config.url.annexPreviewUrl + item.id,
+              latitude: item.latitude,
+              longitude: item.longitude,
+              azimuth: item.azimuth,
+              status: "done"
+            };
+          });
+          this.setState({ fileList: list });
+        }
       }
     });
   };
@@ -116,7 +136,7 @@ export default class Inspect extends PureComponent {
   };
 
   render() {
-    const { show, id, projectId, showSpin } = this.state;
+    const { show, id, projectId, showSpin, fileList, ParentId } = this.state;
     const {
       dispatch,
       form: { getFieldDecorator, validateFields },
@@ -174,6 +194,7 @@ export default class Inspect extends PureComponent {
               color: "#1890ff",
               fontSize: 18
             }}
+            // 提交
             onClick={() => {
               let data = [];
               validateFields((error, v) => {
@@ -213,6 +234,7 @@ export default class Inspect extends PureComponent {
                   payload: {
                     id: id,
                     projectId: projectId,
+                    attachmentId: ParentId,
                     numberYear: v.numberYear,
                     number: v.number,
                     checkDate: v.checkDate
@@ -324,6 +346,119 @@ export default class Inspect extends PureComponent {
                 : getFieldDecorator(item.key)(<div>无数据</div>)}
             </Form.Item>
           ))}
+          <div style={{ minHeight: fileList.length ? 120 : 0 }}>
+            <Upload
+              action={config.url.annexUploadUrl}
+              headers={{ Authorization: `Bearer ${accessToken()}` }}
+              data={{ Id: ParentId }}
+              listType="picture-card"
+              fileList={fileList}
+              onSuccess={v => {
+                this.setState({
+                  ParentId: v.result.id
+                });
+                const item = v.result.child[0];
+                const obj = {
+                  uid: item.id,
+                  name: item.fileName,
+                  url: config.url.annexPreviewUrl + item.id,
+                  latitude: item.latitude,
+                  longitude: item.longitude,
+                  azimuth: item.azimuth,
+                  fileExtend: item.fileExtend,
+                  status: "done"
+                };
+                this.setState({
+                  fileList: [...fileList, obj]
+                });
+              }}
+              onError={(v, response) => {
+                notification["error"]({
+                  message: `图斑附件上传失败：${response.error.message}`
+                });
+              }}
+              onPreview={file => {
+                console.log(file.fileExtend, file);
+                switch (file.fileExtend) {
+                  case "pdf":
+                    window.open(file.url);
+                    break;
+                  case "doc":
+                  case "docx":
+                  case "xls":
+                  case "xlsx":
+                  case "ppt":
+                  case "pptx":
+                    window.open(file.url + "&isDown=true");
+                    break;
+                  default:
+                    this.setState({
+                      previewImage: file.url || file.thumbUrl,
+                      previewVisible_min: true
+                    });
+                    if (file.latitude || file.longitude) {
+                      emitter.emit("imgLocation", {
+                        Latitude: file.latitude,
+                        Longitude: file.longitude,
+                        direction: file.azimuth,
+                        show: true
+                      });
+                    } else {
+                      getFile(file.url);
+                    }
+                    break;
+                }
+              }}
+              onChange={({ fileList }) => {
+                const data = fileList.map(item => {
+                  return {
+                    ...item,
+                    status: "done"
+                  };
+                });
+                this.setState({ fileList: data });
+              }}
+              onRemove={file => {
+                return new Promise((resolve, reject) => {
+                  dispatch({
+                    type: "annex/annexDelete",
+                    payload: {
+                      FileId: file.uid,
+                      Id: inspectInfo.attachment
+                        ? inspectInfo.attachment.id
+                        : ParentId
+                    },
+                    callback: success => {
+                      if (success) {
+                        resolve();
+                      } else {
+                        reject();
+                      }
+                    }
+                  });
+                });
+              }}
+            >
+              <div>
+                <div className="ant-upload-text">
+                  <Button type="div" icon="plus">
+                    上传文件
+                  </Button>
+                  {/* <Button
+                    icon="picture"
+                    onClick={e => {
+                      e.stopPropagation();
+                      emitter.emit("screenshot", {
+                        show: true
+                      });
+                    }}
+                  >
+                    屏幕截图
+                  </Button> */}
+                </div>
+              </div>
+            </Upload>
+          </div>
         </Form>
       </div>
     );

@@ -83,7 +83,7 @@ export default {
           type: "save",
           payload: { inspectInfo: { checkInfoLists: null } }
         });
-        if (callback) callback();
+        if (callback) callback(false);
       } else {
         const {
           data: { success, error, result }

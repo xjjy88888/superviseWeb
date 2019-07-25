@@ -17,8 +17,7 @@ import {
 import locale from "antd/lib/date-picker/locale/zh_CN";
 import emitter from "../../../utils/event";
 import config from "../../../config";
-import { getFile } from "../../../utils/util";
-import { accessToken } from "../../../utils/util";
+import { getFile, accessToken } from "../../../utils/util";
 
 let self;
 const { TextArea } = Input;
