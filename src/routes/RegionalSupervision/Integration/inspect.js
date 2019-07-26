@@ -346,7 +346,9 @@ export default class Inspect extends PureComponent {
                 : getFieldDecorator(item.key)(<div>无数据</div>)}
             </Form.Item>
           ))}
-          <div style={{ minHeight: fileList.length ? 120 : 0 }}>
+          <div
+            style={{ minHeight: fileList.length ? 120 : 0, margin: "0 30px" }}
+          >
             <Upload
               action={config.url.annexUploadUrl}
               headers={{ Authorization: `Bearer ${accessToken()}` }}
