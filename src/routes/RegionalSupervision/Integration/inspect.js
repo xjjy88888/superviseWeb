@@ -196,19 +196,16 @@ export default class Inspect extends PureComponent {
               fontSize: 18
             }}
             onClick={() => {
-              this.showSpin(true);
+              this.setState({ showSpin: true });
               dispatch({
                 type: "inspect/inspectExport",
                 payload: {
-                  id: item.id
+                  id: id
                 },
                 callback: (success, error, result) => {
-                  this.showSpin(false);
+                  this.setState({ showSpin: false });
                   if (success) {
-                    window.open(
-                      `${config.export}?fileName=${result}`,
-                      `_self`
-                    );
+                    window.open(`${config.export}?fileName=${result}`, `_self`);
                   }
                 }
               });
@@ -316,7 +313,7 @@ export default class Inspect extends PureComponent {
           />
         </span>
         <b style={{ fontSize: 16, padding: "0 50px" }}>
-          {id ? `编辑${id}` : `新增`}检查记录
+          {id ? `检查表详情` : `新增检查表`}
         </b>
         <Form
           style={{
@@ -504,7 +501,7 @@ export default class Inspect extends PureComponent {
                       });
                     }}
                   >
-                    屏幕截图
+                    屏幕截图1
                   </Button> */}
                 </div>
               </div>

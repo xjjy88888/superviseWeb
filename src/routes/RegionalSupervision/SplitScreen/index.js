@@ -100,12 +100,13 @@ export default class splitScreen extends PureComponent {
     const me = this;
     if (e.target._container.id === "LMap") {//左侧地图
       userconfig.map = userconfig.LMap;
-      //message.warning("点击操作左侧地图", 1);
     }
     else {//右侧地图
       userconfig.map = userconfig.RMap;
-      //message.warning("点击操作右侧地图", 1);
-    } 
+    }
+    userconfig.LMap.closePopup(); 
+    userconfig.RMap.closePopup(); 
+    me.clearGeojsonLayer();
     let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
     if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {
       message.warning("区域范围之外的数据没有权限操作", 1);

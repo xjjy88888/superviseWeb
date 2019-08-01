@@ -2131,9 +2131,28 @@ export default class sider extends PureComponent {
                               });
                             }}
                           />
+                          <Icon
+                            type="environment"
+                            style={{
+                              float: "right",
+                              fontSize: 18,
+                              color: "#1890ff",
+                              marginRight: 20
+                            }}
+                            onClick={e => {
+                              e.stopPropagation();
+                              emitter.emit("mapLocation", {
+                                item: item.problemPoints,
+                                key: "problemPoint"
+                              });
+                            }}
+                          />
                         </p>
                         {item.problemPoints.map((ite, idx) => (
-                          <p key={idx} style={{ paddingLeft: 30 }}>
+                          <p
+                            key={idx}
+                            style={{ paddingLeft: 30, margin: "5px 0" }}
+                          >
                             <span
                               onClick={e => {
                                 e.stopPropagation();
@@ -2196,23 +2215,15 @@ export default class sider extends PureComponent {
                                 }}
                                 onClick={e => {
                                   e.stopPropagation();
-                                  dispatch({
-                                    type: "problemPoint/goMap",
-                                    payload: {
-                                      type: "problemPoint",
-                                      id: ite.id,
-                                      inspectId: item.id,
-                                      problemPointInfo: item.problemPoints
-                                    }
+                                  emitter.emit("mapLocation", {
+                                    item: [ite],
+                                    key: "problemPoint"
                                   });
                                 }}
                               />
                             </span>
                           </p>
                         ))}
-                        {/* <p style={{ margin: 0, padding: "0 30px" }}>问题点1</p>
-                        <p style={{ margin: 0, padding: "0 30px" }}>问题点1</p>
-                        <p style={{ margin: 0, padding: "0 30px" }}>问题点1</p> */}
                       </p>
                     ))}
                   </Collapse.Panel>

@@ -638,6 +638,7 @@ export default class integration extends PureComponent {
         let content = "";
         for (let i = 0; i < data.features.length; i++) {
           let feature = data.features[i];
+          console.log('feature',feature);
           if (i === data.features.length - 1) {
             me.getWinContent(feature.properties, data => {
               content += data[0].innerHTML;
@@ -648,14 +649,12 @@ export default class integration extends PureComponent {
             });
           }
         }
-        // setTimeout(() => {
         if (map.getZoom() < config.mapInitParams.zoom) {
           map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
             maxZoom: 16
           });
         }
         map.openPopup(content, userconfig.mapPoint);
-        // }, 500);
       } else {
         map.closePopup();
       }
@@ -865,6 +864,7 @@ export default class integration extends PureComponent {
       });
       return;
     }
+    me.clearGeojsonLayer();
     //点查WMS图层
     let point = { x: e.latlng.lng, y: e.latlng.lat };
     //图斑关联判断spotStatus
