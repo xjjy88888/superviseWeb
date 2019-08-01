@@ -36,10 +36,55 @@ export default {
         data: { success, error, result }
       } = yield call(problemTypeApi, payload);
       if (callback) callback(success, error, result);
+
+      const res = result.map(item => {
+        if (item.label === "措施缺陷") {
+          return { ...item, children: item.children[0].children };
+        } else {
+          return item;
+        }
+      });
+      const re = res.map(item => {
+        if (item.label === "措施缺陷") {
+          const arr = item.children.map(ite => {
+            return {
+              label: ite.label,
+              value: ite.value,
+              data: ite.children
+            };
+          });
+          return {
+            label: item.label,
+            value: item.value,
+            children: arr
+          };
+        } else {
+          const arr = item.children.map(ite => {
+            const arr2 = ite.children.map(it => {
+              return {
+                label: it.label,
+                value: it.value,
+                data: it.children
+              };
+            });
+            return {
+              label: ite.label,
+              value: ite.value,
+              children: arr2
+            };
+          });
+          return {
+            label: item.label,
+            value: item.value,
+            children: arr
+          };
+        }
+      });
+
       if (success) {
         yield put({
           type: "save",
-          payload: { problemType: result }
+          payload: { problemType: re }
         });
       } else {
         notification["error"]({
@@ -51,40 +96,22 @@ export default {
 
     //问题点_详情
     *problemPointById({ payload, callback }, { call, put }) {
-      console.log(payload);
-      if (payload.from === "add") {
+      const {
+        data: { success, error, result }
+      } = yield call(problemPointByIdApi, payload);
+      if (success) {
+        if (callback) callback(success, error, result);
         yield put({
           type: "save",
-          payload: { problemPointInfo: {}, imageInfos: [], location: null }
+          payload: {
+            problemPointInfo: result
+          }
         });
-      } else if (payload.from === "edit") {
-        const {
-          data: { success, error, result }
-        } = yield call(problemPointByIdApi, payload);
-        if (success) {
-          if (callback) callback(success, error, result);
-          const imageInfos = result.attachment
-            ? result.attachment.child.map(item => {
-                return { ...item, path: config.attachInfoUrl + item.id };
-              })
-            : [];
-          yield put({
-            type: "save",
-            payload: {
-              problemPointInfo: result,
-              location: {
-                longitude: result.pointY,
-                latitude: result.pointX
-              },
-              imageInfos
-            }
-          });
-        } else {
-          notification["error"]({
-            message: `查询问题点详情失败`,
-            duration: 1
-          });
-        }
+      } else {
+        notification["error"]({
+          message: `查询问题点详情失败`,
+          duration: 1
+        });
       }
     },
 

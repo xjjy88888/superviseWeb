@@ -2139,16 +2139,18 @@ export default class sider extends PureComponent {
                             style={{
                               float: "right",
                               fontSize: 18,
-                              color: "#1890ff",
+                              color: item.problemPoints.length ? "#1890ff" : "",
                               marginRight: 20
                             }}
                             onClick={e => {
                               e.stopPropagation();
-                              emitter.emit("mapLocation", {
-                                item: item.problemPoints,
-                                id: item.problemPoints[0].id,
-                                key: "problemPoint"
-                              });
+                              if (item.problemPoints.length) {
+                                emitter.emit("mapLocation", {
+                                  item: item.problemPoints,
+                                  id: item.problemPoints[0].id,
+                                  key: "problemPoint"
+                                });
+                              }
                             }}
                           />
                         </p>
@@ -2159,6 +2161,7 @@ export default class sider extends PureComponent {
                           >
                             <span
                               onClick={e => {
+                                console.log(12313131);
                                 e.stopPropagation();
                                 this.closeAll();
                                 emitter.emit("showProblemPoint", {
@@ -2179,33 +2182,11 @@ export default class sider extends PureComponent {
                                 }}
                                 onClick={e => {
                                   e.stopPropagation();
-                                  Modal.alert(
-                                    "删除问题点",
-                                    `确定要删除${ite.name}问题点吗?`,
-                                    [
-                                      {
-                                        text: "取消",
-                                        style: "default"
-                                      },
-                                      {
-                                        text: "确定",
-                                        onPress: () => {
-                                          dispatch({
-                                            type:
-                                              "problemPoint/problemPointDelete",
-                                            payload: {
-                                              id: ite.id
-                                            },
-                                            callback: success => {
-                                              if (success) {
-                                                self.inspectList();
-                                              }
-                                            }
-                                          });
-                                        }
-                                      }
-                                    ]
-                                  );
+                                  emitter.emit("showProblemPoint", {
+                                    show: true,
+                                    id: ite.id,
+                                    from: "edit"
+                                  });
                                 }}
                               />
                               <Icon
@@ -3183,10 +3164,6 @@ export default class sider extends PureComponent {
                             color: "#1890ff"
                           }}
                           onClick={() => {
-                            // emitter.emit("showProjectDetail", {
-                            //   show: false,
-                            //   edit: false
-                            // });
                             const x = getFieldValue("pointX");
                             const y = getFieldValue("pointY");
                             emitter.emit("siteLocation", {

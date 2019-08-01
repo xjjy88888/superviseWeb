@@ -7,13 +7,15 @@ import {
   Input,
   Checkbox,
   Form,
-  Radio,
   Modal,
   DatePicker,
   Typography,
   notification,
-  Upload
+  Upload,
+  Cascader,
+  List
 } from "antd";
+import { Radio } from "antd-mobile";
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
 import moment from "moment";
@@ -22,10 +24,7 @@ import config from "../../../config";
 import { getFile, accessToken } from "../../../utils/util";
 
 let self;
-let yearSelect = [];
 const { Text } = Typography;
-
-const year = new Date().getFullYear();
 
 const formItemLayout = {
   labelCol: { span: 7 },
@@ -33,11 +32,9 @@ const formItemLayout = {
 };
 
 @createForm()
-@connect(({ user, district, project, inspect }) => ({
-  user,
-  district,
-  project,
-  inspect
+@connect(({ inspect, problemPoint }) => ({
+  inspect,
+  problemPoint
 }))
 export default class problemPoint extends PureComponent {
   constructor(props) {
@@ -45,10 +42,12 @@ export default class problemPoint extends PureComponent {
     this.state = {
       show: false,
       id: null,
-      projectId: null,
+      problemTypeData: [],
       showSpin: false,
       fileList: [],
-      ParentId: 0
+      ParentId: 0,
+      radioChecked: null,
+      from: null
     };
   }
 
@@ -57,24 +56,100 @@ export default class problemPoint extends PureComponent {
     const {
       form: { resetFields }
     } = this.props;
+
     this.eventEmitter = emitter.addListener("showProblemPoint", v => {
-      this.setState({
-        show: v.show,
-        id: v.id
-      });
+      console.log(v);
+      this.setState(v);
       if (v.show) {
         resetFields();
+
+        this.problemType(v);
       }
     });
   }
 
+  problemType = v => {
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: "problemPoint/problemType",
+      callback: (success, error, result) => {
+        if (success && v.from === "edit") {
+          this.problemPointById(v);
+        }
+      }
+    });
+  };
+
+  problemPointById = v => {
+    const {
+      dispatch,
+      problemPoint: { problemPointId, from }
+    } = this.props;
+    console.log(this.state);
+
+    dispatch({
+      type: "problemPoint/problemPointById",
+      payload: {
+        id: v.id
+      },
+      callback: (success, error, result) => {
+        this.setState({
+          radioChecked: result.problem.id,
+          attachmentId: result.attachment ? result.attachment.id : 0
+        });
+      }
+    });
+  };
+
+  cascaderInit = v => {
+    const {
+      problemPoint: { problemType }
+    } = this.props;
+
+    if (!v) {
+      return [];
+    }
+
+    problemType.map(item => {
+      const filter = item.children.filter(record => record.value === v.type.id);
+      if (filter.length === 1) {
+        this.setState({ problemTypeData: filter[0].data });
+      } else {
+        item.children.map(ite => {
+          const filt = (ite.children || []).filter(
+            reco => reco.value === v.type.id
+          );
+          if (filt.length === 1) {
+            this.setState({ problemTypeData: filt[0].data });
+          }
+        });
+      }
+    });
+
+    if (v.type.type === 2) {
+      return [v.type.type, v.type.id];
+    }
+    return [v.type.type, v.type.depType, v.type.id];
+  };
+
   render() {
-    const { show, id, projectId, showSpin, fileList, ParentId } = this.state;
     const {
       dispatch,
       form: { getFieldDecorator, validateFields },
-      inspect: { inspectForm, inspectInfo }
+      inspect: { inspectInfo },
+      problemPoint: { problemType, problemPointInfo }
     } = this.props;
+
+    const {
+      show,
+      id,
+      showSpin,
+      fileList,
+      ParentId,
+      problemTypeData,
+      radioChecked
+    } = this.state;
 
     return (
       <div
@@ -83,7 +158,7 @@ export default class problemPoint extends PureComponent {
           top: 0,
           left: show ? 350 : -1000,
           zIndex: 1000,
-          width: 400,
+          width: 500,
           height: `100%`,
           paddingTop: 60,
           borderLeft: "solid 1px #ddd",
@@ -152,72 +227,49 @@ export default class problemPoint extends PureComponent {
             }}
             // 提交
             onClick={() => {
-              let data = [];
               validateFields((error, v) => {
-                console.log(v);
-                if (!v.checkDate) {
+                console.log(error, v, radioChecked);
+
+                if (!v.longitude || !v.latitude) {
                   notification["warning"]({
-                    message: `请选择核查日期`
+                    message: `请填写经纬度`,
+                    duration: 1
                   });
                   return;
                 }
-                if (!v.numberYear) {
+                if (!v.name) {
                   notification["warning"]({
-                    message: `请输入编号年份`
+                    message: `请填写问题点`,
+                    duration: 1
                   });
                   return;
                 }
-                if (!v.number) {
+                if (!v.problemId || !radioChecked) {
                   notification["warning"]({
-                    message: `请输入编号序号`
+                    message: `请选择问题类型`,
+                    duration: 1
                   });
                   return;
                 }
-                if (!v.monitorCheckPeopleName) {
-                  notification["warning"]({
-                    message: `请输入监督检查人员`
-                  });
-                  return;
-                }
-                for (let i in v) {
-                  if (v[i]) {
-                    const type = i.split("_")[0];
-                    if (type === "checkbox") {
-                      data = data.concat(v[i]);
-                    } else if (type === "radio") {
-                      if (v[i].length !== 0) {
-                        data.push(v[i]);
-                      }
-                    }
-                  }
-                }
-                const checkInfoLists = data.map(item => {
-                  return {
-                    checkInfoItemId: item
-                  };
-                });
-                this.setState({ showSpin: true });
+                //提交
                 dispatch({
-                  type: "inspect/inspectCreateUpdate",
+                  type: "problemPoint/problemPointCreateUpdate",
                   payload: {
-                    id: id,
-                    projectId: projectId,
-                    attachmentId: ParentId,
-                    numberYear: v.numberYear,
-                    number: v.number,
-                    monitorCheckPeopleName: v.monitorCheckPeopleName,
-                    description: v.description,
-                    checkDate: v.checkDate
-                      ? v.checkDate.format("YYYY-MM-DD")
-                      : "",
-                    checkInfoLists: checkInfoLists
+                    // id: problemPointId,
+                    // projectId: selectedId || "587605766421086208",
+                    // monitorCheckListId: inspectId,
+                    // problemId: radioChecked,
+                    // name: v.name,
+                    // pointX: v.latitude,
+                    // pointY: v.longitude,
+                    // description: v.description,
+                    // attachmentId: attachmentId
                   },
                   callback: (success, error, result) => {
                     if (success) {
-                      emitter.emit("projectInfoRefresh", {
-                        projectId: projectId
+                      this.props.dispatch({
+                        type: "inspect/goProjectEdit"
                       });
-                      this.setState({ show: false, showSpin: false });
                     }
                   }
                 });
@@ -233,7 +285,7 @@ export default class problemPoint extends PureComponent {
             }}
             onClick={() => {
               Modal.confirm({
-                title: `确定放弃填写检查表吗？`,
+                title: `确定放弃填写问题点吗？`,
                 content: "",
                 onOk() {
                   self.setState({ show: false });
@@ -245,7 +297,7 @@ export default class problemPoint extends PureComponent {
           />
         </span>
         <b style={{ fontSize: 16, padding: "0 50px" }}>
-          {id ? `检查表详情` : `新增检查表`}
+          {id ? `问题点详情` : `新增问题点`}
         </b>
         <Form
           style={{
@@ -257,15 +309,100 @@ export default class problemPoint extends PureComponent {
           <Form.Item
             label={
               <span>
-                编号年份 <Text type="danger">*</Text>
+                坐标 <Text type="danger">*</Text>
+              </span>
+            }
+            {...formItemLayout}
+          >
+            {getFieldDecorator("pointX", {
+              initialValue: problemPointInfo.pointX
+            })(<Input placeholder="经度" style={{ width: 92 }} />)}
+            {getFieldDecorator("pointY", {
+              initialValue: problemPointInfo.pointY
+            })(
+              <Input
+                placeholder="纬度"
+                style={{ width: 130, position: "relative", top: -2 }}
+                addonAfter={
+                  <Icon
+                    type="environment"
+                    style={{
+                      color: "#1890ff"
+                    }}
+                    onClick={() => {
+                      // const x = getFieldValue("pointX");
+                      // const y = getFieldValue("pointY");
+                      emitter.emit("siteLocation", {
+                        state: "position"
+                        // Longitude: x,
+                        // Latitude: y
+                      });
+                    }}
+                  />
+                }
+              />
+            )}
+          </Form.Item>
+          <Form.Item
+            label={
+              <span>
+                问题点 <Text type="danger">*</Text>
               </span>
             }
             {...formItemLayout}
           >
             {getFieldDecorator("numberYear", {
-              initialValue: inspectInfo.numberYear
-            })(<Input style={{ width: 240 }} addonAfter={`年`} />)}
+              initialValue: problemPointInfo.name
+            })(<Input style={{ width: 240 }} />)}
           </Form.Item>
+          <Form.Item
+            label={
+              <span>
+                问题类型 <Text type="danger">*</Text>
+              </span>
+            }
+            {...formItemLayout}
+          >
+            {getFieldDecorator("districtCodeId", {
+              initialValue: this.cascaderInit(problemPointInfo.problem)
+            })(
+              <Cascader
+                placeholder="请选择问题类型"
+                options={problemType}
+                onChange={(v, a) => {
+                  console.log(a[a.length - 1].data);
+                  this.setState({ problemTypeData: a[a.length - 1].data });
+                }}
+              />
+            )}
+          </Form.Item>
+          <List style={{ padding: "0 30px", fontStyle: "italic" }}>
+            {problemTypeData.map((item, index) => (
+              <List.Item
+                style={{
+                  position: "relative",
+                  color: radioChecked === item.id ? "#108ee9" : "#000",
+                  paddingRight: 20
+                }}
+                onClick={() => {
+                  this.setState({ radioChecked: item.id });
+                }}
+              >
+                {item.info}
+                <Icon
+                  type="check"
+                  style={{
+                    display: radioChecked === item.id ? "block" : "none",
+                    color: "#1890ff",
+                    fontSize: 20,
+                    position: "absolute",
+                    right: 0,
+                    top: 15
+                  }}
+                />
+              </List.Item>
+            ))}
+          </List>
           <div
             style={{ minHeight: fileList.length ? 120 : 0, margin: "0 30px" }}
           >
