@@ -7,7 +7,7 @@ import "echarts";
 export default class siderbarDetail extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = { show: false };
+    this.state = { show: false,fullviewURL:'' };
     this.charRef = ref => {
       this.chartDom = ref;
     };
@@ -16,13 +16,14 @@ export default class siderbarDetail extends PureComponent {
   componentDidMount() {
     this.eventEmitter = emitter.addListener("showPanorama", data => {
       this.setState({
-        show: data.show
+        show: data.show,
+        fullviewURL:data.fullviewURL
       });
     });
   }
 
   render() {
-    const { show } = this.state;
+    const { show,fullviewURL } = this.state;
     return (
       <div
         style={{
@@ -61,10 +62,11 @@ export default class siderbarDetail extends PureComponent {
             }}
           />
           <iframe
-            title="抽稀"
+            title="全景点"
             height="595px"
             width="1200px"
-            src="./vtour/tour.html"
+            // src="./vtour/tour.html"
+            src= {fullviewURL}
           />
         </div>
       </div>

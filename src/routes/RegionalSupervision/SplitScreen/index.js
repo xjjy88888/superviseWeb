@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
-import { Select, Popover, Button } from "antd";
+import { Select, Popover, Button, message } from "antd";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import proj4 from "proj4";
@@ -86,15 +86,166 @@ export default class splitScreen extends PureComponent {
       userconfig.marker = L.marker(e.latlng, { icon: myIcon }).addTo(
         userconfig.RMap
       );
-      //userconfig.marker = L.marker(e.latlng).addTo(userconfig.RMap);
     } else {
       //操作左侧地图
       userconfig.marker = L.marker(e.latlng, { icon: myIcon }).addTo(
         userconfig.LMap
       );
-      //userconfig.marker = L.marker(e.latlng).addTo(userconfig.LMap);
     }
   };
+  /*
+   *地图点击事件
+   */  
+  onClickMap = e => {
+    const me = this;
+    if (e.target._container.id === "LMap") {//左侧地图
+      userconfig.map = userconfig.LMap;
+      //message.warning("点击操作左侧地图", 1);
+    }
+    else {//右侧地图
+      userconfig.map = userconfig.RMap;
+      //message.warning("点击操作右侧地图", 1);
+    } 
+    let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
+    if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {
+      message.warning("区域范围之外的数据没有权限操作", 1);
+      return;
+    }
+    userconfig.mapPoint = e.latlng;
+    //点查WMS图层
+    const point = { x: e.latlng.lng, y: e.latlng.lat };
+    //普通点查
+    const  LayersName = config.mapLayersName; //扰动图斑、项目红线勾选
+    me.queryWFSServiceByPoint(
+      point,
+      LayersName,
+      me.callbackPointQueryWFSService
+    );
+
+  }
+  /*
+   * 获取气泡窗口内容
+   */  
+  getWinContent = (properties, callback) => {
+    this.creatElements(properties, callback);
+  };
+  creatElements = (properties, callback) => {
+    const elements = properties.map_num
+      ? jQuery(
+          `<div>图斑编号:${properties.map_num}</br>
+        ${
+          properties.project_name
+            ? "关联项目:" + properties.project_name + "</br>"
+            : ""
+        }${
+            properties.interference_compliance
+              ? "扰动范围:" + properties.interference_compliance + "</br>"
+              : ""
+          }</div>`
+        )
+      : jQuery(
+          `<div>项目:${properties.project_name}</br></div>`
+        );
+    callback(elements);
+  }  
+  /*
+   * 点选查询回调函数
+   */
+  callbackPointQueryWFSService = data => {
+    const me = this;
+    if (data.success) {
+      data = data.result;
+      me.clearGeojsonLayer();
+      const style = {
+        color: "#33CCFF", //#33CCFF #e60000
+        weight: 3,
+        opacity: 1,
+        fillColor: "#e6d933", //#33CCFF #e6d933
+        fillOpacity: 0.1
+      };
+      me.loadGeojsonLayer(data, style);
+      if (data.features.length > 0) {
+        let content = "";
+        for (let i = 0; i < data.features.length; i++) {
+          let feature = data.features[i];
+          if (i === data.features.length - 1) {
+            me.getWinContent(feature.properties, data => {
+              content += data[0].innerHTML;
+            });
+          } else {
+            me.getWinContent(feature.properties, data => {
+              content += data[0].innerHTML + "<br>";
+            });
+          }
+        }
+        if (userconfig.map.getZoom() < config.mapInitParams.zoom) {
+          userconfig.map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
+            maxZoom: 16
+          });
+        }
+        userconfig.map.openPopup(content, userconfig.mapPoint);
+      } else {
+        userconfig.map.closePopup();
+      }
+    } else {
+      message.warning("地图匹配不到相关数据", 1);
+      userconfig.map.closePopup();
+    }
+  }  
+  /*点选查询图层
+   *@method queryWFSServiceByPoint
+   *@param point 坐标点
+   *@param typeName 图层名称
+   *@return null
+   */
+  queryWFSServiceByPoint = (point, typeName, callback) => {
+    const me = this;
+    point = point.x + "," + point.y;
+    let filter =
+      '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
+    filter += "<Intersects>";
+    filter += "<PropertyName>geom</PropertyName>";
+    filter += "<gml:Point>";
+    filter += "<gml:coordinates>" + point + "</gml:coordinates>";
+    filter += "</gml:Point>";
+    filter += "</Intersects>";
+    filter += "</Filter>";
+    const urlString = config.mapUrl.geoserverQueryUrl + "/ows";
+    const param = {
+      service: "WFS",
+      version: "1.0.0",
+      request: "GetFeature",
+      typeName: typeName,
+      outputFormat: "application/json",
+      //maxFeatures: 100,
+      filter: filter
+      //srsName: epsg
+    };
+    const geojsonUrl = urlString + L.Util.getParamString(param, urlString);
+    me.props.dispatch({
+      type: "mapdata/queryWFSLayer",
+      payload: { geojsonUrl },
+      callback: callback
+    });
+  }
+   /*
+   * 绘制图形函数
+   */
+  loadGeojsonLayer = (geojson, style) => {
+    userconfig.projectgeojsonLayer = L.Proj.geoJson(geojson, {
+      style: style
+    }).addTo(userconfig.map);
+  };
+  /*
+   * 清空绘制图形函数
+   */
+  clearGeojsonLayer = () => {
+    if (userconfig.projectgeojsonLayer) {
+      userconfig.projectgeojsonLayer.clearLayers();
+      userconfig.map.removeLayer(userconfig.projectgeojsonLayer);
+      userconfig.projectgeojsonLayer = null;
+    }
+  };    
   /*
    *获取项目区域范围
    */
@@ -160,6 +311,10 @@ export default class splitScreen extends PureComponent {
         userconfig.LMap.on("mousemove", me.onMoveMap);
         //监听地图移动事件
         userconfig.RMap.on("mousemove", me.onMoveMap);
+        //监听地图点击事件
+        userconfig.LMap.on("click", me.onClickMap);
+        //监听地图点击事件
+        userconfig.RMap.on("click", me.onClickMap);
         //根据地图当前范围获取对应历史影像数据
         let zoom = userconfig.LMap.getZoom();
         let bounds = userconfig.LMap.getBounds();

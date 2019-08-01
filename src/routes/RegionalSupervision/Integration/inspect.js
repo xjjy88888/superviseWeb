@@ -10,7 +10,7 @@ import {
   Radio,
   Modal,
   DatePicker,
-  Select,
+  Typography,
   notification,
   Upload
 } from "antd";
@@ -23,6 +23,7 @@ import { getFile, accessToken } from "../../../utils/util";
 
 let self;
 let yearSelect = [];
+const { Text } = Typography;
 
 const year = new Date().getFullYear();
 
@@ -188,6 +189,32 @@ export default class Inspect extends PureComponent {
           }}
         >
           <Button
+            icon="download"
+            shape="circle"
+            style={{
+              color: "#1890ff",
+              fontSize: 18
+            }}
+            onClick={() => {
+              this.showSpin(true);
+              dispatch({
+                type: "inspect/inspectExport",
+                payload: {
+                  id: item.id
+                },
+                callback: (success, error, result) => {
+                  this.showSpin(false);
+                  if (success) {
+                    window.open(
+                      `${config.export}?fileName=${result}`,
+                      `_self`
+                    );
+                  }
+                }
+              });
+            }}
+          />
+          <Button
             icon="check"
             shape="circle"
             style={{
@@ -205,9 +232,21 @@ export default class Inspect extends PureComponent {
                   });
                   return;
                 }
-                if (!v.number || !v.numberYear) {
+                if (!v.numberYear) {
                   notification["warning"]({
-                    message: `请输入编号`
+                    message: `请输入编号年份`
+                  });
+                  return;
+                }
+                if (!v.number) {
+                  notification["warning"]({
+                    message: `请输入编号序号`
+                  });
+                  return;
+                }
+                if (!v.monitorCheckPeopleName) {
+                  notification["warning"]({
+                    message: `请输入监督检查人员`
                   });
                   return;
                 }
@@ -237,6 +276,8 @@ export default class Inspect extends PureComponent {
                     attachmentId: ParentId,
                     numberYear: v.numberYear,
                     number: v.number,
+                    monitorCheckPeopleName: v.monitorCheckPeopleName,
+                    description: v.description,
                     checkDate: v.checkDate
                       ? v.checkDate.format("YYYY-MM-DD")
                       : "",
@@ -280,34 +321,32 @@ export default class Inspect extends PureComponent {
         <Form
           style={{
             height: window.innerHeight - 100,
-            paddingTop: 10,
+            paddingTop: 20,
             overflow: "auto"
           }}
         >
-          <Form.Item label="核查日期" {...formItemLayout}>
+          <Form.Item
+            label={
+              <span>
+                核查日期 <Text type="danger">*</Text>
+              </span>
+            }
+            {...formItemLayout}
+          >
             {getFieldDecorator("checkDate", {
               initialValue: inspectInfo.checkDate
                 ? moment(inspectInfo.checkDate)
                 : ""
             })(<DatePicker style={{ width: 240 }} />)}
           </Form.Item>
-          <Form.Item label="编号" {...formItemLayout}>
+          <Form.Item label="编号年份" {...formItemLayout}>
+            {getFieldDecorator("numberYear", {
+              initialValue: inspectInfo.numberYear
+            })(<Input style={{ width: 240 }} addonAfter={`年`} />)}
+          </Form.Item>
+          <Form.Item label="编号序号" {...formItemLayout}>
             {getFieldDecorator("number", { initialValue: inspectInfo.number })(
-              <Input
-                style={{ width: 240 }}
-                addonBefore={getFieldDecorator("numberYear", {
-                  initialValue: inspectInfo.numberYear
-                })(
-                  <Select style={{ width: 100 }}>
-                    {yearSelect.map((item, index) => (
-                      <Select.Option key={index} value={item}>
-                        {item}年
-                      </Select.Option>
-                    ))}
-                  </Select>
-                )}
-                addonAfter={`号`}
-              />
+              <Input style={{ width: 240 }} addonAfter={`号`} />
             )}
           </Form.Item>
           {inspectForm.map((item, index) => (
@@ -346,6 +385,16 @@ export default class Inspect extends PureComponent {
                 : getFieldDecorator(item.key)(<div>无数据</div>)}
             </Form.Item>
           ))}
+          <Form.Item label="监督检查人员" {...formItemLayout}>
+            {getFieldDecorator("monitorCheckPeopleName", {
+              initialValue: inspectInfo.monitorCheckPeopleName
+            })(<Input style={{ width: 240 }} />)}
+          </Form.Item>
+          <Form.Item label="备注" {...formItemLayout}>
+            {getFieldDecorator("description", {
+              initialValue: inspectInfo.description
+            })(<Input.TextArea autosize />)}
+          </Form.Item>
           <div
             style={{ minHeight: fileList.length ? 120 : 0, margin: "0 30px" }}
           >

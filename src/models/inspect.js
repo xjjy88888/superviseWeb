@@ -7,6 +7,7 @@ import {
   inspectByIdApi,
   inspectExportApi
 } from "../services/httpApi";
+import { inspectFormData } from '../utils/util';
 
 export default {
   namespace: "inspect",
@@ -29,7 +30,7 @@ export default {
       } = yield call(inspectFormApi, payload);
       if (callback) callback(success, error, result);
       if (success) {
-        yield put({ type: "save", payload: { inspectForm: result } });
+        yield put({ type: "save", payload: { inspectForm: inspectFormData(result) } });
       } else {
         notification["error"]({
           message: `查询检查表模板失败：${error.message}`

@@ -174,19 +174,25 @@ export default class integration extends PureComponent {
         });
     });
     //全景定位
-    this.eventEmitter = emitter.addListener("fullViewLocation", () => {
-      console.log("fullViewLocation");
+    this.eventEmitter = emitter.addListener("fullViewLocation", data => {
+      console.log("fullViewLocation",data);
       //标注点定位
-      if (marker) marker.remove();
-      let latLng = [23.4437, 113.2368];
-      marker = L.marker(latLng)
-        .addTo(map)
-        .on("click", function(e) {
-          //console.log("marker", e);
-          emitter.emit("showPanorama", {
-            show: true
-          });
+      //let latLng = [23.4437, 113.2368];
+      let latLng = data.latLng;
+      if(latLng){
+        if (marker) marker.remove();
+        map.setView(latLng, config.mapInitParams.zoom)
+        let fullviewURL = data.fullviewURL;
+        marker = L.marker(latLng)
+          .addTo(map)
+          .on("click", function(e) {
+            //console.log("marker", e);
+            emitter.emit("showPanorama", {
+              show: true,
+              fullviewURL:fullviewURL
+            });
         });
+      }
     });
     //地图定位
     this.eventEmitter = emitter.addListener("mapLocation", data => {
@@ -634,11 +640,11 @@ export default class integration extends PureComponent {
           let feature = data.features[i];
           if (i === data.features.length - 1) {
             me.getWinContent(feature.properties, data => {
-              content += data[0].innerHTML + "<br><br>";
+              content += data[0].innerHTML;
             });
           } else {
             me.getWinContent(feature.properties, data => {
-              content += data[0].innerHTML + "<br><br>";
+              content += data[0].innerHTML + "<br>";
             });
           }
         }
@@ -843,6 +849,7 @@ export default class integration extends PureComponent {
       return;
     }
     userconfig.mapPoint = e.latlng;
+    //console.log("userconfig.mapPoint",userconfig.mapPoint);
     //地图定位判断
     if (userconfig.state === "position") {
       //地图获取经纬度

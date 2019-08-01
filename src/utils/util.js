@@ -170,6 +170,24 @@ const treeToList = (v, parent_name = "", parent_code = "", parent_id = "") => {
   return arr;
 };
 
+const inspectFormData = (items, pTitle = null, color = null) => {
+  let arr = [];
+  items.forEach(item => {
+    if (item.type === "label") {
+      arr = arr.concat(
+        inspectFormData(item.child, item.title, item.color ? item.color : color)
+      );
+    } else {
+      arr.push({
+        ...item,
+        title: pTitle ? `${pTitle}-${item.title}` : item.title,
+        color: item.color ? item.color : color
+      });
+    }
+  });
+  return arr;
+};
+
 export {
   dateFormat,
   dateInitFormat,
@@ -178,5 +196,6 @@ export {
   accessToken,
   guid,
   unique,
-  treeToList
+  treeToList,
+  inspectFormData
 };
