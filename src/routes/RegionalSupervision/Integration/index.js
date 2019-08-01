@@ -12,13 +12,14 @@ import {
 import { Link } from "dva/router";
 import Sidebar from "./sidebar";
 import SidebarDetail from "./siderbarDetail";
+import ProjectDetail from "./projectDetail";
 import Tool from "./tool";
 import Sparse from "./sparse";
 import Panorama from "./panorama";
 import Chart from "./chart";
 import Query from "./query";
 import Inspect from "./inspect";
-import ProjectDetail from "./projectDetail";
+import ProblemPoint from "./problemPoint";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import proj4 from "proj4";
@@ -175,13 +176,13 @@ export default class integration extends PureComponent {
     });
     //全景定位
     this.eventEmitter = emitter.addListener("fullViewLocation", data => {
-      console.log("fullViewLocation",data);
+      console.log("fullViewLocation", data);
       //标注点定位
       //let latLng = [23.4437, 113.2368];
       let latLng = data.latLng;
-      if(latLng){
+      if (latLng) {
         if (marker) marker.remove();
-        map.setView(latLng, config.mapInitParams.zoom)
+        map.setView(latLng, config.mapInitParams.zoom);
         let fullviewURL = data.fullviewURL;
         marker = L.marker(latLng)
           .addTo(map)
@@ -189,9 +190,9 @@ export default class integration extends PureComponent {
             //console.log("marker", e);
             emitter.emit("showPanorama", {
               show: true,
-              fullviewURL:fullviewURL
+              fullviewURL: fullviewURL
             });
-        });
+          });
       }
     });
     //地图定位
@@ -638,7 +639,7 @@ export default class integration extends PureComponent {
         let content = "";
         for (let i = 0; i < data.features.length; i++) {
           let feature = data.features[i];
-          console.log('feature',feature);
+          console.log("feature", feature);
           if (i === data.features.length - 1) {
             me.getWinContent(feature.properties, data => {
               content += data[0].innerHTML;
@@ -1943,6 +1944,7 @@ export default class integration extends PureComponent {
         <Panorama />
         <ProjectDetail />
         <Inspect />
+        <ProblemPoint />
         <div
           ref={this.saveRef}
           style={{

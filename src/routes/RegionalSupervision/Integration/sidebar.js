@@ -769,6 +769,9 @@ export default class sider extends PureComponent {
     emitter.emit("showInspect", {
       show: false
     });
+    emitter.emit("showProblemPoint", {
+      show: false
+    });
   };
 
   getDepartKey = value => {
@@ -2143,6 +2146,7 @@ export default class sider extends PureComponent {
                               e.stopPropagation();
                               emitter.emit("mapLocation", {
                                 item: item.problemPoints,
+                                id: item.problemPoints[0].id,
                                 key: "problemPoint"
                               });
                             }}
@@ -2156,13 +2160,11 @@ export default class sider extends PureComponent {
                             <span
                               onClick={e => {
                                 e.stopPropagation();
-                                dispatch({
-                                  type: "problemPoint/goProblemPoint",
-                                  payload: {
-                                    problemPointId: ite.id,
-                                    inspectId: item.id,
-                                    from: "edit"
-                                  }
+                                this.closeAll();
+                                emitter.emit("showProblemPoint", {
+                                  show: true,
+                                  id: ite.id,
+                                  from: "edit"
                                 });
                               }}
                             >
@@ -2216,7 +2218,8 @@ export default class sider extends PureComponent {
                                 onClick={e => {
                                   e.stopPropagation();
                                   emitter.emit("mapLocation", {
-                                    item: [ite],
+                                    item: item.problemPoints,
+                                    id: ite.id,
                                     key: "problemPoint"
                                   });
                                 }}

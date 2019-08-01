@@ -947,3 +947,64 @@ export async function inspectExportApi(params) {
     }
   });
 }
+
+// 问题点_问题类型
+export async function problemTypeApi() {
+  return request(`${config.url.problemTypeUrl}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 问题点_详情
+export async function problemPointByIdApi(params) {
+  return request(`${config.url.problemPointByIdUrl}?Id=${params.id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 问题点_新增修改
+export async function problemPointCreateUpdateApi(params) {
+  return request(
+    `${config.url.problemPointCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify(params)
+    }
+  );
+}
+
+// 问题点_删除
+export async function problemPointDeleteApi(params) {
+  return request(`${config.url.problemPointDeleteUrl}?id=${params.id}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    }
+  });
+}
+
+// 问题点_列表
+export async function problemPointListApi(params) {
+  return request(
+    `${config.url.problemPointListUrl}?SkipCount=${
+      params.SkipCount
+    }&MaxResultCount=${params.MaxResultCount}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`
+      }
+    }
+  );
+}

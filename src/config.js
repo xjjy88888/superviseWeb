@@ -259,7 +259,22 @@ const config = {
     inspectByIdUrl: `${domain}api/services/app/MonitorCheck/Get`,
 
     // 检查表_导出
-    inspectExportUrl: `${domain}api/services/app/MonitorCheck/Print`
+    inspectExportUrl: `${domain}api/services/app/MonitorCheck/Print`,
+
+    // 问题点_问题类型
+    problemTypeUrl: `${domain}api/services/app/ProblemPoint/GetProblemAll`,
+
+    // 问题点_详情
+    problemPointByIdUrl: `${domain}api/services/app/ProblemPoint/Get`,
+
+    // 问题点_新增修改
+    problemPointCreateUpdateUrl: `${domain}api/services/app/ProblemPoint/`,
+
+    // 问题点_删除
+    problemPointDeleteUrl: `${domain}api/services/app/ProblemPoint/Delete`,
+
+    // 问题点_列表
+    problemPointListUrl: `${domain}api/services/app/ProblemPoint/GetAll`
   },
 
   //工具箱
