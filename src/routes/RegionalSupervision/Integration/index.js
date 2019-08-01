@@ -18,6 +18,7 @@ import Panorama from "./panorama";
 import Chart from "./chart";
 import Query from "./query";
 import Inspect from "./inspect";
+import ProblemPoint from "./problemPoint";
 import ProjectDetail from "./projectDetail";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -176,13 +177,13 @@ export default class integration extends PureComponent {
     });
     //全景定位
     this.eventEmitter = emitter.addListener("fullViewLocation", data => {
-      console.log("fullViewLocation",data);
+      console.log("fullViewLocation", data);
       //标注点定位
       //let latLng = [23.4437, 113.2368];
       let latLng = data.latLng;
-      if(latLng){
+      if (latLng) {
         if (marker) marker.remove();
-        map.setView(latLng, config.mapInitParams.zoom)
+        map.setView(latLng, config.mapInitParams.zoom);
         let fullviewURL = data.fullviewURL;
         marker = L.marker(latLng)
           .addTo(map)
@@ -190,9 +191,9 @@ export default class integration extends PureComponent {
             //console.log("marker", e);
             emitter.emit("showPanorama", {
               show: true,
-              fullviewURL:fullviewURL
+              fullviewURL: fullviewURL
             });
-        });
+          });
       }
     });
     //地图定位
@@ -296,7 +297,7 @@ export default class integration extends PureComponent {
         );
       } else if (data.key === "problemPoint") {
         //问题点定位
-        me.locateProblemPoint(data.item,data.id);
+        me.locateProblemPoint(data.item, data.id);
       }
     });
     //照片定位
@@ -507,34 +508,42 @@ export default class integration extends PureComponent {
   }
 
   //定位问题点
-  async locateProblemPoint(problemPointInfos,id) {
+  async locateProblemPoint(problemPointInfos, id) {
     if (problemPointInfos.length <= 0) return;
     await this.clearProblemPoints();
     await this.addProblemPoints(problemPointInfos);
     const layers = this.problemPointLayer.getLayers();
     if (problemPointInfos.length > 0) {
       for (let i = 0; i < problemPointInfos.length; i++) {
-        let index = layers.findIndex(layer => layer.options.properties.id === id);
+        let index = layers.findIndex(
+          layer => layer.options.properties.id === id
+        );
         if (index !== -1) {
           //地图范围跳转
           const FeatureCollection = this.problemPointLayer.toGeoJSON();
           let Bounds = [];
-          if(FeatureCollection.features.length>0){
-            for(let i=0;i<FeatureCollection.features.length;i++){
+          if (FeatureCollection.features.length > 0) {
+            for (let i = 0; i < FeatureCollection.features.length; i++) {
               let feature = FeatureCollection.features[i];
-              Bounds.push([feature.geometry.coordinates[1],feature.geometry.coordinates[0]]);
+              Bounds.push([
+                feature.geometry.coordinates[1],
+                feature.geometry.coordinates[0]
+              ]);
             }
-            map.fitBounds(
-              Bounds,
-             {
+            map.fitBounds(Bounds, {
               maxZoom: config.mapInitParams.zoom
-             }
-            );
+            });
           }
           //
           let problemPointInfo = problemPointInfos[index];
-          let latLng = L.latLng(problemPointInfo.pointY, problemPointInfo.pointX); 
-          const elements = this.getProblemPopupContent(problemPointInfo, latLng);
+          let latLng = L.latLng(
+            problemPointInfo.pointY,
+            problemPointInfo.pointX
+          );
+          const elements = this.getProblemPopupContent(
+            problemPointInfo,
+            latLng
+          );
           map.openPopup(elements[0], latLng);
           break;
         }
@@ -557,10 +566,13 @@ export default class integration extends PureComponent {
     if (geojson) {
       await me.addProblemPointsToMap(geojson, me.problemPointLayer);
     }
-    me.problemPointLayer.eachLayer(function (layer) {
-        layer.unbindPopup();
-        const elements = me.getProblemPopupContent(layer.options.properties, layer._latlng);
-        layer.bindPopup(elements[0]);
+    me.problemPointLayer.eachLayer(function(layer) {
+      layer.unbindPopup();
+      const elements = me.getProblemPopupContent(
+        layer.options.properties,
+        layer._latlng
+      );
+      layer.bindPopup(elements[0]);
     });
   }
 
@@ -572,28 +584,28 @@ export default class integration extends PureComponent {
     // 内容及单击事件
     const elements = jQuery(
       `<div>
-        ${toPopupItemStr('问题点名称', item.name)}
-        ${toPopupItemStr('问题点备注', item.description)}
-        ${toPopupItemStr('经度', latlng.lng)}
-        ${toPopupItemStr('纬度', latlng.lat)}
+        ${toPopupItemStr("问题点名称", item.name)}
+        ${toPopupItemStr("问题点备注", item.description)}
+        ${toPopupItemStr("经度", latlng.lng)}
+        ${toPopupItemStr("纬度", latlng.lat)}
       </div>`
     );
     return elements;
-  } 
-  
+  }
+
   // 转为popup项
   toPopupItemStr = (name, value) => {
-    return value ? `<b>${name}：</b>${value}<br>` : '';
+    return value ? `<b>${name}：</b>${value}<br>` : "";
   };
 
-    /*
+  /*
    * 加载聚合图层
    */
   async addProblemPointsToMap(geojson, problemPointLayer) {
     for (let i = 0; i < geojson.features.length; i++) {
       const myIcon = L.icon({
         iconUrl: "./img/problemPointMarker.png",
-        iconSize: [32, 32],
+        iconSize: [32, 32]
       });
       let marker = L.marker(
         new L.LatLng(
@@ -612,8 +624,8 @@ export default class integration extends PureComponent {
     let item = null;
     try {
       geojson = {
-        type: 'FeatureCollection',
-        features: [],
+        type: "FeatureCollection",
+        features: []
       };
       //构造geojson数据源
       if (items.length > 0) {
@@ -623,15 +635,15 @@ export default class integration extends PureComponent {
             let properties = {
               description: item.description,
               name: item.name,
-              id: item.id,
+              id: item.id
             };
             let obj = {
-              type: 'Feature',
+              type: "Feature",
               properties: properties,
               geometry: {
-                type: 'Point',
-                coordinates: [item.pointX, item.pointY],
-              },
+                type: "Point",
+                coordinates: [item.pointX, item.pointY]
+              }
             };
             geojson.features.push(obj);
           }
@@ -780,7 +792,7 @@ export default class integration extends PureComponent {
         let content = "";
         for (let i = 0; i < data.features.length; i++) {
           let feature = data.features[i];
-          console.log('feature',feature);
+          console.log("feature", feature);
           if (i === data.features.length - 1) {
             me.getWinContent(feature.properties, data => {
               content += data[0].innerHTML;
@@ -919,9 +931,7 @@ export default class integration extends PureComponent {
   // 创建地图
   createMap = () => {
     const me = this;
-    const {
-      problemPointLayer
-    } = this;
+    const { problemPointLayer } = this;
     /* This code is needed to properly load the images in the Leaflet CSS */
     delete L.Icon.Default.prototype._getIconUrl;
     L.Icon.Default.mergeOptions({
@@ -933,7 +943,7 @@ export default class integration extends PureComponent {
       zoomControl: false,
       attributionControl: false,
       //editable: true
-      layers:[problemPointLayer]
+      layers: [problemPointLayer]
     }).setView(config.mapInitParams.center, config.mapInitParams.zoom);
 
     map.createPane("tileLayerZIndex");
@@ -2089,6 +2099,7 @@ export default class integration extends PureComponent {
         <Panorama />
         <ProjectDetail />
         <Inspect />
+        <ProblemPoint />
         <div
           ref={this.saveRef}
           style={{

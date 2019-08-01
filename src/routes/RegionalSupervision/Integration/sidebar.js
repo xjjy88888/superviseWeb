@@ -2159,19 +2159,21 @@ export default class sider extends PureComponent {
                             key={idx}
                             style={{ paddingLeft: 30, margin: "5px 0" }}
                           >
-                            <span
-                              onClick={e => {
-                                console.log(12313131);
-                                e.stopPropagation();
-                                this.closeAll();
-                                emitter.emit("showProblemPoint", {
-                                  show: true,
-                                  id: ite.id,
-                                  from: "edit"
-                                });
-                              }}
-                            >
-                              {ite.name}
+                            <span>
+                              <span
+                                onClick={e => {
+                                  console.log(12313131);
+                                  e.stopPropagation();
+                                  this.closeAll();
+                                  emitter.emit("showProblemPoint", {
+                                    show: true,
+                                    id: ite.id,
+                                    from: "edit"
+                                  });
+                                }}
+                              >
+                                {ite.name}
+                              </span>
                               <Icon
                                 type="delete"
                                 style={{
@@ -2179,14 +2181,6 @@ export default class sider extends PureComponent {
                                   fontSize: 18,
                                   color: "#1890ff",
                                   marginLeft: 20
-                                }}
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  emitter.emit("showProblemPoint", {
-                                    show: true,
-                                    id: ite.id,
-                                    from: "edit"
-                                  });
                                 }}
                               />
                               <Icon
