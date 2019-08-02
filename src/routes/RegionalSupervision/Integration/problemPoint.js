@@ -355,6 +355,11 @@ export default class problemPoint extends PureComponent {
               initialValue: problemPointInfo.name
             })(<Input style={{ width: 240 }} />)}
           </Form.Item>
+          <Form.Item label="描述" {...formItemLayout}>
+            {getFieldDecorator("description", {
+              initialValue: problemPointInfo.description
+            })(<Input.TextArea autosize />)}
+          </Form.Item>
           <Form.Item
             label={
               <span>
@@ -405,11 +410,6 @@ export default class problemPoint extends PureComponent {
               </List.Item>
             ))}
           </List>
-          <Form.Item label="描述" {...formItemLayout}>
-            {getFieldDecorator("description", {
-              initialValue: problemPointInfo.description
-            })(<Input style={{ width: 240 }} />)}
-          </Form.Item>
           <div
             style={{ minHeight: fileList.length ? 120 : 0, margin: "0 30px" }}
           >
