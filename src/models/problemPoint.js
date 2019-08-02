@@ -1,4 +1,3 @@
-import { routerRedux } from "dva/router";
 import { notification } from "antd";
 import {
   problemPointListApi,
@@ -7,7 +6,6 @@ import {
   problemPointByIdApi,
   problemTypeApi
 } from "../services/httpApi";
-import config from "../config";
 
 const initialState = {
   problemPointId: "605312469782495232",

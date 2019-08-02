@@ -5,20 +5,16 @@ import {
   Icon,
   Button,
   Input,
-  Checkbox,
   Form,
   Modal,
-  DatePicker,
   Typography,
   notification,
   Upload,
   Cascader,
   List
 } from "antd";
-import { Radio } from "antd-mobile";
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
-import moment from "moment";
 import Spins from "../../../components/Spins";
 import config from "../../../config";
 import { getFile, accessToken } from "../../../utils/util";
@@ -48,7 +44,7 @@ export default class problemPoint extends PureComponent {
       problemTypeData: [],
       showSpin: false,
       fileList: [],
-      ParentId: 0,
+      attachmentId: 0,
       radioChecked: null,
       from: null
     };
@@ -65,7 +61,8 @@ export default class problemPoint extends PureComponent {
       this.setState({
         ...v,
         problemTypeData: [],
-        radioChecked: null
+        radioChecked: null,
+        attachmentId: 0
       });
 
       if (v.show) {
@@ -78,7 +75,7 @@ export default class problemPoint extends PureComponent {
 
     this.eventEmitter = emitter.addListener("siteLocationBack", data => {
       setFieldsValue({
-        pointX: data.longitude, //经度
+        pointX: data.longitude, //经度1
         pointY: data.latitude //维度
       });
     });
@@ -86,7 +83,6 @@ export default class problemPoint extends PureComponent {
 
   problemType = v => {
     const { dispatch } = this.props;
-
     dispatch({
       type: "problemPoint/problemType",
       callback: (success, error, result) => {
@@ -99,7 +95,6 @@ export default class problemPoint extends PureComponent {
 
   problemPointById = v => {
     const { dispatch } = this.props;
-
     dispatch({
       type: "problemPoint/problemPointById",
       payload: {
@@ -107,19 +102,35 @@ export default class problemPoint extends PureComponent {
         from: v.from
       },
       callback: (success, error, result) => {
-        this.setState({ showSpin: false });
+        this.setState({ showSpin: false, fileList: [] });
         if (success) {
           this.setState({
-            radioChecked: result.problem.id,
-            attachmentId: result.attachment ? result.attachment.id : 0
+            radioChecked: result.problem.id
           });
+          if (result.attachment) {
+            const list = result.attachment.child.map(item => {
+              return {
+                uid: item.id,
+                name: item.fileName,
+                fileExtend: item.fileExtend,
+                url: config.url.annexPreviewUrl + item.id,
+                latitude: item.latitude,
+                longitude: item.longitude,
+                azimuth: item.azimuth,
+                status: "done"
+              };
+            });
+            this.setState({
+              fileList: list,
+              attachmentId: result.attachment.id
+            });
+          }
         }
       }
     });
   };
 
   cascaderInit = v => {
-    console.log("cascaderInit", isOnChange);
     const {
       problemPoint: { problemType }
     } = this.props;
@@ -165,7 +176,7 @@ export default class problemPoint extends PureComponent {
       id,
       showSpin,
       fileList,
-      ParentId,
+      attachmentId,
       problemTypeData,
       radioChecked,
       projectId,
@@ -255,7 +266,8 @@ export default class problemPoint extends PureComponent {
                     ...v,
                     id: id,
                     monitorCheckListId: inspectId,
-                    problemId: radioChecked
+                    problemId: radioChecked,
+                    attachmentId: attachmentId
                   },
                   callback: (success, error, result) => {
                     if (success) {
@@ -404,12 +416,12 @@ export default class problemPoint extends PureComponent {
             <Upload
               action={config.url.annexUploadUrl}
               headers={{ Authorization: `Bearer ${accessToken()}` }}
-              data={{ Id: ParentId }}
+              data={{ Id: attachmentId }}
               listType="picture-card"
               fileList={fileList}
               onSuccess={v => {
                 this.setState({
-                  ParentId: v.result.id
+                  attachmentId: v.result.id
                 });
                 const item = v.result.child[0];
                 const obj = {
@@ -428,7 +440,8 @@ export default class problemPoint extends PureComponent {
               }}
               onError={(v, response) => {
                 notification["error"]({
-                  message: `图斑附件上传失败：${response.error.message}`
+                  message: `图斑附件上传失败：${response.error.message}`,
+                  duration: 1
                 });
               }}
               onPreview={file => {
@@ -479,7 +492,7 @@ export default class problemPoint extends PureComponent {
                       FileId: file.uid,
                       Id: inspectInfo.attachment
                         ? inspectInfo.attachment.id
-                        : ParentId
+                        : attachmentId
                     },
                     callback: success => {
                       if (success) {

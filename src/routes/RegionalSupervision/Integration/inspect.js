@@ -48,7 +48,7 @@ export default class Inspect extends PureComponent {
       projectId: null,
       showSpin: false,
       fileList: [],
-      ParentId: 0
+      attachmentId: 0
     };
   }
 
@@ -61,7 +61,8 @@ export default class Inspect extends PureComponent {
       this.setState({
         show: v.show,
         projectId: v.projectId,
-        id: v.id
+        id: v.id,
+        attachmentId: 0
       });
       if (v.show) {
         resetFields();
@@ -109,7 +110,7 @@ export default class Inspect extends PureComponent {
               status: "done"
             };
           });
-          this.setState({ fileList: list });
+          this.setState({ fileList: list, attachmentId: result.attachment.id });
         }
       }
     });
@@ -137,7 +138,14 @@ export default class Inspect extends PureComponent {
   };
 
   render() {
-    const { show, id, projectId, showSpin, fileList, ParentId } = this.state;
+    const {
+      show,
+      id,
+      projectId,
+      showSpin,
+      fileList,
+      attachmentId
+    } = this.state;
     const {
       dispatch,
       form: { getFieldDecorator, validateFields },
@@ -225,25 +233,29 @@ export default class Inspect extends PureComponent {
                 console.log(v);
                 if (!v.checkDate) {
                   notification["warning"]({
-                    message: `请选择核查日期`
+                    message: `请选择核查日期`,
+                    duration: 1
                   });
                   return;
                 }
                 if (!v.numberYear) {
                   notification["warning"]({
-                    message: `请输入编号年份`
+                    message: `请输入编号年份`,
+                    duration: 1
                   });
                   return;
                 }
                 if (!v.number) {
                   notification["warning"]({
-                    message: `请输入编号序号`
+                    message: `请输入编号序号`,
+                    duration: 1
                   });
                   return;
                 }
                 if (!v.monitorCheckPeopleName) {
                   notification["warning"]({
-                    message: `请输入监督检查人员`
+                    message: `请输入监督检查人员`,
+                    duration: 1
                   });
                   return;
                 }
@@ -270,7 +282,7 @@ export default class Inspect extends PureComponent {
                   payload: {
                     id: id,
                     projectId: projectId,
-                    attachmentId: ParentId,
+                    attachmentId: attachmentId,
                     numberYear: v.numberYear,
                     number: v.number,
                     monitorCheckPeopleName: v.monitorCheckPeopleName,
@@ -336,20 +348,26 @@ export default class Inspect extends PureComponent {
                 : ""
             })(<DatePicker style={{ width: 240 }} />)}
           </Form.Item>
-          <Form.Item label={
+          <Form.Item
+            label={
               <span>
                 编号年份 <Text type="danger">*</Text>
               </span>
-            } {...formItemLayout}>
+            }
+            {...formItemLayout}
+          >
             {getFieldDecorator("numberYear", {
               initialValue: inspectInfo.numberYear
             })(<Input style={{ width: 240 }} addonAfter={`年`} />)}
           </Form.Item>
-          <Form.Item label={
+          <Form.Item
+            label={
               <span>
                 编号序号 <Text type="danger">*</Text>
               </span>
-            } {...formItemLayout}>
+            }
+            {...formItemLayout}
+          >
             {getFieldDecorator("number", { initialValue: inspectInfo.number })(
               <Input style={{ width: 240 }} addonAfter={`号`} />
             )}
@@ -390,11 +408,14 @@ export default class Inspect extends PureComponent {
                 : getFieldDecorator(item.key)(<div>无数据</div>)}
             </Form.Item>
           ))}
-          <Form.Item label={
+          <Form.Item
+            label={
               <span>
                 监督检查人员 <Text type="danger">*</Text>
               </span>
-            } {...formItemLayout}>
+            }
+            {...formItemLayout}
+          >
             {getFieldDecorator("monitorCheckPeopleName", {
               initialValue: inspectInfo.monitorCheckPeopleName
             })(<Input style={{ width: 240 }} />)}
@@ -410,12 +431,12 @@ export default class Inspect extends PureComponent {
             <Upload
               action={config.url.annexUploadUrl}
               headers={{ Authorization: `Bearer ${accessToken()}` }}
-              data={{ Id: ParentId }}
+              data={{ Id: attachmentId }}
               listType="picture-card"
               fileList={fileList}
               onSuccess={v => {
                 this.setState({
-                  ParentId: v.result.id
+                  attachmentId: v.result.id
                 });
                 const item = v.result.child[0];
                 const obj = {
@@ -434,11 +455,11 @@ export default class Inspect extends PureComponent {
               }}
               onError={(v, response) => {
                 notification["error"]({
-                  message: `图斑附件上传失败：${response.error.message}`
+                  message: `图斑附件上传失败：${response.error.message}`,
+                  duration: 1
                 });
               }}
               onPreview={file => {
-                console.log(file.fileExtend, file);
                 switch (file.fileExtend) {
                   case "pdf":
                     window.open(file.url);
@@ -486,7 +507,7 @@ export default class Inspect extends PureComponent {
                       FileId: file.uid,
                       Id: inspectInfo.attachment
                         ? inspectInfo.attachment.id
-                        : ParentId
+                        : attachmentId
                     },
                     callback: success => {
                       if (success) {

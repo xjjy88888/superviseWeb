@@ -36,7 +36,8 @@ export default {
         });
       } else {
         notification["error"]({
-          message: `查询检查表模板失败：${error.message}`
+          message: `查询检查表模板失败：${error.message}`,
+          duration: 1
         });
       }
     },
@@ -51,7 +52,8 @@ export default {
         yield put({ type: "save", payload: { inspectList: result.items } });
       } else {
         notification["error"]({
-          message: `查询检查表列表失败：${error.message}`
+          message: `查询检查表列表失败：${error.message}`,
+          duration: 1
         });
       }
     },
@@ -65,7 +67,8 @@ export default {
       notification[success ? "success" : "error"]({
         message: `${payload.id ? "编辑" : "新增"}检查表${
           success ? "成功" : "失败"
-        }`
+        }`,
+        duration: 1
       });
     },
 
@@ -76,7 +79,8 @@ export default {
       } = yield call(inspectDeleteApi, payload);
       if (callback) callback(success, error, result);
       notification[success ? "success" : "error"]({
-        message: `删除检查表${success ? "成功" : "失败"}`
+        message: `删除检查表${success ? "成功" : "失败"}`,
+        duration: 1
       });
     },
 
@@ -97,7 +101,8 @@ export default {
           yield put({ type: "save", payload: { inspectInfo: result } });
         } else {
           notification["error"]({
-            message: `查询检查表详情失败`
+            message: `查询检查表详情失败`,
+            duration: 1
           });
         }
       }
@@ -109,7 +114,8 @@ export default {
         data: { success, error, result }
       } = yield call(inspectExportApi, payload);
       notification[success ? "success" : "error"]({
-        message: `导出检查表${success ? "成功" : "失败"}`
+        message: `导出检查表${success ? "成功" : "失败"}`,
+        duration: 1
       });
       if (callback) callback(success, error, result);
     }
