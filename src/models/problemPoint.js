@@ -96,22 +96,32 @@ export default {
 
     //问题点_详情
     *problemPointById({ payload, callback }, { call, put }) {
-      const {
-        data: { success, error, result }
-      } = yield call(problemPointByIdApi, payload);
-      if (success) {
-        if (callback) callback(success, error, result);
+      console.log(payload);
+
+      if (payload.from === "add") {
         yield put({
           type: "save",
-          payload: {
-            problemPointInfo: result
-          }
+          payload: { problemPointInfo: {} }
         });
+        if (callback) callback(false);
       } else {
-        notification["error"]({
-          message: `查询问题点详情失败`,
-          duration: 1
-        });
+        const {
+          data: { success, error, result }
+        } = yield call(problemPointByIdApi, payload);
+        if (success) {
+          if (callback) callback(success, error, result);
+          yield put({
+            type: "save",
+            payload: {
+              problemPointInfo: result
+            }
+          });
+        } else {
+          notification["error"]({
+            message: `查询问题点详情失败`,
+            duration: 1
+          });
+        }
       }
     },
 
@@ -121,7 +131,7 @@ export default {
         data: { success, error, result }
       } = yield call(problemPointCreateUpdateApi, payload);
       if (callback) callback(success, error, result);
-      notification["error"]({
+      notification[success ? "success" : "error"]({
         message: `${payload.id ? "编辑" : "新增"}问题点${
           success ? "成功" : "失败"
         }`,
@@ -135,7 +145,7 @@ export default {
         data: { success, error, result }
       } = yield call(problemPointDeleteApi, payload);
       if (callback) callback(success, error, result);
-      notification["error"]({
+      notification[success ? "success" : "error"]({
         message: `删除问题点${success ? "成功" : "失败"}`,
         duration: 1
       });

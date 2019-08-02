@@ -24,6 +24,7 @@ import config from "../../../config";
 import { getFile, accessToken } from "../../../utils/util";
 
 let self;
+let isOnChange = false;
 const { Text } = Typography;
 
 const formItemLayout = {
@@ -42,6 +43,8 @@ export default class problemPoint extends PureComponent {
     this.state = {
       show: false,
       id: null,
+      projectId: null,
+      inspectId: null,
       problemTypeData: [],
       showSpin: false,
       fileList: [],
@@ -52,19 +55,32 @@ export default class problemPoint extends PureComponent {
   }
 
   componentDidMount() {
+    isOnChange = false;
     self = this;
     const {
-      form: { resetFields }
+      form: { resetFields, setFieldsValue }
     } = this.props;
 
     this.eventEmitter = emitter.addListener("showProblemPoint", v => {
-      console.log(v);
-      this.setState(v);
-      if (v.show) {
-        resetFields();
+      this.setState({
+        ...v,
+        problemTypeData: [],
+        radioChecked: null
+      });
 
+      if (v.show) {
+        isOnChange = false;
+        resetFields();
+        this.setState({ showSpin: true });
         this.problemType(v);
       }
+    });
+
+    this.eventEmitter = emitter.addListener("siteLocationBack", data => {
+      setFieldsValue({
+        pointX: data.longitude, //经度
+        pointY: data.latitude //维度
+      });
     });
   }
 
@@ -74,7 +90,7 @@ export default class problemPoint extends PureComponent {
     dispatch({
       type: "problemPoint/problemType",
       callback: (success, error, result) => {
-        if (success && v.from === "edit") {
+        if (success) {
           this.problemPointById(v);
         }
       }
@@ -82,32 +98,35 @@ export default class problemPoint extends PureComponent {
   };
 
   problemPointById = v => {
-    const {
-      dispatch,
-      problemPoint: { problemPointId, from }
-    } = this.props;
-    console.log(this.state);
+    const { dispatch } = this.props;
 
     dispatch({
       type: "problemPoint/problemPointById",
       payload: {
-        id: v.id
+        id: v.id,
+        from: v.from
       },
       callback: (success, error, result) => {
-        this.setState({
-          radioChecked: result.problem.id,
-          attachmentId: result.attachment ? result.attachment.id : 0
-        });
+        this.setState({ showSpin: false });
+        if (success) {
+          this.setState({
+            radioChecked: result.problem.id,
+            attachmentId: result.attachment ? result.attachment.id : 0
+          });
+        }
       }
     });
   };
 
   cascaderInit = v => {
+    console.log("cascaderInit", isOnChange);
     const {
       problemPoint: { problemType }
     } = this.props;
 
-    if (!v) {
+    const { from } = this.state;
+
+    if (!v || from === "add" || isOnChange) {
       return [];
     }
 
@@ -148,7 +167,9 @@ export default class problemPoint extends PureComponent {
       fileList,
       ParentId,
       problemTypeData,
-      radioChecked
+      radioChecked,
+      projectId,
+      inspectId
     } = this.state;
 
     return (
@@ -196,43 +217,19 @@ export default class problemPoint extends PureComponent {
           }}
         >
           <Button
-            icon="download"
-            shape="circle"
-            style={{
-              color: "#1890ff",
-              fontSize: 18
-            }}
-            onClick={() => {
-              this.setState({ showSpin: true });
-              dispatch({
-                type: "inspect/inspectExport",
-                payload: {
-                  id: id
-                },
-                callback: (success, error, result) => {
-                  this.setState({ showSpin: false });
-                  if (success) {
-                    window.open(`${config.export}?fileName=${result}`, `_self`);
-                  }
-                }
-              });
-            }}
-          />
-          <Button
             icon="check"
             shape="circle"
             style={{
               color: "#1890ff",
               fontSize: 18
             }}
-            // 提交
             onClick={() => {
               validateFields((error, v) => {
-                console.log(error, v, radioChecked);
+                console.log(error, v);
 
-                if (!v.longitude || !v.latitude) {
+                if (!v.pointX || !v.pointY) {
                   notification["warning"]({
-                    message: `请填写经纬度`,
+                    message: `请在地图上选择问题点位置`,
                     duration: 1
                   });
                   return;
@@ -255,21 +252,17 @@ export default class problemPoint extends PureComponent {
                 dispatch({
                   type: "problemPoint/problemPointCreateUpdate",
                   payload: {
-                    // id: problemPointId,
-                    // projectId: selectedId || "587605766421086208",
-                    // monitorCheckListId: inspectId,
-                    // problemId: radioChecked,
-                    // name: v.name,
-                    // pointX: v.latitude,
-                    // pointY: v.longitude,
-                    // description: v.description,
-                    // attachmentId: attachmentId
+                    ...v,
+                    id: id,
+                    monitorCheckListId: inspectId,
+                    problemId: radioChecked
                   },
                   callback: (success, error, result) => {
                     if (success) {
-                      this.props.dispatch({
-                        type: "inspect/goProjectEdit"
+                      emitter.emit("projectInfoRefresh", {
+                        projectId: projectId
                       });
+                      this.setState({ show: false });
                     }
                   }
                 });
@@ -316,13 +309,14 @@ export default class problemPoint extends PureComponent {
           >
             {getFieldDecorator("pointX", {
               initialValue: problemPointInfo.pointX
-            })(<Input placeholder="经度" style={{ width: 92 }} />)}
+            })(<Input placeholder="经度" style={{ width: 103 }} disabled />)}
             {getFieldDecorator("pointY", {
               initialValue: problemPointInfo.pointY
             })(
               <Input
+                disabled
                 placeholder="纬度"
-                style={{ width: 130, position: "relative", top: -2 }}
+                style={{ width: 140, position: "relative", top: -2 }}
                 addonAfter={
                   <Icon
                     type="environment"
@@ -330,13 +324,7 @@ export default class problemPoint extends PureComponent {
                       color: "#1890ff"
                     }}
                     onClick={() => {
-                      // const x = getFieldValue("pointX");
-                      // const y = getFieldValue("pointY");
-                      emitter.emit("siteLocation", {
-                        state: "position"
-                        // Longitude: x,
-                        // Latitude: y
-                      });
+                      emitter.emit("siteLocation", {});
                     }}
                   />
                 }
@@ -351,7 +339,7 @@ export default class problemPoint extends PureComponent {
             }
             {...formItemLayout}
           >
-            {getFieldDecorator("numberYear", {
+            {getFieldDecorator("name", {
               initialValue: problemPointInfo.name
             })(<Input style={{ width: 240 }} />)}
           </Form.Item>
@@ -363,15 +351,16 @@ export default class problemPoint extends PureComponent {
             }
             {...formItemLayout}
           >
-            {getFieldDecorator("districtCodeId", {
+            {getFieldDecorator("problemId", {
               initialValue: this.cascaderInit(problemPointInfo.problem)
             })(
               <Cascader
                 placeholder="请选择问题类型"
                 options={problemType}
                 onChange={(v, a) => {
-                  console.log(a[a.length - 1].data);
-                  this.setState({ problemTypeData: a[a.length - 1].data });
+                  isOnChange = true;
+                  const data = a[a.length - 1].data;
+                  self.setState({ problemTypeData: data, radioChecked: null });
                 }}
               />
             )}
@@ -379,6 +368,7 @@ export default class problemPoint extends PureComponent {
           <List style={{ padding: "0 30px", fontStyle: "italic" }}>
             {problemTypeData.map((item, index) => (
               <List.Item
+                key={index}
                 style={{
                   position: "relative",
                   color: radioChecked === item.id ? "#108ee9" : "#000",
@@ -403,6 +393,11 @@ export default class problemPoint extends PureComponent {
               </List.Item>
             ))}
           </List>
+          <Form.Item label="描述" {...formItemLayout}>
+            {getFieldDecorator("description", {
+              initialValue: problemPointInfo.description
+            })(<Input style={{ width: 240 }} />)}
+          </Form.Item>
           <div
             style={{ minHeight: fileList.length ? 120 : 0, margin: "0 30px" }}
           >
@@ -437,7 +432,6 @@ export default class problemPoint extends PureComponent {
                 });
               }}
               onPreview={file => {
-                console.log(file.fileExtend, file);
                 switch (file.fileExtend) {
                   case "pdf":
                     window.open(file.url);

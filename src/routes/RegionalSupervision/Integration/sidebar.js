@@ -58,7 +58,8 @@ const formItemLayout = {
     annex,
     redLine,
     district,
-    inspect
+    inspect,
+    problemPoint
   }) => ({
     project,
     spot,
@@ -68,7 +69,8 @@ const formItemLayout = {
     annex,
     redLine,
     district,
-    inspect
+    inspect,
+    problemPoint
   })
 )
 @createForm()
@@ -187,9 +189,7 @@ export default class sider extends PureComponent {
     });
     this.eventEmitter = emitter.addListener("projectInfoRefresh", v => {
       if (v.projectId) {
-        this.querySpotByProjectId(v.projectId);
-        this.queryRedLineList(v.projectId);
-        this.inspectList(v.projectId);
+        this.queryProjectInfo(v.projectId);
       }
     });
     this.eventEmitter = emitter.addListener("showCreateDepart", v => {
@@ -313,9 +313,7 @@ export default class sider extends PureComponent {
           projectEdit: data.edit
         });
         this.queryProjectById(data.id);
-        this.querySpotByProjectId(data.id);
-        this.queryRedLineList(data.id);
-        this.inspectList(data.id);
+        this.queryProjectInfo(data.id);
       } else if (data.from === "spot") {
       } else {
       }
@@ -325,6 +323,13 @@ export default class sider extends PureComponent {
       clientHeight: clientHeight
     });
   }
+
+  queryProjectInfo = id => {
+    this.querySpotByProjectId(id);
+    this.queryRedLineList(id);
+    this.inspectList(id);
+  };
+
   componentWillUnmount() {
     if (this.scrollDom) {
       this.scrollDom.removeEventListener("scroll", () => {
@@ -1141,9 +1146,7 @@ export default class sider extends PureComponent {
                       projectFileList: []
                     });
                     this.queryProjectById(item.id);
-                    this.querySpotByProjectId(item.id);
-                    this.queryRedLineList(item.id);
-                    this.inspectList(item.id);
+                    this.queryProjectInfo(item.id);
                   } else {
                     emitter.emit("showSiderbarDetail", {
                       show: key !== "project",
@@ -1675,7 +1678,6 @@ export default class sider extends PureComponent {
                           listType="picture-card"
                           fileList={fileList}
                           onPreview={file => {
-                            console.log(file.fileExtend);
                             switch (file.fileExtend) {
                               case "pdf":
                               case "doc":
@@ -2060,9 +2062,9 @@ export default class sider extends PureComponent {
                   <Collapse.Panel
                     header={
                       <b>
-                        检查记录：{inspectList.length}
+                        检查表：{inspectList.length}
                         <Icon
-                          type="plus-circle"
+                          type="plus"
                           style={{
                             marginLeft: 10,
                             fontSize: 16,
@@ -2082,6 +2084,7 @@ export default class sider extends PureComponent {
                     }
                     key="8"
                   >
+                    {/* 检查表 */}
                     {inspectList.map((item, index) => (
                       <p
                         key={index}
@@ -2108,8 +2111,8 @@ export default class sider extends PureComponent {
                             onClick={e => {
                               e.stopPropagation();
                               Modal.confirm({
-                                title: "删除",
-                                content: "是否确定要删除这条检查记录？",
+                                title: "删除检查表",
+                                content: "是否确定要删除这条检查表？",
                                 okText: "是",
                                 okType: "danger",
                                 cancelText: "否",
@@ -2123,6 +2126,7 @@ export default class sider extends PureComponent {
                                     callback: success => {
                                       self.showSpin(false);
                                       if (success) {
+                                        self.closeAll();
                                         emitter.emit("projectInfoRefresh", {
                                           projectId: projectItem.id
                                         });
@@ -2137,9 +2141,12 @@ export default class sider extends PureComponent {
                           <Icon
                             type="environment"
                             style={{
+                              display: item.problemPoints.length
+                                ? "block"
+                                : "none",
                               float: "right",
                               fontSize: 18,
-                              color: item.problemPoints.length ? "#1890ff" : "",
+                              color: "#1890ff",
                               marginRight: 20
                             }}
                             onClick={e => {
@@ -2153,7 +2160,28 @@ export default class sider extends PureComponent {
                               }
                             }}
                           />
+                          <Icon
+                            type="plus"
+                            style={{
+                              float: "right",
+                              fontSize: 18,
+                              color: "#1890ff",
+                              marginRight: 20
+                            }}
+                            onClick={e => {
+                              e.stopPropagation();
+                              this.closeAll();
+                              emitter.emit("showProblemPoint", {
+                                show: true,
+                                id: null,
+                                inspectId: item.id,
+                                projectId: projectItem.id,
+                                from: "add"
+                              });
+                            }}
+                          />
                         </p>
+                        {/* 问题点 */}
                         {item.problemPoints.map((ite, idx) => (
                           <p
                             key={idx}
@@ -2162,12 +2190,13 @@ export default class sider extends PureComponent {
                             <span>
                               <span
                                 onClick={e => {
-                                  console.log(12313131);
                                   e.stopPropagation();
                                   this.closeAll();
                                   emitter.emit("showProblemPoint", {
                                     show: true,
                                     id: ite.id,
+                                    inspectId: item.id,
+                                    projectId: projectItem.id,
                                     from: "edit"
                                   });
                                 }}
@@ -2181,6 +2210,35 @@ export default class sider extends PureComponent {
                                   fontSize: 18,
                                   color: "#1890ff",
                                   marginLeft: 20
+                                }}
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  Modal.confirm({
+                                    title: "删除问题点",
+                                    content: "是否确定要删除这个问题点？",
+                                    okText: "是",
+                                    okType: "danger",
+                                    cancelText: "否",
+                                    onOk() {
+                                      self.showSpin(true);
+                                      dispatch({
+                                        type: "problemPoint/problemPointDelete",
+                                        payload: {
+                                          id: ite.id
+                                        },
+                                        callback: success => {
+                                          self.showSpin(false);
+                                          if (success) {
+                                            self.closeAll();
+                                            emitter.emit("projectInfoRefresh", {
+                                              projectId: projectItem.id
+                                            });
+                                          }
+                                        }
+                                      });
+                                    },
+                                    onCancel() {}
+                                  });
                                 }}
                               />
                               <Icon
@@ -2210,7 +2268,7 @@ export default class sider extends PureComponent {
                       <b>
                         监督执法记录：2
                         <Icon
-                          type="plus-circle"
+                          type="plus"
                           style={{
                             marginLeft: 10,
                             fontSize: 16,
@@ -2313,7 +2371,7 @@ export default class sider extends PureComponent {
                       <b>
                         扰动图斑：{projectInfoSpotList.items.length}
                         <Icon
-                          type="plus-circle"
+                          type="plus"
                           style={{
                             marginLeft: 10,
                             fontSize: 16,
@@ -2443,7 +2501,7 @@ export default class sider extends PureComponent {
                       <b>
                         防治责任范围：{redLineList.items.length}
                         <Icon
-                          type="plus-circle"
+                          type="plus"
                           style={{
                             marginLeft: 10,
                             fontSize: 16,
@@ -2548,7 +2606,7 @@ export default class sider extends PureComponent {
                       <b>
                         责任点：5
                         <Icon
-                          type="plus-circle"
+                          type="plus"
                           style={{
                             marginLeft: 10,
                             fontSize: 16,
@@ -2631,7 +2689,7 @@ export default class sider extends PureComponent {
                       <b>
                         全景图：1
                         <Icon
-                          type="plus-circle"
+                          type="plus"
                           style={{
                             marginLeft: 10,
                             fontSize: 16,
