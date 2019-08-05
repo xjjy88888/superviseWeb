@@ -48,7 +48,10 @@ export default class Inspect extends PureComponent {
       projectId: null,
       showSpin: false,
       fileList: [],
-      attachmentId: 0
+      attachmentId: 0,
+      previewImage: null,
+      previewVisible_min: false,
+      previewVisible: false
     };
   }
 
@@ -144,7 +147,10 @@ export default class Inspect extends PureComponent {
       projectId,
       showSpin,
       fileList,
-      attachmentId
+      attachmentId,
+      previewImage,
+      previewVisible_min,
+      previewVisible
     } = this.state;
     const {
       dispatch,
@@ -167,6 +173,53 @@ export default class Inspect extends PureComponent {
         }}
         ref={this.saveRef}
       >
+        <div
+          style={{
+            display: previewVisible_min ? "block" : "none",
+            position: "fixed",
+            zIndex: 2,
+            width: 350
+          }}
+        >
+          <Icon
+            type="close"
+            style={{
+              fontSize: 18,
+              position: "absolute",
+              top: 0,
+              right: 0
+            }}
+            onClick={() => {
+              this.setState({ previewVisible_min: false });
+              emitter.emit("imgLocation", {
+                Latitude: 0,
+                Longitude: 0,
+                show: false
+              });
+            }}
+          />
+          <img
+            alt="example"
+            style={{ width: "100%", cursor: "pointer" }}
+            src={previewImage}
+            onClick={() => {
+              this.setState({
+                previewImage: previewImage,
+                previewVisible: true
+              });
+            }}
+          />
+        </div>
+        <Modal
+          width={"50vw"}
+          visible={previewVisible}
+          footer={null}
+          onCancel={() => {
+            this.setState({ previewVisible: false });
+          }}
+        >
+          <img alt="example" style={{ width: "100%" }} src={previewImage} />
+        </Modal>
         <Spins show={showSpin} />
         <Icon
           type="left"

@@ -323,7 +323,7 @@ export default class integration extends PureComponent {
             }, 500);
           }
         } else {
-          notification["error"]({
+          notification["warning"]({
             message: "该附件照片无位置信息，无法在地图定位"
           });
         }
@@ -2158,7 +2158,7 @@ export default class integration extends PureComponent {
               top: 65,
               right: 120,
               height: 0,
-              zIndex: 1000,
+              zIndex: 999,
               background: "transparent"
             }}
           >
