@@ -3111,7 +3111,8 @@ export default class sider extends PureComponent {
             </div>
             <div
               style={{
-                display: projectEdit ? "block" : "none"
+                display: projectEdit ? "block" : "none",
+                paddingTop: 30
               }}
             >
               <Form style={{ position: "relative", paddingBottom: 10 }}>
