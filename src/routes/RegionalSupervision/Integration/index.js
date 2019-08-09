@@ -512,12 +512,11 @@ export default class integration extends PureComponent {
     if (problemPointInfos.length <= 0) return;
     await this.clearProblemPoints();
     await this.addProblemPoints(problemPointInfos);
-    const layers = this.problemPointLayer.getLayers();
+    //const layers = this.problemPointLayer.getLayers();
     if (problemPointInfos.length > 0) {
       for (let i = 0; i < problemPointInfos.length; i++) {
-        let index = layers.findIndex(
-          layer => layer.options.properties.id === id
-        );
+        //let indexLayer = layers.findIndex(layer => layer.options.properties.id === id);
+        let index = problemPointInfos.findIndex(problemPointInfo => problemPointInfo.id === id);
         if (index !== -1) {
           //地图范围跳转
           const FeatureCollection = this.problemPointLayer.toGeoJSON();
@@ -534,7 +533,7 @@ export default class integration extends PureComponent {
               maxZoom: config.mapInitParams.zoom
             });
           }
-          //
+
           let problemPointInfo = problemPointInfos[index];
           let latLng = L.latLng(
             problemPointInfo.pointY,
