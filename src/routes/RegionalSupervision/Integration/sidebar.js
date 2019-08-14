@@ -135,6 +135,7 @@ export default class sider extends PureComponent {
   }
 
   componentDidMount() {
+    const { key } = this.state;
     self = this;
     // console.log("贵阳至黄平高速公路", "六枝特区平寨镇跃进砂石厂");
     this.queryProject({ SkipCount: 0 });
@@ -240,12 +241,19 @@ export default class sider extends PureComponent {
       this.setState({
         polygon: data.polygon
       });
-      this.querySpot({
-        SkipCount: 0,
-        polygon: data.polygon
-      });
+      if (self.state.key === "spot") {
+        this.querySpot({
+          SkipCount: 0,
+          polygon: data.polygon
+        });
+      } else {
+        this.queryProject({
+          SkipCount: 0,
+          polygon: data.polygon
+        });
+      }
     });
-    //search
+    //search1
     this.eventEmitter = emitter.addListener("queryInfo", data => {
       console.log(data);
       this.scrollDom.scrollTop = 0;
