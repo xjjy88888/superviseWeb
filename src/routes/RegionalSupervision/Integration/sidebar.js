@@ -129,7 +129,9 @@ export default class sider extends PureComponent {
       previewVisible: false,
       previewImage: "",
       fileList: [],
-      projectFileList: []
+      projectFileList: [],
+      showReply: false,
+      showPlan: false
     };
     this.map = null;
   }
@@ -974,6 +976,18 @@ export default class sider extends PureComponent {
 
   render() {
     const {
+      dispatch,
+      form: { getFieldDecorator, resetFields, setFieldsValue, getFieldValue },
+      district: { districtTree },
+      user: { basinOrganList },
+      project: { projectList, projectInfo, projectListAdd, departSelectList },
+      spot: { spotList, projectInfoSpotList },
+      point: { pointList },
+      redLine: { redLineList },
+      inspect: { inspectList }
+    } = this.props;
+
+    const {
       show,
       showSpin,
       queryHighlight,
@@ -1006,19 +1020,11 @@ export default class sider extends PureComponent {
       ShowArchive,
       sort_key,
       projectFileList,
-      departList
+      departList,
+      showReply,
+      showPlan
     } = this.state;
-    const {
-      dispatch,
-      form: { getFieldDecorator, resetFields, setFieldsValue, getFieldValue },
-      district: { districtTree },
-      user: { basinOrganList },
-      project: { projectList, projectInfo, projectListAdd, departSelectList },
-      spot: { spotList, projectInfoSpotList },
-      point: { pointList },
-      redLine: { redLineList },
-      inspect: { inspectList }
-    } = this.props;
+
     const departSelectListAll = unique(departSelectList.concat(departList));
 
     const projectItem = isProjectUpdate
@@ -1941,6 +1947,10 @@ export default class sider extends PureComponent {
                         </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
+                        <span>是否编制：</span>
+                        <span>-</span>
+                      </p>
+                      <p style={{ marginBottom: 10 }}>
                         <span>监管单位：</span>
                         <span>
                           {this.getDepart(projectItem.supDepartment, "name")}
@@ -1959,6 +1969,10 @@ export default class sider extends PureComponent {
                             ? projectItem.riverBasinOU.name
                             : ""}
                         </span>
+                      </p>
+                      <p style={{ marginBottom: 10 }}>
+                        <span>是否批复：</span>
+                        <span>-</span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>批复文号：</span>
@@ -2453,7 +2467,7 @@ export default class sider extends PureComponent {
                           });
                         }}
                       >
-                        {item.mapNum}{" "}
+                        {item.mapNum}
                         {isArchivalSpot ? item.archiveTime.slice(0, 10) : ""}
                         <Icon
                           type="disconnect"
@@ -3123,7 +3137,10 @@ export default class sider extends PureComponent {
                 paddingTop: 30
               }}
             >
-              <Form style={{ position: "relative", paddingBottom: 10 }}>
+              <Form
+                // layout="inline"
+                style={{ position: "relative", paddingBottom: 10 }}
+              >
                 <Form.Item
                   label={
                     <span>
@@ -3330,41 +3347,6 @@ export default class sider extends PureComponent {
                     </Select>
                   )}
                 </Form.Item>
-                <Form.Item label="批复机构" {...formItemLayout}>
-                  {getFieldDecorator("replyDepartmentId", {
-                    initialValue: this.getDepart(
-                      projectItem.replyDepartment,
-                      "id"
-                    )
-                  })(
-                    <Select
-                      allowClear
-                      showSearch
-                      optionFilterProp="children"
-                      filterOption={(input, option) =>
-                        option.props.children
-                          .toLowerCase()
-                          .indexOf(input.toLowerCase()) >= 0
-                      }
-                      onSearch={v => {
-                        this.setState({ departSearch: v, isSelect: false });
-                        this.queryDepartList(v, 1);
-                      }}
-                      onBlur={() => {
-                        this.getDepartList("supDepartmentId");
-                      }}
-                      onSelect={() => {
-                        this.setState({ isSelect: true });
-                      }}
-                    >
-                      {departSelectListAll.map(item => (
-                        <Select.Option value={item.value} key={item.value}>
-                          {item.label}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  )}
-                </Form.Item>
                 <Form.Item label="流域管理机构" {...formItemLayout}>
                   {getFieldDecorator("riverBasinOUId", {
                     initialValue: projectItem.riverBasinOU
@@ -3380,34 +3362,101 @@ export default class sider extends PureComponent {
                     </Select>
                   )}
                 </Form.Item>
-                <Form.Item label="批复文号" {...formItemLayout}>
-                  {getFieldDecorator("replyNum", {
-                    initialValue: projectItem.replyNum
-                  })(<Input />)}
-                </Form.Item>
-                <Form.Item label="批复时间" {...formItemLayout}>
-                  {getFieldDecorator("replyTime", {
-                    initialValue: dateInitFormat(projectItem.replyTime)
-                  })(<DatePicker />)}
-                </Form.Item>
-                <Form.Item label="责任面积" {...formItemLayout}>
-                  {getFieldDecorator("respArea", {
-                    initialValue: projectItem.expand.respArea
-                  })(<Input addonAfter="公顷" />)}
-                </Form.Item>
-                <Form.Item label="立项级别" {...formItemLayout}>
-                  {getFieldDecorator("projectLevelId", {
-                    initialValue: projectItem.projectLevelId
+                <Form.Item label="是否需要编报方案" {...formItemLayout}>
+                  {getFieldDecorator("是否需要编报方案", {
+                    valuePropName: "checked",
+                    initialValue: false
                   })(
-                    <Select showSearch allowClear optionFilterProp="children">
-                      {this.dictList("立项级别").map(item => (
-                        <Select.Option value={item.id} key={item.id}>
-                          {item.dictTableValue}
-                        </Select.Option>
-                      ))}
-                    </Select>
+                    <Switch
+                      checkedChildren="是"
+                      unCheckedChildren="否"
+                      onChange={v => {
+                        this.setState({ showPlan: v });
+                      }}
+                    />
                   )}
                 </Form.Item>
+                <div style={{ display: showPlan ? "block" : "none" }}>
+                  <Form.Item label="批复机构" {...formItemLayout}>
+                    {getFieldDecorator("replyDepartmentId", {
+                      initialValue: this.getDepart(
+                        projectItem.replyDepartment,
+                        "id"
+                      )
+                    })(
+                      <Select
+                        allowClear
+                        showSearch
+                        optionFilterProp="children"
+                        filterOption={(input, option) =>
+                          option.props.children
+                            .toLowerCase()
+                            .indexOf(input.toLowerCase()) >= 0
+                        }
+                        onSearch={v => {
+                          this.setState({ departSearch: v, isSelect: false });
+                          this.queryDepartList(v, 1);
+                        }}
+                        onBlur={() => {
+                          this.getDepartList("supDepartmentId");
+                        }}
+                        onSelect={() => {
+                          this.setState({ isSelect: true });
+                        }}
+                      >
+                        {departSelectListAll.map(item => (
+                          <Select.Option value={item.value} key={item.value}>
+                            {item.label}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Form.Item>
+                  <Form.Item label="是否批复" {...formItemLayout}>
+                    {getFieldDecorator("是否批复", {
+                      valuePropName: "checked",
+                      initialValue: false
+                    })(
+                      <Switch
+                        checkedChildren="是"
+                        unCheckedChildren="否"
+                        onChange={v => {
+                          this.setState({ showReply: v });
+                        }}
+                      />
+                    )}
+                  </Form.Item>
+                  <div style={{ display: showReply ? "block" : "none" }}>
+                    <Form.Item label="批复文号" {...formItemLayout}>
+                      {getFieldDecorator("replyNum", {
+                        initialValue: projectItem.replyNum
+                      })(<Input />)}
+                    </Form.Item>
+                    <Form.Item label="批复时间" {...formItemLayout}>
+                      {getFieldDecorator("replyTime", {
+                        initialValue: dateInitFormat(projectItem.replyTime)
+                      })(<DatePicker />)}
+                    </Form.Item>
+                  </div>
+                  <Form.Item label="责任面积" {...formItemLayout}>
+                    {getFieldDecorator("respArea", {
+                      initialValue: projectItem.expand.respArea
+                    })(<Input addonAfter="公顷" />)}
+                  </Form.Item>
+                  <Form.Item label="立项级别" {...formItemLayout}>
+                    {getFieldDecorator("projectLevelId", {
+                      initialValue: projectItem.projectLevelId
+                    })(
+                      <Select showSearch allowClear optionFilterProp="children">
+                        {this.dictList("立项级别").map(item => (
+                          <Select.Option value={item.id} key={item.id}>
+                            {item.dictTableValue}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Form.Item>
+                </div>
                 <Form.Item label="扰动合规性" {...formItemLayout}>
                   {getFieldDecorator("complianceId", {
                     initialValue: projectItem.expand.complianceId

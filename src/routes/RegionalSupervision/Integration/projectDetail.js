@@ -673,7 +673,7 @@ export default class projectDetail extends PureComponent {
         >
           <Form
             layout="inline"
-            className="ant-advanced-search-form"
+            // className="ant-advanced-search-form"
             onSubmit={this.handleSearch}
           >
             <Row gutter={24}>

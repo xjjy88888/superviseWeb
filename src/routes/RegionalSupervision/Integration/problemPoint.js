@@ -204,7 +204,7 @@ export default class problemPoint extends PureComponent {
         }}
         ref={this.saveRef}
       >
-        {" "}
+
         <div
           style={{
             display: previewVisible_min ? "block" : "none",
