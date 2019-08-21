@@ -25,6 +25,7 @@ const formItemLayout = {
   labelCol: { span: 7 },
   wrapperCol: { span: 16 }
 };
+let yearList = [];
 
 @connect(({ project, spot, point, user, annex, redLine, district }) => ({
   project,
@@ -57,6 +58,12 @@ export default class siderbarDetail extends PureComponent {
 
   componentDidMount() {
     self = this;
+
+    const year = new Date().getFullYear();
+
+    for (let i = 2015; i <= year; i++) {
+      yearList.push(i);
+    }
     const {
       form: { resetFields, setFieldsValue }
     } = this.props;
@@ -281,7 +288,8 @@ export default class siderbarDetail extends PureComponent {
               v.districtCodeId && v.districtCodeId.length
                 ? v.districtCodeId.pop()
                 : "",
-            id: type === "edit" ? spotInfo.id : ""
+            id: type === "edit" ? spotInfo.id : "",
+            interBatch: String(v.interBatch1) + String(v.interBatch2)
           },
           callback: (success, response) => {
             emitter.emit("deleteDraw", {});
@@ -884,6 +892,49 @@ export default class siderbarDetail extends PureComponent {
                     ))}
                   </Select>
                 )}
+              </Form.Item>
+              <Form.Item label="解译期次" {...formItemLayout}>
+                <Input.Group compact>
+                  {getFieldDecorator("interBatch1", {
+                    initialValue: spotItem.interBatch
+                      ? String(spotItem.interBatch).slice(0, 4)
+                      : ""
+                  })(
+                    <Select disabled={!edit} style={{ width: 80 }}>
+                      {yearList.map(i => (
+                        <Select.Option value={String(i)} key={i}>
+                          {i}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  )}
+                  {getFieldDecorator("interBatch2", {
+                    initialValue: spotItem.interBatch
+                      ? String(spotItem.interBatch).slice(4)
+                      : ""
+                  })(
+                    <Select disabled={!edit} style={{ width: 80 }}>
+                      {[
+                        "01",
+                        "02",
+                        "03",
+                        "04",
+                        "05",
+                        "06",
+                        "07",
+                        "08",
+                        "09",
+                        "10",
+                        "11",
+                        "12"
+                      ].map(i => (
+                        <Select.Option value={i} key={i}>
+                          {i}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  )}
+                </Input.Group>
               </Form.Item>
               <Form.Item label="扰动类型" {...formItemLayout}>
                 {getFieldDecorator("interferenceTypeId", {

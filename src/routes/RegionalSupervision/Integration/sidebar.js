@@ -24,7 +24,8 @@ import {
   DatePicker,
   AutoComplete,
   Table,
-  Collapse
+  Collapse,
+  Typography
 } from "antd";
 import locale from "antd/lib/date-picker/locale/zh_CN";
 import "leaflet/dist/leaflet.css";
@@ -139,6 +140,7 @@ export default class sider extends PureComponent {
   componentDidMount() {
     const { key } = this.state;
     self = this;
+
     // console.log("贵阳至黄平高速公路", "六枝特区平寨镇跃进砂石厂");
     this.queryProject({ SkipCount: 0 });
     // this.querySpot({ SkipCount: 0 });
@@ -583,8 +585,6 @@ export default class sider extends PureComponent {
       },
       callback: (result, success) => {
         this.showSpin(false);
-        this.setState({ isProjectUpdate: true });
-        this.setState({ showProjectDetail: success });
         let arr = [];
         if (result.productDepartment) {
           arr.push(result.productDepartment);
@@ -595,9 +595,14 @@ export default class sider extends PureComponent {
         if (result.replyDepartment) {
           arr.push(result.replyDepartment);
         }
+
         this.setState({
+          isProjectUpdate: true,
+          showProjectDetail: success,
           departList: [...departList, ...arr],
-          ParentId: result.attachment ? result.attachment.id : 0
+          ParentId: result.attachment ? result.attachment.id : 0,
+          showPlan: result.isNeedPlan ? true : false,
+          showReply: result.isReply ? true : false
         });
 
         if (result.attachment) {
@@ -1818,7 +1823,9 @@ export default class sider extends PureComponent {
                             v.districtCodeId && v.districtCodeId.length
                               ? v.districtCodeId.pop()
                               : "",
-                          id: isProjectUpdate ? projectItem.id : ""
+                          id: isProjectUpdate ? projectItem.id : "",
+                          isNeedPlan: v.isNeedPlan ? true : false,
+                          isReply: v.isReply ? true : false
                         };
                         emitter.emit("projectCreateUpdate", data);
                       } else {
@@ -1947,19 +1954,9 @@ export default class sider extends PureComponent {
                         </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
-                        <span>是否编制：</span>
-                        <span>-</span>
-                      </p>
-                      <p style={{ marginBottom: 10 }}>
                         <span>监管单位：</span>
                         <span>
                           {this.getDepart(projectItem.supDepartment, "name")}
-                        </span>
-                      </p>
-                      <p style={{ marginBottom: 10 }}>
-                        <span>批复机构：</span>
-                        <span>
-                          {this.getDepart(projectItem.replyDepartment, "name")}
                         </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
@@ -1971,27 +1968,49 @@ export default class sider extends PureComponent {
                         </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
-                        <span>是否批复：</span>
-                        <span>-</span>
-                      </p>
-                      <p style={{ marginBottom: 10 }}>
-                        <span>批复文号：</span>
-                        <span>{projectItem.replyNum}</span>
-                      </p>
-                      <p style={{ marginBottom: 10 }}>
-                        <span>批复时间：</span>
-                        <span>{projectItem.replyTime}</span>
-                      </p>
-                      <p style={{ marginBottom: 10 }}>
-                        <span>责任面积：</span>
-                        <span>{projectItem.expand.respArea}公顷</span>
-                      </p>
-                      <p style={{ marginBottom: 10 }}>
-                        <span>立项级别：</span>
+                        <span>编报方案：</span>
                         <span>
-                          {this.getDictValue(projectItem.projectLevelId)}
+                          {projectItem.isNeedPlan ? "需要" : "不需要"}
                         </span>
                       </p>
+
+                      <div style={{ display: showPlan ? "block" : "none" }}>
+                        <p style={{ marginBottom: 10 }}>
+                          <span>批复机构：</span>
+                          <span>
+                            {this.getDepart(
+                              projectItem.replyDepartment,
+                              "name"
+                            )}
+                          </span>
+                        </p>
+                        <p style={{ marginBottom: 10 }}>
+                          <span>批复情况：</span>
+                          <span>
+                            {projectItem.isReply ? "已批复" : "未批复"}
+                          </span>
+                        </p>
+                        <div style={{ display: showReply ? "block" : "none" }}>
+                          <p style={{ marginBottom: 10 }}>
+                            <span>批复文号：</span>
+                            <span>{projectItem.replyNum}</span>
+                          </p>
+                          <p style={{ marginBottom: 10 }}>
+                            <span>批复时间：</span>
+                            <span>{projectItem.replyTime}</span>
+                          </p>
+                        </div>
+                        <p style={{ marginBottom: 10 }}>
+                          <span>责任面积：</span>
+                          <span>{projectItem.expand.respArea}公顷</span>
+                        </p>
+                        <p style={{ marginBottom: 10 }}>
+                          <span>立项级别：</span>
+                          <span>
+                            {this.getDictValue(projectItem.projectLevelId)}
+                          </span>
+                        </p>
+                      </div>
                       <p style={{ marginBottom: 10 }}>
                         <span>扰动合规性：</span>
                         <span>
@@ -2128,7 +2147,8 @@ export default class sider extends PureComponent {
                             style={{
                               float: "right",
                               fontSize: 18,
-                              color: "#1890ff"
+                              color: "#1890ff",
+                              marginLeft: 15
                             }}
                             onClick={e => {
                               e.stopPropagation();
@@ -2169,7 +2189,7 @@ export default class sider extends PureComponent {
                               float: "right",
                               fontSize: 18,
                               color: "#1890ff",
-                              marginRight: 20
+                              marginLeft: 15
                             }}
                             onClick={e => {
                               e.stopPropagation();
@@ -2183,12 +2203,27 @@ export default class sider extends PureComponent {
                             }}
                           />
                           <Icon
+                            type="picture"
+                            style={{
+                              display: item.attachment ? "block" : "none",
+                              float: "right",
+                              fontSize: 18,
+                              color: "#1890ff",
+                              marginLeft: 15
+                            }}
+                            onClick={e => {
+                              e.stopPropagation();
+                              emitter.emit("pictureLocation", {
+                                item: item.attachment.child
+                              });
+                            }}
+                          />
+                          <Icon
                             type="plus"
                             style={{
                               float: "right",
                               fontSize: 18,
-                              color: "#1890ff",
-                              marginRight: 20
+                              color: "#1890ff"
                             }}
                             onClick={e => {
                               e.stopPropagation();
@@ -2203,7 +2238,7 @@ export default class sider extends PureComponent {
                             }}
                           />
                         </p>
-                        {/* 问题点 */}
+                        {/* 问题点111 */}
                         {item.problemPoints.map((ite, idx) => (
                           <p
                             key={idx}
@@ -2231,7 +2266,7 @@ export default class sider extends PureComponent {
                                   float: "right",
                                   fontSize: 18,
                                   color: "#1890ff",
-                                  marginLeft: 20
+                                  marginLeft: 15
                                 }}
                                 onClick={e => {
                                   e.stopPropagation();
@@ -2268,7 +2303,8 @@ export default class sider extends PureComponent {
                                 style={{
                                   float: "right",
                                   fontSize: 18,
-                                  color: "#1890ff"
+                                  color: "#1890ff",
+                                  marginLeft: 15
                                 }}
                                 onClick={e => {
                                   e.stopPropagation();
@@ -2276,6 +2312,21 @@ export default class sider extends PureComponent {
                                     item: item.problemPoints,
                                     id: ite.id,
                                     key: "problemPoint"
+                                  });
+                                }}
+                              />
+                              <Icon
+                                type="picture"
+                                style={{
+                                  display: ite.attachment ? "block" : "none",
+                                  float: "right",
+                                  fontSize: 18,
+                                  color: "#1890ff"
+                                }}
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  emitter.emit("pictureLocation", {
+                                    item: ite.attachment.child
                                   });
                                 }}
                               />
@@ -3288,11 +3339,11 @@ export default class sider extends PureComponent {
                       optionFilterProp="children"
                       addonBefore="Http://"
                       addonAfter={<Icon type="setting" />}
-                      filterOption={(input, option) =>
-                        option.props.children
-                          .toLowerCase()
-                          .indexOf(input.toLowerCase()) >= 0
-                      }
+                      // filterOption={(input, option) =>
+                      //   option.props.children
+                      //     .toLowerCase()
+                      //     .indexOf(input.toLowerCase()) >= 0
+                      // }
                       onSearch={v => {
                         this.setState({ departSearch: v, isSelect: false });
                         this.queryDepartList(v, 2);
@@ -3323,11 +3374,11 @@ export default class sider extends PureComponent {
                       showSearch
                       allowClear
                       optionFilterProp="children"
-                      filterOption={(input, option) =>
-                        option.props.children
-                          .toLowerCase()
-                          .indexOf(input.toLowerCase()) >= 0
-                      }
+                      // filterOption={(input, option) =>
+                      //   option.props.children
+                      //     .toLowerCase()
+                      //     .indexOf(input.toLowerCase()) >= 0
+                      // }
                       onSearch={v => {
                         this.setState({ departSearch: v, isSelect: false });
                         this.queryDepartList(v, 1);
@@ -3362,14 +3413,14 @@ export default class sider extends PureComponent {
                     </Select>
                   )}
                 </Form.Item>
-                <Form.Item label="是否需要编报方案" {...formItemLayout}>
-                  {getFieldDecorator("是否需要编报方案", {
+                <Form.Item label="编报方案" {...formItemLayout}>
+                  {getFieldDecorator("isNeedPlan", {
                     valuePropName: "checked",
-                    initialValue: false
+                    initialValue: projectItem.isNeedPlan
                   })(
                     <Switch
-                      checkedChildren="是"
-                      unCheckedChildren="否"
+                      checkedChildren="需要"
+                      unCheckedChildren="不需要"
                       onChange={v => {
                         this.setState({ showPlan: v });
                       }}
@@ -3412,14 +3463,14 @@ export default class sider extends PureComponent {
                       </Select>
                     )}
                   </Form.Item>
-                  <Form.Item label="是否批复" {...formItemLayout}>
-                    {getFieldDecorator("是否批复", {
+                  <Form.Item label="批复情况" {...formItemLayout}>
+                    {getFieldDecorator("isReply", {
                       valuePropName: "checked",
-                      initialValue: false
+                      initialValue: projectItem.isReply
                     })(
                       <Switch
-                        checkedChildren="是"
-                        unCheckedChildren="否"
+                        checkedChildren="已批复"
+                        unCheckedChildren="未批复"
                         onChange={v => {
                           this.setState({ showReply: v });
                         }}
@@ -3795,6 +3846,11 @@ export default class sider extends PureComponent {
                     title: "项目归档",
                     content: (
                       <span>
+                        <Typography.Text type="warning">
+                          这个项目关联图斑也会同步归档！
+                        </Typography.Text>
+                        <br />
+                        <br />
                         归档时间：
                         <DatePicker
                           locale={locale}

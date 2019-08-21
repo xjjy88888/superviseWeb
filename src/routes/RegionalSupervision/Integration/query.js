@@ -25,6 +25,7 @@ const formItemLayoutlong = {
   labelCol: { span: 6 },
   wrapperCol: { span: 15 }
 };
+let yearList = [];
 
 @createForm()
 @connect(({ user, district }) => ({
@@ -46,6 +47,10 @@ export default class Query extends PureComponent {
   }
 
   componentDidMount() {
+    const year = new Date().getFullYear();
+    for (let i = 2015; i <= year; i++) {
+      yearList.push(i);
+    }
     this.eventEmitter = emitter.addListener("showQuery", data => {
       this.setState({
         show: data.show,
@@ -167,8 +172,25 @@ export default class Query extends PureComponent {
                   const d = v.DistrictCodes;
                   emitter.emit("queryInfo", {
                     from: type,
-                    info: { ...v, DistrictCodes: d[d.length - 1] },
-                    ShowArchive: v.ShowArchive
+                    info: {
+                      ...v,
+                      DistrictCodes: d[d.length - 1],
+                      isNeedPlan: !v.isNeedPlan
+                        ? ""
+                        : v.isNeedPlan.length === 2
+                        ? ""
+                        : v.isNeedPlan.length === 1
+                        ? v.isNeedPlan[0]
+                        : "",
+                      isReply: !v.isReply
+                        ? ""
+                        : v.isReply.length === 2
+                        ? ""
+                        : v.isReply.length === 1
+                        ? v.isReply[0]
+                        : "",
+                      interBatch: (v.interBatch1 || "") + (v.interBatch2 || "")
+                    }
                   });
                 }
               });
@@ -220,6 +242,26 @@ export default class Query extends PureComponent {
             <Form.Item label="监管单位" {...formItemLayout}>
               {getFieldDecorator("SupDepartment", { initialValue: "" })(
                 <Input placeholder="请填写监管单位" allowClear />
+              )}
+            </Form.Item>
+            <Form.Item label="编报方案" {...formItemLayoutlong}>
+              {getFieldDecorator("isNeedPlan", {})(
+                <Checkbox.Group
+                  options={[
+                    { label: "需要", value: true },
+                    { label: "不需要", value: false }
+                  ]}
+                />
+              )}
+            </Form.Item>
+            <Form.Item label="批复情况" {...formItemLayoutlong}>
+              {getFieldDecorator("isReply", {})(
+                <Checkbox.Group
+                  options={[
+                    { label: "已批复", value: true },
+                    { label: "未批复", value: false }
+                  ]}
+                />
               )}
             </Form.Item>
             <Form.Item label="立项级别" {...formItemLayoutlong}>
@@ -373,6 +415,41 @@ export default class Query extends PureComponent {
               {getFieldDecorator("OverAreaOfResMax", {})(
                 <InputNumber min={0} />
               )}
+            </Form.Item>
+            <Form.Item label="解译期次" {...formItemLayout}>
+              <Input.Group compact>
+                {getFieldDecorator("interBatch1", {})(
+                  <Select style={{ width: 80 }}>
+                    {yearList.map(i => (
+                      <Select.Option value={String(i)} key={i}>
+                        {i}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                )}
+                {getFieldDecorator("interBatch2", {})(
+                  <Select style={{ width: 80 }}>
+                    {[
+                      "01",
+                      "02",
+                      "03",
+                      "04",
+                      "05",
+                      "06",
+                      "07",
+                      "08",
+                      "09",
+                      "10",
+                      "11",
+                      "12"
+                    ].map(i => (
+                      <Select.Option value={i} key={i}>
+                        {i}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                )}
+              </Input.Group>
             </Form.Item>
             <Form.Item label="扰动类型" {...formItemLayoutlong}>
               {getFieldDecorator("InterferenceType", { initialValue: [] })(

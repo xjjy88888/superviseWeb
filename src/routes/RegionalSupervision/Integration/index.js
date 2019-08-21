@@ -47,6 +47,7 @@ import Layouts from "../../../components/Layouts";
 let userconfig = {};
 let map;
 let marker;
+let picLayerGroup;
 @connect(({ user, mapdata, project, spot }) => ({
   user,
   mapdata,
@@ -174,6 +175,39 @@ export default class integration extends PureComponent {
         .css({
           cursor: "crosshair"
         });
+    });
+    // 检查照片定位
+    this.eventEmitter = emitter.addListener("pictureLocation", data => {
+      console.log("181",data.item);
+      const items = data.item;
+      let picPoints = [];
+      items.forEach((item) => {
+          if(item.latitude && item.longitude){
+            picPoints.push(item);
+          }
+      });
+      //地图打点
+      if(picPoints.length>0){
+        //清空图层组
+        if(picLayerGroup)
+           picLayerGroup.clearLayers();
+        picPoints.forEach((item) => {
+          let latLng = [item.latitude, item.longitude];
+          let marker = L.marker(latLng)
+          .addTo(map)
+          .on("click", function(e) {
+             console.log("item.id", item.id);
+          });
+          picLayerGroup.addLayer(marker);
+        }); 
+        //地图范围跳转
+        if (picLayerGroup.getLayers().length > 0)
+            map.fitBounds(picLayerGroup.getBounds(), {maxZoom: config.mapInitParams.zoom});       
+      }
+      else{
+        message.warning("照片列表无可用位置信息", 1);       
+      }
+
     });
     //全景定位
     this.eventEmitter = emitter.addListener("fullViewLocation", data => {
@@ -993,6 +1027,8 @@ export default class integration extends PureComponent {
     };
     // 将图层绘制控件添加的地图页面上
     map.pm.addControls(options);
+    //检查照片列表
+    picLayerGroup = L.featureGroup().addTo(map);
   };
   onClickMap = e => {
     const me = this;

@@ -13,7 +13,7 @@ import {
   Checkbox,
   Row,
   Col,
-  Cascader
+  // Cascader
 } from "antd";
 import { connect } from "dva";
 import moment from "moment";
@@ -209,10 +209,10 @@ class FormWriteUser extends PureComponent {
 
   render() {
     const {
-      type,
+      // type,
       isLogin,
       form: { getFieldDecorator },
-      district: { districtTree }
+      // district: { districtTree }
     } = this.props;
     const { showDistrict } = this.state;
 
