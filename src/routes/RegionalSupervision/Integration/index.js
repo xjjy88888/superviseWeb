@@ -74,7 +74,9 @@ export default class integration extends PureComponent {
       selectSpotRightV: "",
       spotStatus: "",
       projectId: null, //针对新增图形的项目红线id
-      addGraphLayer: null //针对新增图形的图层
+      addGraphLayer: null, //针对新增图形的图层
+      showPhotoPreview: false,
+      photoPreviewUrl: null
     };
     this.map = null;
     this.problemPointLayer = L.layerGroup([]);
@@ -178,36 +180,39 @@ export default class integration extends PureComponent {
     });
     // 检查照片定位
     this.eventEmitter = emitter.addListener("pictureLocation", data => {
-      console.log("181",data.item);
+      console.log("181", data.item);
       const items = data.item;
       let picPoints = [];
-      items.forEach((item) => {
-          if(item.latitude && item.longitude){
-            picPoints.push(item);
-          }
+      items.forEach(item => {
+        if (item.latitude && item.longitude) {
+          picPoints.push(item);
+        }
       });
       //地图打点
-      if(picPoints.length>0){
+      if (picPoints.length > 0) {
         //清空图层组
-        if(picLayerGroup)
-           picLayerGroup.clearLayers();
-        picPoints.forEach((item) => {
+        if (picLayerGroup) picLayerGroup.clearLayers();
+        picPoints.forEach(item => {
           let latLng = [item.latitude, item.longitude];
           let marker = L.marker(latLng)
-          .addTo(map)
-          .on("click", function(e) {
-             console.log("item.id", item.id);
-          });
+            .addTo(map)
+            .on("click", function(e) {
+              console.log("item.id", item.id);
+              me.setState({
+                showPhotoPreview: true,
+                photoPreviewUrl: config.url.annexPreviewUrl + item.id
+              });
+            });
           picLayerGroup.addLayer(marker);
-        }); 
+        });
         //地图范围跳转
         if (picLayerGroup.getLayers().length > 0)
-            map.fitBounds(picLayerGroup.getBounds(), {maxZoom: config.mapInitParams.zoom});       
+          map.fitBounds(picLayerGroup.getBounds(), {
+            maxZoom: config.mapInitParams.zoom
+          });
+      } else {
+        message.warning("附件照片无可用位置信息", 1);
       }
-      else{
-        message.warning("照片列表无可用位置信息", 1);       
-      }
-
     });
     //全景定位
     this.eventEmitter = emitter.addListener("fullViewLocation", data => {
@@ -550,7 +555,9 @@ export default class integration extends PureComponent {
     if (problemPointInfos.length > 0) {
       for (let i = 0; i < problemPointInfos.length; i++) {
         //let indexLayer = layers.findIndex(layer => layer.options.properties.id === id);
-        let index = problemPointInfos.findIndex(problemPointInfo => problemPointInfo.id === id);
+        let index = problemPointInfos.findIndex(
+          problemPointInfo => problemPointInfo.id === id
+        );
         if (index !== -1) {
           //地图范围跳转
           const FeatureCollection = this.problemPointLayer.toGeoJSON();
@@ -2117,7 +2124,9 @@ export default class integration extends PureComponent {
       selectLeftV,
       selectSpotLeftV,
       selectSpotRightV,
-      selectRightV
+      selectRightV,
+      showPhotoPreview,
+      photoPreviewUrl
     } = this.state;
     const {
       // dispatch,
@@ -2153,6 +2162,21 @@ export default class integration extends PureComponent {
               height: "100%"
             }}
           />
+          {/* 照片预览111*/}
+          <Modal
+            // height={"100vh"}
+            visible={showPhotoPreview}
+            footer={null}
+            onCancel={() => {
+              this.setState({ showPhotoPreview: false });
+            }}
+          >
+            <img
+              alt="example"
+              style={{ width: "100%" }}
+              src={photoPreviewUrl}
+            />
+          </Modal>
           {/* 编辑图形-保存、取消保存按钮 */}
           <div
             style={{
