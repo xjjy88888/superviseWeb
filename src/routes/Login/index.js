@@ -92,7 +92,7 @@ export default class login extends PureComponent {
           }}
         >
           <Spins show={showSpin} />
-          <Form onSubmit={this.handleSubmit} style={{ width: 320 }}>
+          <Form onSubmit={this.handleSubmit} style={{ width: 310 }}>
             <Form.Item>
               <img
                 src="./img/logo.png"
@@ -100,8 +100,7 @@ export default class login extends PureComponent {
                 style={{ width: 30, marginRight: 10 }}
                 onClick={() => {}}
               />
-              {/* 11 */}
-              生产建设项目水土保持信息化监管系统 v2.0.1
+              水土保持监督管理信息移动采集系统管理端
             </Form.Item>
             <Form.Item>
               {getFieldDecorator("userName", {
@@ -149,7 +148,7 @@ export default class login extends PureComponent {
                 style={{ width: "100%" }}
                 disabled={this.hasErrors(getFieldsError())}
               >
-                {config.isFormal ? "登录" : "测试环境登录"}
+                登录
               </Button>
               <span>
                 去

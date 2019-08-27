@@ -106,7 +106,7 @@ export default class layouts extends PureComponent {
                   color: "#fff"
                 }}
               >
-                生产建设项目水土保持信息化监管系统
+                水土保持监督管理信息移动采集系统管理端
               </Link>
             </span>
             <Menu
