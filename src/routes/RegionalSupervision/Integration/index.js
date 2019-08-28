@@ -1352,7 +1352,7 @@ export default class integration extends PureComponent {
   // };
 
   creatElements = (properties, callback) => {
-    // console.log(properties);
+    console.log(properties);
     // const spot = this.getDictValue(spotId);
     // const spot = "";
     let elements;
@@ -2105,7 +2105,7 @@ export default class integration extends PureComponent {
     }
 
     if (userconfig.setTopLayer === "spotLayer") {
-      //历史影像优先历史扰动图斑优先
+      //历史扰动图斑优先
       userconfig.leftLayers = [leftImgLayer, spotleftwms];
       userconfig.rightLayers = [rightImgLayer, spotrightwms];
     } else {
@@ -2113,6 +2113,8 @@ export default class integration extends PureComponent {
       userconfig.leftLayers = [spotleftwms, leftImgLayer];
       userconfig.rightLayers = [spotrightwms, rightImgLayer];
     }
+
+
   };
 
   render() {
@@ -2337,13 +2339,15 @@ export default class integration extends PureComponent {
               position: "absolute",
               top: 65,
               left: 15,
-              zIndex: 1000
+              zIndex: 1000,
+              background: "#fff"
             }}
           >
             {/* 左侧历史影像切换 */}
             <span
               style={{
-                padding: "0 10px"
+                padding: "0 10px",
+                display:'none'
               }}
             >
               影像:
@@ -2353,7 +2357,8 @@ export default class integration extends PureComponent {
               placeholder="请选择"
               onChange={this.onChangeSelectLeft}
               style={{
-                width: 150
+                width: 150,
+                display:'none'
               }}
             >
               {histories.map((item, id) => (
@@ -2392,13 +2397,15 @@ export default class integration extends PureComponent {
               position: "absolute",
               top: 65,
               right: 240,
-              zIndex: 1001
+              zIndex: 1001,
+              background: "#fff"
             }}
           >
             {/* 右侧历史影像切换 */}
             <span
               style={{
-                padding: "0 10px"
+                padding: "0 10px",
+                display:'none'
               }}
             >
               影像:
@@ -2408,7 +2415,8 @@ export default class integration extends PureComponent {
               placeholder="请选择"
               onChange={this.onChangeSelectRight}
               style={{
-                width: 150
+                width: 150,
+                display:'none'
               }}
             >
               {histories.map((item, id) => (

@@ -95,17 +95,18 @@ export default class splitScreen extends PureComponent {
   };
   /*
    *地图点击事件
-   */  
+   */
   onClickMap = e => {
     const me = this;
-    if (e.target._container.id === "LMap") {//左侧地图
+    if (e.target._container.id === "LMap") {
+      //左侧地图
       userconfig.map = userconfig.LMap;
-    }
-    else {//右侧地图
+    } else {
+      //右侧地图
       userconfig.map = userconfig.RMap;
     }
-    userconfig.LMap.closePopup(); 
-    userconfig.RMap.closePopup(); 
+    userconfig.LMap.closePopup();
+    userconfig.RMap.closePopup();
     me.clearGeojsonLayer();
     let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
     if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {
@@ -116,17 +117,16 @@ export default class splitScreen extends PureComponent {
     //点查WMS图层
     const point = { x: e.latlng.lng, y: e.latlng.lat };
     //普通点查
-    const  LayersName = config.mapLayersName; //扰动图斑、项目红线勾选
+    const LayersName = config.mapLayersName; //扰动图斑、项目红线勾选
     me.queryWFSServiceByPoint(
       point,
       LayersName,
       me.callbackPointQueryWFSService
     );
-
-  }
+  };
   /*
    * 获取气泡窗口内容
-   */  
+   */
   getWinContent = (properties, callback) => {
     this.creatElements(properties, callback);
   };
@@ -144,11 +144,9 @@ export default class splitScreen extends PureComponent {
               : ""
           }</div>`
         )
-      : jQuery(
-          `<div>项目:${properties.project_name}</br></div>`
-        );
+      : jQuery(`<div>项目:${properties.project_name}</br></div>`);
     callback(elements);
-  }  
+  };
   /*
    * 点选查询回调函数
    */
@@ -192,7 +190,7 @@ export default class splitScreen extends PureComponent {
       message.warning("地图匹配不到相关数据", 1);
       userconfig.map.closePopup();
     }
-  }  
+  };
   /*点选查询图层
    *@method queryWFSServiceByPoint
    *@param point 坐标点
@@ -228,8 +226,8 @@ export default class splitScreen extends PureComponent {
       payload: { geojsonUrl },
       callback: callback
     });
-  }
-   /*
+  };
+  /*
    * 绘制图形函数
    */
   loadGeojsonLayer = (geojson, style) => {
@@ -246,7 +244,7 @@ export default class splitScreen extends PureComponent {
       userconfig.map.removeLayer(userconfig.projectgeojsonLayer);
       userconfig.projectgeojsonLayer = null;
     }
-  };    
+  };
   /*
    *获取项目区域范围
    */
@@ -664,7 +662,9 @@ export default class splitScreen extends PureComponent {
   /*
    * 左地图的影像列表切换
    */
-  onChangeSelectLeft = v => {
+  onChangeSelectLeft = (v) => {
+    //console.log("668",v);
+    //v.stopPropagation();
     this.setState({ selectLeftV: v });
     //移除左地图的图层列表
     this.removeLMapLayers();
@@ -728,14 +728,26 @@ export default class splitScreen extends PureComponent {
             width: "100vw"
           }}
         >
-          <div style={{ flex: 1, border: "1px solid #cccccc" }} id="LMap">
+          <div
+            style={{ flex: 1, border: "1px solid #cccccc" }}
+            id="LMap"
+            onClick={e => {
+              e.stopPropagation();
+              console.log(e, 742);
+            }}
+          >
             {/*历史影像图切换*/}
             <div
+              // onClick={e => {
+              //   console.log("e",e);
+              //   e.stopPropagation();
+              // }}
               style={{
                 position: "absolute",
                 top: 10,
                 right: 10,
                 zIndex: 1000,
+                // pointerEvents:"none",
                 background: "#fff"
               }}
             >
