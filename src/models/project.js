@@ -23,7 +23,7 @@ export default {
   namespace: "project",
 
   state: {
-    projectList: { totalCount: "", items: [] },
+    projectList: { totalCount: 0, items: [] },
     projectInfoRedLineList: { totalCount: "", items: [] },
     projectInfo: {
       projectBase: {},

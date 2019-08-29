@@ -388,6 +388,7 @@ export default class sider extends PureComponent {
         if (projectList.items.length < projectList.totalCount) {
           this.queryProject({
             ...queryInfo,
+            Count: projectList.totalCount,
             SkipCount: row_pro,
             Sorting: Sorting,
             ProjectName: query_pro
@@ -398,6 +399,7 @@ export default class sider extends PureComponent {
         if (spotList.items.length < spotList.totalCount) {
           this.querySpot({
             ...queryInfo,
+            Count: spotList.totalCount,
             SkipCount: row_spot,
             Sorting: Sorting,
             MapNum: query_spot
