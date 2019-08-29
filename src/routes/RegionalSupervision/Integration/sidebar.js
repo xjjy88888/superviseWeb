@@ -257,7 +257,7 @@ export default class sider extends PureComponent {
         });
       }
     });
-    //search1
+    //search
     this.eventEmitter = emitter.addListener("queryInfo", data => {
       console.log(data);
       if (this.scrollDom) {
