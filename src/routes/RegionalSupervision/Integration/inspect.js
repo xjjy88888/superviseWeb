@@ -305,13 +305,13 @@ export default class Inspect extends PureComponent {
                   });
                   return;
                 }
-                if (!v.monitorCheckPeopleName) {
-                  notification["warning"]({
-                    message: `请输入监督检查人员`,
-                    duration: 1
-                  });
-                  return;
-                }
+                // if (!v.monitorCheckPeopleName) {
+                //   notification["warning"]({
+                //     message: `请输入监督检查人员`,
+                //     duration: 1
+                //   });
+                //   return;
+                // }
                 for (let i in v) {
                   if (v[i]) {
                     const type = i.split("_")[0];
@@ -461,14 +461,7 @@ export default class Inspect extends PureComponent {
                 : getFieldDecorator(item.key)(<div>无数据</div>)}
             </Form.Item>
           ))}
-          <Form.Item
-            label={
-              <span>
-                监督检查人员 <Text type="danger">*</Text>
-              </span>
-            }
-            {...formItemLayout}
-          >
+          <Form.Item label={`监督检查人员`} {...formItemLayout}>
             {getFieldDecorator("monitorCheckPeopleName", {
               initialValue: inspectInfo.monitorCheckPeopleName
             })(<Input style={{ width: 240 }} />)}
