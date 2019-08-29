@@ -260,7 +260,9 @@ export default class sider extends PureComponent {
     //search1
     this.eventEmitter = emitter.addListener("queryInfo", data => {
       console.log(data);
-      this.scrollDom.scrollTop = 0;
+      if (this.scrollDom) {
+        this.scrollDom.scrollTop = 0;
+      }
       const { query_pro, query_spot, query_point } = this.state;
       emitter.emit("checkResult", {
         show: false,
@@ -268,9 +270,12 @@ export default class sider extends PureComponent {
       });
       let queryHighlight = false;
       for (let i in data.info) {
+        console.log(i, data.info[i]);
         if (
           data.info[i] &&
-          (data.info[i].length || typeof data.info[i] === "number")
+          (data.info[i].length ||
+            typeof data.info[i] === "number" ||
+            typeof data.info[i] === "boolean")
         ) {
           queryHighlight = true;
         }

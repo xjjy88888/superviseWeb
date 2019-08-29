@@ -157,7 +157,8 @@ export default class Query extends PureComponent {
               emitter.emit("queryInfo", {
                 from: type,
                 info: {},
-                ShowArchive: false
+                ProjectShowArchive: false,
+                SpotShowArchive: false
               });
             }}
           >
@@ -169,12 +170,14 @@ export default class Query extends PureComponent {
               this.props.form.validateFields((err, v) => {
                 if (!err) {
                   console.log("筛选信息", v);
-                  const d = v.DistrictCodes;
+                  const d1 = v.ProjectDistrictCodes;
+                  const d2 = v.SpotDistrictCodes;
                   emitter.emit("queryInfo", {
                     from: type,
                     info: {
                       ...v,
-                      DistrictCodes: d[d.length - 1],
+                      ProjectDistrictCodes: d1[d1.length - 1],
+                      SpotDistrictCodes: d2[d2.length - 1],
                       isNeedPlan: !v.isNeedPlan
                         ? ""
                         : v.isNeedPlan.length === 2
@@ -226,7 +229,7 @@ export default class Query extends PureComponent {
         >
           <Form>
             <Form.Item label="所在地区" {...formItemLayout}>
-              {getFieldDecorator("DistrictCodes", { initialValue: "" })(
+              {getFieldDecorator("ProjectDistrictCodes", { initialValue: "" })(
                 <Cascader
                   options={districtTree}
                   changeOnSelect
@@ -350,7 +353,7 @@ export default class Query extends PureComponent {
               )}
             </Form.Item>
             <Form.Item label="显示数据" {...formItemLayoutlong}>
-              {getFieldDecorator("ShowArchive", {
+              {getFieldDecorator("ProjectShowArchive", {
                 valuePropName: "checked",
                 initialValue: false
               })(
@@ -372,7 +375,7 @@ export default class Query extends PureComponent {
         >
           <Form>
             <Form.Item label="所在地区" {...formItemLayout}>
-              {getFieldDecorator("DistrictCodes", { initialValue: "" })(
+              {getFieldDecorator("SpotDistrictCodes", { initialValue: "" })(
                 <Cascader
                   options={districtTree}
                   changeOnSelect
@@ -482,7 +485,7 @@ export default class Query extends PureComponent {
               )}
             </Form.Item>
             <Form.Item label="显示数据" {...formItemLayoutlong}>
-              {getFieldDecorator("ShowArchive", {
+              {getFieldDecorator("SpotShowArchive", {
                 valuePropName: "checked",
                 initialValue: false
               })(
