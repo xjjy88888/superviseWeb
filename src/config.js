@@ -63,6 +63,9 @@ const config = {
     // 图斑列表
     spotListUrl: `${domain}api/services/app/Spot/GetAllByPost`,
 
+    // 图斑信息
+    spotPolygonByIdUrl: `${domain}api/services/app/Spot/GetSpotPolygonAll`,
+
     // 图斑列表统计
     spotChartUrl: `${domain}api/services/app/Spot/Statistics`,
 

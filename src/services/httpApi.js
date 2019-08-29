@@ -195,6 +195,16 @@ export async function spotListApi(params) {
   );
 }
 
+// 图斑列表
+export async function spotPolygonByIdApi(ProjectId) {
+  return request(`${config.url.spotPolygonByIdUrl}?ProjectId=${ProjectId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
 // 图斑信息
 export async function spotByIdApi(id) {
   return request(`${config.url.spotByIdUrl}?id=${id}`, {

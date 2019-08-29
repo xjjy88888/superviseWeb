@@ -1,6 +1,7 @@
 import { notification } from "antd";
 import {
   spotListApi,
+  spotPolygonByIdApi,
   spotByIdApi,
   spotCreateUpdateApi,
   projectListApi,
@@ -147,7 +148,7 @@ export default {
       const {
         data: { success, error, result: projectInfoSpotList }
       } = yield call(spotListApi, payload);
-      if (callback) callback(success);
+      if (callback) callback(success,projectInfoSpotList);
       if (success) {
         yield put({ type: "save", payload: { projectInfoSpotList } });
       } else {
@@ -155,6 +156,14 @@ export default {
           message: `查询项目关联图斑列表失败：${error.message}`
         });
       }
+    },
+
+    // 项目id查图斑列表
+    *querySpotPolygonByProjectId({ payload, callback }, { call }) {
+      const {
+        data: { success, result }
+      } = yield call(spotPolygonByIdApi, payload.ProjectId);
+      if (callback) callback(success,result);
     },
 
     // 项目下拉列表

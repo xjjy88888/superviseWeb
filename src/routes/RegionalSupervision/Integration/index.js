@@ -48,6 +48,23 @@ let userconfig = {};
 let map;
 let marker;
 let picLayerGroup;
+//绘制geojson图层样式
+const geoJsonStyle = {
+  color: "#33CCFF", //#33CCFF #e60000
+  weight: 3,
+  opacity: 1,
+  fillColor: "#e6d933", //#33CCFF #e6d933
+  fillOpacity: 0.1
+};
+//项目红线关联扰动图斑高亮样式
+const highLightGeoJsonStyle = {
+  color: "#0000FF", 
+  weight: 3,
+  opacity: 1,
+  fillColor: "#7CFC00",
+  fillOpacity: 0.8
+};
+
 @connect(({ user, mapdata, project, spot }) => ({
   user,
   mapdata,
@@ -711,14 +728,14 @@ export default class integration extends PureComponent {
       map.off("click");
       me.clearPlotGraphic();
       me.clearGeojsonLayer();
-      let style = {
-        color: "#33CCFF", //#33CCFF #e60000
-        weight: 3,
-        opacity: 1,
-        fillColor: "#e6d933", //#33CCFF #e6d933
-        fillOpacity: 0.1
-      };
-      me.loadGeojsonLayer(data, style);
+      // let style = {
+      //   color: "#33CCFF", //#33CCFF #e60000
+      //   weight: 3,
+      //   opacity: 1,
+      //   fillColor: "#e6d933", //#33CCFF #e6d933
+      //   fillOpacity: 0.1
+      // };
+      me.loadGeojsonLayer(data, geoJsonStyle);
       //编辑图形
       userconfig.projectgeojsonLayer.pm.enable({
         allowSelfIntersection: false
@@ -738,14 +755,14 @@ export default class integration extends PureComponent {
       data = data.result;
       if (data.features.length > 0) {
         me.clearGeojsonLayer();
-        let style = {
-          color: "#33CCFF", //#33CCFF #e60000
-          weight: 3,
-          opacity: 1,
-          fillColor: "#e6d933", //#33CCFF #e6d933
-          fillOpacity: 0.1
-        };
-        me.loadGeojsonLayer(data, style);
+        // let style = {
+        //   color: "#33CCFF", //#33CCFF #e60000
+        //   weight: 3,
+        //   opacity: 1,
+        //   fillColor: "#e6d933", //#33CCFF #e6d933
+        //   fillOpacity: 0.1
+        // };
+        me.loadGeojsonLayer(data, geoJsonStyle);
         if (map.getZoom() < config.mapInitParams.zoom) {
           map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
             maxZoom: 16
@@ -762,6 +779,10 @@ export default class integration extends PureComponent {
             me.getWinContent(feature.properties, data => {
               content += data[0].innerHTML + "<br><br>";
             });
+          }
+          //项目红线高亮关联扰动图斑
+          if (!feature.properties.map_num){
+            me.querySpotByProjectId(feature.properties.project_id);
           }
         }
         setTimeout(() => {
@@ -787,14 +808,14 @@ export default class integration extends PureComponent {
       data = data.result;
       if (data.features.length > 0) {
         me.clearGeojsonLayer();
-        let style = {
-          color: "#33CCFF", //#33CCFF #e60000
-          weight: 3,
-          opacity: 1,
-          fillColor: "#e6d933", //#33CCFF #e6d933
-          fillOpacity: 0.1
-        };
-        me.loadGeojsonLayer(data, style);
+        // let style = {
+        //   color: "#33CCFF", //#33CCFF #e60000
+        //   weight: 3,
+        //   opacity: 1,
+        //   fillColor: "#e6d933", //#33CCFF #e6d933
+        //   fillOpacity: 0.1
+        // };
+        me.loadGeojsonLayer(data, geoJsonStyle);
         if (map.getZoom() < config.mapInitParams.zoom) {
           map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
             maxZoom: 16
@@ -819,20 +840,21 @@ export default class integration extends PureComponent {
     const me = this;
     if (data.success) {
       data = data.result;
+      //console.log("data", data);
       me.clearGeojsonLayer();
-      let style = {
-        color: "#33CCFF", //#33CCFF #e60000
-        weight: 3,
-        opacity: 1,
-        fillColor: "#e6d933", //#33CCFF #e6d933
-        fillOpacity: 0.1
-      };
-      me.loadGeojsonLayer(data, style);
+      // let style = {
+      //   color: "#33CCFF", //#33CCFF #e60000
+      //   weight: 3,
+      //   opacity: 1,
+      //   fillColor: "#e6d933", //#33CCFF #e6d933
+      //   fillOpacity: 0.1
+      // };
+      me.loadGeojsonLayer(data, geoJsonStyle);
       if (data.features.length > 0) {
         let content = "";
         for (let i = 0; i < data.features.length; i++) {
           let feature = data.features[i];
-          console.log("feature", feature);
+          //console.log("feature", feature);
           if (i === data.features.length - 1) {
             me.getWinContent(feature.properties, data => {
               content += data[0].innerHTML;
@@ -841,6 +863,10 @@ export default class integration extends PureComponent {
             me.getWinContent(feature.properties, data => {
               content += data[0].innerHTML + "<br>";
             });
+          }
+          //项目红线高亮关联扰动图斑
+          if (!feature.properties.map_num){
+            me.querySpotByProjectId(feature.properties.project_id);
           }
         }
         if (map.getZoom() < config.mapInitParams.zoom) {
@@ -857,19 +883,42 @@ export default class integration extends PureComponent {
       map.closePopup();
     }
   };
+  
+  //根据项目id查询关联扰动图斑信息
+  querySpotByProjectId = ProjectId => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "spot/querySpotPolygonByProjectId",
+      payload: {
+        ProjectId: ProjectId
+      },
+      callback: (success,result) => {
+        if(success){
+           //console.log("result",result);
+           if(result.length>0){
+             result.forEach(element => {
+              this.loadHighlightGeojsonLayer(JSON.parse(element.geom), highLightGeoJsonStyle);            
+             });
+           }
+
+        }
+      }
+    });
+  };
+
   callbackPointQuerySpotWFSService = data => {
     const me = this;
     if (data.success) {
       data = data.result;
       me.clearGeojsonLayer();
-      let style = {
-        color: "#33CCFF", //#33CCFF #e60000
-        weight: 3,
-        opacity: 1,
-        fillColor: "#e6d933", //#33CCFF #e6d933
-        fillOpacity: 0.1
-      };
-      me.loadGeojsonLayer(data, style);
+      // let style = {
+      //   color: "#33CCFF", //#33CCFF #e60000
+      //   weight: 3,
+      //   opacity: 1,
+      //   fillColor: "#e6d933", //#33CCFF #e6d933
+      //   fillOpacity: 0.1
+      // };
+      me.loadGeojsonLayer(data, geoJsonStyle);
       me.setState({
         spotStatus: "end" //start：开始，end：结束
       });
@@ -1443,9 +1492,21 @@ export default class integration extends PureComponent {
    * 绘制图形函数
    */
   loadGeojsonLayer = (geojson, style) => {
-    userconfig.projectgeojsonLayer = L.Proj.geoJson(geojson, {
-      style: style
-    }).addTo(map);
+    if(!userconfig.projectgeojsonLayer){
+      userconfig.projectgeojsonLayer = L.Proj.geoJson(geojson, {
+        style: style
+      }).addTo(map);
+    }
+  };
+  loadHighlightGeojsonLayer = (geojson, style) => {
+    if(!userconfig.highlightgeojsonLayer){
+      userconfig.highlightgeojsonLayer = L.Proj.geoJson(geojson, {
+        style: style
+      }).addTo(map);
+    }
+    else{
+      userconfig.highlightgeojsonLayer.addData(geojson);
+    }
   };
   /*
    * 清空绘制图形函数
@@ -1455,6 +1516,11 @@ export default class integration extends PureComponent {
       userconfig.projectgeojsonLayer.clearLayers();
       map.removeLayer(userconfig.projectgeojsonLayer);
       userconfig.projectgeojsonLayer = null;
+    }
+    if (userconfig.highlightgeojsonLayer) {
+      userconfig.highlightgeojsonLayer.clearLayers();
+      map.removeLayer(userconfig.highlightgeojsonLayer);
+      userconfig.highlightgeojsonLayer = null;
     }
   };
   /*
