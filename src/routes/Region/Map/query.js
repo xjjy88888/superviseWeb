@@ -79,6 +79,7 @@ export default class Query extends PureComponent {
       dataSource: value ? this.searchResult(value) : []
     });
   };
+  
   getDictList = type => {
     const {
       user: { dicList }
