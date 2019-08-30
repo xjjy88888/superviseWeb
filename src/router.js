@@ -1,7 +1,7 @@
 import React from "react";
 import { Router, Route, Switch } from "dva/router";
 import Login from "./routes/Login";
-import HomePage from "./routes/HomePage";
+import Home from "./routes/Home";
 import ProjectList from "./routes/Project/List";
 import ProjectMap from "./routes/Project/Map";
 import RegionMap from "./routes/Region/Map/Map";
@@ -21,7 +21,7 @@ function RouterConfig({ history }) {
       <Switch>
         <Route path="/" exact component={Login} />
         <Route path="/login" exact component={Login} />
-        <Route path="/index" exact component={HomePage} />
+        <Route path="/index" exact component={Home} />
         <Route path="/region/map" exact component={RegionMap} />
         <Route path="/region/contrast" exact component={Contrast} />
         <Route path="/project/list" exact component={ProjectList} />
