@@ -32,6 +32,29 @@ const formItemLayout = {
   wrapperCol: { span: 16 }
 };
 
+const signatureList = [
+  {
+    name: "监督检查人员",
+    key: "signImg"
+  },
+  {
+    name: "建设单位",
+    key: "proDepCPSignImg"
+  },
+  {
+    name: "监测单位",
+    key: "conDepCPSignImg"
+  },
+  {
+    name: "监理单位",
+    key: "monDepCPSignImg"
+  },
+  {
+    name: "施工单位",
+    key: "supDepCPSignImg"
+  }
+];
+
 @createForm()
 @connect(({ user, district, project, inspect }) => ({
   user,
@@ -461,16 +484,29 @@ export default class Inspect extends PureComponent {
                 : getFieldDecorator(item.key)(<div>无数据</div>)}
             </Form.Item>
           ))}
-          <Form.Item label={`监督检查人员`} {...formItemLayout}>
-            {getFieldDecorator("monitorCheckPeopleName", {
-              initialValue: inspectInfo.monitorCheckPeopleName
-            })(<Input style={{ width: 240 }} />)}
-          </Form.Item>
           <Form.Item label="备注" {...formItemLayout}>
             {getFieldDecorator("description", {
               initialValue: inspectInfo.description
             })(<Input.TextArea autosize />)}
           </Form.Item>
+          <div style={{ textAlign: "center" }}>
+            {signatureList.map((item, index) => (
+              <Form.Item
+                label={item.name + `签名`}
+                style={{ display: "inline-block" }}
+              >
+                <img
+                  width={100}
+                  src={
+                    inspectInfo[item.key]
+                      ? config.url.annexPreviewUrl + inspectInfo[item.key].id
+                      : ""
+                  }
+                  alt=""
+                />
+              </Form.Item>
+            ))}
+          </div>
           <div
             style={{ minHeight: fileList.length ? 120 : 0, margin: "0 30px" }}
           >
