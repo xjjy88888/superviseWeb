@@ -12,29 +12,38 @@ const menuList = [
   {
     title: "首页",
     icon: "home",
-    key: "/homePage",
+    key: "/index",
     subMenu: []
   },
   {
     title: "区域监管",
     icon: "radar-chart",
-    key: "/regionalSupervision",
+    key: "/region",
     subMenu: [
       {
         title: "天地一体化",
-        key: "/regionalSupervision/integration"
+        key: "/region/map"
       },
       {
         title: "地图分屏",
-        key: "/regionalSupervision/splitScreen"
+        key: "/region/contrast"
       }
     ]
   },
   {
     title: "项目监管",
     icon: "book",
-    key: "/projectSupervision",
-    subMenu: []
+    key: "/project",
+    subMenu: [
+      {
+        title: "项目列表",
+        key: "/project/list"
+      },
+      {
+        title: "地图",
+        key: "/project/map"
+      }
+    ]
   },
   {
     title: "系统管理",
@@ -100,7 +109,7 @@ export default class layouts extends PureComponent {
             >
               <Avatar src="./img/logo.png" />/
               <Link
-                to="/regionalSupervision/integration"
+                to="/region/map"
                 style={{
                   margin: "0 10px",
                   color: "#fff"

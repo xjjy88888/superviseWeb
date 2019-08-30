@@ -58,7 +58,7 @@ const geoJsonStyle = {
 };
 //项目红线关联扰动图斑高亮样式
 const highLightGeoJsonStyle = {
-  color: "#0000FF", 
+  color: "#0000FF",
   weight: 3,
   opacity: 1,
   fillColor: "#7CFC00",
@@ -781,7 +781,7 @@ export default class integration extends PureComponent {
             });
           }
           //项目红线高亮关联扰动图斑
-          if (!feature.properties.map_num){
+          if (!feature.properties.map_num) {
             me.querySpotByProjectId(feature.properties.project_id);
           }
         }
@@ -865,7 +865,7 @@ export default class integration extends PureComponent {
             });
           }
           //项目红线高亮关联扰动图斑
-          if (!feature.properties.map_num){
+          if (!feature.properties.map_num) {
             me.querySpotByProjectId(feature.properties.project_id);
           }
         }
@@ -883,7 +883,7 @@ export default class integration extends PureComponent {
       map.closePopup();
     }
   };
-  
+
   //根据项目id查询关联扰动图斑信息
   querySpotByProjectId = ProjectId => {
     const { dispatch } = this.props;
@@ -892,15 +892,17 @@ export default class integration extends PureComponent {
       payload: {
         ProjectId: ProjectId
       },
-      callback: (success,result) => {
-        if(success){
-           //console.log("result",result);
-           if(result.length>0){
-             result.forEach(element => {
-              this.loadHighlightGeojsonLayer(JSON.parse(element.geom), highLightGeoJsonStyle);            
-             });
-           }
-
+      callback: (success, result) => {
+        if (success) {
+          //console.log("result",result);
+          if (result.length > 0) {
+            result.forEach(element => {
+              this.loadHighlightGeojsonLayer(
+                JSON.parse(element.geom),
+                highLightGeoJsonStyle
+              );
+            });
+          }
         }
       }
     });
@@ -1492,19 +1494,18 @@ export default class integration extends PureComponent {
    * 绘制图形函数
    */
   loadGeojsonLayer = (geojson, style) => {
-    if(!userconfig.projectgeojsonLayer){
+    if (!userconfig.projectgeojsonLayer) {
       userconfig.projectgeojsonLayer = L.Proj.geoJson(geojson, {
         style: style
       }).addTo(map);
     }
   };
   loadHighlightGeojsonLayer = (geojson, style) => {
-    if(!userconfig.highlightgeojsonLayer){
+    if (!userconfig.highlightgeojsonLayer) {
       userconfig.highlightgeojsonLayer = L.Proj.geoJson(geojson, {
         style: style
       }).addTo(map);
-    }
-    else{
+    } else {
       userconfig.highlightgeojsonLayer.addData(geojson);
     }
   };
@@ -2179,8 +2180,6 @@ export default class integration extends PureComponent {
       userconfig.leftLayers = [spotleftwms, leftImgLayer];
       userconfig.rightLayers = [spotrightwms, rightImgLayer];
     }
-
-
   };
 
   render() {
@@ -2345,7 +2344,7 @@ export default class integration extends PureComponent {
               background: "#fff"
             }}
           >
-            <Link to="/regionalSupervision/splitScreen">
+            <Link to="/region/contrast">
               <Popover content="地图分屏" title="" trigger="hover">
                 <Button icon="column-width" />
               </Popover>
@@ -2413,7 +2412,7 @@ export default class integration extends PureComponent {
             <span
               style={{
                 padding: "0 10px",
-                display:'none'
+                display: "none"
               }}
             >
               影像:
@@ -2424,7 +2423,7 @@ export default class integration extends PureComponent {
               onChange={this.onChangeSelectLeft}
               style={{
                 width: 150,
-                display:'none'
+                display: "none"
               }}
             >
               {histories.map((item, id) => (
@@ -2471,7 +2470,7 @@ export default class integration extends PureComponent {
             <span
               style={{
                 padding: "0 10px",
-                display:'none'
+                display: "none"
               }}
             >
               影像:
@@ -2482,7 +2481,7 @@ export default class integration extends PureComponent {
               onChange={this.onChangeSelectRight}
               style={{
                 width: 150,
-                display:'none'
+                display: "none"
               }}
             >
               {histories.map((item, id) => (

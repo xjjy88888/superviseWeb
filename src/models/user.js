@@ -33,9 +33,11 @@ export default {
     *goBack({ payload }, { call, put }) {
       yield put(routerRedux.goBack());
     },
-    *fetch({ payload }, { call, put }) {
-      yield put({ type: "save" });
+
+    *loginOut({ payload }, { call, put }) {
+      yield put(routerRedux.replace("/login"));
     },
+
     *login({ payload, callback }, { call, put }) {
       const { data: response } = yield call(loginApi, payload);
       if (callback) callback();
@@ -48,16 +50,14 @@ export default {
           type: "save",
           payload: { current_user: response.result }
         });
-        yield put(routerRedux.replace("/regionalSupervision/integration"));
+        yield put(routerRedux.replace("/region/map"));
       } else {
         notification["error"]({
           message: `登录失败：${response.error.message}`
         });
       }
     },
-    *loginOut({ payload }, { call, put }) {
-      yield put(routerRedux.replace("/login"));
-    },
+
     *queryDict({ payload }, { call, put }) {
       const {
         data: {

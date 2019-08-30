@@ -2,9 +2,10 @@ import React from "react";
 import { Router, Route, Switch } from "dva/router";
 import Login from "./routes/Login";
 import HomePage from "./routes/HomePage";
-import ProjectSupervision from "./routes/ProjectSupervision";
-import Integration from "./routes/RegionalSupervision/Integration";
-import SplitScreen from "./routes/RegionalSupervision/SplitScreen";
+import ProjectList from "./routes/Project/List";
+import ProjectMap from "./routes/Project/Map";
+import RegionMap from "./routes/Region/Map/Map";
+import Contrast from "./routes/Region/Contrast";
 import Review from "./routes/System/User/Review";
 import Society from "./routes/System/User/Society";
 import Account from "./routes/System/User/Administrative/Account";
@@ -20,22 +21,11 @@ function RouterConfig({ history }) {
       <Switch>
         <Route path="/" exact component={Login} />
         <Route path="/login" exact component={Login} />
-        <Route path="/homePage" exact component={HomePage} />
-        <Route
-          path="/projectSupervision"
-          exact
-          component={ProjectSupervision}
-        />
-        <Route
-          path="/regionalSupervision/integration"
-          exact
-          component={Integration}
-        />
-        <Route
-          path="/regionalSupervision/splitScreen"
-          exact
-          component={SplitScreen}
-        />
+        <Route path="/index" exact component={HomePage} />
+        <Route path="/region/map" exact component={RegionMap} />
+        <Route path="/region/contrast" exact component={Contrast} />
+        <Route path="/project/list" exact component={ProjectList} />
+        <Route path="/project/map" exact component={ProjectMap} />
         <Route path="/system" exact component={Review} />
         <Route path="/system/user/review" component={Review} exact />
         <Route path="/system/user/society" component={Society} exact />

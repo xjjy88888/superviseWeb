@@ -147,9 +147,8 @@ export default class splitScreen extends PureComponent {
       : jQuery(`<div>项目:${properties.project_name}</br></div>`);
     callback(elements);
   };
-  /*
-   * 点选查询回调函数
-   */
+
+  // 点选查询回调函数
   callbackPointQueryWFSService = data => {
     const me = this;
     if (data.success) {
@@ -662,7 +661,7 @@ export default class splitScreen extends PureComponent {
   /*
    * 左地图的影像列表切换
    */
-  onChangeSelectLeft = (v) => {
+  onChangeSelectLeft = v => {
     //console.log("668",v);
     //v.stopPropagation();
     this.setState({ selectLeftV: v });
@@ -864,7 +863,7 @@ export default class splitScreen extends PureComponent {
               background: "#fff"
             }}
           >
-            <Link to="/regionalSupervision/integration">
+            <Link to="/region/map">
               <Popover content="天地一体化" title="" trigger="hover">
                 <Button icon="rollback" />
               </Popover>
