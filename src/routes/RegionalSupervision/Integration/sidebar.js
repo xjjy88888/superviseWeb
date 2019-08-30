@@ -241,7 +241,11 @@ export default class sider extends PureComponent {
         });
       }
     });
+    // 图表联动
     this.eventEmitter = emitter.addListener("chartLinkage", data => {
+      if (this.scrollDom) {
+        this.scrollDom.scrollTop = 0;
+      }
       this.setState({
         polygon: data.polygon
       });
