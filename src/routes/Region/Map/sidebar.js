@@ -489,7 +489,16 @@ export default class sider extends PureComponent {
   queryDistrict = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: "district/districtTree"
+      type: "district/districtTree",
+      payload: {
+        IsFilter: false
+      }
+    });
+    dispatch({
+      type: "district/districtTree",
+      payload: {
+        IsFilter: true
+      }
     });
   };
 
@@ -994,7 +1003,7 @@ export default class sider extends PureComponent {
     const {
       dispatch,
       form: { getFieldDecorator, resetFields, setFieldsValue, getFieldValue },
-      district: { districtTree },
+      district: { districtTree, districtTreeFilter },
       user: { basinOrganList },
       project: { projectList, projectInfo, projectListAdd, departSelectList },
       spot: { spotList, projectInfoSpotList },
@@ -1916,7 +1925,7 @@ export default class sider extends PureComponent {
                 <span>位置：</span>
                 <span>
                   {this.find(
-                    districtTree,
+                    districtTreeFilter,
                     projectItem.projectBase.districtCodeId,
                     "label"
                   )}
@@ -3270,14 +3279,14 @@ export default class sider extends PureComponent {
                 <Form.Item label="所在地区" {...formItemLayout}>
                   {getFieldDecorator("districtCodeId", {
                     initialValue: this.find(
-                      districtTree,
+                      districtTreeFilter,
                       projectItem.projectBase.districtCodeId,
                       "value"
                     )
                   })(
                     <Cascader
                       placeholder="请选择所在地区"
-                      options={districtTree}
+                      options={districtTreeFilter}
                       changeOnSelect
                     />
                   )}
@@ -3612,40 +3621,53 @@ export default class sider extends PureComponent {
                       : [districtTree[0].value]
                   })(
                     <TreeSelect
-                      showSearch
                       style={{ width: "100%" }}
                       dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
-                      placeholder="请选择涉及县"
-                      allowClear
-                      multiple
+                      treeData={districtTree}
+                      placeholder="Please select"
                       treeDefaultExpandAll
-                    >
-                      {districtTree.map((item, index) => (
-                        <TreeSelect.TreeNode
-                          value={item.value}
-                          title={item.label}
-                          key={index}
-                          disabled={item.children ? true : false}
-                        >
-                          {(item.children || []).map((ite, idx) => (
-                            <TreeSelect.TreeNode
-                              value={ite.value}
-                              title={ite.label}
-                              key={idx}
-                              disabled={ite.children ? true : false}
-                            >
-                              {(ite.children || []).map((i, j) => (
-                                <TreeSelect.TreeNode
-                                  value={i.value}
-                                  title={i.label}
-                                  key={j}
-                                />
-                              ))}
-                            </TreeSelect.TreeNode>
-                          ))}
-                        </TreeSelect.TreeNode>
-                      ))}
-                    </TreeSelect>
+                      multiple
+                      filterTreeNode={(a, b) => {
+                        if (b.props.label.indexOf(a) > -1) {
+                          return true;
+                        }
+                      }}
+                    />
+                    // <TreeSelect
+                    //   showSearch
+                    //   style={{ width: "100%" }}
+                    //   dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
+                    //   placeholder="请选择涉及县"
+                    //   allowClear
+                    //   multiple
+                    //   treeDefaultExpandAll
+                    // >
+                    //   {districtTree.map((item, index) => (
+                    //     <TreeSelect.TreeNode
+                    //       value={item.value}
+                    //       title={item.label}
+                    //       key={index}
+                    //       disabled={item.children ? true : false}
+                    //     >
+                    //       {(item.children || []).map((ite, idx) => (
+                    //         <TreeSelect.TreeNode
+                    //           value={ite.value}
+                    //           title={ite.label}
+                    //           key={idx}
+                    //           disabled={ite.children ? true : false}
+                    //         >
+                    //           {(ite.children || []).map((i, j) => (
+                    //             <TreeSelect.TreeNode
+                    //               value={i.value}
+                    //               title={i.label}
+                    //               key={j}
+                    //             />
+                    //           ))}
+                    //         </TreeSelect.TreeNode>
+                    //       ))}
+                    //     </TreeSelect.TreeNode>
+                    //   ))}
+                    // </TreeSelect>
                   )}
                 </Form.Item>
                 <Form.Item label="备注" {...formItemLayout}>

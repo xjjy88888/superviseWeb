@@ -12,7 +12,9 @@ export default {
 
   state: {
     districtTree: [{ children: null, id: null, value: null }],
-    districtList: []
+    districtTreeFilter: [{ children: null, id: null, value: null }],
+    districtList: [],
+    districtListFilter: []
   },
 
   subscriptions: {
@@ -21,28 +23,25 @@ export default {
 
   effects: {
     // 行政区划_列表
-    *districtTree({ payload }, { call, put }) {
-      const {
-        data: { result: districtTree }
-      } = yield call(districtTreeApi);
-      const districtList = treeToList(districtTree);
-      yield put({
-        type: "save",
-        payload: { districtTree: [districtTree], districtList }
-      });
-    },
-
-    // 行政区划_列表
-    *districtTree_({ payload, callback }, { call, put }) {
+    *districtTree({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result }
       } = yield call(districtTreeApi, payload);
+      const districtList = treeToList(result);
       if (callback) callback(success, error, result);
       if (success) {
-        yield put({ type: "save", payload: { districtTree: result } });
+        yield put({
+          type: "save",
+          payload: payload.IsFilter
+            ? { districtTreeFilter: [result], districtListFilter: districtList }
+            : {
+                districtTree: result.children,
+                districtList
+              }
+        });
       } else {
         notification["error"]({
-          message: `查询行政区划列表失败：${error.message}`
+          message: `查询行政区划列表失败`
         });
       }
     },

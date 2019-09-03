@@ -35,7 +35,12 @@ export default class area extends PureComponent {
 
   districtTree = () => {
     const { dispatch } = this.props;
-    dispatch({ type: "district/districtTree" });
+    dispatch({
+      type: "district/districtTree",
+      payload: {
+        IsFilter: false
+      }
+    });
   };
 
   getColumnSearchProps = dataIndex => ({

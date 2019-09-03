@@ -3,7 +3,7 @@ import request from "../utils/request";
 import CryptoJS from "crypto-js";
 import { dateFormat, accessToken } from "../utils/util";
 
-// 登录
+// 登录1
 export async function loginApi(params) {
   const passwordMd5 = CryptoJS.MD5(params.password).toString();
   return request(config.url.loginUrl, {
@@ -116,9 +116,7 @@ export async function projectDeleteMulApi(params) {
 // 项目归档
 export async function projectArchiveApi(params) {
   return request(
-    `${config.url.projectArchiveUrl}?id=${params.id}&ArchiveTime=${
-      params.ArchiveTime
-    }`,
+    `${config.url.projectArchiveUrl}?id=${params.id}&ArchiveTime=${params.ArchiveTime}`,
     {
       method: "GET",
       headers: {
@@ -151,9 +149,7 @@ export async function projectVerifyApi(params) {
 // 项目取消关联图斑
 export async function projectUnbindSpotApi(params) {
   return request(
-    `${config.url.projectUnbindSpotUrl}?projectId=${params.projectId}&spotId=${
-      params.spotId
-    }`,
+    `${config.url.projectUnbindSpotUrl}?projectId=${params.projectId}&spotId=${params.spotId}`,
     {
       method: "POST",
       headers: {
@@ -255,9 +251,7 @@ export async function spotDeleteMulApi(params) {
 // 图斑归档
 export async function spotArchiveApi(params) {
   return request(
-    `${config.url.spotArchiveUrl}?id=${params.id}&ArchiveTime=${
-      params.ArchiveTime
-    }`,
+    `${config.url.spotArchiveUrl}?id=${params.id}&ArchiveTime=${params.ArchiveTime}`,
     {
       method: "GET",
       headers: {
@@ -300,9 +294,7 @@ export async function spotOldImgApi(params) {
 // 标注点列表
 export async function pointListApi(params) {
   return request(
-    `${config.url.pointListUrl}?MaxResultCount=10&SkipCount=${
-      params.SkipCount
-    }` +
+    `${config.url.pointListUrl}?MaxResultCount=10&SkipCount=${params.SkipCount}` +
       `&Sorting=${params.Sorting || ""}` +
       `&ProjectName=${params.ProjectName || ""}`,
     {
@@ -362,9 +354,7 @@ export async function pointDeleteMulApi(params) {
 // 项目红线列表
 export async function redLineListApi(ProjectId) {
   return request(
-    `${
-      config.url.redLineListUrl
-    }?SkipCount=0&MaxResultCount=20&ProjectId=${ProjectId}`,
+    `${config.url.redLineListUrl}?SkipCount=0&MaxResultCount=20&ProjectId=${ProjectId}`,
     {
       method: "GET",
       headers: {
@@ -727,9 +717,7 @@ export async function dictTypeDeleteMulApi(params) {
 // 字典数据_列表
 export async function dictDataListApi(id) {
   return request(
-    `${
-      config.url.dictDataListUrl
-    }?SkipCount=0&MaxResultCount=1000&DictTypeId=${id}`,
+    `${config.url.dictDataListUrl}?SkipCount=0&MaxResultCount=1000&DictTypeId=${id}`,
     {
       method: "GET",
       headers: {
@@ -778,8 +766,8 @@ export async function dictDataDeleteMulApi(params) {
 }
 
 // 行政区域_列表
-export async function districtTreeApi() {
-  return request(`${config.url.districtTreeUrl}`, {
+export async function districtTreeApi(params) {
+  return request(`${config.url.districtTreeUrl}?IsFilter=${params.IsFilter}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
@@ -981,7 +969,9 @@ export async function problemPointByIdApi(params) {
 // 问题点_新增修改
 export async function problemPointCreateUpdateApi(params) {
   return request(
-    `${config.url.problemPointCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
+    `${config.url.problemPointCreateUpdateUrl}${
+      params.id ? "Update" : "Create"
+    }`,
     {
       method: "POST",
       headers: {
@@ -1007,9 +997,7 @@ export async function problemPointDeleteApi(params) {
 // 问题点_列表
 export async function problemPointListApi(params) {
   return request(
-    `${config.url.problemPointListUrl}?SkipCount=${
-      params.SkipCount
-    }&MaxResultCount=${params.MaxResultCount}`,
+    `${config.url.problemPointListUrl}?SkipCount=${params.SkipCount}&MaxResultCount=${params.MaxResultCount}`,
     {
       method: "GET",
       headers: {
