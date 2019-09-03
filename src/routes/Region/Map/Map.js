@@ -43,6 +43,7 @@ import emitter from "../../../utils/event";
 import jQuery from "jquery";
 // import { validateId } from "@turf/helpers";
 import Layouts from "../../../components/Layouts";
+import "./index.less";
 
 let userconfig = {};
 let map;
@@ -1039,7 +1040,7 @@ export default class integration extends PureComponent {
 
     map.createPane("tileLayerZIndex");
     map.getPane("tileLayerZIndex").style.zIndex = 0;
-    const baseLayer1 = (userconfig.baseLayer1 = L.tileLayer(
+    /*const baseLayer1 = (userconfig.baseLayer1 = L.tileLayer(
       config.baseMaps[0].Url,
       {
         pane: "tileLayerZIndex"
@@ -1062,11 +1063,26 @@ export default class integration extends PureComponent {
       监管影像: baseLayer3,
       街道图: baseLayer1,
       影像图: baseLayer2
-    };
+    };*/
+    const { onlineBasemaps } = config;
+    // 在线底图
+    this.onlineBasemapLayers = onlineBasemaps.map(item => {
+      return L.tileLayer(`${item.url}`, {
+        minZoom: item.minZoom,
+        maxZoom: item.maxZoom,
+        subdomains: item.subdomains,
+        pane: "tileLayerZIndex"
+      });
+    });
+    map.addLayer(this.onlineBasemapLayers[0]);
+    userconfig.baseLayer = this.onlineBasemapLayers[0];
+
     //监听地图点击事件
     map.on("click", me.onClickMap);
     //监听地图移动完成事件
     map.on("moveend", me.onMoveendMap);
+    //监听地图底图切换事件
+    map.on("baselayerchange", me.onBaseLayerChange);
     //获取项目区域范围
     me.getRegionGeometry();
     //编辑图形工具
@@ -1087,6 +1103,19 @@ export default class integration extends PureComponent {
     map.pm.addControls(options);
     //检查照片列表
     picLayerGroup = L.featureGroup().addTo(map);
+  };
+  //监听地图点击事件
+  onBaseLayerChange = e => {
+    userconfig.baseLayer = e.layer;
+  };
+  getBasemapLayer = (baseLayer, onlineBasemapLayers) => {
+    let layer = onlineBasemapLayers[0];
+    onlineBasemapLayers.forEach((item, i) => {
+      if (item._url === baseLayer._url) {
+        layer = onlineBasemapLayers[i];
+      }
+    });
+    return layer;
   };
   onClickMap = e => {
     const me = this;
@@ -1698,16 +1727,55 @@ export default class integration extends PureComponent {
         .addTo(map);
     }
 
+    const { onlineBasemapLayers } = this;
+    const { onlineBasemaps } = config;
+    // 底图图层
+    const baseMaps = {};
+    onlineBasemaps.forEach((item, i) => {
+      baseMaps[this.getImageTitle(item.title, item.picUrl)] = onlineBasemapLayers[i];
+    });
+    // 专题图层
+    // const overlayMaps = (userconfig.overlayMaps = {
+    //   //  [getImageTitle("项目红线", labelPointMarkerImageUrl)]: projectWmsLayer
+    //   [this.getTitle(
+    //     "项目红线",
+    //     SELF_PROJECT_COLOR,
+    //     PROJECT_FILL_COLOR
+    //   )]: userconfig.projectWmsLayer,
+    //   [this.getTitle(
+    //     "扰动图斑",
+    //     SELF_SPOT_COLOR,
+    //     SPOT_FILL_COLOR
+    //   )]: userconfig.spotWmsLayer
+    // });
     const overlays = (userconfig.overlays = {
       项目红线: userconfig.projectWmsLayer,
       扰动图斑: userconfig.spotWmsLayer
     });
     //底图切换控件
-    let layersControl = L.control
-      .layers(userconfig.baseLayers, overlays)
-      .addTo(map);
+    // let layersControl = L.control
+    //   .layers(userconfig.baseLayers, overlays)
+    //   .addTo(map);
+    // 添加控件
+    const layersControl = L.control
+    .layers(baseMaps, overlays, { position: "topright" })
+    .addTo(map);
+
     return layersControl;
   };
+
+  // 构建图层标题及图例
+  getTitle = (text, borderColor, fillColor, isBorderDashed) => {
+    return `<i style='display:inline-block;border:${
+      isBorderDashed ? "dashed" : "solid"
+    } 2px ${borderColor};background:${fillColor};width:20px;height:20px;position:relative;top:4px;'></i><span style='padding-left:1px;'>${text}</span>`;
+  };
+
+  // 构建图片形式的标题及图例
+  getImageTitle = (text, imgUrl) => {
+    return `<div style='display:inline-block;width:20px;height:20px;position:relative;top:4px;'><img src='${imgUrl}' style='height:20px;'/></div><span style='padding-left:1px;'>${text}</span>`;
+  };
+
   /*
    *移除图层控件
    */
@@ -1949,7 +2017,9 @@ export default class integration extends PureComponent {
       //移除卷帘效果
       this.removeSideBySide();
       //还原默认底图加载
-      map.addLayer(userconfig.baseLayer2);
+      if(userconfig.baseLayer)
+         userconfig.baseLayer = this.getBasemapLayer(userconfig.baseLayer, this.onlineBasemapLayers);
+      map.addLayer(userconfig.baseLayer);
       map.addLayer(userconfig.spotWmsLayer);
       //显示图层控件
       jQuery(userconfig.layersControl.getContainer()).css("display", "block");
@@ -2013,12 +2083,16 @@ export default class integration extends PureComponent {
       userconfig.sideBySide.remove();
     }
     //移除地图默认加载底图
-    if (map.hasLayer(userconfig.baseLayer1))
-      map.removeLayer(userconfig.baseLayer1);
-    if (map.hasLayer(userconfig.baseLayer2))
-      map.removeLayer(userconfig.baseLayer2);
-    if (map.hasLayer(userconfig.baseLayer3))
-      map.removeLayer(userconfig.baseLayer3);
+    if(userconfig.baseLayer)
+       userconfig.baseLayer = this.getBasemapLayer(userconfig.baseLayer, this.onlineBasemapLayers);
+    if (map.hasLayer(userconfig.baseLayer))
+        map.removeLayer(userconfig.baseLayer);
+    // if (map.hasLayer(userconfig.baseLayer1))
+    //   map.removeLayer(userconfig.baseLayer1);
+    // if (map.hasLayer(userconfig.baseLayer2))
+    //   map.removeLayer(userconfig.baseLayer2);
+    // if (map.hasLayer(userconfig.baseLayer3))
+    //   map.removeLayer(userconfig.baseLayer3);
     //移除地图默认加载叠加图层组;
     if (userconfig.spotWmsLayer) map.removeLayer(userconfig.spotWmsLayer);
     //移除卷帘对比左右边图层列表
