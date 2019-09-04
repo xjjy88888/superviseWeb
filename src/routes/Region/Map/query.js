@@ -79,7 +79,7 @@ export default class Query extends PureComponent {
       dataSource: value ? this.searchResult(value) : []
     });
   };
-  
+
   getDictList = type => {
     const {
       user: { dicList }
@@ -168,6 +168,7 @@ export default class Query extends PureComponent {
           <Button
             icon="search"
             onClick={() => {
+              // submit
               this.props.form.validateFields((err, v) => {
                 if (!err) {
                   console.log("筛选信息", v);
@@ -193,6 +194,7 @@ export default class Query extends PureComponent {
                         : v.isReply.length === 1
                         ? v.isReply[0]
                         : "",
+                      IsReview: v.IsReview.length === 1 ? v.IsReview[0] : "",
                       interBatch: (v.interBatch1 || "") + (v.interBatch2 || "")
                     }
                   });
@@ -499,7 +501,14 @@ export default class Query extends PureComponent {
             <Form.Item label="是否复核" {...formItemLayoutlong}>
               {getFieldDecorator("IsReview", {
                 initialValue: []
-              })(<Checkbox.Group options={["是", "否"]} />)}
+              })(
+                <Checkbox.Group
+                  options={[
+                    { label: "是", value: true },
+                    { label: "否", value: false }
+                  ]}
+                />
+              )}
             </Form.Item>
           </Form>
         </div>

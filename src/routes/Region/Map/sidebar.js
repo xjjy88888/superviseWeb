@@ -274,7 +274,6 @@ export default class sider extends PureComponent {
       });
       let queryHighlight = false;
       for (let i in data.info) {
-        console.log(i, data.info[i]);
         if (
           data.info[i] &&
           (data.info[i].length ||
