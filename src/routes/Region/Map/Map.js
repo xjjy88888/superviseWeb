@@ -265,11 +265,20 @@ export default class integration extends PureComponent {
           },
           callback: response => {
             if (response.success) {
+              if (
+                response.result.pointX === 0 ||
+                response.result.pointY === 0
+              ) {
+                message.warning("项目无可用位置信息", 1);
+                return;
+              }
               let point = {
                 x: response.result.pointX,
                 y: response.result.pointY
               };
               let latLng = [point.y, point.x];
+              if (marker) marker.remove();
+              marker = L.marker(latLng).addTo(map);
               switch (response.result.type) {
                 case "ProjectScope": //项目红线
                   me.queryWFSServiceByProperty(
@@ -288,8 +297,13 @@ export default class integration extends PureComponent {
                   );
                   break;
                 case "ProjectPoint": //项目点
-                  if (marker) marker.remove();
-                  marker = L.marker(latLng).addTo(map);
+                  const turfpoint = turf.point([latLng.lng, latLng.lat]);
+                  if (
+                    !turf.booleanPointInPolygon(turfpoint, userconfig.polygon)
+                  ) {
+                    message.warning("项目点位置超出区域范围之外", 1);
+                    return;
+                  }
                   map.setZoom(config.mapInitParams.zoom);
                   setTimeout(() => {
                     if (latLng) me.automaticToMap(latLng);
@@ -1732,7 +1746,8 @@ export default class integration extends PureComponent {
     // 底图图层
     const baseMaps = {};
     onlineBasemaps.forEach((item, i) => {
-      baseMaps[this.getImageTitle(item.title, item.picUrl)] = onlineBasemapLayers[i];
+      baseMaps[this.getImageTitle(item.title, item.picUrl)] =
+        onlineBasemapLayers[i];
     });
     // 专题图层
     // const overlayMaps = (userconfig.overlayMaps = {
@@ -1758,8 +1773,8 @@ export default class integration extends PureComponent {
     //   .addTo(map);
     // 添加控件
     const layersControl = L.control
-    .layers(baseMaps, overlays, { position: "topright" })
-    .addTo(map);
+      .layers(baseMaps, overlays, { position: "topright" })
+      .addTo(map);
 
     return layersControl;
   };
@@ -2017,8 +2032,11 @@ export default class integration extends PureComponent {
       //移除卷帘效果
       this.removeSideBySide();
       //还原默认底图加载
-      if(userconfig.baseLayer)
-         userconfig.baseLayer = this.getBasemapLayer(userconfig.baseLayer, this.onlineBasemapLayers);
+      if (userconfig.baseLayer)
+        userconfig.baseLayer = this.getBasemapLayer(
+          userconfig.baseLayer,
+          this.onlineBasemapLayers
+        );
       map.addLayer(userconfig.baseLayer);
       map.addLayer(userconfig.spotWmsLayer);
       //显示图层控件
@@ -2083,10 +2101,13 @@ export default class integration extends PureComponent {
       userconfig.sideBySide.remove();
     }
     //移除地图默认加载底图
-    if(userconfig.baseLayer)
-       userconfig.baseLayer = this.getBasemapLayer(userconfig.baseLayer, this.onlineBasemapLayers);
+    if (userconfig.baseLayer)
+      userconfig.baseLayer = this.getBasemapLayer(
+        userconfig.baseLayer,
+        this.onlineBasemapLayers
+      );
     if (map.hasLayer(userconfig.baseLayer))
-        map.removeLayer(userconfig.baseLayer);
+      map.removeLayer(userconfig.baseLayer);
     // if (map.hasLayer(userconfig.baseLayer1))
     //   map.removeLayer(userconfig.baseLayer1);
     // if (map.hasLayer(userconfig.baseLayer2))
