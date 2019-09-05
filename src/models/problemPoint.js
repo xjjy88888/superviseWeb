@@ -130,7 +130,7 @@ export default {
       } = yield call(problemPointCreateUpdateApi, payload);
       if (callback) callback(success, error, result);
       notification[success ? "success" : "error"]({
-        message: `${payload.id ? "编辑" : "新增"}问题点${
+        message: `${payload.id ? "编辑" : "新建"}问题点${
           success ? "成功" : "失败"
         }`,
         duration: 1

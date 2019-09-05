@@ -5699,7 +5699,7 @@
   };
 
   /*
-   *新增数据入库功能模块
+   *新建数据入库功能模块
    */
   var ImportDataBaseControl = function(gui) {
     var model = gui.model;
@@ -7969,7 +7969,7 @@ slider drag end
     new ExportControl(gui);
     new LayerControl(gui);
     new Console(gui);
-    //新增数据入库模块
+    //新建数据入库模块
     new ImportDataBaseControl(gui);
 
     startEditing = function() {};

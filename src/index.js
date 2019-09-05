@@ -20,6 +20,7 @@ app.model(require("./models/district").default);
 app.model(require("./models/company").default);
 app.model(require("./models/inspect").default);
 app.model(require("./models/problemPoint").default);
+app.model(require("./models/role").default);
 
 // 4. Router
 app.router(require("./router").default);

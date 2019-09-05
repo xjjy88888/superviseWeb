@@ -356,7 +356,7 @@ export default class problemPoint extends PureComponent {
           />
         </span>
         <b style={{ fontSize: 16, padding: "0 50px" }}>
-          {id ? `问题点详情` : `新增问题点`}
+          {id ? `问题点详情` : `新建问题点`}
         </b>
         <Form
           style={{

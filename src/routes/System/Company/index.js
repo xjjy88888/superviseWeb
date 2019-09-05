@@ -243,7 +243,7 @@ export default class company extends PureComponent {
               });
             }}
           >
-            新增
+            新建
           </Button>
           <Button
             icon="delete"
@@ -315,7 +315,7 @@ export default class company extends PureComponent {
           onChange={this.handleTableChange}
         />
         <Modal
-          title="新增单位"
+          title="新建单位"
           visible={visible}
           onOk={() => {
             this.props.form.validateFields((err, v) => {
@@ -333,12 +333,12 @@ export default class company extends PureComponent {
                       visible: false
                     });
                     notification["success"]({
-                      message: `${id ? "编辑" : "新增"}单位成功`
+                      message: `${id ? "编辑" : "新建"}单位成功`
                     });
                     this.companyList();
                   } else {
                     notification["error"]({
-                      message: `${id ? "编辑" : "新增"}单位失败：${
+                      message: `${id ? "编辑" : "新建"}单位失败：${
                         error.message
                       }`
                     });

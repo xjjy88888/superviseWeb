@@ -60,7 +60,7 @@ const menuList = [
     subMenu: []
   }
 ];
-export default class spins extends PureComponent {
+export default class system extends PureComponent {
   static defaultProps = {
     show: false
   };

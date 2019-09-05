@@ -12,7 +12,7 @@ import {
   Layout,
   Checkbox,
   Row,
-  Col,
+  Col
   // Cascader
 } from "antd";
 import { connect } from "dva";
@@ -34,24 +34,28 @@ const formItemLayout = {
   }
 };
 
-@connect(({ user, district }) => ({
+@connect(({ user, district, role }) => ({
   user,
-  district
+  district,
+  role
 }))
 @createForm()
 export default class register extends PureComponent {
   state = {
     show: false,
     state: 0,
-    type: "account"
+    type: "role",
+    user: {}
     //all: 注册
     //review: 管理员
     //society: 社会用户
     //account: 行政用户
     //role: 行政角色
   };
+
   componentDidMount() {
     this.eventEmitter = emitter.addListener("showRegister", v => {
+      console.log(v);
       this.props.form.resetFields();
       const h = window.location.hash;
       this.setState({
@@ -68,12 +72,26 @@ export default class register extends PureComponent {
   };
 
   setType = v => {
-    console.log(v);
     this.setState(v);
   };
 
   showAdd = v => {
     this.setState({ showAdd: v });
+  };
+
+  saveUser = user => {
+    this.setState({ user });
+  };
+
+  submit = v => {
+    const { dispatch } = this.props;
+
+    const { user, type } = this.state;
+
+    console.log("提交", type, user, v);
+    if (type === "role") {
+      dispatch({ type: "role/" });
+    }
   };
 
   render() {
@@ -132,10 +150,15 @@ export default class register extends PureComponent {
                   isLogin={isLogin}
                   next={this.next.bind(this)}
                   setType={this.setType.bind(this)}
+                  saveUser={this.saveUser.bind(this)}
                 />
               </div>
               <div style={{ display: state === 1 ? "block" : "none" }}>
-                <DomPower type={type} next={this.next.bind(this)} />
+                <DomPower
+                  type={type}
+                  next={this.next.bind(this)}
+                  submit={this.submit.bind(this)}
+                />
               </div>
               <div style={{ display: state === 2 ? "block" : "none" }}>
                 <DomFinish
@@ -179,10 +202,11 @@ class FormWriteUser extends PureComponent {
     console.log(this.props);
     e.preventDefault();
     this.props.form.validateFields((err, v) => {
+      console.log("填写用户信息", err, v);
       if (!err) {
-        console.log("填写用户信息", v);
+        this.props.saveUser(v);
         this.props.next(1);
-        this.props.setType({ type: v.user_type || this.props.type });
+        // this.props.setType({ type: v.user_type || this.props.type });
       }
     });
   };
@@ -195,10 +219,12 @@ class FormWriteUser extends PureComponent {
       callback();
     }
   };
+
   handleConfirmBlur = e => {
     const value = e.target.value;
     this.setState({ confirmDirty: this.state.confirmDirty || !!value });
   };
+
   validateToNextPassword = (rule, value, callback) => {
     const { form } = this.props;
     if (value && this.state.confirmDirty) {
@@ -209,12 +235,16 @@ class FormWriteUser extends PureComponent {
 
   render() {
     const {
-      // type,
+      type,
       isLogin,
-      form: { getFieldDecorator },
+      form: { getFieldDecorator }
       // district: { districtTree }
     } = this.props;
     const { showDistrict } = this.state;
+    // console.log(type);
+
+    const showRole = { display: type === "role" ? "block" : "none" };
+    const hideRole = { display: type === "role" ? "none" : "block" };
 
     return (
       <Layout style={{ backgroundColor: "#fff" }}>
@@ -224,23 +254,23 @@ class FormWriteUser extends PureComponent {
             {...formItemLayout}
             style={{ width: 500, margin: "0 auto" }}
           >
-            <Form.Item label="账号" hasFeedback>
+            <Form.Item label={type === "role" ? "角色名" : "账号"} hasFeedback>
               {getFieldDecorator("name", {
                 initialValue: "",
                 rules: [
                   {
                     required: true,
-                    message: "请输入账号"
+                    message: `请输入${type === "role" ? "角色名" : "账号"}`
                   }
                 ]
               })(<Input />)}
             </Form.Item>
-            <Form.Item label="密码" hasFeedback>
+            <Form.Item label="密码" hasFeedback style={hideRole}>
               {getFieldDecorator("password", {
                 initialValue: "",
                 rules: [
                   {
-                    required: true,
+                    required: type !== "role",
                     message: "请输入密码"
                   },
                   {
@@ -249,12 +279,12 @@ class FormWriteUser extends PureComponent {
                 ]
               })(<Input.Password />)}
             </Form.Item>
-            <Form.Item label="确认密码" hasFeedback>
+            <Form.Item label="确认密码" hasFeedback style={hideRole}>
               {getFieldDecorator("confirm", {
                 initialValue: "",
                 rules: [
                   {
-                    required: true,
+                    required: type !== "role",
                     message: "请输入确认密码"
                   },
                   {
@@ -264,25 +294,13 @@ class FormWriteUser extends PureComponent {
               })(<Input.Password onBlur={this.handleConfirmBlur} />)}
             </Form.Item>
             <Form.Item label="姓名" hasFeedback>
-              {getFieldDecorator("full_name", {
-                initialValue: "",
-                rules: [
-                  {
-                    required: true,
-                    message: "请输入姓名"
-                  }
-                ]
+              {getFieldDecorator("displayName", {
+                initialValue: ""
               })(<Input />)}
             </Form.Item>
-            <Form.Item label="电话" hasFeedback>
+            <Form.Item label="电话" hasFeedback style={hideRole}>
               {getFieldDecorator("phone", {
-                initialValue: "",
-                rules: [
-                  {
-                    required: true,
-                    message: "请输入电话"
-                  }
-                ]
+                initialValue: ""
               })(<Input />)}
             </Form.Item>
             <Form.Item
@@ -318,34 +336,17 @@ class FormWriteUser extends PureComponent {
                 </Select>
               )}
             </Form.Item>
-            <Form.Item label="有效期至" hasFeedback>
+            <Form.Item label="有效期至" hasFeedback style={hideRole}>
               {getFieldDecorator("time", {
                 rules: [
-                  { type: "object", required: true, message: "请选择有效期" }
+                  {
+                    type: "object",
+                    required: type !== "role",
+                    message: "请选择有效期"
+                  }
                 ]
               })(<DatePicker style={{ width: 330 }} />)}
             </Form.Item>
-            {/* <Form.Item
-              label="行政区划单位"
-              hasFeedback
-              style={{ display: showDistrict ? "block" : "none" }}
-            >
-              {getFieldDecorator("area", {
-                initialValue: "",
-                rules: [
-                  {
-                    required: showDistrict,
-                    message: "请选择行政区划单位"
-                  }
-                ]
-              })(
-                <Cascader
-                  options={districtTree}
-                  changeOnSelect
-                  placeholder="请选择所在地区"
-                />
-              )}
-            </Form.Item> */}
             <Form.Item
               label="行政区划单位"
               hasFeedback
@@ -372,22 +373,6 @@ class FormWriteUser extends PureComponent {
                     key="0-1"
                   >
                     <TreeSelect.TreeNode
-                      value="parent 1-0"
-                      title="珠江水利科学研究院"
-                      key="0-1-1"
-                    >
-                      <TreeSelect.TreeNode
-                        value="leaf1"
-                        title="珠江水利科学研究院遥感所"
-                        key="random"
-                      />
-                      <TreeSelect.TreeNode
-                        value="leaf2"
-                        title="珠江水利科学研究院中心站"
-                        key="random1"
-                      />
-                    </TreeSelect.TreeNode>
-                    <TreeSelect.TreeNode
                       value="parent 1-1"
                       title="珠江水利科学研究院监测站"
                       key="random2"
@@ -401,6 +386,11 @@ class FormWriteUser extends PureComponent {
                   </TreeSelect.TreeNode>
                 </TreeSelect>
               )}
+            </Form.Item>
+            <Form.Item label="描述" hasFeedback>
+              {getFieldDecorator("description", {
+                initialValue: ""
+              })(<Input />)}
             </Form.Item>
             <Footer
               style={{
@@ -424,22 +414,23 @@ class FormWriteUser extends PureComponent {
 const DomWriteUser = Form.create({ name: "FormWriteUserName" })(FormWriteUser);
 
 //权限分配
-@connect(({ user }) => ({
-  user
+@connect(({ user, role }) => ({
+  user,
+  role
 }))
 class power extends PureComponent {
   state = {
     value: 1,
-    powerList: [{}]
+    permissions: []
   };
 
   componentDidMount() {
-    // this.powerList();
+    this.powerList();
   }
 
   powerList = () => {
     const { dispatch } = this.props;
-    dispatch({ type: "user/powerList" });
+    dispatch({ type: "role/powerList" });
   };
 
   onChange = e => {
@@ -450,10 +441,14 @@ class power extends PureComponent {
   };
 
   handleSubmit = e => {
+    const { permissions } = this.state;
+
     e.preventDefault();
-    this.props.form.validateFields((err, values) => {
+
+    this.props.form.validateFields((err, v) => {
       if (!err) {
-        console.log("权限分配", values);
+        console.log("权限分配", v);
+        this.props.submit({ ...v, permissions });
         this.props.next(2);
       }
     });
@@ -463,10 +458,10 @@ class power extends PureComponent {
     const { getFieldDecorator } = this.props.form;
     const {
       type,
-      user: { powerList }
+      role: { powerList }
     } = this.props;
 
-    const dataSource = powerList.map(item => {
+    const dataSource = powerList.items.map(item => {
       return { ...item, key: item.name, time: "2019-08-08" };
     });
 
@@ -500,8 +495,9 @@ class power extends PureComponent {
     ];
 
     const rowSelection = {
-      onChange: (selectedRowKeys, selectedRows) => {
-        console.log(selectedRows);
+      onChange: (selectedRowKeys, permissions) => {
+        console.log(permissions);
+        this.setState({ permissions });
       }
     };
 

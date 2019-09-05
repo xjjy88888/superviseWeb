@@ -401,7 +401,7 @@ export default class Inspect extends PureComponent {
           />
         </span>
         <b style={{ fontSize: 16, padding: "0 50px" }}>
-          {id ? `检查表详情` : `新增检查表`}
+          {id ? `检查表详情` : `新建检查表`}
         </b>
         <Form
           style={{

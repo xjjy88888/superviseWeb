@@ -91,8 +91,8 @@ export default class integration extends PureComponent {
       selectRightV: "",
       selectSpotRightV: "",
       spotStatus: "",
-      projectId: null, //针对新增图形的项目红线id
-      addGraphLayer: null, //针对新增图形的图层
+      projectId: null, //针对新建图形的项目红线id
+      addGraphLayer: null, //针对新建图形的图层
       showPhotoPreview: false,
       photoPreviewUrl: null
     };
@@ -496,7 +496,7 @@ export default class integration extends PureComponent {
           });
       });
     });
-    //绘制图形-新增
+    //绘制图形-新建
     this.eventEmitter = emitter.addListener("drawGraphics", data => {
       if (data.draw) {
         me.setState({
@@ -1809,14 +1809,14 @@ export default class integration extends PureComponent {
     map.panTo(latlng);
   };
   /*
-   *清空绘制图形,避免新增图形以及编辑图形冲突
+   *清空绘制图形,避免新建图形以及编辑图形冲突
    */
   clearPlotGraphic = () => {
     //禁止编辑图形
     if (userconfig.projectgeojsonLayer)
       userconfig.projectgeojsonLayer.pm.disable();
     this.clearGeojsonLayer();
-    //针对新增图形
+    //针对新建图形
     const { addGraphLayer } = this.state;
     //禁止编辑图形
     if (addGraphLayer) {
@@ -1839,7 +1839,7 @@ export default class integration extends PureComponent {
     this.clearGeojsonLayer();
   };
   /*
-   * 取消新增图形
+   * 取消新建图形
    */
   cancelAddGraphic = () => {
     this.setState({ showButton: false });
@@ -1874,7 +1874,7 @@ export default class integration extends PureComponent {
     }
   };
   /*
-   * 保存新增图形
+   * 保存新建图形
    */
   saveAddGraphic = () => {
     const me = this;
@@ -1961,7 +1961,7 @@ export default class integration extends PureComponent {
   };
   /*
    * geojson转换multipolygon
-   * @type 0代表编辑图形;1代表新增图形
+   * @type 0代表编辑图形;1代表新建图形
    */
   geojson2Multipolygon = (geojson, type) => {
     let polygon = "";
@@ -1988,7 +1988,7 @@ export default class integration extends PureComponent {
               }
             }
           } else {
-            //新增图形
+            //新建图形
             if (j === coordinate.length - 1) {
               polygon += xy[0] + " " + xy[1];
             } else {

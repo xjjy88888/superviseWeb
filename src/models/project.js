@@ -276,7 +276,7 @@ export default {
     *addSpotGraphic({ payload, callback }, { call, put }) {
       const { data: obj } = yield call(addSpotGraphic, payload);
       notification[obj ? "success" : "error"]({
-        message: obj ? "新增图斑图形成功" : "新增图斑图形失败"
+        message: obj ? "新建图斑图形成功" : "新建图斑图形失败"
       });
       yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);
@@ -303,7 +303,7 @@ export default {
     *addProjectScopeGraphic({ payload, callback }, { call, put }) {
       const { data: obj } = yield call(addProjectScopeGraphic, payload);
       notification[obj ? "success" : "error"]({
-        message: obj ? "新增项目红线图形成功" : "新增项目红线图形失败"
+        message: obj ? "新建项目红线图形成功" : "新建项目红线图形失败"
       });
       yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);

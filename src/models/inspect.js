@@ -65,7 +65,7 @@ export default {
       } = yield call(inspectCreateUpdateApi, payload);
       if (callback) callback(success, error, result);
       notification[success ? "success" : "error"]({
-        message: `${payload.id ? "编辑" : "新增"}检查表${
+        message: `${payload.id ? "编辑" : "新建"}检查表${
           success ? "成功" : "失败"
         }`,
         duration: 1

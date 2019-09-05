@@ -251,7 +251,7 @@ export default class account extends PureComponent {
                     });
                   }}
                 >
-                  新增
+                  新建
                 </Button>
                 <Button
                   icon="delete"

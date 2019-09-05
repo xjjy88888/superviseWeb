@@ -1,41 +1,62 @@
 import React, { PureComponent } from "react";
 import { Icon, Input, Button, Table, message, Modal } from "antd";
+import { createForm } from "rc-form";
+import { connect } from "dva";
 import Systems from "../../../../components/Systems";
-import Register from "../../../../components/Register";
 import emitter from "../../../../utils/event";
+import Register from "../../../../components/Register";
 import Highlighter from "react-highlight-words";
 
-const data = [
-  {
-    key: "1",
-    nickname: "花都区办事员",
-    name: "花都区办事员",
+let self;
 
-    phone: 13555479658,
-    address: "广州市花都区"
-  },
-  {
-    key: "2",
-    nickname: "天河区办事员",
-    name: "天河区办事员",
-
-    phone: 16555479658,
-    address: "广州市天河区"
-  },
-  {
-    key: "3",
-    nickname: "海珠区办事员",
-    name: "海珠区办事员",
-
-    phone: 17555479658,
-    address: "广州市海珠区"
-  }
-];
-
+@createForm()
+@connect(({ role }) => ({ role }))
 export default class role extends PureComponent {
-  state = {
-    state: 0,
-    selectedRows: []
+  constructor(props) {
+    super(props);
+    this.state = {
+      state: 0,
+      visible: false,
+      selectedRows: [],
+      pagination: {},
+      loading: false,
+      dataSource: []
+    };
+  }
+
+  componentDidMount() {
+    self = this;
+    this.roleList({ SkipCount: 0, MaxResultCount: 10 });
+  }
+
+  roleList = params => {
+    const { dispatch } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: "role/roleList",
+      payload: { ...params, IsActive: false },
+      callback: (success, error, result) => {
+        const pagination = { ...this.state.pagination };
+        pagination.total = result.totalCount;
+        this.setState({
+          loading: false,
+          dataSource: result.items,
+          pagination
+        });
+      }
+    });
+  };
+
+  handleTableChange = (pagination, filters, sorter) => {
+    console.log(pagination, filters);
+    this.setState({
+      pagination: pagination
+    });
+    this.roleList({
+      SkipCount: (pagination.current - 1) * pagination.pageSize,
+      MaxResultCount: pagination.pageSize,
+      Name: filters.name
+    });
   };
 
   getColumnSearchProps = dataIndex => ({
@@ -87,15 +108,15 @@ export default class role extends PureComponent {
       if (visible) {
         setTimeout(() => this.searchInput.select());
       }
-    },
-    render: text => (
-      <Highlighter
-        highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-        searchWords={[this.state.searchText]}
-        autoEscape
-        textToHighlight={text.toString()}
-      />
-    )
+    }
+    // render: text => (
+    //   <Highlighter
+    //     highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+    //     searchWords={[this.state.searchText]}
+    //     autoEscape
+    //     textToHighlight={text.toString()}
+    //   />
+    // )
   });
 
   handleSearch = (selectedKeys, confirm) => {
@@ -109,14 +130,25 @@ export default class role extends PureComponent {
   };
 
   render() {
-    const { selectedRows } = this.state;
+    const { selectedRows, dataSource, pagination, loading } = this.state;
 
     const columns = [
       {
-        title: "角色名",
-        dataIndex: "nickname",
-        sorter: (a, b) => a.nickname.length - b.nickname.length,
-        ...this.getColumnSearchProps("nickname")
+        title: "账号",
+        dataIndex: "name",
+        sorter: (a, b) => a.roleName.length - b.roleName.length,
+        ...this.getColumnSearchProps("roleName")
+      },
+      {
+        title: "姓名",
+        dataIndex: "displayName",
+        sorter: (a, b) => a.displayName.length - b.displayName.length,
+        ...this.getColumnSearchProps("displayName")
+      },
+      {
+        title: "描述",
+        dataIndex: "description",
+        ...this.getColumnSearchProps("description")
       },
       {
         title: "操作",
@@ -128,7 +160,7 @@ export default class role extends PureComponent {
               onClick={() => {
                 emitter.emit("showRegister", {
                   show: true,
-                  type: "role"
+                  type: "review"
                 });
               }}
             >
@@ -143,7 +175,7 @@ export default class role extends PureComponent {
                   cancelText: "否",
                   okType: "danger",
                   onOk() {
-                    message.success(`删除1个角色成功`);
+                    message.success(`删除1个账号成功`);
                   },
                   onCancel() {}
                 });
@@ -177,7 +209,7 @@ export default class role extends PureComponent {
               });
             }}
           >
-            添加
+            新建
           </Button>
           <Button
             icon="delete"
@@ -186,7 +218,7 @@ export default class role extends PureComponent {
             onClick={() => {
               const l = selectedRows.length;
               if (l === 0) {
-                message.warning("请选择需要删除的角色");
+                message.warning("请选择需要删除的账号");
                 return;
               }
               Modal.confirm({
@@ -196,7 +228,7 @@ export default class role extends PureComponent {
                 cancelText: "否",
                 okType: "danger",
                 onOk() {
-                  message.success(`删除${l}个角色成功`);
+                  message.success(`删除${l}个账号成功`);
                 },
                 onCancel() {}
               });
@@ -207,8 +239,12 @@ export default class role extends PureComponent {
         </span>
         <Table
           columns={columns}
-          dataSource={data}
           rowSelection={rowSelection}
+          rowKey={record => record.id}
+          dataSource={dataSource}
+          pagination={pagination}
+          loading={loading}
+          onChange={this.handleTableChange}
         />
       </Systems>
     );

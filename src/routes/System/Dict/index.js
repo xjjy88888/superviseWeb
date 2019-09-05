@@ -335,7 +335,7 @@ export default class dict extends PureComponent {
                   });
                 }}
               >
-                新增
+                新建
               </Button>
               <Button
                 icon="delete"
@@ -385,11 +385,11 @@ export default class dict extends PureComponent {
               rowSelection={rowSelectionType}
             />
             <Modal
-              title="新增字典分组"
+              title="新建字典分组"
               visible={visibleType}
               onOk={() => {
                 this.props.form.validateFields((err, v) => {
-                  console.log("新增字典类型", v);
+                  console.log("新建字典类型", v);
                   if (!v.dictTypeName) {
                     message.warning("请填写分组名称");
                     return;
@@ -407,12 +407,12 @@ export default class dict extends PureComponent {
                           visibleType: false
                         });
                         notification["success"]({
-                          message: `${id ? "编辑" : "新增"}字典类型成功`
+                          message: `${id ? "编辑" : "新建"}字典类型成功`
                         });
                         this.dictTypeList();
                       } else {
                         notification["error"]({
-                          message: `${id ? "编辑" : "新增"}字典类型失败：${
+                          message: `${id ? "编辑" : "新建"}字典类型失败：${
                             error.message
                           }`
                         });
@@ -498,7 +498,7 @@ export default class dict extends PureComponent {
                   });
                 }}
               >
-                新增
+                新建
               </Button>
               <Button
                 icon="delete"
@@ -549,11 +549,11 @@ export default class dict extends PureComponent {
             />
 
             <Modal
-              title="新增字典数据"
+              title="新建字典数据"
               visible={visibleData}
               onOk={() => {
                 this.props.form.validateFields((err, v) => {
-                  console.log("新增数组字典", v);
+                  console.log("新建数组字典", v);
                   if (!v.dictTypeId) {
                     message.warning("请选择分组名称");
                     return;
@@ -575,12 +575,12 @@ export default class dict extends PureComponent {
                           visibleData: false
                         });
                         notification["success"]({
-                          message: `${id ? "编辑" : "新增"}字典数据成功`
+                          message: `${id ? "编辑" : "新建"}字典数据成功`
                         });
                         this.dictDataList(selectDefaultValue);
                       } else {
                         notification["error"]({
-                          message: `${id ? "编辑" : "新增"}字典数据失败：${
+                          message: `${id ? "编辑" : "新建"}字典数据失败：${
                             error.message
                           }`
                         });

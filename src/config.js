@@ -212,10 +212,10 @@ const config = {
     //编辑项目红线图形
     updateProjectScopeGraphic: `${domain}api/app/updateProjectScopeGraphic`,
 
-    //新增图斑图形
+    //新建图斑图形
     addSpotGraphic: `${domain}api/app/addSpotGraphic`,
 
-    //新增项目红线图形
+    //新建项目红线图形
     addProjectScopeGraphic: `${domain}api/app/addProjectScopeGraphic`,
 
     //删除图斑图形
@@ -275,16 +275,13 @@ const config = {
     // 单位_批量删除
     companyDeleteMulUrl: `${domainApi}SocialDepartment/DeleteBatch`,
 
-    // 权限列表
-    powerListUrl: `${domainApi}Role/GetAllPermissions`,
-
     // 检查表_模板
     inspectFormUrl: `${domainApi}MonitorCheck/GetFormStructure`,
 
     // 检查表_项目id查询列表
     inspectListUrl: `${domainApi}MonitorCheck/GetAll`,
 
-    // 检查表_新增修改
+    // 检查表_新建修改
     inspectCreateUpdateUrl: `${domainApi}MonitorCheck/`,
 
     // 检查表_删除
@@ -302,7 +299,7 @@ const config = {
     // 问题点_详情
     problemPointByIdUrl: `${domainApi}ProblemPoint/Get`,
 
-    // 问题点_新增修改
+    // 问题点_新建修改
     problemPointCreateUpdateUrl: `${domainApi}ProblemPoint/`,
 
     // 问题点_删除
@@ -310,6 +307,15 @@ const config = {
 
     // 问题点_列表
     problemPointListUrl: `${domainApi}ProblemPoint/GetAll`,
+
+    // 角色_列表
+    roleListUrl: `${domainApi}Role/GetAll`,
+
+    // 角色_新建编辑
+    roleListUrl: `${domainApi}Role/GetAll`,
+
+    // 权限_列表
+    powerListUrl: `${domainApi}Role/GetAllPermissions`,
 
     // 用户_列表
     userListUrl: `${domainApi}User/GetAll`
@@ -459,7 +465,7 @@ const config = {
 
   //扰动变化类型
   disturb_change_type: [
-    "新增",
+    "新建",
     "续建（范围扩大）",
     "续建（范围缩小）",
     "续建（范围不变）",

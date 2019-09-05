@@ -273,7 +273,7 @@ export default class area extends PureComponent {
                     });
                   }}
                 >
-                  新增
+                  新建
                 </Button>
                 <Button
                   icon="delete"
@@ -324,11 +324,11 @@ export default class area extends PureComponent {
               rowSelection={rowSelection}
             />
             <Modal
-              title="新增行政区"
+              title="新建行政区"
               visible={visible}
               onOk={() => {
                 this.props.form.validateFields((err, v) => {
-                  console.log("新增行政区", v);
+                  console.log("新建行政区", v);
                   if (!v.parentId) {
                     message.warning("请选择上级行政区");
                     return;
@@ -350,12 +350,12 @@ export default class area extends PureComponent {
                           visible: false
                         });
                         notification["success"]({
-                          message: `${id ? "编辑" : "新增"}字典类型成功`
+                          message: `${id ? "编辑" : "新建"}字典类型成功`
                         });
                         this.districtTree();
                       } else {
                         notification["error"]({
-                          message: `${id ? "编辑" : "新增"}字典类型失败：${
+                          message: `${id ? "编辑" : "新建"}字典类型失败：${
                             error.message
                           }`
                         });

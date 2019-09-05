@@ -523,11 +523,11 @@ export default class projectDetail extends PureComponent {
               <span>{projectItem.expand.ersnAmt}t</span>
             </p>
             <p style={{ margin: 10 }}>
-              <span>新增水土流失量：</span>
+              <span>新建水土流失量：</span>
               <span>{projectItem.expand.newErsnAmt}t</span>
             </p>
             <p style={{ margin: 10 }}>
-              <span>新增水土流失主要区域：</span>
+              <span>新建水土流失主要区域：</span>
               <span>{projectItem.expand.newArea}</span>
             </p>
             <p style={{ margin: 10 }}>
@@ -931,14 +931,14 @@ export default class projectDetail extends PureComponent {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="新增水土流失量">
+                <Form.Item label="新建水土流失量">
                   {getFieldDecorator("newErsnAmt", {
                     initialValue: projectItem.expand.newErsnAmt
                   })(<Input addonAfter="t" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="新增水土流失主要区域">
+                <Form.Item label="新建水土流失主要区域">
                   {getFieldDecorator("newArea", {
                     initialValue: projectItem.expand.newArea
                   })(<Input />)}

@@ -24,7 +24,6 @@ export default {
     basinOrganList: [],
     departList: [],
     departUpdateId: "",
-    powerList: []
   },
 
   subscriptions: {
@@ -118,21 +117,6 @@ export default {
       } else {
         notification["error"]({
           message: `获取流域机构列表失败：${error.message}`
-        });
-      }
-    },
-
-    // 权限列表
-    *powerList({ payload, callback }, { call, put }) {
-      const {
-        data: { success, error, result }
-      } = yield call(powerListApi, payload);
-      if (callback) callback(success, error, result);
-      if (success) {
-        yield put({ type: "save", payload: { powerList: result.items } });
-      } else {
-        notification["error"]({
-          message: `查询权限列表失败：${error.message}`
         });
       }
     },

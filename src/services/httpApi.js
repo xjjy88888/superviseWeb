@@ -558,7 +558,7 @@ export async function updateSpotGraphic(params) {
   );
 }
 
-//新增扰动图斑图形信息
+//新建扰动图斑图形信息
 export async function addSpotGraphic(params) {
   return request(`${config.url.addSpotGraphic}?obj=${JSON.stringify(params)}`, {
     method: "GET",
@@ -591,7 +591,7 @@ export async function updateProjectScopeGraphic(params) {
   );
 }
 
-//新增项目红线图形信息
+//新建项目红线图形信息
 export async function addProjectScopeGraphic(params) {
   return request(
     `${config.url.addProjectScopeGraphic}?obj=${JSON.stringify(params)}`,
@@ -876,16 +876,6 @@ export async function companyDeleteMulApi(params) {
   });
 }
 
-// 权限列表
-export async function powerListApi() {
-  return request(`${config.url.powerListUrl}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken()}`
-    }
-  });
-}
-
 // 检查表_模板
 export async function inspectFormApi(params) {
   return request(`${config.url.inspectFormUrl}`, {
@@ -906,7 +896,7 @@ export async function inspectListApi(params) {
   });
 }
 
-// 检查表_新增修改
+// 检查表_新建修改
 export async function inspectCreateUpdateApi(params) {
   return request(
     `${config.url.inspectCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
@@ -972,7 +962,7 @@ export async function problemPointByIdApi(params) {
   });
 }
 
-// 问题点_新增修改
+// 问题点_新建修改
 export async function problemPointCreateUpdateApi(params) {
   return request(
     `${config.url.problemPointCreateUpdateUrl}${
@@ -1013,10 +1003,33 @@ export async function problemPointListApi(params) {
   );
 }
 
+// 角色_列表
+export async function roleListApi(params) {
+  return request(
+    `${config.url.roleListUrl}?SkipCount=${params.SkipCount}&MaxResultCount=${params.MaxResultCount}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`
+      }
+    }
+  );
+}
+
+// 权限列表
+export async function powerListApi() {
+  return request(`${config.url.powerListUrl}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
 // 用户_列表
 export async function userListApi(params) {
   return request(
-    `${config.url.userListUrl}?SkipCount=${params.SkipCount}&MaxResultCount=${params.MaxResultCount}`,
+    `${config.url.userListUrl}?SkipCount=${params.SkipCount}&MaxResultCount=${params.MaxResultCount}&IsActive=${params.IsActive}`,
     {
       method: "GET",
       headers: {
