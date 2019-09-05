@@ -2,13 +2,15 @@ const l = window.location;
 const isFormal = l.href.split("/")[3] === "stbcjg";
 const isLocal = l.hostname === "localhost";
 
-console.log(`%c当前版本：v2.0.2`, "color:green;font-size:30px");
+console.log(`%c当前版本：v2.0.3`, "color:green;font-size:30px");
 
 console.log(isLocal ? "本地环境" : isFormal ? "正式环境" : "测试环境");
 
 const domain = isLocal
   ? "http://183.6.178.124:8001/stbct/"
   : `${l.origin}/stbc${isFormal ? "" : "t"}/`;
+
+const domainApi = domain + "api/services/app/";
 
 const imageBaseUrl = "http://www.stbcjg.cn/BasemapService/rest/image";
 const imageQueryBaseUrl = "http://210.36.22.122/BasemapService/rest/image";
@@ -46,160 +48,163 @@ const OSMVectorUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 const config = {
   domain: domain,
   download: `http://www.zkygis.cn/stbcjg/Template/`,
-  export: `${domain}api/services/app/File/GetTempFile`,
+  export: `${domainApi}File/GetTempFile`,
   templateDescription: `http://docs.qq.com/doc/DTEV2TGRsU0RNQUV0?coord=DeJxzNFRxNFQxgEAAEUUCWQ`,
   isFormal: isFormal,
 
   url: {
+    // 初始化
+    initUrl: `${domain}AbpUserConfiguration/GetAll`,
+
     // 登录
     loginUrl: `${domain}api/TokenAuth/Authenticate`,
 
     // 项目列表
-    projectListUrl: `${domain}api/services/app/Project/GetAllByPost`,
+    projectListUrl: `${domainApi}Project/GetAllByPost`,
 
     // 项目列表统计
-    projectChartUrl: `${domain}api/services/app/Project/Statistics`,
+    projectChartUrl: `${domainApi}Project/Statistics`,
 
     // 项目信息
-    projectByIdUrl: `${domain}api/services/app/Project/Get`,
+    projectByIdUrl: `${domainApi}Project/Get`,
 
     // 项目新建
-    projectCreateUrl: `${domain}api/services/app/Project/Create`,
+    projectCreateUrl: `${domainApi}Project/Create`,
 
     // 项目编辑
-    projectUpdateUrl: `${domain}api/services/app/Project/Update`,
+    projectUpdateUrl: `${domainApi}Project/Update`,
 
     // 项目删除
-    projectDeleteUrl: `${domain}api/services/app/Project/Delete`,
+    projectDeleteUrl: `${domainApi}Project/Delete`,
 
     // 项目批量删除
-    projectDeleteMulUrl: `${domain}api/services/app/Project/DeleteBatch`,
+    projectDeleteMulUrl: `${domainApi}Project/DeleteBatch`,
 
     // 项目归档
-    projectArchiveUrl: `${domain}api/services/app/Project/Archive`,
+    projectArchiveUrl: `${domainApi}Project/Archive`,
 
     // 项目撤销归档
-    projectUnArchiveUrl: `${domain}api/services/app/Project/UnArchive`,
+    projectUnArchiveUrl: `${domainApi}Project/UnArchive`,
 
     // 项目重名验证
-    projectVerifyUrl: `${domain}api/services/app/Project/VaildProjectName`,
+    projectVerifyUrl: `${domainApi}Project/VaildProjectName`,
 
     // 项目取消关联图斑
-    projectUnbindSpotUrl: `${domain}api/services/app/Project/UnbindSpot`,
+    projectUnbindSpotUrl: `${domainApi}Project/UnbindSpot`,
 
     // 图斑列表
-    spotListUrl: `${domain}api/services/app/Spot/GetAllByPost`,
+    spotListUrl: `${domainApi}Spot/GetAllByPost`,
 
     // 图斑信息
-    spotPolygonByIdUrl: `${domain}api/services/app/Spot/GetSpotPolygonAll`,
+    spotPolygonByIdUrl: `${domainApi}Spot/GetSpotPolygonAll`,
 
     // 图斑列表统计
-    spotChartUrl: `${domain}api/services/app/Spot/Statistics`,
+    spotChartUrl: `${domainApi}Spot/Statistics`,
 
     // 图斑信息
-    spotByIdUrl: `${domain}api/services/app/Spot/Get`,
+    spotByIdUrl: `${domainApi}Spot/Get`,
 
     // 图斑新建
-    spotCreateUrl: `${domain}api/services/app/Spot/Create`,
+    spotCreateUrl: `${domainApi}Spot/Create`,
 
     // 图斑编辑
-    spotUpdateUrl: `${domain}api/services/app/Spot/Update`,
+    spotUpdateUrl: `${domainApi}Spot/Update`,
 
     // 图斑删除
-    spotDeleteUrl: `${domain}api/services/app/Spot/Delete`,
+    spotDeleteUrl: `${domainApi}Spot/Delete`,
 
     // 图斑批量删除
-    spotDeleteMulUrl: `${domain}api/services/app/Spot/DeleteBatch`,
+    spotDeleteMulUrl: `${domainApi}Spot/DeleteBatch`,
 
     // 图斑归档
-    spotArchiveUrl: `${domain}api/services/app/Spot/Archive`,
+    spotArchiveUrl: `${domainApi}Spot/Archive`,
 
     // 图斑撤销归档
-    spotUnArchiveUrl: `${domain}api/services/app/Spot/UnArchive`,
+    spotUnArchiveUrl: `${domainApi}Spot/UnArchive`,
 
     // 图斑历史
-    spotHistoryUrl: `${domain}api/services/app/Spot/GetHistorySpots`,
+    spotHistoryUrl: `${domainApi}Spot/GetHistorySpots`,
 
     // 图斑同步旧系统附件
-    spotOldImgUrl: `${domain}api/services/app/File/ImgSyn`,
+    spotOldImgUrl: `${domainApi}File/ImgSyn`,
 
     // 标注点列表
-    pointListUrl: `${domain}api/services/app/MarkingPoint/GetAll`,
+    pointListUrl: `${domainApi}MarkingPoint/GetAll`,
 
     // 标注点信息
-    pointByIdUrl: `${domain}api/services/app/MarkingPoint/Get`,
+    pointByIdUrl: `${domainApi}MarkingPoint/Get`,
 
     // 标注点新建
-    pointCreateUrl: `${domain}api/services/app/MarkingPoint/Create`,
+    pointCreateUrl: `${domainApi}MarkingPoint/Create`,
 
     // 标注点编辑
-    pointUpdateUrl: `${domain}api/services/app/MarkingPoint/Update`,
+    pointUpdateUrl: `${domainApi}MarkingPoint/Update`,
 
     // 标注点删除
-    pointDeleteUrl: `${domain}api/services/app/MarkingPoint/Delete`,
+    pointDeleteUrl: `${domainApi}MarkingPoint/Delete`,
 
     // 标注点批量删除
-    pointDeleteMulUrl: `${domain}api/services/app/MarkingPoint/DeleteBatch`,
+    pointDeleteMulUrl: `${domainApi}MarkingPoint/DeleteBatch`,
 
     // 项目红线列表
-    redLineListUrl: `${domain}api/services/app/ProjectScope/GetAll`,
+    redLineListUrl: `${domainApi}ProjectScope/GetAll`,
 
     // 项目红线信息
-    redLineByIdUrl: `${domain}api/services/app/ProjectScope/Get`,
+    redLineByIdUrl: `${domainApi}ProjectScope/Get`,
 
     // 项目红线新建
-    redLineCreateUrl: `${domain}api/services/app/ProjectScope/Create`,
+    redLineCreateUrl: `${domainApi}ProjectScope/Create`,
 
     // 项目红线编辑
-    redLineUpdateUrl: `${domain}api/services/app/ProjectScope/Update`,
+    redLineUpdateUrl: `${domainApi}ProjectScope/Update`,
 
     // 项目红线删除
-    redLineDeleteUrl: `${domain}api/services/app/ProjectScope/Delete`,
+    redLineDeleteUrl: `${domainApi}ProjectScope/Delete`,
 
     // 项目红线批量删除
-    redLineDeleteMulUrl: `${domain}api/services/app/ProjectScope/DeleteBatch`,
+    redLineDeleteMulUrl: `${domainApi}ProjectScope/DeleteBatch`,
 
     // 附件上传
-    annexUploadUrl: `${domain}api/services/app/File/UploadAsync`,
+    annexUploadUrl: `${domainApi}File/UploadAsync`,
 
     // 附件预览
-    annexPreviewUrl: `${domain}api/services/app/File/GetFile?id=`,
+    annexPreviewUrl: `${domainApi}File/GetFile?id=`,
 
     // 附件删除
-    annexDeleteUrl: `${domain}api/services/app/File/Delete`,
+    annexDeleteUrl: `${domainApi}File/Delete`,
 
     // 导出项目/图斑(附件)数据
-    exportUrl: `${domain}api/services/app/Export/`,
+    exportUrl: `${domainApi}Export/`,
 
     // 下载导出项目/图斑(附件)数据
-    downloadUrl: `${domain}api/services/app/File/GetExportFile?id=`,
+    downloadUrl: `${domainApi}File/GetExportFile?id=`,
 
     // 上传项目
-    uploadProjectUrl: `${domain}api/services/app/Import/ProjectImport`,
+    uploadProjectUrl: `${domainApi}Import/ProjectImport`,
 
     // 上传图斑
-    uploadSpotUrl: `${domain}api/services/app/Import/SpotImport`,
+    uploadSpotUrl: `${domainApi}Import/SpotImport`,
 
     // 流域机构列表
-    basinOrganizationUrl: `${domain}api/services/app/Project/GetRiverBasinOU`,
+    basinOrganizationUrl: `${domainApi}Project/GetRiverBasinOU`,
 
     // 字典
-    dictUrl: `${domain}api/services/app/DictTable/GetAll`,
+    dictUrl: `${domainApi}DictTable/GetAll`,
 
     // 部门新建
-    departCreateUrl: `${domain}api/services/app/SocialDepartmentDto/Create`,
+    departCreateUrl: `${domainApi}SocialDepartmentDto/Create`,
 
     // 部门列表
-    departListUrl: `${domain}api/services/app/Department/GetAll`,
+    departListUrl: `${domainApi}Department/GetAll`,
 
     // 部门校验
-    departVaildUrl: `${domain}api/services/app/Department/Vaild`,
+    departVaildUrl: `${domainApi}Department/Vaild`,
 
     // 项目位置
-    projectPositionUrl: `${domain}api/services/app/Project/GetPoint`,
+    projectPositionUrl: `${domainApi}Project/GetPoint`,
 
     // 获取边界
-    boundaryUrl: `${domain}api/services/app/User/GetBoundAsync`,
+    boundaryUrl: `${domainApi}User/GetBoundAsync`,
 
     //编辑图斑图形
     updateSpotGraphic: `${domain}api/app/updateSpotGraphic`,
@@ -223,88 +228,91 @@ const config = {
     queryWFSLayer: `${domain}api/Tool/Forward`,
 
     // 字典类型_列表
-    dictTypeListUrl: `${domain}api/services/app/DictType/GetAll`,
+    dictTypeListUrl: `${domainApi}DictType/GetAll`,
 
     // 字典类型_新建修改
-    dictTypeCreateUpdateUrl: `${domain}api/services/app/DictType/`,
+    dictTypeCreateUpdateUrl: `${domainApi}DictType/`,
 
     // 字典类型_删除
-    dictTypeDeleteUrl: `${domain}api/services/app/DictType/Delete`,
+    dictTypeDeleteUrl: `${domainApi}DictType/Delete`,
 
     // 字典类型_批量删除
-    dictTypeDeleteMulUrl: `${domain}api/services/app/DictType/DeleteBatch`,
+    dictTypeDeleteMulUrl: `${domainApi}DictType/DeleteBatch`,
 
     // 字典数据_列表
-    dictDataListUrl: `${domain}api/services/app/DictTable/GetAll`,
+    dictDataListUrl: `${domainApi}DictTable/GetAll`,
 
     // 字典数据_新建修改
-    dictDataCreateUpdateUrl: `${domain}api/services/app/DictTable/`,
+    dictDataCreateUpdateUrl: `${domainApi}DictTable/`,
 
     // 字典数据_删除
-    dictDataDeleteUrl: `${domain}api/services/app/DictTable/Delete`,
+    dictDataDeleteUrl: `${domainApi}DictTable/Delete`,
 
     // 字典数据_批量删除
-    dictDataDeleteMulUrl: `${domain}api/services/app/DictTable/DeleteBatch`,
+    dictDataDeleteMulUrl: `${domainApi}DictTable/DeleteBatch`,
 
     // 行政区划_列表
-    districtTreeUrl: `${domain}api/services/app/User/GetDistrictCodesTree`,
+    districtTreeUrl: `${domainApi}User/GetDistrictCodesTree`,
 
     // 行政区划_新建修改
-    districtCreateUpdateUrl: `${domain}api/services/app/DistrictCode/`,
+    districtCreateUpdateUrl: `${domainApi}DistrictCode/`,
 
     // 行政区划_删除
-    districtDeleteUrl: `${domain}api/services/app/DistrictCode/Delete`,
+    districtDeleteUrl: `${domainApi}DistrictCode/Delete`,
 
     // 行政区划_删除
-    districtDeleteMulUrl: `${domain}api/services/app/DistrictCode/DeleteBatch`,
+    districtDeleteMulUrl: `${domainApi}DistrictCode/DeleteBatch`,
 
     // 单位_列表
-    companyListUrl: `${domain}api/services/app/SocialDepartment/GetAll`,
+    companyListUrl: `${domainApi}SocialDepartment/GetAll`,
 
     // 单位_新建修改
-    companyCreateUpdateUrl: `${domain}api/services/app/SocialDepartment/`,
+    companyCreateUpdateUrl: `${domainApi}SocialDepartment/`,
 
     // 单位_删除
-    companyDeleteUrl: `${domain}api/services/app/SocialDepartment/Delete`,
+    companyDeleteUrl: `${domainApi}SocialDepartment/Delete`,
 
     // 单位_批量删除
-    companyDeleteMulUrl: `${domain}api/services/app/SocialDepartment/DeleteBatch`,
+    companyDeleteMulUrl: `${domainApi}SocialDepartment/DeleteBatch`,
 
     // 权限列表
-    powerListUrl: `${domain}api/services/app/Role/GetAllPermissions`,
+    powerListUrl: `${domainApi}Role/GetAllPermissions`,
 
     // 检查表_模板
-    inspectFormUrl: `${domain}api/services/app/MonitorCheck/GetFormStructure`,
+    inspectFormUrl: `${domainApi}MonitorCheck/GetFormStructure`,
 
     // 检查表_项目id查询列表
-    inspectListUrl: `${domain}api/services/app/MonitorCheck/GetAll`,
+    inspectListUrl: `${domainApi}MonitorCheck/GetAll`,
 
     // 检查表_新增修改
-    inspectCreateUpdateUrl: `${domain}api/services/app/MonitorCheck/`,
+    inspectCreateUpdateUrl: `${domainApi}MonitorCheck/`,
 
     // 检查表_删除
-    inspectDeleteUrl: `${domain}api/services/app/MonitorCheck/Delete`,
+    inspectDeleteUrl: `${domainApi}MonitorCheck/Delete`,
 
     // 检查表_详情
-    inspectByIdUrl: `${domain}api/services/app/MonitorCheck/Get`,
+    inspectByIdUrl: `${domainApi}MonitorCheck/Get`,
 
     // 检查表_导出
-    inspectExportUrl: `${domain}api/services/app/MonitorCheck/Print`,
+    inspectExportUrl: `${domainApi}MonitorCheck/Print`,
 
     // 问题点_问题类型
-    problemTypeUrl: `${domain}api/services/app/ProblemPoint/GetProblemAll`,
+    problemTypeUrl: `${domainApi}ProblemPoint/GetProblemAll`,
 
     // 问题点_详情
-    problemPointByIdUrl: `${domain}api/services/app/ProblemPoint/Get`,
+    problemPointByIdUrl: `${domainApi}ProblemPoint/Get`,
 
     // 问题点_新增修改
-    problemPointCreateUpdateUrl: `${domain}api/services/app/ProblemPoint/`,
+    problemPointCreateUpdateUrl: `${domainApi}ProblemPoint/`,
 
     // 问题点_删除
-    problemPointDeleteUrl: `${domain}api/services/app/ProblemPoint/Delete`,
+    problemPointDeleteUrl: `${domainApi}ProblemPoint/Delete`,
 
     // 问题点_列表
-    problemPointListUrl: `${domain}api/services/app/ProblemPoint/GetAll`
+    problemPointListUrl: `${domainApi}ProblemPoint/GetAll`,
+
+    // 用户_列表
+    userListUrl: `${domainApi}User/GetAll`
   },
 
   //工具箱

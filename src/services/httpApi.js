@@ -3,7 +3,14 @@ import request from "../utils/request";
 import CryptoJS from "crypto-js";
 import { dateFormat, accessToken } from "../utils/util";
 
-// 登录1
+// 初始化
+export async function initApi() {
+  return request(`${config.url.initUrl}`, {
+    method: "GET"
+  });
+}
+
+// 登录
 export async function loginApi(params) {
   const passwordMd5 = CryptoJS.MD5(params.password).toString();
   return request(config.url.loginUrl, {
@@ -997,6 +1004,19 @@ export async function problemPointDeleteApi(params) {
 export async function problemPointListApi(params) {
   return request(
     `${config.url.problemPointListUrl}?SkipCount=${params.SkipCount}&MaxResultCount=${params.MaxResultCount}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`
+      }
+    }
+  );
+}
+
+// 用户_列表
+export async function userListApi(params) {
+  return request(
+    `${config.url.userListUrl}?SkipCount=${params.SkipCount}&MaxResultCount=${params.MaxResultCount}`,
     {
       method: "GET",
       headers: {

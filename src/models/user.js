@@ -3,7 +3,9 @@ import {
   dictApi,
   basinOrganizationApi,
   departVaildApi,
-  powerListApi
+  powerListApi,
+  initApi,
+  userListApi
 } from "../services/httpApi";
 import { routerRedux } from "dva/router";
 import { notification } from "antd";
@@ -30,6 +32,17 @@ export default {
   },
 
   effects: {
+    *init({ payload, callback }, { call, put }) {
+      const {
+        data: { success }
+      } = yield call(initApi);
+      if (!success) {
+        notification["error"]({
+          message: `初始化失败`
+        });
+      }
+    },
+
     *goBack({ payload }, { call, put }) {
       yield put(routerRedux.goBack());
     },
@@ -120,6 +133,21 @@ export default {
       } else {
         notification["error"]({
           message: `查询权限列表失败：${error.message}`
+        });
+      }
+    },
+
+    // 用户_列表
+    *userList({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(userListApi, payload);
+      if (callback) callback(success, error, result);
+      if (success) {
+        yield put({ type: "save", payload: { userList: result } });
+      } else {
+        notification["error"]({
+          message: `查询用户列表失败`
         });
       }
     }

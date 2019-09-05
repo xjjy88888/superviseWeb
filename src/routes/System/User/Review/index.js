@@ -1,41 +1,74 @@
 import React, { PureComponent } from "react";
-import { Icon, Input, Button, Table, message, Modal } from "antd";
+import {
+  Form,
+  Icon,
+  Input,
+  Button,
+  Table,
+  message,
+  Modal,
+  notification
+} from "antd";
 import { createForm } from "rc-form";
 import Systems from "../../../../components/Systems";
-import emitter from "../../../../utils/event";
-import Register from "../../../../components/Register";
+import { connect } from "dva";
 import Highlighter from "react-highlight-words";
 
-const data = [
-  {
-    key: "1",
-    nickname: "花都区办事员",
-    name: "花都区办事员",
-    phone: 13555479658,
-    time: "2019-12-31",
-    surplus: 10
-  },
-  {
-    key: "2",
-    nickname: "天河区办事员",
-    name: "天河区办事员",
-    phone: 16555479658,
-    time: "2020-12-31",
-    surplus: 20
-  }
-];
+let self;
 
 @createForm()
-export default class review extends PureComponent {
-  state = {
-    state: 0,
-    visible: false,
-    selectedRows: []
-  };
+@connect(({ user }) => ({ user }))
+export default class user extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      state: 0,
+      visible: false,
+      selectedRows: [],
+      dataSource: [],
+      pagination: {},
+      loading: false,
+      id: null
+    };
+  }
 
   componentDidMount() {
-    localStorage.setItem("key", "/user/review");
+    self = this;
+    this.userList();
   }
+
+  userList = (
+    params = { isBuild: true, SkipCount: 0, MaxResultCount: 10 }
+  ) => {
+    const { dispatch } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: "user/userList",
+      payload: params,
+      callback: (success, error, result) => {
+        const pagination = { ...this.state.pagination };
+        pagination.total = result.totalCount;
+        this.setState({
+          loading: false,
+          dataSource: result.items,
+          pagination
+        });
+      }
+    });
+  };
+
+  handleTableChange = (pagination, filters, sorter) => {
+    console.log(pagination, filters);
+    this.setState({
+      pagination: pagination
+    });
+    this.userList({
+      isBuild: true,
+      SkipCount: (pagination.current - 1) * pagination.pageSize,
+      MaxResultCount: pagination.pageSize,
+      Name: filters.name
+    });
+  };
 
   getColumnSearchProps = dataIndex => ({
     filterDropdown: ({
@@ -96,6 +129,7 @@ export default class review extends PureComponent {
       />
     )
   });
+
   handleSearch = (selectedKeys, confirm) => {
     confirm();
     this.setState({ searchText: selectedKeys[0] });
@@ -107,83 +141,25 @@ export default class review extends PureComponent {
   };
 
   render() {
-    const { selectedRows } = this.state;
+    const {
+      visible,
+      selectedRows,
+      loading,
+      pagination,
+      dataSource,
+      id
+    } = this.state;
+    const {
+      dispatch,
+      form: { getFieldDecorator, resetFields }
+    } = this.props;
 
     const columns = [
       {
-        title: "账号",
-        dataIndex: "nickname",
-        sorter: (a, b) => a.nickname.length - b.nickname.length,
-        ...this.getColumnSearchProps("nickname")
-      },
-      {
-        title: "姓名",
+        title: "单位名称",
         dataIndex: "name",
-        sorter: (a, b) => a.name.length - b.name.length,
         ...this.getColumnSearchProps("name")
       },
-      {
-        title: "电话",
-        dataIndex: "phone",
-        sorter: (a, b) => a.phone - b.phone,
-        ...this.getColumnSearchProps("phone")
-      },
-      {
-        title: "有效期至",
-        dataIndex: "time",
-        sorter: (a, b) => a.time.length - b.time.length,
-        ...this.getColumnSearchProps("time")
-      },
-      {
-        title: "剩余天数",
-        dataIndex: "surplus",
-        sorter: (a, b) => a.surplus - b.surplus,
-        ...this.getColumnSearchProps("surplus")
-      },
-      {
-        title: "操作",
-        key: "operation",
-        render: (item, record) => (
-          <span>
-            <a
-              style={{ marginRight: 20 }}
-              onClick={() => {
-                emitter.emit("showRegister", {
-                  show: true,
-                  type: "review"
-                });
-              }}
-            >
-              修改
-            </a>
-            <a
-              style={{ marginRight: 20 }}
-              onClick={() => {
-                message.success(`通过1个账号成功`);
-              }}
-            >
-              通过
-            </a>
-            <a
-              onClick={() => {
-                Modal.confirm({
-                  title: "删除",
-                  content: "你是否确定要删除",
-                  okText: "是",
-                  cancelText: "否",
-                  okType: "danger",
-                  onOk() {
-                    message.success(`删除1个账号成功`);
-                  },
-                  onCancel() {}
-                });
-              }}
-            >
-              删除
-            </a>
-          </span>
-        )
-      }
     ];
 
     const rowSelection = {
@@ -195,22 +171,19 @@ export default class review extends PureComponent {
 
     return (
       <Systems>
-        <Register />
         <span>
           <Button
-            icon="delete"
-            disabled={!selectedRows.length}
+            icon="plus"
             style={{ margin: 10 }}
             onClick={() => {
-              const l = selectedRows.length;
-              if (l === 0) {
-                message.warning("请选择需要通过的账号");
-                return;
-              }
-              message.success(`通过${l}个账号成功`);
+              resetFields();
+              this.setState({
+                visible: true,
+                id: null
+              });
             }}
           >
-            通过
+            新增
           </Button>
           <Button
             icon="delete"
@@ -219,7 +192,7 @@ export default class review extends PureComponent {
             onClick={() => {
               const l = selectedRows.length;
               if (l === 0) {
-                message.warning("请选择需要删除的账号");
+                message.warning("请选择需要删除的单位");
                 return;
               }
               Modal.confirm({
@@ -229,7 +202,23 @@ export default class review extends PureComponent {
                 cancelText: "否",
                 okType: "danger",
                 onOk() {
-                  message.success(`删除${l}个账号成功`);
+                  dispatch({
+                    type: "user/userDeleteMul",
+                    payload: { id: selectedRows.map(item => item.id) },
+                    callback: (success, error, result) => {
+                      if (success) {
+                        self.setState({
+                          visible: false
+                        });
+                        self.userList();
+                      }
+                      notification[success ? "success" : "error"]({
+                        message: `删除${l}条单位数据${
+                          success ? "成功" : "失败"
+                        }${success ? "" : `：${error.message}`}`
+                      });
+                    }
+                  });
                 },
                 onCancel() {}
               });
@@ -237,12 +226,102 @@ export default class review extends PureComponent {
           >
             删除
           </Button>
+          <Button
+            icon="upload"
+            style={{ margin: 10 }}
+            onClick={() => {
+              message.info("开始批量上传");
+            }}
+          >
+            批量上传
+          </Button>
+          <Button
+            icon="download"
+            style={{ margin: 10 }}
+            onClick={() => {
+              message.info("开始模板下载");
+            }}
+          >
+            模板下载
+          </Button>
         </span>
         <Table
           columns={columns}
-          dataSource={data}
           rowSelection={rowSelection}
+          rowKey={record => record.id}
+          dataSource={dataSource}
+          pagination={pagination}
+          loading={loading}
+          onChange={this.handleTableChange}
         />
+        <Modal
+          title="新增单位"
+          visible={visible}
+          onOk={() => {
+            this.props.form.validateFields((err, v) => {
+              console.log("表单信息", v);
+              if (!v.name) {
+                message.warning("请填写单位名称");
+                return;
+              }
+              dispatch({
+                type: "user/userCreateUpdate",
+                payload: { ...v, id: id, depType: 1 },
+                callback: (success, error, result) => {
+                  if (success) {
+                    this.setState({
+                      visible: false
+                    });
+                    notification["success"]({
+                      message: `${id ? "编辑" : "新增"}单位成功`
+                    });
+                    this.userList();
+                  } else {
+                    notification["error"]({
+                      message: `${id ? "编辑" : "新增"}单位失败：${
+                        error.message
+                      }`
+                    });
+                  }
+                }
+              });
+            });
+          }}
+          onCancel={() => {
+            this.setState({
+              visible: false
+            });
+          }}
+        >
+          <Form
+            onSubmit={this.handleSubmit}
+            layout="inline"
+            style={{ textAlign: "center" }}
+          >
+            <Form.Item
+              label={
+                <span>
+                  <b style={{ color: "red" }}>*</b>单位名称
+                </span>
+              }
+              hasFeedback
+            >
+              {getFieldDecorator("name", {})(<Input />)}
+            </Form.Item>
+            <Form.Item
+              label={
+                <span>
+                  <b style={{ color: "#fff" }}>*</b>单位描述
+                </span>
+              }
+              hasFeedback
+            >
+              {getFieldDecorator("description", {})(
+                <Input.TextArea autosize style={{ width: 180 }} />
+              )}
+            </Form.Item>
+          </Form>
+        </Modal>
       </Systems>
     );
   }

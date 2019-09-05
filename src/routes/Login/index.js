@@ -23,7 +23,15 @@ export default class login extends PureComponent {
   componentDidMount() {
     localStorage.setItem("key", "");
     this.props.form.validateFields();
+    this.init();
   }
+
+  init = () => {
+    this.props.dispatch({
+      type: "user/init"
+    });
+  };
+
   handleSubmit = e => {
     localStorage.setItem("frequentEdit", 0);
     e.preventDefault();
