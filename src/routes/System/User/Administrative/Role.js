@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { Icon, Input, Button, Table, message, Modal } from "antd";
+import { Icon, Input, Button, Table, message, Modal, notification } from "antd";
 import { createForm } from "rc-form";
 import { connect } from "dva";
 import Systems from "../../../../components/Systems";
@@ -134,17 +134,22 @@ export default class role extends PureComponent {
   };
 
   render() {
+    const {
+      dispatch,
+      form: { getFieldDecorator, resetFields }
+    } = this.props;
+
     const { selectedRows, dataSource, pagination, loading } = this.state;
 
     const columns = [
       {
-        title: "账号",
+        title: "角色标识",
         dataIndex: "name",
         sorter: (a, b) => a.roleName.length - b.roleName.length,
         ...this.getColumnSearchProps("roleName")
       },
       {
-        title: "姓名",
+        title: "角色名",
         dataIndex: "displayName",
         sorter: (a, b) => a.displayName.length - b.displayName.length,
         ...this.getColumnSearchProps("displayName")
@@ -179,7 +184,15 @@ export default class role extends PureComponent {
                   cancelText: "否",
                   okType: "danger",
                   onOk() {
-                    message.success(`删除1个账号成功`);
+                    dispatch({
+                      type: "role/roleDelete",
+                      payload: { id: item.id },
+                      callback: (success, error, result) => {
+                        if (success) {
+                          self.refresh();
+                        }
+                      }
+                    });
                   },
                   onCancel() {}
                 });
@@ -201,7 +214,7 @@ export default class role extends PureComponent {
 
     return (
       <Systems>
-        <Register refresh={this.refresh()} />
+        <Register refresh={this.refresh} />
         <span>
           <Button
             icon="plus"
@@ -222,7 +235,7 @@ export default class role extends PureComponent {
             onClick={() => {
               const l = selectedRows.length;
               if (l === 0) {
-                message.warning("请选择需要删除的账号");
+                message.warning("请选择需要删除的角色");
                 return;
               }
               Modal.confirm({
@@ -232,7 +245,15 @@ export default class role extends PureComponent {
                 cancelText: "否",
                 okType: "danger",
                 onOk() {
-                  message.success(`删除${l}个账号成功`);
+                  dispatch({
+                    type: "role/roleDeleteMul",
+                    payload: { id: selectedRows.map(item => item.id) },
+                    callback: (success, error, result) => {
+                      if (success) {
+                        self.refresh();
+                      }
+                    }
+                  });
                 },
                 onCancel() {}
               });

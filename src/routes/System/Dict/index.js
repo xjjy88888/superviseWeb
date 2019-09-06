@@ -129,6 +129,12 @@ export default class dict extends PureComponent {
 
   render() {
     const {
+      dispatch,
+      form: { getFieldDecorator, resetFields },
+      dict: { dictTypeList, dictDataList }
+    } = this.props;
+    
+    const {
       visibleType,
       visibleData,
       selectedRowsType,
@@ -137,12 +143,6 @@ export default class dict extends PureComponent {
       selectDefaultValue,
       isEdit
     } = this.state;
-
-    const {
-      dispatch,
-      form: { getFieldDecorator, resetFields },
-      dict: { dictTypeList, dictDataList }
-    } = this.props;
 
     const dataSourceType = dictTypeList.items.map(item => {
       return { ...item, key: item.id };

@@ -2,7 +2,9 @@ import { notification } from "antd";
 import {
   roleListApi,
   powerListApi,
-  roleCreateUpdateApi
+  roleCreateUpdateApi,
+  roleDeleteApi,
+  roleDeleteMulApi
 } from "../services/httpApi";
 
 export default {
@@ -41,8 +43,31 @@ export default {
       } = yield call(roleCreateUpdateApi, payload);
       if (callback) callback(success, error, result);
       notification[success ? "success" : "error"]({
-        message: `${payload.id ? "编辑" : "新建"}角色${
-          success ? `成功` : `失败`
+        message: `${payload.id ? "编辑" : "新建"}${success ? `成功` : `失败`}`
+      });
+    },
+
+    // 角色_删除
+    *roleDelete({ payload, callback }, { call, put }) {
+      console.log(payload)
+      const {
+        data: { success, error, result }
+      } = yield call(roleDeleteApi, payload);
+      if (callback) callback(success, error, result);
+      notification[success ? "success" : "error"]({
+        message: `删除${success ? `成功` : `失败`}`
+      });
+    },
+
+    // 角色批量删除
+    *roleDeleteMul({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error }
+      } = yield call(roleDeleteMulApi, payload);
+      if (callback) callback(success);
+      notification[success ? "success" : "error"]({
+        message: `批量删除${success ? "成功" : "失败"}${
+          success ? "" : `：${error.message}`
         }`
       });
     },

@@ -13,7 +13,6 @@ import {
   Checkbox,
   Row,
   Col
-  // Cascader
 } from "antd";
 import { connect } from "dva";
 import moment from "moment";
@@ -21,7 +20,6 @@ import emitter from "../utils/event";
 import { LocaleProvider } from "antd";
 import { createForm } from "rc-form";
 import zh_CN from "antd/lib/locale-provider/zh_CN";
-import data from "../data";
 
 const { Header, Footer, Sider, Content } = Layout;
 const formItemLayout = {
@@ -73,12 +71,19 @@ export default class register extends PureComponent {
     this.setState(v);
   };
 
+  finish = () => {
+    const {
+      form: { resetFields }
+    } = this.props;
+    resetFields();
+  };
+
   submit = power => {
     const { dispatch } = this.props;
-
     const { user, type } = this.state;
 
     console.log("提交", type, user, power);
+
     if (type === "role") {
       dispatch({
         type: "role/roleCreateUpdate",
@@ -89,6 +94,7 @@ export default class register extends PureComponent {
         callback: (success, error, result) => {
           if (success) {
             this.setState({
+              state: 2,
               finishData: [
                 { name: "角色标识", cont: result.name },
                 { name: "角色名", cont: result.displayName },
@@ -156,21 +162,22 @@ export default class register extends PureComponent {
                 <DomWriteUser
                   type={type}
                   isLogin={isLogin}
-                  saveState={this.saveState.bind(this)}
+                  saveState={this.saveState}
                 />
               </div>
               <div style={{ display: state === 1 ? "block" : "none" }}>
                 <DomPower
                   type={type}
-                  saveState={this.saveState.bind(this)}
-                  submit={this.submit.bind(this)}
+                  saveState={this.saveState}
+                  submit={this.submit}
                 />
               </div>
               <div style={{ display: state === 2 ? "block" : "none" }}>
                 <DomFinish
                   type={type}
                   data={finishData}
-                  saveState={this.saveState.bind(this)}
+                  saveState={this.saveState}
+                  finish={this.finish}
                 />
               </div>
             </Content>
@@ -194,13 +201,8 @@ class FormWriteUser extends PureComponent {
   };
 
   componentDidMount() {
-    const {
-      form: { resetFields }
-    } = this.props;
-    this.eventEmitter = emitter.addListener("resetFields", v => {
-      console.log(111111);
-      resetFields();
-      this.setState({ showDistrict: false });
+    this.eventEmitter = emitter.addListener("showRegister", v => {
+      this.props.form.resetFields();
     });
   }
 
@@ -313,7 +315,13 @@ class FormWriteUser extends PureComponent {
             </Form.Item>
             <Form.Item label="电话" hasFeedback style={hideRole}>
               {getFieldDecorator("phone", {
-                initialValue: ""
+                initialValue: "",
+                rules: [
+                  {
+                    required: type !== "role",
+                    message: `请输入电话`
+                  }
+                ]
               })(<Input />)}
             </Form.Item>
             <Form.Item
@@ -462,7 +470,7 @@ class power extends PureComponent {
       if (!err) {
         console.log("权限分配", v);
         this.props.submit({ ...v, permissions });
-        this.props.saveState({ state: 2 });
+        // this.props.saveState({ state: 2 });
       }
     });
   };
@@ -642,7 +650,7 @@ class finish extends PureComponent {
             icon="check"
             size={80}
           />
-          <p style={{ margin: 30, fontSize: 30 }}>创建成功</p>
+          <p style={{ margin: 30, fontSize: 30 }}>成功</p>
           <div>
             {data.map((item, index) => (
               <p key={index}>
@@ -665,11 +673,10 @@ class finish extends PureComponent {
             type="primary"
             style={{ marginRight: 20 }}
             onClick={() => {
-              this.props.saveState({ state: 0 });
-              emitter.emit("resetFields", {});
+              this.props.saveState({ show: false });
             }}
           >
-            再建一个
+            完成
           </Button>
         </Footer>
       </Layout>
