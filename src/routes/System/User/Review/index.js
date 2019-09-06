@@ -177,7 +177,7 @@ export default class review extends PureComponent {
                 });
               }}
             >
-              修改
+              编辑
             </a>
             <a
               style={{ marginRight: 20 }}

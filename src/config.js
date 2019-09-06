@@ -230,7 +230,7 @@ const config = {
     // 字典类型_列表
     dictTypeListUrl: `${domainApi}DictType/GetAll`,
 
-    // 字典类型_新建修改
+    // 字典类型_新建编辑
     dictTypeCreateUpdateUrl: `${domainApi}DictType/`,
 
     // 字典类型_删除
@@ -242,7 +242,7 @@ const config = {
     // 字典数据_列表
     dictDataListUrl: `${domainApi}DictTable/GetAll`,
 
-    // 字典数据_新建修改
+    // 字典数据_新建编辑
     dictDataCreateUpdateUrl: `${domainApi}DictTable/`,
 
     // 字典数据_删除
@@ -254,7 +254,7 @@ const config = {
     // 行政区划_列表
     districtTreeUrl: `${domainApi}User/GetDistrictCodesTree`,
 
-    // 行政区划_新建修改
+    // 行政区划_新建编辑
     districtCreateUpdateUrl: `${domainApi}DistrictCode/`,
 
     // 行政区划_删除
@@ -266,7 +266,7 @@ const config = {
     // 单位_列表
     companyListUrl: `${domainApi}SocialDepartment/GetAll`,
 
-    // 单位_新建修改
+    // 单位_新建编辑
     companyCreateUpdateUrl: `${domainApi}SocialDepartment/`,
 
     // 单位_删除
@@ -281,7 +281,7 @@ const config = {
     // 检查表_项目id查询列表
     inspectListUrl: `${domainApi}MonitorCheck/GetAll`,
 
-    // 检查表_新建修改
+    // 检查表_新建编辑
     inspectCreateUpdateUrl: `${domainApi}MonitorCheck/`,
 
     // 检查表_删除
@@ -299,7 +299,7 @@ const config = {
     // 问题点_详情
     problemPointByIdUrl: `${domainApi}ProblemPoint/Get`,
 
-    // 问题点_新建修改
+    // 问题点_新建编辑
     problemPointCreateUpdateUrl: `${domainApi}ProblemPoint/`,
 
     // 问题点_删除
@@ -312,7 +312,7 @@ const config = {
     roleListUrl: `${domainApi}Role/GetAll`,
 
     // 角色_新建编辑
-    roleListUrl: `${domainApi}Role/GetAll`,
+    roleCreateUpdateUrl: `${domainApi}Role/`,
 
     // 权限_列表
     powerListUrl: `${domainApi}Role/GetAllPermissions`,

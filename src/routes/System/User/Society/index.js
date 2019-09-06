@@ -156,7 +156,7 @@ export default class society extends PureComponent {
                 });
               }}
             >
-              修改
+              编辑
             </a>
             <a
               onClick={() => {

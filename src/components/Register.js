@@ -21,6 +21,7 @@ import emitter from "../utils/event";
 import { LocaleProvider } from "antd";
 import { createForm } from "rc-form";
 import zh_CN from "antd/lib/locale-provider/zh_CN";
+import data from "../data";
 
 const { Header, Footer, Sider, Content } = Layout;
 const formItemLayout = {
@@ -45,7 +46,8 @@ export default class register extends PureComponent {
     show: false,
     state: 0,
     type: "role",
-    user: {}
+    user: {},
+    finishData: []
     //all: 注册
     //review: 管理员
     //society: 社会用户
@@ -67,35 +69,41 @@ export default class register extends PureComponent {
     });
   }
 
-  next = v => {
-    this.setState({ state: v });
-  };
-
-  setType = v => {
+  saveState = v => {
     this.setState(v);
   };
 
-  showAdd = v => {
-    this.setState({ showAdd: v });
-  };
-
-  saveUser = user => {
-    this.setState({ user });
-  };
-
-  submit = v => {
+  submit = power => {
     const { dispatch } = this.props;
 
     const { user, type } = this.state;
 
-    console.log("提交", type, user, v);
+    console.log("提交", type, user, power);
     if (type === "role") {
-      dispatch({ type: "role/" });
+      dispatch({
+        type: "role/roleCreateUpdate",
+        payload: {
+          ...user,
+          permissions: power.permissions.map(i => i.name)
+        },
+        callback: (success, error, result) => {
+          if (success) {
+            this.setState({
+              finishData: [
+                { name: "角色标识", cont: result.name },
+                { name: "角色名", cont: result.displayName },
+                { name: "描述", cont: result.description }
+              ]
+            });
+            this.props.refresh(true);
+          }
+        }
+      });
     }
   };
 
   render() {
-    const { show, state, type, isLogin } = this.state;
+    const { show, state, type, isLogin, finishData } = this.state;
 
     return (
       <LocaleProvider locale={zh_CN}>
@@ -148,23 +156,21 @@ export default class register extends PureComponent {
                 <DomWriteUser
                   type={type}
                   isLogin={isLogin}
-                  next={this.next.bind(this)}
-                  setType={this.setType.bind(this)}
-                  saveUser={this.saveUser.bind(this)}
+                  saveState={this.saveState.bind(this)}
                 />
               </div>
               <div style={{ display: state === 1 ? "block" : "none" }}>
                 <DomPower
                   type={type}
-                  next={this.next.bind(this)}
+                  saveState={this.saveState.bind(this)}
                   submit={this.submit.bind(this)}
                 />
               </div>
               <div style={{ display: state === 2 ? "block" : "none" }}>
                 <DomFinish
                   type={type}
-                  showAdd={this.showAdd.bind(this)}
-                  next={this.next.bind(this)}
+                  data={finishData}
+                  saveState={this.saveState.bind(this)}
                 />
               </div>
             </Content>
@@ -175,7 +181,7 @@ export default class register extends PureComponent {
   }
 }
 
-//填写用户信息
+//填写用户信息1
 @connect(({ user, district }) => ({
   user,
   district
@@ -204,9 +210,7 @@ class FormWriteUser extends PureComponent {
     this.props.form.validateFields((err, v) => {
       console.log("填写用户信息", err, v);
       if (!err) {
-        this.props.saveUser(v);
-        this.props.next(1);
-        // this.props.setType({ type: v.user_type || this.props.type });
+        this.props.saveState({ user: v, state: 1 });
       }
     });
   };
@@ -254,16 +258,19 @@ class FormWriteUser extends PureComponent {
             {...formItemLayout}
             style={{ width: 500, margin: "0 auto" }}
           >
-            <Form.Item label={type === "role" ? "角色名" : "账号"} hasFeedback>
+            <Form.Item
+              label={type === "role" ? "角色标识" : "账号"}
+              hasFeedback
+            >
               {getFieldDecorator("name", {
                 initialValue: "",
                 rules: [
                   {
                     required: true,
-                    message: `请输入${type === "role" ? "角色名" : "账号"}`
+                    message: `请输入${type === "role" ? "角色标识" : "账号"}`
                   }
                 ]
-              })(<Input />)}
+              })(<Input placeholder={type === "role" ? "请输入英文" : ""} />)}
             </Form.Item>
             <Form.Item label="密码" hasFeedback style={hideRole}>
               {getFieldDecorator("password", {
@@ -293,9 +300,15 @@ class FormWriteUser extends PureComponent {
                 ]
               })(<Input.Password onBlur={this.handleConfirmBlur} />)}
             </Form.Item>
-            <Form.Item label="姓名" hasFeedback>
+            <Form.Item label={type === "role" ? "角色名" : "姓名"} hasFeedback>
               {getFieldDecorator("displayName", {
-                initialValue: ""
+                initialValue: "",
+                rules: [
+                  {
+                    required: true,
+                    message: `请输入${type === "role" ? "角色名" : "姓名"}`
+                  }
+                ]
               })(<Input />)}
             </Form.Item>
             <Form.Item label="电话" hasFeedback style={hideRole}>
@@ -449,7 +462,7 @@ class power extends PureComponent {
       if (!err) {
         console.log("权限分配", v);
         this.props.submit({ ...v, permissions });
-        this.props.next(2);
+        this.props.saveState({ state: 2 });
       }
     });
   };
@@ -590,7 +603,7 @@ class power extends PureComponent {
                 type="primary"
                 style={{ marginRight: 20 }}
                 onClick={() => {
-                  this.props.next(0);
+                  this.props.saveState({ state: 0 });
                 }}
               >
                 上一步
@@ -620,6 +633,7 @@ const DomPower = Form.create({ name: "PowerName" })(power);
 //完成
 class finish extends PureComponent {
   render() {
+    const { data } = this.props;
     return (
       <Layout style={{ backgroundColor: "#fff" }}>
         <Content style={{ textAlign: "center" }}>
@@ -630,18 +644,12 @@ class finish extends PureComponent {
           />
           <p style={{ margin: 30, fontSize: 30 }}>创建成功</p>
           <div>
-            <p>
-              <b>用户名：</b>
-              <span>描述内容详细内容</span>
-            </p>
-            <p>
-              <b>用户名：</b>
-              <span>描述内容详细内容</span>
-            </p>
-            <p>
-              <b>用户名：</b>
-              <span>描述内容详细内容</span>
-            </p>
+            {data.map((item, index) => (
+              <p key={index}>
+                <b>{item.name}：</b>
+                <span>{item.cont}</span>
+              </p>
+            ))}
           </div>
         </Content>
         <Footer
@@ -657,7 +665,7 @@ class finish extends PureComponent {
             type="primary"
             style={{ marginRight: 20 }}
             onClick={() => {
-              this.props.next(0);
+              this.props.saveState({ state: 0 });
               emitter.emit("resetFields", {});
             }}
           >

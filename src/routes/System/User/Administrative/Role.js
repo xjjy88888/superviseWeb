@@ -26,7 +26,7 @@ export default class role extends PureComponent {
 
   componentDidMount() {
     self = this;
-    this.roleList({ SkipCount: 0, MaxResultCount: 10 });
+    this.refresh();
   }
 
   roleList = params => {
@@ -45,6 +45,10 @@ export default class role extends PureComponent {
         });
       }
     });
+  };
+
+  refresh = () => {
+    this.roleList({ SkipCount: 0, MaxResultCount: 10 });
   };
 
   handleTableChange = (pagination, filters, sorter) => {
@@ -164,7 +168,7 @@ export default class role extends PureComponent {
                 });
               }}
             >
-              修改
+              编辑
             </a>
             <a
               onClick={() => {
@@ -197,7 +201,7 @@ export default class role extends PureComponent {
 
     return (
       <Systems>
-        <Register />
+        <Register refresh={this.refresh()} />
         <span>
           <Button
             icon="plus"

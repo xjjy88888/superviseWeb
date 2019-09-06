@@ -896,7 +896,7 @@ export async function inspectListApi(params) {
   });
 }
 
-// 检查表_新建修改
+// 检查表_新建编辑
 export async function inspectCreateUpdateApi(params) {
   return request(
     `${config.url.inspectCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
@@ -962,7 +962,7 @@ export async function problemPointByIdApi(params) {
   });
 }
 
-// 问题点_新建修改
+// 问题点_新建编辑
 export async function problemPointCreateUpdateApi(params) {
   return request(
     `${config.url.problemPointCreateUpdateUrl}${
@@ -1012,6 +1012,21 @@ export async function roleListApi(params) {
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
+    }
+  );
+}
+
+// 角色_新建编辑
+export async function roleCreateUpdateApi(params) {
+  return request(
+    `${config.url.roleCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify(params)
     }
   );
 }
