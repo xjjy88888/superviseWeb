@@ -2798,6 +2798,25 @@ export default class sider extends PureComponent {
                     }
                     key="7"
                   >
+                     <p>
+                       广州市花都区云梯山庄项目
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                        onClick={() => {
+                          emitter.emit("fullViewLocation", {
+                            //type:0,
+                            fullviewURL: "./fullview/vtour21/tour.html",
+                            latLng: [23.51857172222222, 113.2668703330556]
+                          });
+                        }}
+                      />
+                    </p>                   
                     <p>
                       国泰河与大坑交界全景图
                       <Icon

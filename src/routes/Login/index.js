@@ -2,9 +2,8 @@ import React, { PureComponent } from "react";
 import { createForm } from "rc-form";
 import { connect } from "dva";
 import { Form, Icon, Input, Button, Checkbox, message, Layout } from "antd";
-import config from "../../config";
 import Spins from "../../components/Spins";
-// import Register from "../../components/Register";
+import Register from "../System/User/Register";
 import emitter from "../../utils/event";
 
 @connect(({ user }) => ({
@@ -87,7 +86,7 @@ export default class login extends PureComponent {
           height: "100vh"
         }}
       >
-        {/* <Register /> */}
+        <Register />
         <div
           style={{
             position: "absolute",
@@ -164,7 +163,9 @@ export default class login extends PureComponent {
                   onClick={() => {
                     emitter.emit("showRegister", {
                       show: true,
-                      type: "all"
+                      type: "all",
+                      status: "add",
+                      item: {}
                     });
                   }}
                 >

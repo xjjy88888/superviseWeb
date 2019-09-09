@@ -40,7 +40,6 @@ export default class role extends PureComponent {
       role: { powerList }
     } = this.props;
     const result = powerList.items.filter(item => item.name === value);
-    console.log(result);
     return result.length ? result[0].displayName : "";
   };
 
@@ -156,10 +155,7 @@ export default class role extends PureComponent {
   };
 
   render() {
-    const {
-      dispatch,
-      form: { getFieldDecorator, resetFields }
-    } = this.props;
+    const { dispatch } = this.props;
 
     const { selectedRows, dataSource, pagination, loading } = this.state;
 

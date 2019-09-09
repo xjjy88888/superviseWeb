@@ -269,11 +269,11 @@ export default class splitScreen extends PureComponent {
     //加载影像底图
     userconfig.leftImgLayer = me.loadMapbaseLayer(
       userconfig.LMap,
-      config.baseMaps[1].Url
+      config.onlineBasemaps[0].url
     );
     userconfig.rightImgLayer = me.loadMapbaseLayer(
       userconfig.RMap,
-      config.baseMaps[1].Url
+      config.onlineBasemaps[0].url
     );
     //构造面
     userconfig.polygon = turf.multiPolygon(

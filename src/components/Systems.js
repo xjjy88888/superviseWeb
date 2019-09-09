@@ -1,9 +1,9 @@
 import React, { PureComponent } from "react";
-import {  Layout, Menu, Icon } from "antd";
+import { Layout, Menu, Icon } from "antd";
 import Layouts from "./Layouts";
 import { Link } from "dva/router";
 
-const {  Sider, Content } = Layout;
+const { Sider, Content } = Layout;
 
 const menuList = [
   {
@@ -34,6 +34,12 @@ const menuList = [
         ]
       }
     ]
+  },
+  {
+    title: "部门管理",
+    key: "/departs",
+    icon: "appstore",
+    subMenu: []
   },
   {
     title: "数据字典",

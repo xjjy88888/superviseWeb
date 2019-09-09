@@ -21,6 +21,7 @@ app.model(require("./models/company").default);
 app.model(require("./models/inspect").default);
 app.model(require("./models/problemPoint").default);
 app.model(require("./models/role").default);
+app.model(require("./models/departs").default);
 
 // 4. Router
 app.router(require("./router").default);

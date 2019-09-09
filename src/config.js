@@ -227,6 +227,39 @@ const config = {
     //点查地图服务后台接口
     queryWFSLayer: `${domain}api/Tool/Forward`,
 
+    // 检查表_模板
+    inspectFormUrl: `${domainApi}MonitorCheck/GetFormStructure`,
+
+    // 检查表_项目id查询列表
+    inspectListUrl: `${domainApi}MonitorCheck/GetAll`,
+
+    // 检查表_新建编辑
+    inspectCreateUpdateUrl: `${domainApi}MonitorCheck/`,
+
+    // 检查表_删除
+    inspectDeleteUrl: `${domainApi}MonitorCheck/Delete`,
+
+    // 检查表_详情
+    inspectByIdUrl: `${domainApi}MonitorCheck/Get`,
+
+    // 检查表_导出
+    inspectExportUrl: `${domainApi}MonitorCheck/Print`,
+
+    // 问题点_问题类型
+    problemTypeUrl: `${domainApi}ProblemPoint/GetProblemAll`,
+
+    // 问题点_详情
+    problemPointByIdUrl: `${domainApi}ProblemPoint/Get`,
+
+    // 问题点_新建编辑
+    problemPointCreateUpdateUrl: `${domainApi}ProblemPoint/`,
+
+    // 问题点_删除
+    problemPointDeleteUrl: `${domainApi}ProblemPoint/Delete`,
+
+    // 问题点_列表
+    problemPointListUrl: `${domainApi}ProblemPoint/GetAll`,
+
     // 字典类型_列表
     dictTypeListUrl: `${domainApi}DictType/GetAll`,
 
@@ -260,7 +293,7 @@ const config = {
     // 行政区划_删除
     districtDeleteUrl: `${domainApi}DistrictCode/Delete`,
 
-    // 行政区划_删除
+    // 行政区划_批量删除
     districtDeleteMulUrl: `${domainApi}DistrictCode/DeleteBatch`,
 
     // 单位_列表
@@ -275,38 +308,20 @@ const config = {
     // 单位_批量删除
     companyDeleteMulUrl: `${domainApi}SocialDepartment/DeleteBatch`,
 
-    // 检查表_模板
-    inspectFormUrl: `${domainApi}MonitorCheck/GetFormStructure`,
+    // 行政部门_树状列表
+    departsTreeUrl: `${domainApi}GovDepartment/GetTree`,
 
-    // 检查表_项目id查询列表
-    inspectListUrl: `${domainApi}MonitorCheck/GetAll`,
+    // 行政部门_列表
+    departsListUrl: `${domainApi}GovDepartment/GetAll`,
 
-    // 检查表_新建编辑
-    inspectCreateUpdateUrl: `${domainApi}MonitorCheck/`,
+    // 行政部门_新建编辑
+    departsCreateUpdateUrl: `${domainApi}GovDepartment/`,
 
-    // 检查表_删除
-    inspectDeleteUrl: `${domainApi}MonitorCheck/Delete`,
+    // 行政部门_删除
+    departsDeleteUrl: `${domainApi}GovDepartment/Delete`,
 
-    // 检查表_详情
-    inspectByIdUrl: `${domainApi}MonitorCheck/Get`,
-
-    // 检查表_导出
-    inspectExportUrl: `${domainApi}MonitorCheck/Print`,
-
-    // 问题点_问题类型
-    problemTypeUrl: `${domainApi}ProblemPoint/GetProblemAll`,
-
-    // 问题点_详情
-    problemPointByIdUrl: `${domainApi}ProblemPoint/Get`,
-
-    // 问题点_新建编辑
-    problemPointCreateUpdateUrl: `${domainApi}ProblemPoint/`,
-
-    // 问题点_删除
-    problemPointDeleteUrl: `${domainApi}ProblemPoint/Delete`,
-
-    // 问题点_列表
-    problemPointListUrl: `${domainApi}ProblemPoint/GetAll`,
+    // 行政部门_批量删除
+    departsDeleteMulUrl: `${domainApi}GovDepartment/DeleteBatch`,
 
     // 角色_列表
     roleListUrl: `${domainApi}Role/GetAll`,

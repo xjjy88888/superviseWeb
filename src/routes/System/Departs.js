@@ -1,7 +1,7 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
 import { createForm } from "rc-form";
-import Systems from "../../../components/Systems";
+import Systems from "../../components/Systems";
 import {
   Form,
   Icon,
@@ -23,23 +23,62 @@ const { Title } = Typography;
 
 let self;
 
-@connect(({ district }) => ({ district }))
+@connect(({ departs }) => ({ departs }))
 @createForm()
 export default class area extends PureComponent {
-  state = { visible: false, selectedRows: [], id: null };
+  state = {
+    visible: false,
+    selectedRows: [],
+    id: null,
+    pagination: {},
+    loading: false,
+    dataSource: []
+  };
 
   componentDidMount() {
     self = this;
-    this.districtTree();
+    this.departsTree();
+    this.departsList({ SkipCount: 0, MaxResultCount: 10 });
   }
 
-  districtTree = () => {
+  departsTree = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: "district/districtTree",
-      payload: {
-        IsFilter: false
+      type: "departs/departsTree"
+    });
+  };
+
+  departsList = payload => {
+    const { dispatch } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: "departs/departsList",
+      payload,
+      callback: (success, error, result) => {
+        const pagination = { ...this.state.pagination };
+        pagination.total = result.totalCount;
+        this.setState({
+          pagination,
+          loading: false,
+          dataSource: result.items.map((item, index) => {
+            return {
+              ...item,
+              key: index
+            };
+          })
+        });
       }
+    });
+  };
+
+  handleTableChange = (pagination, filters, sorter) => {
+    this.setState({
+      pagination: pagination
+    });
+    this.departsList({
+      SkipCount: (pagination.current - 1) * pagination.pageSize,
+      MaxResultCount: pagination.pageSize,
+      Name: filters.name
     });
   };
 
@@ -92,15 +131,15 @@ export default class area extends PureComponent {
       if (visible) {
         setTimeout(() => this.searchInput.select());
       }
-    },
-    render: text => (
-      <Highlighter
-        highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-        searchWords={[this.state.searchText]}
-        autoEscape
-        textToHighlight={text.toString()}
-      />
-    )
+    }
+    // render: text => (
+    //   <Highlighter
+    //     highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+    //     searchWords={[this.state.searchText]}
+    //     autoEscape
+    //     textToHighlight={text.toString()}
+    //   />
+    // )
   });
 
   handleSearch = (selectedKeys, confirm) => {
@@ -113,47 +152,35 @@ export default class area extends PureComponent {
     this.setState({ searchText: "" });
   };
   render() {
-    const { visible, selectedRows, id } = this.state;
     const {
       dispatch,
       form: { getFieldDecorator, resetFields },
-      district: { districtTree, districtList }
+      departs: { departsTree, departsList }
     } = this.props;
 
-    const dataSource = districtList.map(item => {
-      return { ...item, key: item.id };
-    });
+    const {
+      visible,
+      selectedRows,
+      id,
+      dataSource,
+      pagination,
+      loading
+    } = this.state;
 
     const columns = [
       {
-        title: "行政区名称",
+        title: "单位名",
         dataIndex: "name",
         sorter: (a, b) => a.name.length - b.name.length,
         ...this.getColumnSearchProps("name")
       },
       {
-        title: "行政区编码",
-        dataIndex: "code",
-        sorter: (a, b) => a.code - b.code,
-        ...this.getColumnSearchProps("code")
+        title: "单位编码",
+        dataIndex: "districtCodeId"
       },
       {
-        title: "上级行政区",
-        dataIndex: "parent_name",
-        sorter: (a, b) => a.parent_name.length - b.parent_name.length,
-        ...this.getColumnSearchProps("parent_name")
-      },
-      {
-        title: "上级行政区编码",
-        dataIndex: "parent_code",
-        sorter: (a, b) => a.parent_code - b.parent_code,
-        ...this.getColumnSearchProps("parent_code")
-      },
-      {
-        title: "备注",
-        dataIndex: "description",
-        sorter: (a, b) => a.description.length - b.description.length,
-        ...this.getColumnSearchProps("description")
+        title: "上级单位",
+        dataIndex: "parentId"
       },
       {
         title: "操作",
@@ -188,14 +215,14 @@ export default class area extends PureComponent {
                   okType: "danger",
                   onOk() {
                     dispatch({
-                      type: "district/districtDelete",
+                      type: "departs/departsDelete",
                       payload: record.id,
                       callback: (success, error, result) => {
                         if (success) {
                           self.setState({
                             visible: false
                           });
-                          self.districtTree();
+                          self.departsTree();
                         }
                         notification[success ? "success" : "error"]({
                           message: `删除1条行政区划数据${
@@ -236,16 +263,17 @@ export default class area extends PureComponent {
           >
             <Tree.DirectoryTree
               multiple
+              // defaultExpandAll={true}
               onSelect={(keys, event) => {
                 console.log("Trigger Select", keys, event);
               }}
             >
-              {districtTree.map(item => (
-                <Tree.TreeNode title={item.label} key={item.value}>
+              {departsTree.map(item => (
+                <Tree.TreeNode title={item.name} key={item.id}>
                   {(item.children || []).map(ite => (
-                    <Tree.TreeNode title={ite.label} key={ite.value}>
+                    <Tree.TreeNode title={ite.name} key={ite.id}>
                       {(ite.children || []).map(it => (
-                        <Tree.TreeNode title={it.label} key={it.value} isLeaf />
+                        <Tree.TreeNode title={it.name} key={it.id} isLeaf />
                       ))}
                     </Tree.TreeNode>
                   ))}
@@ -292,14 +320,14 @@ export default class area extends PureComponent {
                       okType: "danger",
                       onOk() {
                         dispatch({
-                          type: "district/districtDeleteMul",
+                          type: "departs/departsDeleteMul",
                           payload: { id: selectedRows.map(item => item.id) },
                           callback: (success, error, result) => {
                             if (success) {
                               self.setState({
                                 visible: false
                               });
-                              self.districtTree();
+                              self.departsTree();
                             }
                             notification[success ? "success" : "error"]({
                               message: `删除${l}条行政区划数据${
@@ -319,8 +347,12 @@ export default class area extends PureComponent {
             </Title>
             <Table
               columns={columns}
-              dataSource={dataSource}
               rowSelection={rowSelection}
+              rowKey={record => record.id}
+              dataSource={dataSource}
+              pagination={pagination}
+              loading={loading}
+              onChange={this.handleTableChange}
             />
             <Modal
               title="新建行政区"
@@ -341,7 +373,7 @@ export default class area extends PureComponent {
                     return;
                   }
                   dispatch({
-                    type: "district/districtCreateUpdate",
+                    type: "departs/departsCreateUpdate",
                     payload: { ...v, id: id },
                     callback: (success, error, result) => {
                       if (success) {
@@ -351,7 +383,7 @@ export default class area extends PureComponent {
                         notification["success"]({
                           message: `${id ? "编辑" : "新建"}字典类型成功`
                         });
-                        this.districtTree();
+                        this.departsTree();
                       } else {
                         notification["error"]({
                           message: `${id ? "编辑" : "新建"}字典类型失败：${
@@ -389,7 +421,7 @@ export default class area extends PureComponent {
                       optionFilterProp="children"
                       style={{ width: 180 }}
                     >
-                      {districtList.map((item, index) => (
+                      {departsList.items.map((item, index) => (
                         <Select.Option value={item.id} key={index}>
                           {item.name}
                         </Select.Option>

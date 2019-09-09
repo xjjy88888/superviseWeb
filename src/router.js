@@ -11,6 +11,7 @@ import Society from "./routes/System/User/Society";
 import Account from "./routes/System/User/Admin/Account";
 import Role from "./routes/System/User/Admin/Role";
 import District from "./routes/System/District";
+import Departs from "./routes/System/Departs.js";
 import Dict from "./routes/System/Dict";
 import Branch from "./routes/System/Branch";
 import Company from "./routes/System/Company";
@@ -38,6 +39,7 @@ function RouterConfig({ history }) {
         <Route path="/system/dict" component={Dict} exact />
         <Route path="/system/company" component={Company} exact />
         <Route path="/system/district" component={District} exact />
+        <Route path="/system/departs" component={Departs} exact />
         <Route path="/system/branch" component={Branch} exact />
       </Switch>
     </Router>

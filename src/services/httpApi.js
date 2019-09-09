@@ -669,6 +669,133 @@ export async function getHistorySpotTimeByExtent(params) {
   });
 }
 
+// 检查表_模板
+export async function inspectFormApi(params) {
+  return request(`${config.url.inspectFormUrl}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 检查表_项目id查询列表
+export async function inspectListApi(params) {
+  return request(`${config.url.inspectListUrl}?ProjectId=${params.ProjectId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 检查表_新建编辑
+export async function inspectCreateUpdateApi(params) {
+  return request(
+    `${config.url.inspectCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify(params)
+    }
+  );
+}
+
+// 检查表_删除
+export async function inspectDeleteApi(params) {
+  return request(`${config.url.inspectDeleteUrl}?id=${params.id}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    }
+  });
+}
+
+// 检查表_详情
+export async function inspectByIdApi(params) {
+  return request(`${config.url.inspectByIdUrl}?Id=${params.id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 检查表_导出
+export async function inspectExportApi(params) {
+  return request(`${config.url.inspectExportUrl}?id=${params.id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 问题点_问题类型
+export async function problemTypeApi() {
+  return request(`${config.url.problemTypeUrl}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 问题点_详情
+export async function problemPointByIdApi(params) {
+  return request(`${config.url.problemPointByIdUrl}?Id=${params.id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 问题点_新建编辑
+export async function problemPointCreateUpdateApi(params) {
+  return request(
+    `${config.url.problemPointCreateUpdateUrl}${
+      params.id ? "Update" : "Create"
+    }`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify(params)
+    }
+  );
+}
+
+// 问题点_删除
+export async function problemPointDeleteApi(params) {
+  return request(`${config.url.problemPointDeleteUrl}?id=${params.id}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    }
+  });
+}
+
+// 问题点_列表
+export async function problemPointListApi(params) {
+  return request(
+    `${config.url.problemPointListUrl}?SkipCount=${params.SkipCount}&MaxResultCount=${params.MaxResultCount}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`
+      }
+    }
+  );
+}
+
 // 字典类型_列表
 export async function dictTypeListApi() {
   return request(
@@ -876,9 +1003,9 @@ export async function companyDeleteMulApi(params) {
   });
 }
 
-// 检查表_模板
-export async function inspectFormApi(params) {
-  return request(`${config.url.inspectFormUrl}`, {
+// 行政部门_树状列表
+export async function departsTreeApi(params) {
+  return request(`${config.url.departsTreeUrl}?Name=中华人民共和国水利部`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
@@ -886,114 +1013,10 @@ export async function inspectFormApi(params) {
   });
 }
 
-// 检查表_项目id查询列表
-export async function inspectListApi(params) {
-  return request(`${config.url.inspectListUrl}?ProjectId=${params.ProjectId}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken()}`
-    }
-  });
-}
-
-// 检查表_新建编辑
-export async function inspectCreateUpdateApi(params) {
+// 行政部门_列表
+export async function departsListApi(params) {
   return request(
-    `${config.url.inspectCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken()}`,
-        "Content-Type": "application/json-patch+json"
-      },
-      body: JSON.stringify(params)
-    }
-  );
-}
-
-// 检查表_删除
-export async function inspectDeleteApi(params) {
-  return request(`${config.url.inspectDeleteUrl}?id=${params.id}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${accessToken()}`,
-      "Content-Type": "application/json-patch+json"
-    }
-  });
-}
-
-// 检查表_详情
-export async function inspectByIdApi(params) {
-  return request(`${config.url.inspectByIdUrl}?Id=${params.id}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken()}`
-    }
-  });
-}
-
-// 检查表_导出
-export async function inspectExportApi(params) {
-  return request(`${config.url.inspectExportUrl}?id=${params.id}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken()}`
-    }
-  });
-}
-
-// 问题点_问题类型
-export async function problemTypeApi() {
-  return request(`${config.url.problemTypeUrl}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken()}`
-    }
-  });
-}
-
-// 问题点_详情
-export async function problemPointByIdApi(params) {
-  return request(`${config.url.problemPointByIdUrl}?Id=${params.id}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${accessToken()}`
-    }
-  });
-}
-
-// 问题点_新建编辑
-export async function problemPointCreateUpdateApi(params) {
-  return request(
-    `${config.url.problemPointCreateUpdateUrl}${
-      params.id ? "Update" : "Create"
-    }`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken()}`,
-        "Content-Type": "application/json-patch+json"
-      },
-      body: JSON.stringify(params)
-    }
-  );
-}
-
-// 问题点_删除
-export async function problemPointDeleteApi(params) {
-  return request(`${config.url.problemPointDeleteUrl}?id=${params.id}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${accessToken()}`,
-      "Content-Type": "application/json-patch+json"
-    }
-  });
-}
-
-// 问题点_列表
-export async function problemPointListApi(params) {
-  return request(
-    `${config.url.problemPointListUrl}?SkipCount=${params.SkipCount}&MaxResultCount=${params.MaxResultCount}`,
+    `${config.url.departsListUrl}?SkipCount=${params.SkipCount}&MaxResultCount=${params.MaxResultCount}`,
     {
       method: "GET",
       headers: {
@@ -1001,6 +1024,44 @@ export async function problemPointListApi(params) {
       }
     }
   );
+}
+
+// 行政部门_新建编辑
+export async function departsCreateUpdateApi(params) {
+  return request(
+    `${config.url.departsCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify(params)
+    }
+  );
+}
+
+// 行政部门_删除
+export async function departsDeleteApi(id) {
+  return request(`${config.url.departsDeleteUrl}?id=${id}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    }
+  });
+}
+
+// 行政部门_批量删除
+export async function departsDeleteMulApi(params) {
+  return request(`${config.url.departsDeleteMulUrl}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify(params.id)
+  });
 }
 
 // 角色_列表
