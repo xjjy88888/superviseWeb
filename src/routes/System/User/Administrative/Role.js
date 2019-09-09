@@ -27,7 +27,21 @@ export default class role extends PureComponent {
   componentDidMount() {
     self = this;
     this.refresh();
+    this.powerList();
   }
+
+  powerList = () => {
+    const { dispatch } = this.props;
+    dispatch({ type: "role/powerList" });
+  };
+
+  getPowerLabel = value => {
+    const {
+      role: { powerList }
+    } = this.props;
+    const result = powerList.items.filter(item => item.name === value);
+    return result[0].displayName;
+  };
 
   roleList = params => {
     const { dispatch } = this.props;
@@ -40,7 +54,15 @@ export default class role extends PureComponent {
         pagination.total = result.totalCount;
         this.setState({
           loading: false,
-          dataSource: result.items,
+          dataSource: result.items.map((item, index) => {
+            return {
+              ...item,
+              key: index,
+              power: item.permissions
+                .map(item => this.getPowerLabel(item))
+                .join("，")
+            };
+          }),
           pagination
         });
       }
@@ -52,7 +74,6 @@ export default class role extends PureComponent {
   };
 
   handleTableChange = (pagination, filters, sorter) => {
-    console.log(pagination, filters);
     this.setState({
       pagination: pagination
     });
@@ -141,6 +162,8 @@ export default class role extends PureComponent {
 
     const { selectedRows, dataSource, pagination, loading } = this.state;
 
+    console.log(dataSource);
+
     const columns = [
       {
         title: "角色标识",
@@ -155,9 +178,12 @@ export default class role extends PureComponent {
         ...this.getColumnSearchProps("displayName")
       },
       {
+        title: "权限",
+        dataIndex: "power"
+      },
+      {
         title: "描述",
-        dataIndex: "description",
-        ...this.getColumnSearchProps("description")
+        dataIndex: "description"
       },
       {
         title: "操作",
@@ -169,7 +195,9 @@ export default class role extends PureComponent {
               onClick={() => {
                 emitter.emit("showRegister", {
                   show: true,
-                  type: "review"
+                  type: "role",
+                  status: "edit",
+                  item
                 });
               }}
             >
@@ -222,7 +250,9 @@ export default class role extends PureComponent {
             onClick={() => {
               emitter.emit("showRegister", {
                 show: true,
-                type: "role"
+                type: "role",
+                status: "add",
+                item: {}
               });
             }}
           >

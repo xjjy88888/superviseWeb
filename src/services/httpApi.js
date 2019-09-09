@@ -1018,6 +1018,7 @@ export async function roleListApi(params) {
 
 // 角色_新建编辑
 export async function roleCreateUpdateApi(params) {
+  console.log(params);
   return request(
     `${config.url.roleCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
     {

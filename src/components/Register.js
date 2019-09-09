@@ -45,7 +45,8 @@ export default class register extends PureComponent {
     state: 0,
     type: "role",
     user: {},
-    finishData: []
+    finishData: [],
+    id: null
     //all: 注册
     //review: 管理员
     //society: 社会用户
@@ -61,6 +62,7 @@ export default class register extends PureComponent {
       this.setState({
         state: 0,
         show: v.show,
+        id: v.item.id,
         type: v.type,
         isLogin: h === "#/login" || h === "#/"
       });
@@ -80,7 +82,7 @@ export default class register extends PureComponent {
 
   submit = power => {
     const { dispatch } = this.props;
-    const { user, type } = this.state;
+    const { user, type, id } = this.state;
 
     console.log("提交", type, user, power);
 
@@ -89,7 +91,8 @@ export default class register extends PureComponent {
         type: "role/roleCreateUpdate",
         payload: {
           ...user,
-          permissions: power.permissions.map(i => i.name)
+          id: id,
+          permissions: power.permissions
         },
         callback: (success, error, result) => {
           if (success) {
@@ -197,12 +200,28 @@ class FormWriteUser extends PureComponent {
   state = {
     confirmDirty: false,
     autoCompleteResult: [],
-    showDistrict: false
+    showDistrict: false,
+    id: null
   };
 
   componentDidMount() {
+    const {
+      form: { resetFields, setFieldsValue }
+    } = this.props;
     this.eventEmitter = emitter.addListener("showRegister", v => {
-      this.props.form.resetFields();
+      console.log(v);
+      if (v.status === "add") {
+        resetFields();
+      } else {
+        this.setState({ id: v.item.id });
+        if (v.type === "role") {
+          setFieldsValue({
+            name: v.item.name,
+            displayName: v.item.displayName,
+            description: v.item.description
+          });
+        }
+      }
     });
   }
 
@@ -447,6 +466,21 @@ class power extends PureComponent {
 
   componentDidMount() {
     this.powerList();
+    this.eventEmitter = emitter.addListener("showRegister", v => {
+      console.log(v);
+      if (v.status === "add") {
+        this.setState({
+          permissions: []
+        });
+      } else {
+        this.setState({ id: v.item.id });
+        if (v.type === "role") {
+          this.setState({
+            permissions: v.item.permissions
+          });
+        }
+      }
+    });
   }
 
   powerList = () => {
@@ -468,9 +502,8 @@ class power extends PureComponent {
 
     this.props.form.validateFields((err, v) => {
       if (!err) {
-        console.log("权限分配", v);
+        console.log("权限分配", v, permissions);
         this.props.submit({ ...v, permissions });
-        // this.props.saveState({ state: 2 });
       }
     });
   };
@@ -481,6 +514,8 @@ class power extends PureComponent {
       type,
       role: { powerList }
     } = this.props;
+
+    const { permissions } = this.state;
 
     const dataSource = powerList.items.map(item => {
       return { ...item, key: item.name, time: "2019-08-08" };
@@ -516,9 +551,12 @@ class power extends PureComponent {
     ];
 
     const rowSelection = {
-      onChange: (selectedRowKeys, permissions) => {
+      selectedRowKeys: permissions,
+      onChange: permissions => {
         console.log(permissions);
-        this.setState({ permissions });
+        this.setState({
+          permissions
+        });
       }
     };
 
@@ -630,6 +668,7 @@ class power extends PureComponent {
             columns={columns}
             dataSource={dataSource}
             size="small"
+            selection={["SuperAdmin"]}
           />
         </Content>
       </Layout>

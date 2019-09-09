@@ -20,6 +20,7 @@ import Query from "./query";
 import Inspect from "./inspect";
 import ProblemPoint from "./problemPoint";
 import ProjectDetail from "./projectDetail";
+import HistoryPlay from "./HistoryPlay";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import proj4 from "proj4";
@@ -2306,6 +2307,7 @@ export default class integration extends PureComponent {
         <ProjectDetail />
         <Inspect />
         <ProblemPoint />
+        <HistoryPlay />
         <div
           ref={this.saveRef}
           style={{

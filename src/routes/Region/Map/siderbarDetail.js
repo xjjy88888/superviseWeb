@@ -1169,6 +1169,17 @@ export default class siderbarDetail extends PureComponent {
                   历史查看
                 </Button>
                 <Button
+                  icon="play-square"
+                  style={{ marginRight: 15 }}
+                  onClick={() => {
+                    emitter.emit("showHistoryPlay", {
+                      show: true
+                    });
+                  }}
+                >
+                  历史播放
+                </Button>
+                <Button
                   icon="cloud-download"
                   style={{
                     display:
