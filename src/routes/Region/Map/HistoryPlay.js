@@ -11,6 +11,7 @@ export default class register extends PureComponent {
   }
 
   componentDidMount() {
+    console.log("历史播放");
     this.eventEmitter = emitter.addListener("showHistoryPlay", v => {
       this.setState({
         show: v.show
@@ -25,14 +26,13 @@ export default class register extends PureComponent {
       <LocaleProvider locale={zh_CN}>
         <Layout
           style={{
-            display: show ? "block" : "none",
             position: "absolute",
             top: 0,
             left: 0,
             width: "100vw",
             height: "100vh",
             backgroundColor: "rgba(0,0,0,.5)",
-            zIndex: 1000
+            zIndex: show ? 1000 : 0
           }}
         >
           <Layout
@@ -44,7 +44,7 @@ export default class register extends PureComponent {
               background: "#fff",
               width: "80%",
               height: "85%",
-              padding: 50,
+              padding: 10,
               borderRadius: 10
             }}
           >
@@ -52,12 +52,17 @@ export default class register extends PureComponent {
               type="primary"
               shape="circle"
               icon="close"
-              style={{ position: "absolute", right: 20, top: 20 }}
+              style={{ position: "absolute", right: 1, top: 1, zIndex: 999 }}
               onClick={() => {
                 this.setState({ show: false });
               }}
             />
-            历史播放
+            <iframe
+              title="扰动图斑历史播放"
+              height="100%"
+              width="100%"
+              src="./timelinejs/spaceTimeSpot.html"
+            />
           </Layout>
         </Layout>
       </LocaleProvider>

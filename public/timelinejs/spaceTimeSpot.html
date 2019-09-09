@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	
+	<title>leaflet扰动图斑历史时空播放</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="jquery.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+	<link rel="stylesheet" href="dist/css/timeline.css"/>
+    <script src="dist/js/timeline.js"></script>
+	<style>
+		html, body {
+			height: 100%;
+			width: 100%;
+			margin: 0;
+		}
+	</style>	
+</head>
+<body>
+
+<!--<div id='map'>-->
+	<div class="timeline-container timeline-theme-1">
+	  <div class="timeline js-timeline">
+		<div data-time="2019-08-28Z">
+		  <div id="map"></div>
+		</div>
+		<div data-time="2019-08-27Z" style="display:none">
+		</div>
+		<div data-time="2019-08-26Z" style="display:none">
+		</div>
+		<div data-time="2019-08-25Z" style="display:none">
+		</div>
+		<div data-time="2019-08-24Z" style="display:none">
+		</div>
+		<div data-time="2019-08-23Z" style="display:none">
+		</div>
+		<div data-time="2019-08-22Z" style="display:none">
+		</div>
+		<div data-time="2019-08-21Z" style="display:none">
+		</div>
+		<div data-time="2019-08-20Z" style="display:none">
+		</div>
+		<div data-time="2019-08-19Z" style="display:none">
+		</div>
+	  </div>
+	</div>
+<!--</div>-->
+
+<script>
+	$(function(){ 
+		$('.js-timeline').Timeline({
+		  autoplay: false,
+		  isreplay:true,
+		  //autoplaySpeed:500,
+		  pauseOnHover: false
+		});
+
+		//动态计算map容器大小
+		$("#map").width($(".timeline-list").width());
+		$("#map").height($(".timeline-list").height());
+
+		var map = L.map('map',
+		  {
+			attributionControl: false,
+			center: [23.431365122122635, 113.2348930835724],
+			zoom: 15
+		  }
+		);
+		baseLayer = L.tileLayer('http://www.stbcjg.cn/BasemapService/rest/image/latest/tile/{z}/{y}/{x}', {
+			maxZoom: 18
+		}).addTo(map);
+		
+		timeSpotList = ['2019-08-28Z','2019-08-27Z','2019-08-26Z','2019-08-25Z','2019-08-24Z','2019-08-23Z','2019-08-22Z','2019-08-21Z','2019-08-20Z','2019-08-19Z'];
+		//地图叠加历史扰动图斑
+		spotWmsLayer = L.tileLayer.wms("https://www.zkygis.cn:8143/geoserver/ZKYGIS/wms?", {
+		  layers: 'ZKYGIS:historyspot', //需要加载的图层
+		  format: "image/png", //返回的数据格式
+		  transparent: true,
+		  cql_filter: "atime = 2019-08-28Z"
+		}).addTo(map);
+
+	}); 
+</script>
+
+</body>
+</html>

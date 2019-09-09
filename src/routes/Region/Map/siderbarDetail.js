@@ -1175,6 +1175,7 @@ export default class siderbarDetail extends PureComponent {
                     emitter.emit("showHistoryPlay", {
                       show: true
                     });
+                    localStorage.setItem("spotHistoryList",JSON.stringify(spotHistoryList))
                   }}
                 >
                   历史播放
