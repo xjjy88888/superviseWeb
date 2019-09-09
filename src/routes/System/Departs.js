@@ -176,11 +176,21 @@ export default class area extends PureComponent {
       },
       {
         title: "单位编码",
-        dataIndex: "districtCodeId"
+        dataIndex: "districtCodeId",
+        sorter: (a, b) => a.name.length - b.name.length,
+        ...this.getColumnSearchProps("name")
       },
       {
         title: "上级单位",
-        dataIndex: "parentId"
+        dataIndex: "parentName",
+        sorter: (a, b) => a.name.length - b.name.length,
+        ...this.getColumnSearchProps("name")
+      },
+      {
+        title: "上级单位编码",
+        dataIndex: "parentId",
+        sorter: (a, b) => a.name.length - b.name.length,
+        ...this.getColumnSearchProps("name")
       },
       {
         title: "操作",

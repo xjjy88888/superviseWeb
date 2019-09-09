@@ -1,69 +1,83 @@
 import React, { PureComponent } from "react";
-import {
-  Form,
-  Icon,
-  Input,
-  Button,
-  Table,
-  message,
-  Modal,
-  notification
-} from "antd";
+import { Icon, Input, Button, Table, message, Modal, notification } from "antd";
 import { createForm } from "rc-form";
-import Systems from "../../../components/Systems";
 import { connect } from "dva";
+import Systems from "../../../components/Systems";
+import emitter from "../../../utils/event";
+import Register from "./Register";
 import Highlighter from "react-highlight-words";
 
 let self;
 
 @createForm()
-@connect(({ company }) => ({ company }))
-export default class company extends PureComponent {
+@connect(({ role }) => ({ role }))
+export default class role extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
       state: 0,
       visible: false,
       selectedRows: [],
-      dataSource: [],
       pagination: {},
       loading: false,
-      id: null
+      dataSource: []
     };
   }
 
   componentDidMount() {
     self = this;
-    this.companyList();
+    this.refresh();
+    this.powerList();
   }
 
-  companyList = (
-    params = { isBuild: true, SkipCount: 0, MaxResultCount: 10 }
-  ) => {
+  powerList = () => {
+    const { dispatch } = this.props;
+    dispatch({ type: "role/powerList" });
+  };
+
+  getPowerLabel = value => {
+    const {
+      role: { powerList }
+    } = this.props;
+    const result = powerList.items.filter(item => item.name === value);
+    return result.length ? result[0].displayName : "";
+  };
+
+  roleList = params => {
     const { dispatch } = this.props;
     this.setState({ loading: true });
     dispatch({
-      type: "company/companyList",
-      payload: params,
+      type: "role/roleList",
+      payload: { ...params, IsActive: false },
       callback: (success, error, result) => {
         const pagination = { ...this.state.pagination };
         pagination.total = result.totalCount;
         this.setState({
           loading: false,
-          dataSource: result.items,
+          dataSource: result.items.map((item, index) => {
+            return {
+              ...item,
+              key: index,
+              power: item.permissions
+                .map(item => this.getPowerLabel(item))
+                .join("，")
+            };
+          }),
           pagination
         });
       }
     });
   };
 
+  refresh = () => {
+    this.roleList({ SkipCount: 0, MaxResultCount: 10 });
+  };
+
   handleTableChange = (pagination, filters, sorter) => {
-    console.log(pagination, filters);
     this.setState({
       pagination: pagination
     });
-    this.companyList({
-      isBuild: true,
+    this.roleList({
       SkipCount: (pagination.current - 1) * pagination.pageSize,
       MaxResultCount: pagination.pageSize,
       Name: filters.name
@@ -119,15 +133,15 @@ export default class company extends PureComponent {
       if (visible) {
         setTimeout(() => this.searchInput.select());
       }
-    },
-    render: text => (
-      <Highlighter
-        highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-        searchWords={[this.state.searchText]}
-        autoEscape
-        textToHighlight={text.toString()}
-      />
-    )
+    }
+    // render: text => (
+    //   <Highlighter
+    //     highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+    //     searchWords={[this.state.searchText]}
+    //     autoEscape
+    //     textToHighlight={text.toString()}
+    //   />
+    // )
   });
 
   handleSearch = (selectedKeys, confirm) => {
@@ -141,27 +155,31 @@ export default class company extends PureComponent {
   };
 
   render() {
-    const {
-      visible,
-      selectedRows,
-      loading,
-      pagination,
-      dataSource,
-      id
-    } = this.state;
-    const {
-      dispatch,
-      form: { getFieldDecorator, resetFields }
-    } = this.props;
+    const { dispatch } = this.props;
+
+    const { selectedRows, dataSource, pagination, loading } = this.state;
+
+    console.log(dataSource);
 
     const columns = [
       {
-        title: "单位名称",
+        title: "角色标识",
         dataIndex: "name",
-        ...this.getColumnSearchProps("name")
+        sorter: (a, b) => a.roleName.length - b.roleName.length,
+        ...this.getColumnSearchProps("roleName")
       },
       {
-        title: "单位描述",
+        title: "角色名",
+        dataIndex: "displayName",
+        sorter: (a, b) => a.displayName.length - b.displayName.length,
+        ...this.getColumnSearchProps("displayName")
+      },
+      {
+        title: "权限",
+        dataIndex: "power"
+      },
+      {
+        title: "描述",
         dataIndex: "description"
       },
       {
@@ -172,13 +190,11 @@ export default class company extends PureComponent {
             <a
               style={{ marginRight: 20 }}
               onClick={() => {
-                this.props.form.setFieldsValue({
-                  name: record.name,
-                  description: record.description
-                });
-                this.setState({
-                  visible: true,
-                  id: record.id
+                emitter.emit("showRegister", {
+                  show: true,
+                  type: "role",
+                  status: "edit",
+                  item
                 });
               }}
             >
@@ -194,20 +210,12 @@ export default class company extends PureComponent {
                   okType: "danger",
                   onOk() {
                     dispatch({
-                      type: "company/companyDelete",
-                      payload: record.id,
+                      type: "role/roleDelete",
+                      payload: { id: item.id },
                       callback: (success, error, result) => {
                         if (success) {
-                          self.setState({
-                            visible: false
-                          });
-                          self.companyList();
+                          self.refresh();
                         }
-                        notification[success ? "success" : "error"]({
-                          message: `删除1条单位数据${
-                            success ? "成功" : "失败"
-                          }${success ? "" : `：${error.message}`}`
-                        });
                       }
                     });
                   },
@@ -231,15 +239,17 @@ export default class company extends PureComponent {
 
     return (
       <Systems>
+        <Register refresh={this.refresh} />
         <span>
           <Button
             icon="plus"
             style={{ margin: 10 }}
             onClick={() => {
-              resetFields();
-              this.setState({
-                visible: true,
-                id: null
+              emitter.emit("showRegister", {
+                show: true,
+                type: "role",
+                status: "add",
+                item: {}
               });
             }}
           >
@@ -252,7 +262,7 @@ export default class company extends PureComponent {
             onClick={() => {
               const l = selectedRows.length;
               if (l === 0) {
-                message.warning("请选择需要删除的单位");
+                message.warning("请选择需要删除的角色");
                 return;
               }
               Modal.confirm({
@@ -263,20 +273,12 @@ export default class company extends PureComponent {
                 okType: "danger",
                 onOk() {
                   dispatch({
-                    type: "company/companyDeleteMul",
+                    type: "role/roleDeleteMul",
                     payload: { id: selectedRows.map(item => item.id) },
                     callback: (success, error, result) => {
                       if (success) {
-                        self.setState({
-                          visible: false
-                        });
-                        self.companyList();
+                        self.refresh();
                       }
-                      notification[success ? "success" : "error"]({
-                        message: `删除${l}条单位数据${
-                          success ? "成功" : "失败"
-                        }${success ? "" : `：${error.message}`}`
-                      });
                     }
                   });
                 },
@@ -285,24 +287,6 @@ export default class company extends PureComponent {
             }}
           >
             删除
-          </Button>
-          <Button
-            icon="upload"
-            style={{ margin: 10 }}
-            onClick={() => {
-              message.info("开始批量上传");
-            }}
-          >
-            批量上传
-          </Button>
-          <Button
-            icon="download"
-            style={{ margin: 10 }}
-            onClick={() => {
-              message.info("开始模板下载");
-            }}
-          >
-            模板下载
           </Button>
         </span>
         <Table
@@ -314,74 +298,6 @@ export default class company extends PureComponent {
           loading={loading}
           onChange={this.handleTableChange}
         />
-        <Modal
-          title="新建单位"
-          visible={visible}
-          onOk={() => {
-            this.props.form.validateFields((err, v) => {
-              console.log("表单信息", v);
-              if (!v.name) {
-                message.warning("请填写单位名称");
-                return;
-              }
-              dispatch({
-                type: "company/companyCreateUpdate",
-                payload: { ...v, id: id, depType: 1 },
-                callback: (success, error, result) => {
-                  if (success) {
-                    this.setState({
-                      visible: false
-                    });
-                    notification["success"]({
-                      message: `${id ? "编辑" : "新建"}单位成功`
-                    });
-                    this.companyList();
-                  } else {
-                    notification["error"]({
-                      message: `${id ? "编辑" : "新建"}单位失败：${
-                        error.message
-                      }`
-                    });
-                  }
-                }
-              });
-            });
-          }}
-          onCancel={() => {
-            this.setState({
-              visible: false
-            });
-          }}
-        >
-          <Form
-            onSubmit={this.handleSubmit}
-            layout="inline"
-            style={{ textAlign: "center" }}
-          >
-            <Form.Item
-              label={
-                <span>
-                  <b style={{ color: "red" }}>*</b>单位名称
-                </span>
-              }
-              hasFeedback
-            >
-              {getFieldDecorator("name", {})(<Input />)}
-            </Form.Item>
-            <Form.Item
-              label={
-                <span>
-                  <b style={{ color: "#fff" }}>*</b>单位描述
-                </span>
-              }
-              hasFeedback
-            >
-              {getFieldDecorator("description", {})(
-                <Input.TextArea autosize style={{ width: 180 }} />
-              )}
-            </Form.Item>
-          </Form>
-        </Modal>
       </Systems>
     );
   }

@@ -13,7 +13,7 @@ import {
   notification
 } from "antd";
 import { createForm } from "rc-form";
-import Systems from "../../../components/Systems";
+import Systems from "../../components/Systems";
 import Highlighter from "react-highlight-words";
 let self;
 
@@ -133,7 +133,7 @@ export default class dict extends PureComponent {
       form: { getFieldDecorator, resetFields },
       dict: { dictTypeList, dictDataList }
     } = this.props;
-    
+
     const {
       visibleType,
       visibleData,

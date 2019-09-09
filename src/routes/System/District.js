@@ -1,7 +1,7 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
 import { createForm } from "rc-form";
-import Systems from "../../../components/Systems";
+import Systems from "../../components/Systems";
 import {
   Form,
   Icon,

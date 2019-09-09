@@ -11,7 +11,7 @@ import {
   Select
 } from "antd";
 import { createForm } from "rc-form";
-import Systems from "../../../components/Systems";
+import Systems from "../../components/Systems";
 import { connect } from "dva";
 import Highlighter from "react-highlight-words";
 

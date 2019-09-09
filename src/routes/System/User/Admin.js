@@ -1,9 +1,22 @@
 import React, { PureComponent } from "react";
-import { Icon, Input, Button, Table, message, Modal } from "antd";
-import Systems from "../../../../components/Systems";
+import {
+  Icon,
+  Input,
+  Button,
+  Table,
+  message,
+  Tree,
+  Typography,
+  Layout,
+  Modal
+} from "antd";
 import Highlighter from "react-highlight-words";
-import emitter from "../../../../utils/event";
+import emitter from "../../../utils/event";
 // import Register from "../../../../components/Register";
+import Systems from "../../../components/Systems";
+
+const { Title } = Typography;
+const { Sider, Content } = Layout;
 
 const data = [
   {
@@ -32,7 +45,7 @@ const data = [
   }
 ];
 
-export default class society extends PureComponent {
+export default class account extends PureComponent {
   state = {
     state: 0,
     selectedRows: []
@@ -152,7 +165,7 @@ export default class society extends PureComponent {
               onClick={() => {
                 emitter.emit("showRegister", {
                   show: true,
-                  type: "society"
+                  type: "account"
                 });
               }}
             >
@@ -190,50 +203,90 @@ export default class society extends PureComponent {
     return (
       <Systems>
         {/* <Register /> */}
-        <span>
-          <Button
-            icon="plus"
-            style={{ margin: 10 }}
-            onClick={() => {
-              emitter.emit("showRegister", {
-                show: true,
-                type: "society"
-              });
+        <Layout>
+          <Sider width={300} theme="light">
+            <Title level={4}>部门</Title>
+            <Tree.DirectoryTree
+              multiple
+              defaultExpandAll
+              onSelect={(keys, event) => {
+                console.log("Trigger Select", keys, event);
+              }}
+            >
+              <Tree.TreeNode title="中华人民共和国水利部" key="0-0">
+                <Tree.TreeNode title="贵州省水利厅" key="0-0-0">
+                  <Tree.TreeNode
+                    title="贵阳市水务管理局"
+                    key="0-0-0-0"
+                    isLeaf
+                  />
+                  <Tree.TreeNode title="遵义市水务局" key="0-0-0-1" isLeaf />
+                  <Tree.TreeNode title="毕节市水务局" key="0-0-0-2" isLeaf />
+                </Tree.TreeNode>
+                <Tree.TreeNode title="广东省水利厅" key="0-0-1">
+                  <Tree.TreeNode title="广州市水务局" key="0-0-1-0" isLeaf />
+                </Tree.TreeNode>
+                <Tree.TreeNode title="广西壮族自治区水利厅" key="0-0-2">
+                  <Tree.TreeNode title="南宁市水务局" key="0-0-2-0" isLeaf />
+                  <Tree.TreeNode title="北海市水务局" key="0-0-2-1" isLeaf />
+                </Tree.TreeNode>
+              </Tree.TreeNode>
+            </Tree.DirectoryTree>
+          </Sider>
+          <Content
+            style={{
+              background: "#fff"
             }}
           >
-            添加
-          </Button>
-          <Button
-            icon="delete"
-            disabled={!selectedRows.length}
-            style={{ margin: 10 }}
-            onClick={() => {
-              const l = selectedRows.length;
-              if (l === 0) {
-                message.warning("请选择需要删除的账号");
-                return;
-              }
-              Modal.confirm({
-                title: "删除",
-                content: "你是否确定要删除",
-                okText: "是",
-                cancelText: "否",
-                okType: "danger",
-                onOk() {
-                  message.success(`删除${l}个账号成功`);
-                },
-                onCancel() {}
-              });
-            }}
-          >
-            删除
-          </Button>
-        </span>
-        <Table
-          columns={columns}
-          dataSource={data}
-          rowSelection={rowSelection}
-        />
+            <Title level={4}>
+              用户
+              <span style={{ float: "right" }}>
+                <Button
+                  icon="plus"
+                  style={{ margin: 10 }}
+                  onClick={() => {
+                    emitter.emit("showRegister", {
+                      show: true,
+                      type: "account"
+                    });
+                  }}
+                >
+                  新建
+                </Button>
+                <Button
+                  icon="delete"
+                  disabled={!selectedRows.length}
+                  style={{ marginLeft: 10 }}
+                  onClick={() => {
+                    const l = selectedRows.length;
+                    if (l === 0) {
+                      message.warning("请选择需要删除的账号");
+                      return;
+                    }
+                    Modal.confirm({
+                      title: "删除",
+                      content: "你是否确定要删除",
+                      okText: "是",
+                      cancelText: "否",
+                      okType: "danger",
+                      onOk() {
+                        message.success(`删除${l}个账号成功`);
+                      },
+                      onCancel() {}
+                    });
+                  }}
+                >
+                  删除
+                </Button>
+              </span>
+            </Title>
+            <Table
+              columns={columns}
+              dataSource={data}
+              rowSelection={rowSelection}
+            />
+          </Content>
+        </Layout>
       </Systems>
     );
   }

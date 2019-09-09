@@ -21,15 +21,15 @@ const menuList = [
       },
       {
         title: "行政用户",
-        key: "/user/administrative",
+        key: "/user/admin",
         subMenu: [
           {
             title: "账号管理",
-            key: "/user/administrative/account"
+            key: "/user/admin"
           },
           {
             title: "角色管理",
-            key: "/user/administrative/role"
+            key: "/user/role"
           }
         ]
       }

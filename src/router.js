@@ -6,15 +6,15 @@ import ProjectList from "./routes/Project/List";
 import ProjectMap from "./routes/Project/Map";
 import RegionMap from "./routes/Region/Map/Map";
 import Contrast from "./routes/Region/Contrast";
-import Review from "./routes/System/User/Review";
-import Society from "./routes/System/User/Society";
-import Account from "./routes/System/User/Admin/Account";
-import Role from "./routes/System/User/Admin/Role";
-import District from "./routes/System/District";
+import Review from "./routes/System/User/Review.js";
+import Society from "./routes/System/User/Society.js";
+import Admin from "./routes/System/User/Admin.js";
+import Role from "./routes/System/User/Role.js";
+import District from "./routes/System/District.js";
 import Departs from "./routes/System/Departs.js";
-import Dict from "./routes/System/Dict";
-import Branch from "./routes/System/Branch";
-import Company from "./routes/System/Company";
+import Dict from "./routes/System/Dict.js";
+import Branch from "./routes/System/Branch.js";
+import Company from "./routes/System/Company.js";
 
 function RouterConfig({ history }) {
   return (
@@ -30,12 +30,8 @@ function RouterConfig({ history }) {
         <Route path="/system" exact component={Review} />
         <Route path="/system/user/review" component={Review} exact />
         <Route path="/system/user/society" component={Society} exact />
-        <Route
-          path="/system/user/administrative/account"
-          component={Account}
-          exact
-        />
-        <Route path="/system/user/administrative/role" component={Role} exact />
+        <Route path="/system/user/admin" component={Admin} exact />
+        <Route path="/system/user/role" component={Role} exact />
         <Route path="/system/dict" component={Dict} exact />
         <Route path="/system/company" component={Company} exact />
         <Route path="/system/district" component={District} exact />

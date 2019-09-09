@@ -2,8 +2,8 @@ import React, { PureComponent } from "react";
 import { Icon, Input, Button, Table, message, Modal } from "antd";
 import { createForm } from "rc-form";
 import { connect } from "dva";
-import Systems from "../../../../components/Systems";
-import emitter from "../../../../utils/event";
+import Systems from "../../../components/Systems";
+import emitter from "../../../utils/event";
 // import Register from "../../../../components/Register";
 import Highlighter from "react-highlight-words";
 
