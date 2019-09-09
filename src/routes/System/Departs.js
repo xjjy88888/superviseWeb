@@ -8,18 +8,23 @@ import {
   Input,
   Button,
   Table,
-  Select,
   message,
   Tree,
   Typography,
   Layout,
   Modal,
-  notification
+  notification,
+  Cascader
 } from "antd";
 import Highlighter from "react-highlight-words";
 
 const { Sider, Content } = Layout;
 const { Title } = Typography;
+
+const formItemLayout = {
+  labelCol: { span: 6 },
+  wrapperCol: { span: 15 }
+};
 
 let self;
 
@@ -169,26 +174,14 @@ export default class area extends PureComponent {
 
     const columns = [
       {
-        title: "单位名",
+        title: "部门名",
         dataIndex: "name",
         sorter: (a, b) => a.name.length - b.name.length,
         ...this.getColumnSearchProps("name")
       },
       {
-        title: "单位编码",
-        dataIndex: "districtCodeId",
-        sorter: (a, b) => a.name.length - b.name.length,
-        ...this.getColumnSearchProps("name")
-      },
-      {
-        title: "上级单位",
+        title: "上级部门",
         dataIndex: "parentName",
-        sorter: (a, b) => a.name.length - b.name.length,
-        ...this.getColumnSearchProps("name")
-      },
-      {
-        title: "上级单位编码",
-        dataIndex: "parentId",
         sorter: (a, b) => a.name.length - b.name.length,
         ...this.getColumnSearchProps("name")
       },
@@ -235,7 +228,7 @@ export default class area extends PureComponent {
                           self.departsTree();
                         }
                         notification[success ? "success" : "error"]({
-                          message: `删除1条行政区划数据${
+                          message: `删除1条部门划数据${
                             success ? "成功" : "失败"
                           }${success ? "" : `：${error.message}`}`
                         });
@@ -273,17 +266,16 @@ export default class area extends PureComponent {
           >
             <Tree.DirectoryTree
               multiple
-              // defaultExpandAll={true}
               onSelect={(keys, event) => {
                 console.log("Trigger Select", keys, event);
               }}
             >
               {departsTree.map(item => (
-                <Tree.TreeNode title={item.name} key={item.id}>
+                <Tree.TreeNode title={item.label} key={item.value}>
                   {(item.children || []).map(ite => (
-                    <Tree.TreeNode title={ite.name} key={ite.id}>
+                    <Tree.TreeNode title={ite.label} key={ite.value}>
                       {(ite.children || []).map(it => (
-                        <Tree.TreeNode title={it.name} key={it.id} isLeaf />
+                        <Tree.TreeNode title={it.label} key={it.value} isLeaf />
                       ))}
                     </Tree.TreeNode>
                   ))}
@@ -319,7 +311,7 @@ export default class area extends PureComponent {
                   onClick={() => {
                     const l = selectedRows.length;
                     if (l === 0) {
-                      message.warning("请选择需要删除的行政区");
+                      message.warning("请选择需要删除的部门");
                       return;
                     }
                     Modal.confirm({
@@ -340,7 +332,7 @@ export default class area extends PureComponent {
                               self.departsTree();
                             }
                             notification[success ? "success" : "error"]({
-                              message: `删除${l}条行政区划数据${
+                              message: `删除${l}条部门划数据${
                                 success ? "成功" : "失败"
                               }${success ? "" : `：${error.message}`}`
                             });
@@ -365,21 +357,23 @@ export default class area extends PureComponent {
               onChange={this.handleTableChange}
             />
             <Modal
-              title="新建行政区"
+              width={`50%`}
+              height={`50%`}
+              title="新建部门"
               visible={visible}
               onOk={() => {
                 this.props.form.validateFields((err, v) => {
-                  console.log("新建行政区", v);
+                  console.log("新建部门", v);
                   if (!v.parentId) {
-                    message.warning("请选择上级行政区");
+                    message.warning("请选择上级部门");
                     return;
                   }
                   if (!v.name) {
-                    message.warning("请填写行政区名称");
+                    message.warning("请填写部门名称称");
                     return;
                   }
                   if (!v.code) {
-                    message.warning("请填写行政区编码");
+                    message.warning("请填写部门编码");
                     return;
                   }
                   dispatch({
@@ -413,36 +407,13 @@ export default class area extends PureComponent {
             >
               <Form
                 onSubmit={this.handleSubmit}
-                layout="inline"
-                style={{ textAlign: "center" }}
+                style={{ textAlign: "center", width: `100%`, height: `100%` }}
               >
                 <Form.Item
+                  {...formItemLayout}
                   label={
                     <span>
-                      <b style={{ color: "red" }}>*</b>上级行政区
-                    </span>
-                  }
-                  hasFeedback
-                >
-                  {getFieldDecorator("parentId", {})(
-                    <Select
-                      showSearch
-                      allowClear
-                      optionFilterProp="children"
-                      style={{ width: 180 }}
-                    >
-                      {departsList.items.map((item, index) => (
-                        <Select.Option value={item.id} key={index}>
-                          {item.name}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  )}
-                </Form.Item>
-                <Form.Item
-                  label={
-                    <span>
-                      <b style={{ color: "red" }}>*</b>行政区名称
+                      <b style={{ color: "red" }}>*</b>部门名
                     </span>
                   }
                   hasFeedback
@@ -450,25 +421,21 @@ export default class area extends PureComponent {
                   {getFieldDecorator("name", {})(<Input />)}
                 </Form.Item>
                 <Form.Item
+                  {...formItemLayout}
                   label={
                     <span>
-                      <b style={{ color: "red" }}>*</b>行政区编码
+                      <b style={{ color: "red" }}>*</b>上级部门
                     </span>
                   }
                   hasFeedback
                 >
-                  {getFieldDecorator("code", {})(<Input />)}
-                </Form.Item>
-                <Form.Item
-                  label={
-                    <span>
-                      <b style={{ color: "#fff" }}>*</b>行政区备注
-                    </span>
-                  }
-                  hasFeedback
-                >
-                  {getFieldDecorator("description", {})(
-                    <Input.TextArea autosize style={{ width: 180 }} />
+                  {getFieldDecorator("parentId", {})(
+                    <Cascader
+                      showSearch={true}
+                      placeholder="请选择所在地区"
+                      options={departsTree}
+                      changeOnSelect
+                    />
                   )}
                 </Form.Item>
               </Form>

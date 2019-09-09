@@ -7,7 +7,8 @@ import {
   Modal,
   Select,
   notification,
-  message
+  message,
+  Spin
 } from "antd";
 import { Link } from "dva/router";
 import Sidebar from "./sidebar";
@@ -44,6 +45,7 @@ import emitter from "../../../utils/event";
 import jQuery from "jquery";
 // import { validateId } from "@turf/helpers";
 import Layouts from "../../../components/Layouts";
+import Spins from "../../../components/Spins";
 import "./index.less";
 
 let userconfig = {};
@@ -95,7 +97,8 @@ export default class integration extends PureComponent {
       projectId: null, //针对新建图形的项目红线id
       addGraphLayer: null, //针对新建图形的图层
       showPhotoPreview: false,
-      photoPreviewUrl: null
+      photoPreviewUrl: null,
+      loading: true
     };
     this.map = null;
     this.problemPointLayer = L.layerGroup([]);
@@ -1118,6 +1121,7 @@ export default class integration extends PureComponent {
     map.pm.addControls(options);
     //检查照片列表
     picLayerGroup = L.featureGroup().addTo(map);
+    me.setState({ loading: false });
   };
   //监听地图点击事件
   onBaseLayerChange = e => {
@@ -2289,7 +2293,8 @@ export default class integration extends PureComponent {
       selectSpotRightV,
       selectRightV,
       showPhotoPreview,
-      photoPreviewUrl
+      photoPreviewUrl,
+      loading
     } = this.state;
     const {
       // dispatch,
@@ -2319,6 +2324,18 @@ export default class integration extends PureComponent {
           }}
         >
           <div
+            style={{
+              display: loading ? "block" : "none",
+              boxSizing: "border-box",
+              width: "100%",
+              height: "100%",
+              backgroundColor: "#fff",
+              zIndex: 10000
+            }}
+          >
+            <Spins show={true} />
+          </div>
+          <div
             id="map"
             style={{
               boxSizing: "border-box",
@@ -2326,7 +2343,7 @@ export default class integration extends PureComponent {
               height: "100%"
             }}
           />
-          {/* 照片预览111*/}
+          {/* 照片预览*/}
           <Modal
             // height={"100vh"}
             visible={showPhotoPreview}
