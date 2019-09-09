@@ -12,7 +12,7 @@ import {
 } from "antd";
 import Highlighter from "react-highlight-words";
 import emitter from "../../../../utils/event";
-import Register from "../../../../components/Register";
+// import Register from "../../../../components/Register";
 import Systems from "../../../../components/Systems";
 
 const { Title } = Typography;
@@ -202,7 +202,7 @@ export default class account extends PureComponent {
 
     return (
       <Systems>
-        <Register />
+        {/* <Register /> */}
         <Layout>
           <Sider width={300} theme="light">
             <Title level={4}>部门</Title>

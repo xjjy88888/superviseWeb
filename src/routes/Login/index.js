@@ -4,7 +4,7 @@ import { connect } from "dva";
 import { Form, Icon, Input, Button, Checkbox, message, Layout } from "antd";
 import config from "../../config";
 import Spins from "../../components/Spins";
-import Register from "../../components/Register";
+// import Register from "../../components/Register";
 import emitter from "../../utils/event";
 
 @connect(({ user }) => ({
@@ -87,7 +87,7 @@ export default class login extends PureComponent {
           height: "100vh"
         }}
       >
-        <Register />
+        {/* <Register /> */}
         <div
           style={{
             position: "absolute",

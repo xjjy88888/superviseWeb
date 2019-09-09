@@ -4,7 +4,7 @@ import { createForm } from "rc-form";
 import { connect } from "dva";
 import Systems from "../../../../components/Systems";
 import emitter from "../../../../utils/event";
-import Register from "../../../../components/Register";
+// import Register from "../../../../components/Register";
 import Highlighter from "react-highlight-words";
 
 let self;
@@ -218,7 +218,7 @@ export default class review extends PureComponent {
 
     return (
       <Systems>
-        <Register />
+        {/* <Register /> */}
         <span>
           <Button
             icon="delete"

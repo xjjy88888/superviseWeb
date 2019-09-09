@@ -3,7 +3,7 @@ import { Icon, Input, Button, Table, message, Modal } from "antd";
 import Systems from "../../../../components/Systems";
 import Highlighter from "react-highlight-words";
 import emitter from "../../../../utils/event";
-import Register from "../../../../components/Register";
+// import Register from "../../../../components/Register";
 
 const data = [
   {
@@ -189,7 +189,7 @@ export default class society extends PureComponent {
 
     return (
       <Systems>
-        <Register />
+        {/* <Register /> */}
         <span>
           <Button
             icon="plus"

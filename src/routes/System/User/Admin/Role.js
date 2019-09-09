@@ -4,7 +4,7 @@ import { createForm } from "rc-form";
 import { connect } from "dva";
 import Systems from "../../../../components/Systems";
 import emitter from "../../../../utils/event";
-import Register from "../../../../components/Register";
+import Register from "../Register";
 import Highlighter from "react-highlight-words";
 
 let self;
@@ -40,7 +40,8 @@ export default class role extends PureComponent {
       role: { powerList }
     } = this.props;
     const result = powerList.items.filter(item => item.name === value);
-    return result[0].displayName;
+    console.log(result);
+    return result.length ? result[0].displayName : "";
   };
 
   roleList = params => {
