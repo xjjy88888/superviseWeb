@@ -60,7 +60,7 @@ export default class register extends PureComponent {
       this.props.form.resetFields();
       const h = window.location.hash;
       this.setState({
-        state: 1,
+        state: 0,
         show: v.show,
         id: v.item.id,
         type: v.type,
@@ -84,7 +84,42 @@ export default class register extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: "user/userCreateUpdate",
-      payload
+      payload,
+      callback: (success, error, result) => {
+        if (success) {
+          this.userSetPower(
+            {
+              id: result.id,
+              permissions: [
+                {
+                  permission: payload.companyType,
+                  endTime: payload.endTime
+                }
+              ]
+            },
+            result
+          );
+        }
+      }
+    });
+  };
+
+  userSetPower = (payload, result) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "user/userSetPower",
+      payload,
+      callback: success => {
+        if (success) {
+          this.setState({
+            state: 2,
+            finishData: [
+              { name: "账号", cont: result.userName },
+              { name: "姓名", cont: result.displayName }
+            ]
+          });
+        }
+      }
     });
   };
 
@@ -93,7 +128,6 @@ export default class register extends PureComponent {
     const { user, type, id } = this.state;
 
     console.log("提交", type, user, power);
-
     if (type === "role") {
       dispatch({
         type: "role/roleCreateUpdate",
@@ -108,8 +142,7 @@ export default class register extends PureComponent {
               state: 2,
               finishData: [
                 { name: "角色标识", cont: result.name },
-                { name: "角色名", cont: result.displayName },
-                { name: "描述", cont: result.description }
+                { name: "角色名", cont: result.displayName }
               ]
             });
             this.props.refresh(true);

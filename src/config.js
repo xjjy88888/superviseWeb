@@ -344,6 +344,9 @@ const config = {
     // 用户_新建编辑
     userCreateUpdateUrl: `${domainApi}User/`,
 
+    // 用户_新建设置权限
+    userSetPowerUrl: `${domainApi}User/SetGrantedPermissionsAsync`,
+
     // 用户_删除
     userDeleteUrl: `${domainApi}User/Delete`,
 

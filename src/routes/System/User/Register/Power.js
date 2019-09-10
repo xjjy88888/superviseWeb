@@ -78,6 +78,14 @@ class Power extends PureComponent {
     });
   };
 
+  userCompany = payload => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "user/userCompany",
+      payload
+    });
+  };
+
   powerList = v => {
     const { dispatch } = this.props;
     dispatch({
@@ -111,7 +119,8 @@ class Power extends PureComponent {
   render() {
     const {
       form: { getFieldDecorator },
-      role: { powerList, companyTypeList }
+      role: { powerList, companyTypeList },
+      user: { userProjectList, userCompanyList }
     } = this.props;
 
     const { permissions, userType, companyType } = this.state;
@@ -189,28 +198,46 @@ class Power extends PureComponent {
           <Form
             onSubmit={this.handleSubmit}
             {...formItemLayout}
-            style={{ width: 500, margin: "0 auto" }}
+            style={{ width: 600, margin: "0 auto" }}
           >
             <Form.Item
               label="单位名称"
               hasFeedback
               style={{ display: userType === "1" ? "block" : "none" }}
             >
-              {getFieldDecorator("companyName", {
+              {getFieldDecorator("socialDepartmentId	", {
                 rules: [
                   {
                     required: userType === "1",
                     message: "请输入单位名称"
                   }
                 ]
-              })(<Input />)}
+              })(
+                <Select
+                  showSearch
+                  placeholder="至少输入4个关键字"
+                  optionFilterProp="children"
+                  onSearch={v => {
+                    if (v.length < 4) {
+                      return;
+                    }
+                    this.userCompany({ name: v });
+                  }}
+                >
+                  {userCompanyList.map((item, index) => (
+                    <Select.Option value={item.id} key={index}>
+                      {item.name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              )}
             </Form.Item>
             <Form.Item
               label="单位类型"
               hasFeedback
               style={{ display: userType === "1" ? "block" : "none" }}
             >
-              {getFieldDecorator("socialDepartmentId", {
+              {getFieldDecorator("companyType", {
                 rules: [
                   {
                     required: userType === "1",
@@ -239,7 +266,7 @@ class Power extends PureComponent {
               hasFeedback
               style={{ display: userType === "1" ? "block" : "none" }}
             >
-              {getFieldDecorator("project", {
+              {getFieldDecorator("projectId", {
                 rules: [
                   {
                     required: companyType === "Social.Product",
@@ -247,12 +274,23 @@ class Power extends PureComponent {
                   }
                 ]
               })(
-                <Input
-                  onChange={v => {
-                    console.log(v);
+                <Select
+                  showSearch
+                  placeholder="至少输入4个关键字"
+                  optionFilterProp="children"
+                  onSearch={v => {
+                    if (v.length < 4) {
+                      return;
+                    }
                     this.userProject({ name: v });
                   }}
-                />
+                >
+                  {userProjectList.map((item, index) => (
+                    <Select.Option value={item.id} key={index}>
+                      {item.name}
+                    </Select.Option>
+                  ))}
+                </Select>
               )}
             </Form.Item>
             <Form.Item
@@ -260,7 +298,7 @@ class Power extends PureComponent {
               hasFeedback
               style={{ display: userType === "1" ? "block" : "none" }}
             >
-              {getFieldDecorator("time", {
+              {getFieldDecorator("endTime", {
                 rules: [
                   {
                     type: "object",
@@ -268,7 +306,7 @@ class Power extends PureComponent {
                     message: "请选择有效期"
                   }
                 ]
-              })(<DatePicker style={{ width: 330 }} />)}
+              })(<DatePicker />)}
             </Form.Item>
             <Footer
               style={{

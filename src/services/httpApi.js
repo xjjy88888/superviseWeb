@@ -1144,7 +1144,7 @@ export async function userListApi(params) {
 
 // 用户_新建编辑
 export async function userCreateUpdateApi(params) {
-  console.log(params);
+  const passwordMd5 = CryptoJS.MD5(params.password).toString();
   return request(
     `${config.url.userCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
     {
@@ -1153,9 +1153,21 @@ export async function userCreateUpdateApi(params) {
         Authorization: `Bearer ${accessToken()}`,
         "Content-Type": "application/json-patch+json"
       },
-      body: JSON.stringify(params)
+      body: JSON.stringify({ ...params, password: passwordMd5 })
     }
   );
+}
+
+// 用户_新建设置权限
+export async function userSetPowerApi(params) {
+  return request(`${config.url.userSetPowerUrl}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify(params)
+  });
 }
 
 // 用户_删除

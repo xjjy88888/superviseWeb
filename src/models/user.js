@@ -7,7 +7,9 @@ import {
   userDeleteApi,
   initApi,
   userListApi,
-  userProjectApi
+  userProjectApi,
+  userCompanyApi,
+  userSetPowerApi
 } from "../services/httpApi";
 import { routerRedux } from "dva/router";
 import { notification } from "antd";
@@ -25,7 +27,9 @@ export default {
     departSelectList: [],
     basinOrganList: [],
     departList: [],
-    departUpdateId: ""
+    departUpdateId: "",
+    userProjectList: [],
+    userCompanyList: []
   },
 
   subscriptions: {
@@ -165,6 +169,33 @@ export default {
       const {
         data: { success, error, result }
       } = yield call(userProjectApi, payload);
+      if (success) {
+        yield put({ type: "save", payload: { userProjectList: result.items } });
+      }
+    },
+
+    // 所属单位
+    *userCompany({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(userCompanyApi, payload);
+      if (success) {
+        yield put({ type: "save", payload: { userCompanyList: result.items } });
+      }
+    },
+
+    // 用户_新建设置权限
+    *userSetPower({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(userSetPowerApi, payload);
+      if (callback) callback(success, error, result);
+      if (success) {
+      } else {
+        notification["error"]({
+          message: `用户配置权限失败`
+        });
+      }
     }
   },
 
