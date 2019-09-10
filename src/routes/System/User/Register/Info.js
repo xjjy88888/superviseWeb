@@ -84,8 +84,10 @@ class Info extends PureComponent {
   };
 
   compareToFirstPassword = (rule, value, callback) => {
-    const form = this.props.form;
-    if (value && value !== form.getFieldValue("password")) {
+    const {
+      form: { getFieldValue }
+    } = this.props;
+    if (value && value !== getFieldValue("password")) {
       callback("您输入的两个密码不一致！");
     } else {
       callback();

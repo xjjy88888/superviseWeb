@@ -6,7 +6,8 @@ import {
   userCreateUpdateApi,
   userDeleteApi,
   initApi,
-  userListApi
+  userListApi,
+  userProjectApi
 } from "../services/httpApi";
 import { routerRedux } from "dva/router";
 import { notification } from "antd";
@@ -148,7 +149,7 @@ export default {
       });
     },
 
-    // 用户_删除`
+    // 用户_删除
     *userDelete({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result }
@@ -157,6 +158,13 @@ export default {
       notification[success ? "success" : "error"]({
         message: `删除${success ? `成功` : `失败`}`
       });
+    },
+
+    // 所属项目
+    *userProject({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(userProjectApi, payload);
     }
   },
 

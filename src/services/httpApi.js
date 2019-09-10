@@ -1168,3 +1168,29 @@ export async function userDeleteApi(params) {
     }
   });
 }
+
+// 所属项目
+export async function userProjectApi(params) {
+  return request(
+    `${config.url.userProjectUrl}?SkipCount=0&MaxResultCount=10&Name=${params.name}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`
+      }
+    }
+  );
+}
+
+// 所属单位
+export async function userCompanyApi(params) {
+  return request(
+    `${config.url.userCompanyUrl}?SkipCount=0&MaxResultCount=10&Name=${params.name}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`
+      }
+    }
+  );
+}

@@ -344,8 +344,14 @@ const config = {
     // 用户_新建编辑
     userCreateUpdateUrl: `${domainApi}User/`,
 
-    //用户_删除
-    userDeleteUrl: `${domainApi}User/Delete`
+    // 用户_删除
+    userDeleteUrl: `${domainApi}User/Delete`,
+
+    // 所属项目
+    userProjectUrl: `${domainApi}Project/GetListByName`,
+
+    // 所属单位
+    userCompanyUrl: `${domainApi}SocialDepartment/GetListByName`
   },
 
   //工具箱

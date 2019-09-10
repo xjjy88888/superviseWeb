@@ -42,7 +42,8 @@ class Power extends PureComponent {
   state = {
     value: 1,
     permissions: [],
-    userType: "0" //0:行政  1:社会  2:角色
+    userType: "1", //0:行政  1:社会  2:角色
+    companyType: ""
   };
 
   componentDidMount() {
@@ -68,6 +69,14 @@ class Power extends PureComponent {
       this.setState({ userType: v.type });
     });
   }
+
+  userProject = payload => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "user/userProject",
+      payload
+    });
+  };
 
   powerList = v => {
     const { dispatch } = this.props;
@@ -100,13 +109,12 @@ class Power extends PureComponent {
   };
 
   render() {
-    const { getFieldDecorator } = this.props.form;
     const {
-      type,
+      form: { getFieldDecorator },
       role: { powerList, companyTypeList }
     } = this.props;
 
-    const { permissions, userType } = this.state;
+    const { permissions, userType, companyType } = this.state;
 
     const dataSource = powerList.map(item => {
       return { ...item, key: item.name, time: "2019-08-08" };
@@ -184,15 +192,15 @@ class Power extends PureComponent {
             style={{ width: 500, margin: "0 auto" }}
           >
             <Form.Item
-              label="所属项目"
+              label="单位名称"
               hasFeedback
               style={{ display: userType === "1" ? "block" : "none" }}
             >
-              {getFieldDecorator("project", {
+              {getFieldDecorator("companyName", {
                 rules: [
                   {
                     required: userType === "1",
-                    message: "请输入所属项目"
+                    message: "请输入单位名称"
                   }
                 ]
               })(<Input />)}
@@ -210,7 +218,14 @@ class Power extends PureComponent {
                   }
                 ]
               })(
-                <Select showSearch allowClear optionFilterProp="children">
+                <Select
+                  showSearch
+                  allowClear
+                  optionFilterProp="children"
+                  onChange={companyType => {
+                    this.setState({ companyType });
+                  }}
+                >
                   {companyTypeList.map((item, index) => (
                     <Select.Option value={item.name} key={index}>
                       {item.displayName}单位
@@ -219,7 +234,32 @@ class Power extends PureComponent {
                 </Select>
               )}
             </Form.Item>
-            <Form.Item label="有效期至" hasFeedback>
+            <Form.Item
+              label="所属项目"
+              hasFeedback
+              style={{ display: userType === "1" ? "block" : "none" }}
+            >
+              {getFieldDecorator("project", {
+                rules: [
+                  {
+                    required: companyType === "Social.Product",
+                    message: "请输入所属项目"
+                  }
+                ]
+              })(
+                <Input
+                  onChange={v => {
+                    console.log(v);
+                    this.userProject({ name: v });
+                  }}
+                />
+              )}
+            </Form.Item>
+            <Form.Item
+              label="有效期至"
+              hasFeedback
+              style={{ display: userType === "1" ? "block" : "none" }}
+            >
               {getFieldDecorator("time", {
                 rules: [
                   {

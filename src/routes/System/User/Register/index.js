@@ -42,7 +42,7 @@ const formItemLayout = {
 export default class register extends PureComponent {
   state = {
     show: false,
-    state: 1,
+    state: 0,
     type: "role",
     user: {},
     finishData: [],
@@ -60,7 +60,7 @@ export default class register extends PureComponent {
       this.props.form.resetFields();
       const h = window.location.hash;
       this.setState({
-        state: 0,
+        state: 1,
         show: v.show,
         id: v.item.id,
         type: v.type,
@@ -116,7 +116,7 @@ export default class register extends PureComponent {
           }
         }
       });
-    } else if (type === "society") {
+    } else {
       this.userCreateUpdate({ ...user, ...power });
     }
   };
