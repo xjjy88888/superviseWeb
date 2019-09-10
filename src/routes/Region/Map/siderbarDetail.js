@@ -347,6 +347,7 @@ export default class siderbarDetail extends PureComponent {
       point: { pointInfo, projectSelectListPoint },
       redLine: { redLineInfo, projectSelectListRedLine }
     } = this.props;
+    
     const {
       show,
       from,

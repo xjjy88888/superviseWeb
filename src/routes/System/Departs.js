@@ -2,6 +2,7 @@ import React, { PureComponent } from "react";
 import { connect } from "dva";
 import { createForm } from "rc-form";
 import Systems from "../../components/Systems";
+import MustFill from "../../components/MustFill";
 import {
   Form,
   Icon,
@@ -28,7 +29,7 @@ const formItemLayout = {
 
 let self;
 
-@connect(({ departs }) => ({ departs }))
+@connect(({ departs, district }) => ({ departs, district }))
 @createForm()
 export default class area extends PureComponent {
   state = {
@@ -37,14 +38,49 @@ export default class area extends PureComponent {
     id: null,
     pagination: {},
     loading: false,
-    dataSource: []
+    dataSource: [],
+    ParentId: null
   };
 
   componentDidMount() {
     self = this;
     this.departsTree();
-    this.departsList({ SkipCount: 0, MaxResultCount: 10 });
+    this.districtTree();
   }
+
+  districtTree = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "district/districtTree",
+      payload: {
+        IsFilter: false
+      }
+    });
+  };
+
+  getDist = v => {
+    const {
+      district: { districtTree }
+    } = this.props;
+    function query(v, list) {
+      let arr = [];
+      (list || []).map(i => {
+        if (i.value === v) {
+          arr = [i];
+        } else {
+          arr = arr.concat(query(v, i.children));
+        }
+      });
+      return arr;
+    }
+    return query(v, districtTree);
+  };
+
+  refresh = () => {
+    const { ParentId } = this.state;
+    this.departsList({ SkipCount: 0, MaxResultCount: 10, ParentId });
+    this.departsTree();
+  };
 
   departsTree = () => {
     const { dispatch } = this.props;
@@ -77,13 +113,15 @@ export default class area extends PureComponent {
   };
 
   handleTableChange = (pagination, filters, sorter) => {
+    const { ParentId } = this.state;
     this.setState({
       pagination: pagination
     });
     this.departsList({
       SkipCount: (pagination.current - 1) * pagination.pageSize,
       MaxResultCount: pagination.pageSize,
-      Name: filters.name
+      Name: filters.name,
+      ParentId: ParentId
     });
   };
 
@@ -159,7 +197,7 @@ export default class area extends PureComponent {
   render() {
     const {
       dispatch,
-      form: { getFieldDecorator, resetFields },
+      form: { getFieldDecorator, resetFields, setFieldsValue, validateFields },
       departs: { departsTree, departsList }
     } = this.props;
 
@@ -169,7 +207,9 @@ export default class area extends PureComponent {
       id,
       dataSource,
       pagination,
-      loading
+      loading,
+      ParentCodeId,
+      ParentId
     } = this.state;
 
     const columns = [
@@ -204,6 +244,12 @@ export default class area extends PureComponent {
                   visible: true,
                   id: record.id
                 });
+                setFieldsValue({
+                  districtCodeId: [
+                    this.getDist(ParentCodeId)[0].value,
+                    record.districtCodeId
+                  ]
+                });
               }}
             >
               编辑
@@ -225,12 +271,10 @@ export default class area extends PureComponent {
                           self.setState({
                             visible: false
                           });
-                          self.departsTree();
+                          self.refresh();
                         }
                         notification[success ? "success" : "error"]({
-                          message: `删除1条部门划数据${
-                            success ? "成功" : "失败"
-                          }${success ? "" : `：${error.message}`}`
+                          message: `删除${success ? "成功" : "失败"}`
                         });
                       }
                     });
@@ -261,21 +305,61 @@ export default class area extends PureComponent {
               height: window.innerHeight - 150,
               overflow: "auto"
             }}
-            width={300}
+            width={400}
             theme="light"
           >
             <Tree.DirectoryTree
               multiple
-              onSelect={(keys, event) => {
-                console.log("Trigger Select", keys, event);
+              onSelect={(v, e) => {
+                // console.log(v[0], e.selectedNodes[0].props.districtCodeId);
+                const d = e.selectedNodes[0].props.districtCodeId;
+                // console.log(this.getDist(d));
+                this.setState({
+                  ParentId: v[0],
+                  ParentCodeId: d
+                });
+                this.departsList({
+                  SkipCount: 0,
+                  MaxResultCount: 10,
+                  ParentId: v[0]
+                });
               }}
             >
               {departsTree.map(item => (
-                <Tree.TreeNode title={item.label} key={item.value}>
+                <Tree.TreeNode
+                  title={item.label}
+                  key={item.value}
+                  districtCodeId={item.districtCodeId}
+                >
                   {(item.children || []).map(ite => (
-                    <Tree.TreeNode title={ite.label} key={ite.value}>
+                    <Tree.TreeNode
+                      title={ite.label}
+                      key={ite.value}
+                      districtCodeId={ite.districtCodeId}
+                    >
                       {(ite.children || []).map(it => (
-                        <Tree.TreeNode title={it.label} key={it.value} isLeaf />
+                        <Tree.TreeNode
+                          title={it.label}
+                          key={it.value}
+                          districtCodeId={it.districtCodeId}
+                        >
+                          {(it.children || []).map(i => (
+                            <Tree.TreeNode
+                              title={i.label}
+                              key={i.value}
+                              districtCodeId={i.districtCodeId}
+                            >
+                              {(i.children || []).map(j => (
+                                <Tree.TreeNode
+                                  title={j.label}
+                                  key={j.value}
+                                  districtCodeId={j.districtCodeId}
+                                  isLeaf
+                                />
+                              ))}
+                            </Tree.TreeNode>
+                          ))}
+                        </Tree.TreeNode>
                       ))}
                     </Tree.TreeNode>
                   ))}
@@ -293,6 +377,7 @@ export default class area extends PureComponent {
               <span>
                 <Button
                   icon="plus"
+                  disabled={!ParentId}
                   style={{ margin: 10 }}
                   onClick={() => {
                     resetFields();
@@ -359,40 +444,34 @@ export default class area extends PureComponent {
             <Modal
               width={`50%`}
               height={`50%`}
-              title="新建部门"
+              title={`${id ? `编辑` : `新建`}部门`}
               visible={visible}
               onOk={() => {
-                this.props.form.validateFields((err, v) => {
-                  console.log("新建部门", v);
-                  if (!v.parentId) {
-                    message.warning("请选择上级部门");
-                    return;
-                  }
+                // submit
+                validateFields((err, v) => {
+                  console.log("新建编辑部门", v);
+                  const d = v.districtCodeId;
                   if (!v.name) {
-                    message.warning("请填写部门名称称");
+                    message.warning("请填写部门名");
                     return;
                   }
-                  if (!v.code) {
-                    message.warning("请填写部门编码");
+                  if (!d) {
+                    message.warning("请选择行政区划");
                     return;
                   }
                   dispatch({
                     type: "departs/departsCreateUpdate",
-                    payload: { ...v, id: id },
-                    callback: (success, error, result) => {
+                    payload: {
+                      ...v,
+                      id: id,
+                      districtCodeId: d[d.length - 1],
+                      ParentId
+                    },
+                    callback: success => {
                       if (success) {
+                        this.refresh();
                         this.setState({
                           visible: false
-                        });
-                        notification["success"]({
-                          message: `${id ? "编辑" : "新建"}字典类型成功`
-                        });
-                        this.departsTree();
-                      } else {
-                        notification["error"]({
-                          message: `${id ? "编辑" : "新建"}字典类型失败：${
-                            error.message
-                          }`
                         });
                       }
                     }
@@ -413,7 +492,8 @@ export default class area extends PureComponent {
                   {...formItemLayout}
                   label={
                     <span>
-                      <b style={{ color: "red" }}>*</b>部门名
+                      部门名
+                      <MustFill />
                     </span>
                   }
                   hasFeedback
@@ -421,20 +501,20 @@ export default class area extends PureComponent {
                   {getFieldDecorator("name", {})(<Input />)}
                 </Form.Item>
                 <Form.Item
-                  {...formItemLayout}
                   label={
                     <span>
-                      <b style={{ color: "red" }}>*</b>上级部门
+                      行政区划
+                      <MustFill />
                     </span>
                   }
-                  hasFeedback
+                  {...formItemLayout}
                 >
-                  {getFieldDecorator("parentId", {})(
+                  {getFieldDecorator("districtCodeId", {})(
                     <Cascader
-                      showSearch={true}
-                      placeholder="请选择所在地区"
-                      options={departsTree}
+                      showSearch
+                      options={this.getDist(ParentCodeId)}
                       changeOnSelect
+                      placeholder="请选择所在地区"
                     />
                   )}
                 </Form.Item>

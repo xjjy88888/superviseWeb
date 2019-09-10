@@ -1016,7 +1016,9 @@ export async function departsTreeApi(params) {
 // 行政部门_列表
 export async function departsListApi(params) {
   return request(
-    `${config.url.departsListUrl}?SkipCount=${params.SkipCount}&MaxResultCount=${params.MaxResultCount}`,
+    `${config.url.departsListUrl}?SkipCount=${
+      params.SkipCount
+    }&MaxResultCount=${params.MaxResultCount}&ParentId=${params.ParentId || ""}`,
     {
       method: "GET",
       headers: {

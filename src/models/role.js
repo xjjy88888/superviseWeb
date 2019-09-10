@@ -49,7 +49,6 @@ export default {
 
     // 角色_删除
     *roleDelete({ payload, callback }, { call, put }) {
-      console.log(payload)
       const {
         data: { success, error, result }
       } = yield call(roleDeleteApi, payload);

@@ -29,7 +29,7 @@ export default {
       if (success) {
         yield put({
           type: "save",
-          payload: { departsTree: result.items[0].children }
+          payload: { departsTree: result.items }
         });
       } else {
         notification["error"]({
@@ -38,7 +38,7 @@ export default {
       }
     },
 
-    // 行政部门_列表1
+    // 行政部门_列表
     *departsList({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result }
@@ -62,16 +62,9 @@ export default {
         data: { success, error, result }
       } = yield call(departsCreateUpdateApi, payload);
       if (callback) callback(success, error, result);
-      if (success) {
-        yield put({
-          type: "save",
-          payload: { departsList: result.items }
-        });
-      } else {
-        notification["error"]({
-          message: `查询行政部门列表失败`
-        });
-      }
+      notification[success ? "success" : "error"]({
+        message: `${payload.id ? "编辑" : "新建"}${success ? `成功` : `失败`}`
+      });
     },
 
     // 行政部门_删除

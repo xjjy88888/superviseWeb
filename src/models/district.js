@@ -22,7 +22,7 @@ export default {
   },
 
   effects: {
-    // 行政区划_列表1
+    // 行政区划_列表
     *districtTree({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result }
@@ -35,7 +35,7 @@ export default {
           payload: payload.IsFilter
             ? { districtTreeFilter: [result], districtListFilter: districtList }
             : {
-                districtTree: result.children,
+                districtTree: [result],
                 districtList
               }
         });
