@@ -41,11 +41,13 @@ const formItemLayout = {
 class Power extends PureComponent {
   state = {
     value: 1,
-    permissions: []
+    permissions: [],
+    userType: "0" //0:行政  1:社会  2:角色
   };
 
   componentDidMount() {
-    this.powerList();
+    this.powerList(0);
+    this.powerList(1);
     this.eventEmitter = emitter.addListener("showRegister", v => {
       console.log(v);
       if (v.status === "add") {
@@ -61,11 +63,20 @@ class Power extends PureComponent {
         }
       }
     });
+    this.eventEmitter = emitter.addListener("setUserType", v => {
+      console.log(v);
+      this.setState({ userType: v.type });
+    });
   }
 
-  powerList = () => {
+  powerList = v => {
     const { dispatch } = this.props;
-    dispatch({ type: "role/powerList" });
+    dispatch({
+      type: "role/powerList",
+      payload: {
+        userType: v
+      }
+    });
   };
 
   onChange = e => {
@@ -92,12 +103,12 @@ class Power extends PureComponent {
     const { getFieldDecorator } = this.props.form;
     const {
       type,
-      role: { powerList }
+      role: { powerList, companyTypeList }
     } = this.props;
 
-    const { permissions } = this.state;
+    const { permissions, userType } = this.state;
 
-    const dataSource = powerList.items.map(item => {
+    const dataSource = powerList.map(item => {
       return { ...item, key: item.name, time: "2019-08-08" };
     });
 
@@ -145,7 +156,7 @@ class Power extends PureComponent {
         <Sider
           theme="light"
           style={{
-            display: type === "account" ? "block" : "none"
+            display: userType === "0" ? "block" : "none"
           }}
         >
           <Checkbox.Group>
@@ -175,12 +186,12 @@ class Power extends PureComponent {
             <Form.Item
               label="所属项目"
               hasFeedback
-              style={{ display: type === "society" ? "block" : "none" }}
+              style={{ display: userType === "1" ? "block" : "none" }}
             >
               {getFieldDecorator("project", {
                 rules: [
                   {
-                    required: type === "society",
+                    required: userType === "1",
                     message: "请输入所属项目"
                   }
                 ]
@@ -189,32 +200,35 @@ class Power extends PureComponent {
             <Form.Item
               label="单位类型"
               hasFeedback
-              style={{ display: type === "society" ? "block" : "none" }}
+              style={{ display: userType === "1" ? "block" : "none" }}
             >
-              {getFieldDecorator("company_type", {
+              {getFieldDecorator("socialDepartmentId", {
                 rules: [
                   {
-                    required: type === "society",
+                    required: userType === "1",
                     message: "请选择单位类型"
                   }
                 ]
               })(
                 <Select showSearch allowClear optionFilterProp="children">
-                  {[
-                    { text: "建设单位", value: 1 },
-                    { text: "方案编制单位", value: 2 },
-                    { text: "监测单位", value: 3 },
-                    { text: "监理单位", value: 4 },
-                    { text: "设计单位", value: 5 },
-                    { text: "施工单位", value: 6 },
-                    { text: "验收报告单位", value: 7 }
-                  ].map((item, index) => (
-                    <Select.Option value={item.value} key={index}>
-                      {item.text}
+                  {companyTypeList.map((item, index) => (
+                    <Select.Option value={item.name} key={index}>
+                      {item.displayName}单位
                     </Select.Option>
                   ))}
                 </Select>
               )}
+            </Form.Item>
+            <Form.Item label="有效期至" hasFeedback>
+              {getFieldDecorator("time", {
+                rules: [
+                  {
+                    type: "object",
+                    required: userType === "1",
+                    message: "请选择有效期"
+                  }
+                ]
+              })(<DatePicker style={{ width: 330 }} />)}
             </Form.Item>
             <Footer
               style={{
@@ -242,7 +256,7 @@ class Power extends PureComponent {
 
           <Table
             style={{
-              display: type === "account" || type === "role" ? "block" : "none"
+              display: userType !== "1" ? "block" : "none"
             }}
             rowSelection={rowSelection}
             columns={columns}

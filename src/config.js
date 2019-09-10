@@ -339,7 +339,13 @@ const config = {
     powerListUrl: `${domainApi}Role/GetAllPermissions`,
 
     // 用户_列表
-    userListUrl: `${domainApi}User/GetAll`
+    userListUrl: `${domainApi}User/GetAll`,
+
+    // 用户_新建编辑
+    userCreateUpdateUrl: `${domainApi}User/`,
+
+    //用户_删除
+    userDeleteUrl: `${domainApi}User/Delete`
   },
 
   //工具箱

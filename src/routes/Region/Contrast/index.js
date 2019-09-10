@@ -547,7 +547,7 @@ export default class splitScreen extends PureComponent {
     this.removeLMapLayers();
     this.removeRMapLayers();
     setTimeout(() => {
-      //添加左右地图的图层列表
+      //新建左右地图的图层列表
       this.addLMapLayers();
       this.addRMapLayers();
     }, 200);
@@ -571,7 +571,7 @@ export default class splitScreen extends PureComponent {
       userconfig.RMap.removeLayer(userconfig.rightSpotLayer);
   };
   /*
-   * 添加左地图的图层列表
+   * 新建左地图的图层列表
    */
   addLMapLayers = () => {
     const { selectLeftV, selectSpotLeftV } = this.state;
@@ -615,7 +615,7 @@ export default class splitScreen extends PureComponent {
     }
   };
   /*
-   * 添加右地图的图层列表
+   * 新建右地图的图层列表
    */
   addRMapLayers = () => {
     const { selectRightV, selectSpotRightV } = this.state;
@@ -667,7 +667,7 @@ export default class splitScreen extends PureComponent {
     this.setState({ selectLeftV: v });
     //移除左地图的图层列表
     this.removeLMapLayers();
-    //添加左地图的图层列表
+    //新建左地图的图层列表
     setTimeout(() => {
       this.addLMapLayers();
     }, 200);
@@ -677,7 +677,7 @@ export default class splitScreen extends PureComponent {
     this.setState({ selectSpotLeftV: v });
     //移除左地图的图层列表
     this.removeLMapLayers();
-    //添加左地图的图层列表
+    //新建左地图的图层列表
     setTimeout(() => {
       this.addLMapLayers();
     }, 200);
@@ -689,7 +689,7 @@ export default class splitScreen extends PureComponent {
     this.setState({ selectRightV: v });
     //移除右地图的图层列表
     this.removeRMapLayers();
-    //添加右地图的图层列表
+    //新建右地图的图层列表
     setTimeout(() => {
       this.addRMapLayers();
     }, 200);
@@ -699,7 +699,7 @@ export default class splitScreen extends PureComponent {
     this.setState({ selectSpotRightV: v });
     //移除左地图的图层列表
     this.removeRMapLayers();
-    //添加左地图的图层列表
+    //新建左地图的图层列表
     setTimeout(() => {
       this.addRMapLayers();
     }, 200);

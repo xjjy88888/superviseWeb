@@ -3,7 +3,7 @@ import { Icon, Input, Button, Table, message, Modal } from "antd";
 import Systems from "../../../components/Systems";
 import Highlighter from "react-highlight-words";
 import emitter from "../../../utils/event";
-// import Register from "../../../../components/Register";
+import Register from "./Register";
 
 const data = [
   {
@@ -189,7 +189,7 @@ export default class society extends PureComponent {
 
     return (
       <Systems>
-        {/* <Register /> */}
+        <Register />
         <span>
           <Button
             icon="plus"
@@ -197,11 +197,13 @@ export default class society extends PureComponent {
             onClick={() => {
               emitter.emit("showRegister", {
                 show: true,
-                type: "society"
+                type: "society",
+                status: "add",
+                item: {}
               });
             }}
           >
-            添加
+            新建
           </Button>
           <Button
             icon="delete"

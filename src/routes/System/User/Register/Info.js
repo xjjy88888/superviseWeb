@@ -71,11 +71,13 @@ class Info extends PureComponent {
   }
 
   handleSubmit = e => {
-    console.log(this.props);
     e.preventDefault();
     this.props.form.validateFields((err, v) => {
-      console.log("填写用户信息", err, v);
+      console.log("填写用户信息", v);
       if (!err) {
+        emitter.emit("setUserType", {
+          type: v.userType || "2"
+        });
         this.props.saveState({ user: v, state: 1 });
       }
     });
@@ -114,8 +116,6 @@ class Info extends PureComponent {
     const showRole = { display: type === "role" ? "block" : "none" };
     const hideRole = { display: type === "role" ? "none" : "block" };
 
-    console.log(this.props);
-
     return (
       <Layout
         style={{
@@ -132,7 +132,7 @@ class Info extends PureComponent {
               label={type === "role" ? "角色标识" : "账号"}
               hasFeedback
             >
-              {getFieldDecorator("name", {
+              {getFieldDecorator(type === "role" ? "name" : "userName", {
                 initialValue: "",
                 rules: [
                   {
@@ -182,7 +182,7 @@ class Info extends PureComponent {
               })(<Input />)}
             </Form.Item>
             <Form.Item label="电话" hasFeedback style={hideRole}>
-              {getFieldDecorator("phone", {
+              {getFieldDecorator("phoneNumber", {
                 initialValue: "",
                 rules: [
                   {
@@ -197,7 +197,7 @@ class Info extends PureComponent {
               hasFeedback
               style={{ display: isLogin ? "block" : "none" }}
             >
-              {getFieldDecorator("user_type", {
+              {getFieldDecorator("userType", {
                 rules: [
                   {
                     required: isLogin,
@@ -215,8 +215,8 @@ class Info extends PureComponent {
                   }}
                 >
                   {[
-                    { text: "社会用户", value: "society" },
-                    { text: "行政用户", value: "account" }
+                    { text: "社会用户", value: "1" },
+                    { text: "行政用户", value: "0" }
                   ].map((item, index) => (
                     <Select.Option value={item.value} key={index}>
                       {item.text}
@@ -224,17 +224,6 @@ class Info extends PureComponent {
                   ))}
                 </Select>
               )}
-            </Form.Item>
-            <Form.Item label="有效期至" hasFeedback style={hideRole}>
-              {getFieldDecorator("time", {
-                rules: [
-                  {
-                    type: "object",
-                    required: type !== "role",
-                    message: "请选择有效期"
-                  }
-                ]
-              })(<DatePicker style={{ width: 330 }} />)}
             </Form.Item>
             <Form.Item
               label="行政区划单位"
@@ -275,11 +264,6 @@ class Info extends PureComponent {
                   </TreeSelect.TreeNode>
                 </TreeSelect>
               )}
-            </Form.Item>
-            <Form.Item label="描述" hasFeedback>
-              {getFieldDecorator("description", {
-                initialValue: ""
-              })(<Input />)}
             </Form.Item>
             <Footer
               style={{

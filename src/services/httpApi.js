@@ -1018,7 +1018,8 @@ export async function departsListApi(params) {
   return request(
     `${config.url.departsListUrl}?SkipCount=${
       params.SkipCount
-    }&MaxResultCount=${params.MaxResultCount}&ParentId=${params.ParentId || ""}`,
+    }&MaxResultCount=${params.MaxResultCount}&ParentId=${params.ParentId ||
+      ""}`,
     {
       method: "GET",
       headers: {
@@ -1119,8 +1120,8 @@ export async function roleDeleteMulApi(params) {
 }
 
 // 权限列表
-export async function powerListApi() {
-  return request(`${config.url.powerListUrl}`, {
+export async function powerListApi(params) {
+  return request(`${config.url.powerListUrl}?userType=${params.userType}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
@@ -1139,4 +1140,31 @@ export async function userListApi(params) {
       }
     }
   );
+}
+
+// 用户_新建编辑
+export async function userCreateUpdateApi(params) {
+  console.log(params);
+  return request(
+    `${config.url.userCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify(params)
+    }
+  );
+}
+
+// 用户_删除
+export async function userDeleteApi(params) {
+  return request(`${config.url.userDeleteUrl}?id=${params.id}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    }
+  });
 }

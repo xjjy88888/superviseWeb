@@ -7,32 +7,35 @@ import zh_CN from "antd/lib/locale-provider/zh_CN";
 export default class register extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = { show: false };
+    this.state = { show: false,hisPlayURL:''  };
   }
 
   componentDidMount() {
     console.log("历史播放");
     this.eventEmitter = emitter.addListener("showHistoryPlay", v => {
       this.setState({
-        show: v.show
+        show: v.show,
+        hisPlayURL:v.hisPlayURL
       });
     });
   }
 
   render() {
-    const { show } = this.state;
+    const { show,hisPlayURL  } = this.state;
 
     return (
       <LocaleProvider locale={zh_CN}>
         <Layout
           style={{
+            display: show ? "block" : "none",
             position: "absolute",
             top: 0,
             left: 0,
             width: "100vw",
             height: "100vh",
             backgroundColor: "rgba(0,0,0,.5)",
-            zIndex: show ? 1000 : 0
+            // zIndex: show ? 1000 : 0
+            zIndex: 1001
           }}
         >
           <Layout
@@ -59,9 +62,11 @@ export default class register extends PureComponent {
             />
             <iframe
               title="扰动图斑历史播放"
+              id="hisPlayIframe"
               height="100%"
               width="100%"
-              src="./timelinejs/spaceTimeSpot.html"
+              // src="./timelinejs/spaceTimeSpot.html"
+              src= {hisPlayURL}
             />
           </Layout>
         </Layout>

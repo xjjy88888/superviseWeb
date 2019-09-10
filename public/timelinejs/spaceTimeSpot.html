@@ -2,15 +2,14 @@
 <html>
 <head>
 	
-	<title>leaflet扰动图斑历史时空播放</title>
-
+	<title>扰动图斑历史时空播放</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="jquery.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"/>
-    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+  <script src="jquery.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
 	<link rel="stylesheet" href="dist/css/timeline.css"/>
-    <script src="dist/js/timeline.js"></script>
+  <script src="dist/js/timeline.js"></script>
 	<style>
 		html, body {
 			height: 100%;
@@ -51,6 +50,10 @@
 
 <script>
 	$(function(){ 
+    console.log(localStorage.getItem("spotHistoryList"));
+    var name = getIframeUrl('spotHistoryId');
+    console.log(name);
+
 		$('.js-timeline').Timeline({
 		  autoplay: false,
 		  isreplay:true,
@@ -80,7 +83,19 @@
 		  format: "image/png", //返回的数据格式
 		  transparent: true,
 		  cql_filter: "atime = 2019-08-28Z"
-		}).addTo(map);
+    }).addTo(map);
+
+    /*
+     *获取Iframe参数值函数
+     */
+    function getIframeUrl(name) {
+      var reg = new RegExp("[^\?&]?" + encodeURI(name) + "=[^&]+");
+      var arr = window.parent.document.getElementById("hisPlayIframe").contentWindow.location.search.match(reg);//js获取iframe通过url传递的参数,需要iframe的ID
+      if (arr != null) {
+          return decodeURI(arr[0].substring(arr[0].search("=") + 1));
+      }
+      return "";
+    }   
 
 	}); 
 </script>

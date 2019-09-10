@@ -12,9 +12,10 @@ export default {
 
   state: {
     redLineList: { totalCount: 0, items: [] },
-    powerList: { totalCount: 0, items: [] },
     redLineInfo: {},
-    projectSelectListRedLine: []
+    projectSelectListRedLine: [],
+    powerList: [],
+    companyTypeList: []
   },
 
   subscriptions: {
@@ -78,7 +79,14 @@ export default {
       } = yield call(powerListApi, payload);
       if (callback) callback(success, error, result);
       if (success) {
-        yield put({ type: "save", payload: { powerList: result } });
+        yield put({
+          type: "save",
+          payload: {
+            [payload.userType === 1
+              ? "companyTypeList"
+              : "powerList"]: result.items
+          }
+        });
       } else {
         notification["error"]({
           message: `查询权限列表失败：${error.message}`

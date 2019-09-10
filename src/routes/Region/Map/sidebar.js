@@ -2369,7 +2369,7 @@ export default class sider extends PureComponent {
                           onClick={e => {
                             e.stopPropagation();
                             notification["info"]({
-                              message: "添加监督执法记录"
+                              message: "新建监督执法记录"
                             });
                           }}
                         />
@@ -2707,7 +2707,7 @@ export default class sider extends PureComponent {
                           onClick={e => {
                             e.stopPropagation();
                             notification["info"]({
-                              message: "添加责任点"
+                              message: "新建责任点"
                             });
                           }}
                         />
@@ -2790,7 +2790,7 @@ export default class sider extends PureComponent {
                           onClick={e => {
                             e.stopPropagation();
                             notification["info"]({
-                              message: "添加全景图"
+                              message: "新建全景图"
                             });
                           }}
                         />
@@ -2816,7 +2816,7 @@ export default class sider extends PureComponent {
                           });
                         }}
                       />
-                    </p>                   
+                    </p>
                     <p>
                       国泰河与大坑交界全景图
                       <Icon

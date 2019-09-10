@@ -32,14 +32,19 @@ export default class role extends PureComponent {
 
   powerList = () => {
     const { dispatch } = this.props;
-    dispatch({ type: "role/powerList" });
+    dispatch({
+      type: "role/powerList",
+      payload: {
+        userType: "0"
+      }
+    });
   };
 
   getPowerLabel = value => {
     const {
       role: { powerList }
     } = this.props;
-    const result = powerList.items.filter(item => item.name === value);
+    const result = powerList.filter(item => item.name === value);
     return result.length ? result[0].displayName : "";
   };
 
@@ -55,12 +60,14 @@ export default class role extends PureComponent {
         this.setState({
           loading: false,
           dataSource: result.items.map((item, index) => {
+            const permissions = item.permissions.map(item =>
+              this.getPowerLabel(item)
+            );
+            const power = permissions.filter(i => i !== "");
             return {
               ...item,
               key: index,
-              power: item.permissions
-                .map(item => this.getPowerLabel(item))
-                .join("，")
+              power: power.join("，")
             };
           }),
           pagination

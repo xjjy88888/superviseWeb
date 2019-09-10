@@ -7,8 +7,7 @@ import {
   Modal,
   Select,
   notification,
-  message,
-  Spin
+  message
 } from "antd";
 import { Link } from "dva/router";
 import Sidebar from "./sidebar";
@@ -45,7 +44,7 @@ import emitter from "../../../utils/event";
 import jQuery from "jquery";
 // import { validateId } from "@turf/helpers";
 import Layouts from "../../../components/Layouts";
-import Spins from "../../../components/Spins";
+// import Spins from "../../../components/Spins";
 import "./index.less";
 
 let userconfig = {};
@@ -79,7 +78,7 @@ export default class integration extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false,
+      //loading: false,
       showButton: false,
       showHistoryContrast: false,
       showSiderbar: true,
@@ -98,7 +97,7 @@ export default class integration extends PureComponent {
       addGraphLayer: null, //针对新建图形的图层
       showPhotoPreview: false,
       photoPreviewUrl: null,
-      loading: true
+      //loading: true
     };
     this.map = null;
     this.problemPointLayer = L.layerGroup([]);
@@ -634,7 +633,7 @@ export default class integration extends PureComponent {
     map.closePopup();
   }
 
-  //添加问题点要素
+  //新建问题点要素
   async addProblemPoints(problemPointInfos) {
     const me = this;
     //查询数据源构造geojson
@@ -1117,11 +1116,11 @@ export default class integration extends PureComponent {
       dragMode: false, //adds button to toggle drag mode for all layers
       removalMode: false // adds a button to remove layers
     };
-    // 将图层绘制控件添加的地图页面上
+    // 将图层绘制控件新建的地图页面上
     map.pm.addControls(options);
     //检查照片列表
     picLayerGroup = L.featureGroup().addTo(map);
-    me.setState({ loading: false });
+    //me.setState({ loading: false });
   };
   //监听地图点击事件
   onBaseLayerChange = e => {
@@ -1776,7 +1775,7 @@ export default class integration extends PureComponent {
     // let layersControl = L.control
     //   .layers(userconfig.baseLayers, overlays)
     //   .addTo(map);
-    // 添加控件
+    // 新建控件
     const layersControl = L.control
       .layers(baseMaps, overlays, { position: "topright" })
       .addTo(map);
@@ -2078,7 +2077,7 @@ export default class integration extends PureComponent {
     this.addSideBySide();
   };
   /*
-   * 添加卷帘效果
+   * 新建卷帘效果
    */
   addSideBySide = () => {
     const {
@@ -2294,7 +2293,7 @@ export default class integration extends PureComponent {
       selectRightV,
       showPhotoPreview,
       photoPreviewUrl,
-      loading
+      //loading
     } = this.state;
     const {
       // dispatch,
@@ -2323,7 +2322,7 @@ export default class integration extends PureComponent {
             width: "100vw"
           }}
         >
-          <div
+          {/* <div
             style={{
               display: loading ? "block" : "none",
               boxSizing: "border-box",
@@ -2334,7 +2333,7 @@ export default class integration extends PureComponent {
             }}
           >
             <Spins show={true} />
-          </div>
+          </div> */}
           <div
             id="map"
             style={{

@@ -3,7 +3,8 @@ import {
   dictApi,
   basinOrganizationApi,
   departVaildApi,
-  powerListApi,
+  userCreateUpdateApi,
+  userDeleteApi,
   initApi,
   userListApi
 } from "../services/httpApi";
@@ -23,7 +24,7 @@ export default {
     departSelectList: [],
     basinOrganList: [],
     departList: [],
-    departUpdateId: "",
+    departUpdateId: ""
   },
 
   subscriptions: {
@@ -134,6 +135,28 @@ export default {
           message: `查询用户列表失败`
         });
       }
+    },
+
+    // 用户_新建编辑
+    *userCreateUpdate({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(userCreateUpdateApi, payload);
+      if (callback) callback(success, error, result);
+      notification[success ? "success" : "error"]({
+        message: `${payload.id ? "编辑" : "新建"}${success ? `成功` : `失败`}`
+      });
+    },
+
+    // 用户_删除`
+    *userDelete({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(userDeleteApi, payload);
+      if (callback) callback(success, error, result);
+      notification[success ? "success" : "error"]({
+        message: `删除${success ? `成功` : `失败`}`
+      });
     }
   },
 

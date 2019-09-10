@@ -1174,7 +1174,8 @@ export default class siderbarDetail extends PureComponent {
                   style={{ marginRight: 15 }}
                   onClick={() => {
                     emitter.emit("showHistoryPlay", {
-                      show: true
+                      show: true,
+                      hisPlayURL: './timelinejs/spaceTimeSpot.html?spotHistoryId=' +spotHistoryId
                     });
                     localStorage.setItem("spotHistoryList",JSON.stringify(spotHistoryList))
                   }}
