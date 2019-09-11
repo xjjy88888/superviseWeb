@@ -6,8 +6,8 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="jquery.min.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="leaflet/dist/leaflet.css"/>
+  <script src="leaflet/dist/leaflet.js"></script>
 	<link rel="stylesheet" href="dist/css/timeline.css"/>
   <script src="dist/js/timeline.js"></script>
 	<style>
@@ -20,74 +20,26 @@
 </head>
 <body>
 
-<!--<div id='map'>-->
 	<div class="timeline-container timeline-theme-1">
-	  <div class="timeline js-timeline">
-		<div data-time="2019-08-28Z">
-		  <div id="map"></div>
-		</div>
-		<div data-time="2019-08-27Z" style="display:none">
-		</div>
-		<div data-time="2019-08-26Z" style="display:none">
-		</div>
-		<div data-time="2019-08-25Z" style="display:none">
-		</div>
-		<div data-time="2019-08-24Z" style="display:none">
-		</div>
-		<div data-time="2019-08-23Z" style="display:none">
-		</div>
-		<div data-time="2019-08-22Z" style="display:none">
-		</div>
-		<div data-time="2019-08-21Z" style="display:none">
-		</div>
-		<div data-time="2019-08-20Z" style="display:none">
-		</div>
-		<div data-time="2019-08-19Z" style="display:none">
-		</div>
+	  <div class="timeline js-timeline" id="timelineDomBody">
 	  </div>
 	</div>
-<!--</div>-->
 
+</body>
 <script>
-	$(function(){ 
-    console.log(localStorage.getItem("spotHistoryList"));
-    var name = getIframeUrl('spotHistoryId');
-    console.log(name);
-
-		$('.js-timeline').Timeline({
-		  autoplay: false,
-		  isreplay:true,
-		  //autoplaySpeed:500,
-		  pauseOnHover: false
-		});
-
-		//动态计算map容器大小
-		$("#map").width($(".timeline-list").width());
-		$("#map").height($(".timeline-list").height());
-
-		var map = L.map('map',
-		  {
-			attributionControl: false,
-			center: [23.431365122122635, 113.2348930835724],
-			zoom: 15
-		  }
-		);
-		baseLayer = L.tileLayer('http://www.stbcjg.cn/BasemapService/rest/image/latest/tile/{z}/{y}/{x}', {
-			maxZoom: 18
-		}).addTo(map);
-		
-		timeSpotList = ['2019-08-28Z','2019-08-27Z','2019-08-26Z','2019-08-25Z','2019-08-24Z','2019-08-23Z','2019-08-22Z','2019-08-21Z','2019-08-20Z','2019-08-19Z'];
-		//地图叠加历史扰动图斑
-		spotWmsLayer = L.tileLayer.wms("https://www.zkygis.cn:8143/geoserver/ZKYGIS/wms?", {
-		  layers: 'ZKYGIS:historyspot', //需要加载的图层
-		  format: "image/png", //返回的数据格式
-		  transparent: true,
-		  cql_filter: "atime = 2019-08-28Z"
-    }).addTo(map);
 
     /*
-     *获取Iframe参数值函数
-     */
+      *日期转UTC函数
+      */
+      function dateToUtc(date) {
+      var toUTC = new Date((date +" 00:00:00").replace(/\-/g,"\/")).toISOString();
+      toUTC=toUTC.split(".")[0]+'Z';
+      return toUTC;
+    }
+
+    /*
+      *获取Iframe参数值函数
+      */
     function getIframeUrl(name) {
       var reg = new RegExp("[^\?&]?" + encodeURI(name) + "=[^&]+");
       var arr = window.parent.document.getElementById("hisPlayIframe").contentWindow.location.search.match(reg);//js获取iframe通过url传递的参数,需要iframe的ID
@@ -95,10 +47,117 @@
           return decodeURI(arr[0].substring(arr[0].search("=") + 1));
       }
       return "";
-    }   
+    } 
+    /*属性查询图层
+    *@method queryWFSServiceByProperty
+    *@param propertyValue 属性值
+    *@param propertyName 属性名称
+    *@param typeName 图层名称
+    *@param geoserverQueryUrl geoserverURL查询
+    *@return callback
+    */
+    function queryWFSServiceByProperty(propertyValue,propertyName,typeName,geoserverQueryUrl,callback){
+      var filter =
+        '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
+      filter += "<PropertyIsEqualTo>";
+      filter += "<PropertyName>" + propertyName + "</PropertyName>";
+      filter += "<Literal>" + propertyValue + "</Literal>";
+      filter += "</PropertyIsEqualTo>";
+      filter += "</Filter>";
+      var urlString = geoserverQueryUrl + "/ows";
+      var param = {
+        service: "WFS",
+        version: "1.0.0",
+        request: "GetFeature",
+        typeName: typeName,
+        outputFormat: "application/json",
+        filter: filter
+      };
+      var geojsonUrl = urlString + L.Util.getParamString(param, urlString);
+      $.ajax({
+        type:"GET",
+        url:geojsonUrl,
+        dataType:"json", 
+        success:function(data){
+            console.log("data:",data);
+            callback(data);
+        },
+        error:function(jqXHR){
+          console.log("发生错误："+ jqXHR.status);
+        }
+      });
+    }
 
-	}); 
-</script>
+    $(function(){
+        var l = window.location;  
+        var isFormal = l.href.split("/")[3] === "stbcjg";
+        var isLocal = l.hostname === "localhost"; 
+        var geoserverUrl = isLocal ? "http://183.6.178.124:8143": l.protocol+"//"+l.hostname+":8143";
+        geoserverUrl += "/geoserver/ZKYGIS";
+        var mapHistorySpotLayerName = isFormal ? "ZKYGIS:bs_spot_history" : "ZKYGIS:bs_spot_history_t";  
+        //var geoserverQueryUrl = "http://localhost:8080/geoserver/ZKYGIS";
+        baseLayerUrl = 'http://www.stbcjg.cn/BasemapService/rest/image/latest/tile/{z}/{y}/{x}';    
+        //获取历史扰动图斑数据列表
+        var spotHistoryList = localStorage.getItem("spotHistoryList");
+        spotHistoryList = JSON.parse(spotHistoryList);
+        console.log(spotHistoryList);
+        timeSpotList = [];
+        if(spotHistoryList.length>0){
+          //动态构造扰动图斑历史时间轴刻度
+          for(var i=spotHistoryList.length-1;i >= 0;i--){
+            timeSpotList.push(dateToUtc(spotHistoryList[i].archiveTime));
+             if(i == spotHistoryList.length-1){
+              $('#timelineDomBody').append('<div data-time="'+spotHistoryList[i].archiveTime+'"><div id="map"></div></div>');
+             }
+             else{
+              $('#timelineDomBody').append('<div data-time="'+spotHistoryList[i].archiveTime+'" style="display:none"></div>');
+             }
+          }
+        }
 
-</body>
+        //var spotHistoryId = getIframeUrl('spotHistoryId');
+        //console.log(spotHistoryId);
+
+        $('.js-timeline').Timeline({
+          autoplay: false,
+          isreplay:true,
+          //autoplaySpeed:500,
+          pauseOnHover: false
+        });
+
+        //动态计算map容器大小
+        $("#map").width($(".timeline-list").width());
+        $("#map").height($(".timeline-list").height());
+    
+        var map = L.map('map',
+          {
+          attributionControl: false,
+          center: [23.431365122122635, 113.2348930835724],
+          zoom: 8
+          }
+        );
+        baseLayer = L.tileLayer(baseLayerUrl, {
+          maxZoom: 18
+        }).addTo(map);
+        
+        //timeSpotList = ['2019-08-28Z','2019-08-27Z','2019-08-26Z','2019-08-25Z','2019-08-24Z','2019-08-23Z','2019-08-22Z','2019-08-21Z','2019-08-20Z','2019-08-19Z'];
+        //地图叠加历史扰动图斑      
+        spotWmsLayer = L.tileLayer.wms(geoserverUrl+"/wms?", {         
+          layers:mapHistorySpotLayerName,//需要加载的图层
+          format: "image/png", //返回的数据格式
+          transparent: true,
+          cql_filter: "archive_time = " +timeSpotList[0]
+        }).addTo(map);
+        //定位到图斑范围
+        queryWFSServiceByProperty(spotHistoryList[0].id,"id",mapHistorySpotLayerName,geoserverUrl,function(data){
+           if(data.features && data.features.length>0){
+             var feature = data.features[0];
+             var coordinate = feature.geometry.coordinates[0][0][0];
+             var latlng = [coordinate[1],coordinate[0]];
+             map.setView(latlng,15);
+           }
+        });
+    }); 
+    
+    </script>
 </html>

@@ -1,41 +1,97 @@
 import React, { PureComponent } from "react";
 import { Icon, Input, Button, Table, message, Modal } from "antd";
+import { createForm } from "rc-form";
+import { connect } from "dva";
 import Systems from "../../../components/Systems";
-import Highlighter from "react-highlight-words";
 import emitter from "../../../utils/event";
-import Register from "./Register";
+// import Register from "../../../../components/Register";
+import Highlighter from "react-highlight-words";
+import Spins from "../../../components/Spins";
 
-const data = [
-  {
-    key: "1",
-    nickname: "花都区办事员",
-    name: "花都区办事员",
-    phone: 13555479658,
-    time: "2019-12-31",
-    surplus: 10
-  },
-  {
-    key: "2",
-    nickname: "天河区办事员",
-    name: "天河区办事员",
-    phone: 16555479658,
-    time: "2020-12-31",
-    surplus: 20
-  },
-  {
-    key: "3",
-    nickname: "海珠区办事员",
-    name: "海珠区办事员",
-    phone: 17555479658,
-    time: "2091-12-31",
-    surplus: 30
+let self;
+
+@createForm()
+@connect(({ user }) => ({ user }))
+export default class review extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      state: 0,
+      visible: false,
+      selectedRows: [],
+      pagination: {},
+      loading: false,
+      dataSource: []
+    };
   }
-];
 
-export default class society extends PureComponent {
-  state = {
-    state: 0,
-    selectedRows: []
+  componentDidMount() {
+    self = this;
+    this.refresh();
+  }
+
+  refresh = () => {
+    this.userList({ SkipCount: 0, MaxResultCount: 10 });
+  };
+
+  userDelete = payload => {
+    const { dispatch } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: "user/userDelete",
+      payload,
+      callback: success => {
+        if (success) {
+          this.setState({
+            loading: false
+          });
+          this.refresh();
+        }
+      }
+    });
+  };
+
+  userCreateUpdate = payload => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "user/userCreateUpdate",
+      payload,
+      callback: success => {
+        if (success) {
+          this.refresh();
+        }
+      }
+    });
+  };
+
+  userList = params => {
+    const { dispatch } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: "user/userList",
+      payload: { ...params, IsActive: true, UserType: 1 },
+      callback: (success, error, result) => {
+        const pagination = { ...this.state.pagination };
+        pagination.total = result.totalCount;
+        this.setState({
+          loading: false,
+          dataSource: result.items,
+          pagination
+        });
+      }
+    });
+  };
+
+  handleTableChange = (pagination, filters, sorter) => {
+    console.log(pagination, filters);
+    this.setState({
+      pagination: pagination
+    });
+    this.userList({
+      SkipCount: (pagination.current - 1) * pagination.pageSize,
+      MaxResultCount: pagination.pageSize,
+      Name: filters.name
+    });
   };
 
   getColumnSearchProps = dataIndex => ({
@@ -87,15 +143,15 @@ export default class society extends PureComponent {
       if (visible) {
         setTimeout(() => this.searchInput.select());
       }
-    },
-    render: text => (
-      <Highlighter
-        highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-        searchWords={[this.state.searchText]}
-        autoEscape
-        textToHighlight={text.toString()}
-      />
-    )
+    }
+    // render: text => (
+    //   <Highlighter
+    //     highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+    //     searchWords={[this.state.searchText]}
+    //     autoEscape
+    //     textToHighlight={text.toString()}
+    //   />
+    // )
   });
 
   handleSearch = (selectedKeys, confirm) => {
@@ -109,38 +165,34 @@ export default class society extends PureComponent {
   };
 
   render() {
-    const { selectedRows } = this.state;
+    const { selectedRows, dataSource, pagination, loading } = this.state;
 
     const columns = [
       {
         title: "账号",
-        dataIndex: "nickname",
-        sorter: (a, b) => a.nickname.length - b.nickname.length,
-        ...this.getColumnSearchProps("nickname")
+        dataIndex: "userName",
+        sorter: (a, b) => a.userName.length - b.userName.length,
+        ...this.getColumnSearchProps("userName")
       },
       {
         title: "姓名",
-        dataIndex: "name",
-        sorter: (a, b) => a.name.length - b.name.length,
-        ...this.getColumnSearchProps("name")
+        dataIndex: "displayName",
+        sorter: (a, b) => a.displayName.length - b.displayName.length,
+        ...this.getColumnSearchProps("displayName")
       },
       {
         title: "电话",
-        dataIndex: "phone",
-        sorter: (a, b) => a.phone - b.phone,
-        ...this.getColumnSearchProps("phone")
+        dataIndex: "phoneNumber",
+        sorter: (a, b) => a.phoneNumber - b.phoneNumber,
+        ...this.getColumnSearchProps("phoneNumber")
       },
       {
-        title: "有效期至",
-        dataIndex: "time",
-        sorter: (a, b) => a.time.length - b.time.length,
-        ...this.getColumnSearchProps("time")
+        title: "用户类型",
+        render: item => <span>{item.userType === 1 ? `社会` : `行政`}用户</span>
       },
       {
-        title: "剩余天数",
-        dataIndex: "surplus",
-        sorter: (a, b) => a.surplus - b.surplus,
-        ...this.getColumnSearchProps("surplus")
+        title: "创建时间",
+        dataIndex: "creationTime"
       },
       {
         title: "操作",
@@ -152,22 +204,34 @@ export default class society extends PureComponent {
               onClick={() => {
                 emitter.emit("showRegister", {
                   show: true,
-                  type: "society"
+                  type: "review"
                 });
               }}
             >
               编辑
             </a>
             <a
+              style={{ marginRight: 20 }}
+              onClick={() => {
+                this.userCreateUpdate({
+                  id: item.id,
+                  isActive: true,
+                  isExamine: true
+                });
+              }}
+            >
+              通过
+            </a>
+            <a
               onClick={() => {
                 Modal.confirm({
                   title: "删除",
-                  content: "你是否确定要删除",
+                  content: "是否确定要删除",
                   okText: "是",
                   cancelText: "否",
                   okType: "danger",
                   onOk() {
-                    message.success(`删除1个账号成功`);
+                    self.userDelete({ id: item.id });
                   },
                   onCancel() {}
                 });
@@ -189,18 +253,20 @@ export default class society extends PureComponent {
 
     return (
       <Systems>
-        <Register />
+        {/* <Spins show={loading} /> */}
+        {/* <Register /> */}
         <span>
           <Button
-            icon="plus"
+            icon="delete"
+            disabled={!selectedRows.length}
             style={{ margin: 10 }}
             onClick={() => {
-              emitter.emit("showRegister", {
-                show: true,
-                type: "society",
-                status: "add",
-                item: {}
-              });
+              const l = selectedRows.length;
+              if (l === 0) {
+                message.warning("请选择需要通过的账号");
+                return;
+              }
+              message.success(`通过${l}个账号成功`);
             }}
           >
             新建
@@ -217,7 +283,7 @@ export default class society extends PureComponent {
               }
               Modal.confirm({
                 title: "删除",
-                content: "你是否确定要删除",
+                content: "是否确定要删除",
                 okText: "是",
                 cancelText: "否",
                 okType: "danger",
@@ -233,8 +299,12 @@ export default class society extends PureComponent {
         </span>
         <Table
           columns={columns}
-          dataSource={data}
           rowSelection={rowSelection}
+          rowKey={record => record.id}
+          dataSource={dataSource}
+          pagination={pagination}
+          loading={loading}
+          onChange={this.handleTableChange}
         />
       </Systems>
     );

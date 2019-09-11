@@ -142,7 +142,12 @@ class Info extends PureComponent {
                     message: `请输入${type === "role" ? "角色标识" : "账号"}`
                   }
                 ]
-              })(<Input placeholder={type === "role" ? "请输入英文" : ""} />)}
+              })(
+                <Input
+                  placeholder={type === "role" ? "请输入英文" : ""}
+                  maxLength={20}
+                />
+              )}
             </Form.Item>
             <Form.Item label="密码" hasFeedback style={hideRole}>
               {getFieldDecorator("password", {
@@ -156,7 +161,7 @@ class Info extends PureComponent {
                     validator: this.validateToNextPassword
                   }
                 ]
-              })(<Input.Password />)}
+              })(<Input.Password maxLength={30} />)}
             </Form.Item>
             <Form.Item label="确认密码" hasFeedback style={hideRole}>
               {getFieldDecorator("confirm", {
@@ -170,7 +175,12 @@ class Info extends PureComponent {
                     validator: this.compareToFirstPassword
                   }
                 ]
-              })(<Input.Password onBlur={this.handleConfirmBlur} />)}
+              })(
+                <Input.Password
+                  onBlur={this.handleConfirmBlur}
+                  maxLength={30}
+                />
+              )}
             </Form.Item>
             <Form.Item label={type === "role" ? "角色名" : "姓名"} hasFeedback>
               {getFieldDecorator("displayName", {
@@ -181,7 +191,7 @@ class Info extends PureComponent {
                     message: `请输入${type === "role" ? "角色名" : "姓名"}`
                   }
                 ]
-              })(<Input />)}
+              })(<Input maxLength={20} />)}
             </Form.Item>
             <Form.Item label="电话" hasFeedback style={hideRole}>
               {getFieldDecorator("phoneNumber", {
@@ -192,7 +202,7 @@ class Info extends PureComponent {
                     message: `请输入电话`
                   }
                 ]
-              })(<Input />)}
+              })(<Input maxLength={11} />)}
             </Form.Item>
             <Form.Item
               label="用户类型"
@@ -228,7 +238,7 @@ class Info extends PureComponent {
               )}
             </Form.Item>
             <Form.Item
-              label="行政区划单位"
+              label={`提交审核单位`}
               hasFeedback
               style={{ display: showDistrict ? "block" : "none" }}
             >

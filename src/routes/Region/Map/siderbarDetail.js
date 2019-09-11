@@ -1173,11 +1173,18 @@ export default class siderbarDetail extends PureComponent {
                   icon="play-square"
                   style={{ marginRight: 15 }}
                   onClick={() => {
-                    emitter.emit("showHistoryPlay", {
-                      show: true,
-                      hisPlayURL: './timelinejs/spaceTimeSpot.html?spotHistoryId=' +spotHistoryId
-                    });
-                    localStorage.setItem("spotHistoryList",JSON.stringify(spotHistoryList))
+                    if(spotHistoryList.length>0){
+                      emitter.emit("showHistoryPlay", {
+                        show: true,
+                        hisPlayURL: './timelinejs/spaceTimeSpot.html?spotHistoryId=' +spotHistoryId
+                      });
+                      localStorage.setItem("spotHistoryList",JSON.stringify(spotHistoryList));
+                    }
+                    else{
+                      notification["warning"]({
+                        message: `当前图斑没有图斑归档历史数据`
+                      });                      
+                    }
                   }}
                 >
                   历史播放

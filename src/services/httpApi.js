@@ -1132,7 +1132,11 @@ export async function powerListApi(params) {
 // 用户_列表
 export async function userListApi(params) {
   return request(
-    `${config.url.userListUrl}?SkipCount=${params.SkipCount}&MaxResultCount=${params.MaxResultCount}&IsActive=${params.IsActive}`,
+    `${config.url.userListUrl}?SkipCount=${params.SkipCount}&MaxResultCount=${
+      params.MaxResultCount
+    }&IsActive=${params.IsActive}&UserType=${
+      params.UserType
+    }&GovDepartmentId=${params.GovDepartmentId || ``}`,
     {
       method: "GET",
       headers: {
@@ -1145,6 +1149,7 @@ export async function userListApi(params) {
 // 用户_新建编辑
 export async function userCreateUpdateApi(params) {
   const passwordMd5 = CryptoJS.MD5(params.password).toString();
+  const data = params.isExamine ? params : { ...params, password: passwordMd5 };
   return request(
     `${config.url.userCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
     {
@@ -1153,7 +1158,7 @@ export async function userCreateUpdateApi(params) {
         Authorization: `Bearer ${accessToken()}`,
         "Content-Type": "application/json-patch+json"
       },
-      body: JSON.stringify({ ...params, password: passwordMd5 })
+      body: JSON.stringify(data)
     }
   );
 }

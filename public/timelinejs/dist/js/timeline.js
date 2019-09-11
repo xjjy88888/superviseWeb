@@ -245,10 +245,10 @@
 
 			//console.log(spotWmsLayer);
 			//动态刷新扰动图斑匹配的监管影像
-			baseLayer.setUrl('http://www.stbcjg.cn/BasemapService/rest/image/latest/tile/{z}/{y}/{x}');
+			baseLayer.setUrl(baseLayerUrl);
 			//动态刷新历史扰动图斑
 			spotWmsLayer.setParams({
-			  cql_filter: "atime ="+timeSpotList[self.options.startItem]
+			  cql_filter: "archive_time ="+timeSpotList[self.options.startItem]
 			});
 		},
 

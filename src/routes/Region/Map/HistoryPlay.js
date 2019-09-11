@@ -11,7 +11,7 @@ export default class register extends PureComponent {
   }
 
   componentDidMount() {
-    console.log("历史播放");
+    //console.log("历史播放");
     this.eventEmitter = emitter.addListener("showHistoryPlay", v => {
       this.setState({
         show: v.show,

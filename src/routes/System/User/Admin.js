@@ -1,5 +1,10 @@
 import React, { PureComponent } from "react";
+import { connect } from "dva";
+import { createForm } from "rc-form";
+import Systems from "../../../components/Systems";
+import MustFill from "../../../components/MustFill";
 import {
+  Form,
   Icon,
   Input,
   Button,
@@ -8,47 +13,86 @@ import {
   Tree,
   Typography,
   Layout,
-  Modal
+  Modal,
+  notification,
+  Cascader
 } from "antd";
 import Highlighter from "react-highlight-words";
-import emitter from "../../../utils/event";
-// import Register from "../../../../components/Register";
-import Systems from "../../../components/Systems";
 
-const { Title } = Typography;
 const { Sider, Content } = Layout;
+const { Title } = Typography;
 
-const data = [
-  {
-    key: "1",
-    nickname: "花都区办事员",
-    name: "花都区办事员",
-    phone: 13555479658,
-    time: "2019-12-31",
-    surplus: 10
-  },
-  {
-    key: "2",
-    nickname: "天河区办事员",
-    name: "天河区办事员",
-    phone: 16555479658,
-    time: "2020-12-31",
-    surplus: 20
-  },
-  {
-    key: "3",
-    nickname: "海珠区办事员",
-    name: "海珠区办事员",
-    phone: 17555479658,
-    time: "2091-12-31",
-    surplus: 30
-  }
-];
+const formItemLayout = {
+  labelCol: { span: 6 },
+  wrapperCol: { span: 15 }
+};
 
-export default class account extends PureComponent {
+let self;
+
+@connect(({ user, departs }) => ({ user, departs }))
+@createForm()
+export default class area extends PureComponent {
   state = {
-    state: 0,
-    selectedRows: []
+    visible: false,
+    selectedRows: [],
+    id: null,
+    pagination: {},
+    loading: false,
+    dataSource: [],
+    GovDepartmentId: ""
+  };
+
+  componentDidMount() {
+    self = this;
+    this.departsTree();
+  }
+
+  refresh = () => {
+    const { GovDepartmentId } = this.state;
+    this.userList({ SkipCount: 0, MaxResultCount: 10, GovDepartmentId });
+  };
+
+  departsTree = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "departs/departsTree"
+    });
+  };
+
+  userList = payload => {
+    const { dispatch } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: "user/userList",
+      payload: { ...payload, IsActive: true, UserType: 0 },
+      callback: (success, error, result) => {
+        const pagination = { ...this.state.pagination };
+        pagination.total = result.totalCount;
+        this.setState({
+          pagination,
+          loading: false,
+          dataSource: result.items.map((item, index) => {
+            return {
+              ...item,
+              key: index
+            };
+          })
+        });
+      }
+    });
+  };
+
+  handleTableChange = (pagination, filters, sorter) => {
+    const { GovDepartmentId } = this.state;
+    this.setState({
+      pagination: pagination
+    });
+    this.userList({
+      SkipCount: (pagination.current - 1) * pagination.pageSize,
+      MaxResultCount: pagination.pageSize,
+      Name: filters.name,
+      GovDepartmentId: GovDepartmentId
+    });
   };
 
   getColumnSearchProps = dataIndex => ({
@@ -100,15 +144,15 @@ export default class account extends PureComponent {
       if (visible) {
         setTimeout(() => this.searchInput.select());
       }
-    },
-    render: text => (
-      <Highlighter
-        highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-        searchWords={[this.state.searchText]}
-        autoEscape
-        textToHighlight={text.toString()}
-      />
-    )
+    }
+    // render: text => (
+    //   <Highlighter
+    //     highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+    //     searchWords={[this.state.searchText]}
+    //     autoEscape
+    //     textToHighlight={text.toString()}
+    //   />
+    // )
   });
 
   handleSearch = (selectedKeys, confirm) => {
@@ -120,40 +164,50 @@ export default class account extends PureComponent {
     clearFilters();
     this.setState({ searchText: "" });
   };
-
   render() {
-    const { selectedRows } = this.state;
+    const {
+      dispatch,
+      form: { getFieldDecorator, resetFields, setFieldsValue, validateFields },
+      departs: { departsTree, userList }
+    } = this.props;
+
+    const {
+      visible,
+      selectedRows,
+      id,
+      dataSource,
+      pagination,
+      loading,
+      ParentCodeId,
+      GovDepartmentId
+    } = this.state;
 
     const columns = [
       {
         title: "账号",
-        dataIndex: "nickname",
-        sorter: (a, b) => a.nickname.length - b.nickname.length,
-        ...this.getColumnSearchProps("nickname")
+        dataIndex: "userName",
+        sorter: (a, b) => a.userName.length - b.userName.length,
+        ...this.getColumnSearchProps("userName")
       },
       {
         title: "姓名",
-        dataIndex: "name",
-        sorter: (a, b) => a.name.length - b.name.length,
-        ...this.getColumnSearchProps("name")
+        dataIndex: "displayName",
+        sorter: (a, b) => a.displayName.length - b.displayName.length,
+        ...this.getColumnSearchProps("displayName")
       },
       {
         title: "电话",
-        dataIndex: "phone",
-        sorter: (a, b) => a.phone - b.phone,
-        ...this.getColumnSearchProps("phone")
+        dataIndex: "phoneNumber",
+        sorter: (a, b) => a.phoneNumber - b.phoneNumber,
+        ...this.getColumnSearchProps("phoneNumber")
       },
       {
-        title: "有效期至",
-        dataIndex: "time",
-        sorter: (a, b) => a.time.length - b.time.length,
-        ...this.getColumnSearchProps("time")
+        title: "用户类型",
+        render: item => <span>{item.userType === 1 ? `社会` : `行政`}用户</span>
       },
       {
-        title: "剩余天数",
-        dataIndex: "surplus",
-        sorter: (a, b) => a.surplus - b.surplus,
-        ...this.getColumnSearchProps("surplus")
+        title: "创建时间",
+        dataIndex: "creationTime"
       },
       {
         title: "操作",
@@ -163,9 +217,22 @@ export default class account extends PureComponent {
             <a
               style={{ marginRight: 20 }}
               onClick={() => {
-                emitter.emit("showRegister", {
-                  show: true,
-                  type: "account"
+                console.log(record);
+                this.props.form.setFieldsValue({
+                  GovDepartmentId: record.parent_id,
+                  name: record.name,
+                  code: record.code,
+                  description: record.description
+                });
+                this.setState({
+                  visible: true,
+                  id: record.id
+                });
+                setFieldsValue({
+                  districtCodeId: [
+                    this.getDist(ParentCodeId)[0].value,
+                    record.districtCodeId
+                  ]
                 });
               }}
             >
@@ -175,12 +242,26 @@ export default class account extends PureComponent {
               onClick={() => {
                 Modal.confirm({
                   title: "删除",
-                  content: "你是否确定要删除",
+                  content: "是否确定要删除",
                   okText: "是",
                   cancelText: "否",
                   okType: "danger",
                   onOk() {
-                    message.success(`删除1个账号成功`);
+                    dispatch({
+                      type: "departs/departsDelete",
+                      payload: record.id,
+                      callback: (success, error, result) => {
+                        if (success) {
+                          self.setState({
+                            visible: false
+                          });
+                          self.refresh();
+                        }
+                        notification[success ? "success" : "error"]({
+                          message: `删除${success ? "成功" : "失败"}`
+                        });
+                      }
+                    });
                   },
                   onCancel() {}
                 });
@@ -199,55 +280,94 @@ export default class account extends PureComponent {
         this.setState({ selectedRows: selectedRows });
       }
     };
-
     return (
       <Systems>
-        {/* <Register /> */}
         <Layout>
-          <Sider width={300} theme="light">
-            <Title level={4}>部门</Title>
+          <Sider
+            style={{
+              borderRadius: "10px 0 0 0",
+              height: window.innerHeight - 150,
+              overflow: "auto"
+            }}
+            width={400}
+            theme="light"
+          >
             <Tree.DirectoryTree
               multiple
-              defaultExpandAll
-              onSelect={(keys, event) => {
-                console.log("Trigger Select", keys, event);
+              onSelect={(v, e) => {
+                // console.log(v[0], e.selectedNodes[0].props.districtCodeId);
+                const d = e.selectedNodes[0].props.districtCodeId;
+                // console.log(this.getDist(d));
+                this.setState({
+                  GovDepartmentId: v[0],
+                  ParentCodeId: d
+                });
+                this.userList({
+                  SkipCount: 0,
+                  MaxResultCount: 10,
+                  GovDepartmentId: v[0]
+                });
               }}
             >
-              <Tree.TreeNode title="中华人民共和国水利部" key="0-0">
-                <Tree.TreeNode title="贵州省水利厅" key="0-0-0">
-                  <Tree.TreeNode
-                    title="贵阳市水务管理局"
-                    key="0-0-0-0"
-                    isLeaf
-                  />
-                  <Tree.TreeNode title="遵义市水务局" key="0-0-0-1" isLeaf />
-                  <Tree.TreeNode title="毕节市水务局" key="0-0-0-2" isLeaf />
+              {departsTree.map(item => (
+                <Tree.TreeNode
+                  title={item.label}
+                  key={item.value}
+                  districtCodeId={item.districtCodeId}
+                >
+                  {(item.children || []).map(ite => (
+                    <Tree.TreeNode
+                      title={ite.label}
+                      key={ite.value}
+                      districtCodeId={ite.districtCodeId}
+                    >
+                      {(ite.children || []).map(it => (
+                        <Tree.TreeNode
+                          title={it.label}
+                          key={it.value}
+                          districtCodeId={it.districtCodeId}
+                        >
+                          {(it.children || []).map(i => (
+                            <Tree.TreeNode
+                              title={i.label}
+                              key={i.value}
+                              districtCodeId={i.districtCodeId}
+                            >
+                              {(i.children || []).map(j => (
+                                <Tree.TreeNode
+                                  title={j.label}
+                                  key={j.value}
+                                  districtCodeId={j.districtCodeId}
+                                  isLeaf
+                                />
+                              ))}
+                            </Tree.TreeNode>
+                          ))}
+                        </Tree.TreeNode>
+                      ))}
+                    </Tree.TreeNode>
+                  ))}
                 </Tree.TreeNode>
-                <Tree.TreeNode title="广东省水利厅" key="0-0-1">
-                  <Tree.TreeNode title="广州市水务局" key="0-0-1-0" isLeaf />
-                </Tree.TreeNode>
-                <Tree.TreeNode title="广西壮族自治区水利厅" key="0-0-2">
-                  <Tree.TreeNode title="南宁市水务局" key="0-0-2-0" isLeaf />
-                  <Tree.TreeNode title="北海市水务局" key="0-0-2-1" isLeaf />
-                </Tree.TreeNode>
-              </Tree.TreeNode>
+              ))}
             </Tree.DirectoryTree>
           </Sider>
           <Content
             style={{
+              borderRadius: "0 10px 0 0",
               background: "#fff"
             }}
           >
             <Title level={4}>
-              用户
-              <span style={{ float: "right" }}>
+              <span>
                 <Button
                   icon="plus"
+                  disabled={!GovDepartmentId}
                   style={{ margin: 10 }}
                   onClick={() => {
-                    emitter.emit("showRegister", {
-                      show: true,
-                      type: "account"
+                    resetFields();
+                    this.setState({
+                      visible: true,
+                      id: null
                     });
                   }}
                 >
@@ -256,21 +376,37 @@ export default class account extends PureComponent {
                 <Button
                   icon="delete"
                   disabled={!selectedRows.length}
-                  style={{ marginLeft: 10 }}
+                  style={{ margin: 10 }}
                   onClick={() => {
                     const l = selectedRows.length;
                     if (l === 0) {
-                      message.warning("请选择需要删除的账号");
+                      message.warning("请选择需要删除的部门");
                       return;
                     }
                     Modal.confirm({
                       title: "删除",
-                      content: "你是否确定要删除",
+                      content: "是否确定要删除",
                       okText: "是",
                       cancelText: "否",
                       okType: "danger",
                       onOk() {
-                        message.success(`删除${l}个账号成功`);
+                        dispatch({
+                          type: "departs/departsDeleteMul",
+                          payload: { id: selectedRows.map(item => item.id) },
+                          callback: (success, error, result) => {
+                            if (success) {
+                              self.setState({
+                                visible: false
+                              });
+                              self.departsTree();
+                            }
+                            notification[success ? "success" : "error"]({
+                              message: `删除${l}条部门划数据${
+                                success ? "成功" : "失败"
+                              }${success ? "" : `：${error.message}`}`
+                            });
+                          }
+                        });
                       },
                       onCancel() {}
                     });
@@ -282,9 +418,74 @@ export default class account extends PureComponent {
             </Title>
             <Table
               columns={columns}
-              dataSource={data}
               rowSelection={rowSelection}
+              rowKey={record => record.id}
+              dataSource={dataSource}
+              pagination={pagination}
+              loading={loading}
+              onChange={this.handleTableChange}
             />
+            <Modal
+              width={`50%`}
+              height={`50%`}
+              title={`${id ? `编辑` : `新建`}部门`}
+              visible={visible}
+              onOk={() => {
+                // submit
+                validateFields((err, v) => {
+                  console.log("新建编辑部门", v);
+                  const d = v.districtCodeId;
+                  if (!v.name) {
+                    message.warning("请填写部门名");
+                    return;
+                  }
+                  if (!d) {
+                    message.warning("请选择行政区划");
+                    return;
+                  }
+                  dispatch({
+                    type: "departs/departsCreateUpdate",
+                    payload: {
+                      ...v,
+                      id: id,
+                      districtCodeId: d[d.length - 1],
+                      GovDepartmentId
+                    },
+                    callback: success => {
+                      if (success) {
+                        this.refresh();
+                        this.setState({
+                          visible: false
+                        });
+                      }
+                    }
+                  });
+                });
+              }}
+              onCancel={() => {
+                this.setState({
+                  visible: false
+                });
+              }}
+            >
+              <Form
+                onSubmit={this.handleSubmit}
+                style={{ textAlign: "center", width: `100%`, height: `100%` }}
+              >
+                <Form.Item
+                  {...formItemLayout}
+                  label={
+                    <span>
+                      部门名
+                      <MustFill />
+                    </span>
+                  }
+                  hasFeedback
+                >
+                  {getFieldDecorator("name", {})(<Input />)}
+                </Form.Item>
+              </Form>
+            </Modal>
           </Content>
         </Layout>
       </Systems>

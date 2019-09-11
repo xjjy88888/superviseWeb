@@ -149,7 +149,9 @@ export default {
       } = yield call(userCreateUpdateApi, payload);
       if (callback) callback(success, error, result);
       notification[success ? "success" : "error"]({
-        message: `${payload.id ? "编辑" : "新建"}${success ? `成功` : `失败`}`
+        message: payload.isExamine
+          ? `审核通过${success ? `成功` : `失败`}`
+          : `${payload.id ? "编辑" : "新建"}${success ? `成功` : `失败`}`
       });
     },
 

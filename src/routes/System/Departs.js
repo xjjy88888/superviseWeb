@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import React, { PureComponent } from "react";
 import { connect } from "dva";
 import { createForm } from "rc-form";
@@ -198,7 +199,7 @@ export default class area extends PureComponent {
     const {
       dispatch,
       form: { getFieldDecorator, resetFields, setFieldsValue, validateFields },
-      departs: { departsTree, departsList }
+      departs: { departsTree }
     } = this.props;
 
     const {
@@ -258,7 +259,7 @@ export default class area extends PureComponent {
               onClick={() => {
                 Modal.confirm({
                   title: "删除",
-                  content: "你是否确定要删除",
+                  content: "是否确定要删除",
                   okText: "是",
                   cancelText: "否",
                   okType: "danger",
@@ -401,7 +402,7 @@ export default class area extends PureComponent {
                     }
                     Modal.confirm({
                       title: "删除",
-                      content: "你是否确定要删除",
+                      content: "是否确定要删除",
                       okText: "是",
                       cancelText: "否",
                       okType: "danger",

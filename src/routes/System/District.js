@@ -182,7 +182,7 @@ export default class area extends PureComponent {
               onClick={() => {
                 Modal.confirm({
                   title: "删除",
-                  content: "你是否确定要删除",
+                  content: "是否确定要删除",
                   okText: "是",
                   cancelText: "否",
                   okType: "danger",
@@ -286,7 +286,7 @@ export default class area extends PureComponent {
                     }
                     Modal.confirm({
                       title: "删除",
-                      content: "你是否确定要删除",
+                      content: "是否确定要删除",
                       okText: "是",
                       cancelText: "否",
                       okType: "danger",

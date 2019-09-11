@@ -6,6 +6,7 @@ import Systems from "../../../components/Systems";
 import emitter from "../../../utils/event";
 // import Register from "../../../../components/Register";
 import Highlighter from "react-highlight-words";
+import Spins from "../../../components/Spins";
 
 let self;
 
@@ -26,15 +27,49 @@ export default class review extends PureComponent {
 
   componentDidMount() {
     self = this;
-    this.userList({ SkipCount: 0, MaxResultCount: 10 });
+    this.refresh();
   }
+
+  refresh = () => {
+    this.userList({ SkipCount: 0, MaxResultCount: 10 });
+  };
+
+  userDelete = payload => {
+    const { dispatch } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: "user/userDelete",
+      payload,
+      callback: success => {
+        if (success) {
+          this.setState({
+            loading: false
+          });
+          this.refresh();
+        }
+      }
+    });
+  };
+
+  userCreateUpdate = payload => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "user/userCreateUpdate",
+      payload,
+      callback: success => {
+        if (success) {
+          this.refresh();
+        }
+      }
+    });
+  };
 
   userList = params => {
     const { dispatch } = this.props;
     this.setState({ loading: true });
     dispatch({
       type: "user/userList",
-      payload: { ...params, IsActive: false },
+      payload: { ...params, IsActive: false, UserType: "" },
       callback: (success, error, result) => {
         const pagination = { ...this.state.pagination };
         pagination.total = result.totalCount;
@@ -147,21 +182,17 @@ export default class review extends PureComponent {
       },
       {
         title: "电话",
-        dataIndex: "phone",
-        sorter: (a, b) => a.phone - b.phone,
-        ...this.getColumnSearchProps("phone")
+        dataIndex: "phoneNumber",
+        sorter: (a, b) => a.phoneNumber - b.phoneNumber,
+        ...this.getColumnSearchProps("phoneNumber")
       },
       {
-        title: "有效期至",
-        dataIndex: "time",
-        sorter: (a, b) => a.time.length - b.time.length,
-        ...this.getColumnSearchProps("time")
+        title: "用户类型",
+        render: item => <span>{item.userType === 1 ? `社会` : `行政`}用户</span>
       },
       {
-        title: "剩余天数",
-        dataIndex: "surplus",
-        sorter: (a, b) => a.surplus - b.surplus,
-        ...this.getColumnSearchProps("surplus")
+        title: "创建时间",
+        dataIndex: "creationTime",
       },
       {
         title: "操作",
@@ -182,7 +213,11 @@ export default class review extends PureComponent {
             <a
               style={{ marginRight: 20 }}
               onClick={() => {
-                message.success(`通过1个账号成功`);
+                this.userCreateUpdate({
+                  id: item.id,
+                  isActive: true,
+                  isExamine: true
+                });
               }}
             >
               通过
@@ -191,12 +226,12 @@ export default class review extends PureComponent {
               onClick={() => {
                 Modal.confirm({
                   title: "删除",
-                  content: "你是否确定要删除",
+                  content: "是否确定要删除",
                   okText: "是",
                   cancelText: "否",
                   okType: "danger",
                   onOk() {
-                    message.success(`删除1个账号成功`);
+                    self.userDelete({ id: item.id });
                   },
                   onCancel() {}
                 });
@@ -218,6 +253,7 @@ export default class review extends PureComponent {
 
     return (
       <Systems>
+        {/* <Spins show={loading} /> */}
         {/* <Register /> */}
         <span>
           <Button
@@ -247,7 +283,7 @@ export default class review extends PureComponent {
               }
               Modal.confirm({
                 title: "删除",
-                content: "你是否确定要删除",
+                content: "是否确定要删除",
                 okText: "是",
                 cancelText: "否",
                 okType: "danger",
