@@ -12,7 +12,8 @@ import {
   Layout,
   Checkbox,
   Row,
-  Col
+  Col,
+  Cascader
 } from "antd";
 import { connect } from "dva";
 import moment from "moment";
@@ -35,23 +36,27 @@ const formItemLayout = {
 
 //填写用户信息
 @createForm()
-@connect(({ user, district }) => ({
+@connect(({ user, district, departs }) => ({
   user,
-  district
+  district,
+  departs
 }))
 class Info extends PureComponent {
   state = {
     confirmDirty: false,
     autoCompleteResult: [],
-    showDistrict: false,
     id: null,
-    type: ""
+    type: "",
+    userType: ""
   };
 
   componentDidMount() {
     const {
       form: { resetFields, setFieldsValue }
     } = this.props;
+
+    this.departsTree();
+
     this.eventEmitter = emitter.addListener("showRegister", v => {
       console.log(v);
       this.setState({ type: v.type });
@@ -69,6 +74,13 @@ class Info extends PureComponent {
       }
     });
   }
+
+  departsTree = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "departs/departsTree"
+    });
+  };
 
   handleSubmit = e => {
     e.preventDefault();
@@ -111,9 +123,10 @@ class Info extends PureComponent {
     const {
       isLogin,
       show,
-      form: { getFieldDecorator }
+      form: { getFieldDecorator },
+      departs: { departsTree, userList }
     } = this.props;
-    const { showDistrict, type } = this.state;
+    const { type, userType } = this.state;
 
     const showRole = { display: type === "role" ? "block" : "none" };
     const hideRole = { display: type === "role" ? "none" : "block" };
@@ -219,16 +232,14 @@ class Info extends PureComponent {
               })(
                 <Select
                   showSearch
-                  allowClear
                   optionFilterProp="children"
-                  onChange={e => {
-                    console.log(e);
-                    this.setState({ showDistrict: e === "account" });
+                  onChange={userType => {
+                    this.setState({ userType });
                   }}
                 >
                   {[
-                    { text: "社会用户", value: "1" },
-                    { text: "行政用户", value: "0" }
+                    { text: "社会用户", value: 1 },
+                    { text: "行政用户", value: 0 }
                   ].map((item, index) => (
                     <Select.Option value={item.value} key={index}>
                       {item.text}
@@ -238,43 +249,26 @@ class Info extends PureComponent {
               )}
             </Form.Item>
             <Form.Item
-              label={`提交审核单位`}
+              label={userType === 1 ? `提交审核单位` : `所属单位`}
               hasFeedback
-              style={{ display: showDistrict ? "block" : "none" }}
+              style={{ display: type !== "role" ? "block" : "none" }}
             >
               {getFieldDecorator("area", {
                 initialValue: "",
                 rules: [
                   {
-                    required: showDistrict,
-                    message: "请选择行政区划单位"
+                    required: type !== "role",
+                    message:
+                      userType === 1 ? `请选择提交审核单位` : `请选择所属单位`
                   }
                 ]
               })(
-                <TreeSelect
+                <Cascader
                   showSearch
-                  dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
-                  allowClear
-                  treeDefaultExpandAll
-                >
-                  <TreeSelect.TreeNode
-                    value="parent 1"
-                    title="珠江水利厅"
-                    key="0-1"
-                  >
-                    <TreeSelect.TreeNode
-                      value="parent 1-1"
-                      title="珠江水利科学研究院监测站"
-                      key="random2"
-                    >
-                      <TreeSelect.TreeNode
-                        value="sss"
-                        title="珠江水利科学研究院办公室"
-                        key="random3"
-                      />
-                    </TreeSelect.TreeNode>
-                  </TreeSelect.TreeNode>
-                </TreeSelect>
+                  options={departsTree}
+                  changeOnSelect
+                  placeholder="请选择所在地区"
+                />
               )}
             </Form.Item>
             <Footer

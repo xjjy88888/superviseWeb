@@ -34,12 +34,12 @@ export default class review extends PureComponent {
     this.userList({ SkipCount: 0, MaxResultCount: 10 });
   };
 
-  userDelete = payload => {
+  userDelete = v => {
     const { dispatch } = this.props;
     this.setState({ loading: true });
     dispatch({
       type: "user/userDelete",
-      payload,
+      payload: { ids: v.map(i => i.id) },
       callback: success => {
         if (success) {
           this.setState({
@@ -51,12 +51,21 @@ export default class review extends PureComponent {
     });
   };
 
-  userCreateUpdate = payload => {
+  userExamine = arr => {
     const { dispatch } = this.props;
+    this.setState({ loading: true });
     dispatch({
-      type: "user/userCreateUpdate",
-      payload,
+      type: "user/userExamine",
+      payload: {
+        items: arr.map(item => {
+          return {
+            userId: item.id,
+            isActive: true
+          };
+        })
+      },
       callback: success => {
+        this.setState({ loading: false });
         if (success) {
           this.refresh();
         }
@@ -192,7 +201,7 @@ export default class review extends PureComponent {
       },
       {
         title: "创建时间",
-        dataIndex: "creationTime",
+        dataIndex: "creationTime"
       },
       {
         title: "操作",
@@ -213,10 +222,21 @@ export default class review extends PureComponent {
             <a
               style={{ marginRight: 20 }}
               onClick={() => {
-                this.userCreateUpdate({
-                  id: item.id,
-                  isActive: true,
-                  isExamine: true
+                Modal.confirm({
+                  title: "通过",
+                  content: "是否确定要审核通过",
+                  okText: "是",
+                  cancelText: "否",
+                  okType: "danger",
+                  onOk() {
+                    self.userExamine([
+                      {
+                        id: item.id,
+                        isActive: true
+                      }
+                    ]);
+                  },
+                  onCancel() {}
                 });
               }}
             >
@@ -231,7 +251,7 @@ export default class review extends PureComponent {
                   cancelText: "否",
                   okType: "danger",
                   onOk() {
-                    self.userDelete({ id: item.id });
+                    self.userDelete([{ id: item.id }]);
                   },
                   onCancel() {}
                 });
@@ -253,11 +273,10 @@ export default class review extends PureComponent {
 
     return (
       <Systems>
-        {/* <Spins show={loading} /> */}
         {/* <Register /> */}
         <span>
           <Button
-            icon="delete"
+            icon="check"
             disabled={!selectedRows.length}
             style={{ margin: 10 }}
             onClick={() => {
@@ -266,7 +285,18 @@ export default class review extends PureComponent {
                 message.warning("请选择需要通过的账号");
                 return;
               }
-              message.success(`通过${l}个账号成功`);
+
+              Modal.confirm({
+                title: "通过",
+                content: "是否确定要审核通过",
+                okText: "是",
+                cancelText: "否",
+                okType: "danger",
+                onOk() {
+                  self.userExamine(selectedRows);
+                },
+                onCancel() {}
+              });
             }}
           >
             通过
@@ -288,7 +318,7 @@ export default class review extends PureComponent {
                 cancelText: "否",
                 okType: "danger",
                 onOk() {
-                  message.success(`删除${l}个账号成功`);
+                  self.userDelete(selectedRows);
                 },
                 onCancel() {}
               });

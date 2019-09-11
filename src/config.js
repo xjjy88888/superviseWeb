@@ -344,11 +344,14 @@ const config = {
     // 用户_新建编辑
     userCreateUpdateUrl: `${domainApi}User/`,
 
+    // 用户_审核
+    userExamineUrl: `${domainApi}User/SetIsActive`,
+
     // 用户_新建设置权限
     userSetPowerUrl: `${domainApi}User/SetGrantedPermissionsAsync`,
 
     // 用户_删除
-    userDeleteUrl: `${domainApi}User/Delete`,
+    userDeleteUrl: `${domainApi}User/DeleteBatch`,
 
     // 所属项目
     userProjectUrl: `${domainApi}Project/GetListByName`,

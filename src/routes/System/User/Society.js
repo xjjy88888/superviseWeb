@@ -211,18 +211,6 @@ export default class review extends PureComponent {
               编辑
             </a>
             <a
-              style={{ marginRight: 20 }}
-              onClick={() => {
-                this.userCreateUpdate({
-                  id: item.id,
-                  isActive: true,
-                  isExamine: true
-                });
-              }}
-            >
-              通过
-            </a>
-            <a
               onClick={() => {
                 Modal.confirm({
                   title: "删除",
@@ -260,14 +248,7 @@ export default class review extends PureComponent {
             icon="delete"
             disabled={!selectedRows.length}
             style={{ margin: 10 }}
-            onClick={() => {
-              const l = selectedRows.length;
-              if (l === 0) {
-                message.warning("请选择需要通过的账号");
-                return;
-              }
-              message.success(`通过${l}个账号成功`);
-            }}
+            onClick={() => {}}
           >
             新建
           </Button>

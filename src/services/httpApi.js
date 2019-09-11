@@ -1163,6 +1163,18 @@ export async function userCreateUpdateApi(params) {
   );
 }
 
+// 用户_审核
+export async function userExamineApi(params) {
+  return request(`${config.url.userExamineUrl}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify(params.items)
+  });
+}
+
 // 用户_新建设置权限
 export async function userSetPowerApi(params) {
   return request(`${config.url.userSetPowerUrl}`, {
@@ -1177,12 +1189,13 @@ export async function userSetPowerApi(params) {
 
 // 用户_删除
 export async function userDeleteApi(params) {
-  return request(`${config.url.userDeleteUrl}?id=${params.id}`, {
+  return request(`${config.url.userDeleteUrl}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
       "Content-Type": "application/json-patch+json"
-    }
+    },
+    body: JSON.stringify(params.ids)
   });
 }
 

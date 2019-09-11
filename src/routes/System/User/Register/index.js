@@ -47,10 +47,9 @@ export default class register extends PureComponent {
     user: {},
     finishData: [],
     id: null
-    //all: 注册
-    //review: 管理员
+    //login: 注册
     //society: 社会用户
-    //account: 行政用户
+    //admin: 行政用户
     //role: 行政角色
   };
 
@@ -156,8 +155,6 @@ export default class register extends PureComponent {
 
   render() {
     const { show, state, type, isLogin, finishData } = this.state;
-
-    console.log(type);
 
     return (
       <LocaleProvider locale={zh_CN}>

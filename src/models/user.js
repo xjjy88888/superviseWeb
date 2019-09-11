@@ -9,7 +9,8 @@ import {
   userListApi,
   userProjectApi,
   userCompanyApi,
-  userSetPowerApi
+  userSetPowerApi,
+  userExamineApi
 } from "../services/httpApi";
 import { routerRedux } from "dva/router";
 import { notification } from "antd";
@@ -155,14 +156,16 @@ export default {
       });
     },
 
-    // 用户_删除
+    //  用户_删除
     *userDelete({ payload, callback }, { call, put }) {
       const {
-        data: { success, error, result }
+        data: { success, error }
       } = yield call(userDeleteApi, payload);
-      if (callback) callback(success, error, result);
+      if (callback) callback(success);
       notification[success ? "success" : "error"]({
-        message: `删除${success ? `成功` : `失败`}`
+        message: `删除${success ? "成功" : "失败"}${
+          success ? "" : `：${error.message}`
+        }`
       });
     },
 
@@ -184,6 +187,17 @@ export default {
       if (success) {
         yield put({ type: "save", payload: { userCompanyList: result.items } });
       }
+    },
+
+    // 用户_审核
+    *userExamine({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(userExamineApi, payload);
+      if (callback) callback(success, error, result);
+      notification[success ? "success" : "error"]({
+        message: `审核通过${success ? `成功` : `失败`}`
+      });
     },
 
     // 用户_新建设置权限
