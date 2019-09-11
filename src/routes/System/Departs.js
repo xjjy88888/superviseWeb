@@ -59,22 +59,19 @@ export default class area extends PureComponent {
     });
   };
 
-  getDist = v => {
-    const {
-      district: { districtTree }
-    } = this.props;
-    function query(v, list) {
-      let arr = [];
-      (list || []).map(i => {
-        if (i.value === v) {
-          arr = [i];
-        } else {
-          arr = arr.concat(query(v, i.children));
+  find = (v, list) => {
+    let data;
+    (list || []).map(i => {
+      if (i.value === v) {
+        data = [i];
+      } else {
+        const child = this.find(v, i.children);
+        if (child) {
+          data = child;
         }
-      });
-      return arr;
-    }
-    return query(v, districtTree);
+      }
+    });
+    return data;
   };
 
   refresh = () => {
@@ -199,7 +196,8 @@ export default class area extends PureComponent {
     const {
       dispatch,
       form: { getFieldDecorator, resetFields, setFieldsValue, validateFields },
-      departs: { departsTree }
+      departs: { departsTree },
+      district: { districtTree }
     } = this.props;
 
     const {
@@ -247,7 +245,7 @@ export default class area extends PureComponent {
                 });
                 setFieldsValue({
                   districtCodeId: [
-                    this.getDist(ParentCodeId)[0].value,
+                    this.find(ParentCodeId, districtTree)[0].value,
                     record.districtCodeId
                   ]
                 });
@@ -314,7 +312,6 @@ export default class area extends PureComponent {
               onSelect={(v, e) => {
                 // console.log(v[0], e.selectedNodes[0].props.districtCodeId);
                 const d = e.selectedNodes[0].props.districtCodeId;
-                // console.log(this.getDist(d));
                 this.setState({
                   ParentId: v[0],
                   ParentCodeId: d
@@ -513,7 +510,7 @@ export default class area extends PureComponent {
                   {getFieldDecorator("districtCodeId", {})(
                     <Cascader
                       showSearch
-                      options={this.getDist(ParentCodeId)}
+                      options={this.find(ParentCodeId, districtTree)}
                       changeOnSelect
                       placeholder="请选择所在地区"
                     />

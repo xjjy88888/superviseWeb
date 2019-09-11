@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-	
+
 	<title>扰动图斑历史时空播放</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,7 +17,7 @@
 			width: 100%;
 			margin: 0;
 		}
-	</style>	
+	</style>
 </head>
 <body>
 
@@ -48,7 +48,7 @@
           return decodeURI(arr[0].substring(arr[0].search("=") + 1));
       }
       return "";
-    } 
+    }
     /*属性查询图层
     *@method queryWFSServiceByProperty
     *@param propertyValue 属性值
@@ -78,7 +78,7 @@
       $.ajax({
         type:"GET",
         url:geojsonUrl,
-        dataType:"json", 
+        dataType:"json",
         success:function(data){
             console.log("属性查询图层:",data);
             callback(data);
@@ -119,7 +119,7 @@
 //       $.ajax({
 //         type:"GET",
 //         url:geojsonUrl,
-//         dataType:"json", 
+//         dataType:"json",
 //         success:function(data){
 //             console.log("地图当前范围获取对应历史影像数据:",data);
 //             callback(data);
@@ -131,12 +131,12 @@
         $.ajax({
           type:"POST",
           url:domain+"api/Tool/Forward",
-          dataType:"json", 
+          dataType:"json",
           headers: {
               Authorization: "Bearer "+ JSON.parse(localStorage.user).accessToken ,
               "Content-Type": "application/json-patch+json"
             },
-          body: JSON.stringify({
+          data: JSON.stringify({
               method: "GET",
               url: geojsonUrl
           }),
@@ -151,9 +151,9 @@
     }
 
     $(function(){
-        var l = window.location;  
+        var l = window.location;
         var isFormal = l.href.split("/")[3] === "stbcjg";
-        var isLocal = l.hostname === "localhost"; 
+        var isLocal = l.hostname === "localhost";
         var geoserverUrl = isLocal ? "http://183.6.178.124:8143": l.protocol+"//"+l.hostname+":8143";
         geoserverUrl += "/geoserver/ZKYGIS";
         var mapHistorySpotLayerName = isFormal ? "ZKYGIS:bs_spot_history" : "ZKYGIS:bs_spot_history_t";
@@ -161,8 +161,8 @@
         domain = isLocal ? "http://183.6.178.124:8001/stbct" : l.origin + "/stbc"+ isFormal ? "" : "t";
         domain += "/";
         console.log("domain",domain);
-        var getImageInfoByExtentUrl = "http://www.stbcjg.cn/BasemapService/rest/image/latest/getInfoByExtent";
-        baseLayerUrl = 'http://www.stbcjg.cn/BasemapService/rest/image/latest/tile/{z}/{y}/{x}';    
+        var getImageInfoByExtentUrl = "http://210.36.22.122/BasemapService/rest/image/latest/getInfoByExtent";
+        baseLayerUrl = 'http://www.stbcjg.cn/BasemapService/rest/image/latest/tile/{z}/{y}/{x}';
         //获取历史扰动图斑数据列表
         var spotHistoryList = localStorage.getItem("spotHistoryList");
         spotHistoryList = JSON.parse(spotHistoryList);
@@ -194,7 +194,7 @@
         //动态计算map容器大小
         $("#map").width($(".timeline-list").width());
         $("#map").height($(".timeline-list").height());
-    
+
         var map = L.map('map',
           {
           attributionControl: false,
@@ -205,10 +205,10 @@
         baseLayer = L.tileLayer(baseLayerUrl, {
           maxZoom: 18
         }).addTo(map);
-        
+
         //timeSpotList = ['2019-08-28Z','2019-08-27Z','2019-08-26Z','2019-08-25Z','2019-08-24Z','2019-08-23Z','2019-08-22Z','2019-08-21Z','2019-08-20Z','2019-08-19Z'];
-        //地图叠加历史扰动图斑      
-        spotWmsLayer = L.tileLayer.wms(geoserverUrl+"/wms?", {         
+        //地图叠加历史扰动图斑
+        spotWmsLayer = L.tileLayer.wms(geoserverUrl+"/wms?", {
           layers:mapHistorySpotLayerName,//需要加载的图层
           format: "image/png", //返回的数据格式
           transparent: true,
@@ -227,12 +227,12 @@
               var bounds = map.getBounds();
               getImageInfoByExtent(getImageInfoByExtentUrl,zoom,bounds,function(data){
 
-              })               
+              })
              }, 800);
 
            }
         });
-    }); 
-    
+    });
+
     </script>
 </html>

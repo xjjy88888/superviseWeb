@@ -341,7 +341,7 @@ const config = {
     // 用户_列表
     userListUrl: `${domainApi}User/GetAll`,
 
-    // 用户_新建编辑_登录页
+    // 用户_新建编辑_未登录
     userCreateOutsideUrl: `${domainApi}Account/Register`,
 
     // 用户_新建编辑
@@ -349,6 +349,9 @@ const config = {
 
     // 用户_审核
     userExamineUrl: `${domainApi}User/SetIsActive`,
+
+    // 用户_新建设置权限_未登录
+    userSetPowerOutsideUrl: `${domainApi}User/PreSetGrantedPermissionsAsync`,
 
     // 用户_新建设置权限
     userSetPowerUrl: `${domainApi}User/SetGrantedPermissionsAsync`,

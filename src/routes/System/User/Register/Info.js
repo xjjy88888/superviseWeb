@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import React, { PureComponent } from "react";
 import {
   Steps,
@@ -47,7 +48,12 @@ class Info extends PureComponent {
     autoCompleteResult: [],
     id: null,
     type: "",
+    status: "", // add 新建  edit 编辑
     userType: ""
+    // login: 注册
+    // society: 社会用户
+    // admin: 行政用户
+    // role: 行政角色
   };
 
   componentDidMount() {
@@ -59,7 +65,7 @@ class Info extends PureComponent {
 
     this.eventEmitter = emitter.addListener("showRegister", v => {
       console.log(v);
-      this.setState({ type: v.type });
+      this.setState({ type: v.type, status: v.status });
       if (v.status === "add") {
         resetFields();
       } else {
@@ -67,13 +73,37 @@ class Info extends PureComponent {
         if (v.type === "role") {
           setFieldsValue({
             name: v.item.name,
+            displayName: v.item.displayName
+          });
+        } else if (v.type === "society") {
+          const {
+            departs: { departsTree }
+          } = this.props;
+          setFieldsValue({
+            userName: v.item.userName,
             displayName: v.item.displayName,
-            description: v.item.description
+            phoneNumber: v.item.phoneNumber,
+            govDepartmentId: this.find(v.item.govDepartmentId, departsTree)
           });
         }
       }
     });
   }
+
+  find = (v, list) => {
+    let data;
+    (list || []).map(i => {
+      if (i.value === v) {
+        data = [i.value];
+      } else {
+        const child = this.find(v, i.children);
+        if (child) {
+          data = [i.value, ...child];
+        }
+      }
+    });
+    return data;
+  };
 
   departsTree = () => {
     const { dispatch } = this.props;
@@ -123,6 +153,10 @@ class Info extends PureComponent {
     callback();
   };
 
+  showStyle = v => {
+    return { display: v ? "block" : "none" };
+  };
+
   render() {
     const {
       isLogin,
@@ -130,7 +164,7 @@ class Info extends PureComponent {
       form: { getFieldDecorator },
       departs: { departsTree, userList }
     } = this.props;
-    const { type, userType } = this.state;
+    const { type, userType, status } = this.state;
 
     const showRole = { display: type === "role" ? "block" : "none" };
     const hideRole = { display: type === "role" ? "none" : "block" };
@@ -166,12 +200,16 @@ class Info extends PureComponent {
                 />
               )}
             </Form.Item>
-            <Form.Item label="密码" hasFeedback style={hideRole}>
+            <Form.Item
+              label="密码"
+              hasFeedback
+              style={this.showStyle(type !== "role" && status === "add")}
+            >
               {getFieldDecorator("password", {
                 initialValue: "",
                 rules: [
                   {
-                    required: type !== "role",
+                    required: type !== "role" && status === "add",
                     message: "请输入密码"
                   },
                   {
@@ -180,12 +218,16 @@ class Info extends PureComponent {
                 ]
               })(<Input.Password maxLength={30} />)}
             </Form.Item>
-            <Form.Item label="确认密码" hasFeedback style={hideRole}>
+            <Form.Item
+              label="确认密码"
+              hasFeedback
+              style={this.showStyle(type !== "role" && status === "add")}
+            >
               {getFieldDecorator("confirm", {
                 initialValue: "",
                 rules: [
                   {
-                    required: type !== "role",
+                    required: type !== "role" && status === "add",
                     message: "请输入确认密码"
                   },
                   {
@@ -210,7 +252,11 @@ class Info extends PureComponent {
                 ]
               })(<Input maxLength={20} />)}
             </Form.Item>
-            <Form.Item label="电话" hasFeedback style={hideRole}>
+            <Form.Item
+              label="电话"
+              hasFeedback
+              style={this.showStyle(type !== "role")}
+            >
               {getFieldDecorator("phoneNumber", {
                 initialValue: "",
                 rules: [

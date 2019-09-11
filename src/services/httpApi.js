@@ -1185,14 +1185,22 @@ export async function userExamineApi(params) {
 
 // 用户_新建设置权限
 export async function userSetPowerApi(params) {
-  return request(`${config.url.userSetPowerUrl}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${accessToken()}`,
-      "Content-Type": "application/json-patch+json"
-    },
-    body: JSON.stringify(params)
-  });
+  console.log(params)
+  return request(
+    `${
+      params.isLogin
+        ? config.url.userSetPowerOutsideUrl
+        : config.url.userSetPowerUrl
+    }`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify(params)
+    }
+  );
 }
 
 // 用户_删除

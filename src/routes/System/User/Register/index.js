@@ -38,10 +38,10 @@ export default class register extends PureComponent {
     finishData: [],
     id: null,
     isLogin: true
-    //login: 注册
-    //society: 社会用户
-    //admin: 行政用户
-    //role: 行政角色
+    // login: 注册
+    // society: 社会用户
+    // admin: 行政用户
+    // role: 行政角色
   };
 
   componentDidMount() {
@@ -75,6 +75,8 @@ export default class register extends PureComponent {
 
   userCreateUpdate = payload => {
     const { dispatch } = this.props;
+    const { isLogin } = this.state;
+
     dispatch({
       type: "user/userCreateUpdate",
       payload,
@@ -82,6 +84,7 @@ export default class register extends PureComponent {
         if (success) {
           this.userSetPower(
             {
+              isLogin,
               id: result.id,
               permissions: [
                 {
