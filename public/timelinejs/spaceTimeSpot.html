@@ -28,7 +28,7 @@
 
 </body>
 <script>
-
+    curPlayItem = 0;
     /*
       *日期转UTC函数
       */
@@ -80,7 +80,7 @@
         url:geojsonUrl,
         dataType:"json",
         success:function(data){
-            console.log("属性查询图层:",data);
+            //console.log("属性查询图层:",data);
             callback(data);
         },
         error:function(jqXHR){
@@ -115,40 +115,62 @@
         ymax: xyMax[1] //地图当前范围y最大值
       };
       var geojsonUrl = urlString + L.Util.getParamString(param, urlString);
-      //${domain}api/Tool/Forward
-//       $.ajax({
-//         type:"GET",
-//         url:geojsonUrl,
-//         dataType:"json",
-//         success:function(data){
-//             console.log("地图当前范围获取对应历史影像数据:",data);
-//             callback(data);
-//         },
-//         error:function(jqXHR){
-//           console.log("发生错误："+ jqXHR.status);
-//         }
-//       });
-        $.ajax({
-          type:"POST",
-          url:domain+"api/Tool/Forward",
-          dataType:"json",
-          headers: {
-              Authorization: "Bearer "+ JSON.parse(localStorage.user).accessToken ,
-              "Content-Type": "application/json-patch+json"
-            },
-          data: JSON.stringify({
-              method: "GET",
-              url: geojsonUrl
-          }),
-          success:function(data){
-              console.log("地图当前范围获取对应历史影像数据:",data);
-              callback(data);
-          },
-          error:function(jqXHR){
-            console.log("发生错误："+ jqXHR.status);
-          }
-        });
+      $.ajax({
+        type:"POST",
+        url:domain+"api/Tool/Forward",
+        dataType:"json",
+        headers: {
+            Authorization: "Bearer "+ JSON.parse(localStorage.user).accessToken ,
+            "Content-Type": "application/json-patch+json"
+          },
+        data: JSON.stringify({
+            method: "GET",
+            url: geojsonUrl
+        }),
+        success:function(data){
+            //console.log("地图当前范围获取对应历史影像数据:",data);
+            callback(data);
+        },
+        error:function(jqXHR){
+          console.log("发生错误："+ jqXHR.status);
+        }
+      });
     }
+
+    /*根据图斑日期匹配最接近的影像列表日期函数，时间格式：年－月－日
+    *@param spotDate 图斑日期
+    *@param imageDateList 影像日期列表
+    *@return 
+    */
+    function getMinDate(spotDate,imageDateList){
+      var arr = [];
+      var num = strToDate(spotDate);
+      for(var i = 0; i<imageDateList.length;i++){
+         var imageDate = imageDateList[i];
+         arr.push(strToDate(imageDate));
+      }
+      var index = limit(arr,num);
+      return imageDateList[index];
+    }
+
+    function strToDate(strDate) {
+      var OneMonth = strDate.substring(5, strDate.lastIndexOf("-"));
+      var OneDay = strDate.substring(strDate.length, strDate.lastIndexOf("-") + 1);
+      var OneYear = strDate.substring(0, strDate.indexOf("-"));
+      return Date.parse(OneMonth + "/" + OneDay + "/" + OneYear);
+    }
+
+    function limit(arr, num){
+      var newArr = [];
+      arr.map(function(x){
+        // 对数组各个数值求差值
+        newArr.push(Math.abs(x - num));
+      });
+      // 求最小值的索引
+      var index = newArr.indexOf(Math.min.apply(null, newArr));
+      // return arr[index];
+      return index;
+    }  
 
     $(function(){
         var l = window.location;
@@ -160,18 +182,20 @@
         //后台接口Url
         domain = isLocal ? "http://183.6.178.124:8001/stbct" : l.origin + "/stbc"+ isFormal ? "" : "t";
         domain += "/";
-        console.log("domain",domain);
-        var getImageInfoByExtentUrl = "http://210.36.22.122/BasemapService/rest/image/latest/getInfoByExtent";
-        baseLayerUrl = 'http://www.stbcjg.cn/BasemapService/rest/image/latest/tile/{z}/{y}/{x}';
+        //console.log("domain",domain);
+        getImageInfoByExtentUrl = "http://210.36.22.122/BasemapService/rest/image/latest/getInfoByExtent";
+        imageBaseUrl = "http://www.stbcjg.cn/BasemapService/rest/image/";
+        baseLayerUrl = imageBaseUrl+'latest/tile/{z}/{y}/{x}';
         //获取历史扰动图斑数据列表
         var spotHistoryList = localStorage.getItem("spotHistoryList");
         spotHistoryList = JSON.parse(spotHistoryList);
-        console.log(spotHistoryList);
+        //console.log(spotHistoryList);
         timeSpotList = [];
         if(spotHistoryList.length>0){
           //动态构造扰动图斑历史时间轴刻度
           for(var i=spotHistoryList.length-1;i >= 0;i--){
-            timeSpotList.push(dateToUtc(spotHistoryList[i].archiveTime));
+            //timeSpotList.push(dateToUtc(spotHistoryList[i].archiveTime));
+            timeSpotList.push(spotHistoryList[i].archiveTime);
              if(i == spotHistoryList.length-1){
               $('#timelineDomBody').append('<div data-time="'+spotHistoryList[i].archiveTime+'"><div id="map"></div></div>');
              }
@@ -195,15 +219,17 @@
         $("#map").width($(".timeline-list").width());
         $("#map").height($(".timeline-list").height());
 
-        var map = L.map('map',
+        map = L.map('map',
           {
           attributionControl: false,
           center: [33.7243, 106.8751],//中国范围
           zoom: 5
           }
         );
+
         baseLayer = L.tileLayer(baseLayerUrl, {
-          maxZoom: 18
+          maxZoom: 18,
+          opacity: 0
         }).addTo(map);
 
         //timeSpotList = ['2019-08-28Z','2019-08-27Z','2019-08-26Z','2019-08-25Z','2019-08-24Z','2019-08-23Z','2019-08-22Z','2019-08-21Z','2019-08-20Z','2019-08-19Z'];
@@ -212,8 +238,30 @@
           layers:mapHistorySpotLayerName,//需要加载的图层
           format: "image/png", //返回的数据格式
           transparent: true,
-          cql_filter: "archive_time = " +timeSpotList[0]
+          cql_filter: "archive_time = " + dateToUtc(timeSpotList[0])
         }).addTo(map);
+
+        map.on("moveend", function(e){
+          var zoom = map.getZoom();
+          var bounds = map.getBounds();
+          getImageInfoByExtent(getImageInfoByExtentUrl,zoom,bounds,function(data){
+            var histories = new Set(data.result.histories);
+            histories = [...histories].reverse();
+            if(histories.length>0){
+              for(var i = 0; i<histories.length;i++){
+                histories[i] = histories[i].replace(/\//g, "-");
+              }
+            }
+            console.log("histories",histories);
+            //console.log("curPlayItem",curPlayItem);           
+            //动态刷新扰动图斑匹配的监管影像
+            baseLayerUrl = imageBaseUrl + getMinDate(timeSpotList[curPlayItem],histories)+ "/tile/{z}/{y}/{x}";
+            console.log("baseLayerUrl",baseLayerUrl);
+            baseLayer.setUrl(baseLayerUrl);
+
+          })           
+        });
+
         //定位到图斑范围
         queryWFSServiceByProperty(spotHistoryList[0].id,"id",mapHistorySpotLayerName,geoserverUrl,function(data){
            if(data.features && data.features.length>0){
@@ -226,9 +274,21 @@
               var zoom = map.getZoom();
               var bounds = map.getBounds();
               getImageInfoByExtent(getImageInfoByExtentUrl,zoom,bounds,function(data){
-
-              })
-             }, 800);
+                var histories = new Set(data.result.histories);
+                histories = [...histories].reverse();
+                if(histories.length>0){
+                  for(var i = 0; i<histories.length;i++){
+                    histories[i] = histories[i].replace(/\//g, "-");
+                  }
+                }
+                console.log("histories",histories);
+                //动态刷新扰动图斑匹配的监管影像
+                baseLayerUrl = imageBaseUrl + getMinDate(timeSpotList[0],histories)+ "/tile/{z}/{y}/{x}";
+                console.log("baseLayerUrl",baseLayerUrl);
+                baseLayer.setUrl(baseLayerUrl);
+                baseLayer.setOpacity(1);
+              }) 
+             }, 200);
 
            }
         });

@@ -35,10 +35,9 @@
 			$('.timeline-horizontal .timeline-dots li').width($('.timeline-horizontal .timeline-dots').width()/self.get_count()+"px");
 			//开始播放按钮点击事件
 			$(".timeline-dots-wrap.bottom .play span").on('click', function (e) {
-               //console.log("123");
 			   self.autoplay();
 			   $(".timeline-dots-wrap.bottom .play span").hide();
-               $(".timeline-dots-wrap.bottom .pause span").show();
+         $(".timeline-dots-wrap.bottom .pause span").show();
 			});
 			//暂停播放按钮点击事件
 			$(".timeline-dots-wrap.bottom .pause span").on('click', function (e) {
@@ -243,12 +242,29 @@
 
 			self.change_timeline();
 
+      curPlayItem = self.options.startItem;
 			//console.log(spotWmsLayer);
-			//动态刷新扰动图斑匹配的监管影像
-			baseLayer.setUrl(baseLayerUrl);
+      //动态刷新扰动图斑匹配的监管影像
+      var zoom = map.getZoom();
+      var bounds = map.getBounds();
+      getImageInfoByExtent(getImageInfoByExtentUrl,zoom,bounds,function(data){
+        var histories = new Set(data.result.histories);
+        histories = [...histories].reverse();
+        if(histories.length>0){
+          for(var i = 0; i<histories.length;i++){
+            histories[i] = histories[i].replace(/\//g, "-");
+          }
+        }
+        console.log("histories",histories);
+        baseLayerUrl = imageBaseUrl + getMinDate(timeSpotList[self.options.startItem],histories)+ "/tile/{z}/{y}/{x}";
+        console.log("baseLayerUrl",baseLayerUrl);
+        //动态刷新扰动图斑匹配的监管影像
+        baseLayer.setUrl(baseLayerUrl);
+
+      }) 
 			//动态刷新历史扰动图斑
 			spotWmsLayer.setParams({
-			  cql_filter: "archive_time ="+timeSpotList[self.options.startItem]
+			  cql_filter: "archive_time ="+dateToUtc(timeSpotList[self.options.startItem])
 			});
 		},
 
