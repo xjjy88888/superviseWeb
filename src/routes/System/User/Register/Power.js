@@ -42,7 +42,7 @@ class Power extends PureComponent {
   state = {
     value: 1,
     permissions: [],
-    userType: "1", //0:行政  1:社会  2:角色
+    userType: 1, //0:行政  1:社会  2:角色
     companyType: ""
   };
 
@@ -173,7 +173,7 @@ class Power extends PureComponent {
         <Sider
           theme="light"
           style={{
-            display: userType === "0" ? "block" : "none"
+            display: userType === 0 ? "block" : "none"
           }}
         >
           <Checkbox.Group>
@@ -203,12 +203,12 @@ class Power extends PureComponent {
             <Form.Item
               label="单位名称"
               hasFeedback
-              style={{ display: userType === "1" ? "block" : "none" }}
+              style={{ display: userType === 1 ? "block" : "none" }}
             >
-              {getFieldDecorator("socialDepartmentId	", {
+              {getFieldDecorator("socialDepartmentId", {
                 rules: [
                   {
-                    required: userType === "1",
+                    required: userType === 1,
                     message: "请输入单位名称"
                   }
                 ]
@@ -235,12 +235,12 @@ class Power extends PureComponent {
             <Form.Item
               label="单位类型"
               hasFeedback
-              style={{ display: userType === "1" ? "block" : "none" }}
+              style={{ display: userType === 1 ? "block" : "none" }}
             >
               {getFieldDecorator("companyType", {
                 rules: [
                   {
-                    required: userType === "1",
+                    required: userType === 1,
                     message: "请选择单位类型"
                   }
                 ]
@@ -264,7 +264,7 @@ class Power extends PureComponent {
             <Form.Item
               label="所属项目"
               hasFeedback
-              style={{ display: userType === "1" ? "block" : "none" }}
+              style={{ display: userType === 1 ? "block" : "none" }}
             >
               {getFieldDecorator("projectId", {
                 rules: [
@@ -296,13 +296,13 @@ class Power extends PureComponent {
             <Form.Item
               label="有效期至"
               hasFeedback
-              style={{ display: userType === "1" ? "block" : "none" }}
+              style={{ display: userType === 1 ? "block" : "none" }}
             >
               {getFieldDecorator("endTime", {
                 rules: [
                   {
                     type: "object",
-                    required: userType === "1",
+                    required: userType === 1,
                     message: "请选择有效期"
                   }
                 ]
@@ -334,7 +334,7 @@ class Power extends PureComponent {
 
           <Table
             style={{
-              display: userType !== "1" ? "block" : "none"
+              display: userType !== 1 ? "block" : "none"
             }}
             rowSelection={rowSelection}
             columns={columns}

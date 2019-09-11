@@ -6,6 +6,7 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="jquery.min.js"></script>
+  <script src="proj4.js"></script>
   <link rel="stylesheet" href="leaflet/dist/leaflet.css"/>
   <script src="leaflet/dist/leaflet.js"></script>
 	<link rel="stylesheet" href="dist/css/timeline.css"/>
@@ -79,7 +80,7 @@
         url:geojsonUrl,
         dataType:"json", 
         success:function(data){
-            console.log("data:",data);
+            console.log("属性查询图层:",data);
             callback(data);
         },
         error:function(jqXHR){
@@ -88,14 +89,79 @@
       });
     }
 
+    /*根据地图当前范围获取对应历史影像数据
+    *@method getImageInfoByExtent
+    *@param getImageInfoByExtentUrl 当前地图范围的历史影像列表接口url
+    *@param zoom 地图当前范围级别
+    *@param bounds 地图当前范围
+    *@param callback 回调函数
+    *@return callback
+    */
+    function getImageInfoByExtent(getImageInfoByExtentUrl,zoom, bounds, callback){
+      var urlString = getImageInfoByExtentUrl;
+      var xyMin = proj4("EPSG:4326", "EPSG:3857", [
+        bounds.getSouthWest().lng,
+        bounds.getSouthWest().lat
+      ]);
+      var xyMax = proj4("EPSG:4326", "EPSG:3857", [
+        bounds.getNorthEast().lng,
+        bounds.getNorthEast().lat
+      ]);
+      var param = {
+        level: zoom, //地图当前范围级别
+        xmin: xyMin[0], //地图当前范围x最小值
+        xmax: xyMax[0], //地图当前范围x最大值
+        ymin: xyMin[1], //地图当前范围y最小值
+        ymax: xyMax[1] //地图当前范围y最大值
+      };
+      var geojsonUrl = urlString + L.Util.getParamString(param, urlString);
+      //${domain}api/Tool/Forward
+//       $.ajax({
+//         type:"GET",
+//         url:geojsonUrl,
+//         dataType:"json", 
+//         success:function(data){
+//             console.log("地图当前范围获取对应历史影像数据:",data);
+//             callback(data);
+//         },
+//         error:function(jqXHR){
+//           console.log("发生错误："+ jqXHR.status);
+//         }
+//       });
+        $.ajax({
+          type:"POST",
+          url:domain+"api/Tool/Forward",
+          dataType:"json", 
+          headers: {
+              Authorization: "Bearer "+ JSON.parse(localStorage.user).accessToken ,
+              "Content-Type": "application/json-patch+json"
+            },
+          body: JSON.stringify({
+              method: "GET",
+              url: geojsonUrl
+          }),
+          success:function(data){
+              console.log("地图当前范围获取对应历史影像数据:",data);
+              callback(data);
+          },
+          error:function(jqXHR){
+            console.log("发生错误："+ jqXHR.status);
+          }
+        });
+    }
+
     $(function(){
         var l = window.location;  
         var isFormal = l.href.split("/")[3] === "stbcjg";
         var isLocal = l.hostname === "localhost"; 
         var geoserverUrl = isLocal ? "http://183.6.178.124:8143": l.protocol+"//"+l.hostname+":8143";
         geoserverUrl += "/geoserver/ZKYGIS";
-        var mapHistorySpotLayerName = isFormal ? "ZKYGIS:bs_spot_history" : "ZKYGIS:bs_spot_history_t";  
-        //var geoserverQueryUrl = "http://localhost:8080/geoserver/ZKYGIS";
+        var mapHistorySpotLayerName = isFormal ? "ZKYGIS:bs_spot_history" : "ZKYGIS:bs_spot_history_t";
+        //后台接口Url
+        domain = isLocal ? "http://183.6.178.124:8001/stbct" : l.origin + "/stbc"+ isFormal ? "" : "t";
+        domain += "/";
+        console.log("domain",domain);
+        var getImageInfoByExtentUrl = "http://www.stbcjg.cn/BasemapService/rest/image/latest/getInfoByExtent";
         baseLayerUrl = 'http://www.stbcjg.cn/BasemapService/rest/image/latest/tile/{z}/{y}/{x}';    
         //获取历史扰动图斑数据列表
         var spotHistoryList = localStorage.getItem("spotHistoryList");
@@ -132,8 +198,8 @@
         var map = L.map('map',
           {
           attributionControl: false,
-          center: [23.431365122122635, 113.2348930835724],
-          zoom: 8
+          center: [33.7243, 106.8751],//中国范围
+          zoom: 5
           }
         );
         baseLayer = L.tileLayer(baseLayerUrl, {
@@ -155,6 +221,15 @@
              var coordinate = feature.geometry.coordinates[0][0][0];
              var latlng = [coordinate[1],coordinate[0]];
              map.setView(latlng,15);
+             //根据地图当前范围获取对应历史影像数据
+             setTimeout(() => {
+              var zoom = map.getZoom();
+              var bounds = map.getBounds();
+              getImageInfoByExtent(getImageInfoByExtentUrl,zoom,bounds,function(data){
+
+              })               
+             }, 800);
+
            }
         });
     }); 

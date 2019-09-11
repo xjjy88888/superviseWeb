@@ -88,9 +88,13 @@ class Info extends PureComponent {
       console.log("填写用户信息", v);
       if (!err) {
         emitter.emit("setUserType", {
-          type: v.userType || "2"
+          type: v.userType || 2
         });
-        this.props.saveState({ user: v, state: 1 });
+        const g = v.govDepartmentId;
+        this.props.saveState({
+          user: { ...v, govDepartmentId: g[g.length - 1] },
+          state: 1
+        });
       }
     });
   };
@@ -253,7 +257,7 @@ class Info extends PureComponent {
               hasFeedback
               style={{ display: type !== "role" ? "block" : "none" }}
             >
-              {getFieldDecorator("area", {
+              {getFieldDecorator("govDepartmentId", {
                 initialValue: "",
                 rules: [
                   {
@@ -267,7 +271,7 @@ class Info extends PureComponent {
                   showSearch
                   options={departsTree}
                   changeOnSelect
-                  placeholder="请选择所在地区"
+                  placeholder=""
                 />
               )}
             </Form.Item>

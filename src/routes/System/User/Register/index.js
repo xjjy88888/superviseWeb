@@ -22,16 +22,6 @@ import Finish from "./Finish";
 import zh_CN from "antd/lib/locale-provider/zh_CN";
 
 const { Header, Footer, Sider, Content } = Layout;
-const formItemLayout = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 8 }
-  },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 16 }
-  }
-};
 
 @connect(({ user, district, role }) => ({
   user,
@@ -46,7 +36,8 @@ export default class register extends PureComponent {
     type: "role",
     user: {},
     finishData: [],
-    id: null
+    id: null,
+    isLogin: true
     //login: 注册
     //society: 社会用户
     //admin: 行政用户
@@ -54,6 +45,9 @@ export default class register extends PureComponent {
   };
 
   componentDidMount() {
+    const aa = { a: 1, b: 2, c: 3 };
+    const { a, ...rest } = aa;
+    console.log(a, rest);
     this.eventEmitter = emitter.addListener("showRegister", v => {
       console.log(v);
       this.props.form.resetFields();
@@ -124,7 +118,7 @@ export default class register extends PureComponent {
 
   submit = power => {
     const { dispatch } = this.props;
-    const { user, type, id } = this.state;
+    const { user, type, id, isLogin } = this.state;
 
     console.log("提交", type, user, power);
     if (type === "role") {
@@ -149,7 +143,7 @@ export default class register extends PureComponent {
         }
       });
     } else {
-      this.userCreateUpdate({ ...user, ...power });
+      this.userCreateUpdate({ ...user, ...power, isLogin });
     }
   };
 

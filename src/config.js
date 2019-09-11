@@ -341,6 +341,9 @@ const config = {
     // 用户_列表
     userListUrl: `${domainApi}User/GetAll`,
 
+    // 用户_新建编辑_登录页
+    userCreateOutsideUrl: `${domainApi}Account/Register`,
+
     // 用户_新建编辑
     userCreateUpdateUrl: `${domainApi}User/`,
 

@@ -1148,10 +1148,18 @@ export async function userListApi(params) {
 
 // 用户_新建编辑
 export async function userCreateUpdateApi(params) {
+  console.log(params);
+  const { password, ...rest } = params;
   const passwordMd5 = CryptoJS.MD5(params.password).toString();
-  const data = params.isExamine ? params : { ...params, password: passwordMd5 };
+  const data = params.id ? rest : { ...params, password: passwordMd5 };
   return request(
-    `${config.url.userCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
+    `${
+      params.isLogin
+        ? config.url.userCreateOutsideUrl
+        : config.url.userCreateUpdateUrl + params.id
+        ? "Update"
+        : "Create"
+    }`,
     {
       method: "POST",
       headers: {
