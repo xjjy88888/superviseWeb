@@ -45,9 +45,6 @@ export default class register extends PureComponent {
   };
 
   componentDidMount() {
-    const aa = { a: 1, b: 2, c: 3 };
-    const { a, ...rest } = aa;
-    console.log(a, rest);
     this.eventEmitter = emitter.addListener("showRegister", v => {
       console.log(v);
       this.props.form.resetFields();

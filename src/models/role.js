@@ -11,7 +11,7 @@ export default {
   namespace: "role",
 
   state: {
-    redLineList: { totalCount: 0, items: [] },
+    roleList: { totalCount: 0, items: [] },
     redLineInfo: {},
     projectSelectListRedLine: [],
     powerList: [],
@@ -30,6 +30,7 @@ export default {
       } = yield call(roleListApi, payload);
       if (callback) callback(success, error, result);
       if (success) {
+        yield put({ type: "save", payload: { roleList: result } });
       } else {
         notification["error"]({
           message: `查询角色列表失败`

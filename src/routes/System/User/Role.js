@@ -48,12 +48,12 @@ export default class role extends PureComponent {
     return result.length ? result[0].displayName : "";
   };
 
-  roleList = params => {
+  roleList = payload => {
     const { dispatch } = this.props;
     this.setState({ loading: true });
     dispatch({
       type: "role/roleList",
-      payload: { ...params, IsActive: false },
+      payload,
       callback: (success, error, result) => {
         const pagination = { ...this.state.pagination };
         pagination.total = result.totalCount;
@@ -172,8 +172,8 @@ export default class role extends PureComponent {
       {
         title: "角色标识",
         dataIndex: "name",
-        sorter: (a, b) => a.roleName.length - b.roleName.length,
-        ...this.getColumnSearchProps("roleName")
+        sorter: (a, b) => a.name.length - b.name.length,
+        ...this.getColumnSearchProps("name")
       },
       {
         title: "角色名",

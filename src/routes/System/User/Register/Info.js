@@ -75,7 +75,7 @@ class Info extends PureComponent {
             name: v.item.name,
             displayName: v.item.displayName
           });
-        } else if (v.type === "society") {
+        } else if (v.type === "society" || v.type === "admin") {
           const {
             departs: { departsTree }
           } = this.props;
@@ -114,11 +114,21 @@ class Info extends PureComponent {
 
   handleSubmit = e => {
     e.preventDefault();
+    const { type } = this.state;
     this.props.form.validateFields((err, v) => {
-      console.log("填写用户信息", v);
+      console.log("填写用户信息1", v, type);
       if (!err) {
         emitter.emit("setUserType", {
-          type: v.userType || 2
+          type:
+            type === "login"
+              ? v.userType
+              : type === "admin"
+              ? 0
+              : type === "society"
+              ? 1
+              : type === "role"
+              ? 2
+              : 3
         });
         const g = v.govDepartmentId;
         this.props.saveState({

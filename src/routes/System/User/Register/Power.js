@@ -1,14 +1,10 @@
 import React, { PureComponent } from "react";
 import {
-  Steps,
   Form,
-  Input,
   Button,
   Table,
-  TreeSelect,
   Select,
   DatePicker,
-  Avatar,
   Layout,
   Checkbox,
   Row,
@@ -17,9 +13,7 @@ import {
 import { connect } from "dva";
 import moment from "moment";
 import emitter from "../../../../utils/event";
-import { LocaleProvider } from "antd";
 import { createForm } from "rc-form";
-import zh_CN from "antd/lib/locale-provider/zh_CN";
 
 const { Header, Footer, Sider, Content } = Layout;
 const formItemLayout = {
@@ -42,13 +36,19 @@ class Power extends PureComponent {
   state = {
     value: 1,
     permissions: [],
-    userType: 1, //0:行政  1:社会  2:角色
-    companyType: ""
+    userType: 0, //0:行政  1:社会  2:角色  3:其他
+    companyType: "",
+    dataSource: []
   };
 
   componentDidMount() {
+    const {
+      form: { resetFields, setFieldsValue }
+    } = this.props;
+
     this.powerList(0);
     this.powerList(1);
+    this.roleList();
     this.eventEmitter = emitter.addListener("showRegister", v => {
       console.log(v);
       if (v.status === "add") {
@@ -61,6 +61,10 @@ class Power extends PureComponent {
           this.setState({
             permissions: v.item.permissions
           });
+        } else if (v.type === "society") {
+          setFieldsValue({
+            projectId: v.item.projectId
+          });
         }
       }
     });
@@ -69,6 +73,15 @@ class Power extends PureComponent {
       this.setState({ userType: v.type });
     });
   }
+
+  roleList = () => {
+    const { dispatch } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: "role/roleList",
+      payload: { SkipCount: 0, MaxResultCount: 100 }
+    });
+  };
 
   userProject = payload => {
     const { dispatch } = this.props;
@@ -92,6 +105,15 @@ class Power extends PureComponent {
       type: "role/powerList",
       payload: {
         userType: v
+      },
+      callback: (success, error, result) => {
+        if (success && v === 0) {
+          this.setState({
+            dataSource: result.items.map(item => {
+              return { ...item, key: item.name, time: "2019-08-08" };
+            })
+          });
+        }
       }
     });
   };
@@ -107,7 +129,6 @@ class Power extends PureComponent {
     const { permissions } = this.state;
 
     e.preventDefault();
-
     this.props.form.validateFields((err, v) => {
       if (!err) {
         console.log("权限分配", v, permissions);
@@ -119,15 +140,12 @@ class Power extends PureComponent {
   render() {
     const {
       form: { getFieldDecorator },
-      role: { powerList, companyTypeList },
+      role: { powerList, companyTypeList, roleList },
       user: { userProjectList, userCompanyList }
     } = this.props;
 
-    const { permissions, userType, companyType } = this.state;
-
-    const dataSource = powerList.map(item => {
-      return { ...item, key: item.name, time: "2019-08-08" };
-    });
+    const { permissions, userType, companyType, dataSource } = this.state;
+    console.log(permissions);
 
     const columns = [
       {
@@ -176,18 +194,24 @@ class Power extends PureComponent {
             display: userType === 0 ? "block" : "none"
           }}
         >
-          <Checkbox.Group>
+          <Checkbox.Group
+            onChange={v => {
+              let data = [];
+              v.map(item => {
+                console.log(item);
+                data = data.concat(item);
+              });
+              console.log(v, data);
+              this.setState({ permissions: data });
+            }}
+          >
             <Row>
-              {[
-                "Web端试用角色",
-                "Web端付费角色",
-                "移动端试用角色",
-                "移动端付费角色",
-                "管理员",
-                "超级管理员"
-              ].map((item, index) => (
+              {roleList.items.map((item, index) => (
                 <Col span={24} key={index}>
-                  <Checkbox value={item}>{item}</Checkbox>
+                  <Checkbox value={item.permissions}>
+                    {item.displayName}
+                  </Checkbox>
+                  <br />
                   <br />
                 </Col>
               ))}
