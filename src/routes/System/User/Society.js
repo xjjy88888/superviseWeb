@@ -247,10 +247,16 @@ export default class review extends PureComponent {
         <Register refresh={this.refresh} />
         <span>
           <Button
-            icon="delete"
-            disabled={!selectedRows.length}
+            icon="plus"
             style={{ margin: 10 }}
-            onClick={() => {}}
+            onClick={() => {
+              emitter.emit("showRegister", {
+                show: true,
+                type: `society`,
+                status: "add",
+                item: {}
+              });
+            }}
           >
             新建
           </Button>

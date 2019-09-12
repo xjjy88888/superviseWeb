@@ -52,6 +52,7 @@ class Power extends PureComponent {
     this.powerList(1);
     this.roleList();
     this.eventEmitter = emitter.addListener("showRegister", v => {
+      resetFields();
       console.log(v);
       if (v.status === "add") {
         this.setState({
@@ -64,36 +65,40 @@ class Power extends PureComponent {
             permissions: v.item.permissions
           });
         } else if (v.type === "society") {
-          this.userInfo(v.item.id, result => {
-            setFieldsValue({
-              projectId: result.projectId,
-              socialDepartmentId: result.socialDepartmentId,
-              companyType: result.permissions.length
-                ? result.permissions[0].permission
-                : "",
-              endTime: result.permissions.length
-                ? moment(result.permissions[0].endTime)
-                : ""
+          if (v.item.id) {
+            this.userInfo(v.item.id, result => {
+              setFieldsValue({
+                projectId: result.projectId,
+                socialDepartmentId: result.socialDepartmentId,
+                companyType: result.permissions.length
+                  ? result.permissions[0].permission
+                  : "",
+                endTime: result.permissions.length
+                  ? moment(result.permissions[0].endTime)
+                  : ""
+              });
             });
-          });
+          }
         } else if (v.type === "admin") {
-          console.log(v);
-          this.userInfo(v.item.id, result => {
-            const { dataSource } = this.state;
-            this.setState({
-              permissions: result.permissions.map(i => i.permission),
-              dataSource: dataSource.map(item => {
-                console.log(item);
-                const resu = result.permissions.filter(
-                  i => i.permission === item.name
-                );
-                return {
-                  ...item,
-                  endTime: resu.length ? resu[0].endTime : ""
-                };
-              })
+          if (v.item.id) {
+            console.log(v);
+            this.userInfo(v.item.id, result => {
+              const { dataSource } = this.state;
+              this.setState({
+                permissions: result.permissions.map(i => i.permission),
+                dataSource: dataSource.map(item => {
+                  console.log(item);
+                  const resu = result.permissions.filter(
+                    i => i.permission === item.name
+                  );
+                  return {
+                    ...item,
+                    endTime: resu.length ? resu[0].endTime : ""
+                  };
+                })
+              });
             });
-          });
+          }
         }
       }
     });
@@ -177,19 +182,19 @@ class Power extends PureComponent {
       if (!err) {
         console.log("权限分配", v, permissions);
         const result =
-          userType === 0
-            ? permissions.map(i => {
-                return {
-                  permission: i,
-                  endTime: v[this.getLabel(i) + "_endTime"]
-                };
-              })
-            : [
+          userType === 1
+            ? [
                 {
                   permission: v.companyType,
                   endTime: v.endTime
                 }
-              ];
+              ]
+            : permissions.map(i => {
+                return {
+                  permission: i,
+                  endTime: v[this.getLabel(i) + "_endTime"]
+                };
+              });
         console.log(result);
         this.props.submit({ ...v, permissions: result });
       }
@@ -218,12 +223,14 @@ class Power extends PureComponent {
     } = this.state;
     console.log(permissions);
 
-    const columns = [
+    let columns = [
       {
         title: "模块名",
         dataIndex: "displayName"
-      },
-      {
+      }
+    ];
+    if (userType === 0) {
+      columns[1] = {
         title: "有效期",
         dataIndex: "endTime",
         render: (item, record) => (
@@ -239,12 +246,8 @@ class Power extends PureComponent {
             )}
           </span>
         )
-      },
-      {
-        title: "描述",
-        dataIndex: "description"
-      }
-    ];
+      };
+    }
 
     const rowSelection = {
       selectedRowKeys: permissions,

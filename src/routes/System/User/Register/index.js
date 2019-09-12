@@ -193,7 +193,7 @@ export default class register extends PureComponent {
                 current={state}
                 style={{ background: "#fff", margin: "0 0 30px 0" }}
               >
-                <Steps.Step title="填写用户信息" />
+                <Steps.Step title="填写信息" />
                 <Steps.Step title="权限分配" />
                 <Steps.Step title="完成" />
               </Steps>

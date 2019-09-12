@@ -68,6 +68,16 @@ class Info extends PureComponent {
       this.setState({ type: v.type, status: v.status });
       if (v.status === "add") {
         resetFields();
+        this.setState({
+          userType:
+            v.type === "admin"
+              ? 0
+              : v.type === "society"
+              ? 1
+              : v.type === "role"
+              ? 2
+              : 3
+        });
         this.departsTree();
       } else {
         this.setState({ id: v.item.id });
