@@ -80,7 +80,7 @@ class Info extends PureComponent {
           console.log(v.item.userType);
           this.setState({ userType: v.item.userType });
           setFieldsValue({
-            userName: v.item.userName,
+            name: v.item.name,
             displayName: v.item.displayName,
             phoneNumber: v.item.phoneNumber
           });
@@ -118,8 +118,11 @@ class Info extends PureComponent {
       dispatch,
       departs: { departsTree }
     } = this.props;
+    console.log(departsTree);
     if (departsTree.length) {
-      fn(departsTree);
+      if (fn) {
+        fn(departsTree);
+      }
     } else {
       this.setState({ loading: true });
       dispatch({
@@ -214,7 +217,7 @@ class Info extends PureComponent {
               label={type === "role" ? "角色标识" : "账号"}
               hasFeedback
             >
-              {getFieldDecorator(type === "role" ? "name" : "userName", {
+              {getFieldDecorator(type === "role" ? "name" : "name", {
                 initialValue: "",
                 rules: [
                   {

@@ -26,7 +26,7 @@ export default class review extends PureComponent {
   componentDidMount() {
     self = this;
     this.refresh();
-    
+
     this.eventEmitter = emitter.addListener("refreshSystem", v => {
       this.refresh();
     });
@@ -181,9 +181,9 @@ export default class review extends PureComponent {
     const columns = [
       {
         title: "账号",
-        dataIndex: "userName",
-        sorter: (a, b) => a.userName.length - b.userName.length,
-        ...this.getColumnSearchProps("userName")
+        dataIndex: "name",
+        sorter: (a, b) => a.name.length - b.name.length,
+        ...this.getColumnSearchProps("name")
       },
       {
         title: "姓名",

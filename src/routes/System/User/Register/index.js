@@ -108,9 +108,9 @@ export default class register extends PureComponent {
       payload,
       callback: (success, error, result) => {
         if (success) {
-          if (this.props.refresh) {
-            this.props.refresh(true);
-          }
+          emitter.emit("refreshSystem", {
+            refresh: true
+          });
           this.userSetPower(
             {
               isActive,
@@ -134,7 +134,7 @@ export default class register extends PureComponent {
           this.setState({
             state: 2,
             finishData: [
-              { name: "账号", cont: result.userName },
+              { name: "账号", cont: result.name },
               { name: "姓名", cont: result.displayName }
             ]
           });
