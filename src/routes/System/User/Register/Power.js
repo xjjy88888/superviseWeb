@@ -182,19 +182,23 @@ class Power extends PureComponent {
       if (!err) {
         console.log("权限分配", v, permissions);
         const result =
-          userType === 1
+          userType === 0
+            ? permissions.map(i => {
+                return {
+                  permission: i,
+                  endTime: v[this.getLabel(i) + "_endTime"]
+                };
+              })
+            : userType === 1
             ? [
                 {
                   permission: v.companyType,
                   endTime: v.endTime
                 }
               ]
-            : permissions.map(i => {
-                return {
-                  permission: i,
-                  endTime: v[this.getLabel(i) + "_endTime"]
-                };
-              });
+            : userType === 2
+            ? permissions
+            : [];
         console.log(result);
         this.props.submit({ ...v, permissions: result });
       }

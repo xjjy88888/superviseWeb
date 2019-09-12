@@ -61,6 +61,37 @@ export default class register extends PureComponent {
     });
   }
 
+  submit = power => {
+    const { dispatch } = this.props;
+    const { user, type, id, isLogin } = this.state;
+
+    console.log("提交", user, power);
+    if (type === "role") {
+      dispatch({
+        type: "role/roleCreateUpdate",
+        payload: {
+          ...user,
+          id,
+          permissions: power.permissions
+        },
+        callback: (success, error, result) => {
+          if (success) {
+            this.setState({
+              state: 2,
+              finishData: [
+                { name: "角色标识", cont: result.name },
+                { name: "角色名", cont: result.displayName }
+              ]
+            });
+            this.props.refresh(true);
+          }
+        }
+      });
+    } else {
+      this.userCreateUpdate({ ...user, ...power, isLogin, id });
+    }
+  };
+
   saveState = v => {
     console.log(v);
     this.setState(v);
@@ -116,37 +147,6 @@ export default class register extends PureComponent {
         }
       }
     });
-  };
-
-  submit = power => {
-    const { dispatch } = this.props;
-    const { user, type, id, isLogin } = this.state;
-
-    console.log("提交", user, power);
-    if (type === "role") {
-      dispatch({
-        type: "role/roleCreateUpdate",
-        payload: {
-          ...user,
-          id,
-          permissions: power.permissions
-        },
-        callback: (success, error, result) => {
-          if (success) {
-            this.setState({
-              state: 2,
-              finishData: [
-                { name: "角色标识", cont: result.name },
-                { name: "角色名", cont: result.displayName }
-              ]
-            });
-            this.props.refresh(true);
-          }
-        }
-      });
-    } else {
-      this.userCreateUpdate({ ...user, ...power, isLogin, id });
-    }
   };
 
   render() {
