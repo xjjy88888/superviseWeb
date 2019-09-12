@@ -76,6 +76,24 @@ class Power extends PureComponent {
                 : ""
             });
           });
+        } else if (v.type === "admin") {
+          console.log(v);
+          this.userInfo(v.item.id, result => {
+            const { dataSource } = this.state;
+            this.setState({
+              permissions: result.permissions.map(i => i.permission),
+              dataSource: dataSource.map(item => {
+                console.log(item);
+                const resu = result.permissions.filter(
+                  i => i.permission === item.name
+                );
+                return {
+                  ...item,
+                  endTime: resu.length ? resu[0].endTime : ""
+                };
+              })
+            });
+          });
         }
       }
     });
@@ -133,7 +151,7 @@ class Power extends PureComponent {
         if (success && v === 0) {
           this.setState({
             dataSource: result.items.map(item => {
-              return { ...item, key: item.name, time: "2019-08-08" };
+              return { ...item, key: item.name, endTime: "" };
             })
           });
         }
@@ -149,20 +167,44 @@ class Power extends PureComponent {
   };
 
   handleSubmit = e => {
-    const { permissions } = this.state;
+    const {
+      form: { validateFields }
+    } = this.props;
+    const { permissions, userType } = this.state;
 
     e.preventDefault();
-    this.props.form.validateFields((err, v) => {
+    validateFields((err, v) => {
       if (!err) {
         console.log("权限分配", v, permissions);
-        this.props.submit({ ...v, permissions });
+        const result =
+          userType === 0
+            ? permissions.map(i => {
+                return {
+                  permission: i,
+                  endTime: v[this.getLabel(i) + "_endTime"]
+                };
+              })
+            : [
+                {
+                  permission: v.companyType,
+                  endTime: v.endTime
+                }
+              ];
+        console.log(result);
+        this.props.submit({ ...v, permissions: result });
       }
     });
   };
 
+  getLabel = value => {
+    const { dataSource } = this.state;
+    const result = dataSource.filter(i => i.name === value);
+    return result[0].displayName;
+  };
+
   render() {
     const {
-      form: { getFieldDecorator },
+      form: { getFieldDecorator, validateFields },
       role: { powerList, companyTypeList, roleList },
       user: { userProjectList, userCompanyList }
     } = this.props;
@@ -183,19 +225,18 @@ class Power extends PureComponent {
       },
       {
         title: "有效期",
-        dataIndex: "time",
-        render: (text, record) => (
-          <span
-            onClick={() => {
-              console.log(record);
-            }}
-          >
-            <DatePicker
-              defaultValue={moment(
-                new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1e3),
-                "YYYY-MM-DD"
-              )}
-            />
+        dataIndex: "endTime",
+        render: (item, record) => (
+          <span>
+            {getFieldDecorator(record.displayName + "_endTime", {
+              initialValue: record.endTime ? moment(record.endTime) : ""
+            })(
+              <DatePicker
+                onChange={v => {
+                  console.log(v);
+                }}
+              />
+            )}
           </span>
         )
       },
@@ -209,6 +250,9 @@ class Power extends PureComponent {
       selectedRowKeys: permissions,
       onChange: permissions => {
         console.log(permissions);
+        validateFields((err, v) => {
+          console.log(v);
+        });
         this.setState({
           permissions
         });

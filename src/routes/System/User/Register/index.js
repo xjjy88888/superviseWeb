@@ -83,17 +83,14 @@ export default class register extends PureComponent {
       payload,
       callback: (success, error, result) => {
         if (success) {
-          this.props.refresh(true);
+          if (this.props.refresh) {
+            this.props.refresh(true);
+          }
           this.userSetPower(
             {
               isActive,
               id: result.id,
-              permissions: [
-                {
-                  permission: payload.companyType,
-                  endTime: payload.endTime
-                }
-              ]
+              permissions: payload.permissions
             },
             result
           );
@@ -125,7 +122,7 @@ export default class register extends PureComponent {
     const { dispatch } = this.props;
     const { user, type, id, isLogin } = this.state;
 
-    console.log("提交", type, user, power);
+    console.log("提交", user, power);
     if (type === "role") {
       dispatch({
         type: "role/roleCreateUpdate",

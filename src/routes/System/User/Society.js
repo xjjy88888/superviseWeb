@@ -6,6 +6,7 @@ import Systems from "../../../components/Systems";
 import emitter from "../../../utils/event";
 // import Register from "../../../../components/Register";
 import Highlighter from "react-highlight-words";
+import Register from "./Register";
 import Spins from "../../../components/Spins";
 
 let self;
@@ -204,7 +205,9 @@ export default class review extends PureComponent {
               onClick={() => {
                 emitter.emit("showRegister", {
                   show: true,
-                  type: "review"
+                  type: `society`,
+                  status: "edit",
+                  item
                 });
               }}
             >
@@ -241,8 +244,7 @@ export default class review extends PureComponent {
 
     return (
       <Systems>
-        {/* <Spins show={loading} /> */}
-        {/* <Register /> */}
+        <Register refresh={this.refresh} />
         <span>
           <Button
             icon="delete"
