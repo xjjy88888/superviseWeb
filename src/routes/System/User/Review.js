@@ -6,7 +6,6 @@ import Systems from "../../../components/Systems";
 import emitter from "../../../utils/event";
 import Highlighter from "react-highlight-words";
 import Spins from "../../../components/Spins";
-import Register from "./Register";
 
 let self;
 
@@ -275,7 +274,6 @@ export default class review extends PureComponent {
 
     return (
       <Systems>
-        <Register refresh={this.refresh} />
         <span>
           <Button
             icon="check"

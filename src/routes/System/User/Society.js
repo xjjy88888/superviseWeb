@@ -5,7 +5,6 @@ import { connect } from "dva";
 import Systems from "../../../components/Systems";
 import emitter from "../../../utils/event";
 import Highlighter from "react-highlight-words";
-import Register from "./Register";
 import Spins from "../../../components/Spins";
 
 let self;
@@ -244,7 +243,6 @@ export default class review extends PureComponent {
 
     return (
       <Systems>
-        <Register refresh={this.refresh} />
         <span>
           <Button
             icon="plus"

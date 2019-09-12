@@ -1,6 +1,7 @@
 import React, { PureComponent } from "react";
 import { Layout, Menu, Icon } from "antd";
 import Layouts from "./Layouts";
+import Register from "../routes/System/User/Register";
 import { Link } from "dva/router";
 
 const { Sider, Content } = Layout;
@@ -148,6 +149,7 @@ export default class system extends PureComponent {
             </Menu>
           </Sider>
           <Content style={{ padding: 30 }}>
+            <Register />
             <div
               style={{
                 padding: 20,

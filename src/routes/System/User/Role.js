@@ -4,7 +4,6 @@ import { createForm } from "rc-form";
 import { connect } from "dva";
 import Systems from "../../../components/Systems";
 import emitter from "../../../utils/event";
-import Register from "./Register";
 import Highlighter from "react-highlight-words";
 
 let self;
@@ -246,7 +245,6 @@ export default class role extends PureComponent {
 
     return (
       <Systems>
-        <Register refresh={this.refresh} />
         <span>
           <Button
             icon="plus"

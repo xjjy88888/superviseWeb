@@ -18,7 +18,6 @@ import {
   Cascader
 } from "antd";
 import emitter from "../../../utils/event";
-import Register from "./Register";
 import Highlighter from "react-highlight-words";
 
 const { Sider, Content } = Layout;
@@ -277,7 +276,6 @@ export default class area extends PureComponent {
     };
     return (
       <Systems>
-        <Register refresh={this.refresh} />
         <Layout>
           <Sider
             style={{
