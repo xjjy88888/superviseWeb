@@ -54,7 +54,7 @@ export default class register extends PureComponent {
         state: 0,
         show: v.show,
         id: v.item.id,
-        isActive: Boolean(v.item.isActive),
+        isActive: Boolean(v.isActive),
         type: v.type,
         isLogin: h === "#/login" || h === "#/"
       });

@@ -17,6 +17,8 @@ import {
   notification,
   Cascader
 } from "antd";
+import emitter from "../../../utils/event";
+import Register from "./Register";
 import Highlighter from "react-highlight-words";
 
 const { Sider, Content } = Layout;
@@ -56,6 +58,23 @@ export default class area extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: "departs/departsTree"
+    });
+  };
+
+  userDelete = v => {
+    const { dispatch } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: "user/userDelete",
+      payload: { ids: v.map(i => i.id) },
+      callback: success => {
+        if (success) {
+          this.setState({
+            loading: false
+          });
+          this.refresh();
+        }
+      }
     });
   };
 
@@ -217,22 +236,12 @@ export default class area extends PureComponent {
             <a
               style={{ marginRight: 20 }}
               onClick={() => {
-                console.log(record);
-                this.props.form.setFieldsValue({
-                  GovDepartmentId: record.parent_id,
-                  name: record.name,
-                  code: record.code,
-                  description: record.description
-                });
-                this.setState({
-                  visible: true,
-                  id: record.id
-                });
-                setFieldsValue({
-                  districtCodeId: [
-                    this.getDist(ParentCodeId)[0].value,
-                    record.districtCodeId
-                  ]
+                emitter.emit("showRegister", {
+                  show: true,
+                  isActive: true,
+                  type: `admin`,
+                  status: "edit",
+                  item
                 });
               }}
             >
@@ -247,21 +256,7 @@ export default class area extends PureComponent {
                   cancelText: "否",
                   okType: "danger",
                   onOk() {
-                    dispatch({
-                      type: "departs/departsDelete",
-                      payload: record.id,
-                      callback: (success, error, result) => {
-                        if (success) {
-                          self.setState({
-                            visible: false
-                          });
-                          self.refresh();
-                        }
-                        notification[success ? "success" : "error"]({
-                          message: `删除${success ? "成功" : "失败"}`
-                        });
-                      }
-                    });
+                    self.userDelete([{ id: item.id }]);
                   },
                   onCancel() {}
                 });
@@ -282,6 +277,7 @@ export default class area extends PureComponent {
     };
     return (
       <Systems>
+        <Register refresh={this.refresh} />
         <Layout>
           <Sider
             style={{
@@ -297,7 +293,7 @@ export default class area extends PureComponent {
               onSelect={(v, e) => {
                 // console.log(v[0], e.selectedNodes[0].props.districtCodeId);
                 const d = e.selectedNodes[0].props.districtCodeId;
-                // console.log(this.getDist(d));
+                console.log(v[0], d);
                 this.setState({
                   GovDepartmentId: v[0],
                   ParentCodeId: d
@@ -364,10 +360,12 @@ export default class area extends PureComponent {
                   disabled={!GovDepartmentId}
                   style={{ margin: 10 }}
                   onClick={() => {
-                    resetFields();
-                    this.setState({
-                      visible: true,
-                      id: null
+                    emitter.emit("showRegister", {
+                      show: true,
+                      isActive: true,
+                      type: `admin`,
+                      status: "add",
+                      item: { govDepartmentId: GovDepartmentId }
                     });
                   }}
                 >
@@ -380,7 +378,7 @@ export default class area extends PureComponent {
                   onClick={() => {
                     const l = selectedRows.length;
                     if (l === 0) {
-                      message.warning("请选择需要删除的部门");
+                      message.warning("请选择需要删除的账号");
                       return;
                     }
                     Modal.confirm({
@@ -390,23 +388,7 @@ export default class area extends PureComponent {
                       cancelText: "否",
                       okType: "danger",
                       onOk() {
-                        dispatch({
-                          type: "departs/departsDeleteMul",
-                          payload: { id: selectedRows.map(item => item.id) },
-                          callback: (success, error, result) => {
-                            if (success) {
-                              self.setState({
-                                visible: false
-                              });
-                              self.departsTree();
-                            }
-                            notification[success ? "success" : "error"]({
-                              message: `删除${l}条部门划数据${
-                                success ? "成功" : "失败"
-                              }${success ? "" : `：${error.message}`}`
-                            });
-                          }
-                        });
+                        self.userDelete(selectedRows);
                       },
                       onCancel() {}
                     });

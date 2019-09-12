@@ -4,7 +4,6 @@ import { createForm } from "rc-form";
 import { connect } from "dva";
 import Systems from "../../../components/Systems";
 import emitter from "../../../utils/event";
-// import Register from "../../../../components/Register";
 import Highlighter from "react-highlight-words";
 import Register from "./Register";
 import Spins from "../../../components/Spins";
@@ -35,12 +34,12 @@ export default class review extends PureComponent {
     this.userList({ SkipCount: 0, MaxResultCount: 10 });
   };
 
-  userDelete = payload => {
+  userDelete = v => {
     const { dispatch } = this.props;
     this.setState({ loading: true });
     dispatch({
       type: "user/userDelete",
-      payload,
+      payload: { ids: v.map(i => i.id) },
       callback: success => {
         if (success) {
           this.setState({
@@ -205,6 +204,7 @@ export default class review extends PureComponent {
               onClick={() => {
                 emitter.emit("showRegister", {
                   show: true,
+                  isActive: true,
                   type: `society`,
                   status: "edit",
                   item
@@ -222,7 +222,7 @@ export default class review extends PureComponent {
                   cancelText: "否",
                   okType: "danger",
                   onOk() {
-                    self.userDelete({ id: item.id });
+                    self.userDelete([{ id: item.id }]);
                   },
                   onCancel() {}
                 });
@@ -252,6 +252,7 @@ export default class review extends PureComponent {
             onClick={() => {
               emitter.emit("showRegister", {
                 show: true,
+                isActive: true,
                 type: `society`,
                 status: "add",
                 item: {}
@@ -277,7 +278,7 @@ export default class review extends PureComponent {
                 cancelText: "否",
                 okType: "danger",
                 onOk() {
-                  message.success(`删除${l}个账号成功`);
+                  self.userDelete(selectedRows);
                 },
                 onCancel() {}
               });

@@ -78,7 +78,15 @@ class Info extends PureComponent {
               ? 2
               : 3
         });
-        this.departsTree();
+        if (v.type === "admin") {
+          this.departsTree(result => {
+            setFieldsValue({
+              govDepartmentId: this.find(v.item.govDepartmentId, result)
+            });
+          });
+        } else if (v.type === "society") {
+          this.departsTree();
+        }
       } else {
         this.setState({ id: v.item.id });
         if (v.type === "role") {

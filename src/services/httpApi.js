@@ -1192,7 +1192,7 @@ export async function userExamineApi(params) {
   });
 }
 
-// 用户_新建设置权限1
+// 用户_新建设置权限
 export async function userSetPowerApi(params) {
   console.log("用户设置权限", params);
   return request(
