@@ -245,7 +245,7 @@ export default {
       if (success) {
       } else {
         notification["error"]({
-          message: `用户配置权限失败`
+          message: `配置权限失败`
         });
       }
     }

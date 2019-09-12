@@ -66,7 +66,7 @@ class Info extends PureComponent {
               govDepartmentId: this.find(v.item.govDepartmentId, result)
             });
           });
-        } else if (v.type === "society") {
+        } else {
           this.departsTree();
         }
       } else {

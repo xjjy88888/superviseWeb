@@ -103,14 +103,22 @@ export default class area extends PureComponent {
 
   handleTableChange = (pagination, filters, sorter) => {
     const { GovDepartmentId } = this.state;
+    console.log(filters, sorter);
+    const Sorting = `${
+      sorter.columnKey
+        ? `${sorter.columnKey === "name" ? "userName" : sorter.columnKey} ${
+            sorter.order === "descend" ? "desc" : "asc"
+          }`
+        : ``
+    }`;
     this.setState({
       pagination: pagination
     });
     this.userList({
       SkipCount: (pagination.current - 1) * pagination.pageSize,
       MaxResultCount: pagination.pageSize,
-      Name: filters.name,
-      GovDepartmentId: GovDepartmentId
+      GovDepartmentId: GovDepartmentId,
+      Sorting
     });
   };
 
@@ -218,10 +226,6 @@ export default class area extends PureComponent {
         dataIndex: "phoneNumber",
         sorter: (a, b) => a.phoneNumber - b.phoneNumber,
         ...this.getColumnSearchProps("phoneNumber")
-      },
-      {
-        title: "用户类型",
-        render: item => <span>{item.userType === 1 ? `社会` : `行政`}用户</span>
       },
       {
         title: "创建时间",

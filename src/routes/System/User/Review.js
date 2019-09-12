@@ -94,14 +94,21 @@ export default class review extends PureComponent {
   };
 
   handleTableChange = (pagination, filters, sorter) => {
-    console.log(pagination, filters);
+    console.log(filters, sorter);
+    const Sorting = `${
+      sorter.columnKey
+        ? `${sorter.columnKey === "name" ? "userName" : sorter.columnKey} ${
+            sorter.order === "descend" ? "desc" : "asc"
+          }`
+        : ``
+    }`;
     this.setState({
       pagination: pagination
     });
     this.userList({
       SkipCount: (pagination.current - 1) * pagination.pageSize,
       MaxResultCount: pagination.pageSize,
-      Name: filters.name
+      Sorting
     });
   };
 

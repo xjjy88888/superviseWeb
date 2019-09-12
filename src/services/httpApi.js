@@ -1070,7 +1070,10 @@ export async function departsDeleteMulApi(params) {
 // 角色_列表
 export async function roleListApi(params) {
   return request(
-    `${config.url.roleListUrl}?SkipCount=${params.SkipCount}&MaxResultCount=${params.MaxResultCount}`,
+    `${config.url.roleListUrl}?SkipCount=${params.SkipCount}&MaxResultCount=${
+      params.MaxResultCount
+    }&Name=${params.name || ``}&DisplayName=${params.displayName ||
+      ``}&Sorting=${params.Sorting || ``}`,
     {
       method: "GET",
       headers: {
@@ -1125,7 +1128,10 @@ export async function userListApi(params) {
       params.MaxResultCount
     }&IsActive=${params.IsActive}&UserType=${
       params.UserType
-    }&GovDepartmentId=${params.GovDepartmentId || ``}`,
+    }&GovDepartmentId=${params.GovDepartmentId || ``}&Name=${params.name ||
+      ``}&DisplayName=${params.displayName ||
+      ``}&PhoneNumber=${params.phoneNumber || ``}&Sorting=${params.Sorting ||
+      ``}`,
     {
       method: "GET",
       headers: {

@@ -86,14 +86,21 @@ export default class review extends PureComponent {
   };
 
   handleTableChange = (pagination, filters, sorter) => {
-    console.log(pagination, filters);
+    console.log(filters, sorter);
+    const Sorting = `${
+      sorter.columnKey
+        ? `${sorter.columnKey === "name" ? "userName" : sorter.columnKey} ${
+            sorter.order === "descend" ? "desc" : "asc"
+          }`
+        : ``
+    }`;
     this.setState({
       pagination: pagination
     });
     this.userList({
       SkipCount: (pagination.current - 1) * pagination.pageSize,
       MaxResultCount: pagination.pageSize,
-      Name: filters.name
+      Sorting
     });
   };
 
@@ -113,12 +120,16 @@ export default class review extends PureComponent {
           onChange={e =>
             setSelectedKeys(e.target.value ? [e.target.value] : [])
           }
-          onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
+          onPressEnter={() =>
+            this.handleSearch(dataIndex, selectedKeys, confirm)
+          }
           style={{ width: 188, marginBottom: 8, display: "block" }}
         />
         <Button
           type="primary"
-          onClick={() => this.handleSearch(selectedKeys, confirm)}
+          onClick={() => {
+            this.handleSearch(dataIndex, selectedKeys, confirm);
+          }}
           icon="search"
           size="small"
           style={{ width: 90, marginRight: 8 }}
@@ -157,14 +168,13 @@ export default class review extends PureComponent {
     // )
   });
 
-  handleSearch = (selectedKeys, confirm) => {
+  handleSearch = (dataIndex, selectedKeys, confirm) => {
+    console.log(dataIndex, selectedKeys[0]);
     confirm();
-    this.setState({ searchText: selectedKeys[0] });
   };
 
   handleReset = clearFilters => {
     clearFilters();
-    this.setState({ searchText: "" });
   };
 
   render() {
@@ -188,10 +198,6 @@ export default class review extends PureComponent {
         dataIndex: "phoneNumber",
         sorter: (a, b) => a.phoneNumber - b.phoneNumber,
         ...this.getColumnSearchProps("phoneNumber")
-      },
-      {
-        title: "用户类型",
-        render: item => <span>{item.userType === 1 ? `社会` : `行政`}用户</span>
       },
       {
         title: "创建时间",

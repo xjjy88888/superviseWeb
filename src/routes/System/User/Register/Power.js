@@ -82,13 +82,11 @@ class Power extends PureComponent {
           }
         } else if (v.type === "admin") {
           if (v.item.id) {
-            console.log(v);
             this.userInfo(v.item.id, result => {
               const { dataSource } = this.state;
               this.setState({
                 permissions: result.permissions.map(i => i.permission),
                 dataSource: dataSource.map(item => {
-                  console.log(item);
                   const resu = result.permissions.filter(
                     i => i.permission === item.name
                   );
