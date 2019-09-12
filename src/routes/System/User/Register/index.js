@@ -134,8 +134,8 @@ export default class register extends PureComponent {
           this.setState({
             state: 2,
             finishData: [
-              { name: "账号", cont: result.name },
-              { name: "姓名", cont: result.displayName }
+              { name: "账号", cont: payload.name },
+              { name: "姓名", cont: payload.displayName }
             ]
           });
         }

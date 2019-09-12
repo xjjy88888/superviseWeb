@@ -64,7 +64,7 @@ export default class role extends PureComponent {
           loading: false,
           dataSource: result.items.map((item, index) => {
             const permissions = item.permissions.map(item =>
-              this.getPowerLabel(item)
+              this.getPowerLabel(item.permission)
             );
             const power = permissions.filter(i => i !== "");
             return {

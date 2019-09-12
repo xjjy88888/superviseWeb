@@ -28,7 +28,6 @@ const formItemLayout = {
   }
 };
 
-//权限分配
 @connect(({ user, role }) => ({
   user,
   role
@@ -63,7 +62,7 @@ class Power extends PureComponent {
         this.setState({ id: v.item.id });
         if (v.type === "role") {
           this.setState({
-            permissions: v.item.permissions
+            permissions: v.item.permissions.map(i => i.permission)
           });
         } else if (v.type === "society") {
           if (v.item.id) {
@@ -198,7 +197,12 @@ class Power extends PureComponent {
                 }
               ]
             : userType === 2
-            ? permissions
+            ? permissions.map(i => {
+                return {
+                  permission: i,
+                  endTime: v[this.getLabel(i) + "_endTime"]
+                };
+              })
             : [];
         console.log(result);
         this.props.submit({ ...v, permissions: result });
@@ -279,7 +283,7 @@ class Power extends PureComponent {
             onChange={v => {
               let data = [];
               v.map(item => {
-                console.log(item);
+                // console.log(item);
                 data = data.concat(item);
               });
               console.log(v, data);
