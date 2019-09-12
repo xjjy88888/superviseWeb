@@ -11,7 +11,7 @@ export default {
   namespace: "departs",
 
   state: {
-    departsTree: [{ children: null, id: null, value: null }],
+    departsTree: [],
     departsList: { totalCount: 0, items: [] }
   },
 

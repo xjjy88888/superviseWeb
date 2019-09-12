@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import React, { PureComponent } from "react";
 import {
   Form,
@@ -14,9 +15,8 @@ import { connect } from "dva";
 import moment from "moment";
 import emitter from "../../../../utils/event";
 import Spins from "../../../../components/Spins";
-import { createForm } from "rc-form";
 
-const { Header, Footer, Sider, Content } = Layout;
+const { Footer, Sider, Content } = Layout;
 const formItemLayout = {
   labelCol: {
     xs: { span: 24 },
@@ -44,6 +44,7 @@ class Power extends PureComponent {
   };
 
   componentDidMount() {
+    console.log("componentDidMount111");
     const {
       form: { resetFields, setFieldsValue }
     } = this.props;
@@ -107,6 +108,8 @@ class Power extends PureComponent {
       this.setState({ userType: v.type });
     });
   }
+
+  componentWillUnmount() {}
 
   userInfo = (id, fn) => {
     const { dispatch } = this.props;
@@ -214,7 +217,7 @@ class Power extends PureComponent {
   render() {
     const {
       form: { getFieldDecorator, validateFields },
-      role: { powerList, companyTypeList, roleList },
+      role: { companyTypeList, roleList },
       user: { userProjectList, userCompanyList }
     } = this.props;
 
@@ -225,7 +228,6 @@ class Power extends PureComponent {
       dataSource,
       loading
     } = this.state;
-    console.log(permissions);
 
     let columns = [
       {

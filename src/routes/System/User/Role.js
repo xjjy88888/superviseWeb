@@ -27,6 +27,10 @@ export default class role extends PureComponent {
     self = this;
     this.refresh();
     this.powerList();
+
+    this.eventEmitter = emitter.addListener("refreshSystem", v => {
+      this.refresh();
+    });
   }
 
   powerList = () => {
@@ -160,6 +164,23 @@ export default class role extends PureComponent {
     this.setState({ searchText: "" });
   };
 
+  roleDelete = v => {
+    const { dispatch } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: "role/roleDelete",
+      payload: { ids: v.map(i => i.id) },
+      callback: success => {
+        if (success) {
+          this.setState({
+            loading: false
+          });
+          this.refresh();
+        }
+      }
+    });
+  };
+
   render() {
     const { dispatch } = this.props;
 
@@ -215,15 +236,7 @@ export default class role extends PureComponent {
                   cancelText: "否",
                   okType: "danger",
                   onOk() {
-                    dispatch({
-                      type: "role/roleDelete",
-                      payload: { id: item.id },
-                      callback: (success, error, result) => {
-                        if (success) {
-                          self.refresh();
-                        }
-                      }
-                    });
+                    self.roleDelete([{ id: item.id }]);
                   },
                   onCancel() {}
                 });
@@ -277,15 +290,7 @@ export default class role extends PureComponent {
                 cancelText: "否",
                 okType: "danger",
                 onOk() {
-                  dispatch({
-                    type: "role/roleDeleteMul",
-                    payload: { id: selectedRows.map(item => item.id) },
-                    callback: (success, error, result) => {
-                      if (success) {
-                        self.refresh();
-                      }
-                    }
-                  });
+                  self.roleDelete(selectedRows);
                 },
                 onCancel() {}
               });

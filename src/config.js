@@ -330,10 +330,7 @@ const config = {
     roleCreateUpdateUrl: `${domainApi}Role/`,
 
     // 角色_删除
-    roleDeleteUrl: `${domainApi}Role/Delete`,
-
-    // 角色_批量删除
-    roleDeleteMulUrl: `${domainApi}Role/DeleteBatch`,
+    roleDeleteUrl: `${domainApi}Role/DeleteBatch`,
 
     // 权限_列表
     powerListUrl: `${domainApi}Role/GetAllPermissions`,

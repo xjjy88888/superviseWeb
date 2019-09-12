@@ -27,6 +27,10 @@ export default class review extends PureComponent {
   componentDidMount() {
     self = this;
     this.refresh();
+
+    this.eventEmitter = emitter.addListener("refreshSystem", v => {
+      this.refresh();
+    });
   }
 
   refresh = () => {

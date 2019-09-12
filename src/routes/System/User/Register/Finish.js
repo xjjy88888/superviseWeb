@@ -1,27 +1,7 @@
 import React, { PureComponent } from "react";
-import {
-  Steps,
-  Form,
-  Input,
-  Button,
-  Table,
-  TreeSelect,
-  Select,
-  DatePicker,
-  Avatar,
-  Layout,
-  Checkbox,
-  Row,
-  Col
-} from "antd";
-import { connect } from "dva";
-import moment from "moment";
-import emitter from "../../../../utils/event";
-import { LocaleProvider } from "antd";
-import { createForm } from "rc-form";
-import zh_CN from "antd/lib/locale-provider/zh_CN";
+import { Button, Avatar, Layout } from "antd";
 
-const { Header, Footer, Sider, Content } = Layout;
+const { Footer, Content } = Layout;
 
 //完成
 export default class finish extends PureComponent {

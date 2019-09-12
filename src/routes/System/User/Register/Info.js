@@ -1,30 +1,12 @@
 /* eslint-disable array-callback-return */
 import React, { PureComponent } from "react";
-import {
-  Steps,
-  Form,
-  Input,
-  Button,
-  Table,
-  TreeSelect,
-  Select,
-  DatePicker,
-  Avatar,
-  Layout,
-  Checkbox,
-  Row,
-  Col,
-  Cascader
-} from "antd";
+import { Form, Input, Button, Select, Layout, Cascader } from "antd";
 import { connect } from "dva";
-import moment from "moment";
 import emitter from "../../../../utils/event";
-import { LocaleProvider } from "antd";
 import { createForm } from "rc-form";
-import zh_CN from "antd/lib/locale-provider/zh_CN";
 import Spins from "../../../../components/Spins";
 
-const { Header, Footer, Sider, Content } = Layout;
+const { Footer, Content } = Layout;
 const formItemLayout = {
   labelCol: {
     xs: { span: 24 },
@@ -112,6 +94,10 @@ class Info extends PureComponent {
     });
   }
 
+  componentWillUnmount() {
+    // emitter.removeListener(this.eventEmitter)
+  }
+
   find = (v, list) => {
     let data;
     (list || []).map(i => {
@@ -128,17 +114,24 @@ class Info extends PureComponent {
   };
 
   departsTree = fn => {
-    const { dispatch } = this.props;
-    this.setState({ loading: true });
-    dispatch({
-      type: "departs/departsTree",
-      callback: (success, error, result) => {
-        this.setState({ loading: false });
-        if (success && fn) {
-          fn(result.items);
+    const {
+      dispatch,
+      departs: { departsTree }
+    } = this.props;
+    if (departsTree.length) {
+      fn(departsTree);
+    } else {
+      this.setState({ loading: true });
+      dispatch({
+        type: "departs/departsTree",
+        callback: (success, error, result) => {
+          this.setState({ loading: false });
+          if (success && fn) {
+            fn(result.items);
+          }
         }
-      }
-    });
+      });
+    }
   };
 
   handleSubmit = e => {
@@ -199,14 +192,10 @@ class Info extends PureComponent {
   render() {
     const {
       isLogin,
-      show,
       form: { getFieldDecorator },
-      departs: { departsTree, userList }
+      departs: { departsTree }
     } = this.props;
     const { type, userType, status, loading } = this.state;
-
-    const showRole = { display: type === "role" ? "block" : "none" };
-    const hideRole = { display: type === "role" ? "none" : "block" };
 
     return (
       <Layout

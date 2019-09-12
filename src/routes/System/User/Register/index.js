@@ -1,18 +1,6 @@
 import React, { PureComponent } from "react";
-import {
-  Steps,
-  Form,
-  Input,
-  Button,
-  Table,
-  TreeSelect,
-  Select,
-  DatePicker,
-  Avatar,
-  Layout
-} from "antd";
+import { Steps, Button, Layout } from "antd";
 import { connect } from "dva";
-import moment from "moment";
 import emitter from "../../../../utils/event";
 import { LocaleProvider } from "antd";
 import { createForm } from "rc-form";
@@ -21,7 +9,7 @@ import Power from "./Power";
 import Finish from "./Finish";
 import zh_CN from "antd/lib/locale-provider/zh_CN";
 
-const { Header, Footer, Sider, Content } = Layout;
+const { Header, Content } = Layout;
 
 @connect(({ user, district, role }) => ({
   user,
@@ -61,6 +49,10 @@ export default class register extends PureComponent {
     });
   }
 
+  componentWillUnmount() {
+    // emitter.removeListener(this.eventEmitter);
+  }
+
   submit = power => {
     const { dispatch } = this.props;
     const { user, type, id, isLogin } = this.state;
@@ -83,7 +75,9 @@ export default class register extends PureComponent {
                 { name: "角色名", cont: result.displayName }
               ]
             });
-            this.props.refresh(true);
+            emitter.emit("refreshSystem", {
+              refresh: true
+            });
           }
         }
       });

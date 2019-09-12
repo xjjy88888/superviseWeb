@@ -13,12 +13,9 @@ import {
   Tree,
   Typography,
   Layout,
-  Modal,
-  notification,
-  Cascader
+  Modal
 } from "antd";
 import emitter from "../../../utils/event";
-import Highlighter from "react-highlight-words";
 
 const { Sider, Content } = Layout;
 const { Title } = Typography;
@@ -46,6 +43,10 @@ export default class area extends PureComponent {
   componentDidMount() {
     self = this;
     this.departsTree();
+
+    this.eventEmitter = emitter.addListener("refreshSystem", v => {
+      this.refresh();
+    });
   }
 
   refresh = () => {
@@ -185,8 +186,8 @@ export default class area extends PureComponent {
   render() {
     const {
       dispatch,
-      form: { getFieldDecorator, resetFields, setFieldsValue, validateFields },
-      departs: { departsTree, userList }
+      form: { getFieldDecorator, validateFields },
+      departs: { departsTree }
     } = this.props;
 
     const {
@@ -196,7 +197,6 @@ export default class area extends PureComponent {
       dataSource,
       pagination,
       loading,
-      ParentCodeId,
       GovDepartmentId
     } = this.state;
 

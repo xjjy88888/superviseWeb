@@ -52,11 +52,13 @@ export default {
     // 角色_删除
     *roleDelete({ payload, callback }, { call, put }) {
       const {
-        data: { success, error, result }
+        data: { success, error }
       } = yield call(roleDeleteApi, payload);
-      if (callback) callback(success, error, result);
+      if (callback) callback(success);
       notification[success ? "success" : "error"]({
-        message: `删除${success ? `成功` : `失败`}`
+        message: `删除${success ? "成功" : "失败"}${
+          success ? "" : `：${error.message}`
+        }`
       });
     },
 

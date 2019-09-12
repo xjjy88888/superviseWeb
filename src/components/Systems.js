@@ -121,7 +121,6 @@ export default class system extends PureComponent {
                           <Link
                             to={`/system${ite.key}`}
                             onClick={() => {
-                              console.log(ite.key);
                               localStorage.setItem("key", ite.key);
                             }}
                           >

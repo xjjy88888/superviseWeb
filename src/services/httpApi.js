@@ -1098,24 +1098,13 @@ export async function roleCreateUpdateApi(params) {
 
 // 角色_删除
 export async function roleDeleteApi(params) {
-  return request(`${config.url.roleDeleteUrl}?id=${params.id}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${accessToken()}`,
-      "Content-Type": "application/json-patch+json"
-    }
-  });
-}
-
-// 角色_批量删除
-export async function roleDeleteMulApi(params) {
-  return request(`${config.url.roleDeleteMulUrl}`, {
+  return request(`${config.url.roleDeleteUrl}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
       "Content-Type": "application/json-patch+json"
     },
-    body: JSON.stringify(params.id)
+    body: JSON.stringify(params.ids)
   });
 }
 

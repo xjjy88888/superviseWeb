@@ -18,7 +18,6 @@ import {
   notification,
   Cascader
 } from "antd";
-import Highlighter from "react-highlight-words";
 
 const { Sider, Content } = Layout;
 const { Title } = Typography;
