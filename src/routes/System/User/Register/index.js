@@ -37,7 +37,8 @@ export default class register extends PureComponent {
     user: {},
     finishData: [],
     id: null,
-    isLogin: true
+    isLogin: true,
+    isActive: false
     // login: 注册
     // society: 社会用户
     // admin: 行政用户
@@ -53,6 +54,7 @@ export default class register extends PureComponent {
         state: 0,
         show: v.show,
         id: v.item.id,
+        isActive: Boolean(v.item.isActive),
         type: v.type,
         isLogin: h === "#/login" || h === "#/"
       });
@@ -60,6 +62,7 @@ export default class register extends PureComponent {
   }
 
   saveState = v => {
+    console.log(v);
     this.setState(v);
   };
 
@@ -71,17 +74,19 @@ export default class register extends PureComponent {
   };
 
   userCreateUpdate = payload => {
+    console.log(payload);
     const { dispatch } = this.props;
-    const { isLogin } = this.state;
+    const { isActive } = this.state;
 
     dispatch({
       type: "user/userCreateUpdate",
       payload,
       callback: (success, error, result) => {
         if (success) {
+          this.props.refresh(true);
           this.userSetPower(
             {
-              isLogin,
+              isActive,
               id: result.id,
               permissions: [
                 {
@@ -126,7 +131,7 @@ export default class register extends PureComponent {
         type: "role/roleCreateUpdate",
         payload: {
           ...user,
-          id: id,
+          id,
           permissions: power.permissions
         },
         callback: (success, error, result) => {
@@ -143,7 +148,7 @@ export default class register extends PureComponent {
         }
       });
     } else {
-      this.userCreateUpdate({ ...user, ...power, isLogin });
+      this.userCreateUpdate({ ...user, ...power, isLogin, id });
     }
   };
 

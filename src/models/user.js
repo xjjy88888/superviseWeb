@@ -10,7 +10,8 @@ import {
   userProjectApi,
   userCompanyApi,
   userSetPowerApi,
-  userExamineApi
+  userExamineApi,
+  userInfoApi
 } from "../services/httpApi";
 import { routerRedux } from "dva/router";
 import { notification } from "antd";
@@ -158,6 +159,37 @@ export default {
               }`
         }`
       });
+    },
+
+    // 用户_详情
+    *userInfo({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(userInfoApi, payload);
+      if (callback) callback(success, error, result);
+      if (success) {
+        yield put({
+          type: "save",
+          payload: {
+            userCompanyList: [
+              {
+                name: result.socialDepartmentName,
+                id: result.socialDepartmentId
+              }
+            ],
+            userProjectList: [
+              {
+                name: result.projectName,
+                id: result.projectId
+              }
+            ]
+          }
+        });
+      } else {
+        notification["error"]({
+          message: `查询用户详情失败`
+        });
+      }
     },
 
     //  用户_删除

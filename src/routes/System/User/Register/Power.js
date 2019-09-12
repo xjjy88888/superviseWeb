@@ -13,6 +13,7 @@ import {
 import { connect } from "dva";
 import moment from "moment";
 import emitter from "../../../../utils/event";
+import Spins from "../../../../components/Spins";
 import { createForm } from "rc-form";
 
 const { Header, Footer, Sider, Content } = Layout;
@@ -38,7 +39,8 @@ class Power extends PureComponent {
     permissions: [],
     userType: 0, //0:行政  1:社会  2:角色  3:其他
     companyType: "",
-    dataSource: []
+    dataSource: [],
+    loading: false
   };
 
   componentDidMount() {
@@ -62,8 +64,17 @@ class Power extends PureComponent {
             permissions: v.item.permissions
           });
         } else if (v.type === "society") {
-          setFieldsValue({
-            projectId: v.item.projectId
+          this.userInfo(v.item.id, result => {
+            setFieldsValue({
+              projectId: result.projectId,
+              socialDepartmentId: result.socialDepartmentId,
+              companyType: result.permissions.length
+                ? result.permissions[0].permission
+                : "",
+              endTime: result.permissions.length
+                ? moment(result.permissions[0].endTime)
+                : ""
+            });
           });
         }
       }
@@ -74,9 +85,21 @@ class Power extends PureComponent {
     });
   }
 
+  userInfo = (id, fn) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "user/userInfo",
+      payload: { id },
+      callback: (success, error, result) => {
+        if (success) {
+          fn(result);
+        }
+      }
+    });
+  };
+
   roleList = () => {
     const { dispatch } = this.props;
-    this.setState({ loading: true });
     dispatch({
       type: "role/roleList",
       payload: { SkipCount: 0, MaxResultCount: 100 }
@@ -144,7 +167,13 @@ class Power extends PureComponent {
       user: { userProjectList, userCompanyList }
     } = this.props;
 
-    const { permissions, userType, companyType, dataSource } = this.state;
+    const {
+      permissions,
+      userType,
+      companyType,
+      dataSource,
+      loading
+    } = this.state;
     console.log(permissions);
 
     const columns = [
@@ -188,6 +217,7 @@ class Power extends PureComponent {
 
     return (
       <Layout style={{ backgroundColor: "#fff" }}>
+        <Spins show={loading} />
         <Sider
           theme="light"
           style={{

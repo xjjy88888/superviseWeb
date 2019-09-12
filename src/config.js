@@ -347,6 +347,9 @@ const config = {
     // 用户_新建编辑
     userCreateUpdateUrl: `${domainApi}User/`,
 
+    // 用户_详情
+    userInfoUrl: `${domainApi}User/Get`,
+
     // 用户_审核
     userExamineUrl: `${domainApi}User/SetIsActive`,
 

@@ -22,6 +22,7 @@ import emitter from "../../../../utils/event";
 import { LocaleProvider } from "antd";
 import { createForm } from "rc-form";
 import zh_CN from "antd/lib/locale-provider/zh_CN";
+import Spins from "../../../../components/Spins";
 
 const { Header, Footer, Sider, Content } = Layout;
 const formItemLayout = {
@@ -49,7 +50,8 @@ class Info extends PureComponent {
     id: null,
     type: "",
     status: "", // add 新建  edit 编辑
-    userType: ""
+    userType: "",
+    loading: false
     // login: 注册
     // society: 社会用户
     // admin: 行政用户
@@ -61,13 +63,12 @@ class Info extends PureComponent {
       form: { resetFields, setFieldsValue }
     } = this.props;
 
-    this.departsTree();
-
     this.eventEmitter = emitter.addListener("showRegister", v => {
       console.log(v);
       this.setState({ type: v.type, status: v.status });
       if (v.status === "add") {
         resetFields();
+        this.departsTree();
       } else {
         this.setState({ id: v.item.id });
         if (v.type === "role") {
@@ -76,14 +77,17 @@ class Info extends PureComponent {
             displayName: v.item.displayName
           });
         } else if (v.type === "society" || v.type === "admin") {
-          const {
-            departs: { departsTree }
-          } = this.props;
+          console.log(v.item.userType);
+          this.setState({ userType: v.item.userType });
           setFieldsValue({
             userName: v.item.userName,
             displayName: v.item.displayName,
-            phoneNumber: v.item.phoneNumber,
-            govDepartmentId: this.find(v.item.govDepartmentId, departsTree)
+            phoneNumber: v.item.phoneNumber
+          });
+          this.departsTree(result => {
+            setFieldsValue({
+              govDepartmentId: this.find(v.item.govDepartmentId, result)
+            });
           });
         }
       }
@@ -105,16 +109,23 @@ class Info extends PureComponent {
     return data;
   };
 
-  departsTree = () => {
+  departsTree = fn => {
     const { dispatch } = this.props;
+    this.setState({ loading: true });
     dispatch({
-      type: "departs/departsTree"
+      type: "departs/departsTree",
+      callback: (success, error, result) => {
+        this.setState({ loading: false });
+        if (success && fn) {
+          fn(result.items);
+        }
+      }
     });
   };
 
   handleSubmit = e => {
     e.preventDefault();
-    const { type } = this.state;
+    const { type, userType } = this.state;
     this.props.form.validateFields((err, v) => {
       console.log("填写用户信息1", v, type);
       if (!err) {
@@ -132,7 +143,7 @@ class Info extends PureComponent {
         });
         const g = v.govDepartmentId;
         this.props.saveState({
-          user: { ...v, govDepartmentId: g[g.length - 1] },
+          user: { ...v, userType, govDepartmentId: g[g.length - 1] },
           state: 1
         });
       }
@@ -174,7 +185,7 @@ class Info extends PureComponent {
       form: { getFieldDecorator },
       departs: { departsTree, userList }
     } = this.props;
-    const { type, userType, status } = this.state;
+    const { type, userType, status, loading } = this.state;
 
     const showRole = { display: type === "role" ? "block" : "none" };
     const hideRole = { display: type === "role" ? "none" : "block" };
@@ -185,6 +196,7 @@ class Info extends PureComponent {
           backgroundColor: "#fff"
         }}
       >
+        <Spins show={loading} />
         <Content>
           <Form
             onSubmit={this.handleSubmit}

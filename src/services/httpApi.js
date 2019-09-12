@@ -1156,9 +1156,7 @@ export async function userCreateUpdateApi(params) {
     `${
       params.isLogin
         ? config.url.userCreateOutsideUrl
-        : config.url.userCreateUpdateUrl + params.id
-        ? "Update"
-        : "Create"
+        : `${config.url.userCreateUpdateUrl}${params.id ? "Update" : "Create"}`
     }`,
     {
       method: "POST",
@@ -1169,6 +1167,17 @@ export async function userCreateUpdateApi(params) {
       body: JSON.stringify(data)
     }
   );
+}
+
+// 用户_详情
+export async function userInfoApi(params) {
+  console.log(params);
+  return request(`${config.url.userInfoUrl}?Id=${params.id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
 }
 
 // 用户_审核
@@ -1183,14 +1192,14 @@ export async function userExamineApi(params) {
   });
 }
 
-// 用户_新建设置权限
+// 用户_新建设置权限1
 export async function userSetPowerApi(params) {
-  console.log(params)
+  console.log("用户设置权限", params);
   return request(
     `${
-      params.isLogin
-        ? config.url.userSetPowerOutsideUrl
-        : config.url.userSetPowerUrl
+      params.isActive
+        ? config.url.userSetPowerUrl
+        : config.url.userSetPowerOutsideUrl
     }`,
     {
       method: "POST",
