@@ -287,7 +287,7 @@ class Power extends PureComponent {
                 data = data.concat(item);
               });
               console.log(v, data);
-              this.setState({ permissions: data });
+              this.setState({ permissions: data.map(i => i.permission) });
             }}
           >
             <Row>

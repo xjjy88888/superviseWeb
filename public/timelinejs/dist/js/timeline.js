@@ -255,9 +255,10 @@
             histories[i] = histories[i].replace(/\//g, "-");
           }
         }
-        console.log("histories",histories);
+        //console.log("histories",histories);
         baseLayerUrl = imageBaseUrl + getMinDate(timeSpotList[self.options.startItem],histories)+ "/tile/{z}/{y}/{x}";
-        console.log("baseLayerUrl",baseLayerUrl);
+        //console.log("baseLayerUrl",baseLayerUrl);
+        $("#imgageTimeText").text("影像时间:"+getMinDate(timeSpotList[self.options.startItem],histories));
         //动态刷新扰动图斑匹配的监管影像
         baseLayer.setUrl(baseLayerUrl);
 

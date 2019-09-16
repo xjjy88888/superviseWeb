@@ -197,7 +197,7 @@
             //timeSpotList.push(dateToUtc(spotHistoryList[i].archiveTime));
             timeSpotList.push(spotHistoryList[i].archiveTime);
              if(i == spotHistoryList.length-1){
-              $('#timelineDomBody').append('<div data-time="'+spotHistoryList[i].archiveTime+'"><div id="map"></div></div>');
+              $('#timelineDomBody').append('<div data-time="'+spotHistoryList[i].archiveTime+'"><div id="map"><div id="imgageTimeText" style="background:rgba(0, 0, 0, 0.45);height:20px;left:0px;bottom:34px;color:#fff;position:absolute;z-index:999;font-size:13px;"></div></div></div>');
              }
              else{
               $('#timelineDomBody').append('<div data-time="'+spotHistoryList[i].archiveTime+'" style="display:none"></div>');
@@ -252,11 +252,12 @@
                 histories[i] = histories[i].replace(/\//g, "-");
               }
             }
-            console.log("histories",histories);
+            //console.log("histories",histories);
             //console.log("curPlayItem",curPlayItem);           
             //动态刷新扰动图斑匹配的监管影像
             baseLayerUrl = imageBaseUrl + getMinDate(timeSpotList[curPlayItem],histories)+ "/tile/{z}/{y}/{x}";
-            console.log("baseLayerUrl",baseLayerUrl);
+            //console.log("baseLayerUrl",baseLayerUrl);
+            $("#imgageTimeText").text("影像时间:"+getMinDate(timeSpotList[curPlayItem],histories));
             baseLayer.setUrl(baseLayerUrl);
 
           })           
@@ -281,10 +282,11 @@
                     histories[i] = histories[i].replace(/\//g, "-");
                   }
                 }
-                console.log("histories",histories);
+                //console.log("histories",histories);
                 //动态刷新扰动图斑匹配的监管影像
                 baseLayerUrl = imageBaseUrl + getMinDate(timeSpotList[0],histories)+ "/tile/{z}/{y}/{x}";
-                console.log("baseLayerUrl",baseLayerUrl);
+                //console.log("baseLayerUrl",baseLayerUrl);
+                $("#imgageTimeText").text("影像时间:"+getMinDate(timeSpotList[0],histories));
                 baseLayer.setUrl(baseLayerUrl);
                 baseLayer.setOpacity(1);
               }) 

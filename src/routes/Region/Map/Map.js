@@ -97,6 +97,8 @@ export default class integration extends PureComponent {
       addGraphLayer: null, //针对新建图形的图层
       showPhotoPreview: false,
       photoPreviewUrl: null,
+      imageTimeText:'2019-08-01',
+      showImageTimeText:true,
       //loading: true
     };
     this.map = null;
@@ -1100,6 +1102,8 @@ export default class integration extends PureComponent {
     map.on("moveend", me.onMoveendMap);
     //监听地图底图切换事件
     map.on("baselayerchange", me.onBaseLayerChange);
+    //监听地图鼠标移动事件
+    map.on("mousemove", me.showImageInfos);
     //获取项目区域范围
     me.getRegionGeometry();
     //编辑图形工具
@@ -1125,6 +1129,14 @@ export default class integration extends PureComponent {
   //监听地图点击事件
   onBaseLayerChange = e => {
     userconfig.baseLayer = e.layer;
+    //判断当前底图是否等于监管影像
+    if(e.layer._url === config.onlineBasemaps[0].url){
+      this.setState({ showImageTimeText: true });       
+    }
+    else{
+      this.setState({ showImageTimeText: false });
+    }
+
   };
   getBasemapLayer = (baseLayer, onlineBasemapLayers) => {
     let layer = onlineBasemapLayers[0];
@@ -1208,6 +1220,34 @@ export default class integration extends PureComponent {
       );
     }
   };
+
+  showImageInfos = e => {
+    const {mapdata:{imageTimeResult}} = this.props; 
+    const me = this;
+    //根据地图当前范围获取对应监管影像时间
+    const { showImageTimeText } = me.state;
+    if (showImageTimeText && imageTimeResult) {
+      let tileInfos = imageTimeResult.tileInfos;
+      if(tileInfos.length>0){
+        let pt = proj4("EPSG:4326", "EPSG:3857", [
+          e.latlng.lng,
+          e.latlng.lat
+        ]);
+        for (let i=0; i < tileInfos.length; i++) {
+          let item = tileInfos[i];
+          if (pt[0] >= item.xmin && pt[0] <= item.xmax && pt[1] >= item.ymin && pt[1] <= item.ymax) {
+            let data = item.data;
+            if (data && data.hasOwnProperty("takenDate")) {
+                me.setState({ imageTimeText: data.takenDate });
+            }
+            return true;
+          }  
+
+        }
+      }
+    }
+  }
+
   onMoveendMap = e => {
     const me = this;
     const { chartStatus } = this.state;
@@ -1239,6 +1279,14 @@ export default class integration extends PureComponent {
       //历史影像查询
       me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
     }
+    //根据地图当前范围获取对应监管影像时间
+    const { showImageTimeText } = me.state;
+    if (showImageTimeText) {
+      me.getInfoByExtent(zoom, bounds, data => {
+         me.setState({ imageTimeText: data[0] });  
+      });
+    }
+
   };
   /*根据地图当前范围获取对应历史影像数据
    *@method getInfoByExtent
@@ -2026,6 +2074,7 @@ export default class integration extends PureComponent {
   showHistoryMap = () => {
     const { showHistoryContrast } = this.state;
     if (showHistoryContrast) {
+      this.setState({ showImageTimeText: true});  
       let zoom = map.getZoom();
       let bounds = map.getBounds();
       //历史影像查询
@@ -2293,6 +2342,8 @@ export default class integration extends PureComponent {
       selectRightV,
       showPhotoPreview,
       photoPreviewUrl,
+      imageTimeText,
+      showImageTimeText,
       //loading
     } = this.state;
     const {
@@ -2342,6 +2393,25 @@ export default class integration extends PureComponent {
               height: "100%"
             }}
           />
+          {/* 监管影像时间显示信息 */}
+          <div
+            style={{
+              display: showImageTimeText ? "block" : "none",
+              position: "absolute",
+              bottom: 5,
+              right: 150,
+              zIndex: 1000,
+              background: "#fff"
+            }}
+          > 
+            <span
+              style={{
+                padding: "0 10px"
+              }}
+            >
+              监管影像时间:{imageTimeText}
+            </span>          
+          </div>
           {/* 照片预览*/}
           <Modal
             // height={"100vh"}
@@ -2627,58 +2697,7 @@ export default class integration extends PureComponent {
               ))}
             </Select>
           </div>
-          {/* 底部遮罩层 */}
-          {/* <div
-              style={{
-                position: "absolute",
-                bottom: 0,
-                height: 30,
-                width: "100vw",
-                zIndex: 1000,
-                background: "rgba(0,0,0,.4)"
-              }}
-            /> */}
-          {/* 历史对比 */}
-          {/* <div
-              style={{
-                display: showHistoryContrast ? "block" : "none",
-                position: "fixed",
-                left: 0,
-                top: 0,
-                height: "100vh",
-                width: "100vw",
-                background: "rgba(0,0,0,.3)",
-                zIndex: 1001
-              }}
-            >
-              <div
-                id="historymap"
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  top: "50%",
-                  width: "85vw",
-                  height: "85vh",
-                  background: "#fff",
-                  transform: "translate(-50%,-50%)"
-                }}
-              >
-                <Icon
-                  type="close"
-                  style={{
-                    position: "absolute",
-                    top: 10,
-                    right: 10,
-                    fontSize: 20,
-                    zIndex: 1001
-                  }}
-                  onClick={() => {
-                    this.setState({ showHistoryContrast: false });
-                  }}
-                />
-              </div>
-            </div>
- */}
+
         </div>
       </Layouts>
     );

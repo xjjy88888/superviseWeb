@@ -9,7 +9,7 @@ import { routerRedux } from "dva/router";
 export default {
   namespace: "mapdata",
 
-  state: { histories: [] ,historiesSpot:[]},
+  state: { histories: [] ,historiesSpot:[],imageTimeResult:null},
 
   subscriptions: {
     setup({ dispatch, history }) {
@@ -49,7 +49,7 @@ export default {
       let histories = new Set(result.result.histories);
       yield put({
         type: "save",
-        payload: { histories: [...histories].reverse() }
+        payload: { imageTimeResult: result.result}
       });
       if (callback) callback([...histories].reverse());
     },

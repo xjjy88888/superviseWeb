@@ -117,14 +117,15 @@ export default class register extends PureComponent {
               id: result.id,
               permissions: payload.permissions
             },
-            result
+            result,
+            payload
           );
         }
       }
     });
   };
 
-  userSetPower = (payload, result) => {
+  userSetPower = (payload, result, userInfo) => {
     const { dispatch } = this.props;
     dispatch({
       type: "user/userSetPower",
@@ -134,8 +135,8 @@ export default class register extends PureComponent {
           this.setState({
             state: 2,
             finishData: [
-              { name: "账号", cont: payload.name },
-              { name: "姓名", cont: payload.displayName }
+              { name: "账号", cont: userInfo.name },
+              { name: "姓名", cont: userInfo.displayName }
             ]
           });
         }
