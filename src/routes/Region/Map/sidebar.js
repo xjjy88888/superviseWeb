@@ -2803,8 +2803,14 @@ export default class sider extends PureComponent {
                           }}
                           onClick={e => {
                             e.stopPropagation();
-                            notification["info"]({
-                              message: "新建全景图"
+                            emitter.emit("showSiderbarDetail", {
+                              from: "panorama",
+                              show: true,
+                              edit: false,
+                              type: "edit",
+                              id: null,
+                              projectId: projectItem.id,
+                              item: {}
                             });
                           }}
                         />
@@ -2813,17 +2819,68 @@ export default class sider extends PureComponent {
                     key="7"
                   >
                     {panoramaList.items.map((item, index) => (
-                      <p>
+                      <p
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          this.closeAll();
+                          emitter.emit("showSiderbarDetail", {
+                            from: "panorama",
+                            show: true,
+                            edit: false,
+                            type: "edit",
+                            id: item.id,
+                            projectId: projectItem.id,
+                            item
+                          });
+                        }}
+                      >
                         {item.name}
                         <Icon
-                          type="environment"
+                          type="delete"
                           style={{
                             float: "right",
                             fontSize: 18,
                             cursor: "point",
                             color: "#1890ff"
                           }}
-                          onClick={() => {
+                          onClick={e => {
+                            e.stopPropagation();
+                            Modal.confirm({
+                              title: "删除",
+                              content: "是否确定要删除这条项目红线数据？",
+                              okText: "是",
+                              okType: "danger",
+                              cancelText: "否",
+                              onOk() {
+                                dispatch({
+                                  type: "redLine/redLineDelete",
+                                  payload: {
+                                    id: item.id
+                                  },
+                                  callback: success => {
+                                    if (success) {
+                                      emitter.emit("projectInfoRefresh", {
+                                        projectId: projectItem.id
+                                      });
+                                    }
+                                  }
+                                });
+                              },
+                              onCancel() {}
+                            });
+                          }}
+                        />
+                        <Icon
+                          type="environment"
+                          style={{
+                            float: "right",
+                            fontSize: 16,
+                            cursor: "point",
+                            color: "#1890ff",
+                            marginRight: 10
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
                             emitter.emit("fullViewLocation", {
                               type: item.generateType,
                               fullviewURL: item.urlConfig,

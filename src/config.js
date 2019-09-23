@@ -365,8 +365,11 @@ const config = {
     // 所属单位
     userCompanyUrl: `${domainApi}SocialDepartment/GetListByName`,
 
-    // 全景图_列表
-    panoramaListUrl: `${domainApi}Pano/GetAllByPost`
+    panoramaListUrl: `${domainApi}Pano/GetAllByPost`,
+
+    panoramaUploadUrl: `${domainApi}Pano/Generate`,
+
+    panoramaCreateUpdateUrl: `${domainApi}Pano/`
   },
 
   //工具箱

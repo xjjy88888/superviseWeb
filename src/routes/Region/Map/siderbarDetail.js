@@ -12,12 +12,14 @@ import {
   Modal,
   Switch,
   DatePicker,
-  Form
+  Form,
+  message
 } from "antd";
 import locale from "antd/lib/date-picker/locale/zh_CN";
 import emitter from "../../../utils/event";
 import config from "../../../config";
 import { getFile, accessToken } from "../../../utils/util";
+import Spins from "../../../components/Spins";
 
 let self;
 const { TextArea } = Input;
@@ -51,7 +53,9 @@ export default class siderbarDetail extends PureComponent {
       fileList: [],
       fromList: false,
       showSpotHistory: false,
-      spotHistoryId: ""
+      spotHistoryId: "",
+      panoramaUrlConfig: "",
+      showSpin: false
     };
     this.map = null;
   }
@@ -97,7 +101,8 @@ export default class siderbarDetail extends PureComponent {
         item: data.item,
         type: data.type, //add  edit
         previewVisible_min: false,
-        fromList: data.fromList
+        fromList: data.fromList,
+        panoramaUrlConfig: data.from === "panorama" ? data.item.urlConfig : ""
       });
       if (data.projectId && data.projectName) {
         this.setState({
@@ -364,7 +369,10 @@ export default class siderbarDetail extends PureComponent {
       previewVisible_min,
       relateProject,
       showSpotHistory,
-      spotHistoryId
+      spotHistoryId,
+      item,
+      panoramaUrlConfig,
+      showSpin
     } = this.state;
 
     const projectSelectListAll = [
@@ -414,7 +422,7 @@ export default class siderbarDetail extends PureComponent {
           }}
           onError={(v, response) => {
             notification["error"]({
-              message: `图斑附件上传失败：${response.error.message}`
+              message: `附件上传失败：${response.error.message}`
             });
           }}
           onPreview={file => {
@@ -522,6 +530,7 @@ export default class siderbarDetail extends PureComponent {
           height: "100%"
         }}
       >
+        <Spins show={showSpin} />
         <Icon
           type="left"
           style={{
@@ -1569,6 +1578,177 @@ export default class siderbarDetail extends PureComponent {
                 删除
               </Button>
             )}
+          </div>
+          <div
+            style={{
+              display: from === "panorama" ? "block" : "none"
+            }}
+          >
+            <Form>
+              <Form.Item label="全景点名" {...formItemLayout}>
+                {getFieldDecorator("name", {
+                  initialValue: item.name
+                })(<Input disabled={!edit} />)}
+              </Form.Item>
+              <Form.Item label="描述" {...formItemLayout}>
+                {getFieldDecorator("description", {
+                  initialValue: item.description
+                })(<TextArea autosize={true} disabled={!edit} />)}
+              </Form.Item>
+              <Form.Item label="坐标" {...formItemLayout}>
+                {getFieldDecorator("pointX", {
+                  initialValue: item.pointX
+                })(
+                  <Input
+                    placeholder="经度"
+                    disabled={!edit}
+                    style={{ width: 98 }}
+                  />
+                )}
+                {getFieldDecorator("pointY", {
+                  initialValue: item.pointY
+                })(
+                  <Input
+                    placeholder="纬度"
+                    disabled={!edit}
+                    style={{ width: 135, position: "relative", top: -2 }}
+                    addonAfter={
+                      <Icon
+                        type="environment"
+                        style={{
+                          color: "#1890ff"
+                        }}
+                        onClick={() => {
+                          const x = getFieldValue("pointX");
+                          const y = getFieldValue("pointY");
+                          emitter.emit("siteLocation", {
+                            state: "position",
+                            Longitude: x,
+                            Latitude: y
+                          });
+                        }}
+                      />
+                    }
+                  />
+                )}
+              </Form.Item>
+            </Form>
+            <div style={{ minHeight: fileList.length ? 120 : 0 }}>
+              <Upload
+                action={config.url.panoramaUploadUrl}
+                headers={{ Authorization: `Bearer ${accessToken()}` }}
+                data={{ GenerateType: "2" }}
+                listType="picture-card"
+                fileList={fileList}
+                beforeUpload={() => {
+                  console.log("beforeUpload");
+                  this.setState({ showSpin: true });
+                }}
+                onSuccess={v => {
+                  this.setState({
+                    panoramaUrlConfig: v.result,
+                    showSpin: false
+                  });
+                }}
+                onError={(v, response) => {
+                  notification["error"]({
+                    message: `全景图上传失败：${response.error.message}`
+                  });
+                }}
+                onPreview={file => {
+                  console.log(file.fileExtend, file);
+                  switch (file.fileExtend) {
+                    case "pdf":
+                      window.open(file.url);
+                      break;
+                    case "doc":
+                    case "docx":
+                    case "xls":
+                    case "xlsx":
+                    case "ppt":
+                    case "pptx":
+                      window.open(file.url + "&isDown=true");
+                      break;
+                    default:
+                      this.setState({
+                        previewImage: file.url || file.thumbUrl,
+                        previewVisible_min: true
+                      });
+                      if (file.latitude || file.longitude) {
+                        emitter.emit("imgLocation", {
+                          Latitude: file.latitude,
+                          Longitude: file.longitude,
+                          direction: file.azimuth,
+                          show: true
+                        });
+                      } else {
+                        getFile(file.url);
+                      }
+                      break;
+                  }
+                }}
+                onChange={({ fileList }) => {
+                  const data = fileList.map(item => {
+                    return {
+                      ...item,
+                      status: "done"
+                    };
+                  });
+                  this.setState({ fileList: data });
+                }}
+                onRemove={() => {
+                  this.setState({
+                    panoramaUrlConfig: null
+                  });
+                }}
+              >
+                {edit && fileList.length < 1 ? (
+                  <div>
+                    <div className="ant-upload-text">
+                      <Button type="div" icon="plus">
+                        上传文件
+                      </Button>
+                    </div>
+                  </div>
+                ) : null}
+              </Upload>
+            </div>
+            {edit ? (
+              <Button
+                icon="check"
+                style={{ marginTop: 20 }}
+                onClick={() => {
+                  if (!panoramaUrlConfig) {
+                    message.warning(`请上传全景图`);
+                    return;
+                  }
+                  validateFields((err, v) => {
+                    console.log(v);
+                    this.setState({ showSpin: true });
+                    dispatch({
+                      type: "panorama/panoramaCreateUpdate",
+                      payload: {
+                        ...v,
+                        projectId,
+                        urlConfig: panoramaUrlConfig,
+                        id: type === "edit" ? item.id : ""
+                      },
+                      callback: (success, response) => {
+                        this.setState({ showSpin: false });
+                        if (success) {
+                          emitter.emit("projectInfoRefresh", {
+                            projectId
+                          });
+                          this.setState({ show: false });
+                        }
+                      }
+                    });
+                  });
+                }}
+              >
+                保存
+              </Button>
+            ) : null}
           </div>
         </div>
       </div>

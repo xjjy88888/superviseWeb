@@ -1256,3 +1256,17 @@ export async function panoramaListApi(params) {
     body: JSON.stringify(params)
   });
 }
+
+export async function panoramaCreateUpdateApi(params) {
+  return request(
+    `${config.url.panoramaCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify(params)
+    }
+  );
+}
