@@ -1,5 +1,9 @@
 import { notification } from "antd";
-import { panoramaListApi, panoramaCreateUpdateApi } from "../services/httpApi";
+import {
+  panoramaListApi,
+  panoramaCreateUpdateApi,
+  panoramaDeleteApi
+} from "../services/httpApi";
 
 export default {
   namespace: "panorama",
@@ -32,10 +36,20 @@ export default {
       } = yield call(panoramaCreateUpdateApi, payload);
       if (callback) callback(success, result);
       notification[success ? "success" : "error"]({
-        message: `${payload.id ? "编辑" : "新建"}全景图${
-          success ? "成功" : "失败"
-        }`,
+        message: `${payload.id ? "编辑" : "新建"}${success ? "成功" : "失败"}`,
         duration: 1
+      });
+    },
+
+    *panoramaDelete({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error }
+      } = yield call(panoramaDeleteApi, payload);
+      if (callback) callback(success);
+      notification[success ? "success" : "error"]({
+        message: `删除${success ? "成功" : "失败"}${
+          success ? "" : `：${error.message}`
+        }`
       });
     }
   },

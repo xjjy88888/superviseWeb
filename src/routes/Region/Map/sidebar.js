@@ -176,9 +176,9 @@ export default class sider extends PureComponent {
             Modal.confirm({
               title: "关联图斑",
               content: "该图斑已关联项目，是否确定更改关联项目？",
-              okText: "是",
+              okText: "确定",
               okType: "danger",
-              cancelText: "否",
+              cancelText: "取消",
               onOk() {
                 self.spotRelate(v.spotId[0].spotId, v.projectId);
               },
@@ -2119,9 +2119,9 @@ export default class sider extends PureComponent {
                             title: "是否确定要删除这条项目数据？",
                             content:
                               " 删除项目信息、项目关联的红线、项目关联的责任追究；删除项目关联的扰动图斑里的关联项目ID。 ",
-                            okText: "是",
+                            okText: "确定",
                             okType: "danger",
-                            cancelText: "否",
+                            cancelText: "取消",
                             onOk() {
                               self.projectDelete(projectItem.id);
                             },
@@ -2188,9 +2188,9 @@ export default class sider extends PureComponent {
                               Modal.confirm({
                                 title: "删除检查表",
                                 content: "是否确定要删除这条检查表？",
-                                okText: "是",
+                                okText: "确定",
                                 okType: "danger",
-                                cancelText: "否",
+                                cancelText: "取消",
                                 onOk() {
                                   self.showSpin(true);
                                   dispatch({
@@ -2306,9 +2306,9 @@ export default class sider extends PureComponent {
                                   Modal.confirm({
                                     title: "删除问题点",
                                     content: "是否确定要删除这个问题点？",
-                                    okText: "是",
+                                    okText: "确定",
                                     okType: "danger",
-                                    cancelText: "否",
+                                    cancelText: "取消",
                                     onOk() {
                                       self.showSpin(true);
                                       dispatch({
@@ -2665,9 +2665,9 @@ export default class sider extends PureComponent {
                             Modal.confirm({
                               title: "删除",
                               content: "是否确定要删除这条项目红线数据？",
-                              okText: "是",
+                              okText: "确定",
                               okType: "danger",
-                              cancelText: "否",
+                              cancelText: "取消",
                               onOk() {
                                 dispatch({
                                   type: "redLine/redLineDelete",
@@ -2847,13 +2847,13 @@ export default class sider extends PureComponent {
                             e.stopPropagation();
                             Modal.confirm({
                               title: "删除",
-                              content: "是否确定要删除这条项目红线数据？",
-                              okText: "是",
+                              content: "是否确定要删除？",
+                              okText: "确定",
                               okType: "danger",
-                              cancelText: "否",
+                              cancelText: "取消",
                               onOk() {
                                 dispatch({
-                                  type: "redLine/redLineDelete",
+                                  type: "panorama/panoramaDelete",
                                   payload: {
                                     id: item.id
                                   },
@@ -2882,9 +2882,7 @@ export default class sider extends PureComponent {
                           onClick={e => {
                             e.stopPropagation();
                             emitter.emit("fullViewLocation", {
-                              type: item.generateType,
-                              fullviewURL: item.urlConfig,
-                              latLng: item.point
+                              ...item
                             });
                           }}
                         />
@@ -3404,9 +3402,9 @@ export default class sider extends PureComponent {
                           删除项目关联的扰动图斑里的关联项目ID。
                         </span>
                       ),
-                      okText: "是",
+                      okText: "确定",
                       okType: "danger",
-                      cancelText: "否",
+                      cancelText: "取消",
                       onOk() {
                         self.projectDelete(projectItem.id);
                       },

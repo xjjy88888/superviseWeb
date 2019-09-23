@@ -97,8 +97,8 @@ export default class integration extends PureComponent {
       addGraphLayer: null, //针对新建图形的图层
       showPhotoPreview: false,
       photoPreviewUrl: null,
-      imageTimeText:'',
-      showImageTimeText:true,
+      imageTimeText: "",
+      showImageTimeText: true
       //loading: true
     };
     this.map = null;
@@ -237,17 +237,15 @@ export default class integration extends PureComponent {
         message.warning("附件照片无可用位置信息", 1);
       }
     });
-    //全景定位
-    this.eventEmitter = emitter.addListener("fullViewLocation", data => {
-      console.log("fullViewLocation", data);
+    // 全景定位
+    this.eventEmitter = emitter.addListener("fullViewLocation", v => {
+      console.log("fullViewLocation", v);
       //标注点定位
-      //let latLng = [23.4437, 113.2368];
-      let latLng = data.latLng;
-      if (latLng) {
+      if (v.pointX && v.pointY) {
         if (marker) marker.remove();
-        map.setView(latLng, config.mapInitParams.zoom);
-        let fullviewURL = data.fullviewURL;
-        marker = L.marker(latLng)
+        map.setView([v.pointY, v.pointX], config.mapInitParams.zoom);
+        let fullviewURL = config.url.panoramaPreviewUrl + v.urlConfig;
+        marker = L.marker([v.pointY, v.pointX])
           .addTo(map)
           .on("click", function(e) {
             //console.log("marker", e);
@@ -1130,13 +1128,11 @@ export default class integration extends PureComponent {
   onBaseLayerChange = e => {
     userconfig.baseLayer = e.layer;
     //判断当前底图是否等于监管影像
-    if(e.layer._url === config.onlineBasemaps[0].url){
-      this.setState({ showImageTimeText: true });       
-    }
-    else{
+    if (e.layer._url === config.onlineBasemaps[0].url) {
+      this.setState({ showImageTimeText: true });
+    } else {
       this.setState({ showImageTimeText: false });
     }
-
   };
   getBasemapLayer = (baseLayer, onlineBasemapLayers) => {
     let layer = onlineBasemapLayers[0];
@@ -1222,31 +1218,34 @@ export default class integration extends PureComponent {
   };
 
   showImageInfos = e => {
-    const {mapdata:{imageTimeResult}} = this.props; 
+    const {
+      mapdata: { imageTimeResult }
+    } = this.props;
     const me = this;
     //根据地图当前范围获取对应监管影像时间
     const { showImageTimeText } = me.state;
     if (showImageTimeText && imageTimeResult) {
       let tileInfos = imageTimeResult.tileInfos;
-      if(tileInfos.length>0){
-        let pt = proj4("EPSG:4326", "EPSG:3857", [
-          e.latlng.lng,
-          e.latlng.lat
-        ]);
-        for (let i=0; i < tileInfos.length; i++) {
+      if (tileInfos.length > 0) {
+        let pt = proj4("EPSG:4326", "EPSG:3857", [e.latlng.lng, e.latlng.lat]);
+        for (let i = 0; i < tileInfos.length; i++) {
           let item = tileInfos[i];
-          if (pt[0] >= item.xmin && pt[0] <= item.xmax && pt[1] >= item.ymin && pt[1] <= item.ymax) {
+          if (
+            pt[0] >= item.xmin &&
+            pt[0] <= item.xmax &&
+            pt[1] >= item.ymin &&
+            pt[1] <= item.ymax
+          ) {
             let data = item.data;
             if (data && data.hasOwnProperty("takenDate")) {
-                me.setState({ imageTimeText: data.takenDate });
+              me.setState({ imageTimeText: data.takenDate });
             }
             return true;
-          }  
-
+          }
         }
       }
     }
-  }
+  };
 
   onMoveendMap = e => {
     const me = this;
@@ -1283,10 +1282,9 @@ export default class integration extends PureComponent {
     const { showImageTimeText } = me.state;
     if (showImageTimeText) {
       me.getInfoByExtent(zoom, bounds, data => {
-         me.setState({ imageTimeText: data[0] });  
+        me.setState({ imageTimeText: data[0] });
       });
     }
-
   };
   /*根据地图当前范围获取对应历史影像数据
    *@method getInfoByExtent
@@ -2076,7 +2074,7 @@ export default class integration extends PureComponent {
   showHistoryMap = () => {
     const { showHistoryContrast } = this.state;
     if (showHistoryContrast) {
-      this.setState({ showImageTimeText: true});  
+      this.setState({ showImageTimeText: true });
       let zoom = map.getZoom();
       let bounds = map.getBounds();
       //历史影像查询
@@ -2345,7 +2343,7 @@ export default class integration extends PureComponent {
       showPhotoPreview,
       photoPreviewUrl,
       imageTimeText,
-      showImageTimeText,
+      showImageTimeText
       //loading
     } = this.state;
     const {
@@ -2405,14 +2403,14 @@ export default class integration extends PureComponent {
               zIndex: 1000,
               background: "#fff"
             }}
-          > 
+          >
             <span
               style={{
                 padding: "0 10px"
               }}
             >
               监管影像时间:{imageTimeText}
-            </span>          
+            </span>
           </div>
           {/* 照片预览*/}
           <Modal
@@ -2699,7 +2697,6 @@ export default class integration extends PureComponent {
               ))}
             </Select>
           </div>
-
         </div>
       </Layouts>
     );

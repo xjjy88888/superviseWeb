@@ -1270,3 +1270,13 @@ export async function panoramaCreateUpdateApi(params) {
     }
   );
 }
+
+export async function panoramaDeleteApi(params) {
+  return request(`${config.url.panoramaDeleteUrl}?id=${params.id}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    }
+  });
+}

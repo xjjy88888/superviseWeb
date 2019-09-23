@@ -369,7 +369,11 @@ const config = {
 
     panoramaUploadUrl: `${domainApi}Pano/Generate`,
 
-    panoramaCreateUpdateUrl: `${domainApi}Pano/`
+    panoramaCreateUpdateUrl: `${domainApi}Pano/`,
+
+    panoramaDeleteUrl: `${domainApi}Pano/Delete`,
+
+    panoramaPreviewUrl: `${domain}pano/pannellum.htm?config=`
   },
 
   //工具箱
