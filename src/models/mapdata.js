@@ -66,7 +66,7 @@ export default {
         const day = date.getDate();
         // const hour = date.getHours();
         // const minute = date.getMinutes();
-        // const second = date.getSeconds();    
+        // const second = date.getSeconds();
         // return [year, month, day].map(formatNumber).join('-') + ' ' + [hour, minute, second].map(formatNumber).join(':');
         // return [year, month, day].map(formatNumber).join('/') + ' ' + [hour, minute, second].map(formatNumber).join(':');
         return [year, month, day].map(formatNumber).join('-') + '现状';

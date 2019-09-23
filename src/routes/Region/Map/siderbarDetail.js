@@ -55,8 +55,7 @@ export default class siderbarDetail extends PureComponent {
       showSpotHistory: false,
       spotHistoryId: "",
       panoramaUrlConfig: "",
-      showSpin: false,
-      item: {}
+      showSpin: false
     };
     this.map = null;
   }
@@ -133,7 +132,7 @@ export default class siderbarDetail extends PureComponent {
           edit: data.edit,
           isSpotUpdate: data.type === "edit",
           from: data.from, //spot  point
-          item: data.item,
+          item: data.item || {},
           type: data.type, //add  edit
           previewVisible_min: false
         });
