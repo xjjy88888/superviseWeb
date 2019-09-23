@@ -1706,7 +1706,7 @@ export default class siderbarDetail extends PureComponent {
                   <div>
                     <div className="ant-upload-text">
                       <Button type="div" icon="plus">
-                        上传文件
+                        上传全景图
                       </Button>
                     </div>
                   </div>

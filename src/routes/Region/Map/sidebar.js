@@ -1968,7 +1968,7 @@ export default class sider extends PureComponent {
                   paddingRight: 30
                 }}
               >
-                <Collapse bordered={false} defaultActiveKey={["7"]}>
+                <Collapse bordered={false} defaultActiveKey={["1"]}>
                   <Collapse.Panel header={<b>基本信息</b>} key="1">
                     <div
                       style={{
