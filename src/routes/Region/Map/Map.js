@@ -97,7 +97,7 @@ export default class integration extends PureComponent {
       addGraphLayer: null, //针对新建图形的图层
       showPhotoPreview: false,
       photoPreviewUrl: null,
-      imageTimeText:'2019-08-01',
+      imageTimeText:'',
       showImageTimeText:true,
       //loading: true
     };
@@ -1639,6 +1639,7 @@ export default class integration extends PureComponent {
       ]
     };
     userconfig.geojson = geojson;
+    //me.geojson2Multipolygon(userconfig.geojson,0);
     // L.Proj.GeoJSON继承于L.GeoJSON，可调样式
     map.createPane("geoJsonZIndex");
     map.getPane("geoJsonZIndex").style.zIndex = 1;
@@ -2066,6 +2067,7 @@ export default class integration extends PureComponent {
       }
     }
     polygon += "))";
+    //console.log('polygon',polygon);
     return polygon;
   };
   /*
