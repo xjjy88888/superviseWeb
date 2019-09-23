@@ -134,7 +134,7 @@ export default class sider extends PureComponent {
       fileList: [],
       projectFileList: [],
       showReply: false,
-      showPlan: false
+      showPlan: false,
     };
     this.map = null;
   }

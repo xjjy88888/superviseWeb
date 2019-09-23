@@ -55,7 +55,8 @@ export default class siderbarDetail extends PureComponent {
       showSpotHistory: false,
       spotHistoryId: "",
       panoramaUrlConfig: "",
-      showSpin: false
+      showSpin: false,
+      item: {}
     };
     this.map = null;
   }
@@ -98,7 +99,7 @@ export default class siderbarDetail extends PureComponent {
         projectId: data.projectId,
         isSpotUpdate: data.type === "edit",
         from: data.from, //spot  point
-        item: data.item,
+        item: data.item || {},
         type: data.type, //add  edit
         previewVisible_min: false,
         fromList: data.fromList,
@@ -515,6 +516,8 @@ export default class siderbarDetail extends PureComponent {
         </Upload>
       </div>
     );
+
+    console.log(item);
 
     return (
       <div
@@ -1651,6 +1654,9 @@ export default class siderbarDetail extends PureComponent {
                   });
                 }}
                 onError={(v, response) => {
+                  this.setState({
+                    showSpin: false
+                  });
                   notification["error"]({
                     message: `全景图上传失败：${response.error.message}`
                   });
