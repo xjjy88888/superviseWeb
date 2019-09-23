@@ -363,7 +363,10 @@ const config = {
     userProjectUrl: `${domainApi}Project/GetListByName`,
 
     // 所属单位
-    userCompanyUrl: `${domainApi}SocialDepartment/GetListByName`
+    userCompanyUrl: `${domainApi}SocialDepartment/GetListByName`,
+
+    // 全景图_列表
+    panoramaListUrl: `${domainApi}Pano/GetAllByPost`
   },
 
   //工具箱

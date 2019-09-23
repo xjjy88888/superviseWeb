@@ -1244,3 +1244,15 @@ export async function userCompanyApi(params) {
     }
   );
 }
+
+export async function panoramaListApi(params) {
+  delete params.items;
+  return request(config.url.panoramaListUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify(params)
+  });
+}

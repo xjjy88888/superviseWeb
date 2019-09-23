@@ -60,7 +60,8 @@ const formItemLayout = {
     redLine,
     district,
     inspect,
-    problemPoint
+    problemPoint,
+    panorama
   }) => ({
     project,
     spot,
@@ -71,7 +72,8 @@ const formItemLayout = {
     redLine,
     district,
     inspect,
-    problemPoint
+    problemPoint,
+    panorama
   })
 )
 @createForm()
@@ -348,6 +350,7 @@ export default class sider extends PureComponent {
     this.querySpotByProjectId(id);
     this.queryRedLineList(id);
     this.inspectList(id);
+    this.panoramaList(id);
   };
 
   componentWillUnmount() {
@@ -686,6 +689,16 @@ export default class sider extends PureComponent {
     });
   };
 
+  panoramaList = id => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "panorama/panoramaList",
+      payload: {
+        projectId: id
+      }
+    });
+  };
+
   switchMenu = e => {
     this.scrollDom.scrollTop = 0;
     emitter.emit("emptyPoint", {});
@@ -1008,7 +1021,8 @@ export default class sider extends PureComponent {
       spot: { spotList, projectInfoSpotList },
       point: { pointList },
       redLine: { redLineList },
-      inspect: { inspectList }
+      inspect: { inspectList },
+      panorama: { panoramaList }
     } = this.props;
 
     const {
@@ -1705,7 +1719,7 @@ export default class sider extends PureComponent {
                         this.setState({ previewVisible_min: false })
                       }
                     >
-                      <Collapse.Panel header="附件" key="1">
+                      <Collapse.Panel header="附件" key="8">
                         <Input.TextArea
                           autosize
                           placeholder="问题描述"
@@ -1954,8 +1968,8 @@ export default class sider extends PureComponent {
                   paddingRight: 30
                 }}
               >
-                <Collapse bordered={false} defaultActiveKey={["0", "8"]}>
-                  <Collapse.Panel header={<b>基本信息</b>} key="0">
+                <Collapse bordered={false} defaultActiveKey={["7"]}>
+                  <Collapse.Panel header={<b>基本信息</b>} key="1">
                     <div
                       style={{
                         // borderBottom: "solid 1px #dedede",
@@ -2142,7 +2156,7 @@ export default class sider extends PureComponent {
                         />
                       </b>
                     }
-                    key="8"
+                    key="2"
                   >
                     {/* 检查表 */}
                     {inspectList.map((item, index) => (
@@ -2375,7 +2389,7 @@ export default class sider extends PureComponent {
                         />
                       </b>
                     }
-                    key="1"
+                    key="3"
                   >
                     <p
                       style={{ cursor: "pointer" }}
@@ -2518,7 +2532,7 @@ export default class sider extends PureComponent {
                         />
                       </b>
                     }
-                    key="2"
+                    key="4"
                   >
                     {projectInfoSpotList.items.map((item, index) => (
                       <p
@@ -2619,7 +2633,7 @@ export default class sider extends PureComponent {
                         />
                       </b>
                     }
-                    key="3"
+                    key="5"
                   >
                     {redLineList.items.map((item, index) => (
                       <p
@@ -2779,7 +2793,7 @@ export default class sider extends PureComponent {
                   <Collapse.Panel
                     header={
                       <b>
-                        全景图：1
+                        全景图：{panoramaList.totalCount}
                         <Icon
                           type="plus"
                           style={{
@@ -2798,424 +2812,27 @@ export default class sider extends PureComponent {
                     }
                     key="7"
                   >
-                    <p>
-                      广州市花都区云梯山庄项目
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour21/tour.html",
-                            latLng: [23.51857172222222, 113.2668703330556]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      国泰河与大坑交界全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour1/tour.html",
-                            latLng: [23.4933452068, 112.998323056]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      国泰河白沙东全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour2/tour.html",
-                            latLng: [23.5035102643, 112.999668641]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      龙中村南面开发区全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour3/tour.html",
-                            latLng: [23.4993985556, 112.984331825]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      狗眠岭水库出口全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour4/tour.html",
-                            latLng: [23.5010838089, 112.978764362]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      卡房水库前道路施工全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour5/tour.html",
-                            latLng: [23.5050670266, 112.982190786]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      国泰河孖寮全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour6/tour.html",
-                            latLng: [23.517733059, 113.006304758]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      国泰河孖寮1全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour6-1/tour.html",
-                            latLng: [23.5145241, 113.00516188]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      269省道跨河桥-国泰河全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour8/tour.html",
-                            latLng: [23.5369602937, 112.984118664]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      疑似工业废水排水口-国泰河全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour9/tour.html",
-                            latLng: [23.5395919775, 112.986126929]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      乐排河-北环路跨河桥全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour10/tour.html",
-                            latLng: [23.5629129956, 112.96895416]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      大燕河河口-北江大堤全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour11/tour.html",
-                            latLng: [23.5734091125, 112.95797977]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      国泰河-广州清远交界全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour12/tour.html",
-                            latLng: [23.4660796005, 113.002747107]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      国泰河-广州清远交界1全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour13/tour.html",
-                            latLng: [23.4635695115, 112.998073688]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      国泰河-广州清远交界下500米全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour14/tour.html",
-                            latLng: [23.4646783403, 113.004541063]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      国泰河-老虎冲水库汇入口全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour15/tour.html",
-                            latLng: [23.4694896105, 113.001000425]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      九曲河三水分叉口全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour16/tour.html",
-                            latLng: [23.3653731913, 112.966654638]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      九曲河三水分叉口下游500米全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour17/tour.html",
-                            latLng: [23.3683562272, 112.970354052]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      九曲河门口坑交叉口全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour18/tour.html",
-                            latLng: [23.4051783863, 112.985520736]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      九曲河门口坑交叉口1全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour18-1/tour.html",
-                            latLng: [23.4021019, 112.98124543]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      九曲葛麻坑水库全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour19/tour.html",
-                            latLng: [23.4109176462, 113.005689048]
-                          });
-                        }}
-                      />
-                    </p>
-                    <p>
-                      九曲河与国泰河交汇口全景图
-                      <Icon
-                        type="environment"
-                        style={{
-                          float: "right",
-                          fontSize: 18,
-                          cursor: "point",
-                          color: "#1890ff"
-                        }}
-                        onClick={() => {
-                          emitter.emit("fullViewLocation", {
-                            //type:0,
-                            fullviewURL: "./fullview/vtour20/tour.html",
-                            latLng: [23.421915515, 113.021398249]
-                          });
-                        }}
-                      />
-                    </p>
+                    {panoramaList.items.map((item, index) => (
+                      <p>
+                        {item.name}
+                        <Icon
+                          type="environment"
+                          style={{
+                            float: "right",
+                            fontSize: 18,
+                            cursor: "point",
+                            color: "#1890ff"
+                          }}
+                          onClick={() => {
+                            emitter.emit("fullViewLocation", {
+                              type: item.generateType,
+                              fullviewURL: item.urlConfig,
+                              latLng: item.point
+                            });
+                          }}
+                        />
+                      </p>
+                    ))}
                   </Collapse.Panel>
                 </Collapse>
               </List>

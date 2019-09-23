@@ -7,7 +7,7 @@ const app = dva({});
 // 2. Plugins
 // app.use({});
 
-// 3. Model
+// 3. Model1
 app.model(require("./models/user").default);
 app.model(require("./models/mapdata").default);
 app.model(require("./models/project").default);
@@ -22,6 +22,7 @@ app.model(require("./models/inspect").default);
 app.model(require("./models/problemPoint").default);
 app.model(require("./models/role").default);
 app.model(require("./models/departs").default);
+app.model(require("./models/panorama").default);
 
 // 4. Router
 app.router(require("./router").default);
