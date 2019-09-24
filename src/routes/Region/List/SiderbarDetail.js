@@ -20,6 +20,7 @@ import locale from "antd/lib/date-picker/locale/zh_CN";
 import emitter from "../../../utils/event";
 import config from "../../../config";
 import { getFile, accessToken } from "../../../utils/util";
+import moment from "moment";
 import Spins from "../../../components/Spins";
 
 let self;
@@ -1592,6 +1593,11 @@ export default class siderbarDetail extends PureComponent {
                 {getFieldDecorator("name", {
                   initialValue: item.name
                 })(<Input disabled={!edit} />)}
+              </Form.Item>
+              <Form.Item label="拍摄日期" {...formItemLayout}>
+                {getFieldDecorator("filmingTime", {
+                  initialValue: item.filmingTime ? moment(item.filmingTime) : ""
+                })(<DatePicker disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="描述" {...formItemLayout}>
                 {getFieldDecorator("description", {
