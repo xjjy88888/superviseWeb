@@ -10,16 +10,16 @@ import {
   message
 } from "antd";
 import { Link } from "dva/router";
-import Sidebar from "./sidebar";
-import SidebarDetail from "./siderbarDetail";
-import Tool from "./tool";
-import Sparse from "./sparse";
-import Panorama from "./panorama";
-import Chart from "./chart";
-import Query from "./query";
-import Inspect from "./inspect";
-import ProblemPoint from "./problemPoint";
-import ProjectDetail from "./projectDetail";
+import Sidebar from "../List/Sidebar";
+import SidebarDetail from "../List/SiderbarDetail";
+import Tool from "../List/Tool";
+import Sparse from "./Sparse";
+import Panorama from "./Panorama";
+import Chart from "../List/Chart";
+import Query from "../List/Query";
+import Inspect from "../List/Inspect";
+import ProblemPoint from "../List/ProblemPoint";
+import ProjectDetail from "../List/ProjectDetail";
 import HistoryPlay from "./HistoryPlay";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -46,7 +46,7 @@ import jQuery from "jquery";
 import Layouts from "../../../components/Layouts";
 // import Spins from "../../../components/Spins";
 import "./index.less";
-import Contrast from "./contrast";
+import Contrast from "./Contrast";
 
 let userconfig = {};
 let map;
