@@ -518,8 +518,6 @@ export default class siderbarDetail extends PureComponent {
       </div>
     );
 
-    console.log(item);
-
     return (
       <div
         style={{

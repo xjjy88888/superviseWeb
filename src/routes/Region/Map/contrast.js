@@ -1,4 +1,3 @@
-/* eslint-disable no-loop-func */
 import React, { PureComponent } from "react";
 import { connect } from "dva";
 import { Select, Popover, Button, message } from "antd";
@@ -8,7 +7,10 @@ import proj4 from "proj4";
 import * as turf from "@turf/turf";
 import config from "../../../config";
 import jQuery from "jquery";
+import { Link } from "dva/router";
+import Layouts from "../../../components/Layouts";
 import emitter from "../../../utils/event";
+import { relativeTimeThreshold } from "moment";
 
 let userconfig = {};
 @connect(({ user, mapdata, project, spot }) => ({
@@ -28,28 +30,40 @@ export default class splitScreen extends PureComponent {
       selectSpotRightV: ""
     };
     this.map = null;
+    this.isload = false;
     this.saveRef = v => {
       this.refDom = v;
     };
   }
   componentDidMount() {
     const me = this;
-    //获取url参数
-    me.initUrlParams();
-    me.props.dispatch({
-      type: "mapdata/GetBoundAsync",
-      callback: boundary => {
-        userconfig.geojson = JSON.parse(boundary.result);
-        // 创建地图
-        me.createMap();
-      }
-    });
     this.eventEmitter = emitter.addListener("showContrast", v => {
       this.setState({ show: v.show });
+      if(!this.isload){
+        me.props.dispatch({
+          type: "mapdata/GetBoundAsync",
+          callback: boundary => {
+            userconfig.geojson = JSON.parse(boundary.result);
+            this.isload = true;
+            // 创建地图
+            me.createMap(v.center,v.zoom);
+            // setTimeout(() => {
+            //   userconfig.LMap.setView(v.center,v.zoom);
+            //   userconfig.RMap.setView(v.center,v.zoom);
+            // }, 500);   
+          }
+        });
+      }
+      else{
+        setTimeout(() => {
+          userconfig.LMap.setView(v.center,v.zoom);
+          userconfig.RMap.setView(v.center,v.zoom);
+        }, 500);        
+      }
     });
   }
   // 创建地图
-  createMap = () => {
+  createMap = (center,zoom) => {
     const me = this;
     delete L.Icon.Default.prototype._getIconUrl;
     L.Icon.Default.mergeOptions({
@@ -74,7 +88,7 @@ export default class splitScreen extends PureComponent {
       .zoom({ zoomInTitle: "放大", zoomOutTitle: "缩小", position: "topright" })
       .addTo(userconfig.RMap);
     //获取项目区域范围
-    me.getRegionGeometry();
+    me.getRegionGeometry(center,zoom);
   };
   /*
    *地图鼠标移动监听事件
@@ -182,7 +196,7 @@ export default class splitScreen extends PureComponent {
         }
         if (userconfig.map.getZoom() < config.mapInitParams.zoom) {
           userconfig.map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
-            maxZoom: 16
+            maxZoom: config.mapInitParams.zoom
           });
         }
         userconfig.map.openPopup(content, userconfig.mapPoint);
@@ -251,7 +265,7 @@ export default class splitScreen extends PureComponent {
   /*
    *获取项目区域范围
    */
-  getRegionGeometry = () => {
+  getRegionGeometry = (mapcenter,mapzoom) => {
     const me = this;
     //调用后台接口形式改造
     let geojson = {
@@ -317,6 +331,8 @@ export default class splitScreen extends PureComponent {
         userconfig.LMap.on("click", me.onClickMap);
         //监听地图点击事件
         userconfig.RMap.on("click", me.onClickMap);
+        userconfig.LMap.setView(mapcenter,mapzoom);
+        userconfig.RMap.setView(mapcenter,mapzoom);
         //根据地图当前范围获取对应历史影像数据
         let zoom = userconfig.LMap.getZoom();
         let bounds = userconfig.LMap.getBounds();
@@ -331,7 +347,8 @@ export default class splitScreen extends PureComponent {
     map.createPane("tileLayerZIndex");
     map.getPane("tileLayerZIndex").style.zIndex = 0;
     let layer = L.tileLayer(url, {
-      pane: "tileLayerZIndex"
+      pane: "tileLayerZIndex",
+      maxZoom: config.mapInitParams.maxZoom
     }).addTo(map); //影像图
     return layer;
   };
@@ -367,7 +384,8 @@ export default class splitScreen extends PureComponent {
       .wms(config.mapUrl.geoserverUrl + "/wms?", {
         layers: config.mapProjectLayerName, //需要加载的图层
         format: "image/png", //返回的数据格式
-        transparent: true
+        transparent: true,
+        maxZoom: config.mapInitParams.maxZoom
       })
       .addTo(map);
     //加载图斑图层wms
@@ -428,21 +446,6 @@ export default class splitScreen extends PureComponent {
       .css({
         cursor: "not-allowed"
       });
-  };
-  /*
-   * 获取url参数
-   */
-  initUrlParams = () => {
-    let userParams = JSON.parse(localStorage.getItem("user"));
-    if (!userParams) {
-      this.props.dispatch({
-        type: "user/loginOut"
-      });
-      return;
-    }
-    userconfig.dwdm = userParams.displayArea;
-    userconfig.userId = userParams.userId;
-    userconfig.userName = userParams.displayName;
   };
   /*根据地图当前范围获取对应历史影像数据
    *@method getInfoByExtent
@@ -600,7 +603,8 @@ export default class splitScreen extends PureComponent {
           {
             layers: config.mapSpotLayerName, //需要加载的图层
             format: "image/png", //返回的数据格式
-            transparent: true
+            transparent: true,
+            maxZoom: config.mapInitParams.maxZoom
           }
         );
       } else {
@@ -611,6 +615,7 @@ export default class splitScreen extends PureComponent {
             layers: config.mapHistorySpotLayerName, //需要加载的图层
             format: "image/png", //返回的数据格式
             transparent: true,
+            maxZoom: config.mapInitParams.maxZoom,
             cql_filter: "archive_time <= " + selectSpotLeftV
           }
         );
@@ -644,7 +649,8 @@ export default class splitScreen extends PureComponent {
           {
             layers: config.mapSpotLayerName, //需要加载的图层
             format: "image/png", //返回的数据格式
-            transparent: true
+            transparent: true,
+            maxZoom: config.mapInitParams.maxZoom
           }
         );
       } else {
@@ -655,6 +661,7 @@ export default class splitScreen extends PureComponent {
             layers: config.mapHistorySpotLayerName, //需要加载的图层
             format: "image/png", //返回的数据格式
             transparent: true,
+            maxZoom: config.mapInitParams.maxZoom,
             cql_filter: "archive_time <= " + selectSpotRightV
           }
         );

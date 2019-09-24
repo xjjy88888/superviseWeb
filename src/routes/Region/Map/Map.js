@@ -2528,7 +2528,10 @@ export default class integration extends PureComponent {
               <Button
                 icon="column-width"
                 onClick={() => {
-                  emitter.emit("showContrast", { show: true });
+                  const center = map.getCenter();
+                  const zoom = map.getZoom();
+                  //console.log(center,zoom);
+                  emitter.emit("showContrast", { show: true,center:center,zoom:zoom });
                 }}
               />
             </Popover>

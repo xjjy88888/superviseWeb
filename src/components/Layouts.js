@@ -24,10 +24,10 @@ const menuList = [
         title: "天地一体化",
         key: "/region/map"
       },
-      {
-        title: "地图分屏",
-        key: "/region/contrast"
-      }
+      // {
+      //   title: "地图分屏",
+      //   key: "/region/contrast"
+      // }
     ]
   },
   {

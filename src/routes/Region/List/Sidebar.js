@@ -1185,7 +1185,7 @@ export default class sider extends PureComponent {
         render: (v, item) => (
           <span>
             <p>
-              <b
+              <span
                 style={{ cursor: "pointer" }}
                 onClick={() => {
                   resetFields();
@@ -1218,12 +1218,17 @@ export default class sider extends PureComponent {
                   });
                 }}
               >
-                {key === "project"
-                  ? item.projectName
-                  : key === "spot"
-                  ? item.mapNum
-                  : item.createTime}
-              </b>
+                <b>
+                  {key === "project"
+                    ? item.projectName
+                    : key === "spot"
+                    ? item.mapNum
+                    : item.createTime}
+                </b>
+                <b style={{ marginLeft: 10 }}>
+                  {key === "point" ? item.name : ""}
+                </b>
+              </span>
               {/* 定位 */}
               <Icon
                 type="environment"
