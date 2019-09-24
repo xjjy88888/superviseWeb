@@ -5,7 +5,6 @@ import Home from "./routes/Home";
 import ProjectList from "./routes/Project/List";
 import ProjectMap from "./routes/Project/Map";
 import RegionMap from "./routes/Region/Map/Map";
-import Contrast from "./routes/Region/Contrast";
 import Review from "./routes/System/User/Review.js";
 import Society from "./routes/System/User/Society.js";
 import Admin from "./routes/System/User/Admin.js";
@@ -24,7 +23,6 @@ function RouterConfig({ history }) {
         <Route path="/login" exact component={Login} />
         <Route path="/index" exact component={Home} />
         <Route path="/region/map" exact component={RegionMap} />
-        <Route path="/region/contrast" exact component={Contrast} />
         <Route path="/project/list" exact component={ProjectList} />
         <Route path="/project/map" exact component={ProjectMap} />
         <Route path="/system" exact component={Review} />

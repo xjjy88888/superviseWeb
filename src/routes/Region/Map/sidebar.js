@@ -134,7 +134,7 @@ export default class sider extends PureComponent {
       fileList: [],
       projectFileList: [],
       showReply: false,
-      showPlan: false,
+      showPlan: false
     };
     this.map = null;
   }
@@ -694,7 +694,8 @@ export default class sider extends PureComponent {
     dispatch({
       type: "panorama/panoramaList",
       payload: {
-        projectId: id
+        projectId: id,
+        MaxResultCount: 1000
       }
     });
   };
@@ -2820,6 +2821,7 @@ export default class sider extends PureComponent {
                   >
                     {panoramaList.items.map((item, index) => (
                       <p
+                        key={index}
                         style={{ cursor: "pointer" }}
                         onClick={() => {
                           this.closeAll();
@@ -3310,54 +3312,63 @@ export default class sider extends PureComponent {
                         )
                       : [districtTree[0].value]
                   })(
-                    <TreeSelect
-                      style={{ width: "100%" }}
-                      dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
-                      treeData={districtTree}
-                      placeholder="Please select"
-                      treeDefaultExpandAll
-                      multiple
-                      filterTreeNode={(a, b) => {
-                        if (b.props.label.indexOf(a) > -1) {
-                          return true;
-                        }
-                      }}
-                    />
                     // <TreeSelect
-                    //   showSearch
                     //   style={{ width: "100%" }}
                     //   dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
-                    //   placeholder="请选择涉及县"
-                    //   allowClear
+                    //   treeData={districtTree}
+                    //   placeholder=""
+                    //   // treeDefaultExpandAll
                     //   multiple
-                    //   treeDefaultExpandAll
-                    // >
-                    //   {districtTree.map((item, index) => (
-                    //     <TreeSelect.TreeNode
-                    //       value={item.value}
-                    //       title={item.label}
-                    //       key={index}
-                    //       disabled={item.children ? true : false}
-                    //     >
-                    //       {(item.children || []).map((ite, idx) => (
-                    //         <TreeSelect.TreeNode
-                    //           value={ite.value}
-                    //           title={ite.label}
-                    //           key={idx}
-                    //           disabled={ite.children ? true : false}
-                    //         >
-                    //           {(ite.children || []).map((i, j) => (
-                    //             <TreeSelect.TreeNode
-                    //               value={i.value}
-                    //               title={i.label}
-                    //               key={j}
-                    //             />
-                    //           ))}
-                    //         </TreeSelect.TreeNode>
-                    //       ))}
-                    //     </TreeSelect.TreeNode>
-                    //   ))}
-                    // </TreeSelect>
+                    //   filterTreeNode={(a, b) => {
+                    //     if (b.props.label.indexOf(a) > -1) {
+                    //       return true;
+                    //     }
+                    //   }}
+                    // />
+                    <TreeSelect
+                      showSearch
+                      style={{ width: "100%" }}
+                      dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
+                      placeholder="请选择涉及县"
+                      allowClear
+                      multiple
+                      maxTagCount="5"
+                    >
+                      {districtTree.map((item, index) => (
+                        <TreeSelect.TreeNode
+                          value={item.value}
+                          title={item.label}
+                          key={item.value}
+                          disabled={item.children ? true : false}
+                        >
+                          {(item.children || []).map((ite, idx) => (
+                            <TreeSelect.TreeNode
+                              value={ite.value}
+                              title={ite.label}
+                              key={ite.value}
+                              disabled={ite.children ? true : false}
+                            >
+                              {(ite.children || []).map((it, id) => (
+                                <TreeSelect.TreeNode
+                                  value={it.value}
+                                  title={it.label}
+                                  key={it.value}
+                                  disabled={it.children ? true : false}
+                                >
+                                  {(it.children || []).map((i, j) => (
+                                    <TreeSelect.TreeNode
+                                      value={i.value}
+                                      title={i.label}
+                                      key={i.value}
+                                    />
+                                  ))}
+                                </TreeSelect.TreeNode>
+                              ))}
+                            </TreeSelect.TreeNode>
+                          ))}
+                        </TreeSelect.TreeNode>
+                      ))}
+                    </TreeSelect>
                   )}
                 </Form.Item>
                 <Form.Item label="备注" {...formItemLayout}>

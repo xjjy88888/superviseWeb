@@ -237,7 +237,7 @@ export default class area extends PureComponent {
             <Tree.DirectoryTree
               multiple
               onSelect={(keys, event) => {
-                console.log("Trigger Select", keys, event);
+                console.log(keys, event);
               }}
             >
               {districtTree.map(item => (
@@ -245,7 +245,23 @@ export default class area extends PureComponent {
                   {(item.children || []).map(ite => (
                     <Tree.TreeNode title={ite.label} key={ite.value}>
                       {(ite.children || []).map(it => (
-                        <Tree.TreeNode title={it.label} key={it.value} isLeaf />
+                        <Tree.TreeNode title={it.label} key={it.value}>
+                          {(it.children || []).map(i => (
+                            <Tree.TreeNode
+                              title={i.label}
+                              key={i.value}
+                              isLeaf={!i.children}
+                            >
+                              {(i.children || []).map(j => (
+                                <Tree.TreeNode
+                                  title={j.label}
+                                  key={j.value}
+                                  isLeaf
+                                />
+                              ))}
+                            </Tree.TreeNode>
+                          ))}
+                        </Tree.TreeNode>
                       ))}
                     </Tree.TreeNode>
                   ))}

@@ -9,6 +9,7 @@ import config from "../../../config";
 import jQuery from "jquery";
 import { Link } from "dva/router";
 import Layouts from "../../../components/Layouts";
+import emitter from "../../../utils/event";
 
 let userconfig = {};
 @connect(({ user, mapdata, project, spot }) => ({
@@ -21,6 +22,7 @@ export default class splitScreen extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
+      show: false,
       selectLeftV: "",
       selectRightV: "",
       selectSpotLeftV: "",
@@ -42,6 +44,9 @@ export default class splitScreen extends PureComponent {
         // 创建地图
         me.createMap();
       }
+    });
+    this.eventEmitter = emitter.addListener("showContrast", v => {
+      this.setState({ show: v.show });
     });
   }
   // 创建地图
@@ -707,170 +712,173 @@ export default class splitScreen extends PureComponent {
 
   render() {
     const {
+      mapdata: { histories, historiesSpot }
+    } = this.props;
+
+    const {
+      show,
       selectLeftV,
       selectRightV,
       selectSpotLeftV,
       selectSpotRightV
     } = this.state;
-    const {
-      mapdata: { histories, historiesSpot }
-    } = this.props;
+
     return (
-      <Layouts>
+      <div
+        style={{
+          display: show ? "flex" : "none",
+          position: "absolute",
+          top: 0,
+          paddingTop: 46,
+          height: "100vh",
+          width: "100vw",
+          zIndex: 2000
+        }}
+      >
         <div
-          style={{
-            display: "flex",
-            position: "absolute",
-            top: 0,
-            paddingTop: 46,
-            height: "100vh",
-            width: "100vw"
+          style={{ flex: 1, border: "1px solid #cccccc" }}
+          id="LMap"
+          onClick={e => {
+            e.stopPropagation();
+            console.log(e, 742);
           }}
         >
+          {/*历史影像图切换*/}
           <div
-            style={{ flex: 1, border: "1px solid #cccccc" }}
-            id="LMap"
-            onClick={e => {
-              e.stopPropagation();
-              console.log(e, 742);
+            // onClick={e => {
+            //   console.log("e",e);
+            //   e.stopPropagation();
+            // }}
+            style={{
+              position: "absolute",
+              top: 10,
+              right: 10,
+              zIndex: 1000,
+              // pointerEvents:"none",
+              background: "#fff"
             }}
           >
-            {/*历史影像图切换*/}
-            <div
-              // onClick={e => {
-              //   console.log("e",e);
-              //   e.stopPropagation();
-              // }}
+            {/* 左侧历史影像切换 */}
+            <span
               style={{
-                position: "absolute",
-                top: 10,
-                right: 10,
-                zIndex: 1000,
-                // pointerEvents:"none",
-                background: "#fff"
+                padding: "0 10px"
               }}
             >
-              {/* 左侧历史影像切换 */}
-              <span
-                style={{
-                  padding: "0 10px"
-                }}
-              >
-                影像:
-              </span>
-              <Select
-                value={[selectLeftV]}
-                placeholder="请选择"
-                onChange={this.onChangeSelectLeft}
-                style={{
-                  width: 150
-                }}
-              >
-                {histories.map((item, id) => (
-                  <Select.Option key={id} value={item}>
-                    {item}
-                  </Select.Option>
-                ))}
-              </Select>
-              {/* 左侧扰动图斑切换 */}
-              <span
-                style={{
-                  marginLeft: 10,
-                  padding: "0 10px"
-                }}
-              >
-                图斑:
-              </span>
-              <Select
-                value={[selectSpotLeftV]}
-                placeholder="请选择"
-                onChange={this.onChangeSelectSpotLeft}
-                style={{
-                  width: 150
-                }}
-              >
-                {historiesSpot.map((item, id) => (
-                  <Select.Option key={id} value={item.value}>
-                    {item.id}
-                  </Select.Option>
-                ))}
-              </Select>
-            </div>
-          </div>
-          <div style={{ flex: 1, border: "1px solid #cccccc" }} id="RMap">
-            <div
+              影像:
+            </span>
+            <Select
+              value={[selectLeftV]}
+              placeholder="请选择"
+              onChange={this.onChangeSelectLeft}
               style={{
-                position: "absolute",
-                top: 10,
-                left: 10,
-                zIndex: 1000,
-                background: "#fff"
+                width: 150
               }}
             >
-              {/* 右侧历史影像切换 */}
-              <span
-                style={{
-                  padding: "0 10px"
-                }}
-              >
-                影像:
-              </span>
-              <Select
-                value={[selectRightV]}
-                placeholder="请选择"
-                onChange={this.onChangeSelectRight}
-                style={{
-                  width: 150
-                }}
-              >
-                {histories.map((item, id) => (
-                  <Select.Option key={id} value={item}>
-                    {item}
-                  </Select.Option>
-                ))}
-              </Select>
-              {/*右侧扰动图斑切换 */}
-              <span
-                style={{
-                  marginLeft: 10,
-                  padding: "0 10px"
-                }}
-              >
-                图斑:
-              </span>
-              <Select
-                value={[selectSpotRightV]}
-                placeholder="请选择"
-                onChange={this.onChangeSelectSpotRight}
-                style={{
-                  width: 150
-                }}
-              >
-                {historiesSpot.map((item, id) => (
-                  <Select.Option key={id} value={item.value}>
-                    {item.id}
-                  </Select.Option>
-                ))}
-              </Select>
-            </div>
+              {histories.map((item, id) => (
+                <Select.Option key={id} value={item}>
+                  {item}
+                </Select.Option>
+              ))}
+            </Select>
+            {/* 左侧扰动图斑切换 */}
+            <span
+              style={{
+                marginLeft: 10,
+                padding: "0 10px"
+              }}
+            >
+              图斑:
+            </span>
+            <Select
+              value={[selectSpotLeftV]}
+              placeholder="请选择"
+              onChange={this.onChangeSelectSpotLeft}
+              style={{
+                width: 150
+              }}
+            >
+              {historiesSpot.map((item, id) => (
+                <Select.Option key={id} value={item.value}>
+                  {item.id}
+                </Select.Option>
+              ))}
+            </Select>
           </div>
+        </div>
+        <div style={{ flex: 1, border: "1px solid #cccccc" }} id="RMap">
           <div
             style={{
               position: "absolute",
-              bottom: 20,
-              right: 20,
+              top: 10,
+              left: 10,
               zIndex: 1000,
               background: "#fff"
             }}
           >
-            <Link to="/region/map">
-              <Popover content="天地一体化" title="" trigger="hover">
-                <Button icon="rollback" />
-              </Popover>
-            </Link>
+            {/* 右侧历史影像切换 */}
+            <span
+              style={{
+                padding: "0 10px"
+              }}
+            >
+              影像:
+            </span>
+            <Select
+              value={[selectRightV]}
+              placeholder="请选择"
+              onChange={this.onChangeSelectRight}
+              style={{
+                width: 150
+              }}
+            >
+              {histories.map((item, id) => (
+                <Select.Option key={id} value={item}>
+                  {item}
+                </Select.Option>
+              ))}
+            </Select>
+            {/*右侧扰动图斑切换 */}
+            <span
+              style={{
+                marginLeft: 10,
+                padding: "0 10px"
+              }}
+            >
+              图斑:
+            </span>
+            <Select
+              value={[selectSpotRightV]}
+              placeholder="请选择"
+              onChange={this.onChangeSelectSpotRight}
+              style={{
+                width: 150
+              }}
+            >
+              {historiesSpot.map((item, id) => (
+                <Select.Option key={id} value={item.value}>
+                  {item.id}
+                </Select.Option>
+              ))}
+            </Select>
           </div>
         </div>
-      </Layouts>
+        <div
+          style={{
+            position: "absolute",
+            bottom: 20,
+            right: 20,
+            zIndex: 1000,
+            background: "#fff"
+          }}
+        >
+          <Popover content="天地一体化" title="" trigger="hover">
+            <Button
+              icon="rollback"
+              onClick={() => this.setState({ show: false })}
+            />
+          </Popover>
+        </div>
+      </div>
     );
   }
 }

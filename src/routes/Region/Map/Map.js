@@ -46,6 +46,7 @@ import jQuery from "jquery";
 import Layouts from "../../../components/Layouts";
 // import Spins from "../../../components/Spins";
 import "./index.less";
+import Contrast from "./contrast";
 
 let userconfig = {};
 let map;
@@ -240,10 +241,21 @@ export default class integration extends PureComponent {
     // 全景定位
     this.eventEmitter = emitter.addListener("fullViewLocation", v => {
       console.log("fullViewLocation", v);
-      //标注点定位
+      //全景定位
       if (v.pointX && v.pointY) {
         if (marker) marker.remove();
-        map.setView([v.pointY, v.pointX], config.mapInitParams.zoom);
+
+        let latLng = [v.pointY, v.pointX];
+        if (map.getZoom() >= config.mapInitParams.zoom) {
+          if (latLng) me.automaticToMap(latLng);
+        }
+        else {
+          map.setZoom(config.mapInitParams.zoom);
+          setTimeout(() => {
+            if (latLng) me.automaticToMap(latLng);
+          }, 500);
+        }
+
         let fullviewURL = config.url.panoramaPreviewUrl + v.urlConfig;
         marker = L.marker([v.pointY, v.pointX])
           .addTo(map)
@@ -281,7 +293,6 @@ export default class integration extends PureComponent {
               };
               let latLng = [point.y, point.x];
               if (marker) marker.remove();
-              marker = L.marker(latLng).addTo(map);
               switch (response.result.type) {
                 case "ProjectScope": //项目红线
                   me.queryWFSServiceByProperty(
@@ -300,17 +311,20 @@ export default class integration extends PureComponent {
                   );
                   break;
                 case "ProjectPoint": //项目点
-                  const turfpoint = turf.point([latLng.lng, latLng.lat]);
-                  if (
-                    !turf.booleanPointInPolygon(turfpoint, userconfig.polygon)
-                  ) {
+                  let turfpoint = turf.point([latLng[1], latLng[0]]);
+                  if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {
                     message.warning("项目点位置超出区域范围之外", 1);
                     return;
                   }
-                  map.setZoom(config.mapInitParams.zoom);
-                  setTimeout(() => {
+                  marker = L.marker(latLng).addTo(map);
+                  if (map.getZoom() >= config.mapInitParams.zoom) {
                     if (latLng) me.automaticToMap(latLng);
-                  }, 500);
+                  } else {
+                    map.setZoom(config.mapInitParams.zoom);
+                    setTimeout(() => {
+                      if (latLng) me.automaticToMap(latLng);
+                    }, 500);
+                  }
                   break;
                 default:
               }
@@ -773,17 +787,10 @@ export default class integration extends PureComponent {
       data = data.result;
       if (data.features.length > 0) {
         me.clearGeojsonLayer();
-        // let style = {
-        //   color: "#33CCFF", //#33CCFF #e60000
-        //   weight: 3,
-        //   opacity: 1,
-        //   fillColor: "#e6d933", //#33CCFF #e6d933
-        //   fillOpacity: 0.1
-        // };
         me.loadGeojsonLayer(data, geoJsonStyle);
         if (map.getZoom() < config.mapInitParams.zoom) {
           map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
-            maxZoom: 16
+            maxZoom: config.mapInitParams.zoom
           });
         }
         let content = "";
@@ -836,7 +843,7 @@ export default class integration extends PureComponent {
         me.loadGeojsonLayer(data, geoJsonStyle);
         if (map.getZoom() < config.mapInitParams.zoom) {
           map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
-            maxZoom: 16
+            maxZoom: config.mapInitParams.zoom
           });
         } else {
           let latLng = userconfig.projectgeojsonLayer.getBounds().getCenter();
@@ -889,7 +896,7 @@ export default class integration extends PureComponent {
         }
         if (map.getZoom() < config.mapInitParams.zoom) {
           map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
-            maxZoom: 16
+            maxZoom: config.mapInitParams.zoom
           });
         }
         map.openPopup(content, userconfig.mapPoint);
@@ -1057,30 +1064,6 @@ export default class integration extends PureComponent {
 
     map.createPane("tileLayerZIndex");
     map.getPane("tileLayerZIndex").style.zIndex = 0;
-    /*const baseLayer1 = (userconfig.baseLayer1 = L.tileLayer(
-      config.baseMaps[0].Url,
-      {
-        pane: "tileLayerZIndex"
-      }
-    )); //街道图
-    const baseLayer2 = (userconfig.baseLayer2 = L.tileLayer(
-      config.baseMaps[1].Url,
-      {
-        pane: "tileLayerZIndex"
-      }
-    )); //影像图
-    const baseLayer3 = (userconfig.baseLayer3 = L.tileLayer(
-      config.baseMaps[2].Url,
-      {
-        pane: "tileLayerZIndex"
-      }
-    )); //监管影像
-    map.addLayer(baseLayer2);
-    userconfig.baseLayers = {
-      监管影像: baseLayer3,
-      街道图: baseLayer1,
-      影像图: baseLayer2
-    };*/
     const { onlineBasemaps } = config;
     // 在线底图
     this.onlineBasemapLayers = onlineBasemaps.map(item => {
@@ -1252,7 +1235,7 @@ export default class integration extends PureComponent {
     const { chartStatus } = this.state;
     let zoom = map.getZoom();
     let bounds = map.getBounds();
-    // console.log("地图最小级别903",map.getMinZoom());
+    //console.log("zoom",zoom);
     if (zoom >= config.mapInitParams.zoom && chartStatus) {
       let polygon = "polygon((";
       polygon +=
@@ -1756,7 +1739,8 @@ export default class integration extends PureComponent {
         {
           layers: config.mapProjectLayerName, //需要加载的图层
           format: "image/png", //返回的数据格式
-          transparent: true
+          transparent: true,
+          maxZoom:config.mapInitParams.maxZoom
         }
       ).addTo(map);
 
@@ -1766,7 +1750,8 @@ export default class integration extends PureComponent {
         {
           layers: config.mapSpotLayerName, //需要加载的图层
           format: "image/png", //返回的数据格式
-          transparent: true
+          transparent: true,
+          maxZoom:config.mapInitParams.maxZoom
           // cql_filter: "map_num == 201808_450521_0515"
         }
       ).addTo(map);
@@ -1777,7 +1762,8 @@ export default class integration extends PureComponent {
         .wms(config.mapUrl.geoserverUrl + "/wms?", {
           layers: config.mapProjectLayerName, //需要加载的图层
           format: "image/png", //返回的数据格式
-          transparent: true
+          transparent: true,
+          maxZoom:config.mapInitParams.maxZoom
         })
         .addTo(map);
 
@@ -1786,7 +1772,8 @@ export default class integration extends PureComponent {
         .wms(config.mapUrl.geoserverUrl + "/wms?", {
           layers: config.mapSpotLayerName, //需要加载的图层
           format: "image/png", //返回的数据格式
-          transparent: true
+          transparent: true,
+          maxZoom:config.mapInitParams.maxZoom
           // cql_filter: "is_deleted == false"
         })
         .addTo(map);
@@ -2271,14 +2258,14 @@ export default class integration extends PureComponent {
         "/" +
         selectLeftV.replace(/\//g, "-") +
         "/tile/{z}/{y}/{x}";
-      leftImgLayer = L.tileLayer(leftLayerUrl); //左侧影像
+      leftImgLayer = L.tileLayer(leftLayerUrl,{maxZoom:config.mapInitParams.maxZoom}); //左侧影像
       map.addLayer(leftImgLayer);
       let rightLayerUrl =
         config.imageBaseUrl +
         "/" +
         selectRightV.replace(/\//g, "-") +
         "/tile/{z}/{y}/{x}";
-      rightImgLayer = L.tileLayer(rightLayerUrl); //右侧影像
+      rightImgLayer = L.tileLayer(rightLayerUrl,{maxZoom:config.mapInitParams.maxZoom}); //右侧影像
       map.addLayer(rightImgLayer);
     }
     //加载历史扰动图斑
@@ -2288,7 +2275,8 @@ export default class integration extends PureComponent {
         spotleftwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
           layers: config.mapSpotLayerName, //需要加载的图层
           format: "image/png", //返回的数据格式
-          transparent: true
+          transparent: true,
+          maxZoom:config.mapInitParams.maxZoom
         });
       } else {
         //历史扰动图斑
@@ -2296,6 +2284,7 @@ export default class integration extends PureComponent {
           layers: config.mapHistorySpotLayerName, //需要加载的图层
           format: "image/png", //返回的数据格式
           transparent: true,
+          maxZoom:config.mapInitParams.maxZoom,
           cql_filter: "archive_time <= " + selectSpotLeftV
         });
       }
@@ -2304,7 +2293,8 @@ export default class integration extends PureComponent {
         spotrightwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
           layers: config.mapSpotLayerName, //需要加载的图层
           format: "image/png", //返回的数据格式
-          transparent: true
+          transparent: true,
+          maxZoom:config.mapInitParams.maxZoom
         });
       } else {
         //历史扰动图斑
@@ -2312,6 +2302,7 @@ export default class integration extends PureComponent {
           layers: config.mapHistorySpotLayerName, //需要加载的图层
           format: "image/png", //返回的数据格式
           transparent: true,
+          maxZoom:config.mapInitParams.maxZoom,
           cql_filter: "archive_time <= " + selectSpotRightV
         });
       }
@@ -2363,6 +2354,7 @@ export default class integration extends PureComponent {
         <Inspect />
         <ProblemPoint />
         <HistoryPlay />
+        <Contrast />
         <div
           ref={this.saveRef}
           style={{
@@ -2527,11 +2519,14 @@ export default class integration extends PureComponent {
               background: "#fff"
             }}
           >
-            <Link to="/region/contrast">
-              <Popover content="地图分屏" title="" trigger="hover">
-                <Button icon="column-width" />
-              </Popover>
-            </Link>
+            <Popover content="地图分屏" title="" trigger="hover">
+              <Button
+                icon="column-width"
+                onClick={() => {
+                  emitter.emit("showContrast", { show: true });
+                }}
+              />
+            </Popover>
             <br />
             <Popover content="历史对比" title="" trigger="hover">
               <Button

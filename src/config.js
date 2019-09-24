@@ -600,7 +600,8 @@ const config = {
   /*----------------------------------地图配置部分-------------------------------------*/
   mapInitParams: {
     center: [23.1441, 113.3693],
-    zoom: 15
+    zoom: 14,
+    maxZoom:21
   },
   // baseMaps: [
   //   {
@@ -626,7 +627,7 @@ const config = {
       title: "监管影像图",
       url: myOnlineImageUrl,
       minZoom: 0,
-      maxZoom: 20,
+      maxZoom: 21,
       subdomains: "abc",
       picUrl: `./img/myOnlineImage.png`
     },
@@ -634,7 +635,7 @@ const config = {
       title: "OSM街道图",
       url: OSMVectorUrl,
       minZoom: 0,
-      maxZoom: 18,
+      maxZoom: 21,
       subdomains: "abc",
       picUrl: `./img/OSMVector.png`
     },
@@ -642,7 +643,7 @@ const config = {
       title: "ArcGIS影像图",
       url: arcgisImageUrl,
       minZoom: 0,
-      maxZoom: 18,
+      maxZoom: 21,
       subdomains: "abc",
       picUrl: `./img/arcgisImage.png`
     },
@@ -650,7 +651,7 @@ const config = {
       title: "ArcGIS街道图(有偏移)",
       url: arcgisVectorUrl,
       minZoom: 0,
-      maxZoom: 18,
+      maxZoom: 21,
       subdomains: "abc",
       picUrl: `./img/arcgisVector.png`
     },
@@ -658,7 +659,7 @@ const config = {
       title: "天地影像图",
       url: tdtImageUrl,
       minZoom: 0,
-      maxZoom: 18,
+      maxZoom: 21,
       subdomains: ["0", "1", "2", "3", "4", "5", "6", "7"],
       picUrl: `./img/tdtImage.png`
     },
@@ -666,7 +667,7 @@ const config = {
       title: "天地街道图",
       url: tdtVectorUrl,
       minZoom: 0,
-      maxZoom: 18,
+      maxZoom: 21,
       subdomains: ["0", "1", "2", "3", "4", "5", "6", "7"],
       picUrl: `./img/tdtVector.png`
     },
@@ -674,7 +675,7 @@ const config = {
       title: "谷歌影像图(有偏移)",
       url: googleImageUrl,
       minZoom: 0,
-      maxZoom: 18,
+      maxZoom: 21,
       subdomains: "abc",
       picUrl: `./img/googleImage.png`
     },
@@ -682,7 +683,7 @@ const config = {
       title: "谷歌街道图(有偏移)",
       url: googleVectorUrl,
       minZoom: 0,
-      maxZoom: 18,
+      maxZoom: 21,
       subdomains: "abc",
       picUrl: `./img/googleVector.png`
     },
@@ -690,7 +691,7 @@ const config = {
       title: "高德影像图(有偏移)",
       url: gaodeImageUrl,
       minZoom: 0,
-      maxZoom: 18,
+      maxZoom: 21,
       subdomains: ["1", "2", "3", "4"],
       picUrl: `./img/gaodeImage.png`
     },
@@ -698,7 +699,7 @@ const config = {
       title: "高德街道图(有偏移)",
       url: gaodeVectorUrl,
       minZoom: 0,
-      maxZoom: 18,
+      maxZoom: 21,
       subdomains: ["1", "2", "3", "4"],
       picUrl: `./img/gaodeVector.png`
     }
@@ -706,13 +707,13 @@ const config = {
     //   title: '百度街道图',
     //   url: bdVectorUrl,
     //   minZoom: 0,
-    //   maxZoom: 18,
+    //   maxZoom: 21,
     // },
     // {
     //   title: '百度影像图',
     //   url: bdImageUrl,
     //   minZoom: 0,
-    //   maxZoom: 18,
+    //   maxZoom: 21,
     // },
   ],
   mapUrl: {
