@@ -7,7 +7,7 @@ import zh_CN from "antd/lib/locale-provider/zh_CN";
 export default class register extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = { show: false,hisPlayURL:''  };
+    this.state = { show: false, hisPlayURL: "" };
   }
 
   componentDidMount() {
@@ -15,13 +15,13 @@ export default class register extends PureComponent {
     this.eventEmitter = emitter.addListener("showHistoryPlay", v => {
       this.setState({
         show: v.show,
-        hisPlayURL:v.hisPlayURL
+        hisPlayURL: v.hisPlayURL
       });
     });
   }
 
   render() {
-    const { show,hisPlayURL  } = this.state;
+    const { show, hisPlayURL } = this.state;
 
     return (
       <LocaleProvider locale={zh_CN}>
@@ -66,7 +66,7 @@ export default class register extends PureComponent {
               height="100%"
               width="100%"
               // src="./timelinejs/spaceTimeSpot.html"
-              src= {hisPlayURL}
+              src={hisPlayURL}
             />
           </Layout>
         </Layout>

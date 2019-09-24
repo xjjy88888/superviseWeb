@@ -7,7 +7,7 @@ import "echarts";
 export default class siderbarDetail extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = { show: false,fullviewURL:'' };
+    this.state = { show: false, fullviewURL: "" };
     this.charRef = ref => {
       this.chartDom = ref;
     };
@@ -17,13 +17,13 @@ export default class siderbarDetail extends PureComponent {
     this.eventEmitter = emitter.addListener("showPanorama", data => {
       this.setState({
         show: data.show,
-        fullviewURL:data.fullviewURL
+        fullviewURL: data.fullviewURL
       });
     });
   }
 
   render() {
-    const { show,fullviewURL } = this.state;
+    const { show, fullviewURL } = this.state;
     return (
       <div
         style={{
@@ -66,7 +66,7 @@ export default class siderbarDetail extends PureComponent {
             height="595px"
             width="1200px"
             // src="./vtour/tour.html"
-            src= {fullviewURL}
+            src={fullviewURL}
           />
         </div>
       </div>

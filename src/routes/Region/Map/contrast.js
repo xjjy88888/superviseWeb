@@ -1,3 +1,4 @@
+/* eslint-disable no-loop-func */
 import React, { PureComponent } from "react";
 import { connect } from "dva";
 import { Select, Popover, Button, message } from "antd";
@@ -7,10 +8,7 @@ import proj4 from "proj4";
 import * as turf from "@turf/turf";
 import config from "../../../config";
 import jQuery from "jquery";
-import { Link } from "dva/router";
-import Layouts from "../../../components/Layouts";
 import emitter from "../../../utils/event";
-import { relativeTimeThreshold } from "moment";
 
 let userconfig = {};
 @connect(({ user, mapdata, project, spot }) => ({

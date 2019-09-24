@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import React, { PureComponent } from "react";
 import { connect } from "dva";
 import { createForm } from "rc-form";
@@ -140,7 +141,6 @@ export default class sider extends PureComponent {
   }
 
   componentDidMount() {
-    const { key } = this.state;
     self = this;
 
     // console.log("贵阳至黄平高速公路", "六枝特区平寨镇跃进砂石厂");

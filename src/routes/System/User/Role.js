@@ -1,10 +1,9 @@
 import React, { PureComponent } from "react";
-import { Icon, Input, Button, Table, message, Modal, notification } from "antd";
+import { Icon, Input, Button, Table, message, Modal } from "antd";
 import { createForm } from "rc-form";
 import { connect } from "dva";
 import Systems from "../../../components/Systems";
 import emitter from "../../../utils/event";
-import Highlighter from "react-highlight-words";
 
 let self;
 
@@ -190,8 +189,6 @@ export default class role extends PureComponent {
   };
 
   render() {
-    const { dispatch } = this.props;
-
     const { selectedRows, dataSource, pagination, loading } = this.state;
 
     console.log(dataSource);

@@ -5,7 +5,6 @@ import "leaflet/dist/leaflet.css";
 import echarts from "echarts/lib/echarts";
 import "echarts";
 import { connect } from "dva";
-import config from "../../../config";
 
 let myChart;
 

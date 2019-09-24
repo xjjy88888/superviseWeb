@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import React, { PureComponent } from "react";
 import { createForm } from "rc-form";
 import { connect } from "dva";

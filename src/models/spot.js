@@ -148,7 +148,7 @@ export default {
       const {
         data: { success, error, result: projectInfoSpotList }
       } = yield call(spotListApi, payload);
-      if (callback) callback(success,projectInfoSpotList);
+      if (callback) callback(success, projectInfoSpotList);
       if (success) {
         yield put({ type: "save", payload: { projectInfoSpotList } });
       } else {
@@ -163,7 +163,7 @@ export default {
       const {
         data: { success, result }
       } = yield call(spotPolygonByIdApi, payload.ProjectId);
-      if (callback) callback(success,result);
+      if (callback) callback(success, result);
     },
 
     // 项目下拉列表

@@ -4,8 +4,6 @@ import { createForm } from "rc-form";
 import { connect } from "dva";
 import Systems from "../../../components/Systems";
 import emitter from "../../../utils/event";
-import Highlighter from "react-highlight-words";
-import Spins from "../../../components/Spins";
 
 let self;
 

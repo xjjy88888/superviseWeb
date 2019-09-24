@@ -3,7 +3,6 @@ import { Button, Avatar, Layout } from "antd";
 
 const { Footer, Content } = Layout;
 
-//完成
 export default class finish extends PureComponent {
   render() {
     const { show, data } = this.props;

@@ -1,3 +1,4 @@
+/* eslint-disable no-loop-func */
 import React, { PureComponent } from "react";
 import { connect } from "dva";
 import {
@@ -9,7 +10,6 @@ import {
   notification,
   message
 } from "antd";
-import { Link } from "dva/router";
 import Sidebar from "../List/Sidebar";
 import SidebarDetail from "../List/SiderbarDetail";
 import Tool from "../List/Tool";
@@ -248,8 +248,7 @@ export default class integration extends PureComponent {
         let latLng = [v.pointY, v.pointX];
         if (map.getZoom() >= config.mapInitParams.zoom) {
           if (latLng) me.automaticToMap(latLng);
-        }
-        else {
+        } else {
           map.setZoom(config.mapInitParams.zoom);
           setTimeout(() => {
             if (latLng) me.automaticToMap(latLng);
@@ -312,7 +311,9 @@ export default class integration extends PureComponent {
                   break;
                 case "ProjectPoint": //项目点
                   let turfpoint = turf.point([latLng[1], latLng[0]]);
-                  if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {
+                  if (
+                    !turf.booleanPointInPolygon(turfpoint, userconfig.polygon)
+                  ) {
                     message.warning("项目点位置超出区域范围之外", 1);
                     return;
                   }
@@ -1740,7 +1741,7 @@ export default class integration extends PureComponent {
           layers: config.mapProjectLayerName, //需要加载的图层
           format: "image/png", //返回的数据格式
           transparent: true,
-          maxZoom:config.mapInitParams.maxZoom
+          maxZoom: config.mapInitParams.maxZoom
         }
       ).addTo(map);
 
@@ -1751,7 +1752,7 @@ export default class integration extends PureComponent {
           layers: config.mapSpotLayerName, //需要加载的图层
           format: "image/png", //返回的数据格式
           transparent: true,
-          maxZoom:config.mapInitParams.maxZoom
+          maxZoom: config.mapInitParams.maxZoom
           // cql_filter: "map_num == 201808_450521_0515"
         }
       ).addTo(map);
@@ -1763,7 +1764,7 @@ export default class integration extends PureComponent {
           layers: config.mapProjectLayerName, //需要加载的图层
           format: "image/png", //返回的数据格式
           transparent: true,
-          maxZoom:config.mapInitParams.maxZoom
+          maxZoom: config.mapInitParams.maxZoom
         })
         .addTo(map);
 
@@ -1773,7 +1774,7 @@ export default class integration extends PureComponent {
           layers: config.mapSpotLayerName, //需要加载的图层
           format: "image/png", //返回的数据格式
           transparent: true,
-          maxZoom:config.mapInitParams.maxZoom
+          maxZoom: config.mapInitParams.maxZoom
           // cql_filter: "is_deleted == false"
         })
         .addTo(map);
@@ -2258,14 +2259,18 @@ export default class integration extends PureComponent {
         "/" +
         selectLeftV.replace(/\//g, "-") +
         "/tile/{z}/{y}/{x}";
-      leftImgLayer = L.tileLayer(leftLayerUrl,{maxZoom:config.mapInitParams.maxZoom}); //左侧影像
+      leftImgLayer = L.tileLayer(leftLayerUrl, {
+        maxZoom: config.mapInitParams.maxZoom
+      }); //左侧影像
       map.addLayer(leftImgLayer);
       let rightLayerUrl =
         config.imageBaseUrl +
         "/" +
         selectRightV.replace(/\//g, "-") +
         "/tile/{z}/{y}/{x}";
-      rightImgLayer = L.tileLayer(rightLayerUrl,{maxZoom:config.mapInitParams.maxZoom}); //右侧影像
+      rightImgLayer = L.tileLayer(rightLayerUrl, {
+        maxZoom: config.mapInitParams.maxZoom
+      }); //右侧影像
       map.addLayer(rightImgLayer);
     }
     //加载历史扰动图斑
@@ -2276,7 +2281,7 @@ export default class integration extends PureComponent {
           layers: config.mapSpotLayerName, //需要加载的图层
           format: "image/png", //返回的数据格式
           transparent: true,
-          maxZoom:config.mapInitParams.maxZoom
+          maxZoom: config.mapInitParams.maxZoom
         });
       } else {
         //历史扰动图斑
@@ -2284,7 +2289,7 @@ export default class integration extends PureComponent {
           layers: config.mapHistorySpotLayerName, //需要加载的图层
           format: "image/png", //返回的数据格式
           transparent: true,
-          maxZoom:config.mapInitParams.maxZoom,
+          maxZoom: config.mapInitParams.maxZoom,
           cql_filter: "archive_time <= " + selectSpotLeftV
         });
       }
@@ -2294,7 +2299,7 @@ export default class integration extends PureComponent {
           layers: config.mapSpotLayerName, //需要加载的图层
           format: "image/png", //返回的数据格式
           transparent: true,
-          maxZoom:config.mapInitParams.maxZoom
+          maxZoom: config.mapInitParams.maxZoom
         });
       } else {
         //历史扰动图斑
@@ -2302,7 +2307,7 @@ export default class integration extends PureComponent {
           layers: config.mapHistorySpotLayerName, //需要加载的图层
           format: "image/png", //返回的数据格式
           transparent: true,
-          maxZoom:config.mapInitParams.maxZoom,
+          maxZoom: config.mapInitParams.maxZoom,
           cql_filter: "archive_time <= " + selectSpotRightV
         });
       }
