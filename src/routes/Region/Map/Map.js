@@ -23,6 +23,7 @@ import ProjectDetail from "../List/ProjectDetail";
 import HistoryPlay from "./HistoryPlay";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import DynamicMapLayer from 'esri-leaflet/src/Layers/DynamicMapLayer';
 import proj4 from "proj4";
 import "proj4leaflet";
 import "leaflet.pm/dist/leaflet.pm.css";
@@ -52,6 +53,9 @@ let userconfig = {};
 let map;
 let marker;
 let picLayerGroup;
+
+const DISTRICT_FILL_COLOR = 'rgba(230,0,0,0)';
+const DISTRICT_COLOR = '#bfbfbf';
 //绘制geojson图层样式
 const geoJsonStyle = {
   color: "#33CCFF", //#33CCFF #e60000
@@ -1781,7 +1785,7 @@ export default class integration extends PureComponent {
     }
 
     const { onlineBasemapLayers } = this;
-    const { onlineBasemaps } = config;
+    const { onlineBasemaps,tdtImageLabel, districtBound  } = config;
     // 底图图层
     const baseMaps = {};
     onlineBasemaps.forEach((item, i) => {
@@ -1789,45 +1793,64 @@ export default class integration extends PureComponent {
         onlineBasemapLayers[i];
     });
     // 专题图层
-    // const overlayMaps = (userconfig.overlayMaps = {
-    //   //  [getImageTitle("项目红线", labelPointMarkerImageUrl)]: projectWmsLayer
-    //   [this.getTitle(
-    //     "项目红线",
-    //     SELF_PROJECT_COLOR,
-    //     PROJECT_FILL_COLOR
-    //   )]: userconfig.projectWmsLayer,
-    //   [this.getTitle(
-    //     "扰动图斑",
-    //     SELF_SPOT_COLOR,
-    //     SPOT_FILL_COLOR
-    //   )]: userconfig.spotWmsLayer
+    //基础地图数据
+    //天地图地图标注图层
+    const placeNameImageLayer = L.tileLayer(
+      `${tdtImageLabel.url}`,
+      {
+        minZoom: tdtImageLabel.minZoom,
+        maxZoom: tdtImageLabel.maxZoom,
+        subdomains: tdtImageLabel.subdomains
+      }
+    );
+    this.placeNameImageLayer = placeNameImageLayer;
+    //行政边界-区县图层
+    const districtBoundLayer = DynamicMapLayer({
+      url:districtBound.url,
+      minZoom:districtBound.minZoom,
+      maxZoom:districtBound.maxZoom
+    });
+    this.districtBoundLayer = districtBoundLayer;
+
+    // const overlays = (userconfig.overlays = {
+    //   项目红线: userconfig.projectWmsLayer,
+    //   扰动图斑: userconfig.spotWmsLayer
     // });
     const overlays = (userconfig.overlays = {
+      [this.getImageTitle(tdtImageLabel.title, tdtImageLabel.picUrl)]: placeNameImageLayer,
+      [this.getTitle(districtBound.title, DISTRICT_COLOR, DISTRICT_FILL_COLOR,true,'overlayMapsTile')]: districtBoundLayer,
       项目红线: userconfig.projectWmsLayer,
-      扰动图斑: userconfig.spotWmsLayer
+      扰动图斑: userconfig.spotWmsLayer,
     });
     //底图切换控件
-    // let layersControl = L.control
-    //   .layers(userconfig.baseLayers, overlays)
-    //   .addTo(map);
-    // 新建控件
     const layersControl = L.control
       .layers(baseMaps, overlays, { position: "topright" })
       .addTo(map);
-
+    // 修改图标样式
+    L.DomUtil.addClass(
+      layersControl.getContainer().firstChild,
+      "iconfont icon-layer global-icon-normal"
+    );
     return layersControl;
   };
 
   // 构建图层标题及图例
-  getTitle = (text, borderColor, fillColor, isBorderDashed) => {
-    return `<i style='display:inline-block;border:${
-      isBorderDashed ? "dashed" : "solid"
-    } 2px ${borderColor};background:${fillColor};width:20px;height:20px;position:relative;top:4px;'></i><span style='padding-left:1px;'>${text}</span>`;
+  getTitle = (text, borderColor, fillColor, isBorderDashed, className) => {
+    if(className){
+      return `<i style='display:inline-block;border:${
+        isBorderDashed ? "dashed" : "solid"
+      } 2px ${borderColor};background:${fillColor};width:20px;height:20px;position:relative;top:4px;'></i><span style='padding-left:1px;'>${text}</span><div class='${className}'></div>`;
+    }
+    else{
+      return `<i style='display:inline-block;border:${
+        isBorderDashed ? "dashed" : "solid"
+      } 2px ${borderColor};background:${fillColor};width:20px;height:20px;position:relative;top:4px;'></i><span style='padding-left:1px;'>${text}</span>`;
+    }
   };
 
   // 构建图片形式的标题及图例
   getImageTitle = (text, imgUrl) => {
-    return `<div style='display:inline-block;width:20px;height:20px;position:relative;top:4px;'><img src='${imgUrl}' style='height:20px;'/></div><span style='padding-left:1px;'>${text}</span>`;
+    return `<div style='display:inline-block;width:20px;height:20px;position:relative;top:0px;'><img src='${imgUrl}' style='height:20px;'/></div><span style='padding-left:1px;'>${text}</span>`;
   };
 
   /*

@@ -25,13 +25,28 @@
 //   z-index:1500 !important;
 //   }
 :global {
+  .global-icon-normal {
+    font-size: 22px;
+  }
   .leaflet-control-layers-selector {
     position: relative;
     top: 7px;
   }
+  // .leaflet-touch .leaflet-control-layers-toggle {
+  //   width: 32px;
+  //   height: 32px;
+  // }
+  // 图层按钮
   .leaflet-touch .leaflet-control-layers-toggle {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
+    background-image: none;
+    padding-left: 4px;
+    // padding-top: 3px;
+    color: #000;
+  }
+  .leaflet-control-layers-selector {
+    top: 2px; 
   }
   // 比例尺
   .leaflet-control-scale-line {
@@ -39,4 +54,10 @@
     border-top: none;
     background: rgba(255, 255, 255, 0.8);
   }
+  .overlayMapsTile {
+    height: 0;
+    border-top: 1px solid #ddd;
+    margin: 5px -10px 5px -6px; 
+  }
+
 }

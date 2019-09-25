@@ -98,7 +98,7 @@ export default class Query extends PureComponent {
     const { show, type, showVecType } = this.state;
     const {
       form: { getFieldDecorator, resetFields },
-      district: { districtTree }
+      district: { districtTreeFilter }
     } = this.props;
 
     return (
@@ -234,7 +234,7 @@ export default class Query extends PureComponent {
             <Form.Item label="所在地区" {...formItemLayout}>
               {getFieldDecorator("ProjectDistrictCodes", { initialValue: "" })(
                 <Cascader
-                  options={districtTree}
+                  options={districtTreeFilter}
                   changeOnSelect
                   placeholder="请选择所在地区"
                 />
@@ -380,7 +380,7 @@ export default class Query extends PureComponent {
             <Form.Item label="所在地区" {...formItemLayout}>
               {getFieldDecorator("SpotDistrictCodes", { initialValue: "" })(
                 <Cascader
-                  options={districtTree}
+                  options={districtTreeFilter}
                   changeOnSelect
                   placeholder="请选择所在地区"
                 />

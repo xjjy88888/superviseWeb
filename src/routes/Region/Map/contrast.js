@@ -7,10 +7,10 @@ import proj4 from "proj4";
 import * as turf from "@turf/turf";
 import config from "../../../config";
 import jQuery from "jquery";
-import { Link } from "dva/router";
-import Layouts from "../../../components/Layouts";
+// import { Link } from "dva/router";
+// import Layouts from "../../../components/Layouts";
 import emitter from "../../../utils/event";
-import { relativeTimeThreshold } from "moment";
+// import { relativeTimeThreshold } from "moment";
 
 let userconfig = {};
 @connect(({ user, mapdata, project, spot }) => ({
@@ -46,11 +46,7 @@ export default class splitScreen extends PureComponent {
             userconfig.geojson = JSON.parse(boundary.result);
             this.isload = true;
             // 创建地图
-            me.createMap(v.center,v.zoom);
-            // setTimeout(() => {
-            //   userconfig.LMap.setView(v.center,v.zoom);
-            //   userconfig.RMap.setView(v.center,v.zoom);
-            // }, 500);   
+            me.createMap(v.center,v.zoom); 
           }
         });
       }
@@ -720,7 +716,7 @@ export default class splitScreen extends PureComponent {
     const {
       mapdata: { histories, historiesSpot }
     } = this.props;
-
+    //console.log('histories',histories);
     const {
       show,
       selectLeftV,
@@ -738,7 +734,7 @@ export default class splitScreen extends PureComponent {
           paddingTop: 46,
           height: "100vh",
           width: "100vw",
-          zIndex: 2000
+          zIndex: 1001
         }}
       >
         <div

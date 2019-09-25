@@ -31,6 +31,9 @@ const tdtVectorUrl =
   "http://t{s}.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=7786923a385369346d56b966bb6ad62f";
 const tdtImageUrl =
   "http://t{s}.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=7786923a385369346d56b966bb6ad62f";
+const tdtImageLabelUrl =
+  "http://t{s}.tianditu.gov.cn/DataServer?T=cia_w&x={x}&y={y}&l={z}&tk=7786923a385369346d56b966bb6ad62f";
+  // "http://t{s}.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=7786923a385369346d56b966bb6ad62f";
 const googleVectorUrl =
   "http://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}";
 const googleImageUrl =
@@ -44,6 +47,8 @@ const gaodeImageUrl =
 // const bdImageUrl =
 //   'http://shangetu{s}.map.bdimg.com/it/u=x={x};y={y};z={z};v=009;type=sate&fm=46';
 const OSMVectorUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+//行政边界-区县
+const districtBoundUrl = "http://www.stbcjg.cn:6080/arcgis/rest/services/STBC/XZQH_QG/MapServer";
 
 const config = {
   domain: domain,
@@ -603,24 +608,23 @@ const config = {
     zoom: 14,
     maxZoom:21
   },
-  // baseMaps: [
-  //   {
-  //     label: "街道图",
-  //     className: "vecType",
-  //     Url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-  //   },
-  //   {
-  //     label: "影像图",
-  //     className: "imgType",
-  //     Url:
-  //       "https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-  //   },
-  //   {
-  //     label: "监管影像",
-  //     className: "imgType",
-  //     Url: `${imageBaseUrl}/latest/tile/{z}/{y}/{x}`
-  //   }
-  // ],
+  //天地图影像注记
+  tdtImageLabel:{
+    title: "路网注记",
+    url: tdtImageLabelUrl,
+    minZoom: 0,
+    maxZoom: 21,
+    subdomains: ["0", "1", "2", "3", "4", "5", "6", "7"],
+    picUrl: `./img/tdtImagelabel.png`
+  },
+  //行政边界-区县
+  districtBound:{
+    title: "行政边界",
+    url: districtBoundUrl,
+    minZoom: 0,
+    maxZoom: 21,
+    picUrl: `./img/districtBound.png`
+  },
   // 在线底图
   onlineBasemaps: [
     {
