@@ -742,7 +742,7 @@ export default class splitScreen extends PureComponent {
           id="LMap"
           onClick={e => {
             e.stopPropagation();
-            console.log(e, 742);
+            //console.log(e, 742);
           }}
         >
           {/*历史影像图切换*/}

@@ -49,7 +49,7 @@ export default {
       let histories = new Set(result.result.histories);
       yield put({
         type: "save",
-        payload: { imageTimeResult: result.result }
+        payload: { imageTimeResult: result.result,histories:[...histories].reverse() }
       });
       if (callback) callback([...histories].reverse());
     },

@@ -86,7 +86,9 @@ export default class siderbarDetail extends PureComponent {
     this.eventEmitter = emitter.addListener("siteLocationBack", data => {
       this.props.form.setFieldsValue({
         pointX: data.longitude, //经度
-        pointY: data.latitude //维度
+        pointX_pano: data.longitude, //经度
+        pointY: data.latitude, //维度
+        pointY_pano: data.latitude //维度
       });
     });
     this.eventEmitter = emitter.addListener("showSiderbarDetail", data => {
@@ -1603,7 +1605,7 @@ export default class siderbarDetail extends PureComponent {
                 })(<TextArea autosize={true} disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="坐标" {...formItemLayout}>
-                {getFieldDecorator("pointX", {
+                {getFieldDecorator("pointX_pano", {
                   initialValue: item.pointX
                 })(
                   <Input
@@ -1612,7 +1614,7 @@ export default class siderbarDetail extends PureComponent {
                     style={{ width: 98 }}
                   />
                 )}
-                {getFieldDecorator("pointY", {
+                {getFieldDecorator("pointY_pano", {
                   initialValue: item.pointY
                 })(
                   <Input
@@ -1741,7 +1743,9 @@ export default class siderbarDetail extends PureComponent {
                         ...v,
                         projectId,
                         urlConfig: panoramaUrlConfig,
-                        id: type === "edit" ? item.id : ""
+                        id: type === "edit" ? item.id : "",
+                        pointX: v.pointX_pano,
+                        pointY: v.pointY_pano
                       },
                       callback: (success, response) => {
                         this.setState({ showSpin: false });
