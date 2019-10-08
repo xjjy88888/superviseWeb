@@ -190,7 +190,7 @@ export default class siderbarDetail extends PureComponent {
                             funcTypeText: item.label
                           });
                           break;
-                        //模板下载(Excel)
+                        // 模板下载(Excel)
                         // case "download_excel":
                         //   window.open(
                         //     `${url}Excel/项目红线范围（无图形）.xlsx`,
@@ -200,7 +200,7 @@ export default class siderbarDetail extends PureComponent {
                         //     message: `下载项目模板(Excel)成功`
                         //   });
                         //   break;
-                        //模板说明
+                        // 模板说明
                         case "template_description":
                           window.open(config.templateDescription, "_blank");
                           notification["success"]({

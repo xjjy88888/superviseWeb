@@ -105,7 +105,7 @@ class Power extends PureComponent {
     });
   }
 
-  componentWillUnmount() {}
+  componentWillUnmount() { }
 
   userInfo = (id, fn) => {
     const { dispatch } = this.props;
@@ -183,26 +183,26 @@ class Power extends PureComponent {
         const result =
           userType === 0
             ? permissions.map(i => {
-                return {
-                  permission: i,
-                  endTime: v[this.getLabel(i) + "_endTime"]
-                };
-              })
+              return {
+                permission: i,
+                endTime: v[this.getLabel(i) + "_endTime"]
+              };
+            })
             : userType === 1
-            ? [
+              ? [
                 {
                   permission: v.companyType,
                   endTime: v.endTime
                 }
               ]
-            : userType === 2
-            ? permissions.map(i => {
-                return {
-                  permission: i,
-                  endTime: v[this.getLabel(i) + "_endTime"]
-                };
-              })
-            : [];
+              : userType === 2
+                ? permissions.map(i => {
+                  return {
+                    permission: i,
+                    endTime: v[this.getLabel(i) + "_endTime"]
+                  };
+                })
+                : [];
         console.log(result);
         this.props.submit({ ...v, permissions: result });
       }
