@@ -256,7 +256,8 @@
           }
         }
         //console.log("histories",histories);
-        baseLayerUrl = imageBaseUrl + getMinDate(timeSpotList[self.options.startItem],histories)+ "/tile/{z}/{y}/{x}";
+        if(getMinDate(timeSpotList[curPlayItem],histories).length>0)
+           baseLayerUrl = imageBaseUrl + getMinDate(timeSpotList[self.options.startItem],histories)+ "/tile/{z}/{y}/{x}";
         //console.log("baseLayerUrl",baseLayerUrl);
         $("#imgageTimeText").text("影像时间:"+getMinDate(timeSpotList[self.options.startItem],histories));
         //动态刷新扰动图斑匹配的监管影像

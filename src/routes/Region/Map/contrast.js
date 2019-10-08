@@ -344,7 +344,8 @@ export default class splitScreen extends PureComponent {
     map.getPane("tileLayerZIndex").style.zIndex = 0;
     let layer = L.tileLayer(url, {
       pane: "tileLayerZIndex",
-      maxZoom: config.mapInitParams.maxZoom
+      maxZoom: config.mapInitParams.maxZoom,
+      errorTileUrl:config.errorTileUrl
     }).addTo(map); //影像图
     return layer;
   };
@@ -384,15 +385,6 @@ export default class splitScreen extends PureComponent {
         maxZoom: config.mapInitParams.maxZoom
       })
       .addTo(map);
-    //加载图斑图层wms
-    // L.tileLayer
-    //   .wms(config.mapUrl.geoserverUrl + "/wms?", {
-    //     layers: config.mapSpotLayerName, //需要加载的图层
-    //     format: "image/png", //返回的数据格式
-    //     transparent: true
-    //     //cql_filter:"map_num like '%_52_%'"
-    //   })
-    //   .addTo(map);
   };
   /*
    * 加载地图模态层效果

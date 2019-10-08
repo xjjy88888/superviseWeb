@@ -150,7 +150,12 @@
          arr.push(strToDate(imageDate));
       }
       var index = limit(arr,num);
-      return imageDateList[index];
+      if(index != -1){
+        return imageDateList[index];
+      }
+      else{
+        return '';
+      }
     }
 
     function strToDate(strDate) {
@@ -186,6 +191,7 @@
         getImageInfoByExtentUrl = "http://210.36.22.122/BasemapService/rest/image/latest/getInfoByExtent";
         imageBaseUrl = "http://www.stbcjg.cn/BasemapService/rest/image/";
         baseLayerUrl = imageBaseUrl+'latest/tile/{z}/{y}/{x}';
+        var errorTileUrl ="errorTileUrl.png";
         //获取历史扰动图斑数据列表
         var spotHistoryList = localStorage.getItem("spotHistoryList");
         spotHistoryList = JSON.parse(spotHistoryList);
@@ -229,7 +235,8 @@
 
         baseLayer = L.tileLayer(baseLayerUrl, {
           maxZoom: 18,
-          opacity: 0
+          opacity: 0,
+          errorTileUrl:errorTileUrl
         }).addTo(map);
 
         //timeSpotList = ['2019-08-28Z','2019-08-27Z','2019-08-26Z','2019-08-25Z','2019-08-24Z','2019-08-23Z','2019-08-22Z','2019-08-21Z','2019-08-20Z','2019-08-19Z'];
@@ -255,7 +262,8 @@
             //console.log("histories",histories);
             //console.log("curPlayItem",curPlayItem);           
             //动态刷新扰动图斑匹配的监管影像
-            baseLayerUrl = imageBaseUrl + getMinDate(timeSpotList[curPlayItem],histories)+ "/tile/{z}/{y}/{x}";
+            if(getMinDate(timeSpotList[curPlayItem],histories).length>0)
+               baseLayerUrl = imageBaseUrl + getMinDate(timeSpotList[curPlayItem],histories)+ "/tile/{z}/{y}/{x}";
             //console.log("baseLayerUrl",baseLayerUrl);
             $("#imgageTimeText").text("影像时间:"+getMinDate(timeSpotList[curPlayItem],histories));
             baseLayer.setUrl(baseLayerUrl);
@@ -284,7 +292,8 @@
                 }
                 //console.log("histories",histories);
                 //动态刷新扰动图斑匹配的监管影像
-                baseLayerUrl = imageBaseUrl + getMinDate(timeSpotList[0],histories)+ "/tile/{z}/{y}/{x}";
+                if(getMinDate(timeSpotList[curPlayItem],histories).length>0)
+                   baseLayerUrl = imageBaseUrl + getMinDate(timeSpotList[0],histories)+ "/tile/{z}/{y}/{x}";
                 //console.log("baseLayerUrl",baseLayerUrl);
                 $("#imgageTimeText").text("影像时间:"+getMinDate(timeSpotList[0],histories));
                 baseLayer.setUrl(baseLayerUrl);

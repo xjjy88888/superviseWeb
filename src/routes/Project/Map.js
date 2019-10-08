@@ -8,6 +8,11 @@ import "proj4leaflet";
 import "leaflet-measure/dist/leaflet-measure.css";
 import "leaflet-measure/dist/leaflet-measure.cn";
 import config from "../../config";
+
+const DISTRICT_FILL_COLOR = "rgba(230,0,0,0)";
+// const DISTRICT_COLOR = '#bfbfbf';
+const DISTRICT_COLOR = "#0070FF";
+
 @connect(({ mapdata }) => ({
   mapdata
 }))
@@ -48,6 +53,27 @@ export default class homePage extends PureComponent {
     //     subdomains: item.subdomains
     //   });
     // });
+    const { tdtImageLabel, districtBound  } = config;
+    //天地图地图标注图层
+    const placeNameImageLayer = L.tileLayer(
+      `${tdtImageLabel.url}`,
+      {
+        minZoom: tdtImageLabel.minZoom,
+        maxZoom: tdtImageLabel.maxZoom,
+        subdomains: tdtImageLabel.subdomains
+      }
+    );
+    this.placeNameImageLayer = placeNameImageLayer;
+    //行政边界-区县图层
+    const districtBoundLayer = L.tileLayer.wms(districtBound.url + "/wms?", {
+      layers: districtBound.mapDistrictLayerName, //需要加载的图层
+      format: "image/png", //返回的数据格式
+      transparent: true,
+      maxZoom: districtBound.maxZoom
+    });
+    this.districtBoundLayer = districtBoundLayer;
+
+
   };
   // 创建地图
   createMap = () => {
@@ -57,7 +83,7 @@ export default class homePage extends PureComponent {
       iconUrl: require("leaflet/dist/images/marker-icon.png"),
       shadowUrl: require("leaflet/dist/images/marker-shadow.png")
     });
-    // const { onlineBasemapLayers } = this;
+    // const { onlineBasemapLayers,placeNameImageLayer,districtBoundLayer } = this;
     const map = L.map("map", {
       zoomControl: false,
       //crs: L.CRS.EPSG3857,
@@ -75,7 +101,8 @@ export default class homePage extends PureComponent {
         minZoom: item.minZoom,
         maxZoom: item.maxZoom,
         subdomains: item.subdomains,
-        pane: "tileLayerZIndex"
+        pane: "tileLayerZIndex",
+        errorTileUrl:item.errorTileUrl
       });
     });
     map.addLayer(onlineBasemapLayers[0]); 
@@ -178,19 +205,26 @@ export default class homePage extends PureComponent {
   } 
   // 创建图层管理控件
   createToc = () => {
-    const { map, onlineBasemapLayers } = this;
-    const { onlineBasemaps } = config;
+    const { map, onlineBasemapLayers,placeNameImageLayer,districtBoundLayer } = this;
+    const { onlineBasemaps,tdtImageLabel, districtBound  } = config;
 
     // 构建图层标题及图例
-    const getTitle = (text, borderColor, fillColor, isBorderDashed) => {
-      return `<i style='display:inline-block;border:${
-        isBorderDashed ? "dashed" : "solid"
-      } 2px ${borderColor};background:${fillColor};width:20px;height:20px;position:relative;top:4px;'></i><span style='padding-left:1px;'>${text}</span>`;
+    const getTitle = (text, borderColor, fillColor, isBorderDashed, className) => {
+      if(className){
+        return `<i style='display:inline-block;border:${
+          isBorderDashed ? "dashed" : "solid"
+        } 2px ${borderColor};background:${fillColor};width:20px;height:20px;position:relative;top:4px;'></i><span style='padding-left:1px;'>${text}</span><div class='${className}'></div>`;
+      }
+      else{
+        return `<i style='display:inline-block;border:${
+          isBorderDashed ? "dashed" : "solid"
+        } 2px ${borderColor};background:${fillColor};width:20px;height:20px;position:relative;top:4px;'></i><span style='padding-left:1px;'>${text}</span>`;
+      }
     };
 
     // 构建图片形式的标题及图例
     const getImageTitle = (text, imgUrl) => {
-      return `<div style='display:inline-block;width:20px;height:20px;position:relative;top:4px;'><img src='${imgUrl}' style='height:20px;'/></div><span style='padding-left:1px;'>${text}</span>`;
+      return `<div style='display:inline-block;width:20px;height:20px;position:relative;top:0px;'><img src='${imgUrl}' style='height:20px;'/></div><span style='padding-left:1px;'>${text}</span>`;
     };
     // 底图图层
     const baseMaps = {};
@@ -199,7 +233,11 @@ export default class homePage extends PureComponent {
     });
 
     // 专题图层
-    const overlayMaps = {};
+    // const overlayMaps = {};
+    const overlayMaps = {
+      [getImageTitle(tdtImageLabel.title, tdtImageLabel.picUrl)]: placeNameImageLayer,
+      [getTitle(districtBound.title, DISTRICT_COLOR, DISTRICT_FILL_COLOR,true,'overlayMapsTile')]: districtBoundLayer,
+    };   
 
     // 添加控件
     const container = L.control

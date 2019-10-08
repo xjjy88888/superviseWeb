@@ -23,7 +23,7 @@ import ProjectDetail from "../List/ProjectDetail";
 import HistoryPlay from "./HistoryPlay";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import DynamicMapLayer from 'esri-leaflet/src/Layers/DynamicMapLayer';
+// import DynamicMapLayer from 'esri-leaflet/src/Layers/DynamicMapLayer';
 import proj4 from "proj4";
 import "proj4leaflet";
 import "leaflet.pm/dist/leaflet.pm.css";
@@ -55,7 +55,8 @@ let marker;
 let picLayerGroup;
 
 const DISTRICT_FILL_COLOR = 'rgba(230,0,0,0)';
-const DISTRICT_COLOR = '#bfbfbf';
+// const DISTRICT_COLOR = '#bfbfbf';
+const DISTRICT_COLOR = "#0070FF";
 //绘制geojson图层样式
 const geoJsonStyle = {
   color: "#33CCFF", //#33CCFF #e60000
@@ -274,6 +275,7 @@ export default class integration extends PureComponent {
     //地图定位
     this.eventEmitter = emitter.addListener("mapLocation", data => {
       console.log(data);
+      userconfig.poupLatLng = null;
       if (data.key === "project") {
         //项目
         dispatch({
@@ -295,6 +297,7 @@ export default class integration extends PureComponent {
                 y: response.result.pointY
               };
               let latLng = [point.y, point.x];
+              userconfig.poupLatLng = latLng;
               if (marker) marker.remove();
               switch (response.result.type) {
                 case "ProjectScope": //项目红线
@@ -816,8 +819,12 @@ export default class integration extends PureComponent {
           }
         }
         setTimeout(() => {
-          let latlng = userconfig.projectgeojsonLayer.getBounds().getCenter();
-          if (latlng) {
+          if(userconfig.poupLatLng){
+            map.openPopup(content, userconfig.poupLatLng);
+            me.automaticToMap(userconfig.poupLatLng);
+          }
+          else{
+            let latlng = userconfig.projectgeojsonLayer.getBounds().getCenter();
             map.openPopup(content, latlng);
             me.automaticToMap(latlng);
           }
@@ -1024,15 +1031,17 @@ export default class integration extends PureComponent {
     const offsetSiderbarDetail = showSiderbarDetail ? 200 : 0;
     const offsetQuery = showQuery ? 225 : 0;
     const offsetProblem = showProblem ? 215 : 0;
-    point.x =
+    if(clientWidth && clientHeight){
+      point.x =
       point.x -
       clientWidth / 2 -
       offsetSiderbar -
       offsetSiderbarDetail -
       offsetProblem -
       offsetQuery;
-    point.y = point.y - clientHeight / 2;
-    map.panBy(point);
+      point.y = point.y - clientHeight / 2;
+      map.panBy(point);
+    }
   };
   /*
    * 获取url参数
@@ -1076,7 +1085,8 @@ export default class integration extends PureComponent {
         minZoom: item.minZoom,
         maxZoom: item.maxZoom,
         subdomains: item.subdomains,
-        pane: "tileLayerZIndex"
+        pane: "tileLayerZIndex",
+        errorTileUrl:item.errorTileUrl
       });
     });
     map.addLayer(this.onlineBasemapLayers[0]);
@@ -1647,12 +1657,12 @@ export default class integration extends PureComponent {
     );
     setTimeout(() => {
       // console.log("地图最小级别1285",map.getMinZoom());
-      userconfig.zoom = map.getZoom() + 1;
+      userconfig.zoom = map.getZoom();
       //加载geoserver发布的WMS地图服务
       me.overlayWMSLayers();
       //地图模态层效果
       me.loadmodalLayer();
-    }, 800);
+    }, 900);
   };
   /*
    * 加载地图模态层效果
@@ -1805,10 +1815,16 @@ export default class integration extends PureComponent {
     );
     this.placeNameImageLayer = placeNameImageLayer;
     //行政边界-区县图层
-    const districtBoundLayer = DynamicMapLayer({
-      url:districtBound.url,
-      minZoom:districtBound.minZoom,
-      maxZoom:districtBound.maxZoom
+    // const districtBoundLayer = DynamicMapLayer({
+    //   url:districtBound.url,
+    //   minZoom:districtBound.minZoom,
+    //   maxZoom:districtBound.maxZoom
+    // });
+    const districtBoundLayer = L.tileLayer.wms(districtBound.url + "/wms?", {
+      layers: districtBound.mapDistrictLayerName, //需要加载的图层
+      format: "image/png", //返回的数据格式
+      transparent: true,
+      maxZoom: districtBound.maxZoom
     });
     this.districtBoundLayer = districtBoundLayer;
 
@@ -2283,7 +2299,8 @@ export default class integration extends PureComponent {
         selectLeftV.replace(/\//g, "-") +
         "/tile/{z}/{y}/{x}";
       leftImgLayer = L.tileLayer(leftLayerUrl, {
-        maxZoom: config.mapInitParams.maxZoom
+        maxZoom: config.mapInitParams.maxZoom,
+        errorTileUrl:config.errorTileUrl
       }); //左侧影像
       map.addLayer(leftImgLayer);
       let rightLayerUrl =
@@ -2292,7 +2309,8 @@ export default class integration extends PureComponent {
         selectRightV.replace(/\//g, "-") +
         "/tile/{z}/{y}/{x}";
       rightImgLayer = L.tileLayer(rightLayerUrl, {
-        maxZoom: config.mapInitParams.maxZoom
+        maxZoom: config.mapInitParams.maxZoom,
+        errorTileUrl:config.errorTileUrl
       }); //右侧影像
       map.addLayer(rightImgLayer);
     }
