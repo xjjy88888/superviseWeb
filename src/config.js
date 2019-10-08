@@ -33,7 +33,7 @@ const tdtImageUrl =
   "http://t{s}.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=7786923a385369346d56b966bb6ad62f";
 const tdtImageLabelUrl =
   "http://t{s}.tianditu.gov.cn/DataServer?T=cia_w&x={x}&y={y}&l={z}&tk=7786923a385369346d56b966bb6ad62f";
-  // "http://t{s}.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=7786923a385369346d56b966bb6ad62f";
+// "http://t{s}.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=7786923a385369346d56b966bb6ad62f";
 const googleVectorUrl =
   "http://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}";
 const googleImageUrl =
@@ -47,14 +47,14 @@ const gaodeImageUrl =
 // const bdImageUrl =
 //   'http://shangetu{s}.map.bdimg.com/it/u=x={x};y={y};z={z};v=009;type=sate&fm=46';
 const OSMVectorUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
-const errorTileUrl ="./img/errorTileUrl.png";
+const errorTileUrl = "./img/errorTileUrl.png";
 //行政边界
 // const districtBoundUrl = "http://www.stbcjg.cn:6080/arcgis/rest/services/STBC/XZQH_QG/MapServer";
 const districtBoundUrl = `${
   isFormal
     ? "https://www.zkygis.cn:8143/geoserver/ZKYGIS"
     : "http://183.6.178.124:8143/geoserver/ZKYGIS"
-}`;
+  }`;
 
 const config = {
   domain: domain,
@@ -62,6 +62,7 @@ const config = {
   export: `${domainApi}File/GetTempFile`,
   templateDescription: `http://docs.qq.com/doc/DTEV2TGRsU0RNQUV0?coord=DeJxzNFRxNFQxgEAAEUUCWQ`,
   isFormal: isFormal,
+  topologyCheckUrl: `http://183.6.178.124:8001/apk/lib/拓扑检测工具.zip`,
 
   url: {
     // 初始化
@@ -419,11 +420,11 @@ const config = {
       key: "download_shapfile",
       icon: "download"
     },
-    // {
-    //   label: "模板下载(Excel)",
-    //   key: "download_excel",
-    //   icon: "download"
-    // },
+    {
+      label: "拓扑检测工具下载",
+      key: "topologyCheck",
+      icon: "download"
+    },
     {
       label: "模板说明",
       key: "template_description",
@@ -612,17 +613,17 @@ const config = {
   mapInitParams: {
     center: [23.1441, 113.3693],
     zoom: 14,
-    maxZoom:21
+    maxZoom: 21
   },
   //天地图影像注记
-  tdtImageLabel:{
+  tdtImageLabel: {
     title: "路网注记",
     url: tdtImageLabelUrl,
     minZoom: 0,
     maxZoom: 21,
     subdomains: ["0", "1", "2", "3", "4", "5", "6", "7"],
     picUrl: `./img/tdtImagelabel.png`,
-    errorTileUrl:errorTileUrl,
+    errorTileUrl: errorTileUrl,
   },
   //行政边界
   districtBound: {
@@ -634,9 +635,9 @@ const config = {
     minZoom: 0,
     maxZoom: 21,
     picUrl: `./img/districtBound.png`,
-    errorTileUrl:errorTileUrl,
+    errorTileUrl: errorTileUrl,
   },
-  errorTileUrl:errorTileUrl,
+  errorTileUrl: errorTileUrl,
   // 在线底图
   onlineBasemaps: [
     {
@@ -646,7 +647,7 @@ const config = {
       maxZoom: 21,
       subdomains: "abc",
       picUrl: `./img/myOnlineImage.png`,
-      errorTileUrl:errorTileUrl,
+      errorTileUrl: errorTileUrl,
     },
     {
       title: "OSM街道图",
@@ -655,7 +656,7 @@ const config = {
       maxZoom: 21,
       subdomains: "abc",
       picUrl: `./img/OSMVector.png`,
-      errorTileUrl:errorTileUrl,
+      errorTileUrl: errorTileUrl,
     },
     {
       title: "ArcGIS影像图",
@@ -664,7 +665,7 @@ const config = {
       maxZoom: 21,
       subdomains: "abc",
       picUrl: `./img/arcgisImage.png`,
-      errorTileUrl:errorTileUrl,
+      errorTileUrl: errorTileUrl,
     },
     {
       title: "ArcGIS街道图(有偏移)",
@@ -673,7 +674,7 @@ const config = {
       maxZoom: 21,
       subdomains: "abc",
       picUrl: `./img/arcgisVector.png`,
-      errorTileUrl:errorTileUrl,
+      errorTileUrl: errorTileUrl,
     },
     {
       title: "天地影像图",
@@ -682,7 +683,7 @@ const config = {
       maxZoom: 21,
       subdomains: ["0", "1", "2", "3", "4", "5", "6", "7"],
       picUrl: `./img/tdtImage.png`,
-      errorTileUrl:errorTileUrl,
+      errorTileUrl: errorTileUrl,
     },
     {
       title: "天地街道图",
@@ -691,7 +692,7 @@ const config = {
       maxZoom: 21,
       subdomains: ["0", "1", "2", "3", "4", "5", "6", "7"],
       picUrl: `./img/tdtVector.png`,
-      errorTileUrl:errorTileUrl,
+      errorTileUrl: errorTileUrl,
     },
     {
       title: "谷歌影像图(有偏移)",
@@ -700,7 +701,7 @@ const config = {
       maxZoom: 21,
       subdomains: "abc",
       picUrl: `./img/googleImage.png`,
-      errorTileUrl:errorTileUrl,
+      errorTileUrl: errorTileUrl,
     },
     {
       title: "谷歌街道图(有偏移)",
@@ -709,7 +710,7 @@ const config = {
       maxZoom: 21,
       subdomains: "abc",
       picUrl: `./img/googleVector.png`,
-      errorTileUrl:errorTileUrl,
+      errorTileUrl: errorTileUrl,
     },
     {
       title: "高德影像图(有偏移)",
@@ -718,7 +719,7 @@ const config = {
       maxZoom: 21,
       subdomains: ["1", "2", "3", "4"],
       picUrl: `./img/gaodeImage.png`,
-      errorTileUrl:errorTileUrl,
+      errorTileUrl: errorTileUrl,
     },
     {
       title: "高德街道图(有偏移)",
@@ -727,7 +728,7 @@ const config = {
       maxZoom: 21,
       subdomains: ["1", "2", "3", "4"],
       picUrl: `./img/gaodeVector.png`,
-      errorTileUrl:errorTileUrl,
+      errorTileUrl: errorTileUrl,
     }
     // {
     //   title: '百度街道图',
@@ -751,7 +752,7 @@ const config = {
       isLocal
         ? "http://183.6.178.124:8143"
         : `${l.protocol}//${l.hostname}:8143`
-    }/geoserver/ZKYGIS`,
+      }/geoserver/ZKYGIS`,
     geoserverQueryUrl: "http://localhost:8080/geoserver/ZKYGIS",
     //根据地图当前范围获取对应历史影像数据接口
     getInfoByExtent: `${imageQueryBaseUrl}/latest/getInfoByExtent`
