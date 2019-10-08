@@ -109,7 +109,7 @@ export default class problemPoint extends PureComponent {
         this.setState({ showSpin: false, fileList: [] });
         if (success) {
           this.setState({
-            radioChecked: result.problem.id
+            radioChecked: result.problem ? result.problem.id : null
           });
           if (result.attachment) {
             const list = result.attachment.child.map(item => {
@@ -307,13 +307,13 @@ export default class problemPoint extends PureComponent {
                   });
                   return;
                 }
-                if (!v.problemId || !radioChecked) {
-                  notification["warning"]({
-                    message: `请选择问题类型`,
-                    duration: 1
-                  });
-                  return;
-                }
+                // if (!v.problemId || !radioChecked) {
+                //   notification["warning"]({
+                //     message: `请选择问题类型`,
+                //     duration: 1
+                //   });
+                //   return;
+                // }
                 //提交
                 dispatch({
                   type: "problemPoint/problemPointCreateUpdate",
@@ -351,7 +351,7 @@ export default class problemPoint extends PureComponent {
                   self.setState({ show: false });
                   emitter.emit("deleteDraw", {});
                 },
-                onCancel() {}
+                onCancel() { }
               });
             }}
           />
@@ -418,7 +418,7 @@ export default class problemPoint extends PureComponent {
           <Form.Item
             label={
               <span>
-                问题类型 <Text type="danger">*</Text>
+                问题类型
               </span>
             }
             {...formItemLayout}

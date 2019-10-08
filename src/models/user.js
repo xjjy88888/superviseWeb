@@ -35,7 +35,7 @@ export default {
   },
 
   subscriptions: {
-    setup({ dispatch, history }) {}
+    setup({ dispatch, history }) { }
   },
 
   effects: {
@@ -155,9 +155,9 @@ export default {
           success
             ? `成功`
             : `失败：${
-                error.validationErrors ? error.validationErrors[0].message : ""
-              }${error.message || ""}`
-        }`
+            error.validationErrors ? error.validationErrors[0].message : ""
+            }${error.message || ""}`
+          }`
       });
     },
 
@@ -201,7 +201,7 @@ export default {
       notification[success ? "success" : "error"]({
         message: `删除${success ? "成功" : "失败"}${
           success ? "" : `：${error.message}`
-        }`
+          }`
       });
     },
 

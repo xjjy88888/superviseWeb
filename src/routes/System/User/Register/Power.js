@@ -43,7 +43,6 @@ class Power extends PureComponent {
   };
 
   componentDidMount() {
-    console.log("componentDidMount111");
     const {
       form: { resetFields, setFieldsValue }
     } = this.props;
