@@ -1092,17 +1092,17 @@ export default class integration extends PureComponent {
     map.addLayer(this.onlineBasemapLayers[0]);
     userconfig.baseLayer = this.onlineBasemapLayers[0];
 
-    //监听地图点击事件
+    // 监听地图点击事件
     map.on("click", me.onClickMap);
-    //监听地图移动完成事件
+    // 监听地图移动完成事件
     map.on("moveend", me.onMoveendMap);
-    //监听地图底图切换事件
+    // 监听地图底图切换事件
     map.on("baselayerchange", me.onBaseLayerChange);
-    //监听地图鼠标移动事件
+    // 监听地图鼠标移动事件
     map.on("mousemove", me.showImageInfos);
-    //获取项目区域范围
+    // 获取项目区域范围
     me.getRegionGeometry();
-    //编辑图形工具
+    // 编辑图形工具
     // 定义图层绘制控件选择项
     const options = {
       position: "topright", // toolbar position, options are 'topleft', 'topright', 'bottomleft', 'bottomright'
