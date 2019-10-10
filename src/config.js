@@ -2,7 +2,7 @@ const l = window.location;
 const isFormal = l.href.split("/")[3] === "stbcjg";
 const isLocal = l.hostname === "localhost";
 
-console.log(`%c当前版本：v2.0.6`, "color:green;font-size:30px");
+console.log(`%c当前版本：v2.0.7`, "color:green;font-size:30px");
 
 console.log(isLocal ? "本地环境" : isFormal ? "正式环境" : "测试环境");
 
@@ -615,6 +615,17 @@ const config = {
     zoom: 14,
     maxZoom: 21
   },
+  cesiumMapInitParams: {
+    extent: {//初始化范围
+      xmin: 91.262834,
+      ymin: 8.178795,
+      xmax: 136.851228,
+      ymax: 49.517782
+    },
+    spatialReference: {//地图空间参考坐标系
+      wkid: 4326
+    },
+  }, 
   //天地图影像注记
   tdtImageLabel: {
     title: "路网注记",

@@ -40,8 +40,12 @@ const menuList = [
         key: "/project/list"
       },
       {
-        title: "地图",
+        title: "二维地图",
         key: "/project/map"
+      },
+      {
+        title: "三维地图",
+        key: "/project/cesiummap"
       }
     ]
   },

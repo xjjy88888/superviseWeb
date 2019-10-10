@@ -290,6 +290,7 @@ export default class problemPoint extends PureComponent {
               fontSize: 18
             }}
             onClick={() => {
+              // submit
               validateFields((error, v) => {
                 console.log(error, v);
 

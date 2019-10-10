@@ -4,6 +4,7 @@ import Login from "./routes/Login";
 import Home from "./routes/Home";
 import ProjectList from "./routes/Project/List";
 import ProjectMap from "./routes/Project/Map";
+import CesiumMap from "./routes/Project/CesiumMap";
 import RegionMap from "./routes/Region/Map/Map";
 import Review from "./routes/System/User/Review.js";
 import Society from "./routes/System/User/Society.js";
@@ -25,6 +26,7 @@ function RouterConfig({ history }) {
         <Route path="/region/map" exact component={RegionMap} />
         <Route path="/project/list" exact component={ProjectList} />
         <Route path="/project/map" exact component={ProjectMap} />
+        <Route path="/project/cesiummap" exact component={CesiumMap} />
         <Route path="/system" exact component={Review} />
         <Route path="/system/user/review" component={Review} exact />
         <Route path="/system/user/society" component={Society} exact />
