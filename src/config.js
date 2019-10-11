@@ -625,6 +625,28 @@ const config = {
     spatialReference: {//地图空间参考坐标系
       wkid: 4326
     },
+    Tiles3D:{//三维倾斜摄影配置信息
+      url: "./cesiumfile/3Dtiles/pazhou/Production_3.json"
+    },
+    /*备注说明:配置底图列表
+      *type代表地图服务类型(0代表ArcGisMapServerImageryProvider;1代表createOpenStreetMapImageryProvider;
+                      2代表WebMapTileServiceImageryProvider;3代表createTileMapServiceImageryProvider;
+                      4 代表UrlTemplateImageryProvider;5 代表WebMapServiceImageryProviderr)
+      *proxyUrl代理请求服务
+      *iconUrl图标
+      *name显示名称
+      *Url地图Url
+      */
+      imageryViewModels:[
+        {"label":"ArcGIS影像图",className:"imgType",type:0,proxyUrl:'',Url:'http://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer'},
+        {"label":"ArcGIS街道图",className:"vecType",type:0,proxyUrl:'',Url:'http://cache1.arcgisonline.cn/arcgis/rest/services/ChinaOnlineCommunity/MapServer'},
+        {"label":"监管影像图",className:"imgType",type:4,proxyUrl:'',Url:'http://www.stbcjg.cn/BasemapService/rest/image/latest/tile/{z}/{y}/{x}'},
+        {"label":"OSM街道图",className:"vecType",type:1,proxyUrl:'',Url:'https://a.tile.openstreetmap.org/'},
+        //{"label":"WMS",className:"imgType",type:5,proxyUrl:'',Url:'http://localhost:8180/geoserver/gwc/service/wms',credit:'wms服务',layers: 'worldMap'},
+        //{"label":"WMS",className:"imgType",type:5,proxyUrl:'',Url:'http://localhost:8180/geoserver/gwc/service/wms',credit:'wms服务',layers: 'worldMap',tilingScheme:new Cesium.WebMercatorTilingScheme()},
+        {"label":"天地影像图",className:"imgType",type:2,proxyUrl:'',Url:'http://t{l}.tianditu.cn/img_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=c&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=tiles',layer: 'tdtImgBasicLayer',style: 'default',format: 'image/jpeg',tileMatrixSetID:'tdtMap'},
+        {"label":"天地街道图",className:"vecType",type:2,proxyUrl:'',Url:'http://t{l}.tianditu.cn/vec_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=c&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=tiles',layer: 'tdtVecBasicLayer',style: 'default',format: 'image/jpeg',tileMatrixSetID:'tdtMap'},
+      ],   
   }, 
   //天地图影像注记
   tdtImageLabel: {

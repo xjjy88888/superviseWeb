@@ -19,23 +19,22 @@ export default class homePage extends PureComponent {
     this.viewer = null;
     this.initExtent = null;
     this.defaultResetView = null;
+    this.tileset = null;
+    this.cesiumLayerList = [];
     this.onlineBasemapLayers = null;
   }
 
   componentDidMount() {
-    const me = this;
-    // 创建图层
-    me.createLayers();    
+    const me = this;  
     // 创建地图
     me.createMap();
+    // 创建底图切换控件
+    me.createSwitcherMapControl(); 
     // 创建图层管理控件
     me.createToc();    
     // 创建地图导航控件
     me.createNavigationControl();
   }
-  // 创建图层
-  createLayers = () => {
-  };
   // 创建地图
   createMap = () => {
     const me = this;
@@ -65,6 +64,14 @@ export default class homePage extends PureComponent {
     // map.on("baselayerchange", this.onBaseLayerChange); 
     // //监听地图鼠标移动事件
     // map.on("mousemove", this.showImageInfos);
+
+    //默认加载配置文件第一个底图
+    me.viewer.scene.imageryLayers.removeAll();//清空底图
+    const layers = me.viewer.scene.imageryLayers;
+    const baseLayer = layers.addImageryProvider(me.returnProviderViewModel(cesiumMapInitParams.imageryViewModels[0]));
+    layers.lowerToBottom(baseLayer);
+    //viewer.scene.globe.show = false;//设置隐藏球体不可见
+    me.cesiumLayerList.push({layer:baseLayer,id:"baseMap"});   
     //cesium全屏按钮是否设置
     if(me.viewer.fullscreenButton){
       // this.viewer.fullscreenButton.viewModel.tooltip = "全屏"; 
@@ -103,7 +110,194 @@ export default class homePage extends PureComponent {
 
     //添加地形
     me.addTerrainLayer();
+
+    //创建3DTiles按钮容器
+    me.create3DTilesButton();
     
+  }
+
+  // 创建底图切换控件
+  createSwitcherMapControl= () => {
+    const me = this;
+    const { cesiumMapInitParams } = config;
+    me.loadSwitcherMap(cesiumMapInitParams.imageryViewModels);
+  }
+
+  /**
+   * 地图切换控件
+  */ 
+  loadSwitcherMap= (data) => {
+    const me = this;
+    const { cesiumMapInitParams } = config;
+    //设置底图不同类型
+    // eslint-disable-next-line no-undef
+    const baseLayerSwitcherToolbar = new BaseLayerSwitcherToolBar({
+        data: data
+    });
+    jQuery(".cesium-viewer").append(baseLayerSwitcherToolbar.target);
+    let curlayer = null;
+    baseLayerSwitcherToolbar.onItemClick = function(itemData,index,element){
+        //var data = itemData.data;
+        // const data = itemData;
+        //清空指定ID的底图imageryLayers
+        me.removeLayerByID("baseMap");
+        const layers = me.viewer.scene.imageryLayers;
+        // curlayer = layers.addImageryProvider(me.returnProviderViewModel(cesiumMapInitParams.imageryViewModels[data.id]));
+        curlayer = layers.addImageryProvider(me.returnProviderViewModel(cesiumMapInitParams.imageryViewModels[index]));
+        layers.lowerToBottom(curlayer);
+        me.cesiumLayerList.push({layer:curlayer,id:"baseMap"});
+    };   
+  }
+
+  /**
+   * 删除指定id的底图
+   * @method removeLayerByID
+   * @param  id
+   * @return
+   */
+  removeLayerByID = (id) => {
+    if(this.cesiumLayerList.length>0){
+      for(var i=0;i<this.cesiumLayerList.length;i++){
+          if(this.cesiumLayerList[i].id === id){
+              this.viewer.scene.imageryLayers.remove(this.cesiumLayerList[i].layer);
+          }
+      }
+  }    
+  }
+  
+  // 创建图层管理控件
+  createToc = () => {
+  };  
+
+  // 创建地图导航控件
+  createNavigationControl = () => {
+    // eslint-disable-next-line no-undef
+    this.viewer.extend(Cesium.viewerCesiumNavigationMixin, {defaultResetView:this.defaultResetView});
+  };
+
+  /*创建3DTiles按钮容器*/
+  create3DTilesButton = () =>{
+    const me = this;
+    const { cesiumMapInitParams } = config;
+    let html ='<button id="cesium-3DTiles-btn" type="button" class="cesium-button cesium-toolbar-button cesium-3DTiles-button" title="倾斜模型">';
+    html += '<svg class="cesium-svgPath-svg" width="28" height="28" viewBox="0 0 310.288 310.288" >';
+    // html += '<path d="M14,4l-10,8.75h20l-4.25-3.7188v-4.6562h-2.812v2.1875l-2.938-2.5625zm-7.0938,9.906v10.094h14.094v-10.094h-14.094zm2.1876,2.313h3.3122v4.25h-3.3122v-4.25zm5.8442,1.281h3.406v6.438h-3.406v-6.438z"></path>';
+    html += '<g><g><polygon style="fill:#FFC843;" points="287.641,76.497 155.144,0 22.647,76.497 155.144,152.993"/></g><g><polygon style="fill:#0071CE;" points="155.144,310.288 22.647,233.792 22.647,76.497 155.144,152.993"/></g><g><polygon style="fill:#00AF41;" points="155.144,310.288 287.641,233.792 287.641,76.497 155.144,152.993"/></g><g><path style="fill:#1E252B;" d="M64.62,208.163c2.68,3.262,8.896,9.53,15.434,13.304c12.109,6.992,15.86,1.44,15.754-4.408c-0.107-9.815-8.896-19.069-18.005-24.328l-5.251-3.032v-7.073l5.251,3.031c6.859,3.96,15.54,5.435,15.54-2.817c0-5.573-3.537-12.546-12.218-17.558c-5.572-3.217-10.932-3.846-13.932-3.435l-2.466-8.283c3.645-0.576,10.718,0.829,18.219,5.16c13.718,7.92,19.935,19.654,19.935,28.121c0,7.181-4.287,10.815-12.86,8.974v0.214c8.573,6.665,15.539,17.117,15.539,26.871c0,11.146-8.681,15.888-25.398,6.235c-7.824-4.517-14.684-10.942-18.112-15.173L64.62,208.163z"/></g><g><path style="fill:#1E252B;" d="M197.157,174.405c5.68-4.137,12.432-8.677,19.826-12.947c13.396-7.734,22.935-10.132,29.258-7.889c6.43,2.182,10.181,8.376,10.181,20.059c0,11.79-3.644,23.539-10.396,34.083c-6.752,10.65-17.897,20.729-31.937,28.835c-6.645,3.836-12.218,6.731-16.933,8.918L197.157,174.405L197.157,174.405z M206.48,232.9c2.358-0.933,5.787-2.805,9.431-4.909c19.935-11.509,30.759-28.905,30.759-48.412c0.106-17.103-9.538-22.358-29.258-10.973c-4.822,2.784-8.466,5.315-10.932,7.275V232.9z"/></g></g>';
+    html += '</svg>';    
+    html += '</button>';
+    jQuery(".cesium-viewer-toolbar").append(html); 
+    jQuery("#cesium-3DTiles-btn").on("click", function () {
+      me.add3DTile(cesiumMapInitParams.Tiles3D);
+    });  
+  }
+
+  /**
+   * 加载指定的3DTitle模型
+   * @method add3DTile
+   * @param  obj
+   * @return
+   */
+  add3DTile= (obj) => {
+    const me = this;
+    if(me.tileset){
+      me.viewer.scene.primitives.remove(me.tileset);      
+    }
+    // eslint-disable-next-line no-undef
+    me.tileset = me.viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
+        url:obj.url,
+        maximumScreenSpaceError: 2,//默认16,最大屏幕空间错误
+        maximumMemoryUsage:1024//默认512,内存MB的最大数量
+    }));
+    me.tileset.readyPromise.then(function(tileset) {
+        // // eslint-disable-next-line no-undef
+        // me.viewer.camera.viewBoundingSphere(tileset.boundingSphere, new Cesium.HeadingPitchRange(0, -0.5, 0));
+        // // eslint-disable-next-line no-undef
+        // me.viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+        me.viewer.zoomTo(tileset);       
+    }).otherwise(function (error) {
+        throw (error);
+    });   
+  }
+
+  /**
+   * 删除指定的3DTitle模型
+   * @method remove3DTile
+   * @param  primitive
+   * @return
+   */
+  remove3DTile= (primitive) => {
+    this.viewer.scene.primitives.remove(primitive);      
+  }  
+
+  /**
+   * 返回地图服务imageryProvider
+   * @method returnProviderViewModel
+   * @param  model 配置文件中的底图服务列表其中一个选项
+   * @return imageryProvider
+   */ 
+  returnProviderViewModel = (model) => {
+    let provider ={};
+    let obj = null;
+    let providerViewModel = null;
+    // if(model.proxyUrl && model.proxyUrl.length>0){
+    //   // eslint-disable-next-line no-undef
+    //   provider = {proxy : new Cesium.DefaultProxy(model.proxyUrl),url : model.Url};
+    // }
+    // else{
+    //   provider = {url : model.Url};
+    // }
+    
+    // eslint-disable-next-line no-undef
+    provider = model.proxyUrl && model.proxyUrl.length>0 ? {proxy : new Cesium.DefaultProxy(model.proxyUrl),url : model.Url}: {url : model.Url};
+
+    switch (model.type) {
+        case 0://ArcGisMapServerImageryProvider
+            obj= {enablePickFeatures:false};
+            provider = Object.assign(provider, obj);
+            // eslint-disable-next-line no-undef
+            providerViewModel = new Cesium.ArcGisMapServerImageryProvider(provider);
+            break;
+        case 1://OpenStreetMapImageryProvider
+            // eslint-disable-next-line no-undef
+            providerViewModel = new Cesium.OpenStreetMapImageryProvider(provider);
+            //providerViewModel = Cesium.createOpenStreetMapImageryProvider(provider);
+            break;
+        case 2://WebMapTileServiceImageryProvider
+            /*var obj= { layer:model.layer,style:model.style,format:model.format,tileMatrixSetID:model.tileMatrixSetID};
+            provider = Object.assign(provider, obj);
+            return new Cesium.WebMapTileServiceImageryProvider(provider);*/
+            // var obj= { layer:model.layer,style:model.style,format:model.format,tileMatrixSetID:model.tileMatrixSetID};
+            // provider = Object.assign(provider, obj);
+            // var tdtProvider = new TDTWMTSImageProvider(provider.url, false, 1, 18);
+            // return tdtProvider;
+            break;
+        case 3://TileMapServiceImageryProvider
+            obj= {credit:model.credit,fileExtension:model.fileExtension};
+            provider = Object.assign(provider, obj);
+            // eslint-disable-next-line no-undef
+            providerViewModel = new Cesium.TileMapServiceImageryProvider(provider);
+            //providerViewModel = Cesium.createTileMapServiceImageryProvider(provider);
+            break;
+        case 4://Cesium.UrlTemplateImageryProvider
+            obj= {credit:model.credit};
+            provider = Object.assign(provider, obj);
+            // eslint-disable-next-line no-undef
+            providerViewModel = new Cesium.UrlTemplateImageryProvider(provider);
+            break;
+        case 5://Cesium.WebMapServiceImageryProvider
+            obj= {credit:model.credit,layers:model.layers,tilingScheme:model.tilingScheme};
+            provider = Object.assign(provider, obj);
+            // eslint-disable-next-line no-undef
+            providerViewModel = new Cesium.WebMapServiceImageryProvider(provider);
+            break;
+        default:
+            obj= {enablePickFeatures:false};
+            provider = Object.assign(provider, obj);
+            // eslint-disable-next-line no-undef
+            providerViewModel = new Cesium.ArcGisMapServerImageryProvider(provider);
+            break;
+    } 
+    return providerViewModel;  
   }
 
   /**
@@ -332,15 +526,6 @@ export default class homePage extends PureComponent {
     //   }
     // }
   } 
-  // 创建图层管理控件
-  createToc = () => {
-  };  
-  // 创建地图导航控件
-  createNavigationControl = () => {
-    // eslint-disable-next-line no-undef
-    this.viewer.extend(Cesium.viewerCesiumNavigationMixin, {defaultResetView:this.defaultResetView});
-  };
-
 
   render() {
     const {

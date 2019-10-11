@@ -1,0 +1,71 @@
+/*底图切换控件*/
+.map_switch {
+    position: absolute;
+    right: 7px;
+    /* top: 15px; */
+    bottom: 40px;
+    font-family: "宋体";
+    font-size: 12px;
+    width: 80px;
+    z-index: 999;
+}
+.map_switch_item {
+    width: 80px;
+    height: 60px;
+    border: 1px solid #b1b1b1;
+    text-align: center;
+    float: right;
+    display: inline;
+    margin-left: 10px;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.hoverType:hover {
+    width: 76px;
+    height: 58px;
+    background-color: #c6e0f7;
+    margin: auto;
+}
+
+.hoverType {
+    width: 76px;
+    height: 58px;
+    background-color: #fff;
+    margin: auto;
+}
+.vecType {
+    width: 76px;
+    height: 38px;
+    /* background: url(./images/indexImage.png) no-repeat -154px -202px; */
+    background: url(./images/arcgisVector.png);
+}
+
+.imgType {
+    width: 76px;
+    height: 38px;
+    /* background: url(./images/indexImage.png) no-repeat -154px -155px; */
+    background: url(./images/arcgisImage.png);
+}
+
+.terType {
+    width: 76px;
+    height: 38px;
+    background: url(./images/indexImage.png) no-repeat -86px -202px;
+}
+.d25Type {
+    width: 76px;
+    height: 38px;
+    background: url(./images/indexImage.png) no-repeat -220px -202px;
+}
+.glbType {
+    width: 76px;
+    height: 38px;
+    background: url(./images/indexImage.png) no-repeat -86px -155px;
+}
+
+.map_bom {
+    height:22px;
+    line-height:22px;
+    color: #333333;
+}
