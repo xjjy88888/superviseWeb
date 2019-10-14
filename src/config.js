@@ -626,7 +626,9 @@ const config = {
       wkid: 4326
     },
     Tiles3D:{//三维倾斜摄影配置信息
-      url: "./cesiumfile/3Dtiles/pazhou/Production_3.json"
+      url: "./cesiumfile/3Dtiles/pazhou/Production_3.json",
+      //url: "./cesiumfile/3Dtiles/Production_1/Scene/Production_1.json",
+     // url: "./cesiumfile/3Dtiles/Scene/cesium1.json",
     },
     /*备注说明:配置底图列表
       *type代表地图服务类型(0代表ArcGisMapServerImageryProvider;1代表createOpenStreetMapImageryProvider;
@@ -644,8 +646,13 @@ const config = {
         {"label":"OSM街道图",className:"vecType",type:1,proxyUrl:'',Url:'https://a.tile.openstreetmap.org/'},
         //{"label":"WMS",className:"imgType",type:5,proxyUrl:'',Url:'http://localhost:8180/geoserver/gwc/service/wms',credit:'wms服务',layers: 'worldMap'},
         //{"label":"WMS",className:"imgType",type:5,proxyUrl:'',Url:'http://localhost:8180/geoserver/gwc/service/wms',credit:'wms服务',layers: 'worldMap',tilingScheme:new Cesium.WebMercatorTilingScheme()},
-        {"label":"天地影像图",className:"imgType",type:2,proxyUrl:'',Url:'http://t{l}.tianditu.cn/img_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=c&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=tiles',layer: 'tdtImgBasicLayer',style: 'default',format: 'image/jpeg',tileMatrixSetID:'tdtMap'},
-        {"label":"天地街道图",className:"vecType",type:2,proxyUrl:'',Url:'http://t{l}.tianditu.cn/vec_c/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=c&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=tiles',layer: 'tdtVecBasicLayer',style: 'default',format: 'image/jpeg',tileMatrixSetID:'tdtMap'},
+        //subdomains默认值'abc'
+        {"label":"天地影像图",className:"imgType",type:2,proxyUrl:'',Url:'http://t{s}.tianditu.com/img_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&tk=7786923a385369346d56b966bb6ad62f',layer: 'tdtImgBasicLayer',style: 'default',format: 'tiles',tileMatrixSetID:'tdtMap',subdomains:["0", "1", "2", "3", "4", "5", "6", "7"]},
+        {"label":"天地街道图",className:"vecType",type:2,proxyUrl:'',Url:'http://t{s}.tianditu.com/vec_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=vec&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&tk=7786923a385369346d56b966bb6ad62f',layer: 'tdtVecBasicLayer',style: 'default',format: 'tiles',tileMatrixSetID:'tdtMap',subdomains:["0", "1", "2", "3", "4", "5", "6", "7"]},
+        {"label":"谷歌影像图",className:"imgType",type:4,proxyUrl:'',Url:'http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}',credit:'googleMap服务',subdomains: "abc"},
+        {"label":"谷歌街道图",className:"vecType",type:4,proxyUrl:'',Url:'http://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}',credit:'googleMap服务',subdomains: "abc"},
+        {"label":"高德影像图",className:"imgType",type:4,proxyUrl:'',Url:'http://webst0{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',credit:'gaodeMap服务',subdomains: ["1", "2", "3", "4"]},
+        {"label":"高德街道图",className:"vecType",type:4,proxyUrl:'',Url:'http://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',credit:'gaodeMap服务',subdomains: ["1", "2", "3", "4"]},
       ],   
   }, 
   //天地图影像注记

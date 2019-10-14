@@ -3156,11 +3156,11 @@ export default class sider extends PureComponent {
                         allowClear
                         showSearch
                         optionFilterProp="children"
-                        filterOption={(input, option) =>
-                          option.props.children
-                            .toLowerCase()
-                            .indexOf(input.toLowerCase()) >= 0
-                        }
+                        // filterOption={(input, option) =>
+                        //   option.props.children
+                        //     .toLowerCase()
+                        //     .indexOf(input.toLowerCase()) >= 0
+                        // }
                         onSearch={v => {
                           this.setState({ departSearch: v, isSelect: false });
                           this.queryDepartList(v, 1);

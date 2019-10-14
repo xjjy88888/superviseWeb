@@ -3,7 +3,10 @@ import { connect } from "dva";
 import Layouts from "../../components/Layouts";
 import proj4 from "proj4";
 import config from "../../config";
-import jQuery from "jquery";
+// import $ from "jquery";
+import $ from './jquery-vendor'
+import 'ztree';
+import 'ztree/css/zTreeStyle/zTreeStyle.css';
 
 
 @connect(({ mapdata }) => ({
@@ -15,6 +18,7 @@ export default class homePage extends PureComponent {
     this.state = {
       imageTimeText:'',
       showImageTimeText:false,
+      showLayerContainer:false,
     };
     this.viewer = null;
     this.initExtent = null;
@@ -30,6 +34,8 @@ export default class homePage extends PureComponent {
     me.createMap();
     // 创建底图切换控件
     me.createSwitcherMapControl(); 
+    //创建3DTiles按钮容器
+    me.create3DTilesButton();
     // 创建图层管理控件
     me.createToc();    
     // 创建地图导航控件
@@ -75,7 +81,7 @@ export default class homePage extends PureComponent {
     //cesium全屏按钮是否设置
     if(me.viewer.fullscreenButton){
       // this.viewer.fullscreenButton.viewModel.tooltip = "全屏"; 
-      jQuery(".cesium-viewer-fullscreenContainer").css("z-index","100");
+      $(".cesium-viewer-fullscreenContainer").css("z-index","100");
     }
     //地图初始化跳转
     me.cartographicWS = [cesiumMapInitParams.extent.xmin, cesiumMapInitParams.extent.ymin];
@@ -111,9 +117,9 @@ export default class homePage extends PureComponent {
     //添加地形
     me.addTerrainLayer();
 
-    //创建3DTiles按钮容器
-    me.create3DTilesButton();
-    
+    //设置为true时,球体会有高程遮挡效果(在没有地形时候也会有高程遮挡效果)
+    //me.viewer.scene.globe.depthTestAgainstTerrain = true;
+   
   }
 
   // 创建底图切换控件
@@ -134,7 +140,7 @@ export default class homePage extends PureComponent {
     const baseLayerSwitcherToolbar = new BaseLayerSwitcherToolBar({
         data: data
     });
-    jQuery(".cesium-viewer").append(baseLayerSwitcherToolbar.target);
+    $(".cesium-viewer").append(baseLayerSwitcherToolbar.target);
     let curlayer = null;
     baseLayerSwitcherToolbar.onItemClick = function(itemData,index,element){
         //var data = itemData.data;
@@ -167,6 +173,16 @@ export default class homePage extends PureComponent {
   
   // 创建图层管理控件
   createToc = () => {
+    const me = this;
+    const { cesiumMapInitParams } = config;
+    let html ='<button id="cesium-layer-btn" type="button" class="cesium-button cesium-toolbar-button cesium-layer-button" title="图层控制">';
+    html += '<img src="./g/component/Cesium/images/layer.png" width="30" height="30">';
+    html += '</img>';    
+    html += '</button>';
+    $(".cesium-viewer-toolbar").append(html); 
+    // $("#cesium-3DTiles-btn").on("click", function () {
+    //   me.add3DTile(cesiumMapInitParams.Tiles3D);
+    // });     
   };  
 
   // 创建地图导航控件
@@ -185,8 +201,8 @@ export default class homePage extends PureComponent {
     html += '<g><g><polygon style="fill:#FFC843;" points="287.641,76.497 155.144,0 22.647,76.497 155.144,152.993"/></g><g><polygon style="fill:#0071CE;" points="155.144,310.288 22.647,233.792 22.647,76.497 155.144,152.993"/></g><g><polygon style="fill:#00AF41;" points="155.144,310.288 287.641,233.792 287.641,76.497 155.144,152.993"/></g><g><path style="fill:#1E252B;" d="M64.62,208.163c2.68,3.262,8.896,9.53,15.434,13.304c12.109,6.992,15.86,1.44,15.754-4.408c-0.107-9.815-8.896-19.069-18.005-24.328l-5.251-3.032v-7.073l5.251,3.031c6.859,3.96,15.54,5.435,15.54-2.817c0-5.573-3.537-12.546-12.218-17.558c-5.572-3.217-10.932-3.846-13.932-3.435l-2.466-8.283c3.645-0.576,10.718,0.829,18.219,5.16c13.718,7.92,19.935,19.654,19.935,28.121c0,7.181-4.287,10.815-12.86,8.974v0.214c8.573,6.665,15.539,17.117,15.539,26.871c0,11.146-8.681,15.888-25.398,6.235c-7.824-4.517-14.684-10.942-18.112-15.173L64.62,208.163z"/></g><g><path style="fill:#1E252B;" d="M197.157,174.405c5.68-4.137,12.432-8.677,19.826-12.947c13.396-7.734,22.935-10.132,29.258-7.889c6.43,2.182,10.181,8.376,10.181,20.059c0,11.79-3.644,23.539-10.396,34.083c-6.752,10.65-17.897,20.729-31.937,28.835c-6.645,3.836-12.218,6.731-16.933,8.918L197.157,174.405L197.157,174.405z M206.48,232.9c2.358-0.933,5.787-2.805,9.431-4.909c19.935-11.509,30.759-28.905,30.759-48.412c0.106-17.103-9.538-22.358-29.258-10.973c-4.822,2.784-8.466,5.315-10.932,7.275V232.9z"/></g></g>';
     html += '</svg>';    
     html += '</button>';
-    jQuery(".cesium-viewer-toolbar").append(html); 
-    jQuery("#cesium-3DTiles-btn").on("click", function () {
+    $(".cesium-viewer-toolbar").append(html); 
+    $("#cesium-3DTiles-btn").on("click", function () {
       me.add3DTile(cesiumMapInitParams.Tiles3D);
     });  
   }
@@ -263,9 +279,10 @@ export default class homePage extends PureComponent {
             //providerViewModel = Cesium.createOpenStreetMapImageryProvider(provider);
             break;
         case 2://WebMapTileServiceImageryProvider
-            /*var obj= { layer:model.layer,style:model.style,format:model.format,tileMatrixSetID:model.tileMatrixSetID};
+            obj= { layer:model.layer,style:model.style,format:model.format,tileMatrixSetID:model.tileMatrixSetID,subdomains:model.subdomains};
             provider = Object.assign(provider, obj);
-            return new Cesium.WebMapTileServiceImageryProvider(provider);*/
+            // eslint-disable-next-line no-undef
+            providerViewModel = new Cesium.WebMapTileServiceImageryProvider(provider);
             // var obj= { layer:model.layer,style:model.style,format:model.format,tileMatrixSetID:model.tileMatrixSetID};
             // provider = Object.assign(provider, obj);
             // var tdtProvider = new TDTWMTSImageProvider(provider.url, false, 1, 18);
@@ -279,7 +296,7 @@ export default class homePage extends PureComponent {
             //providerViewModel = Cesium.createTileMapServiceImageryProvider(provider);
             break;
         case 4://Cesium.UrlTemplateImageryProvider
-            obj= {credit:model.credit};
+            obj= {credit:model.credit,subdomains:model.subdomains};
             provider = Object.assign(provider, obj);
             // eslint-disable-next-line no-undef
             providerViewModel = new Cesium.UrlTemplateImageryProvider(provider);
@@ -349,7 +366,7 @@ export default class homePage extends PureComponent {
     const me = this;
     //地图底部工具栏显示地图坐标信息
     let elementbottom = document.createElement("div");
-    jQuery(".cesium-viewer").append(elementbottom);
+    $(".cesium-viewer").append(elementbottom);
     // elementbottom.className = "mapfootBottom";
     elementbottom.style.width = "100%";
     elementbottom.style.height = "30px";
@@ -375,7 +392,7 @@ export default class homePage extends PureComponent {
         coordinatesDiv.style.left = "10px";
         coordinatesDiv.style.lineHeight = "29px";
         coordinatesDiv.innerHTML = "<span id='cd_label' style='font-size:13px;text-align:center;font-family:微软雅黑;color:#edffff;'>暂无坐标信息</span>";
-        jQuery(".cesium-viewer").append(coordinatesDiv);
+        $(".cesium-viewer").append(coordinatesDiv);
         // eslint-disable-next-line no-undef
         let handler3D = new Cesium.ScreenSpaceEventHandler(me.viewer.scene.canvas);
         handler3D.setInputAction(function(movement) {
@@ -406,7 +423,7 @@ export default class homePage extends PureComponent {
                         if(!point){
                             point = [0,0];
                         }
-                        coordinatesDiv.innerHTML = "<span id='cd_label' style='font-size:13px;text-align:center;font-family:微软雅黑;color:#edffff;'>视角海拔高度:"+(he - he2).toFixed(2)+"米&nbsp;&nbsp;&nbsp;&nbsp;海拔:"+height.toFixed(2)+"米&nbsp;&nbsp;&nbsp;&nbsp;经度：" + point[0].toFixed(6) + "&nbsp;&nbsp;纬度：" + point[1].toFixed(6)+ "</span>";
+                        coordinatesDiv.innerHTML = "<span id='cd_label' style='font-size:13px;text-align:center;font-family:微软雅黑;color:#edffff;'>视角高度:"+(he - he2).toFixed(2)+"米&nbsp;&nbsp;&nbsp;&nbsp;海拔高度:"+height.toFixed(2)+"米&nbsp;&nbsp;&nbsp;&nbsp;经度：" + point[0].toFixed(6) + "&nbsp;&nbsp;纬度：" + point[1].toFixed(6)+ "</span>";
                     }
                 }
             }
@@ -531,6 +548,7 @@ export default class homePage extends PureComponent {
     const {
       imageTimeText,
       showImageTimeText,
+      showLayerContainer,
     } = this.state;
     return (
       <Layouts avtive="map">
@@ -551,6 +569,19 @@ export default class homePage extends PureComponent {
               height: "100%"
             }}
           />
+          {/* 图层叠加面板 */}
+          <div
+            style={{
+              display: showLayerContainer ? "block" : "none",
+              width:150,
+              position: "absolute",
+              top: 95,
+              right: 10, 
+              background: "#ffffff"             
+            }}
+          >
+            <ul id="ztreeThemeServerOfLayer" className="ztree"></ul>
+          </div>
           {/* 监管影像时间显示信息 */}
           <div
             style={{

@@ -49,7 +49,8 @@
     "react-dom": "^16.2.0",
     "react-highlight-words": "^0.16.0",
     "shpjs": "^3.4.3",
-    "turf": "^3.0.14"
+    "turf": "^3.0.14",
+    "ztree": "^3.5.24"
   },
   "devDependencies": {
     "babel-plugin-dva-hmr": "^0.3.2",
