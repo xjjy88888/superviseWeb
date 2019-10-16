@@ -56,6 +56,10 @@ const districtBoundUrl = `${
     : "http://183.6.178.124:8143/geoserver/ZKYGIS"
   }`;
 
+const geoserverUrl =`${isLocal ? "http://183.6.178.124:8143" : `${l.protocol}//${l.hostname}:8143`}/geoserver/ZKYGIS`;
+const mapProjectLayerName = isFormal ? "ZKYGIS:bs_project_scope" : "ZKYGIS:bs_project_scope_t";//现状库项目红线
+const mapSpotLayerName = isFormal ? "ZKYGIS:bs_spot" : "ZKYGIS:bs_spot_t";//现状库扰动图斑
+
 const config = {
   domain: domain,
   download: `http://www.zkygis.cn/stbcjg/Template/`,
@@ -625,11 +629,6 @@ const config = {
     spatialReference: {//地图空间参考坐标系
       wkid: 4326
     },
-    Tiles3D:{//三维倾斜摄影配置信息
-      url: "./cesiumfile/3Dtiles/pazhou/Production_3.json",
-      //url: "./cesiumfile/3Dtiles/Production_1/Scene/Production_1.json",
-     // url: "./cesiumfile/3Dtiles/Scene/cesium1.json",
-    },
     /*备注说明:配置底图列表
       *type代表地图服务类型(0代表ArcGisMapServerImageryProvider;1代表createOpenStreetMapImageryProvider;
                       2代表WebMapTileServiceImageryProvider;3代表createTileMapServiceImageryProvider;
@@ -653,7 +652,53 @@ const config = {
         {"label":"谷歌街道图",className:"vecType",type:4,proxyUrl:'',Url:'http://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}',credit:'googleMap服务',subdomains: "abc"},
         {"label":"高德影像图",className:"imgType",type:4,proxyUrl:'',Url:'http://webst0{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',credit:'gaodeMap服务',subdomains: ["1", "2", "3", "4"]},
         {"label":"高德街道图",className:"vecType",type:4,proxyUrl:'',Url:'http://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',credit:'gaodeMap服务',subdomains: ["1", "2", "3", "4"]},
-      ],   
+      ], 
+      /*地图图层菜单目录构造*/
+      /*
+      *name-图层名称
+      *layerurl-图层服务配置
+      *type代表地图服务类型:
+      0代表ArcGisMapServerImageryProvider;
+      1代表createOpenStreetMapImageryProvider;
+      2代表WebMapTileServiceImageryProvider;
+      3代表createTileMapServiceImageryProvider;
+      4 代表UrlTemplateImageryProvider;
+      5 代表WebMapServiceImageryProviderr(WMS);
+      6 代表kml,kmz;
+      7 代表geoJson;
+      *layerid-图层id
+      */     
+      overlayLayers:[
+        { id: 1, pId: 0, name: "基础图层",checked:false },
+        {
+            id: 11,
+            pId: 1,
+            name: "扰动图斑",//WMS
+            layerurl:geoserverUrl,
+            layerid: mapSpotLayerName,
+            IsWebMercatorTilingScheme:true,//是否创建摩卡托投影坐标系,默认是地理坐标系
+            type: 5,
+            checked: false
+        }, 
+        {
+            id: 12,
+            pId: 1,
+            name: "项目红线",//WMS
+            layerurl:geoserverUrl,
+            layerid: mapProjectLayerName,
+            IsWebMercatorTilingScheme:true,//是否创建摩卡托投影坐标系,默认是地理坐标系
+            type: 5,
+            checked: false
+        },                 
+      ],
+      Tiles3D:{//三维倾斜摄影配置信息
+        url: "./cesiumfile/3Dtiles/pazhou/Production_3.json",
+        //url: "./cesiumfile/3Dtiles/Production_1/Scene/Production_1.json",
+       // url: "./cesiumfile/3Dtiles/Scene/cesium1.json",
+      },    
+      
+
+
   }, 
   //天地图影像注记
   tdtImageLabel: {
@@ -786,13 +831,8 @@ const config = {
   mapUrl: {
     SHP: `./mapfile/SHP/`,
     mapshaper: `./mapshaper/index.html`,
-    // geoserverUrl: "https://www.zkygis.cn/geoserver/ZKYGIS",
     //geoserverUrl: "https://www.zkygis.cn:8143/geoserver/ZKYGIS",
-    geoserverUrl: `${
-      isLocal
-        ? "http://183.6.178.124:8143"
-        : `${l.protocol}//${l.hostname}:8143`
-      }/geoserver/ZKYGIS`,
+    geoserverUrl:geoserverUrl,
     geoserverQueryUrl: "http://localhost:8080/geoserver/ZKYGIS",
     //根据地图当前范围获取对应历史影像数据接口
     getInfoByExtent: `${imageQueryBaseUrl}/latest/getInfoByExtent`
@@ -802,13 +842,8 @@ const config = {
   mapLayersName: isFormal
     ? "ZKYGIS:bs_project_scope,ZKYGIS:bs_spot"
     : "ZKYGIS:bs_project_scope_t,ZKYGIS:bs_spot_t", //现状库扰动图斑和项目红线
-  // mapProjectLayerName: "ZKYGIS:bs_project_scope", //现状库项目红线
-  mapProjectLayerName: isFormal
-    ? "ZKYGIS:bs_project_scope"
-    : "ZKYGIS:bs_project_scope_t", //现状库项目红线
-  // mapSpotLayerName: "ZKYGIS:bs_spot", //现状库扰动图斑
-  mapSpotLayerName: isFormal ? "ZKYGIS:bs_spot" : "ZKYGIS:bs_spot_t", //现状库扰动图斑
-  // mapHistorySpotLayerName: "ZKYGIS:bs_spot_history", //历史库扰动图斑
+  mapProjectLayerName: mapProjectLayerName, //现状库项目红线
+  mapSpotLayerName: mapSpotLayerName, //现状库扰动图斑
   mapHistorySpotLayerName: isFormal
     ? "ZKYGIS:bs_spot_history"
     : "ZKYGIS:bs_spot_history_t", //历史库扰动图斑

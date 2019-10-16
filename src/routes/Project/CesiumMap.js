@@ -179,10 +179,13 @@ export default class homePage extends PureComponent {
     html += '<img src="./g/component/Cesium/images/layer.png" width="30" height="30">';
     html += '</img>';    
     html += '</button>';
-    $(".cesium-viewer-toolbar").append(html); 
-    // $("#cesium-3DTiles-btn").on("click", function () {
-    //   me.add3DTile(cesiumMapInitParams.Tiles3D);
-    // });     
+    $(".cesium-viewer-toolbar").append(html);
+    //加载ztree目录树数据源
+    //点击事件显示以及隐藏 ztree目录树
+    $("#cesium-layer-btn").on("click", function () {
+      const { showLayerContainer } = me.state;
+      me.setState({ showLayerContainer: !showLayerContainer });   
+    });     
   };  
 
   // 创建地图导航控件
