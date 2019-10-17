@@ -131,7 +131,6 @@ export default class area extends PureComponent {
       district: { districtTreeFilter }
     } = this.props;
     const items = this.find(v, list || districtTreeFilter);
-    console.log(items);
     this.setState({
       districtList: (items || []).map(i => {
         return { ...i, children: null };
