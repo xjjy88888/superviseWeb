@@ -1,14 +1,14 @@
-import { notification } from "antd";
+import { notification } from 'antd';
 import {
   departsTreeApi,
   departsListApi,
   departsCreateUpdateApi,
   departsDeleteApi,
   departsDeleteMulApi
-} from "../services/httpApi";
+} from '../services/httpApi';
 
 export default {
-  namespace: "departs",
+  namespace: 'departs',
 
   state: {
     departsTree: [],
@@ -20,22 +20,22 @@ export default {
   },
 
   effects: {
-    // 行政部门_树状列表
+    // 行政部门_树状列表1
     *departsTree({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result }
       } = yield call(departsTreeApi, payload);
-      if (callback) callback(success, error, result);
       if (success) {
         yield put({
-          type: "save",
+          type: 'save',
           payload: { departsTree: result.items }
         });
       } else {
-        notification["error"]({
+        notification['error']({
           message: `查询行政部门列表失败`
         });
       }
+      if (callback) callback(success, error, result);
     },
 
     // 行政部门_列表
@@ -46,11 +46,11 @@ export default {
       if (callback) callback(success, error, result);
       if (success) {
         yield put({
-          type: "save",
+          type: 'save',
           payload: { departsList: result }
         });
       } else {
-        notification["error"]({
+        notification['error']({
           message: `查询行政部门列表失败`
         });
       }
@@ -62,8 +62,8 @@ export default {
         data: { success, error, result }
       } = yield call(departsCreateUpdateApi, payload);
       if (callback) callback(success, error, result);
-      notification[success ? "success" : "error"]({
-        message: `${payload.id ? "编辑" : "新建"}${success ? `成功` : `失败`}`
+      notification[success ? 'success' : 'error']({
+        message: `${payload.id ? '编辑' : '新建'}${success ? `成功` : `失败`}`
       });
     },
 

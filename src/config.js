@@ -2,7 +2,7 @@ const l = window.location;
 const isFormal = l.href.split("/")[3] === "stbcjg";
 const isLocal = l.hostname === "localhost";
 
-console.log(`%c当前版本：v2.0.7`, "color:green;font-size:30px");
+console.log(`%c当前版本：v2.0.8`, "color:green;font-size:30px");
 
 console.log(isLocal ? "本地环境" : isFormal ? "正式环境" : "测试环境");
 
@@ -59,6 +59,7 @@ const districtBoundUrl = `${
 const geoserverUrl =`${isLocal ? "http://183.6.178.124:8143" : `${l.protocol}//${l.hostname}:8143`}/geoserver/ZKYGIS`;
 const mapProjectLayerName = isFormal ? "ZKYGIS:bs_project_scope" : "ZKYGIS:bs_project_scope_t";//现状库项目红线
 const mapSpotLayerName = isFormal ? "ZKYGIS:bs_spot" : "ZKYGIS:bs_spot_t";//现状库扰动图斑
+const mapDistrictLayerName = isFormal ? "ZKYGIS:district_code" : "ZKYGIS:district_code_t";
 
 const config = {
   domain: domain,
@@ -639,10 +640,10 @@ const config = {
       *Url地图Url
       */
       imageryViewModels:[
+        {"label":"监管影像图",className:"imgType",type:4,proxyUrl:'',Url:myOnlineImageUrl},
+        {"label":"OSM街道图",className:"vecType",type:1,proxyUrl:'',Url:'https://a.tile.openstreetmap.org/'},
         {"label":"ArcGIS影像图",className:"imgType",type:0,proxyUrl:'',Url:'http://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer'},
         {"label":"ArcGIS街道图",className:"vecType",type:0,proxyUrl:'',Url:'http://cache1.arcgisonline.cn/arcgis/rest/services/ChinaOnlineCommunity/MapServer'},
-        {"label":"监管影像图",className:"imgType",type:4,proxyUrl:'',Url:'http://www.stbcjg.cn/BasemapService/rest/image/latest/tile/{z}/{y}/{x}'},
-        {"label":"OSM街道图",className:"vecType",type:1,proxyUrl:'',Url:'https://a.tile.openstreetmap.org/'},
         //{"label":"WMS",className:"imgType",type:5,proxyUrl:'',Url:'http://localhost:8180/geoserver/gwc/service/wms',credit:'wms服务',layers: 'worldMap'},
         //{"label":"WMS",className:"imgType",type:5,proxyUrl:'',Url:'http://localhost:8180/geoserver/gwc/service/wms',credit:'wms服务',layers: 'worldMap',tilingScheme:new Cesium.WebMercatorTilingScheme()},
         //subdomains默认值'abc'
@@ -659,9 +660,9 @@ const config = {
       *layerurl-图层服务配置
       *type代表地图服务类型:
       0代表ArcGisMapServerImageryProvider;
-      1代表createOpenStreetMapImageryProvider;
+      1代表OpenStreetMapImageryProvider;
       2代表WebMapTileServiceImageryProvider;
-      3代表createTileMapServiceImageryProvider;
+      3代表TileMapServiceImageryProvider;
       4 代表UrlTemplateImageryProvider;
       5 代表WebMapServiceImageryProviderr(WMS);
       6 代表kml,kmz;
@@ -674,27 +675,52 @@ const config = {
             id: 11,
             pId: 1,
             name: "扰动图斑",//WMS
-            layerurl:geoserverUrl,
+            layerurl:geoserverUrl+"/wms",
             layerid: mapSpotLayerName,
-            IsWebMercatorTilingScheme:true,//是否创建摩卡托投影坐标系,默认是地理坐标系
+            IsWebMercatorTilingScheme:false,//是否创建摩卡托投影坐标系,默认是地理坐标系
             type: 5,
+            proxyUrl:'',
             checked: false
         }, 
         {
             id: 12,
             pId: 1,
             name: "项目红线",//WMS
-            layerurl:geoserverUrl,
+            layerurl:geoserverUrl+"/wms",
             layerid: mapProjectLayerName,
-            IsWebMercatorTilingScheme:true,//是否创建摩卡托投影坐标系,默认是地理坐标系
+            IsWebMercatorTilingScheme:false,//是否创建摩卡托投影坐标系,默认是地理坐标系
             type: 5,
+            proxyUrl:'',
             checked: false
-        },                 
+        }, 
+        {
+          id: 13,
+          pId: 1,
+          name: "路网注记",
+          layerurl:"http://t{s}.tianditu.com/cia_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=cia&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&tk=7786923a385369346d56b966bb6ad62f",
+          layerid: "tdtImgLabelLayer",
+          IsWebMercatorTilingScheme:false,//是否创建摩卡托投影坐标系,默认是地理坐标系
+          type: 2,
+          proxyUrl:'',
+          checked: false
+        },
+        {
+          id: 14,
+          pId: 1,
+          name: "行政边界",//WMS
+          layerurl:geoserverUrl+"/wms",
+          layerid: mapDistrictLayerName,
+          IsWebMercatorTilingScheme:false,//是否创建摩卡托投影坐标系,默认是地理坐标系
+          type: 5,
+          proxyUrl:'',
+          checked: false
+        },                   
+        
+
       ],
       Tiles3D:{//三维倾斜摄影配置信息
         url: "./cesiumfile/3Dtiles/pazhou/Production_3.json",
         //url: "./cesiumfile/3Dtiles/Production_1/Scene/Production_1.json",
-       // url: "./cesiumfile/3Dtiles/Scene/cesium1.json",
       },    
       
 
@@ -714,9 +740,7 @@ const config = {
   districtBound: {
     title: "行政边界",
     url: districtBoundUrl,
-    mapDistrictLayerName: isFormal
-      ? "ZKYGIS:district_code"
-      : "ZKYGIS:district_code_t",
+    mapDistrictLayerName: mapDistrictLayerName,
     minZoom: 0,
     maxZoom: 21,
     picUrl: `./img/districtBound.png`,

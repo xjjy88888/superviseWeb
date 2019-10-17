@@ -69,3 +69,8 @@
     line-height:22px;
     color: #333333;
 }
+
+/*覆盖ztree样式*/
+.ztree li a {
+  color: #fff !important;
+}

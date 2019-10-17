@@ -17,7 +17,7 @@ export default class homePage extends PureComponent {
     super(props);
     this.state = {
       imageTimeText:'',
-      showImageTimeText:false,
+      showImageTimeText:true,
       showLayerContainer:false,
     };
     this.viewer = null;
@@ -25,6 +25,8 @@ export default class homePage extends PureComponent {
     this.defaultResetView = null;
     this.tileset = null;
     this.cesiumLayerList = [];
+    this.layer3DList=[];
+    this.treeObj = null;
     this.onlineBasemapLayers = null;
   }
 
@@ -60,16 +62,14 @@ export default class homePage extends PureComponent {
       selectionIndicator:true,//选中元素显示,默认true
       navigationHelpButton:false,//导航帮助说明,默认true
       navigationInstructionsInitiallyVisible:false,
+      // skyBox : false, //天空设置，undefined则显示默认星空
+      skyAtmosphere : false,//不显示蓝色的大气层
       //imageryProviderViewModels:this._getImageryViewModels(options.mapInitParams.imageryViewModels),//设置影像图列表，baseLayerPicker配合使用
       //imageryProvider :this.returnProviderViewModel(options.mapInitParams.imageryViewModels[0]),//baseLayerPicker设置false才生效，默认加载的底图
       sceneModePicker : false,//是否显示地图2D2.5D3D模式  
     });
-    // //监听地图移动完成事件
-    // map.on("moveend", this.onMoveendMap);
-    // //监听地图底图切换事件
-    // map.on("baselayerchange", this.onBaseLayerChange); 
-    // //监听地图鼠标移动事件
-    // map.on("mousemove", this.showImageInfos);
+    //监听地图移动完成事件
+    me.viewer.camera.moveEnd.addEventListener(this.onMoveendMap);
 
     //默认加载配置文件第一个底图
     me.viewer.scene.imageryLayers.removeAll();//清空底图
@@ -143,15 +143,20 @@ export default class homePage extends PureComponent {
     $(".cesium-viewer").append(baseLayerSwitcherToolbar.target);
     let curlayer = null;
     baseLayerSwitcherToolbar.onItemClick = function(itemData,index,element){
-        //var data = itemData.data;
-        // const data = itemData;
+        // console.log('itemData',itemData);
         //清空指定ID的底图imageryLayers
         me.removeLayerByID("baseMap");
         const layers = me.viewer.scene.imageryLayers;
-        // curlayer = layers.addImageryProvider(me.returnProviderViewModel(cesiumMapInitParams.imageryViewModels[data.id]));
         curlayer = layers.addImageryProvider(me.returnProviderViewModel(cesiumMapInitParams.imageryViewModels[index]));
         layers.lowerToBottom(curlayer);
         me.cesiumLayerList.push({layer:curlayer,id:"baseMap"});
+        //判断当前底图是否等于监管影像
+        if(itemData.Url === config.onlineBasemaps[0].url){
+          me.setState({ showImageTimeText: true });       
+        }
+        else{
+          me.setState({ showImageTimeText: false });
+        }
     };   
   }
 
@@ -181,12 +186,206 @@ export default class homePage extends PureComponent {
     html += '</button>';
     $(".cesium-viewer-toolbar").append(html);
     //加载ztree目录树数据源
+    me.Init3DTreeLayers(cesiumMapInitParams.overlayLayers);
     //点击事件显示以及隐藏 ztree目录树
     $("#cesium-layer-btn").on("click", function () {
       const { showLayerContainer } = me.state;
       me.setState({ showLayerContainer: !showLayerContainer });   
     });     
-  };  
+  };
+
+  /*初始化三维目录树图层*/
+  Init3DTreeLayers = (layersconfig) => {
+    const me = this;
+    const setting = {
+        check: {
+            enable: true
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        },
+        callback: {
+            onCheck: function (e, treeId, treeNode) {
+                if (treeNode.checked) {//勾选状态下,显示地图控件
+                    if (treeNode.children) { //勾选专题目录
+                        for (let i = 0; i < treeNode.children.length; i++) {
+                          me.loadServerTypeMap(treeNode.children[i].id, treeNode.children[i].type, treeNode.children[i].layerurl, treeNode.children[i].layerid, treeNode.children[i].proxyUrl,treeNode.children[i].IsWebMercatorTilingScheme);
+                        }
+                    }
+                    else {//勾选叶节点
+                          me.loadServerTypeMap(treeNode.id, treeNode.type, treeNode.layerurl, treeNode.layerid, treeNode.proxyUrl,treeNode.IsWebMercatorTilingScheme);
+                    }
+                }
+                else { //去掉勾选框,隐藏地图控件
+                    if (treeNode.children) { //专题目录
+                        for (let i = 0; i < treeNode.children.length; i++) {
+                          me.deleteServerTypeMap(treeNode.children[i].id);
+                        }
+                    }
+                    else {//叶节点
+                         me.deleteServerTypeMap(treeNode.id);
+                    }
+                }
+            }
+        }
+    };
+    const ztreeRoleAuth = $("#ztreeThemeServerOfLayer");
+    $.fn.zTree.init(ztreeRoleAuth, setting, layersconfig);
+    this.treeObj = $.fn.zTree.getZTreeObj("ztreeThemeServerOfLayer");
+    this.treeObj.expandAll(true);
+    //加载已经勾选的图层
+    const nodes = this.treeObj.getCheckedNodes(true);
+    if(nodes.length>0){
+        for(let i=0;i<nodes.length;i++){
+            if(!nodes[i].isParent){//节点图层
+               me.loadServerTypeMap(nodes[i].id, nodes[i].type, nodes[i].layerurl, nodes[i].layerid, nodes[i].proxyUrl,nodes[i].IsWebMercatorTilingScheme);
+            }
+        }
+    }   
+  }
+
+  /**
+   * 加载不同类型地图服务的底图
+   @ id 图层的id标识
+    @ servertype 地图服务类型(0代表ArcGisMapServerImageryProvider;1代表OpenStreetMapImageryProvider;
+    2代表WebMapTileServiceImageryProvider;3代表TileMapServiceImageryProvider;
+    4 代表UrlTemplateImageryProvider;5 代表WebMapServiceImageryProviderr(WMS));6 代表kml,kmz;7 代表geoJson
+    @ url 地图服务的url
+    @ layerid 地图图层的id
+    @ proxyUrl 代理请求url
+    @ tilingScheme 地图坐标系,WebMercatorTilingScheme(摩卡托投影坐标系3857);GeographicTilingScheme(世界地理坐标系4326)
+  */
+  loadServerTypeMap = (id, servertype, url, layerid, proxyUrl,IsWebMercatorTilingScheme) => {
+    const layers = this.viewer.scene.imageryLayers;
+    let layer = null;
+    let curlayer = null;
+    switch (servertype) {
+        case 0://ArcGisMapServerImageryProvider
+            // eslint-disable-next-line no-undef
+            curlayer = layers.addImageryProvider(new Cesium.ArcGisMapServerImageryProvider({
+                // eslint-disable-next-line no-undef
+                proxy : new Cesium.DefaultProxy(proxyUrl),
+                url : url,
+                layers:layerid,
+                enablePickFeatures : false
+            }));
+            layer = {layer:curlayer,id:id};
+            break;
+        case 1://OpenStreetMapImageryProvider
+            // eslint-disable-next-line no-undef
+            curlayer = layers.addImageryProvider(new Cesium.OpenStreetMapImageryProvider({
+                url : url
+            }));
+            layer = {layer:curlayer,id:id};
+            break;
+        case 2://WebMapTileServiceImageryProvider 天地图
+            // obj= { layer:model.layer,style:model.style,format:model.format,tileMatrixSetID:model.tileMatrixSetID,subdomains:model.subdomains};
+            // provider = Object.assign(provider, obj);
+            // // eslint-disable-next-line no-undef
+            // providerViewModel = new Cesium.WebMapTileServiceImageryProvider(provider);
+            // eslint-disable-next-line no-undef
+            curlayer = layers.addImageryProvider(new Cesium.WebMapTileServiceImageryProvider({
+                url : url,
+                layer:layerid,
+                style:'default',
+                format:'tiles',
+                subdomains:["0", "1", "2", "3", "4", "5", "6", "7"]
+            }));
+            layer = {layer:curlayer,id:id};        
+            break;
+        case 3://TileMapServiceImageryProvider
+            break;
+        case 4://UrlTemplateImageryProvider
+            break;
+        case 5://WebMapServiceImageryProvider
+            // eslint-disable-next-line no-undef
+            let m_tilingScheme = new Cesium.GeographicTilingScheme();
+            if(IsWebMercatorTilingScheme){
+                // eslint-disable-next-line no-undef
+                m_tilingScheme = new Cesium.WebMercatorTilingScheme();
+            }
+            // eslint-disable-next-line no-undef
+            curlayer = layers.addImageryProvider(new Cesium.WebMapServiceImageryProvider({
+                url: url,
+                layers: layerid,
+                tilingScheme:m_tilingScheme,
+                parameters : {
+                    service:"WMS",
+                    version:"1.1.1",
+                    request:"GetMap",
+                    transparent : true,
+                    format : 'image/png'
+                },
+                enablePickFeatures : false,
+                show: false
+            }));
+            layer = {layer:curlayer,id:id};
+            break;
+        case 6://kml,kmz
+            var options = {
+                camera : this.viewer.scene.camera,
+                canvas : this.viewer.scene.canvas
+            };
+            // eslint-disable-next-line no-undef
+            this.viewer.dataSources.add(Cesium.KmlDataSource.load(url, options)).then(function(dataSource){
+               this.viewer.camera.flyHome();
+            });
+            break;
+        case 7://geoJson
+            // eslint-disable-next-line no-undef
+            this.viewer.dataSources.add(Cesium.GeoJsonDataSource.load(url)).then(function(dataSource){
+               this.viewer.zoomTo(dataSource);
+            });
+            break;
+        default://ArcGisMapServerImageryProvider
+            // eslint-disable-next-line no-undef
+            curlayer = layers.addImageryProvider(new Cesium.ArcGisMapServerImageryProvider({
+                // eslint-disable-next-line no-undef
+                proxy : new Cesium.DefaultProxy(proxyUrl),
+                url : url,
+                layers:layerid,
+                enablePickFeatures : false
+            }));
+            layer = {layer:curlayer,id:id};
+            break;
+    }
+    if(layer)
+        this.layer3DList.push(layer);   
+  } 
+
+  /**
+   * 删除指定ID的图层
+   */
+  deleteServerTypeMap = (id) => {
+    // eslint-disable-next-line default-case
+    switch(typeof(id))
+    {
+        case "number":
+            if(this.layer3DList.length>0){
+                for(let i=0;i<this.layer3DList.length;i++){
+                    if(this.layer3DList[i].id === id){
+                        this.viewer.scene.imageryLayers.remove(this.layer3DList[i].layer);
+                    }
+                }
+            }
+            break;
+        case "string":
+            var len = this.viewer.dataSources.length;
+            if(len>0){
+                for(let i=0;i<len;i++){
+                    var dataSource = this.viewer.dataSources.get(i);
+                    if(dataSource._name && dataSource._name === id){
+                      this.viewer.dataSources.remove(dataSource);
+                    }
+                }
+            }
+            break;
+        case "undefined":
+            break;
+    }   
+  }
 
   // 创建地图导航控件
   createNavigationControl = () => {
@@ -232,10 +431,29 @@ export default class homePage extends PureComponent {
         // me.viewer.camera.viewBoundingSphere(tileset.boundingSphere, new Cesium.HeadingPitchRange(0, -0.5, 0));
         // // eslint-disable-next-line no-undef
         // me.viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
-        me.viewer.zoomTo(tileset);       
+        me.viewer.zoomTo(tileset);
+        // me.changeHeight(tileset,-1000);       
     }).otherwise(function (error) {
         throw (error);
     });   
+  }
+
+  /*调整3dtiles模型高度*/
+  changeHeight = (tileset,height) => {
+    height = Number(height);
+    if (isNaN(height)) {
+    return;
+    }
+    // eslint-disable-next-line no-undef
+    var cartographic = Cesium.Cartographic.fromCartesian(tileset.boundingSphere.center);
+        // eslint-disable-next-line no-undef
+    var surface = Cesium.Cartesian3.fromRadians(cartographic.longitude, cartographic.latitude, cartographic.height);
+        // eslint-disable-next-line no-undef
+    var offset = Cesium.Cartesian3.fromRadians(cartographic.longitude, cartographic.latitude,height);
+        // eslint-disable-next-line no-undef
+    var translation = Cesium.Cartesian3.subtract(offset, surface, new Cesium.Cartesian3());
+        // eslint-disable-next-line no-undef
+    tileset.modelMatrix = Cesium.Matrix4.fromTranslation(translation);    
   }
 
   /**
@@ -257,15 +475,7 @@ export default class homePage extends PureComponent {
   returnProviderViewModel = (model) => {
     let provider ={};
     let obj = null;
-    let providerViewModel = null;
-    // if(model.proxyUrl && model.proxyUrl.length>0){
-    //   // eslint-disable-next-line no-undef
-    //   provider = {proxy : new Cesium.DefaultProxy(model.proxyUrl),url : model.Url};
-    // }
-    // else{
-    //   provider = {url : model.Url};
-    // }
-    
+    let providerViewModel = null; 
     // eslint-disable-next-line no-undef
     provider = model.proxyUrl && model.proxyUrl.length>0 ? {proxy : new Cesium.DefaultProxy(model.proxyUrl),url : model.Url}: {url : model.Url};
 
@@ -427,6 +637,8 @@ export default class homePage extends PureComponent {
                             point = [0,0];
                         }
                         coordinatesDiv.innerHTML = "<span id='cd_label' style='font-size:13px;text-align:center;font-family:微软雅黑;color:#edffff;'>视角高度:"+(he - he2).toFixed(2)+"米&nbsp;&nbsp;&nbsp;&nbsp;海拔高度:"+height.toFixed(2)+"米&nbsp;&nbsp;&nbsp;&nbsp;经度：" + point[0].toFixed(6) + "&nbsp;&nbsp;纬度：" + point[1].toFixed(6)+ "</span>";
+                        //刷新监管影像时间信息
+                        me.showImageInfos(point);
                     }
                 }
             }
@@ -453,39 +665,173 @@ export default class homePage extends PureComponent {
       me.limitCameraHandler = null;
     }
     me.limitCameraHandler = me.viewer.camera.changed.addEventListener(function() {
-          // eslint-disable-next-line no-undef
-          if (me.viewer.camera._suspendTerrainAdjustment && me.viewer.scene.mode === Cesium.SceneMode.SCENE3D) {
-            me.viewer.camera._suspendTerrainAdjustment = !isOpen;
-            me.viewer.camera._adjustHeightForTerrain();
-          }
-    });    
+      // eslint-disable-next-line no-undef
+      if (me.viewer.camera._suspendTerrainAdjustment && me.viewer.scene.mode === Cesium.SceneMode.SCENE3D) {
+        me.viewer.camera._suspendTerrainAdjustment = !isOpen;
+        me.viewer.camera._adjustHeightForTerrain();
+      }
+    });  
+    
+    /*me.limitCameraHandler = me.viewer.scene.postRender.addEventListener(function() {
+      // eslint-disable-next-line no-undef
+      if (me.viewer.camera._suspendTerrainAdjustment && me.viewer.scene.mode === Cesium.SceneMode.SCENE3D) {
+        me.viewer.camera._suspendTerrainAdjustment = !isOpen;
+        me.viewer.camera._adjustHeightForTerrain();
+      }
+    });*/       
+    
   }
 
-  //监听地图点击事件
-  onBaseLayerChange = e => {
-    //判断当前底图是否等于监管影像
-    // if(e.layer._url === config.onlineBasemaps[0].url){
-    //   this.setState({ showImageTimeText: true });       
-    // }
-    // else{
-    //   this.setState({ showImageTimeText: false });
-    // }
+  limitCamera = (viewer) => {
+      /**
+       * 设置后当相机高度达到设置的最大和最小高度时将不再放大和缩小
+       */
+      viewer.scene.screenSpaceCameraController.minimumZoomDistance = 50;//相机的高度的最小值
+      viewer.scene.screenSpaceCameraController.maximumZoomDistance = 20000;  //相机高度的最大值
+      viewer.scene.screenSpaceCameraController._minimumZoomRate = 50; // 设置相机缩小时的速率
+      viewer.scene.screenSpaceCameraController._maximumZoomRate=500000000   //设置相机放大时的速率
 
-  };
+      // 限制相机钻到地下
+      // eslint-disable-next-line no-undef
+      var minPitch = -Cesium.Math.PI_OVER_TWO;
+      var maxPitch = 0;
+      var minHeight = 50;
+
+      viewer.camera.changed.addEventListener(
+      function() {
+      // eslint-disable-next-line no-undef
+      if (viewer.camera._suspendTerrainAdjustment && viewer.scene.mode === Cesium.SceneMode.SCENE3D) {
+      viewer.camera._suspendTerrainAdjustment = false;
+      viewer.camera._adjustHeightForTerrain();
+      }
+
+      // Keep camera in a reasonable pitch range
+      var pitch = viewer.camera.pitch;
+
+      if (pitch > maxPitch || pitch < minPitch) {
+      viewer.scene.screenSpaceCameraController.enableTilt = false;
+
+      // clamp the pitch
+      if(pitch > maxPitch ) { 
+      pitch = maxPitch; 
+      } else if(pitch < minPitch) {
+      pitch = minPitch;
+      }
+
+      // eslint-disable-next-line no-undef
+      var destination = Cesium.Cartesian3.fromRadians(
+      viewer.camera.positionCartographic.longitude,
+      viewer.camera.positionCartographic.latitude,
+      Math.max(viewer.camera.positionCartographic.height, minHeight));
+
+      viewer.camera.setView({
+      destination: destination,
+      orientation: { pitch: pitch }
+      });
+      viewer.scene.screenSpaceCameraController.enableTilt = true;
+      }
+      }
+      );    
+  }
+
   //监听地图移动完成事件
-  onMoveendMap = e => {
-    // const me = this;
-    // const { map } = this;
-    // let zoom = map.getZoom();
-    // let bounds = map.getBounds();
-    // //根据地图当前范围获取对应监管影像时间
-    // const { showImageTimeText } = me.state;
-    // if (showImageTimeText) {
-    //   me.getInfoByExtent(zoom, bounds, data => {
-    //      me.setState({ imageTimeText: data[0] });  
-    //   });
-    // }
+  onMoveendMap = () => {
+    const me = this;
+    //获取当前相机高度
+    let height = Math.ceil(me.viewer.camera.positionCartographic.height);
+    let zoom = me.heightToZoom(height);
+    let bounds = me.getCurrentExtent();
+    // console.log('地图变化监听事件',zoom,bounds);
+    //根据地图当前范围获取对应监管影像时间
+    const { showImageTimeText } = me.state;
+    if (showImageTimeText) {
+      me.getInfoByExtent(zoom, bounds, data => {
+        //  console.log('data',data);
+         me.setState({ imageTimeText: data[0] });  
+      });
+    }
   }; 
+  /*
+   *获取当前三维范围
+   *extent,返回当前模式下地图范围[xmin,ymin,xmax,ymax]
+   *extent,返回当前模式下地图范围{xmin,ymin,xmax,ymax}
+  */
+  getCurrentExtent = () => {
+    //获取当前三维地图范围
+    var Rectangle = this.viewer.camera.computeViewRectangle();
+    //地理坐标（弧度）转经纬度坐标
+    var extent=[ Rectangle.west / Math.PI * 180, Rectangle.south / Math.PI * 180, Rectangle.east / Math.PI * 180, Rectangle.north / Math.PI * 180];
+    //var cartographic1 = proj4('EPSG:4326', 'EPSG:3857', [extent[0], extent[1]]);
+    //var cartographic2 = proj4('EPSG:4326', 'EPSG:3857', [extent[2], extent[3]]);
+    // eslint-disable-next-line no-undef
+    //extent = new Cesium.Rectangle(cartographic1[0], cartographic1[1], cartographic2[0], cartographic2[1]);
+    return extent;
+     /*// 范围对象
+     var extent = {};
+    
+     // 得到当前三维场景
+     var scene = this.viewer.scene;
+     
+     // 得到当前三维场景的椭球体
+     var ellipsoid = scene.globe.ellipsoid;
+     var canvas = scene.canvas;
+     
+     // canvas左上角
+     // eslint-disable-next-line no-undef
+     var car3_lt = this.viewer.camera.pickEllipsoid(new Cesium.Cartesian2(0,0), ellipsoid);
+     
+     // canvas右下角
+     // eslint-disable-next-line no-undef
+     var car3_rb = this.viewer.camera.pickEllipsoid(new Cesium.Cartesian2(canvas.width,canvas.height), ellipsoid);
+     
+     // 当canvas左上角和右下角全部在椭球体上
+     if (car3_lt && car3_rb) {
+         var carto_lt = ellipsoid.cartesianToCartographic(car3_lt);
+         var carto_rb = ellipsoid.cartesianToCartographic(car3_rb);
+              // eslint-disable-next-line no-undef
+         extent.xmin = Cesium.Math.toDegrees(carto_lt.longitude);
+              // eslint-disable-next-line no-undef
+         extent.ymax = Cesium.Math.toDegrees(carto_lt.latitude);
+              // eslint-disable-next-line no-undef
+         extent.xmax = Cesium.Math.toDegrees(carto_rb.longitude);
+              // eslint-disable-next-line no-undef
+         extent.ymin = Cesium.Math.toDegrees(carto_rb.latitude);
+     }
+     
+     // 当canvas左上角不在但右下角在椭球体上
+     else if (!car3_lt && car3_rb) {
+         var car3_lt2 = null;
+         var yIndex = 0;
+         do {
+             // 这里每次10像素递加，一是10像素相差不大，二是为了提高程序运行效率
+             // eslint-disable-next-line no-unused-expressions
+             yIndex <= canvas.height ? yIndex += 10 : canvas.height;
+             // eslint-disable-next-line no-undef
+             car3_lt2 = this.viewer.camera.pickEllipsoid(new Cesium.Cartesian2(0,yIndex), ellipsoid);
+         }while (!car3_lt2);
+         var carto_lt2 = ellipsoid.cartesianToCartographic(car3_lt2);
+         var carto_rb2 = ellipsoid.cartesianToCartographic(car3_rb);
+                       // eslint-disable-next-line no-undef
+         extent.xmin = Cesium.Math.toDegrees(carto_lt2.longitude);
+                       // eslint-disable-next-line no-undef
+         extent.ymax = Cesium.Math.toDegrees(carto_lt2.latitude);
+                       // eslint-disable-next-line no-undef
+         extent.xmax = Cesium.Math.toDegrees(carto_rb2.longitude);
+                       // eslint-disable-next-line no-undef
+         extent.ymin = Cesium.Math.toDegrees(carto_rb2.latitude);
+     }    
+     // 获取高度
+    //  extent.height = Math.ceil(this.viewer.camera.positionCartographic.height);
+     return extent;*/       
+  }
+  /*根据camera高度近似计算当前层级*/  
+  heightToZoom = (height) => {
+    var A = 40487.57;
+    var B = 0.00007096758;
+    var C = 91610.74;
+    var D = -40467.74;
+    return Math.round(D+(A-D)/(1+Math.pow(height/C, B)));
+  }
   /*根据地图当前范围获取对应历史影像数据
    *@method getInfoByExtent
    *@param zoom 地图当前范围级别
@@ -495,56 +841,117 @@ export default class homePage extends PureComponent {
    *@return null
    */
   getInfoByExtent = (zoom, bounds, callback) => {
-    // const me = this;
-    // let urlString = config.mapUrl.getInfoByExtent;
-    // let xyMin = proj4("EPSG:4326", "EPSG:3857", [
-    //   bounds.getSouthWest().lng,
-    //   bounds.getSouthWest().lat
-    // ]);
-    // let xyMax = proj4("EPSG:4326", "EPSG:3857", [
-    //   bounds.getNorthEast().lng,
-    //   bounds.getNorthEast().lat
-    // ]);
-    // let param = {
-    //   level: zoom, //地图当前范围级别
-    //   xmin: xyMin[0], //地图当前范围x最小值
-    //   xmax: xyMax[0], //地图当前范围x最大值
-    //   ymin: xyMin[1], //地图当前范围y最小值
-    //   ymax: xyMax[1] //地图当前范围y最大值
-    // };
-    // let geojsonUrl = urlString + L.Util.getParamString(param, urlString);
-    // me.props.dispatch({
-    //   type: "mapdata/getInfoByExtent",
-    //   payload: { geojsonUrl },
-    //   callback: callback
-    // });
-  };  
-  //监听地图鼠标移动事件
-  showImageInfos = e => {
-    // const {mapdata:{imageTimeResult}} = this.props; 
-    // const me = this;
-    // //根据地图当前范围获取对应监管影像时间
-    // const { showImageTimeText } = me.state;
-    // if (showImageTimeText && imageTimeResult) {
-    //   let tileInfos = imageTimeResult.tileInfos;
-    //   if(tileInfos.length>0){
-    //     let pt = proj4("EPSG:4326", "EPSG:3857", [
-    //       e.latlng.lng,
-    //       e.latlng.lat
-    //     ]);
-    //     for (let i=0; i < tileInfos.length; i++) {
-    //       let item = tileInfos[i];
-    //       if (pt[0] >= item.xmin && pt[0] <= item.xmax && pt[1] >= item.ymin && pt[1] <= item.ymax) {
-    //         let data = item.data;
-    //         if (data && data.hasOwnProperty("takenDate")) {
-    //             me.setState({ imageTimeText: data.takenDate });
-    //         }
-    //         return true;
-    //       }  
+    const me = this;
+    let urlString = config.mapUrl.getInfoByExtent; 
+    const mercator_xmin  = -20037508.34;
+    const mercator_ymin  = -20037508.34;
+    const mercator_xmax  = 20037508.34;
+    const mercator_ymax  = 20037508.34;
+    let xmin,xmax,ymin,ymax;
+    if(bounds[0] === -180){
+      xmin = mercator_xmin;
+      xmax = mercator_xmax;
+      ymin = mercator_ymin;
+      ymax = mercator_ymax;
+    }
+    else{
+      let xyMin = proj4("EPSG:4326", "EPSG:3857", [
+        bounds[0],
+        bounds[1]
+      ]);
+      xmin = xyMin[0];
+      ymin = xyMin[1];
+      let xyMax = proj4("EPSG:4326", "EPSG:3857", [
+        bounds[2],
+        bounds[3]
+      ]);
+      xmax = xyMax[0];
+      ymax = xyMax[1];
+    }  
+    let param = {
+      level: zoom, //地图当前范围级别
+      xmin: xmin, //地图当前范围x最小值
+      xmax: xmax, //地图当前范围x最大值
+      ymin: ymin, //地图当前范围y最小值
+      ymax: ymax //地图当前范围y最大值
+    };
+    // console.log('param',param);
+    let geojsonUrl = urlString + me.getParamString(param, urlString);
+    // console.log('geojsonUrl',geojsonUrl);
+    me.props.dispatch({
+      type: "mapdata/getInfoByExtent",
+      payload: { geojsonUrl },
+      callback: callback
+    });
+  }; 
+  
+  getParamString = (obj, existingUrl, uppercase) => {
+    var params = [];
+    for (var i in obj) {
+      params.push(encodeURIComponent(uppercase ? i.toUpperCase() : i) + '=' + encodeURIComponent(obj[i]));
+    }
+    return ((!existingUrl || existingUrl.indexOf('?') === -1) ? '?' : '&') + params.join('&');    
+  }
 
-    //     }
-    //   }
-    // }
+  //经度转墨卡托
+  handle_x = (x) => {
+    return (x / 180.0) * 20037508.34;
+  }
+
+  //纬度度转墨卡托
+  handle_y = (y) => {
+    if (y > 85.05112) {
+      y = 85.05112;
+    }
+    
+    if (y < -85.05112) {
+      y = -85.05112;
+    }
+    
+    y = (Math.PI / 180.0) * y;
+    var tmp = Math.PI / 4.0 + y / 2.0;
+    return 20037508.34 * Math.log(Math.tan(tmp)) / Math.PI; 
+
+  }
+
+  //墨卡托转经度
+  handle_me_x = (x) => {
+    return x/20037508.34*180;
+  }
+
+  //墨卡托转纬度
+  handle_me_y = (y) => {
+    var my = y/20037508.34*180;
+    return 180/Math.PI*(2*Math.atan(Math.exp(my*Math.PI/180))-Math.PI/2);
+  
+  }
+
+  //监听地图鼠标移动事件
+  showImageInfos = point => {
+    const {mapdata:{imageTimeResult}} = this.props; 
+    const me = this;
+    //根据地图当前范围获取对应监管影像时间
+    const { showImageTimeText } = me.state;
+    if (showImageTimeText && imageTimeResult) {
+      let tileInfos = imageTimeResult.tileInfos;
+      if(tileInfos && tileInfos.length>0){
+        let pt = proj4("EPSG:4326", "EPSG:3857", [
+          point[0],
+          point[1]
+        ]);
+        for (let i=0; i < tileInfos.length; i++) {
+          let item = tileInfos[i];
+          if (pt[0] >= item.xmin && pt[0] <= item.xmax && pt[1] >= item.ymin && pt[1] <= item.ymax) {
+            let data = item.data;
+            if (data && data.hasOwnProperty("takenDate")) {
+                me.setState({ imageTimeText: data.takenDate });
+            }
+            return true;
+          }  
+
+        }
+      }
+    }
   } 
 
   render() {
@@ -580,7 +987,7 @@ export default class homePage extends PureComponent {
               position: "absolute",
               top: 95,
               right: 10, 
-              background: "#ffffff"             
+              background: 'rgba(0, 0, 0, 0.5)'          
             }}
           >
             <ul id="ztreeThemeServerOfLayer" className="ztree"></ul>
@@ -593,7 +1000,9 @@ export default class homePage extends PureComponent {
               bottom: 5,
               right: 150,
               zIndex: 1000,
-              background: "rgba(255, 255, 255, 0.8)"
+              color:'#fff',
+              fontSize:'13px',
+              // background: "rgba(255, 255, 255, 0.8)"
               // background: "#fff"
             }}
           > 
@@ -602,7 +1011,7 @@ export default class homePage extends PureComponent {
                 padding: "0 10px"
               }}
             >
-              监管影像时间:{imageTimeText}
+              影像时间:{imageTimeText}
             </span>          
           </div>          
       </div>

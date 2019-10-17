@@ -39,7 +39,8 @@ export default class area extends PureComponent {
     pagination: {},
     loading: false,
     dataSource: [],
-    ParentId: null
+    ParentId: null,
+    ParentCodeId: null,
   };
 
   componentDidMount() {
@@ -53,7 +54,7 @@ export default class area extends PureComponent {
     dispatch({
       type: 'district/districtTree',
       payload: {
-        IsFilter: false
+        IsFilter: true
       }
     });
   };
@@ -83,7 +84,8 @@ export default class area extends PureComponent {
   departsTree = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'departs/departsTree'
+      type: 'departs/departsTree',
+      payload: { IsFilter: true }
     });
   };
 
@@ -197,10 +199,8 @@ export default class area extends PureComponent {
       dispatch,
       form: { getFieldDecorator, resetFields, setFieldsValue, validateFields },
       departs: { departsTree },
-      district: { districtTree }
+      district: { districtTree, districtTreeFilter }
     } = this.props;
-
-    console.log('districtTree', districtTree);
 
     const {
       visible,
@@ -297,6 +297,7 @@ export default class area extends PureComponent {
         this.setState({ selectedRows: selectedRows });
       }
     };
+
     return (
       <Systems>
         <Layout>
@@ -314,7 +315,8 @@ export default class area extends PureComponent {
               onSelect={(v, e) => {
                 // console.log(v[0], e.selectedNodes[0].props.districtCodeId);
                 const d = e.selectedNodes[0].props.districtCodeId;
-                console.log(`ParentCodeId`, d);
+                console.log(`ParentCodeId`, d + '', districtTreeFilter);
+                console.log(this.find(d + '', districtTreeFilter));
                 this.setState({
                   ParentId: v[0],
                   ParentCodeId: d
@@ -514,7 +516,7 @@ export default class area extends PureComponent {
                   {getFieldDecorator('districtCodeId', {})(
                     <Cascader
                       showSearch
-                      options={this.find(ParentCodeId, districtTree)}
+                      options={this.find(ParentCodeId + '', districtTreeFilter)}
                       changeOnSelect
                       placeholder="请选择所在地区"
                     />

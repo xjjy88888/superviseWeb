@@ -127,7 +127,6 @@ export default class area extends PureComponent {
   };
 
   getDistrictList = (v, list) => {
-    console.log(111111122);
     const {
       district: { districtTreeFilter }
     } = this.props;
