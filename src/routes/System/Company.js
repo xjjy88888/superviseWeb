@@ -268,7 +268,7 @@ export default class company extends PureComponent {
                     callback: (success, error, result) => {
                       if (success) {
                         self.setState({
-                          visible: false
+                          visible: false,selectedRows:[]
                         });
                         self.companyList();
                       }

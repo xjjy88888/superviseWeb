@@ -1,5 +1,5 @@
 /* eslint-disable array-callback-return */
-import React, { PureComponent } from "react";
+import React, { PureComponent } from 'react';
 import {
   Form,
   Button,
@@ -10,11 +10,11 @@ import {
   Checkbox,
   Row,
   Col
-} from "antd";
-import { connect } from "dva";
-import moment from "moment";
-import emitter from "../../../../utils/event";
-import Spins from "../../../../components/Spins";
+} from 'antd';
+import { connect } from 'dva';
+import moment from 'moment';
+import emitter from '../../../../utils/event';
+import Spins from '../../../../components/Spins';
 
 const { Footer, Sider, Content } = Layout;
 const formItemLayout = {
@@ -37,7 +37,7 @@ class Power extends PureComponent {
     value: 1,
     permissions: [],
     userType: 0, //0:行政  1:社会  2:角色  3:其他
-    companyType: "",
+    companyType: '',
     dataSource: [],
     loading: false
   };
@@ -50,20 +50,20 @@ class Power extends PureComponent {
     this.powerList(0);
     this.powerList(1);
     this.roleList();
-    this.eventEmitter = emitter.addListener("showRegister", v => {
+    this.eventEmitter = emitter.addListener('showRegister', v => {
       resetFields();
       console.log(v);
-      if (v.status === "add") {
+      if (v.status === 'add') {
         this.setState({
           permissions: []
         });
       } else {
         this.setState({ id: v.item.id });
-        if (v.type === "role") {
+        if (v.type === 'role') {
           this.setState({
             permissions: v.item.permissions.map(i => i.permission)
           });
-        } else if (v.type === "society") {
+        } else if (v.type === 'society') {
           if (v.item.id) {
             this.userInfo(v.item.id, result => {
               setFieldsValue({
@@ -71,14 +71,14 @@ class Power extends PureComponent {
                 socialDepartmentId: result.socialDepartmentId,
                 companyType: result.permissions.length
                   ? result.permissions[0].permission
-                  : "",
+                  : '',
                 endTime: result.permissions.length
                   ? moment(result.permissions[0].endTime)
-                  : ""
+                  : ''
               });
             });
           }
-        } else if (v.type === "admin") {
+        } else if (v.type === 'admin') {
           if (v.item.id) {
             this.userInfo(v.item.id, result => {
               const { dataSource } = this.state;
@@ -90,7 +90,7 @@ class Power extends PureComponent {
                   );
                   return {
                     ...item,
-                    endTime: resu.length ? resu[0].endTime : ""
+                    endTime: resu.length ? resu[0].endTime : ''
                   };
                 })
               });
@@ -99,18 +99,18 @@ class Power extends PureComponent {
         }
       }
     });
-    this.eventEmitter = emitter.addListener("setUserType", v => {
+    this.eventEmitter = emitter.addListener('setUserType', v => {
       console.log(v);
       this.setState({ userType: v.type });
     });
   }
 
-  componentWillUnmount() { }
+  componentWillUnmount() {}
 
   userInfo = (id, fn) => {
     const { dispatch } = this.props;
     dispatch({
-      type: "user/userInfo",
+      type: 'user/userInfo',
       payload: { id },
       callback: (success, error, result) => {
         if (success) {
@@ -123,7 +123,7 @@ class Power extends PureComponent {
   roleList = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: "role/roleList",
+      type: 'role/roleList',
       payload: { SkipCount: 0, MaxResultCount: 100 }
     });
   };
@@ -131,7 +131,7 @@ class Power extends PureComponent {
   userProject = payload => {
     const { dispatch } = this.props;
     dispatch({
-      type: "user/userProject",
+      type: 'user/userProject',
       payload
     });
   };
@@ -139,7 +139,7 @@ class Power extends PureComponent {
   userCompany = payload => {
     const { dispatch } = this.props;
     dispatch({
-      type: "user/userCompany",
+      type: 'user/userCompany',
       payload
     });
   };
@@ -147,7 +147,7 @@ class Power extends PureComponent {
   powerList = v => {
     const { dispatch } = this.props;
     dispatch({
-      type: "role/powerList",
+      type: 'role/powerList',
       payload: {
         userType: v
       },
@@ -155,7 +155,7 @@ class Power extends PureComponent {
         if (success && v === 0) {
           this.setState({
             dataSource: result.items.map(item => {
-              return { ...item, key: item.name, endTime: "" };
+              return { ...item, key: item.name, endTime: '' };
             })
           });
         }
@@ -164,7 +164,7 @@ class Power extends PureComponent {
   };
 
   onChange = e => {
-    console.log("radio checked", e.target.value);
+    console.log('radio checked', e.target.value);
     this.setState({
       value: e.target.value
     });
@@ -179,30 +179,30 @@ class Power extends PureComponent {
     e.preventDefault();
     validateFields((err, v) => {
       if (!err) {
-        console.log("权限分配", v, permissions);
+        console.log('权限分配', v, permissions);
         const result =
           userType === 0
             ? permissions.map(i => {
-              return {
-                permission: i,
-                endTime: v[this.getLabel(i) + "_endTime"]
-              };
-            })
+                return {
+                  permission: i,
+                  endTime: v[this.getLabel(i) + '_endTime']
+                };
+              })
             : userType === 1
-              ? [
+            ? [
                 {
                   permission: v.companyType,
                   endTime: v.endTime
                 }
               ]
-              : userType === 2
-                ? permissions.map(i => {
-                  return {
-                    permission: i,
-                    endTime: v[this.getLabel(i) + "_endTime"]
-                  };
-                })
-                : [];
+            : userType === 2
+            ? permissions.map(i => {
+                return {
+                  permission: i,
+                  endTime: v[this.getLabel(i) + '_endTime']
+                };
+              })
+            : [];
         console.log(result);
         this.props.submit({ ...v, permissions: result });
       }
@@ -211,8 +211,10 @@ class Power extends PureComponent {
 
   getLabel = value => {
     const { dataSource } = this.state;
+    console.log(dataSource);
     const result = dataSource.filter(i => i.name === value);
-    return result[0].displayName;
+    console.log(result);
+    return result.length ? result[0].displayName : '';
   };
 
   render() {
@@ -232,18 +234,18 @@ class Power extends PureComponent {
 
     let columns = [
       {
-        title: "模块名",
-        dataIndex: "displayName"
+        title: '模块名',
+        dataIndex: 'displayName'
       }
     ];
     if (userType === 0) {
       columns[1] = {
-        title: "有效期",
-        dataIndex: "endTime",
+        title: '有效期',
+        dataIndex: 'endTime',
         render: (item, record) => (
           <span>
-            {getFieldDecorator(record.displayName + "_endTime", {
-              initialValue: record.endTime ? moment(record.endTime) : ""
+            {getFieldDecorator(record.displayName + '_endTime', {
+              initialValue: record.endTime ? moment(record.endTime) : ''
             })(
               <DatePicker
                 onChange={v => {
@@ -270,12 +272,12 @@ class Power extends PureComponent {
     };
 
     return (
-      <Layout style={{ backgroundColor: "#fff" }}>
+      <Layout style={{ backgroundColor: '#fff' }}>
         <Spins show={loading} />
         <Sider
           theme="light"
           style={{
-            display: userType === 0 ? "block" : "none"
+            display: userType === 0 ? 'block' : 'none'
           }}
         >
           <Checkbox.Group
@@ -306,18 +308,18 @@ class Power extends PureComponent {
           <Form
             onSubmit={this.handleSubmit}
             {...formItemLayout}
-            style={{ width: 600, margin: "0 auto" }}
+            style={{ width: 600, margin: '0 auto' }}
           >
             <Form.Item
               label="单位名称"
               hasFeedback
-              style={{ display: userType === 1 ? "block" : "none" }}
+              style={{ display: userType === 1 ? 'block' : 'none' }}
             >
-              {getFieldDecorator("socialDepartmentId", {
+              {getFieldDecorator('socialDepartmentId', {
                 rules: [
                   {
                     required: userType === 1,
-                    message: "请输入单位名称"
+                    message: '请输入单位名称'
                   }
                 ]
               })(
@@ -343,13 +345,13 @@ class Power extends PureComponent {
             <Form.Item
               label="单位类型"
               hasFeedback
-              style={{ display: userType === 1 ? "block" : "none" }}
+              style={{ display: userType === 1 ? 'block' : 'none' }}
             >
-              {getFieldDecorator("companyType", {
+              {getFieldDecorator('companyType', {
                 rules: [
                   {
                     required: userType === 1,
-                    message: "请选择单位类型"
+                    message: '请选择单位类型'
                   }
                 ]
               })(
@@ -372,13 +374,13 @@ class Power extends PureComponent {
             <Form.Item
               label="所属项目"
               hasFeedback
-              style={{ display: userType === 1 ? "block" : "none" }}
+              style={{ display: userType === 1 ? 'block' : 'none' }}
             >
-              {getFieldDecorator("projectId", {
+              {getFieldDecorator('projectId', {
                 rules: [
                   {
-                    required: companyType === "Social.Product",
-                    message: "请输入所属项目"
+                    required: companyType === 'Social.Product',
+                    message: '请输入所属项目'
                   }
                 ]
               })(
@@ -404,25 +406,25 @@ class Power extends PureComponent {
             <Form.Item
               label="有效期至"
               hasFeedback
-              style={{ display: userType === 1 ? "block" : "none" }}
+              style={{ display: userType === 1 ? 'block' : 'none' }}
             >
-              {getFieldDecorator("endTime", {
+              {getFieldDecorator('endTime', {
                 rules: [
                   {
-                    type: "object",
+                    type: 'object',
                     required: userType === 1,
-                    message: "请选择有效期"
+                    message: '请选择有效期'
                   }
                 ]
               })(<DatePicker />)}
             </Form.Item>
             <Footer
               style={{
-                backgroundColor: "transparent",
-                position: "absolute",
+                backgroundColor: 'transparent',
+                position: 'absolute',
                 bottom: 0,
-                left: "50%",
-                transform: "translateX(-50%)"
+                left: '50%',
+                transform: 'translateX(-50%)'
               }}
             >
               <Button
@@ -442,26 +444,26 @@ class Power extends PureComponent {
 
           <Table
             style={{
-              display: userType !== 1 ? "block" : "none"
+              display: userType !== 1 ? 'block' : 'none'
             }}
             rowSelection={rowSelection}
             columns={columns}
             dataSource={dataSource}
             size="small"
-            selection={["SuperAdmin"]}
+            selection={['SuperAdmin']}
           />
         </Content>
       </Layout>
     );
   }
 }
-const Dom = Form.create({ name: "Power" })(Power);
+const Dom = Form.create({ name: 'Power' })(Power);
 
 export default class register extends PureComponent {
   render() {
     const { show, ...rest } = this.props;
     return (
-      <div style={{ display: show ? "block" : "none" }}>
+      <div style={{ display: show ? 'block' : 'none' }}>
         <Dom {...rest}></Dom>
       </div>
     );

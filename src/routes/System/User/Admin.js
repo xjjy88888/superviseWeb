@@ -1,8 +1,8 @@
-import React, { PureComponent } from "react";
-import { connect } from "dva";
-import { createForm } from "rc-form";
-import Systems from "../../../components/Systems";
-import MustFill from "../../../components/MustFill";
+import React, { PureComponent } from 'react';
+import { connect } from 'dva';
+import { createForm } from 'rc-form';
+import Systems from '../../../components/Systems';
+import MustFill from '../../../components/MustFill';
 import {
   Form,
   Icon,
@@ -14,8 +14,8 @@ import {
   Typography,
   Layout,
   Modal
-} from "antd";
-import emitter from "../../../utils/event";
+} from 'antd';
+import emitter from '../../../utils/event';
 
 const { Sider, Content } = Layout;
 const { Title } = Typography;
@@ -37,14 +37,14 @@ export default class area extends PureComponent {
     pagination: {},
     loading: false,
     dataSource: [],
-    GovDepartmentId: ""
+    GovDepartmentId: ''
   };
 
   componentDidMount() {
     self = this;
     this.departsTree();
 
-    this.eventEmitter = emitter.addListener("refreshSystem", v => {
+    this.eventEmitter = emitter.addListener('refreshSystem', v => {
       this.refresh();
     });
   }
@@ -57,7 +57,8 @@ export default class area extends PureComponent {
   departsTree = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: "departs/departsTree"
+      type: 'departs/departsTree',
+      payload: { IsFilter: true }
     });
   };
 
@@ -65,12 +66,13 @@ export default class area extends PureComponent {
     const { dispatch } = this.props;
     this.setState({ loading: true });
     dispatch({
-      type: "user/userDelete",
+      type: 'user/userDelete',
       payload: { ids: v.map(i => i.id) },
       callback: success => {
         if (success) {
           this.setState({
-            loading: false
+            loading: false,
+            selectedRows: []
           });
           this.refresh();
         }
@@ -82,7 +84,7 @@ export default class area extends PureComponent {
     const { dispatch } = this.props;
     this.setState({ loading: true });
     dispatch({
-      type: "user/userList",
+      type: 'user/userList',
       payload: { ...payload, IsActive: true, UserType: 0 },
       callback: (success, error, result) => {
         const pagination = { ...this.state.pagination };
@@ -106,8 +108,8 @@ export default class area extends PureComponent {
     console.log(filters, sorter);
     const Sorting = `${
       sorter.columnKey
-        ? `${sorter.columnKey === "name" ? "userName" : sorter.columnKey} ${
-            sorter.order === "descend" ? "desc" : "asc"
+        ? `${sorter.columnKey === 'name' ? 'userName' : sorter.columnKey} ${
+            sorter.order === 'descend' ? 'desc' : 'asc'
           }`
         : ``
     }`;
@@ -139,7 +141,7 @@ export default class area extends PureComponent {
             setSelectedKeys(e.target.value ? [e.target.value] : [])
           }
           onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
-          style={{ width: 188, marginBottom: 8, display: "block" }}
+          style={{ width: 188, marginBottom: 8, display: 'block' }}
         />
         <Button
           type="primary"
@@ -160,7 +162,7 @@ export default class area extends PureComponent {
       </div>
     ),
     filterIcon: filtered => (
-      <Icon type="search" style={{ color: filtered ? "#1890ff" : undefined }} />
+      <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
     ),
     onFilter: (value, record) =>
       record[dataIndex]
@@ -189,7 +191,7 @@ export default class area extends PureComponent {
 
   handleReset = clearFilters => {
     clearFilters();
-    this.setState({ searchText: "" });
+    this.setState({ searchText: '' });
   };
   render() {
     const {
@@ -210,40 +212,40 @@ export default class area extends PureComponent {
 
     const columns = [
       {
-        title: "账号",
-        dataIndex: "name",
+        title: '账号',
+        dataIndex: 'name',
         sorter: (a, b) => a.name.length - b.name.length,
-        ...this.getColumnSearchProps("name")
+        ...this.getColumnSearchProps('name')
       },
       {
-        title: "姓名",
-        dataIndex: "displayName",
+        title: '姓名',
+        dataIndex: 'displayName',
         sorter: (a, b) => a.displayName.length - b.displayName.length,
-        ...this.getColumnSearchProps("displayName")
+        ...this.getColumnSearchProps('displayName')
       },
       {
-        title: "电话",
-        dataIndex: "phoneNumber",
+        title: '电话',
+        dataIndex: 'phoneNumber',
         sorter: (a, b) => a.phoneNumber - b.phoneNumber,
-        ...this.getColumnSearchProps("phoneNumber")
+        ...this.getColumnSearchProps('phoneNumber')
       },
       {
-        title: "创建时间",
-        dataIndex: "creationTime"
+        title: '创建时间',
+        dataIndex: 'creationTime'
       },
       {
-        title: "操作",
-        key: "operation",
+        title: '操作',
+        key: 'operation',
         render: (item, record) => (
           <span>
             <a
               style={{ marginRight: 20 }}
               onClick={() => {
-                emitter.emit("showRegister", {
+                emitter.emit('showRegister', {
                   show: true,
                   isActive: true,
                   type: `admin`,
-                  status: "edit",
+                  status: 'edit',
                   item
                 });
               }}
@@ -253,11 +255,11 @@ export default class area extends PureComponent {
             <a
               onClick={() => {
                 Modal.confirm({
-                  title: "删除",
-                  content: "是否确定要删除",
-                  okText: "是",
-                  cancelText: "否",
-                  okType: "danger",
+                  title: '删除',
+                  content: '是否确定要删除',
+                  okText: '是',
+                  cancelText: '否',
+                  okType: 'danger',
                   onOk() {
                     self.userDelete([{ id: item.id }]);
                   },
@@ -283,9 +285,9 @@ export default class area extends PureComponent {
         <Layout>
           <Sider
             style={{
-              borderRadius: "10px 0 0 0",
+              borderRadius: '10px 0 0 0',
               height: window.innerHeight - 150,
-              overflow: "auto"
+              overflow: 'auto'
             }}
             width={400}
             theme="light"
@@ -351,8 +353,8 @@ export default class area extends PureComponent {
           </Sider>
           <Content
             style={{
-              borderRadius: "0 10px 0 0",
-              background: "#fff"
+              borderRadius: '0 10px 0 0',
+              background: '#fff'
             }}
           >
             <Title level={4}>
@@ -362,11 +364,11 @@ export default class area extends PureComponent {
                   disabled={!GovDepartmentId}
                   style={{ margin: 10 }}
                   onClick={() => {
-                    emitter.emit("showRegister", {
+                    emitter.emit('showRegister', {
                       show: true,
                       isActive: true,
                       type: `admin`,
-                      status: "add",
+                      status: 'add',
                       item: { govDepartmentId: GovDepartmentId }
                     });
                   }}
@@ -380,15 +382,15 @@ export default class area extends PureComponent {
                   onClick={() => {
                     const l = selectedRows.length;
                     if (l === 0) {
-                      message.warning("请选择需要删除的账号");
+                      message.warning('请选择需要删除的账号');
                       return;
                     }
                     Modal.confirm({
-                      title: "删除",
-                      content: "是否确定要删除",
-                      okText: "是",
-                      cancelText: "否",
-                      okType: "danger",
+                      title: '删除',
+                      content: '是否确定要删除',
+                      okText: '是',
+                      cancelText: '否',
+                      okType: 'danger',
                       onOk() {
                         self.userDelete(selectedRows);
                       },
@@ -417,18 +419,18 @@ export default class area extends PureComponent {
               onOk={() => {
                 // submit
                 validateFields((err, v) => {
-                  console.log("新建编辑部门", v);
+                  console.log('新建编辑部门', v);
                   const d = v.districtCodeId;
                   if (!v.name) {
-                    message.warning("请填写部门名");
+                    message.warning('请填写部门名');
                     return;
                   }
                   if (!d) {
-                    message.warning("请选择行政区划");
+                    message.warning('请选择行政区划');
                     return;
                   }
                   dispatch({
-                    type: "departs/departsCreateUpdate",
+                    type: 'departs/departsCreateUpdate',
                     payload: {
                       ...v,
                       id: id,
@@ -454,7 +456,7 @@ export default class area extends PureComponent {
             >
               <Form
                 onSubmit={this.handleSubmit}
-                style={{ textAlign: "center", width: `100%`, height: `100%` }}
+                style={{ textAlign: 'center', width: `100%`, height: `100%` }}
               >
                 <Form.Item
                   {...formItemLayout}
@@ -466,7 +468,7 @@ export default class area extends PureComponent {
                   }
                   hasFeedback
                 >
-                  {getFieldDecorator("name", {})(<Input />)}
+                  {getFieldDecorator('name', {})(<Input />)}
                 </Form.Item>
               </Form>
             </Modal>

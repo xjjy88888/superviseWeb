@@ -45,7 +45,7 @@ export default class review extends PureComponent {
       callback: success => {
         if (success) {
           this.setState({
-            loading: false
+            loading: false,selectedRows:[]
           });
           this.refresh();
         }
