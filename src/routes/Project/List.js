@@ -173,7 +173,7 @@ export default class projectSupervision extends PureComponent {
     clearFilters();
     this.setState({ searchText: '' });
   };
-  
+
   render() {
     const { dataSource, pagination, loading } = this.state;
 
