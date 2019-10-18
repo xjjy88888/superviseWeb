@@ -1,29 +1,29 @@
-import React, { PureComponent } from "react";
-import { Menu, Icon, Dropdown, Avatar, Layout, Typography } from "antd";
-import { connect } from "dva";
-import { Link } from "dva/router";
-import { LocaleProvider } from "antd";
-import zh_CN from "antd/lib/locale-provider/zh_CN";
+import React, { PureComponent } from 'react';
+import { Menu, Icon, Dropdown, Avatar, Layout, Typography } from 'antd';
+import { connect } from 'dva';
+import { Link } from 'dva/router';
+import { LocaleProvider } from 'antd';
+import zh_CN from 'antd/lib/locale-provider/zh_CN';
 
 const { Header, Footer, Sider, Content } = Layout;
 const { Text, Paragraph, Title } = Typography;
 
 const menuList = [
   {
-    title: "首页",
-    icon: "home",
-    key: "/index",
+    title: '首页',
+    icon: 'home',
+    key: '/index',
     subMenu: []
   },
   {
-    title: "区域监管",
-    icon: "radar-chart",
-    key: "/region",
+    title: '区域监管',
+    icon: 'radar-chart',
+    key: '/region/map',
     subMenu: [
-      {
-        title: "天地一体化",
-        key: "/region/map"
-      },
+      // {
+      //   title: '天地一体化',
+      //   key: '/region/map'
+      // }
       // {
       //   title: "地图分屏",
       //   key: "/region/contrast"
@@ -31,28 +31,28 @@ const menuList = [
     ]
   },
   {
-    title: "项目监管",
-    icon: "book",
-    key: "/project",
+    title: '项目监管',
+    icon: 'book',
+    key: '/project',
     subMenu: [
       {
-        title: "项目列表",
-        key: "/project/list"
+        title: '项目列表',
+        key: '/project/list'
       },
       {
-        title: "二维地图",
-        key: "/project/map"
+        title: '二维地图',
+        key: '/project/map'
       },
       {
-        title: "三维地图",
-        key: "/project/cesiummap"
+        title: '三维地图',
+        key: '/project/cesiummap'
       }
     ]
   },
   {
-    title: "系统管理",
-    icon: "setting",
-    key: "/system",
+    title: '系统管理',
+    icon: 'setting',
+    key: '/system',
     subMenu: []
   }
 ];
@@ -67,7 +67,7 @@ export default class layouts extends PureComponent {
 
     // 状态
     this.state = {
-      current: active ? active : "product"
+      current: active ? active : 'product'
     };
   }
 
@@ -81,7 +81,7 @@ export default class layouts extends PureComponent {
         </Menu.Item>
         <Menu.Item
           onClick={() => {
-            window.open("https://docs.qq.com/doc/DTEV2TGRsU0RNQUV0");
+            window.open('https://docs.qq.com/doc/DTEV2TGRsU0RNQUV0');
           }}
         >
           <Icon type="question-circle" />
@@ -95,28 +95,28 @@ export default class layouts extends PureComponent {
         </Menu.Item>
       </Menu>
     );
-    const user = JSON.parse(localStorage.getItem("user"));
-    const displayName = user ? user.displayName : "";
-    const departmentName = user ? user.departmentName : "";
+    const user = JSON.parse(localStorage.getItem('user'));
+    const displayName = user ? user.displayName : '';
+    const departmentName = user ? user.departmentName : '';
 
     return (
       <LocaleProvider locale={zh_CN}>
         <Layout>
-          <Header style={{ position: "relative", height: 46, zIndex: 1001 }}>
+          <Header style={{ position: 'relative', height: 46, zIndex: 1001 }}>
             <span
               style={{
-                lineHeight: "43px",
+                lineHeight: '43px',
                 // margin: "0 30px",
-                float: "left",
-                height: "100%"
+                float: 'left',
+                height: '100%'
               }}
             >
               <Avatar src="./img/logo.png" />/
               <Link
                 to="/region/map"
                 style={{
-                  margin: "0 10px",
-                  color: "#fff"
+                  margin: '0 10px',
+                  color: '#fff'
                 }}
               >
                 水土保持监督管理信息移动采集系统管理端
@@ -133,7 +133,7 @@ export default class layouts extends PureComponent {
                     key={item.key}
                     title={
                       <span>
-                        <Icon type={item.icon || "setting"} />
+                        <Icon type={item.icon || 'setting'} />
                         <span>{item.title}</span>
                       </span>
                     }
@@ -167,20 +167,20 @@ export default class layouts extends PureComponent {
             <span
               // className={styles.right}
               style={{
-                margin: "0 20px",
-                position: "absolute",
+                margin: '0 20px',
+                position: 'absolute',
                 right: 0,
                 top: -10,
-                color: "#fff"
+                color: '#fff'
               }}
             >
-              <Avatar style={{ backgroundColor: "#00a2ae" }}>
-                {user ? displayName.slice(0, 1) : ""}
+              <Avatar style={{ backgroundColor: '#00a2ae' }}>
+                {user ? displayName.slice(0, 1) : ''}
               </Avatar>
               <Dropdown overlay={menu}>
-                <span> {user ? displayName : "请登录"}</span>
+                <span> {user ? displayName : '请登录'}</span>
               </Dropdown>
-              <span> {user ? `（${departmentName}）` : ""}</span>
+              <span> {user ? `（${departmentName}）` : ''}</span>
             </span>
           </Header>
           <Content>{children}</Content>

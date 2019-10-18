@@ -396,7 +396,9 @@ const config = {
 
     panoramaDeleteUrl: `${domainApi}Pano/Delete`,
 
-    panoramaPreviewUrl: `${domain}pano/pannellum.htm?config=`
+    panoramaPreviewUrl: `${domain}pano/pannellum.htm?config=`,
+
+    projectDataListUrl: `${domainApi}Project/GetAllByPost`
   },
 
   //工具箱

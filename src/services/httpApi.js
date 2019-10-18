@@ -1280,3 +1280,47 @@ export async function panoramaDeleteApi(params) {
     }
   });
 }
+
+export async function projectDataListApi(params) {
+  delete params.items;
+  return request(config.url.projectDataListUrl, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      'Content-Type': 'application/json-patch+json'
+    },
+    body: JSON.stringify({
+      ...params,
+      MaxResultCount: params.MaxResultCount || '10',
+      ReplyTimeBegin:
+        params.ReplyTime && params.ReplyTime.length
+          ? dateFormat(params.ReplyTime[0]._d)
+          : '',
+      ReplyTimeEnd:
+        params.ReplyTime && params.ReplyTime.length
+          ? dateFormat(params.ReplyTime[1]._d)
+          : '',
+      ProjectCate: params.ProjectCate
+        ? params.ProjectCate.map(v => v).join(',')
+        : '',
+      HasScopes: params.HasScopes ? params.HasScopes.map(v => v).join(',') : '',
+      ProjectNat: params.ProjectNat
+        ? params.ProjectNat.map(v => v).join(',')
+        : '',
+      ProjectStatus: params.ProjectStatus
+        ? params.ProjectStatus.map(v => v).join(',')
+        : '',
+      VecType: params.VecType ? params.VecType.map(v => v).join(',') : '',
+      HasSpot: params.HasSpot ? params.HasSpot.map(v => v).join(',') : '',
+      ProjectType: params.ProjectType
+        ? params.ProjectType.map(v => v).join(',')
+        : '',
+      Compliance: params.Compliance
+        ? params.Compliance.map(v => v).join(',')
+        : '',
+      ProjectLevel: params.ProjectLevel
+        ? params.ProjectLevel.map(v => v).join(',')
+        : ''
+    })
+  });
+}

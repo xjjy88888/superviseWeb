@@ -1,20 +1,74 @@
-import React, { PureComponent } from "react";
-import { Table, Button, Input, Icon } from "antd";
-import Highlighter from "react-highlight-words";
-import config from "../../config";
-import Layouts from "../../components/Layouts";
+import React, { PureComponent } from 'react';
+import { createForm } from 'rc-form';
+import { connect } from 'dva';
+import { Table, Button, Input, Icon } from 'antd';
+import Highlighter from 'react-highlight-words';
+import config from '../../config';
+import Layouts from '../../components/Layouts';
 
+@connect(({ projectList }) => ({
+  projectList
+}))
+@createForm()
 export default class projectSupervision extends PureComponent {
-  state = {
-    filteredInfo: null,
-    sortedInfo: null,
-    searchText: ""
+  constructor(props) {
+    super(props);
+    this.state = {
+      filteredInfo: null,
+      sortedInfo: null,
+      searchText: '',
+      pagination: {
+        showQuickJumper: true,
+        showSizeChanger: true,
+        pageSizeOptions: ['10', '20', '30', '40', '50']
+      },
+      loading: false,
+      dataSource: []
+    };
+  }
+
+  componentDidMount() {
+    this.refresh();
+  }
+
+  refresh = () => {
+    this.projectDataList({ SkipCount: 0, MaxResultCount: 10 });
   };
-  handleChange = (pagination, filters, sorter) => {
-    console.log("sort", pagination, filters, sorter);
+
+  projectDataList = params => {
+    const { dispatch } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: 'projectList/projectDataList',
+      payload: { ...params, IsActive: true, UserType: 1 },
+      callback: (success, result) => {
+        const pagination = { ...this.state.pagination };
+        pagination.total = result.totalCount;
+        this.setState({
+          loading: false,
+          dataSource: result.items,
+          pagination
+        });
+      }
+    });
+  };
+
+  handleTableChange = (pagination, filters, sorter) => {
+    console.log(pagination, filters, sorter);
+    const Sorting = `${
+      sorter.columnKey
+        ? `${sorter.columnKey === 'name' ? 'userName' : sorter.columnKey} ${
+            sorter.order === 'descend' ? 'desc' : 'asc'
+          }`
+        : ``
+    }`;
     this.setState({
-      filteredInfo: filters,
-      sortedInfo: sorter
+      pagination: pagination
+    });
+    this.projectDataList({
+      SkipCount: (pagination.current - 1) * pagination.pageSize,
+      MaxResultCount: pagination.pageSize,
+      Sorting
     });
   };
 
@@ -32,11 +86,12 @@ export default class projectSupervision extends PureComponent {
   setAgeSort = () => {
     this.setState({
       sortedInfo: {
-        order: "descend",
-        columnKey: "age"
+        order: 'descend',
+        columnKey: 'age'
       }
     });
   };
+
   getColumnSearchProps = dataIndex => ({
     filterDropdown: ({
       setSelectedKeys,
@@ -55,7 +110,7 @@ export default class projectSupervision extends PureComponent {
             setSelectedKeys(e.target.value ? [e.target.value] : [])
           }
           onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
-          style={{ width: 188, marginBottom: 8, display: "block" }}
+          style={{ width: 188, marginBottom: 8, display: 'block' }}
         />
         <Button
           type="primary"
@@ -76,7 +131,7 @@ export default class projectSupervision extends PureComponent {
       </div>
     ),
     filterIcon: filtered => (
-      <Icon type="search" style={{ color: filtered ? "#1890ff" : undefined }} />
+      <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
     ),
     onFilter: (value, record) =>
       record[dataIndex]
@@ -87,15 +142,15 @@ export default class projectSupervision extends PureComponent {
       if (visible) {
         setTimeout(() => this.searchInput.select());
       }
-    },
-    render: text => (
-      <Highlighter
-        highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-        searchWords={[this.state.searchText]}
-        autoEscape
-        textToHighlight={text.toString()}
-      />
-    )
+    }
+    // render: text => (
+    //   <Highlighter
+    //     highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+    //     searchWords={[this.state.searchText]}
+    //     autoEscape
+    //     textToHighlight={text.toString()}
+    //   />
+    // )
   });
 
   handleSearch = (selectedKeys, confirm) => {
@@ -105,154 +160,48 @@ export default class projectSupervision extends PureComponent {
 
   handleReset = clearFilters => {
     clearFilters();
-    this.setState({ searchText: "" });
+    this.setState({ searchText: '' });
   };
   render() {
+    const { selectedRows, dataSource, pagination, loading } = this.state;
+
     const rowSelection = {};
-    const data = [
-      {
-        entry_name: "广东",
-        construction_unit: "广州建设单位",
-        approval_number: "423",
-        approval_organ: "广州批复机构",
-        supervision_unit: "广州监管单位",
-        red_line: "666",
-        perturbation_plot: "666",
-        related_counties: "666",
-        address: "666",
-        coordinate: "666",
-        approval_time: "534654326",
-        status: "已提交",
-        approval_level: "部级",
-        project_type: "公路工程",
-        project_category: "建设类",
-        project_nature: "新建",
-        construct_state: "未开工",
-        compliance: "合规"
-      },
-      {
-        entry_name: "北京",
-        construction_unit: "广州建设单位",
-        approval_number: "41234",
-        approval_time: "42315235",
-        approval_organ: "广州批复机构",
-        supervision_unit: "广州监管单位",
-        red_line: "666",
-        perturbation_plot: "666",
-        related_counties: "666",
-        address: "666",
-        coordinate: "666",
-        status: "已提交",
-        approval_level: "省级",
-        project_type: "铁路工程",
-        project_category: "生产类",
-        project_nature: "扩建",
-        construct_state: "停工",
-        compliance: "疑似未批先建"
-      },
-      {
-        entry_name: "上海",
-        construction_unit: "广州建设单位",
-        approval_number: "976",
-        approval_time: "2015325320",
-        approval_organ: "海外批复机构",
-        supervision_unit: "海外监管单位",
-        red_line: "666",
-        perturbation_plot: "666",
-        related_counties: "666",
-        address: "666",
-        coordinate: "666",
-        status: "已提交",
-        approval_level: "市级",
-        project_type: "涉水交通工程",
-        project_category: "建设类",
-        project_nature: "续建",
-        construct_state: "施工",
-        compliance: "未批先建"
-      },
-      {
-        entry_name: "新建铁路广州至香港专线",
-        construction_unit: "广州建设单位",
-        approval_number: "643576",
-        approval_time: "201921",
-        approval_organ: "上海批复机构",
-        supervision_unit: "上海监管单位",
-        red_line: "666",
-        perturbation_plot: "666",
-        related_counties: "666",
-        address: "666",
-        coordinate: "666",
-        status: "已提交",
-        approval_level: "县级",
-        project_type: "机场工程",
-        project_category: "生产类",
-        project_nature: "改建",
-        construct_state: "完工",
-        compliance: "疑似超出防治责任范围"
-      },
-      {
-        entry_name: "111",
-        construction_unit: "广州建设单位",
-        approval_number: "5436",
-        approval_time: "2019501",
-        approval_organ: "北京批复机构",
-        supervision_unit: "北京监管单位",
-        red_line: "666",
-        perturbation_plot: "666",
-        related_counties: "666",
-        address: "666",
-        coordinate: "666",
-        status: "已提交",
-        approval_level: "部级",
-        project_type: "火电工程",
-        project_category: "建设类",
-        project_nature: "新建",
-        construct_state: "已验收",
-        compliance: "超出防治责任范围"
-      }
-    ];
+
     const columns = [
       {
-        title: "项目名称",
-        dataIndex: "entry_name",
-        key: "entry_name",
-        fixed: "left",
+        title: '项目名称',
+        dataIndex: 'projectName',
+        key: 'projectName',
+        fixed: 'left',
+        width: 400,
+        ...this.getColumnSearchProps('projectName')
+      },
+      {
+        title: '建设单位',
+        dataIndex: 'productDepartmentName',
+        key: 'productDepartmentName',
+        fixed: 'left',
+        width: 300,
+        ...this.getColumnSearchProps('productDepartmentName')
+      },
+      {
+        title: '批复机构',
+        dataIndex: 'replyDepartmentName',
+        key: 'replyDepartmentName',
+        fixed: 'left',
         width: 120,
-        ...this.getColumnSearchProps("entry_name")
+        ...this.getColumnSearchProps('replyDepartmentName')
       },
       {
-        title: "建设单位",
-        dataIndex: "construction_unit",
-        key: "construction_unit",
-        fixed: "left",
+        title: '监管单位',
+        dataIndex: 'supervision_unit',
+        key: 'supervision_unit',
         width: 120,
-        ...this.getColumnSearchProps("construction_unit")
+        ...this.getColumnSearchProps('supervision_unit')
       },
       {
-        title: "批复机构",
-        dataIndex: "approval_organ",
-        key: "approval_organ",
-        fixed: "left",
-        width: 120,
-        ...this.getColumnSearchProps("approval_organ")
-      },
-      {
-        title: "操作",
-        dataIndex: "entry_name",
-        key: "entry_name",
-        fixed: "left",
-        width: 120
-      },
-      {
-        title: "监管单位",
-        dataIndex: "supervision_unit",
-        key: "supervision_unit",
-        width: 120,
-        ...this.getColumnSearchProps("supervision_unit")
-      },
-      {
-        title: "立项级别",
-        dataIndex: "approval_level",
+        title: '立项级别',
+        dataIndex: 'approval_level',
         width: 120,
         filters: config.approval_level.map(item => {
           return {
@@ -263,23 +212,23 @@ export default class projectSupervision extends PureComponent {
         onFilter: (value, record) => record.approval_level.indexOf(value) === 0
       },
       {
-        title: "批复文号",
-        dataIndex: "approval_number",
-        key: "approval_number",
+        title: '批复文号',
+        dataIndex: 'approval_number',
+        key: 'approval_number',
         width: 120,
         sorter: (a, b) => a.approval_number.length - b.approval_number.length
       },
       {
-        title: "批复时间",
-        dataIndex: "approval_time",
-        key: "approval_time",
+        title: '批复时间',
+        dataIndex: 'approval_time',
+        key: 'approval_time',
         width: 120,
         sorter: (a, b) => a.approval_time.length - b.approval_time.length
       },
       {
-        title: "项目合规性",
-        dataIndex: "compliance",
-        key: "compliance",
+        title: '项目合规性',
+        dataIndex: 'compliance',
+        key: 'compliance',
         width: 130,
         filters: config.compliance.map(item => {
           return {
@@ -290,9 +239,9 @@ export default class projectSupervision extends PureComponent {
         onFilter: (value, record) => record.compliance.indexOf(value) === 0
       },
       {
-        title: "项目类型",
-        dataIndex: "project_type",
-        key: "project_type",
+        title: '项目类型',
+        dataIndex: 'project_type',
+        key: 'project_type',
         width: 120,
         filters: config.project_type.map(item => {
           return {
@@ -303,9 +252,9 @@ export default class projectSupervision extends PureComponent {
         onFilter: (value, record) => record.project_type.indexOf(value) === 0
       },
       {
-        title: "项目类别",
-        dataIndex: "project_category",
-        key: "project_category",
+        title: '项目类别',
+        dataIndex: 'project_category',
+        key: 'project_category',
         width: 120,
         filters: config.project_category.map(item => {
           return {
@@ -317,9 +266,9 @@ export default class projectSupervision extends PureComponent {
           record.project_category.indexOf(value) === 0
       },
       {
-        title: "项目性质",
-        dataIndex: "project_nature",
-        key: "project_nature",
+        title: '项目性质',
+        dataIndex: 'project_nature',
+        key: 'project_nature',
         width: 120,
         filters: config.project_nature.map(item => {
           return {
@@ -330,9 +279,9 @@ export default class projectSupervision extends PureComponent {
         onFilter: (value, record) => record.project_nature.indexOf(value) === 0
       },
       {
-        title: "建设状态",
-        dataIndex: "construct_state",
-        key: "construct_state",
+        title: '建设状态',
+        dataIndex: 'construct_state',
+        key: 'construct_state',
         width: 120,
         filters: config.construct_state.map(item => {
           return {
@@ -343,46 +292,62 @@ export default class projectSupervision extends PureComponent {
         onFilter: (value, record) => record.construct_state.indexOf(value) === 0
       },
       {
-        title: "红线数据",
-        dataIndex: "red_line",
-        key: "red_line",
+        title: '红线数据',
+        dataIndex: 'red_line',
+        key: 'red_line',
         width: 120,
         sorter: (a, b) => a.red_line.length - b.red_line.length
       },
       {
-        title: "扰动图斑",
-        dataIndex: "perturbation_plot",
-        key: "perturbation_plot",
+        title: '扰动图斑',
+        dataIndex: 'perturbation_plot',
+        key: 'perturbation_plot',
         width: 120,
         sorter: (a, b) =>
           a.perturbation_plot.length - b.perturbation_plot.length
       },
       {
-        title: "涉及县",
-        dataIndex: "related_counties",
-        key: "related_counties",
+        title: '涉及县',
+        dataIndex: 'related_counties',
+        key: 'related_counties',
         width: 120,
         sorter: (a, b) => a.related_counties.length - b.related_counties.length
       },
       {
-        title: "地址",
-        dataIndex: "address",
-        key: "address",
+        title: '地址',
+        dataIndex: 'address',
+        key: 'address',
         width: 120,
         sorter: (a, b) => a.address.length - b.address.length
       },
       {
-        title: "坐标",
-        dataIndex: "coordinate",
-        key: "coordinate",
+        title: '坐标',
+        dataIndex: 'coordinate',
+        key: 'coordinate',
         width: 120,
         sorter: (a, b) => a.coordinate.length - b.coordinate.length
+      },
+      {
+        title: '操作',
+        dataIndex: 'entry_name',
+        key: 'entry_name',
+        fixed: 'right',
+        width: 130,
+        render: (i, record) => (
+          <span>
+            <a style={{ margin: 10 }}>共享</a>
+            <a style={{ margin: 10 }} onClick={() => {}}>
+              删除
+            </a>
+            {/* <a style={{ margin: 10 }}>移除</a> */}
+          </span>
+        )
       }
     ];
 
     return (
       <Layouts avtive="projectSupervision">
-        <div style={{ margin: 20, backgroundColor: "#fff" }}>
+        <div style={{ margin: 20, backgroundColor: '#fff' }}>
           {/* <div style={{ textAlign: "right", padding: "15px 25px" }}>
               <Switch checkedChildren="当前项目" unCheckedChildren="归档项目" />
               <Button style={{ marginLeft: 20 }}>重置</Button>
@@ -394,17 +359,16 @@ export default class projectSupervision extends PureComponent {
               </Button>
             </div> */}
           <Table
-            rowSelection={rowSelection}
             columns={columns}
-            dataSource={data}
-            onChange={this.handleChange}
-            scroll={{ x: "2200px" }}
-            style={{ padding: 20 }}
-            pagination={{
-              showQuickJumper: true,
-              showSizeChanger: true,
-              pageSizeOptions: ["10", "20", "30", "40", "50"]
-            }}
+            dataSource={dataSource}
+            rowSelection={rowSelection}
+            rowKey={record => record.id}
+            onChange={this.handleTableChange}
+            pagination={pagination}
+            loading={loading}
+            scroll={{ x: '2700px' }}
+            style={{ padding: 20, }}
+            // bordered
           />
         </div>
       </Layouts>
