@@ -1,5 +1,6 @@
 import {
   queryWFSLayer,
+  queryRegionWFSLayer,
   boundaryApi,
   projectPositionApi,
   getInfoByExtent,
@@ -21,6 +22,10 @@ export default {
     *gotest({ payload, callback }, { call, put }) {
       yield put(routerRedux.replace("/home/welcome"));
     },
+    *queryRegionWFSLayer({ payload, callback }, { call, put }) {
+      const { data: result } = yield call(queryRegionWFSLayer, payload);
+      if (callback) callback(result);
+    },  
     *queryWFSLayer({ payload, callback }, { call, put }) {
       // eslint-disable-line
       //console.log(payload);

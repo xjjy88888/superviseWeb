@@ -1,10 +1,21 @@
 import React, { PureComponent } from 'react';
 import { createForm } from 'rc-form';
 import { connect } from 'dva';
-import { Table, Button, Input, Icon } from 'antd';
+import {
+  Table,
+  Button,
+  Input,
+  Icon,
+  Layout,
+  Switch,
+  Radio,
+  Checkbox
+} from 'antd';
 import Highlighter from 'react-highlight-words';
 import config from '../../config';
 import Layouts from '../../components/Layouts';
+
+const { Header, Footer, Sider, Content } = Layout;
 
 @connect(({ projectList }) => ({
   projectList
@@ -162,8 +173,9 @@ export default class projectSupervision extends PureComponent {
     clearFilters();
     this.setState({ searchText: '' });
   };
+  
   render() {
-    const { selectedRows, dataSource, pagination, loading } = this.state;
+    const { dataSource, pagination, loading } = this.state;
 
     const rowSelection = {};
 
@@ -174,7 +186,8 @@ export default class projectSupervision extends PureComponent {
         key: 'projectName',
         fixed: 'left',
         width: 400,
-        ...this.getColumnSearchProps('projectName')
+        ...this.getColumnSearchProps('projectName'),
+        render: (i, record) => <a>{i}</a>
       },
       {
         title: '建设单位',
@@ -347,30 +360,57 @@ export default class projectSupervision extends PureComponent {
 
     return (
       <Layouts avtive="projectSupervision">
-        <div style={{ margin: 20, backgroundColor: '#fff' }}>
-          {/* <div style={{ textAlign: "right", padding: "15px 25px" }}>
-              <Switch checkedChildren="当前项目" unCheckedChildren="归档项目" />
-              <Button style={{ marginLeft: 20 }}>重置</Button>
+        <Layout style={{ margin: 20, backgroundColor: '#fff' }}>
+          <Content
+            style={{ backgroundColor: '#fff', padding: '30px 30px 20px 30px' }}
+          >
+            <span>
+              <Button icon="download">共享导入</Button>
+              <Button icon="plus" style={{ marginLeft: 20 }}>
+                新增项目
+              </Button>
+            </span>
+            <span style={{ float: 'right' }}>
+              <span style={{ marginRight: 30 }}>
+                数据源：
+                <Checkbox.Group
+                  options={['共享', '独有']}
+                  defaultValue={['共享', '独有']}
+                  onChange={() => {}}
+                />
+              </span>
+              <Radio.Group defaultValue="a" buttonStyle="solid">
+                <Radio.Button value="a">当前项目</Radio.Button>
+                <Radio.Button value="b">归档项目</Radio.Button>
+              </Radio.Group>
+              <Button icon="delete" style={{ marginLeft: 20 }}>
+                回收站
+              </Button>
+              <Button icon="reload" style={{ marginLeft: 20 }}>
+                重置
+              </Button>
               <Button icon="shopping" style={{ marginLeft: 20 }}>
                 工具箱
               </Button>
               <Button icon="desktop" style={{ marginLeft: 20 }}>
                 控制台
               </Button>
-            </div> */}
-          <Table
-            columns={columns}
-            dataSource={dataSource}
-            rowSelection={rowSelection}
-            rowKey={record => record.id}
-            onChange={this.handleTableChange}
-            pagination={pagination}
-            loading={loading}
-            scroll={{ x: '2700px' }}
-            style={{ padding: 20, }}
-            // bordered
-          />
-        </div>
+            </span>
+          </Content>
+          <Content>
+            <Table
+              columns={columns}
+              dataSource={dataSource}
+              rowSelection={rowSelection}
+              rowKey={record => record.id}
+              onChange={this.handleTableChange}
+              pagination={pagination}
+              loading={loading}
+              scroll={{ x: '2700px' }}
+              style={{ padding: 20 }}
+            />
+          </Content>
+        </Layout>
       </Layouts>
     );
   }

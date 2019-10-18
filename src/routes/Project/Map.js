@@ -1,5 +1,8 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
+import {
+  message
+} from "antd";
 import Layouts from "../../components/Layouts";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -13,6 +16,15 @@ const DISTRICT_FILL_COLOR = "rgba(230,0,0,0)";
 // const DISTRICT_COLOR = '#bfbfbf';
 const DISTRICT_COLOR = "#0070FF";
 
+//绘制geojson行政区划图层样式
+const regionGeoJsonStyle = {
+  color: "#33CCFF", //#33CCFF #e60000
+  weight: 3,
+  opacity: 1,
+  fillColor: "#e6d933", //#33CCFF #e6d933
+  fillOpacity: 0.1
+};
+
 @connect(({ mapdata }) => ({
   mapdata
 }))
@@ -24,6 +36,7 @@ export default class homePage extends PureComponent {
       showImageTimeText:true,
     };
     this.map = null;
+    this.regiongeojsonLayer = null;//行政区划矢量图层
     this.onlineBasemapLayers = null;
   }
 
@@ -33,6 +46,8 @@ export default class homePage extends PureComponent {
     me.createLayers();    
     // 创建地图
     me.createMap();
+    // 创建行政区划渲染
+    me.createRegion();
     // 创建图层管理控件
     me.createToc();    
     // 创建地图缩放控件
@@ -282,6 +297,96 @@ export default class homePage extends PureComponent {
     });
     measureControl.addTo(map);
   }; 
+
+  // 创建行政区划渲染
+  createRegion = () => {
+    this.getNextRegions();
+  }
+  //获取当前账号行政区下一级行政区数据
+  getNextRegions = () => {
+    const user = localStorage.getItem('user');
+    if(user){
+        const curuser = JSON.parse(user);
+        const parentid = curuser.departmentDistrictCodeId;
+      //  console.log('curuser',curuser);
+        this.queryRegionByProperty(
+          parentid,
+          "parent_id",
+          config.districtBound.mapDistrictLayerName,
+          this.callbackRegionQueryWFSService
+        );
+    }
+    else{
+      message.warning("区域范围之外的数据没有权限操作", 1);      
+    }
+  }
+
+  /*
+   * 行政区划查询回调函数
+   */
+  callbackRegionQueryWFSService = data => {
+    console.log('data',data);
+  }
+
+  /*属性查询行政区划图层
+   *@method queryRegionByProperty
+   *@param propertyValue 属性值
+   *@param propertyName 属性名称
+   *@param typeName 图层名称
+   *@return null
+   */
+  queryRegionByProperty = (
+    propertyValue,
+    propertyName,
+    typeName,
+    callback
+  ) => {
+    const me = this;
+    let filter =
+      '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
+    filter += "<PropertyIsEqualTo>";
+    filter += "<PropertyName>" + propertyName + "</PropertyName>";
+    filter += "<Literal>" + propertyValue + "</Literal>";
+    filter += "</PropertyIsEqualTo>";
+    filter += "</Filter>";
+    let urlString = config.mapUrl.geoserverUrl + "/ows";
+    let param = {
+      service: "WFS",
+      version: "1.0.0",
+      request: "GetFeature",
+      typeName: typeName,
+      outputFormat: "application/json",
+      filter: filter
+    };
+    let geojsonUrl = urlString + L.Util.getParamString(param, urlString);
+    me.props.dispatch({
+      type: "mapdata/queryRegionWFSLayer",
+      payload: { geojsonUrl },
+      callback: callback
+    });
+  }; 
+
+  /*
+   * 绘制图形函数
+   */
+  loadGeojsonLayer = (geojsonlayer,geojson, style) => {
+    if (!geojsonlayer) {
+        geojsonlayer = L.Proj.geoJson(geojson, {
+          style: style
+        }).addTo(this.map);
+    }
+  };
+
+  /*
+   * 清空绘制图形函数
+   */
+  clearGeojsonLayer = () => {
+    if (this.regiongeojsonLayer) {
+      this.regiongeojsonLayer.clearLayers();
+      this.map.removeLayer(this.regiongeojsonLayer);
+      this.regiongeojsonLayer = null;
+    }
+  };  
 
   render() {
     const {

@@ -618,6 +618,16 @@ export async function removeProjectScopeGraphic(project_id) {
 }
 
 //地图WFS请求图层数据源
+
+export async function queryRegionWFSLayer(params) {
+  return request(params.geojsonUrl, {
+    method: "GET",
+    dataType: "json",
+    headers: {
+    }
+  });
+}
+
 /*export async function queryWFSLayer(params) {
   return request(params.geojsonUrl, {
     method: "GET",
