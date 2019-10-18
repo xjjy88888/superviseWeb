@@ -1,65 +1,71 @@
 const l = window.location;
-const isFormal = l.href.split("/")[3] === "stbcjg";
-const isLocal = l.hostname === "localhost";
+const isFormal = l.href.split('/')[3] === 'stbcjg';
+const isLocal = l.hostname === 'localhost';
 
-console.log(`%c当前版本：v2.0.8`, "color:green;font-size:30px");
+console.log(`%c当前版本：v2.0.11`, 'color:green;font-size:30px');
 
-console.log(isLocal ? "本地环境" : isFormal ? "正式环境" : "测试环境");
+console.log(isLocal ? '本地环境' : isFormal ? '正式环境' : '测试环境');
 
 const domain = isLocal
-  ? "http://183.6.178.124:8001/stbct/"
-  : `${l.origin}/stbc${isFormal ? "" : "t"}/`;
+  ? 'http://183.6.178.124:8001/stbct/'
+  : `${l.origin}/stbc${isFormal ? '' : 't'}/`;
 
-const domainApi = domain + "api/services/app/";
+const domainApi = domain + 'api/services/app/';
 
-const imageBaseUrl = "http://www.stbcjg.cn/BasemapService/rest/image";
-const imageQueryBaseUrl = "http://210.36.22.122/BasemapService/rest/image";
+const imageBaseUrl = 'http://www.stbcjg.cn/BasemapService/rest/image';
+const imageQueryBaseUrl = 'http://210.36.22.122/BasemapService/rest/image';
 
-const color_back_spot = "rgba(255,255,0,0.4)"; //背景色-图斑
-const color_back_redLine = "rgba(230,0,0,0.4)"; //背景色-红线
-const color_border_spot1 = "#ffd700"; //边框色-图斑-未复核
-const color_border_spot2 = "#E09A00"; //边框色-图斑-已复核
-const color_border_redLine = "#e60000"; //边框色-红线
+const color_back_spot = 'rgba(255,255,0,0.4)'; //背景色-图斑
+const color_back_redLine = 'rgba(230,0,0,0.4)'; //背景色-红线
+const color_border_spot1 = '#ffd700'; //边框色-图斑-未复核
+const color_border_spot2 = '#E09A00'; //边框色-图斑-已复核
+const color_border_redLine = '#e60000'; //边框色-红线
 
 const myOnlineImageUrl =
-  "http://www.stbcjg.cn/BasemapService/rest/image/latest/tile/{z}/{y}/{x}";
+  'http://www.stbcjg.cn/BasemapService/rest/image/latest/tile/{z}/{y}/{x}';
 const arcgisVectorUrl =
-  "http://cache1.arcgisonline.cn/arcgis/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}";
+  'http://cache1.arcgisonline.cn/arcgis/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}';
 const arcgisImageUrl =
-  "https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
+  'https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
 const tdtVectorUrl =
-  "http://t{s}.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=7786923a385369346d56b966bb6ad62f";
+  'http://t{s}.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=7786923a385369346d56b966bb6ad62f';
 const tdtImageUrl =
-  "http://t{s}.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=7786923a385369346d56b966bb6ad62f";
+  'http://t{s}.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=7786923a385369346d56b966bb6ad62f';
 const tdtImageLabelUrl =
-  "http://t{s}.tianditu.gov.cn/DataServer?T=cia_w&x={x}&y={y}&l={z}&tk=7786923a385369346d56b966bb6ad62f";
+  'http://t{s}.tianditu.gov.cn/DataServer?T=cia_w&x={x}&y={y}&l={z}&tk=7786923a385369346d56b966bb6ad62f';
 // "http://t{s}.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=7786923a385369346d56b966bb6ad62f";
 const googleVectorUrl =
-  "http://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}";
+  'http://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}';
 const googleImageUrl =
-  "http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}";
+  'http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}';
 const gaodeVectorUrl =
-  "http://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}";
+  'http://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}';
 const gaodeImageUrl =
-  "http://webst0{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}";
+  'http://webst0{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}';
 // const bdVectorUrl =
 //   'http://online{s}.map.bdimg.com/onlinelabel/?qt=tile&x={x}&y={y}&z={z}&styles={styles}&scaler=1&p=1';
 // const bdImageUrl =
 //   'http://shangetu{s}.map.bdimg.com/it/u=x={x};y={y};z={z};v=009;type=sate&fm=46';
-const OSMVectorUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
-const errorTileUrl = "./img/errorTileUrl.png";
+const OSMVectorUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+const errorTileUrl = './img/errorTileUrl.png';
 //行政边界
 // const districtBoundUrl = "http://www.stbcjg.cn:6080/arcgis/rest/services/STBC/XZQH_QG/MapServer";
 const districtBoundUrl = `${
   isFormal
-    ? "https://www.zkygis.cn:8143/geoserver/ZKYGIS"
-    : "http://183.6.178.124:8143/geoserver/ZKYGIS"
-  }`;
+    ? 'https://www.zkygis.cn:8143/geoserver/ZKYGIS'
+    : 'http://183.6.178.124:8143/geoserver/ZKYGIS'
+}`;
 
-const geoserverUrl =`${isLocal ? "http://183.6.178.124:8143" : `${l.protocol}//${l.hostname}:8143`}/geoserver/ZKYGIS`;
-const mapProjectLayerName = isFormal ? "ZKYGIS:bs_project_scope" : "ZKYGIS:bs_project_scope_t";//现状库项目红线
-const mapSpotLayerName = isFormal ? "ZKYGIS:bs_spot" : "ZKYGIS:bs_spot_t";//现状库扰动图斑
-const mapDistrictLayerName = isFormal ? "ZKYGIS:district_code" : "ZKYGIS:district_code_t";
+const geoserverUrl = `${
+  isLocal ? 'http://183.6.178.124:8143' : `${l.protocol}//${l.hostname}:8143`
+}/geoserver/ZKYGIS`;
+const mapProjectLayerName = isFormal
+  ? 'ZKYGIS:bs_project_scope'
+  : 'ZKYGIS:bs_project_scope_t'; //现状库项目红线
+const mapSpotLayerName = isFormal ? 'ZKYGIS:bs_spot' : 'ZKYGIS:bs_spot_t'; //现状库扰动图斑
+const mapDistrictLayerName = isFormal
+  ? 'ZKYGIS:district_code'
+  : 'ZKYGIS:district_code_t';
 
 const config = {
   domain: domain,
@@ -396,44 +402,44 @@ const config = {
   //工具箱
   toolbox: [
     {
-      label: "勾选管理",
-      key: "checklist",
-      icon: "check"
+      label: '勾选管理',
+      key: 'checklist',
+      icon: 'check'
     },
     {
-      label: "导出",
-      key: "export",
-      icon: "cloud-download"
+      label: '导出',
+      key: 'export',
+      icon: 'cloud-download'
     },
     {
-      label: "导出",
-      key: "attach",
-      icon: "cloud-download"
+      label: '导出',
+      key: 'attach',
+      icon: 'cloud-download'
     },
     {
-      label: "归档",
-      key: "archiving",
-      icon: "folder-open"
+      label: '归档',
+      key: 'archiving',
+      icon: 'folder-open'
     },
     {
-      label: "删除",
-      key: "delete",
-      icon: "delete"
+      label: '删除',
+      key: 'delete',
+      icon: 'delete'
     },
     {
-      label: "模板下载",
-      key: "download_shapfile",
-      icon: "download"
+      label: '模板下载',
+      key: 'download_shapfile',
+      icon: 'download'
     },
     {
-      label: "拓扑检测工具下载",
-      key: "topologyCheck",
-      icon: "download"
+      label: '拓扑检测工具下载',
+      key: 'topologyCheck',
+      icon: 'download'
     },
     {
-      label: "模板说明",
-      key: "template_description",
-      icon: "question-circle"
+      label: '模板说明',
+      key: 'template_description',
+      icon: 'question-circle'
     },
     // {
     //   label: "批量上传(GeoJSON)",
@@ -446,54 +452,54 @@ const config = {
     //   icon: "upload"
     // },
     {
-      label: "数据抽稀",
-      key: "data_sparse",
-      icon: "font-size"
+      label: '数据抽稀',
+      key: 'data_sparse',
+      icon: 'font-size'
     }
   ],
 
   //控制台-项目
   console_project: [
     {
-      label: "立项级别",
-      value: "level",
-      icon: "schedule",
+      label: '立项级别',
+      value: 'level',
+      icon: 'schedule',
       type: 0
     },
     {
-      label: "合规性",
-      value: "compliance",
-      icon: "info-circle",
+      label: '合规性',
+      value: 'compliance',
+      icon: 'info-circle',
       type: 1
     },
     {
-      label: "项目类型",
-      value: "type",
-      icon: "appstore",
+      label: '项目类型',
+      value: 'type',
+      icon: 'appstore',
       type: 2
     },
     {
-      label: "项目类别",
-      value: "sort",
-      icon: "ant-design",
+      label: '项目类别',
+      value: 'sort',
+      icon: 'ant-design',
       type: 3
     },
     {
-      label: "项目性质",
-      value: "nature",
-      icon: "project",
+      label: '项目性质',
+      value: 'nature',
+      icon: 'project',
       type: 4
     },
     {
-      label: "建设状态",
-      value: "state",
-      icon: "thunderbolt",
+      label: '建设状态',
+      value: 'state',
+      icon: 'thunderbolt',
       type: 5
     },
     {
-      label: "矢量化类型",
-      value: "vector",
-      icon: "profile",
+      label: '矢量化类型',
+      value: 'vector',
+      icon: 'profile',
       type: 6
     }
   ],
@@ -501,116 +507,116 @@ const config = {
   //控制台-图斑
   console_spot: [
     {
-      label: "现场复核",
-      value: "level",
-      icon: "edit",
+      label: '现场复核',
+      value: 'level',
+      icon: 'edit',
       type: 0
     },
     {
-      label: "合规性",
-      value: "compliance",
-      icon: "info-circle",
+      label: '合规性',
+      value: 'compliance',
+      icon: 'info-circle',
       type: 1
     },
     {
-      label: "扰动类型",
-      value: "type",
-      icon: "appstore",
+      label: '扰动类型',
+      value: 'type',
+      icon: 'appstore',
       type: 2
     },
     {
-      label: "建设状态",
-      value: "nature",
-      icon: "thunderbolt",
+      label: '建设状态',
+      value: 'nature',
+      icon: 'thunderbolt',
       type: 3
     },
     {
-      label: "扰动变化类型",
-      value: "sort",
-      icon: "border-inner",
+      label: '扰动变化类型',
+      value: 'sort',
+      icon: 'border-inner',
       type: 4
     }
   ],
 
   //扰动类型
-  disturb_type: ["弃土（渣）场", "取土（石）场", "其他扰动", "非生产建设项目"],
+  disturb_type: ['弃土（渣）场', '取土（石）场', '其他扰动', '非生产建设项目'],
 
   //扰动变化类型
   disturb_change_type: [
-    "新建",
-    "续建（范围扩大）",
-    "续建（范围缩小）",
-    "续建（范围不变）",
-    "完工"
+    '新建',
+    '续建（范围扩大）',
+    '续建（范围缩小）',
+    '续建（范围不变）',
+    '完工'
   ],
 
   //合规性
   compliance: [
-    "合规",
-    "疑似未批先建",
-    "未批先建",
-    "疑似超出项目红线",
-    "超出项目红线",
-    "疑似建设地点变更",
-    "建设地点变更",
-    "已批",
-    "可不编报方案"
+    '合规',
+    '疑似未批先建',
+    '未批先建',
+    '疑似超出项目红线',
+    '超出项目红线',
+    '疑似建设地点变更',
+    '建设地点变更',
+    '已批',
+    '可不编报方案'
   ],
 
   //建设状态
-  construct_state: ["未开工", "停工", "施工", "完工", "已验收"],
+  construct_state: ['未开工', '停工', '施工', '完工', '已验收'],
 
   //立项级别
-  approval_level: ["部级", "省级", "市级", "县级"],
+  approval_level: ['部级', '省级', '市级', '县级'],
 
   //项目类型
   project_type: [
-    "公路工程",
-    "铁路工程",
-    "涉水交通工程",
-    "机场工程",
-    "火电工程",
-    "核电工程",
-    "风电工程",
-    "输变电工程",
-    "其他电力工程",
-    "水利枢纽工程",
-    "灌区工程",
-    "引调水工程",
-    "堤防工程",
-    "蓄滞洪区工程",
-    "其他小型水利工程",
-    "水电枢纽工程",
-    "露天煤矿",
-    "露天金属矿",
-    "露天非金属矿",
-    "井采煤矿",
-    "井采金属矿",
-    "井采非金属矿",
-    "油气开采工程",
-    "油气管道工程",
-    "油气储存于加工工程",
-    "工业园区工程",
-    "城市轨道交通工程",
-    "城市管网工程",
-    "房地产工程",
-    "其他城建工程",
-    "林浆纸一体化工程",
-    "农林开发工程",
-    "加工制造类项目",
-    "社会事业类项目",
-    "信息产业类项目",
-    "其他行业项目"
+    '公路工程',
+    '铁路工程',
+    '涉水交通工程',
+    '机场工程',
+    '火电工程',
+    '核电工程',
+    '风电工程',
+    '输变电工程',
+    '其他电力工程',
+    '水利枢纽工程',
+    '灌区工程',
+    '引调水工程',
+    '堤防工程',
+    '蓄滞洪区工程',
+    '其他小型水利工程',
+    '水电枢纽工程',
+    '露天煤矿',
+    '露天金属矿',
+    '露天非金属矿',
+    '井采煤矿',
+    '井采金属矿',
+    '井采非金属矿',
+    '油气开采工程',
+    '油气管道工程',
+    '油气储存于加工工程',
+    '工业园区工程',
+    '城市轨道交通工程',
+    '城市管网工程',
+    '房地产工程',
+    '其他城建工程',
+    '林浆纸一体化工程',
+    '农林开发工程',
+    '加工制造类项目',
+    '社会事业类项目',
+    '信息产业类项目',
+    '其他行业项目'
   ],
 
   //项目类别
-  project_category: ["建设类", "生产类"],
+  project_category: ['建设类', '生产类'],
 
   //项目性质
-  project_nature: ["新建", "扩建", "续建", "改建"],
+  project_nature: ['新建', '扩建', '续建', '改建'],
 
   //矢量化类型
-  vectorization_type: ["项目红线", "示意性范围"],
+  vectorization_type: ['项目红线', '示意性范围'],
 
   imageBaseUrl: imageBaseUrl,
 
@@ -621,13 +627,15 @@ const config = {
     maxZoom: 21
   },
   cesiumMapInitParams: {
-    extent: {//初始化范围
+    extent: {
+      //初始化范围
       xmin: 91.262834,
       ymin: 8.178795,
       xmax: 136.851228,
       ymax: 49.517782
     },
-    spatialReference: {//地图空间参考坐标系
+    spatialReference: {
+      //地图空间参考坐标系
       wkid: 4326
     },
     /*备注说明:配置底图列表
@@ -639,23 +647,107 @@ const config = {
       *name显示名称
       *Url地图Url
       */
-      imageryViewModels:[
-        {"label":"监管影像图",className:"imgType",type:4,proxyUrl:'',Url:myOnlineImageUrl},
-        {"label":"OSM街道图",className:"vecType",type:1,proxyUrl:'',Url:'https://a.tile.openstreetmap.org/'},
-        {"label":"ArcGIS影像图",className:"imgType",type:0,proxyUrl:'',Url:'http://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer'},
-        {"label":"ArcGIS街道图",className:"vecType",type:0,proxyUrl:'',Url:'http://cache1.arcgisonline.cn/arcgis/rest/services/ChinaOnlineCommunity/MapServer'},
-        //{"label":"WMS",className:"imgType",type:5,proxyUrl:'',Url:'http://localhost:8180/geoserver/gwc/service/wms',credit:'wms服务',layers: 'worldMap'},
-        //{"label":"WMS",className:"imgType",type:5,proxyUrl:'',Url:'http://localhost:8180/geoserver/gwc/service/wms',credit:'wms服务',layers: 'worldMap',tilingScheme:new Cesium.WebMercatorTilingScheme()},
-        //subdomains默认值'abc'
-        {"label":"天地影像图",className:"imgType",type:2,proxyUrl:'',Url:'http://t{s}.tianditu.com/img_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&tk=7786923a385369346d56b966bb6ad62f',layer: 'tdtImgBasicLayer',style: 'default',format: 'tiles',tileMatrixSetID:'tdtMap',subdomains:["0", "1", "2", "3", "4", "5", "6", "7"]},
-        {"label":"天地街道图",className:"vecType",type:2,proxyUrl:'',Url:'http://t{s}.tianditu.com/vec_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=vec&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&tk=7786923a385369346d56b966bb6ad62f',layer: 'tdtVecBasicLayer',style: 'default',format: 'tiles',tileMatrixSetID:'tdtMap',subdomains:["0", "1", "2", "3", "4", "5", "6", "7"]},
-        {"label":"谷歌影像图",className:"imgType",type:4,proxyUrl:'',Url:'http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}',credit:'googleMap服务',subdomains: "abc"},
-        {"label":"谷歌街道图",className:"vecType",type:4,proxyUrl:'',Url:'http://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}',credit:'googleMap服务',subdomains: "abc"},
-        {"label":"高德影像图",className:"imgType",type:4,proxyUrl:'',Url:'http://webst0{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',credit:'gaodeMap服务',subdomains: ["1", "2", "3", "4"]},
-        {"label":"高德街道图",className:"vecType",type:4,proxyUrl:'',Url:'http://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',credit:'gaodeMap服务',subdomains: ["1", "2", "3", "4"]},
-      ], 
-      /*地图图层菜单目录构造*/
-      /*
+    imageryViewModels: [
+      {
+        label: '监管影像图',
+        className: 'imgType',
+        type: 4,
+        proxyUrl: '',
+        Url: myOnlineImageUrl
+      },
+      {
+        label: 'OSM街道图',
+        className: 'vecType',
+        type: 1,
+        proxyUrl: '',
+        Url: 'https://a.tile.openstreetmap.org/'
+      },
+      {
+        label: 'ArcGIS影像图',
+        className: 'imgType',
+        type: 0,
+        proxyUrl: '',
+        Url:
+          'http://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer'
+      },
+      {
+        label: 'ArcGIS街道图',
+        className: 'vecType',
+        type: 0,
+        proxyUrl: '',
+        Url:
+          'http://cache1.arcgisonline.cn/arcgis/rest/services/ChinaOnlineCommunity/MapServer'
+      },
+      //{"label":"WMS",className:"imgType",type:5,proxyUrl:'',Url:'http://localhost:8180/geoserver/gwc/service/wms',credit:'wms服务',layers: 'worldMap'},
+      //{"label":"WMS",className:"imgType",type:5,proxyUrl:'',Url:'http://localhost:8180/geoserver/gwc/service/wms',credit:'wms服务',layers: 'worldMap',tilingScheme:new Cesium.WebMercatorTilingScheme()},
+      //subdomains默认值'abc'
+      {
+        label: '天地影像图',
+        className: 'imgType',
+        type: 2,
+        proxyUrl: '',
+        Url:
+          'http://t{s}.tianditu.com/img_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&tk=7786923a385369346d56b966bb6ad62f',
+        layer: 'tdtImgBasicLayer',
+        style: 'default',
+        format: 'tiles',
+        tileMatrixSetID: 'tdtMap',
+        subdomains: ['0', '1', '2', '3', '4', '5', '6', '7']
+      },
+      {
+        label: '天地街道图',
+        className: 'vecType',
+        type: 2,
+        proxyUrl: '',
+        Url:
+          'http://t{s}.tianditu.com/vec_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=vec&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&tk=7786923a385369346d56b966bb6ad62f',
+        layer: 'tdtVecBasicLayer',
+        style: 'default',
+        format: 'tiles',
+        tileMatrixSetID: 'tdtMap',
+        subdomains: ['0', '1', '2', '3', '4', '5', '6', '7']
+      },
+      {
+        label: '谷歌影像图',
+        className: 'imgType',
+        type: 4,
+        proxyUrl: '',
+        Url: 'http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}',
+        credit: 'googleMap服务',
+        subdomains: 'abc'
+      },
+      {
+        label: '谷歌街道图',
+        className: 'vecType',
+        type: 4,
+        proxyUrl: '',
+        Url: 'http://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}',
+        credit: 'googleMap服务',
+        subdomains: 'abc'
+      },
+      {
+        label: '高德影像图',
+        className: 'imgType',
+        type: 4,
+        proxyUrl: '',
+        Url:
+          'http://webst0{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',
+        credit: 'gaodeMap服务',
+        subdomains: ['1', '2', '3', '4']
+      },
+      {
+        label: '高德街道图',
+        className: 'vecType',
+        type: 4,
+        proxyUrl: '',
+        Url:
+          'http://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
+        credit: 'gaodeMap服务',
+        subdomains: ['1', '2', '3', '4']
+      }
+    ],
+    /*地图图层菜单目录构造*/
+    /*
       *name-图层名称
       *layerurl-图层服务配置
       *type代表地图服务类型:
@@ -668,176 +760,174 @@ const config = {
       6 代表kml,kmz;
       7 代表geoJson;
       *layerid-图层id
-      */     
-      overlayLayers:[
-        { id: 1, pId: 0, name: "基础图层",checked:false },
-        {
-            id: 11,
-            pId: 1,
-            name: "扰动图斑",//WMS
-            layerurl:geoserverUrl+"/wms",
-            layerid: mapSpotLayerName,
-            IsWebMercatorTilingScheme:false,//是否创建摩卡托投影坐标系,默认是地理坐标系
-            type: 5,
-            proxyUrl:'',
-            checked: false
-        }, 
-        {
-            id: 12,
-            pId: 1,
-            name: "项目红线",//WMS
-            layerurl:geoserverUrl+"/wms",
-            layerid: mapProjectLayerName,
-            IsWebMercatorTilingScheme:false,//是否创建摩卡托投影坐标系,默认是地理坐标系
-            type: 5,
-            proxyUrl:'',
-            checked: false
-        }, 
-        {
-          id: 13,
-          pId: 1,
-          name: "路网注记",
-          layerurl:"http://t{s}.tianditu.com/cia_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=cia&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&tk=7786923a385369346d56b966bb6ad62f",
-          layerid: "tdtImgLabelLayer",
-          IsWebMercatorTilingScheme:false,//是否创建摩卡托投影坐标系,默认是地理坐标系
-          type: 2,
-          proxyUrl:'',
-          checked: false
-        },
-        {
-          id: 14,
-          pId: 1,
-          name: "行政边界",//WMS
-          layerurl:geoserverUrl+"/wms",
-          layerid: mapDistrictLayerName,
-          IsWebMercatorTilingScheme:false,//是否创建摩卡托投影坐标系,默认是地理坐标系
-          type: 5,
-          proxyUrl:'',
-          checked: false
-        },                   
-        
+      */
 
-      ],
-      Tiles3D:{//三维倾斜摄影配置信息
-        url: "./cesiumfile/3Dtiles/pazhou/Production_3.json",
-        //url: "./cesiumfile/3Dtiles/Production_1/Scene/Production_1.json",
-      },    
-      
-
-
-  }, 
+    overlayLayers: [
+      { id: 1, pId: 0, name: '基础图层', checked: false },
+      {
+        id: 11,
+        pId: 1,
+        name: '扰动图斑', //WMS
+        layerurl: geoserverUrl + '/wms',
+        layerid: mapSpotLayerName,
+        IsWebMercatorTilingScheme: false, //是否创建摩卡托投影坐标系,默认是地理坐标系
+        type: 5,
+        proxyUrl: '',
+        checked: false
+      },
+      {
+        id: 12,
+        pId: 1,
+        name: '项目红线', //WMS
+        layerurl: geoserverUrl + '/wms',
+        layerid: mapProjectLayerName,
+        IsWebMercatorTilingScheme: false, //是否创建摩卡托投影坐标系,默认是地理坐标系
+        type: 5,
+        proxyUrl: '',
+        checked: false
+      },
+      {
+        id: 13,
+        pId: 1,
+        name: '路网注记',
+        layerurl:
+          'http://t{s}.tianditu.com/cia_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=cia&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&tk=7786923a385369346d56b966bb6ad62f',
+        layerid: 'tdtImgLabelLayer',
+        IsWebMercatorTilingScheme: false, //是否创建摩卡托投影坐标系,默认是地理坐标系
+        type: 2,
+        proxyUrl: '',
+        checked: false
+      },
+      {
+        id: 14,
+        pId: 1,
+        name: '行政边界', //WMS
+        layerurl: geoserverUrl + '/wms',
+        layerid: mapDistrictLayerName,
+        IsWebMercatorTilingScheme: false, //是否创建摩卡托投影坐标系,默认是地理坐标系
+        type: 5,
+        proxyUrl: '',
+        checked: false
+      }
+    ],
+    Tiles3D: {
+      //三维倾斜摄影配置信息
+      url: './cesiumfile/3Dtiles/pazhou/Production_3.json'
+      //url: "./cesiumfile/3Dtiles/Production_1/Scene/Production_1.json",
+    }
+  },
   //天地图影像注记
   tdtImageLabel: {
-    title: "路网注记",
+    title: '路网注记',
     url: tdtImageLabelUrl,
     minZoom: 0,
     maxZoom: 21,
-    subdomains: ["0", "1", "2", "3", "4", "5", "6", "7"],
+    subdomains: ['0', '1', '2', '3', '4', '5', '6', '7'],
     picUrl: `./img/tdtImagelabel.png`,
-    errorTileUrl: errorTileUrl,
+    errorTileUrl: errorTileUrl
   },
   //行政边界
   districtBound: {
-    title: "行政边界",
+    title: '行政边界',
     url: districtBoundUrl,
     mapDistrictLayerName: mapDistrictLayerName,
     minZoom: 0,
     maxZoom: 21,
     picUrl: `./img/districtBound.png`,
-    errorTileUrl: errorTileUrl,
+    errorTileUrl: errorTileUrl
   },
   errorTileUrl: errorTileUrl,
   // 在线底图
   onlineBasemaps: [
     {
-      title: "监管影像图",
+      title: '监管影像图',
       url: myOnlineImageUrl,
       minZoom: 0,
       maxZoom: 21,
-      subdomains: "abc",
+      subdomains: 'abc',
       picUrl: `./img/myOnlineImage.png`,
-      errorTileUrl: errorTileUrl,
+      errorTileUrl: errorTileUrl
     },
     {
-      title: "OSM街道图",
+      title: 'OSM街道图',
       url: OSMVectorUrl,
       minZoom: 0,
       maxZoom: 21,
-      subdomains: "abc",
+      subdomains: 'abc',
       picUrl: `./img/OSMVector.png`,
-      errorTileUrl: errorTileUrl,
+      errorTileUrl: errorTileUrl
     },
     {
-      title: "ArcGIS影像图",
+      title: 'ArcGIS影像图',
       url: arcgisImageUrl,
       minZoom: 0,
       maxZoom: 21,
-      subdomains: "abc",
+      subdomains: 'abc',
       picUrl: `./img/arcgisImage.png`,
-      errorTileUrl: errorTileUrl,
+      errorTileUrl: errorTileUrl
     },
     {
-      title: "ArcGIS街道图(有偏移)",
+      title: 'ArcGIS街道图(有偏移)',
       url: arcgisVectorUrl,
       minZoom: 0,
       maxZoom: 21,
-      subdomains: "abc",
+      subdomains: 'abc',
       picUrl: `./img/arcgisVector.png`,
-      errorTileUrl: errorTileUrl,
+      errorTileUrl: errorTileUrl
     },
     {
-      title: "天地影像图",
+      title: '天地影像图',
       url: tdtImageUrl,
       minZoom: 0,
       maxZoom: 21,
-      subdomains: ["0", "1", "2", "3", "4", "5", "6", "7"],
+      subdomains: ['0', '1', '2', '3', '4', '5', '6', '7'],
       picUrl: `./img/tdtImage.png`,
-      errorTileUrl: errorTileUrl,
+      errorTileUrl: errorTileUrl
     },
     {
-      title: "天地街道图",
+      title: '天地街道图',
       url: tdtVectorUrl,
       minZoom: 0,
       maxZoom: 21,
-      subdomains: ["0", "1", "2", "3", "4", "5", "6", "7"],
+      subdomains: ['0', '1', '2', '3', '4', '5', '6', '7'],
       picUrl: `./img/tdtVector.png`,
-      errorTileUrl: errorTileUrl,
+      errorTileUrl: errorTileUrl
     },
     {
-      title: "谷歌影像图(有偏移)",
+      title: '谷歌影像图(有偏移)',
       url: googleImageUrl,
       minZoom: 0,
       maxZoom: 21,
-      subdomains: "abc",
+      subdomains: 'abc',
       picUrl: `./img/googleImage.png`,
-      errorTileUrl: errorTileUrl,
+      errorTileUrl: errorTileUrl
     },
     {
-      title: "谷歌街道图(有偏移)",
+      title: '谷歌街道图(有偏移)',
       url: googleVectorUrl,
       minZoom: 0,
       maxZoom: 21,
-      subdomains: "abc",
+      subdomains: 'abc',
       picUrl: `./img/googleVector.png`,
-      errorTileUrl: errorTileUrl,
+      errorTileUrl: errorTileUrl
     },
     {
-      title: "高德影像图(有偏移)",
+      title: '高德影像图(有偏移)',
       url: gaodeImageUrl,
       minZoom: 0,
       maxZoom: 21,
-      subdomains: ["1", "2", "3", "4"],
+      subdomains: ['1', '2', '3', '4'],
       picUrl: `./img/gaodeImage.png`,
-      errorTileUrl: errorTileUrl,
+      errorTileUrl: errorTileUrl
     },
     {
-      title: "高德街道图(有偏移)",
+      title: '高德街道图(有偏移)',
       url: gaodeVectorUrl,
       minZoom: 0,
       maxZoom: 21,
-      subdomains: ["1", "2", "3", "4"],
+      subdomains: ['1', '2', '3', '4'],
       picUrl: `./img/gaodeVector.png`,
-      errorTileUrl: errorTileUrl,
+      errorTileUrl: errorTileUrl
     }
     // {
     //   title: '百度街道图',
@@ -856,44 +946,44 @@ const config = {
     SHP: `./mapfile/SHP/`,
     mapshaper: `./mapshaper/index.html`,
     //geoserverUrl: "https://www.zkygis.cn:8143/geoserver/ZKYGIS",
-    geoserverUrl:geoserverUrl,
-    geoserverQueryUrl: "http://localhost:8080/geoserver/ZKYGIS",
+    geoserverUrl: geoserverUrl,
+    geoserverQueryUrl: 'http://localhost:8080/geoserver/ZKYGIS',
     //根据地图当前范围获取对应历史影像数据接口
     getInfoByExtent: `${imageQueryBaseUrl}/latest/getInfoByExtent`
   },
 
   // mapLayersName: "ZKYGIS:bs_project_scope,ZKYGIS:bs_spot", //现状库扰动图斑和项目红线
   mapLayersName: isFormal
-    ? "ZKYGIS:bs_project_scope,ZKYGIS:bs_spot"
-    : "ZKYGIS:bs_project_scope_t,ZKYGIS:bs_spot_t", //现状库扰动图斑和项目红线
+    ? 'ZKYGIS:bs_project_scope,ZKYGIS:bs_spot'
+    : 'ZKYGIS:bs_project_scope_t,ZKYGIS:bs_spot_t', //现状库扰动图斑和项目红线
   mapProjectLayerName: mapProjectLayerName, //现状库项目红线
   mapSpotLayerName: mapSpotLayerName, //现状库扰动图斑
   mapHistorySpotLayerName: isFormal
-    ? "ZKYGIS:bs_spot_history"
-    : "ZKYGIS:bs_spot_history_t", //历史库扰动图斑
+    ? 'ZKYGIS:bs_spot_history'
+    : 'ZKYGIS:bs_spot_history_t', //历史库扰动图斑
   legend: [
     {
-      title: "扰动图斑_未关联_未复核",
+      title: '扰动图斑_未关联_未复核',
       background: color_back_spot,
       border: color_border_spot1
     },
     {
-      title: "扰动图斑_未关联_已复核",
+      title: '扰动图斑_未关联_已复核',
       background: color_back_spot,
       border: color_border_spot2
     },
     {
-      title: "扰动图斑_已关联_未复核",
+      title: '扰动图斑_已关联_未复核',
       background: color_back_spot,
       border: color_border_spot1
     },
     {
-      title: "扰动图斑_已关联_已复核",
+      title: '扰动图斑_已关联_已复核',
       background: color_back_spot,
       border: color_border_spot2
     },
     {
-      title: "项目红线",
+      title: '项目红线',
       background: color_back_redLine,
       border: color_border_redLine
     }

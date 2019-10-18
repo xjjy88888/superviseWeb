@@ -1,72 +1,76 @@
-import React, { PureComponent } from "react";
-import { Layout, Menu, Icon } from "antd";
-import Layouts from "./Layouts";
-import Register from "../routes/System/User/Register";
-import { Link } from "dva/router";
+import React, { PureComponent } from 'react';
+import { Layout, Menu, Icon } from 'antd';
+import Layouts from './Layouts';
+import Register from '../routes/System/User/Register';
+import { Link } from 'dva/router';
 
-const { Sider, Content } = Layout;
-
-const menuList = [
+let lowPowerList = [
   {
-    title: "用户管理",
-    key: "/user",
-    icon: "user",
+    title: '建设单位管理',
+    key: '/company',
+    icon: 'bank',
+    subMenu: []
+  },
+  {
+    title: '水保行业单位管理',
+    key: '/branch',
+    icon: 'solution',
+    subMenu: []
+  }
+];
+
+const highPowerList = [
+  {
+    title: '用户管理',
+    key: '/user',
+    icon: 'user',
     subMenu: [
       {
-        title: "待审核账号",
-        key: "/user/review"
+        title: '待审核账号',
+        key: '/user/review'
       },
       {
-        title: "社会用户",
-        key: "/user/society"
+        title: '社会用户',
+        key: '/user/society'
       },
       {
-        title: "行政用户",
-        key: "/user/admin",
+        title: '行政用户',
+        key: '/user/admin',
         subMenu: [
           {
-            title: "账号管理",
-            key: "/user/admin"
+            title: '账号管理',
+            key: '/user/admin'
           },
           {
-            title: "角色管理",
-            key: "/user/role"
+            title: '角色管理',
+            key: '/user/role'
           }
         ]
       }
     ]
   },
   {
-    title: "部门管理",
-    key: "/departs",
-    icon: "appstore",
+    title: '部门管理',
+    key: '/departs',
+    icon: 'appstore',
     subMenu: []
   },
   {
-    title: "数据字典",
-    key: "/dict",
-    icon: "book",
+    title: '数据字典',
+    key: '/dict',
+    icon: 'book',
     subMenu: []
   },
   {
-    title: "行政区划管理",
-    key: "/district",
-    icon: "global",
-    subMenu: []
-  },
-  {
-    title: "建设单位管理",
-    key: "/company",
-    icon: "bank",
-    subMenu: []
-  },
-  {
-    title: "水保行业单位管理",
-    key: "/branch",
-    icon: "solution",
+    title: '行政区划管理',
+    key: '/district',
+    icon: 'global',
     subMenu: []
   }
 ];
+let menuList = [];
+const { Sider, Content } = Layout;
+
 export default class system extends PureComponent {
   static defaultProps = {
     show: false
@@ -74,6 +78,17 @@ export default class system extends PureComponent {
 
   render() {
     const { children } = this.props;
+
+    const user = localStorage.getItem('user');
+    const userName = user ? JSON.parse(user).displayName : '';
+    const isAllPower = userName.indexOf('办事员') === -1;
+
+    if (isAllPower) {
+      menuList = highPowerList.concat(lowPowerList);
+    } else {
+      menuList = lowPowerList;
+    }
+
     return (
       <Layouts>
         <Layout>
@@ -83,18 +98,18 @@ export default class system extends PureComponent {
               style={{
                 height: window.innerHeight - 46
               }}
-              selectedKeys={[localStorage.getItem("key")]}
-              defaultOpenKeys={["/user"]}
-              defaultSelectedKeys={["/user/review"]}
+              selectedKeys={[localStorage.getItem('key')]}
+              defaultOpenKeys={['/user']}
+              defaultSelectedKeys={['/user/review']}
             >
               {menuList.map(item =>
                 item.subMenu.length ? (
                   <Menu.SubMenu
-                    defaultOpenKeys={["administrative"]}
+                    defaultOpenKeys={['administrative']}
                     key={item.key}
                     title={
                       <span>
-                        <Icon type={item.icon || "setting"} />
+                        <Icon type={item.icon || 'setting'} />
                         <span>{item.title}</span>
                       </span>
                     }
@@ -108,7 +123,7 @@ export default class system extends PureComponent {
                                 to={`/system${it.key}`}
                                 onClick={() => {
                                   console.log(it.key);
-                                  localStorage.setItem("key", it.key);
+                                  localStorage.setItem('key', it.key);
                                 }}
                               >
                                 {it.title}
@@ -121,7 +136,7 @@ export default class system extends PureComponent {
                           <Link
                             to={`/system${ite.key}`}
                             onClick={() => {
-                              localStorage.setItem("key", ite.key);
+                              localStorage.setItem('key', ite.key);
                             }}
                           >
                             {ite.title}
@@ -136,7 +151,7 @@ export default class system extends PureComponent {
                       to={`/system${item.key}`}
                       onClick={() => {
                         console.log(item.key);
-                        localStorage.setItem("key", item.key);
+                        localStorage.setItem('key', item.key);
                       }}
                     >
                       <Icon type={item.icon} />
@@ -152,7 +167,7 @@ export default class system extends PureComponent {
             <div
               style={{
                 padding: 20,
-                backgroundColor: "#fff",
+                backgroundColor: '#fff',
                 borderRadius: 5
               }}
             >

@@ -616,7 +616,7 @@ export default class Inspect extends PureComponent {
                       });
                     }}
                   >
-                    屏幕截图1
+                    屏幕截图
                   </Button> */}
                 </div>
               </div>
