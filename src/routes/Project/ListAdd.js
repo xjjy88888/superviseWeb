@@ -25,11 +25,12 @@ import {
   AutoComplete,
   Table,
   Collapse,
-  Typography
+  Typography,
+  message
 } from 'antd';
 import Highlighter from 'react-highlight-words';
 import config from '../../config';
-import Layouts from '../../components/Layouts';
+import MustFill from '../../components/MustFill';
 import emitter from '../../utils/event';
 import {
   dateInitFormat,
@@ -44,8 +45,8 @@ const formItemLayout = {
   wrapperCol: { span: 16 }
 };
 
-@connect(({ projectList, district, user, project }) => ({
-  projectList,
+@connect(({ projectSupervise, district, user, project }) => ({
+  projectSupervise,
   district,
   user,
   project
@@ -76,13 +77,13 @@ export default class homePage extends PureComponent {
     dispatch({
       type: 'district/districtTree',
       payload: {
-        IsFilter: true,
+        IsFilter: true
       }
     });
     dispatch({
       type: 'district/districtTree',
       payload: {
-        IsFilter: false,
+        IsFilter: false
       }
     });
   };
@@ -104,6 +105,7 @@ export default class homePage extends PureComponent {
     });
     return result;
   };
+
   getDepart = (obj, key) => {
     if (obj) {
       return obj[key];
@@ -150,13 +152,27 @@ export default class homePage extends PureComponent {
     });
   };
 
+  projectSuperviseCreateUpdate = payload => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'projectSupervise/projectSuperviseCreateUpdate',
+      payload
+    });
+  };
+
   render() {
     const {
       show,
       hide,
       dispatch,
-      form: { getFieldDecorator, resetFields, setFieldsValue, getFieldValue },
-      projectList: { projectItem },
+      form: {
+        getFieldDecorator,
+        resetFields,
+        setFieldsValue,
+        getFieldValue,
+        validateFields
+      },
+      projectSupervise: { projectItem },
       district: { districtTree, districtTreeFilter },
       user: { basinOrganList },
       project: { projectList, projectInfo, projectListAdd, departSelectList }
@@ -178,7 +194,31 @@ export default class homePage extends PureComponent {
       <Modal
         title="新建项目"
         visible={show}
-        onOk={() => hide()}
+        onOk={() => {
+          // submit
+          validateFields((err, v) => {
+            if (!v.projectName) {
+              message.warning('请填写项目名');
+              return;
+            }
+            if (v.districtCodes.length === 0) {
+              message.warning('请选择涉及县');
+              return;
+            }
+            const data = {
+              ...v,
+              districtCodes: v.districtCodes.join(','),
+              districtCodeId:
+                v.districtCodeId && v.districtCodeId.length
+                  ? v.districtCodeId.pop()
+                  : '',
+              id: projectItem.id,
+              isNeedPlan: v.isNeedPlan ? true : false
+            };
+            console.log(`项目监管新建`, data);
+            this.projectSuperviseCreateUpdate(data);
+          });
+        }}
         onCancel={() => hide()}
         width={window.innerWidth * 0.6}
       >
@@ -188,7 +228,15 @@ export default class homePage extends PureComponent {
         >
           <Row>
             <Col span={12}>
-              <Form.Item label="项目名" {...formItemLayout}>
+              <Form.Item
+                label={
+                  <span>
+                    <MustFill />
+                    项目名
+                  </span>
+                }
+                {...formItemLayout}
+              >
                 {getFieldDecorator('projectName', {
                   initialValue: projectItem.projectBase.name
                 })(<Input />)}
@@ -204,7 +252,7 @@ export default class homePage extends PureComponent {
                   )
                 })(
                   <Cascader
-                    placeholder="请选择所在地区"
+                    placeholder=""
                     options={districtTreeFilter}
                     changeOnSelect
                   />
@@ -342,10 +390,10 @@ export default class homePage extends PureComponent {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label="批复时间" {...formItemLayout}>
+              <Form.Item label="批复日期" {...formItemLayout}>
                 {getFieldDecorator('replyTime', {
                   initialValue: dateInitFormat(projectItem.replyTime)
-                })(<DatePicker />)}
+                })(<DatePicker placeholder="" />)}
               </Form.Item>
             </Col>
           </Row>
@@ -466,7 +514,7 @@ export default class homePage extends PureComponent {
               <Form.Item
                 label={
                   <span>
-                    <b style={{ color: 'red' }}>*</b>
+                    <MustFill />
                     涉及县
                   </span>
                 }
@@ -484,10 +532,9 @@ export default class homePage extends PureComponent {
                     showSearch
                     style={{ width: '100%' }}
                     dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                    placeholder="请选择涉及县"
                     allowClear
                     multiple
-                    maxTagCount="5"
+                    maxTagCount={5}
                   >
                     {districtTree.map((item, index) => (
                       <TreeSelect.TreeNode

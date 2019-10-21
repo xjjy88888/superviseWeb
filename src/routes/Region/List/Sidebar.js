@@ -3326,19 +3326,6 @@ export default class sider extends PureComponent {
                         )
                       : [districtTree[0].value]
                   })(
-                    // <TreeSelect
-                    //   style={{ width: "100%" }}
-                    //   dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
-                    //   treeData={districtTree}
-                    //   placeholder=""
-                    //   // treeDefaultExpandAll
-                    //   multiple
-                    //   filterTreeNode={(a, b) => {
-                    //     if (b.props.label.indexOf(a) > -1) {
-                    //       return true;
-                    //     }
-                    //   }}
-                    // />
                     <TreeSelect
                       showSearch
                       style={{ width: '100%' }}
@@ -3346,7 +3333,7 @@ export default class sider extends PureComponent {
                       placeholder="请选择涉及县"
                       allowClear
                       multiple
-                      maxTagCount="5"
+                      maxTagCount={5}
                     >
                       {districtTree.map((item, index) => (
                         <TreeSelect.TreeNode

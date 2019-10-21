@@ -1290,9 +1290,9 @@ export async function panoramaDeleteApi(params) {
   });
 }
 
-export async function projectDataListApi(params) {
+export async function projectSuperviseListApi(params) {
   delete params.items;
-  return request(config.url.projectDataListUrl, {
+  return request(config.url.projectSuperviseListUrl, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken()}`,
@@ -1300,4 +1300,20 @@ export async function projectDataListApi(params) {
     },
     body: JSON.stringify(params)
   });
+}
+
+export async function projectSuperviseCreateUpdateApi(params) {
+  return request(
+    `${config.url.projectSuperviseCreateUpdateUrl}${
+      params.id ? 'Update' : 'Create'
+    }`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        'Content-Type': 'application/json-patch+json'
+      },
+      body: JSON.stringify(params)
+    }
+  );
 }

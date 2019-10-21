@@ -11,7 +11,6 @@ const app = dva({});
 app.model(require('./models/user').default);
 app.model(require('./models/mapdata').default);
 app.model(require('./models/project').default);
-app.model(require('./models/projectList').default);
 app.model(require('./models/point').default);
 app.model(require('./models/spot').default);
 app.model(require('./models/redLine').default);
@@ -24,6 +23,7 @@ app.model(require('./models/problemPoint').default);
 app.model(require('./models/role').default);
 app.model(require('./models/departs').default);
 app.model(require('./models/panorama').default);
+app.model(require('./models/projectSupervise').default);
 
 // 4. Router
 app.router(require('./router').default);

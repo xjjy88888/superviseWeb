@@ -60,8 +60,8 @@ const sortList = [
   }
 ];
 
-@connect(({ projectList }) => ({
-  projectList
+@connect(({ projectSupervise }) => ({
+  projectSupervise
 }))
 @createForm()
 export default class listMin extends PureComponent {
@@ -85,7 +85,7 @@ export default class listMin extends PureComponent {
     const { dispatch } = this.props;
     this.setState({ loading: true });
     dispatch({
-      type: 'projectList/projectDataList',
+      type: 'projectSupervise/projectDataList',
       payload: { ...params, IsActive: true, UserType: 1 },
       callback: (success, result) => {
         this.setState({ loading: false });
@@ -96,9 +96,9 @@ export default class listMin extends PureComponent {
   render() {
     const {
       form: { resetFields },
-      projectList: { projectDataList }
+      projectSupervise: { projectDataList }
     } = this.props;
-    
+
     const {
       show,
       sort_key,

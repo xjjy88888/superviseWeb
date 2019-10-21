@@ -1,8 +1,11 @@
 import { notification } from 'antd';
-import { projectDataListApi } from '../services/httpApi';
+import {
+  projectSuperviseListApi,
+  projectSuperviseCreateUpdateApi
+} from '../services/httpApi';
 
 export default {
-  namespace: 'projectList',
+  namespace: 'projectSupervise',
 
   state: {
     projectDataList: { totalCount: 0, items: [] },
@@ -26,8 +29,7 @@ export default {
     *projectDataList({ payload, callback }, { call, put }) {
       const {
         data: { success, result }
-      } = yield call(projectDataListApi, payload);
-      console.log(result);
+      } = yield call(projectSuperviseListApi, payload);
       if (success) {
         yield put({ type: 'save', payload: { projectDataList: result } });
       } else {
@@ -36,6 +38,18 @@ export default {
         });
       }
       if (callback) callback(success, result);
+    },
+
+    *projectSuperviseCreateUpdate({ payload, callback }, { call, put }) {
+      const {
+        data: { success }
+      } = yield call(projectSuperviseCreateUpdateApi, payload);
+      notification[success ? 'success' : 'error']({
+        message: `${payload.id ? '编辑' : '新建'}项目${
+          success ? '成功' : '失败'
+        }`
+      });
+      if (callback) callback(success);
     }
   },
 

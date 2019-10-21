@@ -9,8 +9,8 @@ import ListAdd from './ListAdd';
 
 const { Content } = Layout;
 
-@connect(({ projectList }) => ({
-  projectList
+@connect(({ projectSupervise }) => ({
+  projectSupervise
 }))
 @createForm()
 export default class projectSupervision extends PureComponent {
@@ -43,7 +43,7 @@ export default class projectSupervision extends PureComponent {
     const { dispatch } = this.props;
     this.setState({ loading: true });
     dispatch({
-      type: 'projectList/projectDataList',
+      type: 'projectSupervise/projectDataList',
       payload: { ...params, IsActive: true, UserType: 1 },
       callback: (success, result) => {
         const pagination = { ...this.state.pagination };
