@@ -118,7 +118,6 @@ class Info extends PureComponent {
       dispatch,
       departs: { departsTree }
     } = this.props;
-    console.log(departsTree);
     if (departsTree.length) {
       if (fn) {
         fn(departsTree);
@@ -127,6 +126,7 @@ class Info extends PureComponent {
       this.setState({ loading: true });
       dispatch({
         type: "departs/departsTree",
+        payload: { IsFilter: true },
         callback: (success, error, result) => {
           this.setState({ loading: false });
           if (success && fn) {
