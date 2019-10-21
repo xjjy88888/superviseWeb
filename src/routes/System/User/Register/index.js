@@ -1,13 +1,13 @@
-import React, { PureComponent } from "react";
-import { Steps, Button, Layout } from "antd";
-import { connect } from "dva";
-import emitter from "../../../../utils/event";
-import { LocaleProvider } from "antd";
-import { createForm } from "rc-form";
-import Info from "./Info";
-import Power from "./Power";
-import Finish from "./Finish";
-import zh_CN from "antd/lib/locale-provider/zh_CN";
+import React, { PureComponent } from 'react';
+import { Steps, Button, Layout } from 'antd';
+import { connect } from 'dva';
+import emitter from '../../../../utils/event';
+import { LocaleProvider } from 'antd';
+import { createForm } from 'rc-form';
+import Info from './Info';
+import Power from './Power';
+import Finish from './Finish';
+import zh_CN from 'antd/lib/locale-provider/zh_CN';
 
 const { Header, Content } = Layout;
 
@@ -21,7 +21,7 @@ export default class register extends PureComponent {
   state = {
     show: false,
     state: 0,
-    type: "role",
+    type: 'role',
     user: {},
     finishData: [],
     id: null,
@@ -34,7 +34,7 @@ export default class register extends PureComponent {
   };
 
   componentDidMount() {
-    this.eventEmitter = emitter.addListener("showRegister", v => {
+    this.eventEmitter = emitter.addListener('showRegister', v => {
       console.log(v);
       this.props.form.resetFields();
       const h = window.location.hash;
@@ -44,7 +44,7 @@ export default class register extends PureComponent {
         id: v.item.id,
         isActive: Boolean(v.isActive),
         type: v.type,
-        isLogin: h === "#/login" || h === "#/"
+        isLogin: h === '#/login' || h === '#/'
       });
     });
   }
@@ -57,10 +57,10 @@ export default class register extends PureComponent {
     const { dispatch } = this.props;
     const { user, type, id, isLogin } = this.state;
 
-    console.log("提交", user, power);
-    if (type === "role") {
+    console.log('提交', user, power);
+    if (type === 'role') {
       dispatch({
-        type: "role/roleCreateUpdate",
+        type: 'role/roleCreateUpdate',
         payload: {
           ...user,
           id,
@@ -71,11 +71,11 @@ export default class register extends PureComponent {
             this.setState({
               state: 2,
               finishData: [
-                { name: "角色标识", cont: result.name },
-                { name: "角色名", cont: result.displayName }
+                { name: '角色标识', cont: result.name },
+                { name: '角色名', cont: result.displayName }
               ]
             });
-            emitter.emit("refreshSystem", {
+            emitter.emit('refreshSystem', {
               refresh: true
             });
           }
@@ -104,11 +104,11 @@ export default class register extends PureComponent {
     const { isActive } = this.state;
 
     dispatch({
-      type: "user/userCreateUpdate",
+      type: 'user/userCreateUpdate',
       payload,
       callback: (success, error, result) => {
         if (success) {
-          emitter.emit("refreshSystem", {
+          emitter.emit('refreshSystem', {
             refresh: true
           });
           this.userSetPower(
@@ -128,15 +128,15 @@ export default class register extends PureComponent {
   userSetPower = (payload, result, userInfo) => {
     const { dispatch } = this.props;
     dispatch({
-      type: "user/userSetPower",
+      type: 'user/userSetPower',
       payload,
       callback: success => {
         if (success) {
           this.setState({
             state: 2,
             finishData: [
-              { name: "账号", cont: userInfo.name },
-              { name: "姓名", cont: userInfo.displayName }
+              { name: '账号', cont: userInfo.name },
+              { name: '姓名', cont: userInfo.displayName }
             ]
           });
         }
@@ -151,25 +151,25 @@ export default class register extends PureComponent {
       <LocaleProvider locale={zh_CN}>
         <Layout
           style={{
-            display: show ? "block" : "none",
-            position: "absolute",
+            display: show ? 'block' : 'none',
+            position: 'absolute',
             top: 0,
             left: 0,
-            width: "100vw",
-            height: "100vh",
-            backgroundColor: "rgba(0,0,0,.5)",
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0,0,0,.5)',
             zIndex: 2
           }}
         >
           <Layout
             style={{
-              transform: " translate(-50%,-50%)",
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              background: "#fff",
+              transform: ' translate(-50%,-50%)',
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              background: '#fff',
               width: 1000,
-              height: "85%",
+              height: '85%',
               padding: 50,
               borderRadius: 10
             }}
@@ -178,22 +178,22 @@ export default class register extends PureComponent {
               type="primary"
               shape="circle"
               icon="close"
-              style={{ position: "absolute", right: 20, top: 20 }}
+              style={{ position: 'absolute', right: 20, top: 20 }}
               onClick={() => {
                 this.setState({ show: false });
               }}
             />
-            <Header style={{ background: "#fff", margin: "0 0 30px 0" }}>
+            <Header style={{ background: '#fff', margin: '0 0 30px 0' }}>
               <Steps
                 current={state}
-                style={{ background: "#fff", margin: "0 0 30px 0" }}
+                style={{ background: '#fff', margin: '0 0 30px 0' }}
               >
                 <Steps.Step title="填写信息" />
                 <Steps.Step title="权限分配" />
                 <Steps.Step title="完成" />
               </Steps>
             </Header>
-            <Content style={{ position: "relative" }}>
+            <Content style={{ position: 'relative' }}>
               <Info
                 show={state === 0}
                 type={type}

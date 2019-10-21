@@ -5,7 +5,17 @@ export default {
   namespace: 'projectList',
 
   state: {
-    projectDataList: { totalCount: 0, items: [] }
+    projectDataList: { totalCount: 0, items: [] },
+    projectItem: {
+      projectBase: {},
+      productDepartment: { name: '', id: '' },
+      expand: {
+        designStartTime: '',
+        designCompTime: '',
+        actStartTime: '',
+        actCompTime: ''
+      }
+    }
   },
 
   subscriptions: {

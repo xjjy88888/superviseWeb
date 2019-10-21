@@ -1,14 +1,148 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { message } from 'antd';
+import { message, Radio, Input } from 'antd';
 import Layouts from '../../components/Layouts';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import proj4 from 'proj4';
 import 'proj4leaflet';
+import 'leaflet-easybutton/src/easy-button.css';
+import 'leaflet-easybutton';
 import 'leaflet-measure/dist/leaflet-measure.css';
 import 'leaflet-measure/dist/leaflet-measure.cn';
 import config from '../../config';
+import ProjectListMin from './ListMin';
+
+//模拟测试数据
+const RegionCenterData = [
+  {
+    pointX:110.021,
+    pointY:21.124,
+    num:12,
+    name:'湛江市'
+  },
+  {
+    pointX:110.88,
+    pointY:21.976,
+    num:22,
+    name:'茂名市'
+  },
+  {
+    pointX:111.759,
+    pointY:22.029,
+    num:35,
+    name:'阳江市'
+  },
+  {
+    pointX:111.746,
+    pointY:22.842,
+    num:40,
+    name:'云浮市'
+  },
+  {
+    pointX:112.644,
+    pointY:22.243,
+    num:55,
+    name:'江门市'
+  },
+  {
+    pointX:113.282,
+    pointY:22.139,
+    num:78,
+    name:'珠海市'
+  }, 
+  {
+    pointX:113.387,
+    pointY:22.523,
+    num:102,
+    name:'中山市'
+  }, 
+  {
+    pointX:112.957,
+    pointY:22.999,
+    num:85,
+    name:'佛山市'
+  },
+  {
+    pointX:112.169,
+    pointY:23.487,
+    num:75,
+    name:'肇庆市'
+  },
+  {
+    pointX:114.103,
+    pointY:22.627,
+    num:120,
+    name:'深圳市'
+  },
+  {
+    pointX:113.484,
+    pointY:23.331,
+    num:108,
+    name:'广州市'
+  }, 
+  {
+    pointX:112.989,
+    pointY:24.222,
+    num:68,
+    name:'清远市'
+  }, 
+  {
+    pointX:113.823,
+    pointY:22.953,
+    num:98,
+    name:'东莞市'
+  },
+  {
+    pointX:114.461,
+    pointY:23.187,
+    num:55,
+    name:'惠州市'
+  },
+  {
+    pointX:113.712,
+    pointY:24.828,
+    num:66,
+    name:'韶关市'
+  },
+  {
+    pointX:115.535,
+    pointY:23.025,
+    num:88,
+    name:'汕尾市'
+  }, 
+  {
+    pointX:114.936,
+    pointY:23.962,
+    num:78,
+    name:'河源市'
+  }, 
+  {
+    pointX:116.075,
+    pointY:23.344,
+    num:95,
+    name:'揭阳市'
+  }, 
+  {
+    pointX:116.531,
+    pointY:23.291,
+    num:35,
+    name:'汕头市'
+  },
+  {
+    pointX:116.752,
+    pointY:23.793,
+    num:45,
+    name:'潮州市'
+  },
+  {
+    pointX:116.082,
+    pointY:24.196,
+    num:35,
+    name:'梅州市'
+  },                 
+
+];
 
 const DISTRICT_FILL_COLOR = 'rgba(230,0,0,0)';
 // const DISTRICT_COLOR = '#bfbfbf';
@@ -18,7 +152,7 @@ const DISTRICT_COLOR = '#0070FF';
 const regionGeoJsonStyle = {
   color: '#0000FF',
   weight: 2,
-  opacity: 0.8,
+  opacity: 0.6,
   fillColor: '#0000FF',
   fillOpacity: 0.1
 };
@@ -39,7 +173,9 @@ export default class homePage extends PureComponent {
     super(props);
     this.state = {
       imageTimeText: '',
-      showImageTimeText: true
+      showImageTimeText: true,
+      projectSymbolValue:1,
+      showProjectSymbol: false,
     };
     this.map = null;
     this.regiongeojsonLayer = null; //行政区划矢量图层
@@ -62,7 +198,10 @@ export default class homePage extends PureComponent {
     me.createScale();
     // 创建量算工具
     me.createMeasureControl();
+    // 创建项目类型符号化按钮
+    me.createProjectSymbolButton();
   }
+
   // 创建图层
   createLayers = () => {
     const { tdtImageLabel, districtBound } = config;
@@ -86,8 +225,14 @@ export default class homePage extends PureComponent {
     const regiongeojsonLayer = L.Proj.geoJson(null, {
       style: regionGeoJsonStyle
     });
-
     this.regiongeojsonLayer = regiongeojsonLayer;
+    //区域统计图层
+    const ZSgeojsonLayer = L.Proj.geoJson(null, {
+      style: regionGeoJsonStyle
+    });
+    this.ZSgeojsonLayer = ZSgeojsonLayer;
+
+
   };
   // 创建地图
   createMap = () => {
@@ -97,12 +242,12 @@ export default class homePage extends PureComponent {
       iconUrl: require('leaflet/dist/images/marker-icon.png'),
       shadowUrl: require('leaflet/dist/images/marker-shadow.png')
     });
-    const { regiongeojsonLayer } = this;
+    const { regiongeojsonLayer,ZSgeojsonLayer } = this;
     const map = L.map('map', {
       zoomControl: false,
       //crs: L.CRS.EPSG3857,
       attributionControl: false,
-      layers: [regiongeojsonLayer]
+      layers: [regiongeojsonLayer,ZSgeojsonLayer]
     });
     const { onlineBasemaps } = config;
     map.createPane('tileLayerZIndex');
@@ -314,6 +459,41 @@ export default class homePage extends PureComponent {
     measureControl.addTo(map);
   };
 
+  // 创建项目类型符号化按钮
+  createProjectSymbolButton = () => {
+    const { map, imgTextButtonHtml } = this;
+    const me = this;
+    L.easyButton(imgTextButtonHtml('./img/projectSymbol.png','项目符号化'), () => {
+      //message.warning('区域范围之外的数据没有权限操作', 1);
+      //showProjectSymbol
+      const { showProjectSymbol } = me.state;
+      this.setState({ showProjectSymbol: !showProjectSymbol });
+    }).addTo(map).setPosition('topright');
+  };
+  
+  // 获取图标文本按钮html
+  imgTextButtonHtml = (icon, title, text) => {
+    if (text) {
+      return `<div class="global-map-button-icon"><img src="${icon}"></img></div><div class="global-map-button-text">${text}</div>`;
+    }
+    else {
+      if (title) {
+        return `<img src="${icon}" style='width:20px;height:20px;margin-top:-5px;margin-left:-1px;' title='${title}'></img>`;
+      }
+      else{
+        return `<img src="${icon}" style='width:20px;height:20px;margin-top:-5px;margin-left:-1px;'></img>`;
+      }
+    }
+  };
+  // 获取图标文本按钮html
+  iconTextButtonHtml = (icon, text) => {
+    if (text) {
+      return `<div class="global-map-button-icon"><i class="iconfont ${icon}"></i></div><div class="global-map-button-text">${text}</div>`;
+    } else {
+      return `iconfont ${icon} global-icon-normal`;
+    }
+  };  
+
   // 创建行政区划渲染
   createRegion = () => {
     const { regiongeojsonLayer } = this;
@@ -435,15 +615,32 @@ export default class homePage extends PureComponent {
   clearGeojsonLayer = () => {
     if (this.regiongeojsonLayer) {
       this.regiongeojsonLayer.clearLayers();
-      //this.map.removeLayer(this.regiongeojsonLayer);
-      //this.regiongeojsonLayer = null;
+    }
+    if(this.ZSgeojsonLayer){
+      this.ZSgeojsonLayer.clearLayers();   
     }
   };
 
+  /*
+   * 项目符号化类型切换函数
+  */
+  onChangeProjectSymbol = e => {
+    console.log('radio checked', e.target.value);
+    this.setState({
+      projectSymbolValue: e.target.value,
+    });
+  };
+
   render() {
-    const { imageTimeText, showImageTimeText } = this.state;
+    const radioStyle = {
+      display: 'block',
+      height: '25px',
+      lineHeight: '25px',
+    };
+    const { imageTimeText, showImageTimeText,projectSymbolValue,showProjectSymbol } = this.state;
     return (
       <Layouts avtive="map">
+        <ProjectListMin />
         <div
           style={{
             position: 'absolute',
@@ -480,6 +677,31 @@ export default class homePage extends PureComponent {
             >
               监管影像时间:{imageTimeText}
             </span>
+          </div>
+          {/* 项目符号化 */}
+          <div
+            style={{
+              display: showProjectSymbol ? 'block' : 'none',
+              position: 'absolute',
+              top: 260,
+              right: 13,
+              zIndex: 1000,
+              background: '#fff',
+              padding:'5px',
+              borderRadius:'5px'
+            }}
+          >
+            <Radio.Group onChange={this.onChangeProjectSymbol} value={projectSymbolValue}>
+              <Radio style={radioStyle} value={1}>
+                项目性质
+              </Radio>
+              <Radio style={radioStyle} value={2}>
+                项目类别
+              </Radio>
+              <Radio style={radioStyle} value={3}>
+                建设状态
+              </Radio>
+            </Radio.Group>
           </div>
         </div>
       </Layouts>

@@ -40,7 +40,7 @@ export default class area extends PureComponent {
     loading: false,
     dataSource: [],
     ParentId: null,
-    ParentCodeId: null,
+    ParentCodeId: null
   };
 
   componentDidMount() {
@@ -418,7 +418,7 @@ export default class area extends PureComponent {
                                 visible: false,
                                 selectedRows: []
                               });
-                              self.departsTree();
+                              self.refresh();
                             }
                             notification[success ? 'success' : 'error']({
                               message: `删除${l}条部门划数据${

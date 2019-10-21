@@ -31,7 +31,8 @@ export default class area extends PureComponent {
     selectedRows: [],
     id: null,
     districtList: [],
-    ParentId: null
+    ParentId: null,
+    loading: false
   };
 
   componentDidMount() {
@@ -42,13 +43,14 @@ export default class area extends PureComponent {
   districtTreeFilter = () => {
     const { dispatch } = this.props;
     const { ParentId } = this.state;
+    self.setState({ loading: true });
     dispatch({
       type: 'district/districtTree',
       payload: {
         IsFilter: true
       },
       callback: (success, error, result) => {
-        console.log(success, 111);
+        self.setState({ loading: false });
         if (success) {
           this.getDistrictList(ParentId, [result]);
         }
@@ -160,7 +162,14 @@ export default class area extends PureComponent {
       district: { districtTreeFilter }
     } = this.props;
 
-    const { visible, selectedRows, id, districtList, ParentId } = this.state;
+    const {
+      visible,
+      selectedRows,
+      id,
+      districtList,
+      ParentId,
+      loading
+    } = this.state;
 
     const dataSource = districtList.map(item => {
       return { ...item, key: item.id };
@@ -217,10 +226,12 @@ export default class area extends PureComponent {
                   cancelText: '否',
                   okType: 'danger',
                   onOk() {
+                    self.setState({ loading: true });
                     dispatch({
                       type: 'district/districtDelete',
                       payload: record.value,
                       callback: (success, error, result) => {
+                        self.setState({ loading: false });
                         if (success) {
                           self.setState({
                             visible: false
@@ -332,6 +343,7 @@ export default class area extends PureComponent {
                       message.warning('请选择需要删除的行政区');
                       return;
                     }
+                    console.log(selectedRows);
                     Modal.confirm({
                       title: '删除',
                       content: '是否确定要删除',
@@ -339,10 +351,12 @@ export default class area extends PureComponent {
                       cancelText: '否',
                       okType: 'danger',
                       onOk() {
+                        self.setState({ loading: true });
                         dispatch({
                           type: 'district/districtDeleteMul',
-                          payload: { id: selectedRows.map(item => item.id) },
+                          payload: { id: selectedRows.map(item => item.value) },
                           callback: (success, error, result) => {
+                            self.setState({ loading: false });
                             if (success) {
                               self.setState({
                                 visible: false
@@ -369,6 +383,7 @@ export default class area extends PureComponent {
               columns={columns}
               dataSource={dataSource}
               rowSelection={rowSelection}
+              loading={loading}
             />
             <Modal
               title="新建行政区"
@@ -384,10 +399,12 @@ export default class area extends PureComponent {
                     message.warning('请填写行政区编码');
                     return;
                   }
+                  self.setState({ loading: true });
                   dispatch({
                     type: 'district/districtCreateUpdate',
                     payload: { ...v, id: id, parentId: ParentId },
                     callback: (success, error, result) => {
+                      self.setState({ loading: false });
                       if (success) {
                         this.setState({
                           visible: false

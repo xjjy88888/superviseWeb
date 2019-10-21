@@ -1,21 +1,13 @@
 import React, { PureComponent } from 'react';
 import { createForm } from 'rc-form';
 import { connect } from 'dva';
-import {
-  Table,
-  Button,
-  Input,
-  Icon,
-  Layout,
-  Switch,
-  Radio,
-  Checkbox
-} from 'antd';
-import Highlighter from 'react-highlight-words';
+import { Table, Button, Input, Icon, Layout, Radio, Checkbox } from 'antd';
+// import Highlighter from 'react-highlight-words';
 import config from '../../config';
 import Layouts from '../../components/Layouts';
+import ListAdd from './ListAdd';
 
-const { Header, Footer, Sider, Content } = Layout;
+const { Content } = Layout;
 
 @connect(({ projectList }) => ({
   projectList
@@ -34,7 +26,8 @@ export default class projectSupervision extends PureComponent {
         pageSizeOptions: ['10', '20', '30', '40', '50']
       },
       loading: false,
-      dataSource: []
+      dataSource: [],
+      showAdd: false
     };
   }
 
@@ -175,7 +168,7 @@ export default class projectSupervision extends PureComponent {
   };
 
   render() {
-    const { dataSource, pagination, loading } = this.state;
+    const { dataSource, pagination, loading, showAdd } = this.state;
 
     const rowSelection = {};
 
@@ -361,13 +354,21 @@ export default class projectSupervision extends PureComponent {
     return (
       <Layouts avtive="projectSupervision">
         <Layout style={{ margin: 20, backgroundColor: '#fff' }}>
+          <ListAdd
+            show={showAdd}
+            hide={() => this.setState({ showAdd: false })}
+          ></ListAdd>
           <Content
             style={{ backgroundColor: '#fff', padding: '30px 30px 20px 30px' }}
           >
             <span>
               <Button icon="download">共享导入</Button>
-              <Button icon="plus" style={{ marginLeft: 20 }}>
-                新增项目
+              <Button
+                icon="plus"
+                style={{ marginLeft: 20 }}
+                onClick={() => this.setState({ showAdd: true })}
+              >
+                新建项目
               </Button>
             </span>
             <span style={{ float: 'right' }}>

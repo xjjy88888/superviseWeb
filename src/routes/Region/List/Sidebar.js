@@ -37,7 +37,6 @@ import {
   dateInitFormat,
   accessToken,
   getFile,
-  guid,
   unique
 } from '../../../utils/util';
 import Spins from '../../../components/Spins';
@@ -1104,12 +1103,14 @@ export default class sider extends PureComponent {
         : key === 'spot'
         ? spotList.items
         : pointList.items;
+
     const dataSourceTable = list.map((item, index) => {
       return {
         ...item,
         key: index
       };
     });
+
     const columnsTable = [
       {
         title: (
@@ -1354,7 +1355,6 @@ export default class sider extends PureComponent {
             allowClear
             placeholder={`${placeholder}`}
             onSearch={v => {
-              console.log(guid());
               this.search(v);
             }}
             style={{ padding: '20px 20px', width: 300 }}

@@ -398,7 +398,7 @@ const config = {
 
     panoramaPreviewUrl: `${domain}pano/pannellum.htm?config=`,
 
-    projectDataListUrl: `${domainApi}Project/GetAllByPost`
+    projectDataListUrl: `${domainApi}ProjectRegulation/GetAllByPost`
   },
 
   //工具箱
