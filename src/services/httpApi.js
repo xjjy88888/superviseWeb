@@ -1317,3 +1317,13 @@ export async function projectSuperviseCreateUpdateApi(params) {
     }
   );
 }
+
+export async function projectSuperviseDeleteApi(id) {
+  return request(`${config.url.projectSuperviseDeleteUrl}?id=${id}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      'Content-Type': 'application/json-patch+json'
+    }
+  });
+}

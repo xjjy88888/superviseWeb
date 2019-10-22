@@ -1,7 +1,8 @@
 import { notification } from 'antd';
 import {
   projectSuperviseListApi,
-  projectSuperviseCreateUpdateApi
+  projectSuperviseCreateUpdateApi,
+  projectSuperviseDeleteApi
 } from '../services/httpApi';
 
 export default {
@@ -48,6 +49,16 @@ export default {
         message: `${payload.id ? '编辑' : '新建'}项目${
           success ? '成功' : '失败'
         }`
+      });
+      if (callback) callback(success);
+    },
+
+    *projectSuperviseDelete({ payload, callback }, { call, put }) {
+      const {
+        data: { success }
+      } = yield call(projectSuperviseDeleteApi, payload);
+      notification[success ? 'success' : 'error']({
+        message: `删除项目${success ? '成功' : '失败'}`
       });
       if (callback) callback(success);
     }

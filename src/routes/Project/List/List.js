@@ -1,11 +1,11 @@
 import React, { PureComponent } from 'react';
 import { createForm } from 'rc-form';
 import { connect } from 'dva';
-import { Table, Button, Input, Icon, Layout, Radio, Checkbox } from 'antd';
+import { Table, Button, Input, Icon, Layout, Radio, Checkbox, Tag } from 'antd';
 // import Highlighter from 'react-highlight-words';
 import config from '../../../config';
 import Layouts from '../../../components/Layouts';
-import ListAdd from './Add';
+import Add from './Add';
 
 const { Content } = Layout;
 
@@ -27,7 +27,10 @@ export default class projectSupervision extends PureComponent {
       },
       loading: false,
       dataSource: [],
-      showAdd: false
+      showAdd: false,
+      IsShared: true,
+      IsExclusive: true,
+      ProjectShowArchive: false
     };
   }
 
@@ -41,10 +44,11 @@ export default class projectSupervision extends PureComponent {
 
   projectDataList = params => {
     const { dispatch } = this.props;
+    const { IsShared, IsExclusive, ProjectShowArchive } = this.state;
     this.setState({ loading: true });
     dispatch({
       type: 'projectSupervise/projectDataList',
-      payload: { ...params, IsActive: true, UserType: 1 },
+      payload: { ...params, IsShared, IsExclusive, ProjectShowArchive },
       callback: (success, result) => {
         const pagination = { ...this.state.pagination };
         pagination.total = result.totalCount;
@@ -53,6 +57,21 @@ export default class projectSupervision extends PureComponent {
           dataSource: result.items,
           pagination
         });
+      }
+    });
+  };
+
+  projectSuperviseDelete = payload => {
+    const { dispatch } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: 'projectSupervise/projectSuperviseDelete',
+      payload,
+      callback: (success, result) => {
+        this.setState({ loading: false });
+        if (success) {
+          this.refresh();
+        }
       }
     });
   };
@@ -178,15 +197,15 @@ export default class projectSupervision extends PureComponent {
         dataIndex: 'projectName',
         key: 'projectName',
         fixed: 'left',
-        width: 400,
+        width: 420,
         ...this.getColumnSearchProps('projectName'),
-        render: (i, record) => <a>{i}</a>
+        render: i => <a>{i}</a>
       },
       {
         title: '建设单位',
         dataIndex: 'productDepartmentName',
         key: 'productDepartmentName',
-        fixed: 'left',
+        // fixed: 'left',
         width: 300,
         ...this.getColumnSearchProps('productDepartmentName')
       },
@@ -194,7 +213,7 @@ export default class projectSupervision extends PureComponent {
         title: '批复机构',
         dataIndex: 'replyDepartmentName',
         key: 'replyDepartmentName',
-        fixed: 'left',
+        // fixed: 'left',
         width: 120,
         ...this.getColumnSearchProps('replyDepartmentName')
       },
@@ -334,30 +353,55 @@ export default class projectSupervision extends PureComponent {
         sorter: (a, b) => a.coordinate.length - b.coordinate.length
       },
       {
+        title: '项目源',
+        dataIndex: 'isShared',
+        key: 'isShared',
+        fixed: 'right',
+        width: 50,
+        render: i => (
+          <Tag color={i ? 'volcano' : 'cyan'}> {i ? '共享' : '独有'}</Tag>
+        )
+      },
+      {
         title: '操作',
         dataIndex: 'entry_name',
         key: 'entry_name',
         fixed: 'right',
         width: 130,
-        render: (i, record) => (
-          <span>
-            <a style={{ margin: 10 }}>共享</a>
-            <a style={{ margin: 10 }} onClick={() => {}}>
-              删除
-            </a>
-            {/* <a style={{ margin: 10 }}>移除</a> */}
-          </span>
-        )
+        render: (i, record) =>
+          record.isShared ? (
+            <span>
+              <a style={{ margin: 10 }} onClick={() => {}}>
+                移除
+              </a>
+            </span>
+          ) : (
+            <span>
+              <a
+                style={{ margin: 10 }}
+                onClick={() => this.projectSuperviseDelete(record.id)}
+              >
+                删除
+              </a>
+              <a style={{ margin: 10 }}>共享</a>
+            </span>
+          )
       }
     ];
 
     return (
       <Layouts avtive="projectSupervision">
         <Layout style={{ margin: 20, backgroundColor: '#fff' }}>
-          <ListAdd
+          <Add
             show={showAdd}
-            hide={() => this.setState({ showAdd: false })}
-          ></ListAdd>
+            hide={success => {
+              this.setState({ showAdd: false });
+              if (success) {
+                this.refresh();
+              }
+            }}
+            onThis={v => (this.add = v)}
+          ></Add>
           <Content
             style={{ backgroundColor: '#fff', padding: '30px 30px 20px 30px' }}
           >
@@ -366,7 +410,10 @@ export default class projectSupervision extends PureComponent {
               <Button
                 icon="plus"
                 style={{ marginLeft: 20 }}
-                onClick={() => this.setState({ showAdd: true })}
+                onClick={() => {
+                  this.setState({ showAdd: true });
+                  this.add.reset();
+                }}
               >
                 新建项目
               </Button>
@@ -377,12 +424,29 @@ export default class projectSupervision extends PureComponent {
                 <Checkbox.Group
                   options={['共享', '独有']}
                   defaultValue={['共享', '独有']}
-                  onChange={() => {}}
+                  onChange={v => {
+                    console.log(v);
+                    this.setState({
+                      IsShared: v.indexOf('共享') !== -1,
+                      IsExclusive: v.indexOf('独有') !== -1
+                    });
+                    setTimeout(() => this.refresh(), 100);
+                  }}
                 />
               </span>
-              <Radio.Group defaultValue="a" buttonStyle="solid">
-                <Radio.Button value="a">当前项目</Radio.Button>
-                <Radio.Button value="b">归档项目</Radio.Button>
+              <Radio.Group
+                defaultValue={false}
+                buttonStyle="solid"
+                onChange={v => {
+                  console.log(v.target.value);
+                  this.setState({
+                    ProjectShowArchive: v.target.value
+                  });
+                  setTimeout(() => this.refresh(), 100);
+                }}
+              >
+                <Radio.Button value={false}>当前项目</Radio.Button>
+                <Radio.Button value={true}>归档项目</Radio.Button>
               </Radio.Group>
               <Button icon="delete" style={{ marginLeft: 20 }}>
                 回收站
@@ -407,7 +471,7 @@ export default class projectSupervision extends PureComponent {
               onChange={this.handleTableChange}
               pagination={pagination}
               loading={loading}
-              scroll={{ x: '2700px' }}
+              scroll={{ x: 2800 }}
               style={{ padding: 20 }}
             />
           </Content>

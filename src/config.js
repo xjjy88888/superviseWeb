@@ -400,7 +400,9 @@ const config = {
 
     projectSuperviseListUrl: `${domainApi}ProjectRegulation/GetAllByPost`,
 
-    projectSuperviseCreateUpdateUrl: `${domainApi}ProjectRegulation/`
+    projectSuperviseCreateUpdateUrl: `${domainApi}ProjectRegulation/`,
+
+    projectSuperviseDeleteUrl: `${domainApi}ProjectRegulation/Delete`
   },
 
   //工具箱

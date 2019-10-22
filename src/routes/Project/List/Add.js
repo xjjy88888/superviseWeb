@@ -67,9 +67,11 @@ export default class homePage extends PureComponent {
   }
 
   componentDidMount() {
+    const { onThis } = this.props;
     this.basinOrgan();
     this.districtTree();
     this.queryDict();
+    onThis(this);
   }
 
   districtTree = () => {
@@ -153,12 +155,24 @@ export default class homePage extends PureComponent {
   };
 
   projectSuperviseCreateUpdate = payload => {
-    const { dispatch } = this.props;
+    const { hide, dispatch } = this.props;
     dispatch({
       type: 'projectSupervise/projectSuperviseCreateUpdate',
-      payload
+      payload,
+      callback: success => {
+        if (success) {
+          hide(true);
+        }
+      }
     });
   };
+
+  reset() {
+    const {
+      form: { resetFields }
+    } = this.props;
+    resetFields();
+  }
 
   render() {
     const {
@@ -219,7 +233,7 @@ export default class homePage extends PureComponent {
             this.projectSuperviseCreateUpdate(data);
           });
         }}
-        onCancel={() => hide()}
+        onCancel={() => hide(false)}
         width={window.innerWidth * 0.6}
       >
         <Form
