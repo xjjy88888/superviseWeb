@@ -3,9 +3,9 @@ import { createForm } from 'rc-form';
 import { connect } from 'dva';
 import { Table, Button, Input, Icon, Layout, Radio, Checkbox } from 'antd';
 // import Highlighter from 'react-highlight-words';
-import config from '../../config';
-import Layouts from '../../components/Layouts';
-import ListAdd from './ListAdd';
+import config from '../../../config';
+import Layouts from '../../../components/Layouts';
+import ListAdd from './Add';
 
 const { Content } = Layout;
 

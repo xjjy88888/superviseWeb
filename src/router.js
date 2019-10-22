@@ -2,9 +2,6 @@ import React from 'react';
 import { Router, Route, Switch } from 'dva/router';
 import Login from './routes/Login';
 import Home from './routes/Home';
-import ProjectList from './routes/Project/List';
-import ProjectMap from './routes/Project/Map';
-import CesiumMap from './routes/Project/CesiumMap';
 import RegionMap from './routes/Region/Map/Map';
 import Review from './routes/System/User/Review.js';
 import Society from './routes/System/User/Society.js';
@@ -15,6 +12,9 @@ import Departs from './routes/System/Departs.js';
 import Dict from './routes/System/Dict.js';
 import Branch from './routes/System/Branch.js';
 import Company from './routes/System/Company.js';
+import ProjectList from './routes/Project/List/List';
+import ProjectMap from './routes/Project/Map/Map';
+import CesiumMap from './routes/Project/Map/CesiumMap';
 
 function RouterConfig({ history }) {
   const user = localStorage.getItem('user');

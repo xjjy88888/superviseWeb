@@ -1,8 +1,8 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
-import Layouts from "../../components/Layouts";
+import Layouts from "../../../components/Layouts";
 import proj4 from "proj4";
-import config from "../../config";
+import config from "../../../config";
 // import $ from "jquery";
 import $ from './jquery-vendor'
 import 'ztree';

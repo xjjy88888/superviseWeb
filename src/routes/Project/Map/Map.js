@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { message, Radio, Input } from 'antd';
-import Layouts from '../../components/Layouts';
+import Layouts from '../../../components/Layouts';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import proj4 from 'proj4';
@@ -10,8 +10,8 @@ import 'leaflet-easybutton/src/easy-button.css';
 import 'leaflet-easybutton';
 import 'leaflet-measure/dist/leaflet-measure.css';
 import 'leaflet-measure/dist/leaflet-measure.cn';
-import config from '../../config';
-import ProjectListMin from './ListMin';
+import config from '../../../config';
+import ProjectListMin from '../List/Min';
 
 //模拟测试数据
 const RegionCenterData = [

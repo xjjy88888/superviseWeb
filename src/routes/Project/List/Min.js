@@ -32,17 +32,17 @@ import {
 } from 'antd';
 import locale from 'antd/lib/date-picker/locale/zh_CN';
 import 'leaflet/dist/leaflet.css';
-import emitter from '../../utils/event';
-import config from '../../config';
-import data from '../../data';
+import emitter from '../../../utils/event';
+import config from '../../../config';
+import data from '../../../data';
 import {
   dateInitFormat,
   accessToken,
   getFile,
   guid,
   unique
-} from '../../utils/util';
-import Spins from '../../components/Spins';
+} from '../../../utils/util';
+import Spins from '../../../components/Spins';
 
 const { Header, Footer, Sider, Content } = Layout;
 const sortList = [

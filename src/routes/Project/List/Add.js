@@ -29,16 +29,16 @@ import {
   message
 } from 'antd';
 import Highlighter from 'react-highlight-words';
-import config from '../../config';
-import MustFill from '../../components/MustFill';
-import emitter from '../../utils/event';
+import config from '../../../config';
+import MustFill from '../../../components/MustFill';
+import emitter from '../../../utils/event';
 import {
   dateInitFormat,
   accessToken,
   getFile,
   guid,
   unique
-} from '../../utils/util';
+} from '../../../utils/util';
 
 const formItemLayout = {
   labelCol: { span: 8 },
