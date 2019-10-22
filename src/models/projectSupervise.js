@@ -9,7 +9,7 @@ export default {
   namespace: 'projectSupervise',
 
   state: {
-    projectDataList: { totalCount: 0, items: [] },
+    projectSuperviseList: { totalCount: 0, items: [] },
     projectItem: {
       projectBase: {},
       productDepartment: { name: '', id: '' },
@@ -27,12 +27,35 @@ export default {
   },
 
   effects: {
-    *projectDataList({ payload, callback }, { call, put }) {
+    *queryProjectSupervise({ payload, callback }, { call, put }) {
+      const items_old = payload.items;
+      const {
+        data: { success, error, result }
+      } = yield call(projectSuperviseListApi, payload);
+      if (success) {
+        const response = {
+          items: [...items_old, ...result.items],
+          totalCount: result.totalCount
+        };
+        yield put({
+          type: 'save',
+          payload: { projectSuperviseList: response }
+        });
+        if (callback) callback(success, response);
+      } else {
+        notification['error']({
+          message: `查询图斑列表失败：${error.message}`
+        });
+        if (callback) callback(success);
+      }
+    },
+
+    *projectSuperviseList({ payload, callback }, { call, put }) {
       const {
         data: { success, result }
       } = yield call(projectSuperviseListApi, payload);
       if (success) {
-        yield put({ type: 'save', payload: { projectDataList: result } });
+        yield put({ type: 'save', payload: { projectSuperviseList: result } });
       } else {
         notification['error']({
           message: `查询项目监管列表失败`

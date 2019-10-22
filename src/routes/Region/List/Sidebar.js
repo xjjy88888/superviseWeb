@@ -32,6 +32,7 @@ import locale from 'antd/lib/date-picker/locale/zh_CN';
 import 'leaflet/dist/leaflet.css';
 import emitter from '../../../utils/event';
 import config from '../../../config';
+import { Link } from 'dva/router';
 import data from '../../../data';
 import {
   dateInitFormat,
@@ -61,7 +62,8 @@ const formItemLayout = {
     district,
     inspect,
     problemPoint,
-    panorama
+    panorama,
+    projectSupervise
   }) => ({
     project,
     spot,
@@ -73,7 +75,8 @@ const formItemLayout = {
     district,
     inspect,
     problemPoint,
-    panorama
+    panorama,
+    projectSupervise
   })
 )
 @createForm()
@@ -135,7 +138,8 @@ export default class sider extends PureComponent {
       projectFileList: [],
       showReply: false,
       showPlan: false,
-      clickId: null
+      clickId: null,
+      isProjectSupervise: false
     };
     this.map = null;
   }
@@ -145,6 +149,7 @@ export default class sider extends PureComponent {
 
     // console.log("贵阳至黄平高速公路", "六枝特区平寨镇跃进砂石厂");
     this.queryProject({ SkipCount: 0 });
+    this.queryProjectSupervise({ SkipCount: 0 });
     // this.querySpot({ SkipCount: 0 });
     // this.queryPoint({ SkipCount: 0 });
     this.queryDistrict();
@@ -520,28 +525,52 @@ export default class sider extends PureComponent {
 
   queryProject = items => {
     loading = true;
-    const { polygon, key, showCheck } = this.state;
+    const { polygon, key, showCheck, isProjectSupervise } = this.state;
     const {
       dispatch,
       project: { projectList }
     } = this.props;
+    if (isProjectSupervise) {
+      this.queryProjectSupervise(items);
+    } else {
+      this.showSpin(true);
+      dispatch({
+        type: 'project/queryProject',
+        payload: {
+          ...items,
+          polygon: polygon,
+          items: items.SkipCount === 0 ? [] : projectList.items
+        },
+        callback: (success, response) => {
+          loading = false;
+          this.showSpin(false);
+          if (!showCheck && success && key === 'project') {
+            emitter.emit('checkResult', {
+              show: false,
+              result: response.items
+            });
+          }
+        }
+      });
+    }
+  };
+
+  queryProjectSupervise = items => {
+    const {
+      dispatch,
+      projectSupervise: { projectSuperviseList }
+    } = this.props;
     this.showSpin(true);
     dispatch({
-      type: 'project/queryProject',
+      type: 'projectSupervise/queryProjectSupervise',
       payload: {
         ...items,
-        polygon: polygon,
-        items: items.SkipCount === 0 ? [] : projectList.items
+        IsExclusive: true,
+        IsShared: true,
+        items: items.SkipCount === 0 ? [] : projectSuperviseList.items
       },
       callback: (success, response) => {
-        loading = false;
         this.showSpin(false);
-        if (!showCheck && success && key === 'project') {
-          emitter.emit('checkResult', {
-            show: false,
-            result: response.items
-          });
-        }
       }
     });
   };
@@ -1023,7 +1052,8 @@ export default class sider extends PureComponent {
       point: { pointList },
       redLine: { redLineList },
       inspect: { inspectList },
-      panorama: { panoramaList }
+      panorama: { panoramaList },
+      projectSupervise: { projectSuperviseList }
     } = this.props;
 
     const {
@@ -1062,7 +1092,8 @@ export default class sider extends PureComponent {
       departList,
       showReply,
       showPlan,
-      clickId
+      clickId,
+      isProjectSupervise
     } = this.state;
 
     const departSelectListAll = unique(departSelectList.concat(departList));
@@ -1097,8 +1128,17 @@ export default class sider extends PureComponent {
       }
     ];
 
+    const tabsProject = [
+      {
+        title: '项目',
+        key: ['project']
+      }
+    ];
+
     const list =
-      key === 'project'
+      key === 'project' && isProjectSupervise
+        ? projectSuperviseList.items
+        : key === 'project' && !isProjectSupervise
         ? projectList.items
         : key === 'spot'
         ? spotList.items
@@ -1107,7 +1147,7 @@ export default class sider extends PureComponent {
     const dataSourceTable = list.map((item, index) => {
       return {
         ...item,
-        key: index
+        key: index,
       };
     });
 
@@ -1117,13 +1157,17 @@ export default class sider extends PureComponent {
           <span>
             <span>
               共有
-              {key === 'project'
+              {key === 'project' && isProjectSupervise
+                ? projectSuperviseList.items.length
+                : key === 'project' && !isProjectSupervise
                 ? projectList.items.length
                 : key === 'spot'
                 ? spotList.items.length
                 : pointList.items.length}
               /
-              {key === 'project'
+              {key === 'project' && isProjectSupervise
+                ? projectSuperviseList.totalCount
+                : key === 'project' && !isProjectSupervise
                 ? projectList.totalCount
                 : key === 'spot'
                 ? spotList.totalCount
@@ -1344,8 +1388,38 @@ export default class sider extends PureComponent {
             backgroundColor: '#fff'
           }}
         >
+          <Link to="/project/list">
+            <Icon
+              type="menu-unfold"
+              style={{
+                display: isProjectSupervise ? 'block' : 'none',
+                position: 'absolute',
+                right: 64,
+                top: 60,
+                fontSize: 20,
+                color: '#1890ff'
+              }}
+            />
+          </Link>
+          <Tag
+            color={isProjectSupervise ? 'volcano' : 'cyan'}
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: 49,
+              userSelect: 'none',
+              cursor: 'pointer'
+            }}
+            onClick={() => {
+              this.setState({ isProjectSupervise: !isProjectSupervise });
+            }}
+          >
+            {isProjectSupervise ? `区域` : `项目`}
+            <br />
+            监管
+          </Tag>
           <Menu mode="horizontal" defaultSelectedKeys={['project']}>
-            {tabs.map(item => (
+            {(isProjectSupervise ? tabsProject : tabs).map(item => (
               <Menu.Item key={item.key} onClick={this.switchMenu}>
                 {item.title}
               </Menu.Item>
@@ -1514,7 +1588,8 @@ export default class sider extends PureComponent {
               });
               emitter.emit('showQuery', {
                 show: !showQuery,
-                type: key
+                type: key,
+                isProjectSupervise
               });
             }}
           >

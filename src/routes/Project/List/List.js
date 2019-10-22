@@ -40,10 +40,10 @@ export default class projectSupervision extends PureComponent {
   }
 
   refresh = () => {
-    this.projectDataList({ SkipCount: 0, MaxResultCount: 10 });
+    this.projectSuperviseList({ SkipCount: 0, MaxResultCount: 10 });
   };
 
-  projectDataList = params => {
+  projectSuperviseList = params => {
     const { dispatch } = this.props;
     const {
       IsShared,
@@ -53,7 +53,7 @@ export default class projectSupervision extends PureComponent {
     } = this.state;
     this.setState({ loading: true });
     dispatch({
-      type: 'projectSupervise/projectDataList',
+      type: 'projectSupervise/projectSuperviseList',
       payload: {
         ...params,
         IsShared,
@@ -100,7 +100,7 @@ export default class projectSupervision extends PureComponent {
     this.setState({
       pagination: pagination
     });
-    this.projectDataList({
+    this.projectSuperviseList({
       SkipCount: (pagination.current - 1) * pagination.pageSize,
       MaxResultCount: pagination.pageSize,
       Sorting
@@ -386,24 +386,18 @@ export default class projectSupervision extends PureComponent {
         key: 'entry_name',
         fixed: 'right',
         width: 130,
-        render: (i, record) =>
-          record.isShared ? (
-            <span>
-              <a style={{ margin: 10 }} onClick={() => {}}>
-                移除
-              </a>
-            </span>
-          ) : (
-            <span>
-              <a
-                style={{ margin: 10 }}
-                onClick={() => this.projectSuperviseDelete(record.id)}
-              >
-                删除
-              </a>
-              <a style={{ margin: 10 }}>共享</a>
-            </span>
-          )
+        render: (i, record) => (
+          <span>
+            <a style={{ margin: 10 }}>删除</a>
+            <a
+              style={{ margin: 10 }}
+              onClick={() => this.projectSuperviseDelete(record.id)}
+            >
+              {record.isShared ? `移除` : `删除`}
+            </a>
+            {record.isShared ? null : <a style={{ margin: 10 }}>共享</a>}
+          </span>
+        )
       }
     ];
 
