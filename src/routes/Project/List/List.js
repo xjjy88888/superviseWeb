@@ -30,7 +30,8 @@ export default class projectSupervision extends PureComponent {
       showAdd: false,
       IsShared: true,
       IsExclusive: true,
-      ProjectShowArchive: false
+      ProjectShowArchive: false,
+      isRecycleBin: false
     };
   }
 
@@ -44,11 +45,22 @@ export default class projectSupervision extends PureComponent {
 
   projectDataList = params => {
     const { dispatch } = this.props;
-    const { IsShared, IsExclusive, ProjectShowArchive } = this.state;
+    const {
+      IsShared,
+      IsExclusive,
+      ProjectShowArchive,
+      isRecycleBin
+    } = this.state;
     this.setState({ loading: true });
     dispatch({
       type: 'projectSupervise/projectDataList',
-      payload: { ...params, IsShared, IsExclusive, ProjectShowArchive },
+      payload: {
+        ...params,
+        IsShared,
+        IsExclusive,
+        ProjectShowArchive,
+        isRecycleBin
+      },
       callback: (success, result) => {
         const pagination = { ...this.state.pagination };
         pagination.total = result.totalCount;
@@ -187,7 +199,13 @@ export default class projectSupervision extends PureComponent {
   };
 
   render() {
-    const { dataSource, pagination, loading, showAdd } = this.state;
+    const {
+      dataSource,
+      pagination,
+      loading,
+      showAdd,
+      isRecycleBin
+    } = this.state;
 
     const rowSelection = {};
 
@@ -448,7 +466,15 @@ export default class projectSupervision extends PureComponent {
                 <Radio.Button value={false}>当前项目</Radio.Button>
                 <Radio.Button value={true}>归档项目</Radio.Button>
               </Radio.Group>
-              <Button icon="delete" style={{ marginLeft: 20 }}>
+              <Button
+                type={isRecycleBin ? `primary` : ``}
+                icon="delete"
+                style={{ marginLeft: 20 }}
+                onClick={() => {
+                  this.setState({ isRecycleBin: !isRecycleBin });
+                  setTimeout(() => this.refresh(), 100);
+                }}
+              >
                 回收站
               </Button>
               <Button icon="reload" style={{ marginLeft: 20 }}>

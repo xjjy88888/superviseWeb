@@ -398,9 +398,7 @@ const config = {
 
     panoramaPreviewUrl: `${domain}pano/pannellum.htm?config=`,
 
-    projectSuperviseListUrl: `${domainApi}ProjectRegulation/GetAllByPost`,
-
-    projectSuperviseCreateUpdateUrl: `${domainApi}ProjectRegulation/`,
+    projectSuperviseUrl: `${domainApi}ProjectRegulation/`,
 
     projectSuperviseDeleteUrl: `${domainApi}ProjectRegulation/Delete`
   },
