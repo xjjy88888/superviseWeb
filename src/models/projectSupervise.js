@@ -2,7 +2,8 @@ import { notification } from 'antd';
 import {
   projectSuperviseListApi,
   projectSuperviseCreateUpdateApi,
-  projectSuperviseDeleteApi
+  projectSuperviseDeleteApi,
+  projectListApi
 } from '../services/httpApi';
 
 export default {
@@ -53,7 +54,10 @@ export default {
     *projectSuperviseList({ payload, callback }, { call, put }) {
       const {
         data: { success, result }
-      } = yield call(projectSuperviseListApi, payload);
+      } = yield call(
+        payload.isImport ? projectListApi : projectSuperviseListApi,
+        payload
+      );
       if (success) {
         yield put({ type: 'save', payload: { projectSuperviseList: result } });
       } else {

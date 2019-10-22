@@ -31,7 +31,8 @@ export default class projectSupervision extends PureComponent {
       IsShared: true,
       IsExclusive: true,
       ProjectShowArchive: false,
-      isRecycleBin: false
+      isRecycleBin: false,
+      isImport: false
     };
   }
 
@@ -49,7 +50,8 @@ export default class projectSupervision extends PureComponent {
       IsShared,
       IsExclusive,
       ProjectShowArchive,
-      isRecycleBin
+      isRecycleBin,
+      isImport
     } = this.state;
     this.setState({ loading: true });
     dispatch({
@@ -59,7 +61,8 @@ export default class projectSupervision extends PureComponent {
         IsShared,
         IsExclusive,
         ProjectShowArchive,
-        isRecycleBin
+        isRecycleBin,
+        isImport
       },
       callback: (success, result) => {
         const pagination = { ...this.state.pagination };
@@ -204,7 +207,8 @@ export default class projectSupervision extends PureComponent {
       pagination,
       loading,
       showAdd,
-      isRecycleBin
+      isRecycleBin,
+      isImport
     } = this.state;
 
     const rowSelection = {};
@@ -388,7 +392,6 @@ export default class projectSupervision extends PureComponent {
         width: 130,
         render: (i, record) => (
           <span>
-            <a style={{ margin: 10 }}>删除</a>
             <a
               style={{ margin: 10 }}
               onClick={() => this.projectSuperviseDelete(record.id)}
@@ -418,7 +421,16 @@ export default class projectSupervision extends PureComponent {
             style={{ backgroundColor: '#fff', padding: '30px 30px 20px 30px' }}
           >
             <span>
-              <Button icon="download">共享导入</Button>
+              <Button
+                type={isImport ? `primary` : ``}
+                icon="download"
+                onClick={() => {
+                  this.setState({ isImport: !isImport });
+                  setTimeout(() => this.refresh(), 100);
+                }}
+              >
+                共享导入
+              </Button>
               <Button
                 icon="plus"
                 style={{ marginLeft: 20 }}
