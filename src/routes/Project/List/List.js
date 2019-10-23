@@ -90,62 +90,16 @@ export default class projectSupervision extends PureComponent {
     });
   };
 
-  projectSuperviseDelete = payload => {
+  projectSuperviseModels = (url, payload) => {
     const { dispatch } = this.props;
     this.setState({ loading: true });
     dispatch({
-      type: 'projectSupervise/projectSuperviseDelete',
+      type: 'projectSupervise/' + url,
       payload,
       callback: (success, result) => {
         this.setState({ loading: false });
         if (success) {
           this.refresh();
-        }
-      }
-    });
-  };
-
-  projectDelete = payload => {
-    const { dispatch } = this.props;
-    this.setState({ loading: true });
-    dispatch({
-      type: 'project/projectDelete',
-      payload,
-      callback: (success, result) => {
-        this.setState({ loading: false });
-        if (success) {
-          this.refresh();
-        }
-      }
-    });
-  };
-
-  projectShare = payload => {
-    const { dispatch } = this.props;
-    this.setState({ loading: true });
-    dispatch({
-      type: 'projectSupervise/projectShare',
-      payload,
-      callback: (success, result) => {
-        this.setState({ loading: false });
-        if (success) {
-          this.refresh();
-        }
-      }
-    });
-  };
-
-  projectImport = payload => {
-    const { dispatch } = this.props;
-    this.setState({ loading: true });
-    dispatch({
-      type: 'projectSupervise/projectImport',
-      payload,
-      callback: (success, result) => {
-        this.setState({ loading: false });
-        if (success) {
-          this.refresh();
-          this.setState({ selectedRows: [] });
         }
       }
     });
@@ -457,7 +411,7 @@ export default class projectSupervision extends PureComponent {
             dataIndex: 'entry_name',
             key: 'entry_name',
             fixed: 'right',
-            width: 150,
+            width: isRecycleBin ? 200 : 150,
             render: (i, record) => {
               const text = isRecycleBin
                 ? `永久删除`
@@ -477,7 +431,10 @@ export default class projectSupervision extends PureComponent {
                           cancelText: '否',
                           okType: 'danger',
                           onOk() {
-                            self.projectShare(record.id);
+                            self.projectSuperviseModels(
+                              `projectShare`,
+                              record.id
+                            );
                           }
                         });
                       }}
@@ -485,6 +442,28 @@ export default class projectSupervision extends PureComponent {
                       共享
                     </a>
                   )}
+                  {isRecycleBin ? (
+                    <a
+                      style={{ margin: 8 }}
+                      onClick={() => {
+                        Modal.confirm({
+                          title: `恢复`,
+                          content: `是否确定要恢复吗？`,
+                          okText: '是',
+                          cancelText: '否',
+                          okType: 'danger',
+                          onOk() {
+                            self.projectSuperviseModels(
+                              `projectSuperviseCancelDelete`,
+                              [record.id]
+                            );
+                          }
+                        });
+                      }}
+                    >
+                      恢复
+                    </a>
+                  ) : null}
                   <a
                     style={{ margin: 8 }}
                     onClick={() => {
@@ -496,9 +475,15 @@ export default class projectSupervision extends PureComponent {
                         okType: 'danger',
                         onOk() {
                           if (isRecycleBin) {
-                            self.projectDelete({ id: record.id });
+                            self.projectSuperviseModels(
+                              `projectSuperviseForeverDelete`,
+                              [record.id]
+                            );
                           } else {
-                            self.projectSuperviseDelete(record.id);
+                            self.projectSuperviseModels(
+                              `projectSuperviseDelete`,
+                              record.id
+                            );
                           }
                         }
                       });
@@ -534,7 +519,7 @@ export default class projectSupervision extends PureComponent {
                 type={isImport ? `primary` : ``}
                 icon="download"
                 onClick={() => {
-                  this.setState({ isImport: !isImport });
+                  this.setState({ isImport: !isImport, isRecycleBin: false });
                   setTimeout(() => this.refresh(), 100);
                 }}
               >
@@ -555,7 +540,10 @@ export default class projectSupervision extends PureComponent {
                     cancelText: '否',
                     okType: 'danger',
                     onOk() {
-                      self.projectImport(selectedRows);
+                      self.projectSuperviseModels(
+                        `projectImport`,
+                        selectedRows
+                      );
                     }
                   });
                 }}
@@ -598,7 +586,10 @@ export default class projectSupervision extends PureComponent {
                 icon="delete"
                 style={{ marginLeft: 20 }}
                 onClick={() => {
-                  this.setState({ isRecycleBin: !isRecycleBin });
+                  this.setState({
+                    isRecycleBin: !isRecycleBin,
+                    isImport: false
+                  });
                   setTimeout(() => this.refresh(), 100);
                 }}
               >

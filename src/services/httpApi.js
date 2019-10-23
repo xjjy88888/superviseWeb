@@ -1335,12 +1335,34 @@ export async function projectShareApi(id) {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${accessToken()}`
-    },
+    }
   });
 }
 
 export async function projectImportApi(params) {
   return request(`${config.url.projectImportUrl}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      'Content-Type': 'application/json-patch+json'
+    },
+    body: JSON.stringify(params)
+  });
+}
+
+export async function projectSuperviseCancelDeleteApi(params) {
+  return request(`${config.url.projectSuperviseCancelDeleteUrl}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      'Content-Type': 'application/json-patch+json'
+    },
+    body: JSON.stringify(params)
+  });
+}
+
+export async function projectSuperviseForeverDeleteApi(params) {
+  return request(`${config.url.projectSuperviseForeverDeleteUrl}`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken()}`,

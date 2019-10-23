@@ -404,7 +404,11 @@ const config = {
 
     projectImportUrl: `${domainApi}Project/SetShareds`,
 
-    projectShareUrl: `${domainApi}ProjectRegulation/SetShared`
+    projectShareUrl: `${domainApi}ProjectRegulation/SetShared`,
+
+    projectSuperviseCancelDeleteUrl: `${domainApi}ProjectRegulation/CancelDelete`,
+
+    projectSuperviseForeverDeleteUrl: `${domainApi}ProjectRegulation/HardDelete`
   },
 
   //工具箱

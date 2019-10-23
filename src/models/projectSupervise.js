@@ -4,7 +4,10 @@ import {
   projectSuperviseCreateUpdateApi,
   projectSuperviseDeleteApi,
   projectListApi,
-  projectShareApi,projectImportApi
+  projectShareApi,
+  projectImportApi,
+  projectSuperviseCancelDeleteApi,
+  projectSuperviseForeverDeleteApi
 } from '../services/httpApi';
 
 export default {
@@ -74,9 +77,7 @@ export default {
         data: { success }
       } = yield call(projectSuperviseCreateUpdateApi, payload);
       notification[success ? 'success' : 'error']({
-        message: `${payload.id ? '编辑' : '新建'}${
-          success ? '成功' : '失败'
-        }`
+        message: `${payload.id ? '编辑' : '新建'}${success ? '成功' : '失败'}`
       });
       if (callback) callback(success);
     },
@@ -110,6 +111,26 @@ export default {
       });
       if (callback) callback(success);
     },
+
+    *projectSuperviseCancelDelete({ payload, callback }, { call, put }) {
+      const {
+        data: { success }
+      } = yield call(projectSuperviseCancelDeleteApi, payload);
+      notification[success ? 'success' : 'error']({
+        message: `恢复${success ? '成功' : '失败'}`
+      });
+      if (callback) callback(success);
+    },
+
+    *projectSuperviseForeverDelete({ payload, callback }, { call, put }) {
+      const {
+        data: { success }
+      } = yield call(projectSuperviseForeverDeleteApi, payload);
+      notification[success ? 'success' : 'error']({
+        message: `永久删除${success ? '成功' : '失败'}`
+      });
+      if (callback) callback(success);
+    }
   },
 
   reducers: {
