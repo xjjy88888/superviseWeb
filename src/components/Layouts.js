@@ -43,7 +43,6 @@ export default class layouts extends PureComponent {
     super(props);
     const { active } = this.props;
 
-    // 状态
     this.state = {
       current: active ? active : 'product'
     };
@@ -66,7 +65,12 @@ export default class layouts extends PureComponent {
           使用手册
         </Menu.Item>
         <Menu.Item>
-          <Link to="/login">
+          <Link
+            to="/login"
+            onClick={() => {
+              localStorage.removeItem(`user`);
+            }}
+          >
             <Icon type="logout" style={{ marginRight: 10 }} />
             退出登录
           </Link>
