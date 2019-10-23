@@ -165,6 +165,23 @@ const regionGeoJsonHLightStyle = {
   fillOpacity: 0
 };
 
+//绘制geojson区域统计图层样式
+const ZSGeoJsonStyle = {
+  color: '#0000FF',
+  weight: 2,
+  opacity: 0.6,
+  fillColor: '#0000FF',
+  fillOpacity: 0.3
+};
+//绘制geojson区域统计图层高亮样式
+const ZSGeoJsonHLightStyle = {
+  color: '#FF0000',
+  weight: 2,
+  opacity: 0.6,
+  fillColor: '#FF0000',
+  fillOpacity: 0.3
+};
+
 @connect(({ mapdata }) => ({
   mapdata
 }))
@@ -179,6 +196,7 @@ export default class homePage extends PureComponent {
     };
     this.map = null;
     this.regiongeojsonLayer = null; //行政区划矢量图层
+    this.ZSgeojsonLayer = null;//区域统计图层
     this.onlineBasemapLayers = null;
   }
 
@@ -190,6 +208,8 @@ export default class homePage extends PureComponent {
     me.createMap();
     // 创建行政区划渲染
     me.createRegion();
+    // 创建区域统计渲染
+    me.createZStatistics();
     // 创建图层管理控件
     me.createToc();
     // 创建地图缩放控件
@@ -226,12 +246,10 @@ export default class homePage extends PureComponent {
       style: regionGeoJsonStyle
     });
     this.regiongeojsonLayer = regiongeojsonLayer;
-    //区域统计图层
-    const ZSgeojsonLayer = L.Proj.geoJson(null, {
-      style: regionGeoJsonStyle
-    });
-    this.ZSgeojsonLayer = ZSgeojsonLayer;
 
+    //行政区划图层
+    const ZSgeojsonLayer = L.featureGroup([]);
+    this.ZSgeojsonLayer = ZSgeojsonLayer;
 
   };
   // 创建地图
@@ -288,6 +306,7 @@ export default class homePage extends PureComponent {
     const me = this;
     const { map } = this;
     let zoom = map.getZoom();
+    console.log('zoom',zoom);
     let bounds = map.getBounds();
     //根据地图当前范围获取对应监管影像时间
     const { showImageTimeText } = me.state;
@@ -494,6 +513,65 @@ export default class homePage extends PureComponent {
     }
   };  
 
+  // 创建区域统计渲染
+  createZStatistics = () => {
+    setTimeout(() => {
+      if(RegionCenterData.length>0){
+        const zoom = this.map.getZoom();
+        let radius = 2000;
+        if(zoom<=7){//省级行政区划
+          radius = 15000;
+        }
+        else if(zoom>7 && zoom <=9){//市级行政区划
+          radius = 5000;
+        }
+        else{//区县级行政区划
+          radius = 1500;
+        }
+        RegionCenterData.forEach((item) => {
+          const myIcon = L.divIcon({
+            html: item.num,
+            className: 'my-div-icon',
+            iconSize:16
+          });
+          //console.log('item.name',item.name);
+          this.ZSgeojsonLayer.addLayer(L.circle([item.pointY,item.pointX],radius,Object.assign(ZSGeoJsonStyle, {name:item.name})));
+          this.ZSgeojsonLayer.addLayer(L.marker([item.pointY,item.pointX], { icon: myIcon }));
+        });
+        console.log('this.ZSgeojsonLayer.getLayers()',this.ZSgeojsonLayer.getLayers());
+      }    
+    }, 1500);
+  }
+
+  // 根据行政区划名称匹配对应的区域统计圆圈图层
+  HLZSLayerbyName = (name) => {
+    //console.log('HLZSLayerbyName',this.ZSgeojsonLayer.getLayers());
+    let layers = this.ZSgeojsonLayer.getLayers();
+    if(layers.length>0){
+      for(let i = 0;i<layers.length;i++){
+          if(layers[i].options.name && layers[i].options.name === name){
+            //  layers[i].setStyle(ZSGeoJsonHLightStyle);
+            layers[i].setStyle(Object.assign(ZSGeoJsonHLightStyle, {name:name}));
+             break;
+          }        
+      }
+    }
+  }
+
+  resetZSLayerbyName = (name) => {
+    //console.log('resetZSLayerbyName',this.ZSgeojsonLayer.getLayers());
+    let layers = this.ZSgeojsonLayer.getLayers();
+    if(layers.length>0){
+      for(let i = 0;i<layers.length;i++){
+        if(layers[i].options.name && layers[i].options.name === name){
+           layers[i].setStyle(Object.assign(ZSGeoJsonStyle, {name:name}));
+           break;  
+        }     
+      }
+    }
+  }
+
+
   // 创建行政区划渲染
   createRegion = () => {
     const { regiongeojsonLayer } = this;
@@ -505,14 +583,19 @@ export default class homePage extends PureComponent {
   };
 
   onMoveoverRegiongeojsonLayer = e => {
-    //console.log('e',e);
+    //console.log('onMoveoverRegiongeojsonLayer',e);
+    //e.layer.feature.properties.name
     e.layer.setStyle(regionGeoJsonHLightStyle);
     e.layer.bringToFront();
+    //高亮区域统计圆圈图层样式
+    this.HLZSLayerbyName(e.layer.feature.properties.name);
   };
 
   onMoveoutRegiongeojsonLayer = e => {
-    //console.log('e',e);
+    //console.log('onMoveoutRegiongeojsonLayer',e);
     e.layer.setStyle(regionGeoJsonStyle);
+    //设置区域统计圆圈图层默认样式
+    this.resetZSLayerbyName(e.layer.feature.properties.name);   
   };
 
   //获取当前账号行政区下一级行政区数据
@@ -612,12 +695,9 @@ export default class homePage extends PureComponent {
   /*
    * 清空绘制图形函数
    */
-  clearGeojsonLayer = () => {
-    if (this.regiongeojsonLayer) {
-      this.regiongeojsonLayer.clearLayers();
-    }
-    if(this.ZSgeojsonLayer){
-      this.ZSgeojsonLayer.clearLayers();   
+  clearGeojsonLayer = (geojsonLayer) => {
+    if(geojsonLayer){
+       geojsonLayer.clearLayers();      
     }
   };
 

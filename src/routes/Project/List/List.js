@@ -1,16 +1,28 @@
 import React, { PureComponent } from 'react';
 import { createForm } from 'rc-form';
 import { connect } from 'dva';
-import { Table, Button, Input, Icon, Layout, Radio, Checkbox, Tag } from 'antd';
+import {
+  Table,
+  Button,
+  Input,
+  Icon,
+  Layout,
+  Radio,
+  Checkbox,
+  Tag,
+  Modal
+} from 'antd';
 // import Highlighter from 'react-highlight-words';
 import config from '../../../config';
 import Layouts from '../../../components/Layouts';
 import Add from './Add';
 
 const { Content } = Layout;
+let self;
 
-@connect(({ projectSupervise }) => ({
-  projectSupervise
+@connect(({ projectSupervise, project }) => ({
+  projectSupervise,
+  project
 }))
 @createForm()
 export default class projectSupervision extends PureComponent {
@@ -37,6 +49,7 @@ export default class projectSupervision extends PureComponent {
   }
 
   componentDidMount() {
+    self = this;
     this.refresh();
   }
 
@@ -81,6 +94,21 @@ export default class projectSupervision extends PureComponent {
     this.setState({ loading: true });
     dispatch({
       type: 'projectSupervise/projectSuperviseDelete',
+      payload,
+      callback: (success, result) => {
+        this.setState({ loading: false });
+        if (success) {
+          this.refresh();
+        }
+      }
+    });
+  };
+
+  projectDelete = payload => {
+    const { dispatch } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: 'project/projectDelete',
       payload,
       callback: (success, result) => {
         this.setState({ loading: false });
@@ -389,18 +417,41 @@ export default class projectSupervision extends PureComponent {
         dataIndex: 'entry_name',
         key: 'entry_name',
         fixed: 'right',
-        width: 130,
-        render: (i, record) => (
-          <span>
-            <a
-              style={{ margin: 10 }}
-              onClick={() => this.projectSuperviseDelete(record.id)}
-            >
-              {record.isShared ? `移除` : `删除`}
-            </a>
-            {record.isShared ? null : <a style={{ margin: 10 }}>共享</a>}
-          </span>
-        )
+        width: 150,
+        render: (i, record) => {
+          const text = isRecycleBin
+            ? `永久删除`
+            : record.isShared
+            ? `移除`
+            : `删除`;
+          return (
+            <span>
+              {record.isShared ? null : <a style={{ margin: 8 }}>共享</a>}
+              <a
+                style={{ margin: 8 }}
+                onClick={() => {
+                  Modal.confirm({
+                    title: text,
+                    content: `是否确定要${text}`,
+                    okText: '是',
+                    cancelText: '否',
+                    okType: 'danger',
+                    onOk() {
+                      if (isRecycleBin) {
+                        self.projectDelete({ id: record.id });
+                      } else {
+                        self.projectSuperviseDelete(record.id);
+                      }
+                    },
+                    onCancel() {}
+                  });
+                }}
+              >
+                {text}
+              </a>
+            </span>
+          );
+        }
       }
     ];
 

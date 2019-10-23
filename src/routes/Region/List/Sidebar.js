@@ -1147,7 +1147,7 @@ export default class sider extends PureComponent {
     const dataSourceTable = list.map((item, index) => {
       return {
         ...item,
-        key: index,
+        key: index
       };
     });
 
@@ -1412,6 +1412,9 @@ export default class sider extends PureComponent {
             }}
             onClick={() => {
               this.setState({ isProjectSupervise: !isProjectSupervise });
+              emitter.emit('switchData', {
+                state: isProjectSupervise
+              });
             }}
           >
             {isProjectSupervise ? `区域` : `项目`}

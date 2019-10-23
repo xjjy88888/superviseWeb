@@ -601,9 +601,16 @@ export default class integration extends PureComponent {
         spotRelateProjectId: data.projectId
       });
     });
+    this.eventEmitter = emitter.addListener(`switchData`, v => {
+      console.log(
+        `switchData`,
+        v,
+        `${v.state ? `项目` : `区域`}监管切换到${v.state ? `区域` : `项目`}监管`
+      );
+    });
   }
 
-  //定位问题点
+  // 定位问题点
   async locateProblemPoint(problemPointInfos, id) {
     if (problemPointInfos.length <= 0) return;
     await this.clearProblemPoints();

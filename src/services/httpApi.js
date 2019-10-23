@@ -1293,7 +1293,7 @@ export async function panoramaDeleteApi(params) {
 export async function projectSuperviseListApi(params) {
   return request(
     `${config.url.projectSuperviseUrl}${
-      params.isRecycleBin ? `GetRecycleBin` : `GetAllByPost`
+      params.isRecycleBin ? `GetRecycleBinByPost` : `GetAllByPost`
     }`,
     {
       method: 'POST',
