@@ -12,11 +12,7 @@ import {
   Tag,
   Modal
 } from 'antd';
-import Highlighter from 'react-highlight-words';
-import config from '../../../config';
 import Layouts from '../../../components/Layouts';
-import Add from './Add';
-import emitter from '../../../utils/event';
 import { Link } from 'dva/router';
 
 const { Content } = Layout;
@@ -43,7 +39,6 @@ export default class projectSupervision extends PureComponent {
       },
       loading: false,
       dataSource: [],
-      showAdd: false,
       IsShared: true,
       IsExclusive: true,
       ProjectShowArchive: false,
@@ -264,14 +259,9 @@ export default class projectSupervision extends PureComponent {
 
   render() {
     const {
-      form: { getFieldDecorator, resetFields, setFieldsValue, getFieldValue }
-    } = this.props;
-
-    const {
       dataSource,
       pagination,
       loading,
-      showAdd,
       isRecycleBin,
       isImport,
       selectedRows,
@@ -513,16 +503,6 @@ export default class projectSupervision extends PureComponent {
     return (
       <Layouts avtive="projectSupervision">
         <Layout style={{ margin: 20, backgroundColor: '#fff' }}>
-          <Add
-            show={showAdd}
-            hide={success => {
-              this.setState({ showAdd: false });
-              if (success) {
-                this.refresh();
-              }
-            }}
-            onThis={v => (this.add = v)}
-          ></Add>
           <Content
             style={{ backgroundColor: '#fff', padding: '30px 30px 20px 30px' }}
           >

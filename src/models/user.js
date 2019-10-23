@@ -12,30 +12,30 @@ import {
   userSetPowerApi,
   userExamineApi,
   userInfoApi
-} from "../services/httpApi";
-import { routerRedux } from "dva/router";
-import { notification } from "antd";
+} from '../services/httpApi';
+import { routerRedux } from 'dva/router';
+import { notification } from 'antd';
 
 export default {
-  namespace: "user",
+  namespace: 'user',
 
   state: {
     current_user: [
       {
-        us_name: "请登录"
+        us_name: '请登录'
       }
     ],
     dicList: [],
     departSelectList: [],
     basinOrganList: [],
     departList: [],
-    departUpdateId: "",
+    departUpdateId: '',
     userProjectList: [],
     userCompanyList: []
   },
 
   subscriptions: {
-    setup({ dispatch, history }) { }
+    setup({ dispatch, history }) {}
   },
 
   effects: {
@@ -44,7 +44,7 @@ export default {
         data: { success }
       } = yield call(initApi);
       if (!success) {
-        notification["error"]({
+        notification['error']({
           message: `初始化失败`
         });
       }
@@ -55,24 +55,24 @@ export default {
     },
 
     *loginOut({ payload }, { call, put }) {
-      yield put(routerRedux.replace("/login"));
+      yield put(routerRedux.replace('/login'));
     },
 
     *login({ payload, callback }, { call, put }) {
       const { data: response } = yield call(loginApi, payload);
       if (callback) callback();
       if (response.success) {
-        notification["success"]({
-          message: "登录成功"
+        notification['success']({
+          message: '登录成功'
         });
-        localStorage.setItem("user", JSON.stringify(response.result));
+        localStorage.setItem('user', JSON.stringify(response.result));
         yield put({
-          type: "save",
+          type: 'save',
           payload: { current_user: response.result }
         });
-        yield put(routerRedux.replace("/region"));
+        yield put(routerRedux.replace('/region'));
       } else {
-        notification["error"]({
+        notification['error']({
           message: `登录失败：${response.error.message}`
         });
       }
@@ -88,11 +88,11 @@ export default {
       } = yield call(dictApi, payload);
       if (success) {
         yield put({
-          type: "save",
+          type: 'save',
           payload: { dicList }
         });
       } else {
-        notification["error"]({
+        notification['error']({
           message: `查询字典失败：${error.message}`
         });
       }
@@ -106,7 +106,7 @@ export default {
       if (success) {
         if (callback) callback(response.isVaild, response.department);
       } else {
-        notification["error"]({
+        notification['error']({
           message: `单位校验失败：${error.message}`
         });
       }
@@ -119,11 +119,11 @@ export default {
       } = yield call(basinOrganizationApi, payload);
       if (success) {
         yield put({
-          type: "save",
+          type: 'save',
           payload: { basinOrganList }
         });
       } else {
-        notification["error"]({
+        notification['error']({
           message: `获取流域机构列表失败：${error.message}`
         });
       }
@@ -136,9 +136,9 @@ export default {
       } = yield call(userListApi, payload);
       if (callback) callback(success, error, result);
       if (success) {
-        yield put({ type: "save", payload: { userList: result } });
+        yield put({ type: 'save', payload: { userList: result } });
       } else {
-        notification["error"]({
+        notification['error']({
           message: `查询用户列表失败`
         });
       }
@@ -150,14 +150,14 @@ export default {
         data: { success, error, result }
       } = yield call(userCreateUpdateApi, payload);
       if (callback) callback(success, error, result);
-      notification[success ? "success" : "error"]({
-        message: `${payload.id ? "编辑" : "新建"}${
+      notification[success ? 'success' : 'error']({
+        message: `${payload.id ? '编辑' : '新建'}${
           success
             ? `成功`
             : `失败：${
-            error.validationErrors ? error.validationErrors[0].message : ""
-            }${error.message || ""}`
-          }`
+                error.validationErrors ? error.validationErrors[0].message : ''
+              }${error.message || ''}`
+        }`
       });
     },
 
@@ -169,7 +169,7 @@ export default {
       if (callback) callback(success, error, result);
       if (success) {
         yield put({
-          type: "save",
+          type: 'save',
           payload: {
             userCompanyList: [
               {
@@ -186,7 +186,7 @@ export default {
           }
         });
       } else {
-        notification["error"]({
+        notification['error']({
           message: `查询用户详情失败`
         });
       }
@@ -198,30 +198,30 @@ export default {
         data: { success, error }
       } = yield call(userDeleteApi, payload);
       if (callback) callback(success);
-      notification[success ? "success" : "error"]({
-        message: `删除${success ? "成功" : "失败"}${
-          success ? "" : `：${error.message}`
-          }`
+      notification[success ? 'success' : 'error']({
+        message: `删除${success ? '成功' : '失败'}${
+          success ? '' : `：${error.message}`
+        }`
       });
     },
 
     // 所属项目
     *userProject({ payload, callback }, { call, put }) {
       const {
-        data: { success, error, result }
+        data: { success, result }
       } = yield call(userProjectApi, payload);
       if (success) {
-        yield put({ type: "save", payload: { userProjectList: result.items } });
+        yield put({ type: 'save', payload: { userProjectList: result.items } });
       }
     },
 
     // 所属单位
     *userCompany({ payload, callback }, { call, put }) {
       const {
-        data: { success, error, result }
+        data: { success, result }
       } = yield call(userCompanyApi, payload);
       if (success) {
-        yield put({ type: "save", payload: { userCompanyList: result.items } });
+        yield put({ type: 'save', payload: { userCompanyList: result.items } });
       }
     },
 
@@ -231,7 +231,7 @@ export default {
         data: { success, error, result }
       } = yield call(userExamineApi, payload);
       if (callback) callback(success, error, result);
-      notification[success ? "success" : "error"]({
+      notification[success ? 'success' : 'error']({
         message: `审核通过${success ? `成功` : `失败`}`
       });
     },
@@ -244,7 +244,7 @@ export default {
       if (callback) callback(success, error, result);
       if (success) {
       } else {
-        notification["error"]({
+        notification['error']({
           message: `配置权限失败`
         });
       }
