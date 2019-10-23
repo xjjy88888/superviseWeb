@@ -11,7 +11,6 @@ import 'leaflet-easybutton';
 import 'leaflet-measure/dist/leaflet-measure.css';
 import 'leaflet-measure/dist/leaflet-measure.cn';
 import config from '../../../config';
-import ProjectListMin from '../List/Min';
 
 //模拟测试数据
 const RegionCenterData = [
@@ -720,7 +719,6 @@ export default class homePage extends PureComponent {
     const { imageTimeText, showImageTimeText,projectSymbolValue,showProjectSymbol } = this.state;
     return (
       <Layouts avtive="map">
-        <ProjectListMin />
         <div
           style={{
             position: 'absolute',
