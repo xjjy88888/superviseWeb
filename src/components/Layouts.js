@@ -18,36 +18,14 @@ const menuList = [
   {
     title: '区域监管',
     icon: 'radar-chart',
-    key: '/region/map',
-    subMenu: [
-      // {
-      //   title: '天地一体化',
-      //   key: '/region/map'
-      // }
-      // {
-      //   title: "地图分屏",
-      //   key: "/region/contrast"
-      // }
-    ]
+    key: '/region',
+    subMenu: []
   },
   {
     title: '项目监管',
     icon: 'book',
     key: '/project',
-    subMenu: [
-      {
-        title: '项目列表',
-        key: '/project/list'
-      },
-      {
-        title: '二维地图',
-        key: '/project/map'
-      },
-      {
-        title: '三维地图',
-        key: '/project/cesiummap'
-      }
-    ]
+    subMenu: []
   },
   {
     title: '系统管理',
@@ -113,7 +91,7 @@ export default class layouts extends PureComponent {
             >
               <Avatar src="./img/logo.png" />/
               <Link
-                to="/region/map"
+                to="/region"
                 style={{
                   margin: '0 10px',
                   color: '#fff'

@@ -38,7 +38,8 @@ import {
   dateInitFormat,
   accessToken,
   getFile,
-  unique
+  unique,
+  getUrl
 } from '../../../utils/util';
 import Spins from '../../../components/Spins';
 
@@ -147,7 +148,18 @@ export default class sider extends PureComponent {
   componentDidMount() {
     self = this;
 
-    // console.log("贵阳至黄平高速公路", "六枝特区平寨镇跃进砂石厂");
+    const urlFrom = getUrl(`from`);
+    const urlId = getUrl(`id`);
+    const urlIsProject = getUrl(`isProject`);
+    if (urlFrom === `project` && urlId) {
+      this.setState({ showProjectDetail: true });
+      this.queryProjectById(urlId);
+      this.queryProjectInfo(urlId);
+    }
+    if (urlFrom === `project` && urlIsProject === `true`) {
+      this.setState({ isProjectSupervise: true });
+    }
+
     this.queryProject({ SkipCount: 0 });
     this.queryProjectSupervise({ SkipCount: 0 });
     // this.querySpot({ SkipCount: 0 });
@@ -1388,7 +1400,7 @@ export default class sider extends PureComponent {
             backgroundColor: '#fff'
           }}
         >
-          <Link to="/project/list">
+          <Link to="/project">
             <Icon
               type="menu-unfold"
               style={{
@@ -3409,12 +3421,11 @@ export default class sider extends PureComponent {
                       showSearch
                       style={{ width: '100%' }}
                       dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                      placeholder="请选择涉及县"
                       allowClear
                       multiple
                       maxTagCount={5}
                     >
-                      {districtTree.map((item, index) => (
+                      {districtTree.map(item => (
                         <TreeSelect.TreeNode
                           value={item.value}
                           title={item.label}

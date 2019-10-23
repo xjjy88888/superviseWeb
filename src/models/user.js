@@ -70,7 +70,7 @@ export default {
           type: "save",
           payload: { current_user: response.result }
         });
-        yield put(routerRedux.replace("/region/map"));
+        yield put(routerRedux.replace("/region"));
       } else {
         notification["error"]({
           message: `登录失败：${response.error.message}`

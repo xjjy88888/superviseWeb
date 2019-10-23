@@ -16,6 +16,8 @@ import {
 import config from '../../../config';
 import Layouts from '../../../components/Layouts';
 import Add from './Add';
+import emitter from '../../../utils/event';
+import { Link } from 'dva/router';
 
 const { Content } = Layout;
 let self;
@@ -219,18 +221,23 @@ export default class projectSupervision extends PureComponent {
 
   render() {
     const {
+      form: { getFieldDecorator, resetFields, setFieldsValue, getFieldValue }
+    } = this.props;
+
+    const {
       dataSource,
       pagination,
       loading,
       showAdd,
       isRecycleBin,
       isImport,
-      selectedRows
+      selectedRows,
+      ProjectShowArchive
     } = this.state;
 
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
-        console.log(selectedRowKeys, selectedRows, 111111);
+        console.log(selectedRowKeys, selectedRows);
         this.setState({ selectedRows: selectedRowKeys });
       }
     };
@@ -241,9 +248,13 @@ export default class projectSupervision extends PureComponent {
         dataIndex: 'projectName',
         key: 'projectName',
         fixed: 'left',
-        width: 420,
+        width: 400,
         ...this.getColumnSearchProps('projectName'),
-        render: i => <a>{i}</a>
+        render: (i, item) => (
+          <Link to={'/region?from=project&id=' + item.id}>
+            <a>{i}</a>
+          </Link>
+        )
       },
       {
         title: '建设单位',
@@ -517,6 +528,16 @@ export default class projectSupervision extends PureComponent {
             style={{ backgroundColor: '#fff', padding: '30px 30px 20px 30px' }}
           >
             <span>
+              <Link to="/region?from=project&isProject=true">
+                <Icon
+                  type="menu-fold"
+                  style={{
+                    fontSize: 20,
+                    color: '#1890ff',
+                    marginRight: 20
+                  }}
+                />
+              </Link>
               <Button
                 type={isImport ? `primary` : ``}
                 icon="download"
@@ -570,7 +591,7 @@ export default class projectSupervision extends PureComponent {
                 />
               </span>
               <Radio.Group
-                defaultValue={false}
+                defaultValue={ProjectShowArchive}
                 buttonStyle="solid"
                 onChange={v => {
                   console.log(v.target.value);
@@ -597,7 +618,13 @@ export default class projectSupervision extends PureComponent {
               >
                 回收站
               </Button>
-              <Button icon="reload" style={{ marginLeft: 20 }}>
+              <Button
+                icon="reload"
+                style={{ marginLeft: 20 }}
+                onClick={() => {
+                  window.location.reload(false);
+                }}
+              >
                 重置
               </Button>
             </span>
@@ -611,7 +638,7 @@ export default class projectSupervision extends PureComponent {
               onChange={this.handleTableChange}
               pagination={pagination}
               loading={loading}
-              scroll={{ x: 2800 }}
+              scroll={{ x: 2700 }}
               style={{ padding: 20 }}
             />
           </Content>
