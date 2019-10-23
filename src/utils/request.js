@@ -1,10 +1,19 @@
 import fetch from 'dva/fetch';
+import { createHashHistory } from 'history'; // 如果是hash路由
+
+const history = createHashHistory();
 
 function parseJSON(response) {
   return response.json();
 }
 
 function checkStatus(response) {
+  if (response.status !== 200) {
+    console.log(response.status);
+  }
+  if (response.status === 401) {
+    history.push('/login');
+  }
   if (response.status >= 200) {
     return response;
   }
