@@ -88,7 +88,10 @@ export default class projectSupervision extends PureComponent {
           dataSource: result.items.map(i => {
             return {
               ...i,
-              productDepartmentName: i.productDepartmentName || ``
+              productDepartmentName: i.productDepartmentName || ``,
+              replyDepartmentName: i.replyDepartmentName || ``,
+              supDepartmentName: i.supDepartmentName || ``,
+              replyNum: i.replyNum || ``
             };
           }),
           pagination
@@ -145,7 +148,17 @@ export default class projectSupervision extends PureComponent {
       productDepartment:
         filters.productDepartmentName && filters.productDepartmentName.length
           ? filters.productDepartmentName[0]
-          : ``
+          : ``,
+      replyDepartment:
+        filters.replyDepartmentName && filters.replyDepartmentName.length
+          ? filters.replyDepartmentName[0]
+          : ``,
+      supDepartment:
+        filters.supDepartmentName && filters.supDepartmentName.length
+          ? filters.supDepartmentName[0]
+          : ``,
+      replyNum:
+        filters.replyNum && filters.replyNum.length ? filters.replyNum[0] : ``
     });
   };
 
@@ -244,6 +257,20 @@ export default class projectSupervision extends PureComponent {
     return result;
   };
 
+  getDictList = type => {
+    const {
+      user: { dicList }
+    } = this.props;
+    const filter = dicList.filter(item => item.dictTypeName === type);
+    const result = filter.map(i => {
+      return {
+        text: i.dictTableValue,
+        value: i.dictTableKey
+      };
+    });
+    return result;
+  };
+
   getDistrictLabel = ids => {
     const {
       district: { districtList }
@@ -300,26 +327,22 @@ export default class projectSupervision extends PureComponent {
         title: '批复机构',
         dataIndex: 'replyDepartmentName',
         key: 'replyDepartmentName',
-        width: 120
+        width: 120,
+        ...this.getColumnSearchProps('replyDepartmentName')
       },
       {
         title: '监管单位',
         dataIndex: 'supDepartmentName',
         key: 'supDepartmentName',
-        width: 120
-      },
-      {
-        title: '立项级别',
-        dataIndex: 'projectLevelId',
-        key: 'projectLevelId',
         width: 120,
-        render: i => this.getDictLabel(i)
+        ...this.getColumnSearchProps('supDepartmentName')
       },
       {
         title: '批复文号',
         dataIndex: 'replyNum',
         key: 'replyNum',
-        width: 200
+        width: 200,
+        ...this.getColumnSearchProps('replyNum')
       },
       {
         title: '批复时间',
@@ -328,10 +351,19 @@ export default class projectSupervision extends PureComponent {
         width: 120
       },
       {
+        title: '立项级别',
+        dataIndex: 'projectLevelId',
+        key: 'projectLevelId',
+        width: 120,
+        filters: this.getDictList(`立项级别`),
+        render: i => this.getDictLabel(i)
+      },
+      {
         title: '扰动合规性',
         dataIndex: 'complianceId',
         key: 'complianceId',
         width: 150,
+        filters: this.getDictList(`扰动合规性`),
         render: i => this.getDictLabel(i)
       },
       {
@@ -339,6 +371,7 @@ export default class projectSupervision extends PureComponent {
         dataIndex: 'projectTypeId',
         key: 'projectTypeId',
         width: 120,
+        filters: this.getDictList(`项目类型`),
         render: i => this.getDictLabel(i)
       },
       {
@@ -346,6 +379,7 @@ export default class projectSupervision extends PureComponent {
         dataIndex: 'projectCateId',
         key: 'projectCateId',
         width: 120,
+        filters: this.getDictList(`项目类别`),
         render: i => this.getDictLabel(i)
       },
       {
@@ -353,6 +387,7 @@ export default class projectSupervision extends PureComponent {
         dataIndex: 'projectNatId',
         key: 'projectNatId',
         width: 120,
+        filters: this.getDictList(`项目性质`),
         render: i => this.getDictLabel(i)
       },
       {
@@ -360,6 +395,7 @@ export default class projectSupervision extends PureComponent {
         dataIndex: 'projectStatusId',
         key: 'projectStatusId',
         width: 120,
+        filters: this.getDictList(`建设状态`),
         render: i => this.getDictLabel(i)
       },
       {
