@@ -76,7 +76,8 @@ export default class projectSupervision extends PureComponent {
         IsExclusive,
         ProjectShowArchive,
         isRecycleBin,
-        isImport
+        isImport,
+        isRegulationShared: true
       },
       callback: (success, result) => {
         const pagination = { ...this.state.pagination };
@@ -100,6 +101,7 @@ export default class projectSupervision extends PureComponent {
         this.setState({ loading: false });
         if (success) {
           this.refresh();
+          this.setState({ selectedRows: [] });
         }
       }
     });
@@ -420,7 +422,7 @@ export default class projectSupervision extends PureComponent {
                 : `删除`;
               return (
                 <span>
-                  {record.isShared ? null : (
+                  {record.isShared || isRecycleBin ? null : (
                     <a
                       style={{ margin: 8 }}
                       onClick={() => {

@@ -16,7 +16,8 @@ import {
   departCreateApi,
   projectUnArchiveApi,
   projectUnbindSpotApi,
-  projectArchiveApi
+  projectArchiveApi,
+  projectSuperviseCreateUpdateApi
 } from '../services/httpApi';
 
 export default {
@@ -128,16 +129,19 @@ export default {
 
     // 项目新建编辑
     *projectCreateUpdate({ payload, callback }, { call, put }) {
+      console.log(payload.isProjectSupervise);
       const {
-        data: { success, error, result: response }
-      } = yield call(projectCreateUpdateApi, payload);
-      if (success) {
-        if (callback) callback(success, response);
-      } else {
-        notification['error']({
-          message: `${payload.id ? '编辑' : '新建'}项目失败：${error.message}`
-        });
-      }
+        data: { success, error }
+      } = yield call(
+        payload.isProjectSupervise
+          ? projectSuperviseCreateUpdateApi
+          : projectCreateUpdateApi,
+        payload,
+      );
+      notification[success ? `success` : `error`]({
+        message: `${payload.id ? '编辑' : '新建'}${success ? `成功` : `失败`}`
+      });
+      if (callback) callback(success);
     },
 
     // 项目删除

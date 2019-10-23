@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
-import React, { PureComponent } from "react";
-import { connect } from "dva";
-import { createForm } from "rc-form";
+import React, { PureComponent } from 'react';
+import { connect } from 'dva';
+import { createForm } from 'rc-form';
 import {
   Icon,
   Input,
@@ -13,12 +13,12 @@ import {
   Select,
   Col,
   DatePicker
-} from "antd";
-import "leaflet/dist/leaflet.css";
-import emitter from "../../../utils/event";
-import config from "../../../config";
-import { getFile, unique } from "../../../utils/util";
-import { dateInitFormat, dateFormat, accessToken } from "../../../utils/util";
+} from 'antd';
+import 'leaflet/dist/leaflet.css';
+import emitter from '../../../utils/event';
+import config from '../../../config';
+import { getFile, unique } from '../../../utils/util';
+import { dateInitFormat, dateFormat, accessToken } from '../../../utils/util';
 
 let yearDataSource = [];
 let self;
@@ -60,11 +60,11 @@ export default class projectDetail extends PureComponent {
         value: i
       });
     }
-    this.eventEmitter = emitter.addListener("departNameReset", v => {
+    this.eventEmitter = emitter.addListener('departNameReset', v => {
       console.log(v);
       setFieldsValue({ [v.key]: v.id });
     });
-    this.eventEmitter = emitter.addListener("showProjectDetail", data => {
+    this.eventEmitter = emitter.addListener('showProjectDetail', data => {
       resetFields();
       this.setState({
         show: data.show,
@@ -74,7 +74,7 @@ export default class projectDetail extends PureComponent {
         this.queryProjectById(data.id);
       }
     });
-    this.eventEmitter = emitter.addListener("projectCreateUpdate", data => {
+    this.eventEmitter = emitter.addListener('projectCreateUpdate', data => {
       const { expandParentId, changeParentId } = this.state;
       //submit
       this.props.form.validateFields((err, v) => {
@@ -94,15 +94,12 @@ export default class projectDetail extends PureComponent {
           actCompTime: v.actCompTime ? dateFormat(v.actCompTime._d) : null
         };
         dispatch({
-          type: "project/projectCreateUpdate",
+          type: 'project/projectCreateUpdate',
           payload: values,
-          callback: (success, response) => {
+          callback: success => {
             if (success) {
-              emitter.emit("deleteSuccess", {});
-              notification["success"]({
-                message: `${data.id ? "编辑" : "新建"}项目成功`
-              });
-              this.setState({ show: false });
+              emitter.emit('deleteSuccess', {});
+              this.setState({ show: false, });
             }
           }
         });
@@ -113,7 +110,7 @@ export default class projectDetail extends PureComponent {
   queryProjectById = id => {
     const { dispatch } = this.props;
     dispatch({
-      type: "project/queryProjectById",
+      type: 'project/queryProjectById',
       payload: {
         id: id,
         refresh: true
@@ -133,7 +130,7 @@ export default class projectDetail extends PureComponent {
             return {
               uid: item.id,
               name: item.fileName,
-              status: "done",
+              status: 'done',
               url: config.url.annexPreviewUrl + item.id
             };
           });
@@ -146,7 +143,7 @@ export default class projectDetail extends PureComponent {
             return {
               uid: item.id,
               name: item.fileName,
-              status: "done",
+              status: 'done',
               url: config.url.annexPreviewUrl + item.id
             };
           });
@@ -164,13 +161,13 @@ export default class projectDetail extends PureComponent {
     const children = [];
     for (let i = 0; i < 10; i++) {
       children.push(
-        <Col span={4} key={i} style={{ display: i < count ? "block" : "none" }}>
+        <Col span={4} key={i} style={{ display: i < count ? 'block' : 'none' }}>
           <Form.Item label={`Field ${i}`}>
             {getFieldDecorator(`field-${i}`, {
               rules: [
                 {
                   required: true,
-                  message: "Input something!"
+                  message: 'Input something!'
                 }
               ]
             })(<Input />)}
@@ -199,7 +196,7 @@ export default class projectDetail extends PureComponent {
     if (obj) {
       return obj[key];
     } else {
-      return "";
+      return '';
     }
   };
 
@@ -211,7 +208,7 @@ export default class projectDetail extends PureComponent {
     const { departSearch } = this.state;
     if (departSearch) {
       dispatch({
-        type: "user/departVaild",
+        type: 'user/departVaild',
         payload: {
           name: departSearch
         },
@@ -243,7 +240,7 @@ export default class projectDetail extends PureComponent {
   queryDepartList = v => {
     const { dispatch } = this.props;
     dispatch({
-      type: "project/departList",
+      type: 'project/departList',
       payload: {
         name: v,
         kind: 2
@@ -259,9 +256,9 @@ export default class projectDetail extends PureComponent {
       const filter = dicList.filter(item => {
         return item.id === id;
       });
-      return filter.map(item => item.dictTableValue).join(",");
+      return filter.map(item => item.dictTableValue).join(',');
     } else {
-      return "";
+      return '';
     }
   };
 
@@ -300,7 +297,7 @@ export default class projectDetail extends PureComponent {
                 });
               }
             } else {
-              notification["error"]({
+              notification['error']({
                 message: `水保方案附件上传失败：${v.error.message}`
               });
             }
@@ -316,7 +313,7 @@ export default class projectDetail extends PureComponent {
             const data = fileList.map(item => {
               return {
                 ...item,
-                status: "done"
+                status: 'done'
               };
             });
             if (isChange) {
@@ -333,7 +330,7 @@ export default class projectDetail extends PureComponent {
             return new Promise((resolve, reject) => {
               if (edit) {
                 dispatch({
-                  type: "annex/annexDelete",
+                  type: 'annex/annexDelete',
                   payload: {
                     FileId: file.uid,
                     Id: is
@@ -350,7 +347,7 @@ export default class projectDetail extends PureComponent {
                 });
               } else {
                 reject();
-                notification["info"]({
+                notification['info']({
                   message: `请先开始编辑项目`
                 });
               }
@@ -361,7 +358,7 @@ export default class projectDetail extends PureComponent {
             <div>
               <Icon type="plus" />
               <div className="ant-upload-text">
-                {isChange ? "变更依据" : "水保方案"}上传
+                {isChange ? '变更依据' : '水保方案'}上传
               </div>
             </div>
           ) : null}
@@ -383,12 +380,12 @@ export default class projectDetail extends PureComponent {
     return (
       <div
         style={{
-          position: "absolute",
+          position: 'absolute',
           left: show ? 350 : -4000,
           top: 0,
           zIndex: 1000,
           width: 800,
-          height: "100%",
+          height: '100%',
           paddingTop: 46,
           backgroundColor: `#fff`,
           borderLeft: `solid 1px #ddd`
@@ -399,7 +396,7 @@ export default class projectDetail extends PureComponent {
           type="left"
           style={{
             fontSize: 30,
-            display: show ? "block" : "none",
+            display: show ? 'block' : 'none',
             position: `absolute`,
             right: -50,
             top: `48%`,
@@ -409,7 +406,7 @@ export default class projectDetail extends PureComponent {
             cursor: `pointer`
           }}
           onClick={() => {
-            emitter.emit("hideProjectDetail", {
+            emitter.emit('hideProjectDetail', {
               hide: true
             });
             this.setState({
@@ -420,12 +417,12 @@ export default class projectDetail extends PureComponent {
         <div
           style={{
             padding: 30,
-            display: edit ? "none" : "block",
-            overflow: "auto",
-            height: "100%"
+            display: edit ? 'none' : 'block',
+            overflow: 'auto',
+            height: '100%'
           }}
         >
-          <div style={{ float: "left", width: 350, padding: "0 30px" }}>
+          <div style={{ float: 'left', width: 350, padding: '0 30px' }}>
             <p style={{ margin: 10 }}>
               <span>防治标准：</span>
               <span>{this.getDictValue(projectItem.expand.prevenStdId)}</span>
@@ -536,7 +533,7 @@ export default class projectDetail extends PureComponent {
               <span>——</span>
             </p>
           </div>
-          <div style={{ float: "left", width: 350, padding: "0 60px" }}>
+          <div style={{ float: 'left', width: 350, padding: '0 60px' }}>
             <p style={{ margin: 10 }}>
               <span>扰动土地整治率：</span>
               <span>{projectItem.expand.fixRate}%</span>
@@ -605,13 +602,13 @@ export default class projectDetail extends PureComponent {
             <p style={{ margin: 10 }}>
               <span>方案编制单位：</span>
               <span>
-                {this.getDepart(projectItem.projectDepartment, "name")}
+                {this.getDepart(projectItem.projectDepartment, 'name')}
               </span>
             </p>
             <p style={{ margin: 10 }}>
               <span>监测单位：</span>
               <span>
-                {this.getDepart(projectItem.monitorDepartment, "name")}
+                {this.getDepart(projectItem.monitorDepartment, 'name')}
               </span>
             </p>
             <p style={{ margin: 10 }}>
@@ -619,26 +616,26 @@ export default class projectDetail extends PureComponent {
               <span>
                 {this.getDepart(
                   projectItem.expand.SupervisionDepartment,
-                  "name"
+                  'name'
                 )}
               </span>
             </p>
             <p style={{ margin: 10 }}>
               <span>设计单位：</span>
               <span>
-                {this.getDepart(projectItem.designDepartment, "name")}
+                {this.getDepart(projectItem.designDepartment, 'name')}
               </span>
             </p>
             <p style={{ margin: 10 }}>
               <span>施工单位：</span>
               <span>
-                {this.getDepart(projectItem.constructionDepartment, "name")}
+                {this.getDepart(projectItem.constructionDepartment, 'name')}
               </span>
             </p>
             <p style={{ margin: 10 }}>
               <span>验收报告单位：</span>
               <span>
-                {this.getDepart(projectItem.expand.ReportDepartment, "name")}
+                {this.getDepart(projectItem.expand.ReportDepartment, 'name')}
               </span>
             </p>
             <p style={{ margin: 10 }}>
@@ -666,10 +663,10 @@ export default class projectDetail extends PureComponent {
         </div>
         <div
           style={{
-            display: edit ? "block" : "none",
-            height: "100%",
+            display: edit ? 'block' : 'none',
+            height: '100%',
             padding: 30,
-            overflow: "auto"
+            overflow: 'auto'
           }}
         >
           <Form
@@ -680,7 +677,7 @@ export default class projectDetail extends PureComponent {
             <Row gutter={24}>
               <Col span={12}>
                 <Form.Item label="防治标准">
-                  {getFieldDecorator("prevenStdId", {
+                  {getFieldDecorator('prevenStdId', {
                     initialValue: projectItem.expand.prevenStdId
                   })(
                     <Select
@@ -689,7 +686,7 @@ export default class projectDetail extends PureComponent {
                       allowClear
                       optionFilterProp="children"
                     >
-                      {this.dictList("防治标准").map(item => (
+                      {this.dictList('防治标准').map(item => (
                         <Select.Option value={item.id} key={item.id}>
                           {item.dictTableValue}
                         </Select.Option>
@@ -700,28 +697,28 @@ export default class projectDetail extends PureComponent {
               </Col>
               <Col span={12}>
                 <Form.Item label="总投资">
-                  {getFieldDecorator("totalInvest", {
+                  {getFieldDecorator('totalInvest', {
                     initialValue: projectItem.expand.totalInvest
                   })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="土建投资">
-                  {getFieldDecorator("civilEngInvest", {
+                  {getFieldDecorator('civilEngInvest', {
                     initialValue: projectItem.expand.civilEngInvest
                   })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="项目规模">
-                  {getFieldDecorator("projectSize", {
+                  {getFieldDecorator('projectSize', {
                     initialValue: projectItem.expand.projectSize
                   })(<Input addonAfter="米或公顷" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="设计动工时间">
-                  {getFieldDecorator("designStartTime", {
+                  {getFieldDecorator('designStartTime', {
                     initialValue: dateInitFormat(
                       projectItem.expand.designStartTime
                     )
@@ -730,7 +727,7 @@ export default class projectDetail extends PureComponent {
               </Col>
               <Col span={12}>
                 <Form.Item label="设计完工时间">
-                  {getFieldDecorator("designCompTime", {
+                  {getFieldDecorator('designCompTime', {
                     initialValue: dateInitFormat(
                       projectItem.expand.designCompTime
                     )
@@ -739,7 +736,7 @@ export default class projectDetail extends PureComponent {
               </Col>
               <Col span={12}>
                 <Form.Item label="实际开工时间">
-                  {getFieldDecorator("actStartTime", {
+                  {getFieldDecorator('actStartTime', {
                     initialValue: dateInitFormat(
                       projectItem.expand.actStartTime
                     )
@@ -748,14 +745,14 @@ export default class projectDetail extends PureComponent {
               </Col>
               <Col span={12}>
                 <Form.Item label="实际完工时间">
-                  {getFieldDecorator("actCompTime", {
+                  {getFieldDecorator('actCompTime', {
                     initialValue: dateInitFormat(projectItem.expand.actCompTime)
                   })(<DatePicker placeholder="" style={{ width: 130 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="设计水平年">
-                  {getFieldDecorator("designLevelYear", {
+                  {getFieldDecorator('designLevelYear', {
                     initialValue: projectItem.expand.designLevelYear
                   })(
                     <Select
@@ -782,7 +779,7 @@ export default class projectDetail extends PureComponent {
               </Col>
               <Col span={12}>
                 <Form.Item label="防治区类型">
-                  {getFieldDecorator("prevenZoneTypeId", {
+                  {getFieldDecorator('prevenZoneTypeId', {
                     initialValue: projectItem.expand.prevenZoneTypeId
                   })(
                     <Select
@@ -791,7 +788,7 @@ export default class projectDetail extends PureComponent {
                       allowClear
                       optionFilterProp="children"
                     >
-                      {this.dictList("防治区类型").map(item => (
+                      {this.dictList('防治区类型').map(item => (
                         <Select.Option value={item.id} key={item.id}>
                           {item.dictTableValue}
                         </Select.Option>
@@ -802,7 +799,7 @@ export default class projectDetail extends PureComponent {
               </Col>
               <Col span={12}>
                 <Form.Item label="防治区级别">
-                  {getFieldDecorator("prevenZoneLevelId", {
+                  {getFieldDecorator('prevenZoneLevelId', {
                     initialValue: projectItem.expand.prevenZoneLevelId
                   })(
                     <Select
@@ -811,7 +808,7 @@ export default class projectDetail extends PureComponent {
                       allowClear
                       optionFilterProp="children"
                     >
-                      {this.dictList("防治区级别").map(item => (
+                      {this.dictList('防治区级别').map(item => (
                         <Select.Option value={item.id} key={item.id}>
                           {item.dictTableValue}
                         </Select.Option>
@@ -822,7 +819,7 @@ export default class projectDetail extends PureComponent {
               </Col>
               <Col span={12}>
                 <Form.Item label="地貌类型">
-                  {getFieldDecorator("landTypeId", {
+                  {getFieldDecorator('landTypeId', {
                     initialValue: projectItem.expand.landTypeId
                   })(
                     <Select
@@ -831,7 +828,7 @@ export default class projectDetail extends PureComponent {
                       allowClear
                       optionFilterProp="children"
                     >
-                      {this.dictList("地貌类型").map(item => (
+                      {this.dictList('地貌类型').map(item => (
                         <Select.Option value={item.id} key={item.id}>
                           {item.dictTableValue}
                         </Select.Option>
@@ -842,7 +839,7 @@ export default class projectDetail extends PureComponent {
               </Col>
               <Col span={12}>
                 <Form.Item label="土壤类型">
-                  {getFieldDecorator("soilTypeId", {
+                  {getFieldDecorator('soilTypeId', {
                     initialValue: projectItem.expand.soilTypeId
                   })(
                     <Select
@@ -851,7 +848,7 @@ export default class projectDetail extends PureComponent {
                       allowClear
                       optionFilterProp="children"
                     >
-                      {this.dictList("土壤类型").map(item => (
+                      {this.dictList('土壤类型').map(item => (
                         <Select.Option value={item.id} key={item.id}>
                           {item.dictTableValue}
                         </Select.Option>
@@ -862,7 +859,7 @@ export default class projectDetail extends PureComponent {
               </Col>
               <Col span={12}>
                 <Form.Item label="植被类型">
-                  {getFieldDecorator("vegTypeId", {
+                  {getFieldDecorator('vegTypeId', {
                     initialValue: projectItem.expand.vegTypeId
                   })(
                     <Select
@@ -871,7 +868,7 @@ export default class projectDetail extends PureComponent {
                       allowClear
                       optionFilterProp="children"
                     >
-                      {this.dictList("植被类型").map(item => (
+                      {this.dictList('植被类型').map(item => (
                         <Select.Option value={item.id} key={item.id}>
                           {item.dictTableValue}
                         </Select.Option>
@@ -883,28 +880,28 @@ export default class projectDetail extends PureComponent {
               <Divider />
               <Col span={12}>
                 <Form.Item label="项目建设区面积">
-                  {getFieldDecorator("consArea", {
+                  {getFieldDecorator('consArea', {
                     initialValue: projectItem.expand.consArea
                   })(<Input addonAfter="公顷" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="直接影响区面积">
-                  {getFieldDecorator("affeArea", {
+                  {getFieldDecorator('affeArea', {
                     initialValue: projectItem.expand.affeArea
                   })(<Input addonAfter="公顷" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="扰动地表面积">
-                  {getFieldDecorator("distSurfaceArea", {
+                  {getFieldDecorator('distSurfaceArea', {
                     initialValue: projectItem.expand.distSurfaceArea
                   })(<Input addonAfter="公顷" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="损坏水土保持设施面积">
-                  {getFieldDecorator("dmgArea", {
+                  {getFieldDecorator('dmgArea', {
                     initialValue: projectItem.expand.dmgArea
                   })(<Input addonAfter="公顷" style={{ width: 150 }} />)}
                 </Form.Item>
@@ -912,35 +909,35 @@ export default class projectDetail extends PureComponent {
               <Divider />
               <Col span={12}>
                 <Form.Item label="原地貌土壤侵蚀模数">
-                  {getFieldDecorator("landErsn", {
+                  {getFieldDecorator('landErsn', {
                     initialValue: projectItem.expand.landErsn
                   })(<Input addonAfter="t/km²*a" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="土壤容许流失量">
-                  {getFieldDecorator("soilLoss", {
+                  {getFieldDecorator('soilLoss', {
                     initialValue: projectItem.expand.soilLoss
                   })(<Input addonAfter="t/km²*a" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="水土流失预测总量">
-                  {getFieldDecorator("ersnAmt", {
+                  {getFieldDecorator('ersnAmt', {
                     initialValue: projectItem.expand.ersnAmt
                   })(<Input addonAfter="t" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="新建水土流失量">
-                  {getFieldDecorator("newErsnAmt", {
+                  {getFieldDecorator('newErsnAmt', {
                     initialValue: projectItem.expand.newErsnAmt
                   })(<Input addonAfter="t" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="新建水土流失主要区域">
-                  {getFieldDecorator("newArea", {
+                  {getFieldDecorator('newArea', {
                     initialValue: projectItem.expand.newArea
                   })(<Input />)}
                 </Form.Item>
@@ -948,42 +945,42 @@ export default class projectDetail extends PureComponent {
               <Divider />
               <Col span={12}>
                 <Form.Item label="扰动土地整治率">
-                  {getFieldDecorator("fixRate", {
+                  {getFieldDecorator('fixRate', {
                     initialValue: projectItem.expand.fixRate
                   })(<Input addonAfter="%" style={{ width: 100 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="水土流失总治理度">
-                  {getFieldDecorator("govern", {
+                  {getFieldDecorator('govern', {
                     initialValue: projectItem.expand.govern
                   })(<Input addonAfter="%" style={{ width: 100 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="土壤流失控制比">
-                  {getFieldDecorator("ctlRatio", {
+                  {getFieldDecorator('ctlRatio', {
                     initialValue: projectItem.expand.ctlRatio
                   })(<Input addonAfter="%" style={{ width: 100 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="拦渣率">
-                  {getFieldDecorator("blkRate", {
+                  {getFieldDecorator('blkRate', {
                     initialValue: projectItem.expand.blkRate
                   })(<Input addonAfter="%" style={{ width: 100 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="植被恢复系数">
-                  {getFieldDecorator("vegRec", {
+                  {getFieldDecorator('vegRec', {
                     initialValue: projectItem.expand.vegRec
                   })(<Input addonAfter="%" style={{ width: 100 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="林草覆盖率">
-                  {getFieldDecorator("forestGrassCover", {
+                  {getFieldDecorator('forestGrassCover', {
                     initialValue: projectItem.expand.forestGrassCover
                   })(<Input addonAfter="%" style={{ width: 100 }} />)}
                 </Form.Item>
@@ -991,56 +988,56 @@ export default class projectDetail extends PureComponent {
               <Divider />
               <Col span={12}>
                 <Form.Item label="水土保持总投资">
-                  {getFieldDecorator("waterSoilTotal", {
+                  {getFieldDecorator('waterSoilTotal', {
                     initialValue: projectItem.expand.waterSoilTotal
                   })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="独立费用">
-                  {getFieldDecorator("idptExp", {
+                  {getFieldDecorator('idptExp', {
                     initialValue: projectItem.expand.idptExp
                   })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="水土保持监理费">
-                  {getFieldDecorator("waterSoilSupervise", {
+                  {getFieldDecorator('waterSoilSupervise', {
                     initialValue: projectItem.expand.waterSoilSupervise
                   })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="水土保持监测费">
-                  {getFieldDecorator("waterSoilDetect", {
+                  {getFieldDecorator('waterSoilDetect', {
                     initialValue: projectItem.expand.waterSoilDetect
                   })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="水土保持补偿费">
-                  {getFieldDecorator("waterSoilCompensate", {
+                  {getFieldDecorator('waterSoilCompensate', {
                     initialValue: projectItem.expand.waterSoilCompensate
                   })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="工程措施设计投资">
-                  {getFieldDecorator("engInvest", {
+                  {getFieldDecorator('engInvest', {
                     initialValue: projectItem.expand.EngInvest
                   })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="植物措施设计投资">
-                  {getFieldDecorator("vegInvest", {
+                  {getFieldDecorator('vegInvest', {
                     initialValue: projectItem.expand.vegInvest
                   })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="临时措施设计投资">
-                  {getFieldDecorator("temInvest", {
+                  {getFieldDecorator('temInvest', {
                     initialValue: projectItem.expand.temInvest
                   })(<Input addonAfter="万元" style={{ width: 150 }} />)}
                 </Form.Item>
@@ -1050,28 +1047,28 @@ export default class projectDetail extends PureComponent {
               <Col span={12}>
                 <Form.Item
                   label={
-                    <span style={{ userSelect: "none" }}>
+                    <span style={{ userSelect: 'none' }}>
                       方案编制单位
                       <Icon
                         type="plus"
                         style={{
-                          color: "#1890ff"
+                          color: '#1890ff'
                         }}
                         onClick={() => {
-                          emitter.emit("showCreateDepart", {
+                          emitter.emit('showCreateDepart', {
                             show: true,
-                            key: "projectDepartmentId"
+                            key: 'projectDepartmentId'
                           });
-                          setFieldsValue({ projectDepartmentId: "" });
+                          setFieldsValue({ projectDepartmentId: '' });
                         }}
                       />
                     </span>
                   }
                 >
-                  {getFieldDecorator("projectDepartmentId", {
+                  {getFieldDecorator('projectDepartmentId', {
                     initialValue: this.getDepart(
                       projectItem.projectDepartment,
-                      "id"
+                      'id'
                     )
                   })(
                     <Select
@@ -1089,7 +1086,7 @@ export default class projectDetail extends PureComponent {
                         this.queryDepartList(v);
                       }}
                       onBlur={() => {
-                        this.getDepartList("projectDepartmentId");
+                        this.getDepartList('projectDepartmentId');
                       }}
                       onSelect={() => {
                         this.setState({ isSelect: true });
@@ -1107,28 +1104,28 @@ export default class projectDetail extends PureComponent {
               <Col span={12}>
                 <Form.Item
                   label={
-                    <span style={{ userSelect: "none" }}>
+                    <span style={{ userSelect: 'none' }}>
                       监测单位
                       <Icon
                         type="plus"
                         style={{
-                          color: "#1890ff"
+                          color: '#1890ff'
                         }}
                         onClick={() => {
-                          emitter.emit("showCreateDepart", {
+                          emitter.emit('showCreateDepart', {
                             show: true,
-                            key: "monitorDepartmentId"
+                            key: 'monitorDepartmentId'
                           });
-                          setFieldsValue({ monitorDepartmentId: "" });
+                          setFieldsValue({ monitorDepartmentId: '' });
                         }}
                       />
                     </span>
                   }
                 >
-                  {getFieldDecorator("monitorDepartmentId", {
+                  {getFieldDecorator('monitorDepartmentId', {
                     initialValue: this.getDepart(
                       projectItem.monitorDepartment,
-                      "id"
+                      'id'
                     )
                   })(
                     <Select
@@ -1146,7 +1143,7 @@ export default class projectDetail extends PureComponent {
                         this.queryDepartList(v);
                       }}
                       onBlur={() => {
-                        this.getDepartList("monitorDepartmentId");
+                        this.getDepartList('monitorDepartmentId');
                       }}
                       onSelect={() => {
                         this.setState({ isSelect: true });
@@ -1164,28 +1161,28 @@ export default class projectDetail extends PureComponent {
               <Col span={12}>
                 <Form.Item
                   label={
-                    <span style={{ userSelect: "none" }}>
+                    <span style={{ userSelect: 'none' }}>
                       监理单位
                       <Icon
                         type="plus"
                         style={{
-                          color: "#1890ff"
+                          color: '#1890ff'
                         }}
                         onClick={() => {
-                          emitter.emit("showCreateDepart", {
+                          emitter.emit('showCreateDepart', {
                             show: true,
-                            key: "supervisionDepartmentId"
+                            key: 'supervisionDepartmentId'
                           });
-                          setFieldsValue({ supervisionDepartmentId: "" });
+                          setFieldsValue({ supervisionDepartmentId: '' });
                         }}
                       />
                     </span>
                   }
                 >
-                  {getFieldDecorator("supervisionDepartmentId", {
+                  {getFieldDecorator('supervisionDepartmentId', {
                     initialValue: this.getDepart(
                       projectItem.supervisionDepartment,
-                      "id"
+                      'id'
                     )
                   })(
                     <Select
@@ -1203,7 +1200,7 @@ export default class projectDetail extends PureComponent {
                         this.queryDepartList(v);
                       }}
                       onBlur={() => {
-                        this.getDepartList("supervisionDepartmentId");
+                        this.getDepartList('supervisionDepartmentId');
                       }}
                       onSelect={() => {
                         this.setState({ isSelect: true });
@@ -1221,28 +1218,28 @@ export default class projectDetail extends PureComponent {
               <Col span={12}>
                 <Form.Item
                   label={
-                    <span style={{ userSelect: "none" }}>
+                    <span style={{ userSelect: 'none' }}>
                       设计单位
                       <Icon
                         type="plus"
                         style={{
-                          color: "#1890ff"
+                          color: '#1890ff'
                         }}
                         onClick={() => {
-                          emitter.emit("showCreateDepart", {
+                          emitter.emit('showCreateDepart', {
                             show: true,
-                            key: "designDepartmentId"
+                            key: 'designDepartmentId'
                           });
-                          setFieldsValue({ designDepartmentId: "" });
+                          setFieldsValue({ designDepartmentId: '' });
                         }}
                       />
                     </span>
                   }
                 >
-                  {getFieldDecorator("designDepartmentId", {
+                  {getFieldDecorator('designDepartmentId', {
                     initialValue: this.getDepart(
                       projectItem.designDepartment,
-                      "id"
+                      'id'
                     )
                   })(
                     <Select
@@ -1260,7 +1257,7 @@ export default class projectDetail extends PureComponent {
                         this.queryDepartList(v);
                       }}
                       onBlur={() => {
-                        this.getDepartList("designDepartmentId");
+                        this.getDepartList('designDepartmentId');
                       }}
                       onSelect={() => {
                         this.setState({ isSelect: true });
@@ -1278,28 +1275,28 @@ export default class projectDetail extends PureComponent {
               <Col span={12}>
                 <Form.Item
                   label={
-                    <span style={{ userSelect: "none" }}>
+                    <span style={{ userSelect: 'none' }}>
                       施工单位
                       <Icon
                         type="plus"
                         style={{
-                          color: "#1890ff"
+                          color: '#1890ff'
                         }}
                         onClick={() => {
-                          emitter.emit("showCreateDepart", {
+                          emitter.emit('showCreateDepart', {
                             show: true,
-                            key: "constructionDepartmentId"
+                            key: 'constructionDepartmentId'
                           });
-                          setFieldsValue({ constructionDepartmentId: "" });
+                          setFieldsValue({ constructionDepartmentId: '' });
                         }}
                       />
                     </span>
                   }
                 >
-                  {getFieldDecorator("constructionDepartmentId", {
+                  {getFieldDecorator('constructionDepartmentId', {
                     initialValue: this.getDepart(
                       projectItem.constructionDepartment,
-                      "id"
+                      'id'
                     )
                   })(
                     <Select
@@ -1317,7 +1314,7 @@ export default class projectDetail extends PureComponent {
                         this.queryDepartList(v);
                       }}
                       onBlur={() => {
-                        this.getDepartList("constructionDepartmentId");
+                        this.getDepartList('constructionDepartmentId');
                       }}
                       onSelect={() => {
                         this.setState({ isSelect: true });
@@ -1335,28 +1332,28 @@ export default class projectDetail extends PureComponent {
               <Col span={12}>
                 <Form.Item
                   label={
-                    <span style={{ userSelect: "none" }}>
+                    <span style={{ userSelect: 'none' }}>
                       验收报告单位
                       <Icon
                         type="plus"
                         style={{
-                          color: "#1890ff"
+                          color: '#1890ff'
                         }}
                         onClick={() => {
-                          emitter.emit("showCreateDepart", {
+                          emitter.emit('showCreateDepart', {
                             show: true,
-                            key: "reportDepartmentId"
+                            key: 'reportDepartmentId'
                           });
-                          setFieldsValue({ reportDepartmentId: "" });
+                          setFieldsValue({ reportDepartmentId: '' });
                         }}
                       />
                     </span>
                   }
                 >
-                  {getFieldDecorator("reportDepartmentId", {
+                  {getFieldDecorator('reportDepartmentId', {
                     initialValue: this.getDepart(
                       projectItem.reportDepartment,
-                      "id"
+                      'id'
                     )
                   })(
                     <Select
@@ -1374,7 +1371,7 @@ export default class projectDetail extends PureComponent {
                         this.queryDepartList(v);
                       }}
                       onBlur={() => {
-                        this.getDepartList("reportDepartmentId");
+                        this.getDepartList('reportDepartmentId');
                       }}
                       onSelect={() => {
                         this.setState({ isSelect: true });
@@ -1392,28 +1389,28 @@ export default class projectDetail extends PureComponent {
               <Divider />
               <Col span={12}>
                 <Form.Item label="项目变更信息">
-                  {getFieldDecorator("changeInfo", {
+                  {getFieldDecorator('changeInfo', {
                     initialValue: projectItem.expand.changeInfo
                   })(<Input.TextArea autosize />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="变更原因">
-                  {getFieldDecorator("changeReason", {
+                  {getFieldDecorator('changeReason', {
                     initialValue: projectItem.expand.changeReason
                   })(<Input.TextArea autosize />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="变更时间">
-                  {getFieldDecorator("changeTime", {
+                  {getFieldDecorator('changeTime', {
                     initialValue: dateInitFormat(projectItem.expand.changeTime)
                   })(<DatePicker placeholder="" style={{ width: 130 }} />)}
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item label="原项目名称">
-                  {getFieldDecorator("originalProjectName", {
+                  {getFieldDecorator('originalProjectName', {
                     initialValue: projectItem.expand.originalProjectName
                   })(<Input />)}
                 </Form.Item>

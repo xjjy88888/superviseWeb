@@ -1931,7 +1931,7 @@ export default class sider extends PureComponent {
                 }}
                 onClick={() => {
                   if (projectEdit) {
-                    //submit
+                    // submit
                     this.props.form.validateFields((err, v) => {
                       if (!err) {
                         console.log(v);
@@ -1951,7 +1951,8 @@ export default class sider extends PureComponent {
                               : '',
                           id: isProjectUpdate ? projectItem.id : '',
                           isNeedPlan: v.isNeedPlan ? true : false,
-                          isReply: v.isReply ? true : false
+                          isReply: v.isReply ? true : false,
+                          isProjectSupervise
                         };
                         emitter.emit('projectCreateUpdate', data);
                       } else {
