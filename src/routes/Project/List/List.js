@@ -44,7 +44,8 @@ export default class projectSupervision extends PureComponent {
       IsExclusive: true,
       ProjectShowArchive: false,
       isRecycleBin: false,
-      isImport: false
+      isImport: false,
+      selectedRows: []
     };
   }
 
@@ -129,6 +130,22 @@ export default class projectSupervision extends PureComponent {
         this.setState({ loading: false });
         if (success) {
           this.refresh();
+        }
+      }
+    });
+  };
+
+  projectImport = payload => {
+    const { dispatch } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: 'projectSupervise/projectImport',
+      payload,
+      callback: (success, result) => {
+        this.setState({ loading: false });
+        if (success) {
+          this.refresh();
+          this.setState({ selectedRows: [] });
         }
       }
     });
@@ -251,10 +268,16 @@ export default class projectSupervision extends PureComponent {
       loading,
       showAdd,
       isRecycleBin,
-      isImport
+      isImport,
+      selectedRows
     } = this.state;
 
-    const rowSelection = {};
+    const rowSelection = {
+      onChange: (selectedRowKeys, selectedRows) => {
+        console.log(selectedRowKeys, selectedRows, 111111);
+        this.setState({ selectedRows: selectedRowKeys });
+      }
+    };
 
     const columns = [
       {
@@ -417,74 +440,77 @@ export default class projectSupervision extends PureComponent {
         width: 120,
         sorter: (a, b) => a.coordinate.length - b.coordinate.length
       },
-      {
-        title: '项目源',
-        dataIndex: 'isShared',
-        key: 'isShared',
-        fixed: 'right',
-        width: 50,
-        render: i => (
-          <Tag color={i ? 'volcano' : 'cyan'}> {i ? '共享' : '独有'}</Tag>
-        )
-      },
-      {
-        title: '操作',
-        dataIndex: 'entry_name',
-        key: 'entry_name',
-        fixed: 'right',
-        width: 150,
-        render: (i, record) => {
-          const text = isRecycleBin
-            ? `永久删除`
-            : record.isShared
-            ? `移除`
-            : `删除`;
-          return (
-            <span>
-              {record.isShared ? null : (
-                <a
-                  style={{ margin: 8 }}
-                  onClick={() => {
-                    Modal.confirm({
-                      title: `共享`,
-                      content: `是否确定要共享吗？`,
-                      okText: '是',
-                      cancelText: '否',
-                      okType: 'danger',
-                      onOk() {
-                        self.projectShare([record.id]);
-                      }
-                    });
-                  }}
-                >
-                  共享
-                </a>
-              )}
-              <a
-                style={{ margin: 8 }}
-                onClick={() => {
-                  Modal.confirm({
-                    title: text,
-                    content: `是否确定要${text}吗？`,
-                    okText: '是',
-                    cancelText: '否',
-                    okType: 'danger',
-                    onOk() {
-                      if (isRecycleBin) {
-                        self.projectDelete({ id: record.id });
-                      } else {
-                        self.projectSuperviseDelete(record.id);
-                      }
-                    }
-                  });
-                }}
-              >
-                {text}
-              </a>
-            </span>
-          );
-        }
-      }
+      !isImport
+        ? {
+            title: '项目源',
+            dataIndex: 'isShared',
+            fixed: 'right',
+            width: 50,
+            render: i => (
+              <Tag color={i ? 'volcano' : 'cyan'}> {i ? '共享' : '独有'}</Tag>
+            )
+          }
+        : {},
+      !isImport
+        ? {
+            title: '操作',
+            dataIndex: 'entry_name',
+            key: 'entry_name',
+            fixed: 'right',
+            width: 150,
+            render: (i, record) => {
+              const text = isRecycleBin
+                ? `永久删除`
+                : record.isShared
+                ? `移除`
+                : `删除`;
+              return (
+                <span>
+                  {record.isShared ? null : (
+                    <a
+                      style={{ margin: 8 }}
+                      onClick={() => {
+                        Modal.confirm({
+                          title: `共享`,
+                          content: `是否确定要共享吗？`,
+                          okText: '是',
+                          cancelText: '否',
+                          okType: 'danger',
+                          onOk() {
+                            self.projectShare(record.id);
+                          }
+                        });
+                      }}
+                    >
+                      共享
+                    </a>
+                  )}
+                  <a
+                    style={{ margin: 8 }}
+                    onClick={() => {
+                      Modal.confirm({
+                        title: text,
+                        content: `是否确定要${text}吗？`,
+                        okText: '是',
+                        cancelText: '否',
+                        okType: 'danger',
+                        onOk() {
+                          if (isRecycleBin) {
+                            self.projectDelete({ id: record.id });
+                          } else {
+                            self.projectSuperviseDelete(record.id);
+                          }
+                        }
+                      });
+                    }}
+                  >
+                    {text}
+                  </a>
+                </span>
+              );
+            }
+          }
+        : {}
     ];
 
     return (
@@ -513,6 +539,28 @@ export default class projectSupervision extends PureComponent {
                 }}
               >
                 共享导入
+              </Button>
+              <Button
+                style={{
+                  display: isImport ? 'inline' : 'none',
+                  marginLeft: 30
+                }}
+                disabled={!selectedRows.length}
+                icon="check"
+                onClick={() => {
+                  Modal.confirm({
+                    title: `导入`,
+                    content: `是否确定要导入吗？`,
+                    okText: '是',
+                    cancelText: '否',
+                    okType: 'danger',
+                    onOk() {
+                      self.projectImport(selectedRows);
+                    }
+                  });
+                }}
+              >
+                确定导入
               </Button>
             </span>
             <span style={{ float: 'right' }}>
@@ -565,7 +613,7 @@ export default class projectSupervision extends PureComponent {
             <Table
               columns={columns}
               dataSource={dataSource}
-              rowSelection={rowSelection}
+              rowSelection={isImport ? rowSelection : null}
               rowKey={record => record.id}
               onChange={this.handleTableChange}
               pagination={pagination}

@@ -402,7 +402,9 @@ const config = {
 
     projectSuperviseDeleteUrl: `${domainApi}ProjectRegulation/Delete`,
 
-    projectShareUrl: `${domainApi}Project/SetShareds`
+    projectImportUrl: `${domainApi}Project/SetShareds`,
+
+    projectShareUrl: `${domainApi}ProjectRegulation/SetShared`
   },
 
   //工具箱

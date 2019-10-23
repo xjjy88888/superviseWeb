@@ -4,7 +4,7 @@ import {
   projectSuperviseCreateUpdateApi,
   projectSuperviseDeleteApi,
   projectListApi,
-  projectShareApi
+  projectShareApi,projectImportApi
 } from '../services/httpApi';
 
 export default {
@@ -74,7 +74,7 @@ export default {
         data: { success }
       } = yield call(projectSuperviseCreateUpdateApi, payload);
       notification[success ? 'success' : 'error']({
-        message: `${payload.id ? '编辑' : '新建'}项目${
+        message: `${payload.id ? '编辑' : '新建'}${
           success ? '成功' : '失败'
         }`
       });
@@ -86,7 +86,7 @@ export default {
         data: { success }
       } = yield call(projectSuperviseDeleteApi, payload);
       notification[success ? 'success' : 'error']({
-        message: `删除项目${success ? '成功' : '失败'}`
+        message: `删除${success ? '成功' : '失败'}`
       });
       if (callback) callback(success);
     },
@@ -96,10 +96,20 @@ export default {
         data: { success }
       } = yield call(projectShareApi, payload);
       notification[success ? 'success' : 'error']({
-        message: `项目共享${success ? '成功' : '失败'}`
+        message: `共享${success ? '成功' : '失败'}`
       });
       if (callback) callback(success);
-    }
+    },
+
+    *projectImport({ payload, callback }, { call, put }) {
+      const {
+        data: { success }
+      } = yield call(projectImportApi, payload);
+      notification[success ? 'success' : 'error']({
+        message: `导入${success ? '成功' : '失败'}`
+      });
+      if (callback) callback(success);
+    },
   },
 
   reducers: {

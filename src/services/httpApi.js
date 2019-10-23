@@ -1330,8 +1330,17 @@ export async function projectSuperviseDeleteApi(id) {
   });
 }
 
-export async function projectShareApi(params) {
-  return request(`${config.url.projectShareUrl}`, {
+export async function projectShareApi(id) {
+  return request(`${config.url.projectShareUrl}?Id=${id}`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    },
+  });
+}
+
+export async function projectImportApi(params) {
+  return request(`${config.url.projectImportUrl}`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken()}`,
