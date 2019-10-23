@@ -119,6 +119,21 @@ export default class projectSupervision extends PureComponent {
     });
   };
 
+  projectShare = payload => {
+    const { dispatch } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: 'projectSupervise/projectShare',
+      payload,
+      callback: (success, result) => {
+        this.setState({ loading: false });
+        if (success) {
+          this.refresh();
+        }
+      }
+    });
+  };
+
   handleTableChange = (pagination, filters, sorter) => {
     console.log(pagination, filters, sorter);
     const Sorting = `${
@@ -426,13 +441,31 @@ export default class projectSupervision extends PureComponent {
             : `删除`;
           return (
             <span>
-              {record.isShared ? null : <a style={{ margin: 8 }}>共享</a>}
+              {record.isShared ? null : (
+                <a
+                  style={{ margin: 8 }}
+                  onClick={() => {
+                    Modal.confirm({
+                      title: `共享`,
+                      content: `是否确定要共享吗？`,
+                      okText: '是',
+                      cancelText: '否',
+                      okType: 'danger',
+                      onOk() {
+                        self.projectShare([record.id]);
+                      }
+                    });
+                  }}
+                >
+                  共享
+                </a>
+              )}
               <a
                 style={{ margin: 8 }}
                 onClick={() => {
                   Modal.confirm({
                     title: text,
-                    content: `是否确定要${text}`,
+                    content: `是否确定要${text}吗？`,
                     okText: '是',
                     cancelText: '否',
                     okType: 'danger',
@@ -442,8 +475,7 @@ export default class projectSupervision extends PureComponent {
                       } else {
                         self.projectSuperviseDelete(record.id);
                       }
-                    },
-                    onCancel() {}
+                    }
                   });
                 }}
               >
@@ -481,16 +513,6 @@ export default class projectSupervision extends PureComponent {
                 }}
               >
                 共享导入
-              </Button>
-              <Button
-                icon="plus"
-                style={{ marginLeft: 20 }}
-                onClick={() => {
-                  this.setState({ showAdd: true });
-                  this.add.reset();
-                }}
-              >
-                新建项目
               </Button>
             </span>
             <span style={{ float: 'right' }}>
@@ -536,12 +558,6 @@ export default class projectSupervision extends PureComponent {
               </Button>
               <Button icon="reload" style={{ marginLeft: 20 }}>
                 重置
-              </Button>
-              <Button icon="shopping" style={{ marginLeft: 20 }}>
-                工具箱
-              </Button>
-              <Button icon="desktop" style={{ marginLeft: 20 }}>
-                控制台
               </Button>
             </span>
           </Content>

@@ -400,7 +400,9 @@ const config = {
 
     projectSuperviseUrl: `${domainApi}ProjectRegulation/`,
 
-    projectSuperviseDeleteUrl: `${domainApi}ProjectRegulation/Delete`
+    projectSuperviseDeleteUrl: `${domainApi}ProjectRegulation/Delete`,
+
+    projectShareUrl: `${domainApi}Project/SetShareds`
   },
 
   //工具箱

@@ -3,7 +3,8 @@ import {
   projectSuperviseListApi,
   projectSuperviseCreateUpdateApi,
   projectSuperviseDeleteApi,
-  projectListApi
+  projectListApi,
+  projectShareApi
 } from '../services/httpApi';
 
 export default {
@@ -86,6 +87,16 @@ export default {
       } = yield call(projectSuperviseDeleteApi, payload);
       notification[success ? 'success' : 'error']({
         message: `删除项目${success ? '成功' : '失败'}`
+      });
+      if (callback) callback(success);
+    },
+
+    *projectShare({ payload, callback }, { call, put }) {
+      const {
+        data: { success }
+      } = yield call(projectShareApi, payload);
+      notification[success ? 'success' : 'error']({
+        message: `项目共享${success ? '成功' : '失败'}`
       });
       if (callback) callback(success);
     }

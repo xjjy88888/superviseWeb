@@ -1329,3 +1329,14 @@ export async function projectSuperviseDeleteApi(id) {
     }
   });
 }
+
+export async function projectShareApi(params) {
+  return request(`${config.url.projectShareUrl}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      'Content-Type': 'application/json-patch+json'
+    },
+    body: JSON.stringify(params)
+  });
+}
