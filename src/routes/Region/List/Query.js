@@ -277,7 +277,7 @@ export default class Query extends PureComponent {
                 </Select>
               )}
             </Form.Item>
-            <Form.Item label="项目合规性" {...formItemLayout}>
+            <Form.Item label="扰动合规性" {...formItemLayout}>
               {getFieldDecorator('Compliance', { initialValue: [] })(
                 <Select mode="multiple" style={{ width: '100%' }}>
                   {this.getDictList('扰动合规性').map(item => (

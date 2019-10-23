@@ -12,7 +12,7 @@ import {
   Tag,
   Modal
 } from 'antd';
-// import Highlighter from 'react-highlight-words';
+import Highlighter from 'react-highlight-words';
 import config from '../../../config';
 import Layouts from '../../../components/Layouts';
 import Add from './Add';
@@ -22,9 +22,11 @@ import { Link } from 'dva/router';
 const { Content } = Layout;
 let self;
 
-@connect(({ projectSupervise, project }) => ({
+@connect(({ projectSupervise, project, user, district }) => ({
   projectSupervise,
-  project
+  project,
+  user,
+  district
 }))
 @createForm()
 export default class projectSupervision extends PureComponent {
@@ -54,6 +56,8 @@ export default class projectSupervision extends PureComponent {
   componentDidMount() {
     self = this;
     this.refresh();
+    this.queryDict();
+    this.districtTree();
   }
 
   refresh = () => {
@@ -86,9 +90,31 @@ export default class projectSupervision extends PureComponent {
         pagination.total = result.totalCount;
         this.setState({
           loading: false,
-          dataSource: result.items,
+          dataSource: result.items.map(i => {
+            return {
+              ...i,
+              productDepartmentName: i.productDepartmentName || ``
+            };
+          }),
           pagination
         });
+      }
+    });
+  };
+
+  queryDict = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'user/queryDict'
+    });
+  };
+
+  districtTree = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'district/districtTree',
+      payload: {
+        IsFilter: false
       }
     });
   };
@@ -111,20 +137,20 @@ export default class projectSupervision extends PureComponent {
 
   handleTableChange = (pagination, filters, sorter) => {
     console.log(pagination, filters, sorter);
-    const Sorting = `${
-      sorter.columnKey
-        ? `${sorter.columnKey === 'name' ? 'userName' : sorter.columnKey} ${
-            sorter.order === 'descend' ? 'desc' : 'asc'
-          }`
-        : ``
-    }`;
     this.setState({
       pagination: pagination
     });
     this.projectSuperviseList({
       SkipCount: (pagination.current - 1) * pagination.pageSize,
       MaxResultCount: pagination.pageSize,
-      Sorting
+      projectName:
+        filters.projectName && filters.projectName.length
+          ? filters.projectName[0]
+          : ``,
+      productDepartment:
+        filters.productDepartmentName && filters.productDepartmentName.length
+          ? filters.productDepartmentName[0]
+          : ``
     });
   };
 
@@ -199,14 +225,6 @@ export default class projectSupervision extends PureComponent {
         setTimeout(() => this.searchInput.select());
       }
     }
-    // render: text => (
-    //   <Highlighter
-    //     highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-    //     searchWords={[this.state.searchText]}
-    //     autoEscape
-    //     textToHighlight={text.toString()}
-    //   />
-    // )
   });
 
   handleSearch = (selectedKeys, confirm) => {
@@ -217,6 +235,31 @@ export default class projectSupervision extends PureComponent {
   handleReset = clearFilters => {
     clearFilters();
     this.setState({ searchText: '' });
+  };
+
+  getDictLabel = id => {
+    const {
+      user: { dicList }
+    } = this.props;
+    let result = ``;
+    if (id) {
+      const filter = dicList.filter(item => item.id === id);
+      result = filter.map(item => item.dictTableValue).join(',');
+    }
+    return result;
+  };
+
+  getDistrictLabel = ids => {
+    const {
+      district: { districtList }
+    } = this.props;
+    let result = ``;
+    const arr = ids ? ids.split(`,`) : [];
+    if (arr.length) {
+      const filter = districtList.filter(item => arr.indexOf(item.id) !== -1);
+      result = filter.map(item => item.name).join(',');
+    }
+    return result;
   };
 
   render() {
@@ -248,7 +291,7 @@ export default class projectSupervision extends PureComponent {
         dataIndex: 'projectName',
         key: 'projectName',
         fixed: 'left',
-        width: 400,
+        width: 420,
         ...this.getColumnSearchProps('projectName'),
         render: (i, item) => (
           <Link to={'/region?from=project&id=' + item.id}>
@@ -260,7 +303,6 @@ export default class projectSupervision extends PureComponent {
         title: '建设单位',
         dataIndex: 'productDepartmentName',
         key: 'productDepartmentName',
-        // fixed: 'left',
         width: 300,
         ...this.getColumnSearchProps('productDepartmentName')
       },
@@ -268,144 +310,101 @@ export default class projectSupervision extends PureComponent {
         title: '批复机构',
         dataIndex: 'replyDepartmentName',
         key: 'replyDepartmentName',
-        // fixed: 'left',
-        width: 120,
-        ...this.getColumnSearchProps('replyDepartmentName')
+        width: 120
       },
       {
         title: '监管单位',
-        dataIndex: 'supervision_unit',
-        key: 'supervision_unit',
-        width: 120,
-        ...this.getColumnSearchProps('supervision_unit')
+        dataIndex: 'supDepartmentName',
+        key: 'supDepartmentName',
+        width: 120
       },
       {
         title: '立项级别',
-        dataIndex: 'approval_level',
+        dataIndex: 'projectLevelId',
+        key: 'projectLevelId',
         width: 120,
-        filters: config.approval_level.map(item => {
-          return {
-            text: item,
-            value: item
-          };
-        }),
-        onFilter: (value, record) => record.approval_level.indexOf(value) === 0
+        render: i => this.getDictLabel(i)
       },
       {
         title: '批复文号',
-        dataIndex: 'approval_number',
-        key: 'approval_number',
-        width: 120,
-        sorter: (a, b) => a.approval_number.length - b.approval_number.length
+        dataIndex: 'replyNum',
+        key: 'replyNum',
+        width: 200
       },
       {
         title: '批复时间',
-        dataIndex: 'approval_time',
-        key: 'approval_time',
-        width: 120,
-        sorter: (a, b) => a.approval_time.length - b.approval_time.length
+        dataIndex: 'replyTime',
+        key: 'replyTime',
+        width: 120
       },
       {
-        title: '项目合规性',
-        dataIndex: 'compliance',
-        key: 'compliance',
-        width: 130,
-        filters: config.compliance.map(item => {
-          return {
-            text: item,
-            value: item
-          };
-        }),
-        onFilter: (value, record) => record.compliance.indexOf(value) === 0
+        title: '扰动合规性',
+        dataIndex: 'complianceId',
+        key: 'complianceId',
+        width: 150,
+        render: i => this.getDictLabel(i)
       },
       {
         title: '项目类型',
-        dataIndex: 'project_type',
-        key: 'project_type',
+        dataIndex: 'projectTypeId',
+        key: 'projectTypeId',
         width: 120,
-        filters: config.project_type.map(item => {
-          return {
-            text: item,
-            value: item
-          };
-        }),
-        onFilter: (value, record) => record.project_type.indexOf(value) === 0
+        render: i => this.getDictLabel(i)
       },
       {
         title: '项目类别',
-        dataIndex: 'project_category',
-        key: 'project_category',
+        dataIndex: 'projectCateId',
+        key: 'projectCateId',
         width: 120,
-        filters: config.project_category.map(item => {
-          return {
-            text: item,
-            value: item
-          };
-        }),
-        onFilter: (value, record) =>
-          record.project_category.indexOf(value) === 0
+        render: i => this.getDictLabel(i)
       },
       {
         title: '项目性质',
-        dataIndex: 'project_nature',
-        key: 'project_nature',
+        dataIndex: 'projectNatId',
+        key: 'projectNatId',
         width: 120,
-        filters: config.project_nature.map(item => {
-          return {
-            text: item,
-            value: item
-          };
-        }),
-        onFilter: (value, record) => record.project_nature.indexOf(value) === 0
+        render: i => this.getDictLabel(i)
       },
       {
         title: '建设状态',
-        dataIndex: 'construct_state',
-        key: 'construct_state',
+        dataIndex: 'projectStatusId',
+        key: 'projectStatusId',
         width: 120,
-        filters: config.construct_state.map(item => {
-          return {
-            text: item,
-            value: item
-          };
-        }),
-        onFilter: (value, record) => record.construct_state.indexOf(value) === 0
-      },
-      {
-        title: '红线数据',
-        dataIndex: 'red_line',
-        key: 'red_line',
-        width: 120,
-        sorter: (a, b) => a.red_line.length - b.red_line.length
-      },
-      {
-        title: '扰动图斑',
-        dataIndex: 'perturbation_plot',
-        key: 'perturbation_plot',
-        width: 120,
-        sorter: (a, b) =>
-          a.perturbation_plot.length - b.perturbation_plot.length
+        render: i => this.getDictLabel(i)
       },
       {
         title: '涉及县',
-        dataIndex: 'related_counties',
-        key: 'related_counties',
-        width: 120,
-        sorter: (a, b) => a.related_counties.length - b.related_counties.length
+        dataIndex: 'districtCodes',
+        key: 'districtCodes',
+        width: 200,
+        render: i => {
+          const text = this.getDistrictLabel(i);
+          return (
+            <span title={text}>
+              {text.slice(0, 11)}
+              {text.length > 11 ? `...` : ``}
+            </span>
+          );
+        }
       },
       {
         title: '地址',
-        dataIndex: 'address',
-        key: 'address',
-        width: 120,
-        sorter: (a, b) => a.address.length - b.address.length
+        dataIndex: 'addressInfo',
+        key: 'addressInfo',
+        width: 120
       },
       {
         title: '坐标',
         dataIndex: 'coordinate',
         key: 'coordinate',
         width: 120,
-        sorter: (a, b) => a.coordinate.length - b.coordinate.length
+        render: (i, item) =>
+          item.pointX &&
+          item.pointY &&
+          item.pointX !== `0` &&
+          item.pointY !== `0`
+            ? item.pointX + `，` + item.pointY
+            : ``
       },
       !isImport
         ? {

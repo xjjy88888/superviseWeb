@@ -1,7 +1,7 @@
 /* eslint-disable array-callback-return */
-import React, { PureComponent } from "react";
-import { createForm } from "rc-form";
-import { connect } from "dva";
+import React, { PureComponent } from 'react';
+import { createForm } from 'rc-form';
+import { connect } from 'dva';
 import {
   Icon,
   Button,
@@ -15,13 +15,13 @@ import {
   DatePicker,
   Form,
   message
-} from "antd";
-import locale from "antd/lib/date-picker/locale/zh_CN";
-import emitter from "../../../utils/event";
-import config from "../../../config";
-import { getFile, accessToken } from "../../../utils/util";
-import moment from "moment";
-import Spins from "../../../components/Spins";
+} from 'antd';
+import locale from 'antd/lib/date-picker/locale/zh_CN';
+import emitter from '../../../utils/event';
+import config from '../../../config';
+import { getFile, accessToken } from '../../../utils/util';
+import moment from 'moment';
+import Spins from '../../../components/Spins';
 
 let self;
 const { TextArea } = Input;
@@ -46,17 +46,17 @@ export default class siderbarDetail extends PureComponent {
     super(props);
     this.state = {
       show: false,
-      from: "spot",
+      from: 'spot',
       ParentId: 0,
       edit: false,
-      polygon: "",
+      polygon: '',
       isSpotUpdate: true,
-      item: { project_id: "" },
+      item: { project_id: '' },
       fileList: [],
       fromList: false,
       showSpotHistory: false,
-      spotHistoryId: "",
-      panoramaUrlConfig: "",
+      spotHistoryId: '',
+      panoramaUrlConfig: '',
       showSpin: false
     };
     this.map = null;
@@ -73,17 +73,17 @@ export default class siderbarDetail extends PureComponent {
     const {
       form: { resetFields, setFieldsValue }
     } = this.props;
-    this.eventEmitter = emitter.addListener("screenshotBack", v => {
-      console.log("屏幕截图", v);
+    this.eventEmitter = emitter.addListener('screenshotBack', v => {
+      console.log('屏幕截图', v);
       if (v.img) {
         this.annexUploadBase64(v);
       } else {
-        notification["warning"]({
+        notification['warning']({
           message: `未获取到数据，请重新截图`
         });
       }
     });
-    this.eventEmitter = emitter.addListener("siteLocationBack", data => {
+    this.eventEmitter = emitter.addListener('siteLocationBack', data => {
       this.props.form.setFieldsValue({
         pointX: data.longitude, //经度
         pointX_pano: data.longitude, //经度
@@ -91,7 +91,7 @@ export default class siderbarDetail extends PureComponent {
         pointY_pano: data.latitude //维度
       });
     });
-    this.eventEmitter = emitter.addListener("showSiderbarDetail", data => {
+    this.eventEmitter = emitter.addListener('showSiderbarDetail', data => {
       resetFields();
       this.setState({
         ParentId: 0,
@@ -100,13 +100,13 @@ export default class siderbarDetail extends PureComponent {
         show: data.show,
         edit: data.edit,
         projectId: data.projectId,
-        isSpotUpdate: data.type === "edit",
+        isSpotUpdate: data.type === 'edit',
         from: data.from, //spot  point
         item: data.item || {},
         type: data.type, //add  edit
         previewVisible_min: false,
         fromList: data.fromList,
-        panoramaUrlConfig: data.from === "panorama" ? data.item.urlConfig : ""
+        panoramaUrlConfig: data.from === 'panorama' ? data.item.urlConfig : ''
       });
       if (data.projectId && data.projectName) {
         this.setState({
@@ -114,36 +114,36 @@ export default class siderbarDetail extends PureComponent {
         });
         setFieldsValue({ projectIdSpot: data.projectId });
       }
-      if (data.type !== "add" && data.id) {
-        if (data.from === "spot") {
+      if (data.type !== 'add' && data.id) {
+        if (data.from === 'spot') {
           this.querySpotById(data.id);
-        } else if (data.from === "point") {
+        } else if (data.from === 'point') {
           this.queryPointById(data.id);
-        } else if (data.from === "redLine") {
+        } else if (data.from === 'redLine') {
           this.queryRedLineById(data.id);
         }
       }
     });
-    this.eventEmitter = emitter.addListener("showProjectSpotInfo", data => {
+    this.eventEmitter = emitter.addListener('showProjectSpotInfo', data => {
       console.log(data);
-      emitter.emit("showSiderbar", {
+      emitter.emit('showSiderbar', {
         show: true
       });
-      if (data.from !== "project") {
+      if (data.from !== 'project') {
         resetFields();
         this.setState({
           show: data.show,
           edit: data.edit,
-          isSpotUpdate: data.type === "edit",
+          isSpotUpdate: data.type === 'edit',
           from: data.from, //spot  point
           item: data.item || {},
           type: data.type, //add  edit
           previewVisible_min: false
         });
-        if (data.show && data.type !== "add" && data.id) {
-          if (data.from === "spot") {
+        if (data.show && data.type !== 'add' && data.id) {
+          if (data.from === 'spot') {
             this.querySpotById(data.id);
-          } else if (data.from === "point") {
+          } else if (data.from === 'point') {
             this.queryPointById(data.id);
           }
         }
@@ -155,13 +155,13 @@ export default class siderbarDetail extends PureComponent {
     const { dispatch } = this.props;
     const { ParentId, fileList } = this.state;
     dispatch({
-      type: "annex/annexUploadBase64Api",
+      type: 'annex/annexUploadBase64Api',
       payload: {
         Id: ParentId,
-        "FileBase64.FileName": Math.random()
+        'FileBase64.FileName': Math.random()
           .toString(36)
           .substr(2),
-        "FileBase64.Base64": v.img,
+        'FileBase64.Base64': v.img,
         Longitude: v.longitude,
         Latitude: v.latitude,
         Azimuth: 0
@@ -178,11 +178,11 @@ export default class siderbarDetail extends PureComponent {
             longitude: item.longitude,
             azimuth: item.azimuth,
             fileExtend: item.fileExtend,
-            status: "done"
+            status: 'done'
           };
           this.setState({ fileList: [...fileList, obj] });
         } else {
-          notification["error"]({
+          notification['error']({
             message: `屏幕截图上传失败：${error.message}`
           });
         }
@@ -192,22 +192,22 @@ export default class siderbarDetail extends PureComponent {
 
   querySpotById = (id, isHistory) => {
     const { dispatch } = this.props;
-    this.queryDetail(id, "spot/querySpotById");
+    this.queryDetail(id, 'spot/querySpotById');
     if (!isHistory) {
       this.setState({ spotHistoryId: id });
       dispatch({
-        type: "spot/spotHistory",
+        type: 'spot/spotHistory',
         payload: { id: id }
       });
     }
   };
 
   queryPointById = id => {
-    this.queryDetail(id, "point/queryPointById");
+    this.queryDetail(id, 'point/queryPointById');
   };
 
   queryRedLineById = id => {
-    this.queryDetail(id, "redLine/queryredLineById");
+    this.queryDetail(id, 'redLine/queryredLineById');
   };
 
   queryDetail = (id, url) => {
@@ -230,7 +230,7 @@ export default class siderbarDetail extends PureComponent {
               latitude: item.latitude,
               longitude: item.longitude,
               azimuth: item.azimuth,
-              status: "done"
+              status: 'done'
             };
           });
           this.setState({ fileList: list });
@@ -262,9 +262,9 @@ export default class siderbarDetail extends PureComponent {
       const filter = dicList.filter(item => {
         return item.dictTypeName === type && item.dictTableValue === value;
       });
-      return filter.map(item => item.id).join(",");
+      return filter.map(item => item.id).join(',');
     } else {
-      return "";
+      return '';
     }
   };
 
@@ -286,7 +286,7 @@ export default class siderbarDetail extends PureComponent {
       if (!err) {
         console.log(v);
         dispatch({
-          type: "spot/spotCreateUpdate",
+          type: 'spot/spotCreateUpdate',
           payload: {
             ...v,
             projectId: v.projectIdSpot,
@@ -296,24 +296,24 @@ export default class siderbarDetail extends PureComponent {
             districtCodeId:
               v.districtCodeId && v.districtCodeId.length
                 ? v.districtCodeId.pop()
-                : "",
-            id: type === "edit" ? spotInfo.id : "",
+                : '',
+            id: type === 'edit' ? spotInfo.id : '',
             interBatch: String(v.interBatch1) + String(v.interBatch2)
           },
           callback: (success, response) => {
-            emitter.emit("deleteDraw", {});
+            emitter.emit('deleteDraw', {});
             if (success) {
-              notification["success"]({
-                message: `${type === "edit" ? "编辑" : "新建"}图斑成功`
+              notification['success']({
+                message: `${type === 'edit' ? '编辑' : '新建'}图斑成功`
               });
               this.setState({ show: false });
               if (fromList) {
-                emitter.emit("deleteSuccess", {
+                emitter.emit('deleteSuccess', {
                   success: true
                 });
               } else {
                 resetFields();
-                emitter.emit("projectInfoRefresh", {
+                emitter.emit('projectInfoRefresh', {
                   projectId: projectId
                 });
               }
@@ -321,7 +321,7 @@ export default class siderbarDetail extends PureComponent {
           }
         });
       } else {
-        notification["warning"]({
+        notification['warning']({
           message: err.mapNum.errors[0].message
         });
       }
@@ -391,7 +391,7 @@ export default class siderbarDetail extends PureComponent {
 
     const spotItem = isSpotUpdate
       ? spotInfo
-      : { mapNum: "", provinceCityDistrict: [null, null, null] };
+      : { mapNum: '', provinceCityDistrict: [null, null, null] };
 
     const pointItem = isSpotUpdate ? pointInfo : {};
 
@@ -418,30 +418,30 @@ export default class siderbarDetail extends PureComponent {
               longitude: item.longitude,
               azimuth: item.azimuth,
               fileExtend: item.fileExtend,
-              status: "done"
+              status: 'done'
             };
             this.setState({
               fileList: [...fileList, obj]
             });
           }}
           onError={(v, response) => {
-            notification["error"]({
+            notification['error']({
               message: `附件上传失败：${response.error.message}`
             });
           }}
           onPreview={file => {
             console.log(file.fileExtend, file);
             switch (file.fileExtend) {
-              case "pdf":
+              case 'pdf':
                 window.open(file.url);
                 break;
-              case "doc":
-              case "docx":
-              case "xls":
-              case "xlsx":
-              case "ppt":
-              case "pptx":
-                window.open(file.url + "&isDown=true");
+              case 'doc':
+              case 'docx':
+              case 'xls':
+              case 'xlsx':
+              case 'ppt':
+              case 'pptx':
+                window.open(file.url + '&isDown=true');
                 break;
               default:
                 this.setState({
@@ -449,7 +449,7 @@ export default class siderbarDetail extends PureComponent {
                   previewVisible_min: true
                 });
                 if (file.latitude || file.longitude) {
-                  emitter.emit("imgLocation", {
+                  emitter.emit('imgLocation', {
                     Latitude: file.latitude,
                     Longitude: file.longitude,
                     direction: file.azimuth,
@@ -465,7 +465,7 @@ export default class siderbarDetail extends PureComponent {
             const data = fileList.map(item => {
               return {
                 ...item,
-                status: "done"
+                status: 'done'
               };
             });
             this.setState({ fileList: data });
@@ -474,7 +474,7 @@ export default class siderbarDetail extends PureComponent {
             return new Promise((resolve, reject) => {
               if (edit) {
                 dispatch({
-                  type: "annex/annexDelete",
+                  type: 'annex/annexDelete',
                   payload: {
                     FileId: file.uid,
                     Id: spotItem.attachment ? spotItem.attachment.id : ParentId
@@ -489,7 +489,7 @@ export default class siderbarDetail extends PureComponent {
                 });
               } else {
                 reject();
-                notification["info"]({
+                notification['info']({
                   message: `请先开始编辑图斑`
                 });
               }
@@ -506,7 +506,7 @@ export default class siderbarDetail extends PureComponent {
                   icon="picture"
                   onClick={e => {
                     e.stopPropagation();
-                    emitter.emit("screenshot", {
+                    emitter.emit('screenshot', {
                       show: true
                     });
                   }}
@@ -527,11 +527,11 @@ export default class siderbarDetail extends PureComponent {
           width: 400,
           backgroundColor: `#fff`,
           borderLeft: `solid 1px #ddd`,
-          position: "absolute",
+          position: 'absolute',
           zIndex: 1000,
           top: 0,
           paddingTop: 46,
-          height: "100%"
+          height: '100%'
         }}
       >
         <Spins show={showSpin} />
@@ -539,7 +539,7 @@ export default class siderbarDetail extends PureComponent {
           type="left"
           style={{
             fontSize: 30,
-            display: show ? "block" : "none",
+            display: show ? 'block' : 'none',
             position: `absolute`,
             right: -50,
             top: `48%`,
@@ -554,29 +554,29 @@ export default class siderbarDetail extends PureComponent {
         />
         <p
           style={{
-            float: "right",
-            position: "absolute",
+            float: 'right',
+            position: 'absolute',
             right: 25,
             top: 56,
             zIndex: 1
           }}
         >
           <Button
-            icon={edit ? "rollback" : "edit"}
+            icon={edit ? 'rollback' : 'edit'}
             shape="circle"
             style={{
-              float: "right",
-              color: "#1890ff"
+              float: 'right',
+              color: '#1890ff'
             }}
             onClick={() => {
               if (edit) {
-                if (from === "spot" || from === "redLine") {
+                if (from === 'spot' || from === 'redLine') {
                   Modal.confirm({
                     title: `确定放弃已绘制的图形和填写的属性吗？`,
-                    content: "",
+                    content: '',
                     onOk() {
                       self.setState({ show: false });
-                      emitter.emit("deleteDraw", {});
+                      emitter.emit('deleteDraw', {});
                     },
                     onCancel() {}
                   });
@@ -591,15 +591,15 @@ export default class siderbarDetail extends PureComponent {
         </p>
         <div
           style={{
-            height: "100%",
+            height: '100%',
             overflow: `auto`,
             padding: 23
           }}
         >
           <div
             style={{
-              display: previewVisible_min ? "block" : "none",
-              position: "fixed",
+              display: previewVisible_min ? 'block' : 'none',
+              position: 'fixed',
               zIndex: 2,
               width: 350
             }}
@@ -608,13 +608,13 @@ export default class siderbarDetail extends PureComponent {
               type="close"
               style={{
                 fontSize: 18,
-                position: "absolute",
+                position: 'absolute',
                 top: 0,
                 right: 0
               }}
               onClick={() => {
                 this.setState({ previewVisible_min: false });
-                emitter.emit("imgLocation", {
+                emitter.emit('imgLocation', {
                   Latitude: 0,
                   Longitude: 0,
                   show: false
@@ -623,7 +623,7 @@ export default class siderbarDetail extends PureComponent {
             />
             <img
               alt="example"
-              style={{ width: "100%", cursor: "pointer" }}
+              style={{ width: '100%', cursor: 'pointer' }}
               src={previewImage}
               onClick={() => {
                 this.setState({
@@ -634,18 +634,18 @@ export default class siderbarDetail extends PureComponent {
             />
           </div>
           <Modal
-            width={"50vw"}
+            width={'50vw'}
             visible={previewVisible}
             footer={null}
             onCancel={() => {
               this.setState({ previewVisible: false });
             }}
           >
-            <img alt="example" style={{ width: "100%" }} src={previewImage} />
+            <img alt="example" style={{ width: '100%' }} src={previewImage} />
           </Modal>
           <div
             style={{
-              display: from === "redLine" ? "block" : "none"
+              display: from === 'redLine' ? 'block' : 'none'
             }}
           >
             <Form>
@@ -653,10 +653,10 @@ export default class siderbarDetail extends PureComponent {
                 <b>防治责任范围</b>
               </p>
               <Form.Item label="设计阶段" {...formItemLayout}>
-                {getFieldDecorator("designStageId", {
+                {getFieldDecorator('designStageId', {
                   initialValue: redLineItem.designStage
                     ? redLineItem.designStage.id
-                    : ""
+                    : ''
                 })(
                   <Select
                     showSearch
@@ -664,7 +664,7 @@ export default class siderbarDetail extends PureComponent {
                     disabled={!edit}
                     optionFilterProp="children"
                   >
-                    {this.dictList("设计阶段").map(item => (
+                    {this.dictList('设计阶段').map(item => (
                       <Select.Option value={item.id} key={item.id}>
                         {item.dictTableValue}
                       </Select.Option>
@@ -675,16 +675,16 @@ export default class siderbarDetail extends PureComponent {
               <Form.Item
                 label={
                   <span>
-                    <b style={{ color: "red" }}>*</b>
+                    <b style={{ color: 'red' }}>*</b>
                     矢量化类型
                   </span>
                 }
                 {...formItemLayout}
               >
-                {getFieldDecorator("vecTypeId", {
+                {getFieldDecorator('vecTypeId', {
                   initialValue: redLineItem.vecType
                     ? redLineItem.vecType.id
-                    : ""
+                    : ''
                 })(
                   <Select
                     showSearch
@@ -692,7 +692,7 @@ export default class siderbarDetail extends PureComponent {
                     disabled={!edit}
                     optionFilterProp="children"
                   >
-                    {this.dictList("矢量化类型").map(item => (
+                    {this.dictList('矢量化类型').map(item => (
                       <Select.Option value={item.id} key={item.id}>
                         {item.dictTableValue}
                       </Select.Option>
@@ -701,20 +701,20 @@ export default class siderbarDetail extends PureComponent {
                 )}
               </Form.Item>
               <Form.Item label="面积" {...formItemLayout}>
-                {getFieldDecorator("area", {
+                {getFieldDecorator('area', {
                   initialValue: redLineItem.area
                 })(<Input addonAfter="公顷" disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="组成部分" {...formItemLayout}>
-                {getFieldDecorator("consPart", {
+                {getFieldDecorator('consPart', {
                   initialValue: redLineItem.consPart
                 })(<Input disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="上图单位" {...formItemLayout}>
-                {getFieldDecorator("upmapDepartmentId", {
+                {getFieldDecorator('upmapDepartmentId', {
                   initialValue: redLineItem.upmapDepartment
                     ? redLineItem.upmapDepartment.id
-                    : ""
+                    : ''
                 })(
                   <Select
                     disabled={!edit}
@@ -727,7 +727,7 @@ export default class siderbarDetail extends PureComponent {
                     }
                     onSearch={v => {
                       dispatch({
-                        type: "project/departList",
+                        type: 'project/departList',
                         payload: {
                           name: v,
                           kind: 2
@@ -751,37 +751,37 @@ export default class siderbarDetail extends PureComponent {
                 icon="check"
                 style={{ marginTop: 20 }}
                 onClick={() => {
-                  const vecTypeId = getFieldValue("vecTypeId");
+                  const vecTypeId = getFieldValue('vecTypeId');
                   if (!vecTypeId) {
-                    notification["warning"]({
-                      message: "矢量化类型不能为空"
+                    notification['warning']({
+                      message: '矢量化类型不能为空'
                     });
                     return;
                   }
                   validateFields((err, v) => {
-                    console.log("项目红线信息", v);
+                    console.log('项目红线信息', v);
                     dispatch({
-                      type: "redLine/redLineCreateUpdate",
+                      type: 'redLine/redLineCreateUpdate',
                       payload: {
                         ...v,
                         attachmentId: ParentId,
                         polygon: polygon,
                         projectId: projectId,
-                        id: type === "edit" ? redLineInfo.id : ""
+                        id: type === 'edit' ? redLineInfo.id : ''
                       },
                       callback: (success, response) => {
                         if (success) {
                           this.setState({ show: false });
                           resetFields();
-                          emitter.emit("projectInfoRefresh", {
+                          emitter.emit('projectInfoRefresh', {
                             projectId: projectId
                           });
-                          notification["success"]({
+                          notification['success']({
                             message: `${
-                              type === "edit" ? "编辑" : "新建"
+                              type === 'edit' ? '编辑' : '新建'
                             }项目红线成功`
                           });
-                          emitter.emit("deleteDraw", {});
+                          emitter.emit('deleteDraw', {});
                         }
                       }
                     });
@@ -794,27 +794,27 @@ export default class siderbarDetail extends PureComponent {
               <Button
                 icon="delete"
                 style={{
-                  display: type !== "add" ? "inherit" : "none",
+                  display: type !== 'add' ? 'inherit' : 'none',
                   marginLeft: 20
                 }}
                 onClick={() => {
                   Modal.confirm({
-                    title: "删除",
-                    content: "是否确定要删除这条项目红线数据？",
-                    okText: "是",
-                    okType: "danger",
-                    cancelText: "否",
+                    title: '删除',
+                    content: '是否确定要删除这条项目红线数据？',
+                    okText: '是',
+                    okType: 'danger',
+                    cancelText: '否',
                     onOk() {
                       dispatch({
-                        type: "redLine/redLineDelete",
+                        type: 'redLine/redLineDelete',
                         payload: {
                           id: redLineItem.id
                         },
                         callback: success => {
                           if (success) {
-                            emitter.emit("deleteDraw", {});
+                            emitter.emit('deleteDraw', {});
                             self.setState({ show: false });
-                            emitter.emit("projectInfoRefresh", {
+                            emitter.emit('projectInfoRefresh', {
                               projectId: projectId
                             });
                           }
@@ -831,23 +831,23 @@ export default class siderbarDetail extends PureComponent {
           </div>
           <div
             style={{
-              display: from === "spot" ? "block" : "none"
+              display: from === 'spot' ? 'block' : 'none'
             }}
           >
             <Form>
               <Form.Item
                 label={
                   <span>
-                    <b style={{ color: "red" }}>*</b>
+                    <b style={{ color: 'red' }}>*</b>
                     图斑编号
                   </span>
                 }
                 {...formItemLayout}
                 hasFeedback
               >
-                {getFieldDecorator("mapNum", {
+                {getFieldDecorator('mapNum', {
                   initialValue: spotItem.mapNum,
-                  rules: [{ required: true, message: "图斑编号不能为空" }]
+                  rules: [{ required: true, message: '图斑编号不能为空' }]
                 })(<Input disabled={!edit} />)}
               </Form.Item>
               <Form.Item
@@ -855,15 +855,15 @@ export default class siderbarDetail extends PureComponent {
                   <a
                     onClick={() => {
                       if (spotItem.projectName) {
-                        emitter.emit("showProjectSpotInfo", {
+                        emitter.emit('showProjectSpotInfo', {
                           show: true,
-                          edit: type === "add",
-                          from: "project",
+                          edit: type === 'add',
+                          from: 'project',
                           state: type,
                           id: spotItem.projectId
                         });
                       } else {
-                        notification["info"]({
+                        notification['info']({
                           message: `关联项目为空`
                         });
                       }
@@ -874,7 +874,7 @@ export default class siderbarDetail extends PureComponent {
                 }
                 {...formItemLayout}
               >
-                {getFieldDecorator("projectIdSpot", {
+                {getFieldDecorator('projectIdSpot', {
                   initialValue: spotItem.projectId
                 })(
                   <Select
@@ -888,7 +888,7 @@ export default class siderbarDetail extends PureComponent {
                     }
                     onSearch={v => {
                       dispatch({
-                        type: "spot/queryProjectSelect",
+                        type: 'spot/queryProjectSelect',
                         payload: {
                           ProjectName: v,
                           MaxResultCount: 5
@@ -909,10 +909,10 @@ export default class siderbarDetail extends PureComponent {
               </Form.Item>
               <Form.Item label="解译期次" {...formItemLayout}>
                 <Input.Group compact>
-                  {getFieldDecorator("interBatch1", {
+                  {getFieldDecorator('interBatch1', {
                     initialValue: spotItem.interBatch
                       ? String(spotItem.interBatch).slice(0, 4)
-                      : ""
+                      : ''
                   })(
                     <Select disabled={!edit} style={{ width: 80 }}>
                       {yearList.map(i => (
@@ -922,25 +922,25 @@ export default class siderbarDetail extends PureComponent {
                       ))}
                     </Select>
                   )}
-                  {getFieldDecorator("interBatch2", {
+                  {getFieldDecorator('interBatch2', {
                     initialValue: spotItem.interBatch
                       ? String(spotItem.interBatch).slice(4)
-                      : ""
+                      : ''
                   })(
                     <Select disabled={!edit} style={{ width: 80 }}>
                       {[
-                        "01",
-                        "02",
-                        "03",
-                        "04",
-                        "05",
-                        "06",
-                        "07",
-                        "08",
-                        "09",
-                        "10",
-                        "11",
-                        "12"
+                        '01',
+                        '02',
+                        '03',
+                        '04',
+                        '05',
+                        '06',
+                        '07',
+                        '08',
+                        '09',
+                        '10',
+                        '11',
+                        '12'
                       ].map(i => (
                         <Select.Option value={i} key={i}>
                           {i}
@@ -951,7 +951,7 @@ export default class siderbarDetail extends PureComponent {
                 </Input.Group>
               </Form.Item>
               <Form.Item label="扰动类型" {...formItemLayout}>
-                {getFieldDecorator("interferenceTypeId", {
+                {getFieldDecorator('interferenceTypeId', {
                   initialValue: spotItem.interferenceTypeId
                 })(
                   <Select
@@ -960,7 +960,7 @@ export default class siderbarDetail extends PureComponent {
                     disabled={!edit}
                     optionFilterProp="children"
                   >
-                    {this.dictList("扰动类型").map(item => (
+                    {this.dictList('扰动类型').map(item => (
                       <Select.Option value={item.id} key={item.id}>
                         {item.dictTableValue}
                       </Select.Option>
@@ -969,17 +969,17 @@ export default class siderbarDetail extends PureComponent {
                 )}
               </Form.Item>
               <Form.Item label="扰动面积" {...formItemLayout}>
-                {getFieldDecorator("interferenceArea", {
+                {getFieldDecorator('interferenceArea', {
                   initialValue: spotItem.interferenceArea
                 })(<Input disabled={!edit} addonAfter="公顷" />)}
               </Form.Item>
               <Form.Item label="扰动超出面积" {...formItemLayout}>
-                {getFieldDecorator("overAreaOfRes", {
+                {getFieldDecorator('overAreaOfRes', {
                   initialValue: spotItem.overAreaOfRes
                 })(<Input disabled={!edit} addonAfter="公顷" />)}
               </Form.Item>
               <Form.Item label="扰动合规性" {...formItemLayout}>
-                {getFieldDecorator("interferenceComplianceId", {
+                {getFieldDecorator('interferenceComplianceId', {
                   initialValue: spotItem.interferenceComplianceId
                 })(
                   <Select
@@ -988,7 +988,7 @@ export default class siderbarDetail extends PureComponent {
                     disabled={!edit}
                     optionFilterProp="children"
                   >
-                    {this.dictList("扰动合规性").map(item => (
+                    {this.dictList('扰动合规性').map(item => (
                       <Select.Option value={item.id} key={item.id}>
                         {item.dictTableValue}
                       </Select.Option>
@@ -997,7 +997,7 @@ export default class siderbarDetail extends PureComponent {
                 )}
               </Form.Item>
               <Form.Item label="扰动变化类型" {...formItemLayout}>
-                {getFieldDecorator("interferenceVaryTypeId", {
+                {getFieldDecorator('interferenceVaryTypeId', {
                   initialValue: spotItem.interferenceVaryTypeId
                 })(
                   <Select
@@ -1006,7 +1006,7 @@ export default class siderbarDetail extends PureComponent {
                     disabled={!edit}
                     optionFilterProp="children"
                   >
-                    {this.dictList("扰动变化类型").map(item => (
+                    {this.dictList('扰动变化类型').map(item => (
                       <Select.Option value={item.id} key={item.id}>
                         {item.dictTableValue}
                       </Select.Option>
@@ -1015,7 +1015,7 @@ export default class siderbarDetail extends PureComponent {
                 )}
               </Form.Item>
               <Form.Item label="建设状态" {...formItemLayout}>
-                {getFieldDecorator("buildStatusId", {
+                {getFieldDecorator('buildStatusId', {
                   initialValue: spotItem.buildStatusId
                 })(
                   <Select
@@ -1024,7 +1024,7 @@ export default class siderbarDetail extends PureComponent {
                     disabled={!edit}
                     optionFilterProp="children"
                   >
-                    {this.dictList("建设状态").map(item => (
+                    {this.dictList('建设状态').map(item => (
                       <Select.Option value={item.id} key={item.id}>
                         {item.dictTableValue}
                       </Select.Option>
@@ -1033,17 +1033,17 @@ export default class siderbarDetail extends PureComponent {
                 )}
               </Form.Item>
               <Form.Item label="是否复核" {...formItemLayout}>
-                {getFieldDecorator("isReview", {
-                  valuePropName: "checked",
+                {getFieldDecorator('isReview', {
+                  valuePropName: 'checked',
                   initialValue: spotItem.isReview ? true : false
                 })(<Switch disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="所在地区" {...formItemLayout}>
-                {getFieldDecorator("districtCodeId", {
+                {getFieldDecorator('districtCodeId', {
                   initialValue: this.find(
                     districtTree,
                     spotItem.districtCodeId,
-                    "value"
+                    'value'
                   )
                 })(
                   <Cascader
@@ -1055,22 +1055,22 @@ export default class siderbarDetail extends PureComponent {
                 )}
               </Form.Item>
               <Form.Item label="详细地址" {...formItemLayout}>
-                {getFieldDecorator("addressInfo", {
+                {getFieldDecorator('addressInfo', {
                   initialValue: spotItem.addressInfo
                 })(<Input disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="问题" {...formItemLayout}>
-                {getFieldDecorator("problem", {
+                {getFieldDecorator('problem', {
                   initialValue: spotItem.problem
                 })(<TextArea autosize={true} disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="建议" {...formItemLayout}>
-                {getFieldDecorator("proposal", {
+                {getFieldDecorator('proposal', {
                   initialValue: spotItem.proposal
                 })(<TextArea autosize={true} disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="备注" {...formItemLayout}>
-                {getFieldDecorator("description", {
+                {getFieldDecorator('description', {
                   initialValue: spotItem.description
                 })(<TextArea autosize={true} disabled={!edit} />)}
               </Form.Item>
@@ -1081,7 +1081,7 @@ export default class siderbarDetail extends PureComponent {
                 <Button
                   icon="check"
                   style={{
-                    display: !spotItem.isArchive ? "inline-block" : "none",
+                    display: !spotItem.isArchive ? 'inline-block' : 'none',
                     marginTop: 20
                   }}
                   onClick={() => {
@@ -1094,26 +1094,26 @@ export default class siderbarDetail extends PureComponent {
                   icon="check-circle"
                   style={{
                     display:
-                      type !== "add" && !spotItem.isArchive
-                        ? "inherit"
-                        : "none",
+                      type !== 'add' && !spotItem.isArchive
+                        ? 'inherit'
+                        : 'none',
                     marginLeft: 20
                   }}
                   onClick={() => {
                     this.props.form.validateFields((err, v) => {
                       if (err) {
-                        notification["warning"]({
+                        notification['warning']({
                           message: err.mapNum.errors[0].message
                         });
                       } else {
-                        this.setState({ archiveTime: "" });
-                        console.log("spotItem", spotItem);
+                        this.setState({ archiveTime: '' });
+                        console.log('spotItem', spotItem);
                         Modal.confirm({
-                          title: "归档保存",
+                          title: '归档保存',
                           content: (
                             <div>
                               {spotItem.archiveTimes.map((item, index) => (
-                                <p key={index} style={{ margin: "5px 0" }}>
+                                <p key={index} style={{ margin: '5px 0' }}>
                                   {item}
                                 </p>
                               ))}
@@ -1143,7 +1143,7 @@ export default class siderbarDetail extends PureComponent {
                                   new Date(archiveTime).getTime() <=
                                     new Date(spotItem.archiveTimes[0]).getTime()
                                 ) {
-                                  notification["warning"]({
+                                  notification['warning']({
                                     message: `归档时间早于该图斑上次归档时间，用户重新选择时间`
                                   });
                                   reject();
@@ -1152,7 +1152,7 @@ export default class siderbarDetail extends PureComponent {
                                   resolve();
                                 }
                               } else {
-                                notification["warning"]({
+                                notification['warning']({
                                   message: `请选择归档时间`
                                 });
                                 reject();
@@ -1187,18 +1187,18 @@ export default class siderbarDetail extends PureComponent {
                   style={{ marginRight: 15 }}
                   onClick={() => {
                     if (spotHistoryList.length > 0) {
-                      emitter.emit("showHistoryPlay", {
+                      emitter.emit('showHistoryPlay', {
                         show: true,
                         hisPlayURL:
-                          "./timelinejs/spaceTimeSpot.html?spotHistoryId=" +
+                          './timelinejs/spaceTimeSpot.html?spotHistoryId=' +
                           spotHistoryId
                       });
                       localStorage.setItem(
-                        "spotHistoryList",
+                        'spotHistoryList',
                         JSON.stringify(spotHistoryList)
                       );
                     } else {
-                      notification["warning"]({
+                      notification['warning']({
                         message: `当前图斑没有图斑归档历史数据`
                       });
                     }
@@ -1210,15 +1210,15 @@ export default class siderbarDetail extends PureComponent {
                   icon="cloud-download"
                   style={{
                     display:
-                      type !== "add" && !spotItem.isArchive
-                        ? "inline-block"
-                        : "none",
+                      type !== 'add' && !spotItem.isArchive
+                        ? 'inline-block'
+                        : 'none',
                     marginTop: 20
                   }}
                   onClick={() => {
-                    this.setState({ archiveTimeSpot: "" });
+                    this.setState({ archiveTimeSpot: '' });
                     Modal.confirm({
-                      title: "图斑归档",
+                      title: '图斑归档',
                       content: (
                         <span>
                           归档时间：
@@ -1236,7 +1236,7 @@ export default class siderbarDetail extends PureComponent {
                           if (archiveTimeSpot) {
                             resolve();
                             dispatch({
-                              type: "spot/spotArchive",
+                              type: 'spot/spotArchive',
                               payload: {
                                 id: spotItem.id,
                                 ArchiveTime: archiveTimeSpot
@@ -1244,12 +1244,12 @@ export default class siderbarDetail extends PureComponent {
                               callback: success => {
                                 if (success) {
                                   self.setState({ show: false });
-                                  emitter.emit("deleteSuccess", {});
+                                  emitter.emit('deleteSuccess', {});
                                 }
                               }
                             });
                           } else {
-                            notification["warning"]({
+                            notification['warning']({
                               message: `请选择归档时间`
                             });
                             reject();
@@ -1266,21 +1266,21 @@ export default class siderbarDetail extends PureComponent {
                   icon="rollback"
                   style={{
                     display:
-                      type !== "add" && spotItem.isArchive
-                        ? "inline-block"
-                        : "none",
+                      type !== 'add' && spotItem.isArchive
+                        ? 'inline-block'
+                        : 'none',
                     marginTop: 20
                   }}
                   onClick={() => {
                     dispatch({
-                      type: "spot/spotUnArchive",
+                      type: 'spot/spotUnArchive',
                       payload: {
                         id: spotItem.id
                       },
                       callback: success => {
                         if (success) {
                           self.setState({ show: false });
-                          emitter.emit("deleteSuccess", {});
+                          emitter.emit('deleteSuccess', {});
                         }
                       }
                     });
@@ -1292,35 +1292,35 @@ export default class siderbarDetail extends PureComponent {
                   icon="delete"
                   style={{
                     display:
-                      type !== "add" && !spotItem.isArchive
-                        ? "inline-block"
-                        : "none",
+                      type !== 'add' && !spotItem.isArchive
+                        ? 'inline-block'
+                        : 'none',
                     marginLeft: 15
                   }}
                   onClick={() => {
                     Modal.confirm({
-                      title: "删除",
+                      title: '删除',
                       content:
-                        "将删除该图斑的图形、属性及附件信息，直接删除将不保存该图斑的历史版本，是否确定删除？",
-                      okText: "是",
-                      okType: "danger",
-                      cancelText: "否",
+                        '将删除该图斑的图形、属性及附件信息，直接删除将不保存该图斑的历史版本，是否确定删除？',
+                      okText: '是',
+                      okType: 'danger',
+                      cancelText: '否',
                       onOk() {
                         dispatch({
-                          type: "spot/spotDelete",
+                          type: 'spot/spotDelete',
                           payload: {
                             id: spotItem.id
                           },
                           callback: success => {
                             if (success) {
                               self.setState({ show: false });
-                              emitter.emit("deleteDraw", {});
+                              emitter.emit('deleteDraw', {});
                               if (fromList) {
-                                emitter.emit("deleteSuccess", {
+                                emitter.emit('deleteSuccess', {
                                   success: true
                                 });
                               } else {
-                                emitter.emit("projectInfoRefresh", {
+                                emitter.emit('projectInfoRefresh', {
                                   projectId: projectId
                                 });
                               }
@@ -1341,14 +1341,14 @@ export default class siderbarDetail extends PureComponent {
                   }}
                   onClick={() => {
                     dispatch({
-                      type: "spot/spotOldImg",
+                      type: 'spot/spotOldImg',
                       payload: {
                         id: spotItem.id
                       },
                       callback: (success, error, result) => {
-                        notification[success ? "success" : "error"]({
-                          message: `同步旧系统附件${success ? "成功" : "失败"}${
-                            success ? "" : `：${error.message}`
+                        notification[success ? 'success' : 'error']({
+                          message: `同步旧系统附件${success ? '成功' : '失败'}${
+                            success ? '' : `：${error.message}`
                           }`
                         });
                         if (success) {
@@ -1364,14 +1364,14 @@ export default class siderbarDetail extends PureComponent {
             )}
             <div
               style={{
-                display: showSpotHistory && !edit ? "block" : "none",
+                display: showSpotHistory && !edit ? 'block' : 'none',
                 marginTop: 20
               }}
             >
               {spotHistoryList.map((item, index) => (
                 <p
                   key={index}
-                  style={{ cursor: "pointer" }}
+                  style={{ cursor: 'pointer' }}
                   onClick={() => {
                     this.querySpotById(item.id, true);
                   }}
@@ -1381,17 +1381,17 @@ export default class siderbarDetail extends PureComponent {
                   <Icon
                     type="environment"
                     style={{
-                      float: "right",
+                      float: 'right',
                       fontSize: 16,
-                      cursor: "point",
-                      color: "#1890ff",
+                      cursor: 'point',
+                      color: '#1890ff',
                       marginRight: 10
                     }}
                     onClick={e => {
                       e.stopPropagation();
-                      emitter.emit("mapLocation", {
+                      emitter.emit('mapLocation', {
                         item: item,
-                        key: "spot"
+                        key: 'spot'
                       });
                     }}
                   />
@@ -1401,12 +1401,12 @@ export default class siderbarDetail extends PureComponent {
           </div>
           <div
             style={{
-              display: from === "point" ? "block" : "none"
+              display: from === 'point' ? 'block' : 'none'
             }}
           >
             <Form>
               <Form.Item label="标注点" {...formItemLayout}>
-                {getFieldDecorator("name", {
+                {getFieldDecorator('name', {
                   initialValue: pointItem.name
                 })(<Input disabled={!edit} />)}
               </Form.Item>
@@ -1415,15 +1415,15 @@ export default class siderbarDetail extends PureComponent {
                   <a
                     onClick={() => {
                       if (pointItem.projectName) {
-                        emitter.emit("showProjectSpotInfo", {
+                        emitter.emit('showProjectSpotInfo', {
                           show: true,
-                          edit: type === "add",
-                          from: "project",
+                          edit: type === 'add',
+                          from: 'project',
                           state: type,
                           id: pointItem.projectId
                         });
                       } else {
-                        notification["info"]({
+                        notification['info']({
                           message: `关联项目为空`
                         });
                       }
@@ -1434,8 +1434,8 @@ export default class siderbarDetail extends PureComponent {
                 }
                 {...formItemLayout}
               >
-                {getFieldDecorator("projectId", {
-                  initialValue: pointItem.project ? pointItem.project.id : ""
+                {getFieldDecorator('projectId', {
+                  initialValue: pointItem.project ? pointItem.project.id : ''
                 })(
                   <Select
                     disabled={!edit}
@@ -1449,7 +1449,7 @@ export default class siderbarDetail extends PureComponent {
                     }
                     onSearch={v => {
                       dispatch({
-                        type: "spot/queryProjectSelect",
+                        type: 'spot/queryProjectSelect',
                         payload: {
                           ProjectName: v,
                           MaxResultCount: 5
@@ -1466,12 +1466,12 @@ export default class siderbarDetail extends PureComponent {
                 )}
               </Form.Item>
               <Form.Item label="描述" {...formItemLayout}>
-                {getFieldDecorator("description", {
+                {getFieldDecorator('description', {
                   initialValue: pointItem.description
                 })(<TextArea autosize={true} disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="坐标" {...formItemLayout}>
-                {getFieldDecorator("pointX", {
+                {getFieldDecorator('pointX', {
                   initialValue: pointItem.pointX
                 })(
                   <Input
@@ -1480,24 +1480,24 @@ export default class siderbarDetail extends PureComponent {
                     style={{ width: 98 }}
                   />
                 )}
-                {getFieldDecorator("pointY", {
+                {getFieldDecorator('pointY', {
                   initialValue: pointItem.pointY
                 })(
                   <Input
                     placeholder="纬度"
                     disabled={!edit}
-                    style={{ width: 135, position: "relative", top: -2 }}
+                    style={{ width: 135, position: 'relative', top: -2 }}
                     addonAfter={
                       <Icon
                         type="environment"
                         style={{
-                          color: "#1890ff"
+                          color: '#1890ff'
                         }}
                         onClick={() => {
-                          const x = getFieldValue("pointX");
-                          const y = getFieldValue("pointY");
-                          emitter.emit("siteLocation", {
-                            state: "position",
+                          const x = getFieldValue('pointX');
+                          const y = getFieldValue('pointY');
+                          emitter.emit('siteLocation', {
+                            state: 'position',
                             Longitude: x,
                             Latitude: y
                           });
@@ -1517,24 +1517,24 @@ export default class siderbarDetail extends PureComponent {
                   validateFields((err, v) => {
                     console.log(v);
                     dispatch({
-                      type: "point/pointCreateUpdate",
+                      type: 'point/pointCreateUpdate',
                       payload: {
                         ...v,
                         attachmentId: ParentId,
-                        id: type === "edit" ? pointItem.id : ""
+                        id: type === 'edit' ? pointItem.id : ''
                       },
                       callback: (success, response) => {
                         if (success) {
-                          emitter.emit("projectCreateUpdateBack", {});
-                          notification["success"]({
+                          emitter.emit('projectCreateUpdateBack', {});
+                          notification['success']({
                             message: `${
-                              type === "edit" ? "编辑" : "新建"
+                              type === 'edit' ? '编辑' : '新建'
                             }标注点成功`
                           });
-                          emitter.emit("deleteSuccess", {
+                          emitter.emit('deleteSuccess', {
                             success: true
                           });
-                          emitter.emit("deleteDraw", {});
+                          emitter.emit('deleteDraw', {});
                         }
                       }
                     });
@@ -1547,28 +1547,28 @@ export default class siderbarDetail extends PureComponent {
               <Button
                 icon="delete"
                 style={{
-                  display: type !== "add" ? "inherit" : "none",
+                  display: type !== 'add' ? 'inherit' : 'none',
                   marginLeft: 20
                 }}
                 onClick={() => {
                   Modal.confirm({
-                    title: "删除",
-                    content: "是否确定要删除这条标注点数据？",
-                    okText: "是",
-                    okType: "danger",
-                    cancelText: "否",
+                    title: '删除',
+                    content: '是否确定要删除这条标注点数据？',
+                    okText: '是',
+                    okType: 'danger',
+                    cancelText: '否',
                     onOk() {
                       resetFields();
                       dispatch({
-                        type: "point/pointDelete",
+                        type: 'point/pointDelete',
                         payload: {
                           id: pointItem.id
                         },
                         callback: success => {
                           if (success) {
-                            emitter.emit("deleteDraw", {});
+                            emitter.emit('deleteDraw', {});
                             self.setState({ show: false });
-                            emitter.emit("deleteSuccess", {
+                            emitter.emit('deleteSuccess', {
                               success: true
                             });
                           }
@@ -1585,27 +1585,27 @@ export default class siderbarDetail extends PureComponent {
           </div>
           <div
             style={{
-              display: from === "panorama" ? "block" : "none"
+              display: from === 'panorama' ? 'block' : 'none'
             }}
           >
             <Form>
               <Form.Item label="全景点名" {...formItemLayout}>
-                {getFieldDecorator("name", {
+                {getFieldDecorator('name', {
                   initialValue: item.name
                 })(<Input disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="拍摄日期" {...formItemLayout}>
-                {getFieldDecorator("filmingTime", {
-                  initialValue: item.filmingTime ? moment(item.filmingTime) : ""
+                {getFieldDecorator('filmingTime', {
+                  initialValue: item.filmingTime ? moment(item.filmingTime) : ''
                 })(<DatePicker disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="描述" {...formItemLayout}>
-                {getFieldDecorator("description", {
+                {getFieldDecorator('description', {
                   initialValue: item.description
                 })(<TextArea autosize={true} disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="坐标" {...formItemLayout}>
-                {getFieldDecorator("pointX_pano", {
+                {getFieldDecorator('pointX_pano', {
                   initialValue: item.pointX
                 })(
                   <Input
@@ -1614,24 +1614,24 @@ export default class siderbarDetail extends PureComponent {
                     style={{ width: 98 }}
                   />
                 )}
-                {getFieldDecorator("pointY_pano", {
+                {getFieldDecorator('pointY_pano', {
                   initialValue: item.pointY
                 })(
                   <Input
                     placeholder="纬度"
                     disabled={!edit}
-                    style={{ width: 135, position: "relative", top: -2 }}
+                    style={{ width: 135, position: 'relative', top: -2 }}
                     addonAfter={
                       <Icon
                         type="environment"
                         style={{
-                          color: "#1890ff"
+                          color: '#1890ff'
                         }}
                         onClick={() => {
-                          const x = getFieldValue("pointX");
-                          const y = getFieldValue("pointY");
-                          emitter.emit("siteLocation", {
-                            state: "position",
+                          const x = getFieldValue('pointX');
+                          const y = getFieldValue('pointY');
+                          emitter.emit('siteLocation', {
+                            state: 'position',
                             Longitude: x,
                             Latitude: y
                           });
@@ -1646,11 +1646,11 @@ export default class siderbarDetail extends PureComponent {
               <Upload
                 action={config.url.panoramaUploadUrl}
                 headers={{ Authorization: `Bearer ${accessToken()}` }}
-                data={{ GenerateType: "2" }}
+                data={{ GenerateType: '2' }}
                 listType="picture-card"
                 fileList={fileList}
                 beforeUpload={() => {
-                  console.log("beforeUpload");
+                  console.log('beforeUpload');
                   this.setState({ showSpin: true });
                 }}
                 onSuccess={v => {
@@ -1663,23 +1663,23 @@ export default class siderbarDetail extends PureComponent {
                   this.setState({
                     showSpin: false
                   });
-                  notification["error"]({
+                  notification['error']({
                     message: `全景图上传失败：${response.error.message}`
                   });
                 }}
                 onPreview={file => {
                   console.log(file.fileExtend, file);
                   switch (file.fileExtend) {
-                    case "pdf":
+                    case 'pdf':
                       window.open(file.url);
                       break;
-                    case "doc":
-                    case "docx":
-                    case "xls":
-                    case "xlsx":
-                    case "ppt":
-                    case "pptx":
-                      window.open(file.url + "&isDown=true");
+                    case 'doc':
+                    case 'docx':
+                    case 'xls':
+                    case 'xlsx':
+                    case 'ppt':
+                    case 'pptx':
+                      window.open(file.url + '&isDown=true');
                       break;
                     default:
                       this.setState({
@@ -1687,7 +1687,7 @@ export default class siderbarDetail extends PureComponent {
                         previewVisible_min: true
                       });
                       if (file.latitude || file.longitude) {
-                        emitter.emit("imgLocation", {
+                        emitter.emit('imgLocation', {
                           Latitude: file.latitude,
                           Longitude: file.longitude,
                           direction: file.azimuth,
@@ -1703,7 +1703,7 @@ export default class siderbarDetail extends PureComponent {
                   const data = fileList.map(item => {
                     return {
                       ...item,
-                      status: "done"
+                      status: 'done'
                     };
                   });
                   this.setState({ fileList: data });
@@ -1738,19 +1738,19 @@ export default class siderbarDetail extends PureComponent {
                     console.log(v);
                     this.setState({ showSpin: true });
                     dispatch({
-                      type: "panorama/panoramaCreateUpdate",
+                      type: 'panorama/panoramaCreateUpdate',
                       payload: {
                         ...v,
                         projectId,
                         urlConfig: panoramaUrlConfig,
-                        id: type === "edit" ? item.id : "",
+                        id: type === 'edit' ? item.id : '',
                         pointX: v.pointX_pano,
                         pointY: v.pointY_pano
                       },
                       callback: (success, response) => {
                         this.setState({ showSpin: false });
                         if (success) {
-                          emitter.emit("projectInfoRefresh", {
+                          emitter.emit('projectInfoRefresh', {
                             projectId
                           });
                           this.setState({ show: false });
