@@ -1,15 +1,17 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { message, Radio, Input } from 'antd';
+import { message, Radio } from 'antd';
 import Layouts from '../../../components/Layouts';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import proj4 from 'proj4';
 import 'proj4leaflet';
+import 'leaflet.vectorgrid'; //矢量瓦片
 import 'leaflet-easybutton/src/easy-button.css';
 import 'leaflet-easybutton';
 import 'leaflet-measure/dist/leaflet-measure.css';
 import 'leaflet-measure/dist/leaflet-measure.cn';
+import echarts from 'echarts/lib/echarts';
 import config from '../../../config';
 
 //模拟测试数据
@@ -143,16 +145,712 @@ const RegionCenterData = [
 
 ];
 
+const RegionPieData = [
+  {
+    pointX:110.021,
+    pointY:21.124,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:20},
+          {name:'省级',value:25},
+          {name:'市级',value:40},
+          {name:'县级',value:40},
+          {name:'未说明',value:12}
+        ]
+      }
+    ]
+  },
+  {
+    pointX:110.88,
+    pointY:21.976,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:44},
+          {name:'省级',value:25},
+          {name:'市级',value:22},
+          {name:'县级',value:62},
+          {name:'未说明',value:10}
+        ]
+      }
+    ]
+  },
+  {
+    pointX:111.759,
+    pointY:22.029,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:44},
+          {name:'省级',value:63},
+          {name:'市级',value:22},
+          {name:'县级',value:55},
+          {name:'未说明',value:6}
+        ]
+      }
+    ]
+  },
+  {
+    pointX:111.746,
+    pointY:22.842,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:44},
+          {name:'省级',value:25},
+          {name:'市级',value:88},
+          {name:'县级',value:23},
+          {name:'未说明',value:8}
+        ]
+      }
+    ]
+  },
+  {
+    pointX:112.644,
+    pointY:22.243,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:44},
+          {name:'省级',value:25},
+          {name:'市级',value:22},
+          {name:'县级',value:55},
+          {name:'未说明',value:9}
+        ]
+      }
+    ]
+  },
+  {
+    pointX:113.282,
+    pointY:22.139,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:44},
+          {name:'省级',value:25},
+          {name:'市级',value:22},
+          {name:'县级',value:33},
+          {name:'未说明',value:6}
+        ]
+      }
+    ]
+  }, 
+  {
+    pointX:113.387,
+    pointY:22.523,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:44},
+          {name:'省级',value:77},
+          {name:'市级',value:22},
+          {name:'县级',value:35},
+          {name:'未说明',value:14}
+        ]
+      }
+    ]
+  }, 
+  {
+    pointX:112.957,
+    pointY:22.999,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:44},
+          {name:'省级',value:25},
+          {name:'市级',value:22},
+          {name:'县级',value:56},
+          {name:'未说明',value:18}
+        ]
+      }
+    ]
+  },
+  {
+    pointX:112.169,
+    pointY:23.487,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:44},
+          {name:'省级',value:85},
+          {name:'市级',value:22},
+          {name:'县级',value:62},
+          {name:'未说明',value:13}
+        ]
+      }
+    ]
+  },
+  {
+    pointX:114.103,
+    pointY:22.627,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:44},
+          {name:'省级',value:25},
+          {name:'市级',value:22},
+          {name:'县级',value:88},
+          {name:'未说明',value:7}
+        ]
+      }
+    ]
+  },
+  {
+    pointX:113.484,
+    pointY:23.331,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:44},
+          {name:'省级',value:36},
+          {name:'市级',value:88},
+          {name:'县级',value:25},
+          {name:'未说明',value:11}
+        ]
+      }
+    ]
+  }, 
+  {
+    pointX:112.989,
+    pointY:24.222,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:44},
+          {name:'省级',value:35},
+          {name:'市级',value:22},
+          {name:'县级',value:55},
+          {name:'未说明',value:15}
+        ]
+      }
+    ]
+  }, 
+  {
+    pointX:113.823,
+    pointY:22.953,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:44},
+          {name:'省级',value:65},
+          {name:'市级',value:25},
+          {name:'县级',value:33},
+          {name:'未说明',value:11}
+        ]
+      }
+    ]
+  },
+  {
+    pointX:114.461,
+    pointY:23.187,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:25},
+          {name:'省级',value:25},
+          {name:'市级',value:33},
+          {name:'县级',value:62},
+          {name:'未说明',value:15}
+        ]
+      }
+    ]
+  },
+  {
+    pointX:113.712,
+    pointY:24.828,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:44},
+          {name:'省级',value:55},
+          {name:'市级',value:22},
+          {name:'县级',value:33},
+          {name:'未说明',value:15}
+        ]
+      }
+    ]
+  },
+  {
+    pointX:115.535,
+    pointY:23.025,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:85},
+          {name:'省级',value:26},
+          {name:'市级',value:77},
+          {name:'县级',value:55},
+          {name:'未说明',value:6}
+        ]
+      }
+    ]
+  }, 
+  {
+    pointX:114.936,
+    pointY:23.962,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:33},
+          {name:'省级',value:66},
+          {name:'市级',value:55},
+          {name:'县级',value:11},
+          {name:'未说明',value:9}
+        ]
+      }
+    ]
+  }, 
+  {
+    pointX:116.075,
+    pointY:23.344,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:44},
+          {name:'省级',value:55},
+          {name:'市级',value:22},
+          {name:'县级',value:88},
+          {name:'未说明',value:7}
+        ]
+      }
+    ]
+  }, 
+  {
+    pointX:116.531,
+    pointY:23.291,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:44},
+          {name:'省级',value:42},
+          {name:'市级',value:22},
+          {name:'县级',value:88},
+          {name:'未说明',value:9}
+        ]
+      }
+    ]
+  },
+  {
+    pointX:116.752,
+    pointY:23.793,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:33},
+          {name:'省级',value:25},
+          {name:'市级',value:44},
+          {name:'县级',value:55},
+          {name:'未说明',value:11}
+        ]
+      }
+    ]
+  },
+  {
+    pointX:116.082,
+    pointY:24.196,
+    result:[
+      {
+        type:'立项级别',
+        data:[
+          {name:'部级',value:88},
+          {name:'省级',value:85},
+          {name:'市级',value:23},
+          {name:'县级',value:55},
+          {name:'未说明',value:8}
+        ]
+      }
+    ]
+  },                 
+
+];
+
+const ProjectPointsData = [
+  {
+    id:1,
+    pointX:110.021,
+    pointY:21.124,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },
+  {
+    id:2,
+    pointX:109.995,
+    pointY:21.069,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  }, 
+  {
+    id:3,
+    pointX:110.88,
+    pointY:21.976,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },
+  {
+    id:4,
+    pointX:110.961,
+    pointY:21.886,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },  
+  {
+    id:5,
+    pointX:111.759,
+    pointY:22.029,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },
+  {
+    id:6,
+    pointX:111.796,
+    pointY:22.072,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },
+  {
+    id:7,
+    pointX:111.746,
+    pointY:22.842,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },
+  {
+    id:8,
+    pointX:111.805,
+    pointY:22.826,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },
+  {
+    id:9,
+    pointX:112.644,
+    pointY:22.243,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },
+  {
+    id:10,
+    pointX:112.731,
+    pointY:22.245,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },
+  {
+    id:11,
+    pointX:113.282,
+    pointY:22.139,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  }, 
+  {
+    id:12,
+    pointX:113.387,
+    pointY:22.523,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  }, 
+  {
+    id:13,
+    pointX:112.957,
+    pointY:22.999,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },
+  {
+    id:14,
+    pointX:112.169,
+    pointY:23.487,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },
+  {
+    id:15,
+    pointX:114.103,
+    pointY:22.627,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },
+  {
+    id:16,
+    pointX:113.484,
+    pointY:23.331,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  }, 
+  {
+    id:17,
+    pointX:112.989,
+    pointY:24.222,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  }, 
+  {
+    id:18,
+    pointX:113.823,
+    pointY:22.953,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },
+  {
+    id:19,
+    pointX:114.461,
+    pointY:23.187,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },
+  {
+    id:20,
+    pointX:113.712,
+    pointY:24.828,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },
+  {
+    id:21,
+    pointX:115.535,
+    pointY:23.025,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  }, 
+  {
+    id:22,
+    pointX:114.936,
+    pointY:23.962,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  }, 
+  {
+    id:23,
+    pointX:116.075,
+    pointY:23.344,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  }, 
+  {
+    id:24,
+    pointX:116.531,
+    pointY:23.291,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },
+  {
+    id:25,
+    pointX:116.752,
+    pointY:23.793,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },
+  {
+    id:26,
+    pointX:116.082,
+    pointY:24.196,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },
+  {
+    id:27,
+    pointX:115.927,
+    pointY:24.056,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },  
+  {
+    id:28,
+    pointX:116.169,
+    pointY:24.076,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },  
+  {
+    id:29,
+    pointX:116.383,
+    pointY:24.201,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },  
+  {
+    id:30,
+    pointX:116.284,
+    pointY:24.367,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },  
+  {
+    id:31,
+    pointX:116.114,
+    pointY:24.417,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },  
+  {
+    id:32,
+    pointX:115.872,
+    pointY:24.241,
+    projectLevelId:'',//立项级别
+    complianceId:'',//扰动合规性
+    projectCateId:'',//项目类别
+    projectNatId:'',//项目性质
+    projectStatusId:'',//建设状态
+    vecTypeId:'',//矢量化类型
+  },                  
+
+];
+
 const DISTRICT_FILL_COLOR = 'rgba(230,0,0,0)';
 // const DISTRICT_COLOR = '#bfbfbf';
 const DISTRICT_COLOR = '#0070FF';
 
 //绘制geojson行政区划图层样式
 const regionGeoJsonStyle = {
-  color: '#0000FF',
+  color: '#33CCFF', //#33CCFF #0000FF
   weight: 2,
-  opacity: 0.6,
-  fillColor: '#0000FF',
+  opacity: 0.8,
+  fillColor: '#33CCFF',
   fillOpacity: 0.1
 };
 //绘制geojson行政区划图层高亮样式
@@ -196,6 +894,7 @@ export default class homePage extends PureComponent {
     this.map = null;
     this.regiongeojsonLayer = null; //行政区划矢量图层
     this.ZSgeojsonLayer = null;//区域统计图层
+    this.projectPointVGLayer = null;//项目点矢量瓦片图层
     this.onlineBasemapLayers = null;
   }
 
@@ -208,7 +907,10 @@ export default class homePage extends PureComponent {
     // 创建行政区划渲染
     me.createRegion();
     // 创建区域统计渲染
-    me.createZStatistics();
+    //me.createZStatistics();
+    me.createZSPie();
+    // 添加所有项目点要素
+    me.addAllProjectPoints();
     // 创建图层管理控件
     me.createToc();
     // 创建地图缩放控件
@@ -246,9 +948,13 @@ export default class homePage extends PureComponent {
     });
     this.regiongeojsonLayer = regiongeojsonLayer;
 
-    //行政区划图层
+    //区域统计图层
     const ZSgeojsonLayer = L.featureGroup([]);
     this.ZSgeojsonLayer = ZSgeojsonLayer;
+
+    //项目点矢量瓦片图层
+    const projectPointVGLayer = L.gridLayer();
+    this.projectPointVGLayer = projectPointVGLayer;
 
   };
   // 创建地图
@@ -288,6 +994,8 @@ export default class homePage extends PureComponent {
     map.on('baselayerchange', this.onBaseLayerChange);
     //监听地图鼠标移动事件
     map.on('mousemove', this.showImageInfos);
+    // 监听地图点击事件
+    map.on('click', this.onClickMap);
     //地图范围跳转
     map.setView(config.mapInitParams.center, config.mapInitParams.zoom);
   };
@@ -312,6 +1020,17 @@ export default class homePage extends PureComponent {
     if (showImageTimeText) {
       me.getInfoByExtent(zoom, bounds, data => {
         me.setState({ imageTimeText: data[0] });
+      });
+    }
+    //设置饼状图图层是否隐藏
+    if(zoom>=config.mapInitParams.zoom){
+      me.ZSgeojsonLayer.eachLayer(function (layer) {
+          layer.setOpacity(0);
+      });
+    }
+    else{
+      me.ZSgeojsonLayer.eachLayer(function (layer) {
+          layer.setOpacity(1);
       });
     }
   };
@@ -348,6 +1067,10 @@ export default class homePage extends PureComponent {
       callback: callback
     });
   };
+  //监听地图点击事件
+  onClickMap = e => {
+    console.log('e.latlng',e.latlng);
+  }
   //监听地图鼠标移动事件
   showImageInfos = e => {
     const {
@@ -537,9 +1260,156 @@ export default class homePage extends PureComponent {
           this.ZSgeojsonLayer.addLayer(L.circle([item.pointY,item.pointX],radius,Object.assign(ZSGeoJsonStyle, {name:item.name})));
           this.ZSgeojsonLayer.addLayer(L.marker([item.pointY,item.pointX], { icon: myIcon }));
         });
-        console.log('this.ZSgeojsonLayer.getLayers()',this.ZSgeojsonLayer.getLayers());
+        //console.log('this.ZSgeojsonLayer.getLayers()',this.ZSgeojsonLayer.getLayers());
       }    
-    }, 1500);
+    }, 2000);
+  }
+
+  createZSPie = () => {
+    if(RegionPieData.length>0){
+        RegionPieData.forEach((item,index) => {
+          const myIcon = L.divIcon({
+            html: `<div id="cMark${index}" style="width:40px;height:40px;position:relative;background-color:transparent;"></div>`,
+            className: 'leaflet-echart-icon',
+            iconSize:[40,40]
+          });
+          //console.log('item.name',item.name);
+          this.ZSgeojsonLayer.addLayer(L.marker([item.pointY,item.pointX], { icon: myIcon }));
+          let ChartMarker=echarts.init(document.getElementById(`cMark${index}`));
+          let option = {
+              tooltip: {
+                  trigger: 'item',
+                  formatter: "{a} <br/>{b}: {c} ({d}%)"
+              },
+              // legend: {
+              //     orient: 'vertical',
+              //     x: 'left',
+              //     data:['直接访问','邮件营销','联盟广告','视频广告','搜索引擎']
+              // },
+              series : [
+                {
+                    name: `${item.result[0].type}`,
+                    type: 'pie',
+                    hoverAnimation:false,//是否开启hover在扇区上的放大动画效果
+                    radius : '100%',
+                    center: ['50%', '50%'],
+                    label:{            //饼图图形上的文本标签
+                      normal:{
+                          show:true,
+                          position:'inner', //标签的位置
+                          textStyle : {
+                              // fontWeight : 300 ,
+                              fontSize : 10    //文字的字体大小
+                          },
+                          //formatter:'{d}%'
+                          formatter:'{c}'                             
+                      }
+                    },
+                    //{value:50,name:'高速50KM',itemStyle:{normal:{color:'#FE0000'}}},  
+                    data:item.result[0].data,
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+              ]
+          };
+          ChartMarker.setOption(option);          
+        });
+      //console.log('this.ZSgeojsonLayer.getLayers()',this.ZSgeojsonLayer.getLayers());
+    }     
+  }
+
+  //添加所有项目点要素
+  addAllProjectPoints = () => {
+    //查询数据源构造geojson
+    const geojson = this.data2GeoJSON(ProjectPointsData);
+    if (geojson) {
+      //加载项目点矢量瓦片图层
+      this.loadProjectPointsVectorLayer(geojson);
+    }
+  }
+  /*
+   * 矢量瓦片扰动图斑绘制函数
+   */
+  loadProjectPointsVectorLayer(geojson) {
+    let obj = {
+      //rendererFactory: L.svg.tile,
+      rendererFactory: L.canvas.tile,
+      // vectorTileLayerStyles: { sliced: {icon: new L.Icon.Default()} },
+			vectorTileLayerStyles: {
+				sliced: function(properties, zoom) {
+          // return {icon: L.icon({
+          //   iconUrl: './img/problemPoint.png',
+          //   iconSize: [20, 20]
+          // })};
+          return {icon: new L.Icon.Default() };
+          // return {
+					// 	weight: 2,
+					// 	color: 'red',
+					// 	opacity: 1,
+					// 	fillColor: 'yellow',
+					// 	fill: true,
+					// 	radius: 6,
+					// 	fillOpacity: 0.7
+					// }
+				}
+			},
+      interactive: true,
+      getFeatureId: function(f) {
+        return f.properties.id;
+      },
+      maxZoom: config.mapInitParams.maxZoom,
+      minZoom: config.mapInitParams.zoom,
+    };
+    this.projectPointVGLayer = L.vectorGrid.slicer(geojson, obj).on('click', function(e) {
+      console.log('e.layer.properties', e.layer.properties);
+    }).addTo(this.map);;
+  }
+  //查询数据源构造geojson
+  data2GeoJSON(items) {
+    let geojson = {};
+    let item = null;
+    try {
+      geojson = {
+        type: 'FeatureCollection',
+        features: []
+      };
+      //构造geojson数据源
+      if (items.length > 0) {
+        for (let i = 0; i < items.length; i++) {
+          item = items[i];
+          if (item.pointX && item.pointY) {
+            // console.log("item",item);
+            let properties = {
+              id: item.id, //项目点
+              projectLevelId:item.projectLevelId,//立项级别
+              complianceId:item.complianceId,//扰动合规性
+              projectCateId:item.projectCateId,//项目类别
+              projectNatId:item.projectNatId,//项目性质
+              projectStatusId:item.projectStatusId,//建设状态
+              vecTypeId:item.vecTypeId,//矢量化类型
+            };
+
+            let obj = {
+              type: 'Feature',
+              properties: properties,
+              geometry:{
+                type:"Point",
+                coordinates:[item.pointX,item.pointY]
+              }
+            };
+            geojson.features.push(obj);
+          }
+        }
+      }
+    } catch (e) {
+      console.error(e, JSON.stringify(item));
+    }
+    return geojson;       
   }
 
   // 根据行政区划名称匹配对应的区域统计圆圈图层
@@ -771,13 +1641,22 @@ export default class homePage extends PureComponent {
           >
             <Radio.Group onChange={this.onChangeProjectSymbol} value={projectSymbolValue}>
               <Radio style={radioStyle} value={1}>
-                项目性质
+                立项级别
               </Radio>
               <Radio style={radioStyle} value={2}>
-                项目类别
+                扰动合规性
               </Radio>
               <Radio style={radioStyle} value={3}>
+                项目类别
+              </Radio>
+              <Radio style={radioStyle} value={4}>
+                项目性质
+              </Radio>
+              <Radio style={radioStyle} value={4}>
                 建设状态
+              </Radio>
+              <Radio style={radioStyle} value={4}>
+                矢量化类型
               </Radio>
             </Radio.Group>
           </div>
