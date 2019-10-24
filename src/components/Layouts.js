@@ -25,7 +25,20 @@ const menuList = [
     title: '项目监管',
     icon: 'book',
     key: '/project',
-    subMenu: []
+    subMenu: [
+      {
+        title: '项目列表',
+        key: '/project/list'
+      },
+      {
+        title: '二维地图',
+        key: '/project/map'
+      },
+      {
+        title: '三维地图',
+        key: '/project/cesiummap'
+      }
+    ]
   },
   {
     title: '系统管理',

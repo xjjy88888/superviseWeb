@@ -141,6 +141,12 @@ export default class projectSupervision extends PureComponent {
     this.projectSuperviseList({
       SkipCount: (pagination.current - 1) * pagination.pageSize,
       MaxResultCount: pagination.pageSize,
+      ProjectLevel: filters.projectLevelId || [],
+      Compliance: filters.complianceId || [],
+      ProjectType: filters.projectTypeId || [],
+      ProjectCate: filters.projectCateId || [],
+      ProjectNat: filters.projectNatId || [],
+      ProjectStatus: filters.projectStatusId || [],
       projectName:
         filters.projectName && filters.projectName.length
           ? filters.projectName[0]
@@ -265,7 +271,7 @@ export default class projectSupervision extends PureComponent {
     const result = filter.map(i => {
       return {
         text: i.dictTableValue,
-        value: i.dictTableKey
+        value: i.dictTableValue
       };
     });
     return result;
