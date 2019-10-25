@@ -19,7 +19,7 @@ import CesiumMap from './routes/Project/Map/CesiumMap';
 function RouterConfig({ history }) {
   const user = localStorage.getItem('user');
   const userName = user ? JSON.parse(user).displayName : '';
-  const isAllPower = userName.indexOf('办事员1') !== -1;
+  const isAllPower = userName ? userName.indexOf('办事员') !== -1 : true;
 
   return (
     <Router history={history}>

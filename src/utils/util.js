@@ -203,6 +203,27 @@ const getUrl = key => {
   return result;
 };
 
+const localStorageSet = (name, data, expire = 24) => {
+  const time = new Date().getTime() + expire * 60 * 60 * 1000;
+  const obj = { data, time };
+  localStorage.setItem(name, JSON.stringify(obj));
+};
+
+const localStorageGet = name => {
+  const storage = localStorage.getItem(name);
+  const time = new Date().getTime();
+  let result = {};
+  if (storage) {
+    const obj = JSON.parse(storage);
+    if (time < obj.time) {
+      result = obj.data;
+    } else {
+      localStorage.removeItem(name);
+    }
+  }
+  return result;
+};
+
 export {
   dateFormat,
   dateInitFormat,
@@ -213,5 +234,7 @@ export {
   unique,
   treeToList,
   inspectFormData,
-  getUrl
+  getUrl,
+  localStorageSet,
+  localStorageGet
 };

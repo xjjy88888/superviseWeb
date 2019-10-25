@@ -864,10 +864,10 @@ const regionGeoJsonHLightStyle = {
 
 //绘制geojson区域统计图层样式
 const ZSGeoJsonStyle = {
-  color: '#0000FF',
+  color: '#33CCFF',
   weight: 2,
   opacity: 0.6,
-  fillColor: '#0000FF',
+  fillColor: '#33CCFF',
   fillOpacity: 0.3
 };
 //绘制geojson区域统计图层高亮样式
@@ -895,6 +895,7 @@ export default class homePage extends PureComponent {
     this.regiongeojsonLayer = null; //行政区划矢量图层
     this.ZSgeojsonLayer = null;//区域统计图层
     this.projectPointVGLayer = null;//项目点矢量瓦片图层
+    this.radius = null;//画圆圈半径大小
     this.onlineBasemapLayers = null;
   }
 
@@ -907,8 +908,8 @@ export default class homePage extends PureComponent {
     // 创建行政区划渲染
     me.createRegion();
     // 创建区域统计渲染
-    //me.createZStatistics();
-    me.createZSPie();
+    me.createZStatistics();
+    //me.createZSPie();
     // 添加所有项目点要素
     me.addAllProjectPoints();
     // 创建图层管理控件
@@ -942,16 +943,6 @@ export default class homePage extends PureComponent {
     });
     this.districtBoundLayer = districtBoundLayer;
 
-    //行政区划图层
-    const regiongeojsonLayer = L.Proj.geoJson(null, {
-      style: regionGeoJsonStyle
-    });
-    this.regiongeojsonLayer = regiongeojsonLayer;
-
-    //区域统计图层
-    const ZSgeojsonLayer = L.featureGroup([]);
-    this.ZSgeojsonLayer = ZSgeojsonLayer;
-
     //项目点矢量瓦片图层
     const projectPointVGLayer = L.gridLayer();
     this.projectPointVGLayer = projectPointVGLayer;
@@ -965,12 +956,12 @@ export default class homePage extends PureComponent {
       iconUrl: require('leaflet/dist/images/marker-icon.png'),
       shadowUrl: require('leaflet/dist/images/marker-shadow.png')
     });
-    const { regiongeojsonLayer,ZSgeojsonLayer } = this;
+    // const { ZSgeojsonLayer } = this;
     const map = L.map('map', {
       zoomControl: false,
       //crs: L.CRS.EPSG3857,
       attributionControl: false,
-      layers: [regiongeojsonLayer,ZSgeojsonLayer]
+      // layers: [ZSgeojsonLayer]
     });
     const { onlineBasemaps } = config;
     map.createPane('tileLayerZIndex');
@@ -987,6 +978,22 @@ export default class homePage extends PureComponent {
     });
     map.addLayer(onlineBasemapLayers[0]);
     this.onlineBasemapLayers = onlineBasemapLayers;
+
+    //行政区划图层
+    map.createPane('regiongeoJsonZIndex');
+    map.getPane('regiongeoJsonZIndex').style.zIndex = 1;
+    const regiongeojsonLayer = L.Proj.geoJson(null, {
+      style: regionGeoJsonStyle,
+      pane: 'regiongeoJsonZIndex'
+    });
+    this.regiongeojsonLayer = regiongeojsonLayer;
+    map.addLayer(regiongeojsonLayer);
+
+    //区域统计图层
+    const ZSgeojsonLayer = L.featureGroup([],{pane: 'regiongeoJsonZIndex'});
+    this.ZSgeojsonLayer = ZSgeojsonLayer;
+    map.addLayer(ZSgeojsonLayer);
+
     this.map = map;
     //监听地图移动完成事件
     map.on('moveend', this.onMoveendMap);
@@ -995,7 +1002,7 @@ export default class homePage extends PureComponent {
     //监听地图鼠标移动事件
     map.on('mousemove', this.showImageInfos);
     // 监听地图点击事件
-    map.on('click', this.onClickMap);
+    //map.on('click', this.onClickMap);
     //地图范围跳转
     map.setView(config.mapInitParams.center, config.mapInitParams.zoom);
   };
@@ -1022,16 +1029,40 @@ export default class homePage extends PureComponent {
         me.setState({ imageTimeText: data[0] });
       });
     }
-    //设置饼状图图层是否隐藏
-    if(zoom>=config.mapInitParams.zoom){
-      me.ZSgeojsonLayer.eachLayer(function (layer) {
-          layer.setOpacity(0);
-      });
+    //设置区域统计图层是否隐藏
+    if(zoom>=config.pointLevel){
+      // me.ZSgeojsonLayer.eachLayer(function (layer) {
+      //   if(layer.setOpacity){
+      //     layer.setOpacity(0);
+      //   }
+      // });
+      // setTimeout(() => {
+      //   me.ZSgeojsonLayer.setStyle({opacity:0,fillOpacity:0});
+      // },500);
+
+      if(me.ZSgeojsonLayer.getLayers().length>0){
+        me.clearGeojsonLayer(me.ZSgeojsonLayer);
+      }
     }
     else{
-      me.ZSgeojsonLayer.eachLayer(function (layer) {
-          layer.setOpacity(1);
-      });
+      // me.ZSgeojsonLayer.eachLayer(function (layer) {
+      //   if(layer.setOpacity){
+      //     layer.setOpacity(1);
+      //   }
+      // });
+      // me.ZSgeojsonLayer.setStyle({opacity:0.6,fillOpacity:0.3});
+
+      const { projectSymbolValue } = me.state;
+      if(projectSymbolValue === 1){
+        if(me.ZSgeojsonLayer.getLayers().length<=0){
+          me.createZStatistics();
+        }
+      }
+      else{
+        if(me.ZSgeojsonLayer.getLayers().length<=0){
+          me.createZSPie();
+        }
+      }
     }
   };
   /*根据地图当前范围获取对应历史影像数据
@@ -1067,10 +1098,7 @@ export default class homePage extends PureComponent {
       callback: callback
     });
   };
-  //监听地图点击事件
-  onClickMap = e => {
-    console.log('e.latlng',e.latlng);
-  }
+
   //监听地图鼠标移动事件
   showImageInfos = e => {
     const {
@@ -1237,36 +1265,47 @@ export default class homePage extends PureComponent {
 
   // 创建区域统计渲染
   createZStatistics = () => {
-    setTimeout(() => {
-      if(RegionCenterData.length>0){
+
+    if(!this.radius){
+      setTimeout(() => {
         const zoom = this.map.getZoom();
-        let radius = 2000;
         if(zoom<=7){//省级行政区划
-          radius = 15000;
+          this.radius = 15000;
         }
         else if(zoom>7 && zoom <=9){//市级行政区划
-          radius = 5000;
+          this.radius = 5000;
         }
         else{//区县级行政区划
-          radius = 1500;
+          this.radius = 1500;
         }
-        RegionCenterData.forEach((item) => {
-          const myIcon = L.divIcon({
-            html: item.num,
-            className: 'my-div-icon',
-            iconSize:16
-          });
-          //console.log('item.name',item.name);
-          this.ZSgeojsonLayer.addLayer(L.circle([item.pointY,item.pointX],radius,Object.assign(ZSGeoJsonStyle, {name:item.name})));
-          this.ZSgeojsonLayer.addLayer(L.marker([item.pointY,item.pointX], { icon: myIcon }));
+        this.drawMapZStatistics();
+      }, 2000);
+    }
+    else{
+      this.drawMapZStatistics();
+    }
+  }
+
+  drawMapZStatistics = () =>{
+    if(RegionCenterData.length>0){
+      this.clearGeojsonLayer(this.ZSgeojsonLayer);
+      RegionCenterData.forEach((item) => {
+        const myIcon = L.divIcon({
+          html: item.num,
+          className: 'my-div-icon',
+          iconSize:16
         });
-        //console.log('this.ZSgeojsonLayer.getLayers()',this.ZSgeojsonLayer.getLayers());
-      }    
-    }, 2000);
+        //console.log('item.name',item.name);
+        this.ZSgeojsonLayer.addLayer(L.circle([item.pointY,item.pointX],this.radius,Object.assign(ZSGeoJsonStyle, {name:item.name})));
+        this.ZSgeojsonLayer.addLayer(L.marker([item.pointY,item.pointX], { icon: myIcon }));
+      });
+      //console.log('this.ZSgeojsonLayer.getLayers()',this.ZSgeojsonLayer.getLayers());
+    }     
   }
 
   createZSPie = () => {
     if(RegionPieData.length>0){
+      this.clearGeojsonLayer(this.ZSgeojsonLayer);
         RegionPieData.forEach((item,index) => {
           const myIcon = L.divIcon({
             html: `<div id="cMark${index}" style="width:40px;height:40px;position:relative;background-color:transparent;"></div>`,
@@ -1343,27 +1382,28 @@ export default class homePage extends PureComponent {
 			vectorTileLayerStyles: {
 				sliced: function(properties, zoom) {
           // return {icon: L.icon({
-          //   iconUrl: './img/problemPoint.png',
-          //   iconSize: [20, 20]
+          //   iconUrl: './img/problemPointMarker.png',
+          //   iconSize: [40, 40]
           // })};
-          return {icon: new L.Icon.Default() };
-          // return {
-					// 	weight: 2,
-					// 	color: 'red',
-					// 	opacity: 1,
-					// 	fillColor: 'yellow',
-					// 	fill: true,
-					// 	radius: 6,
-					// 	fillOpacity: 0.7
-					// }
+          // return {icon: new L.Icon.Default() };
+          return {
+						weight: 2,
+						color: 'red',
+						opacity: 1,
+						fillColor: 'yellow',
+						fill: true,
+						radius: 12,
+						fillOpacity: 0.7
+					}
 				}
 			},
       interactive: true,
       getFeatureId: function(f) {
         return f.properties.id;
       },
-      maxZoom: config.mapInitParams.maxZoom,
-      minZoom: config.mapInitParams.zoom,
+      maxZoom: 21,
+      minZoom: config.pointLevel,
+      zIndex: 500
     };
     this.projectPointVGLayer = L.vectorGrid.slicer(geojson, obj).on('click', function(e) {
       console.log('e.layer.properties', e.layer.properties);
@@ -1447,9 +1487,17 @@ export default class homePage extends PureComponent {
     const me = this;
     this.getNextRegions();
     //监听行政区划图层鼠标事件
+    regiongeojsonLayer.on('click', me.onClickRegiongeojsonLayer);
     regiongeojsonLayer.on('mouseover', me.onMoveoverRegiongeojsonLayer);
     regiongeojsonLayer.on('mouseout', me.onMoveoutRegiongeojsonLayer);
   };
+
+  onClickRegiongeojsonLayer = e => {
+    const zoom = this.map.getZoom();
+    if(zoom<config.pointLevel){
+      this.map.flyTo(e.latlng,config.pointLevel);
+    }   
+  }
 
   onMoveoverRegiongeojsonLayer = e => {
     //console.log('onMoveoverRegiongeojsonLayer',e);
@@ -1575,6 +1623,18 @@ export default class homePage extends PureComponent {
   */
   onChangeProjectSymbol = e => {
     console.log('radio checked', e.target.value);
+    const zoom = this.map.getZoom();
+    if(zoom >= config.pointLevel){ //切换项目点符号类型
+
+    }
+    else{ //切换区域统计类型
+      if(e.target.value === 1){
+        this.createZStatistics();
+      }
+      else{
+        this.createZSPie();
+      }
+    }
     this.setState({
       projectSymbolValue: e.target.value,
     });
@@ -1641,21 +1701,24 @@ export default class homePage extends PureComponent {
           >
             <Radio.Group onChange={this.onChangeProjectSymbol} value={projectSymbolValue}>
               <Radio style={radioStyle} value={1}>
-                立项级别
+                项目总数
               </Radio>
               <Radio style={radioStyle} value={2}>
-                扰动合规性
+                立项级别
               </Radio>
               <Radio style={radioStyle} value={3}>
+                扰动合规性
+              </Radio>
+              <Radio style={radioStyle} value={4}>
                 项目类别
               </Radio>
-              <Radio style={radioStyle} value={4}>
+              <Radio style={radioStyle} value={5}>
                 项目性质
               </Radio>
-              <Radio style={radioStyle} value={4}>
+              <Radio style={radioStyle} value={6}>
                 建设状态
               </Radio>
-              <Radio style={radioStyle} value={4}>
+              <Radio style={radioStyle} value={7}>
                 矢量化类型
               </Radio>
             </Radio.Group>

@@ -3417,13 +3417,25 @@ export default class sider extends PureComponent {
                         )
                       : [districtTree[0].value]
                   })(
+                    // <TreeSelect
+                    //   treeData={districtTree}
+                    //   multiple
+                    //   filterTreeNode={(a, b) => {
+                    //     if (b.props.label.indexOf(a) > -1) {
+                    //       return true;
+                    //     }
+                    //   }}
+                    // />
                     <TreeSelect
                       showSearch
-                      style={{ width: '100%' }}
-                      dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                       allowClear
                       multiple
-                      maxTagCount={5}
+                      dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                      filterTreeNode={(a, b) => {
+                        if (b.props.title.indexOf(a) > -1) {
+                          return true;
+                        }
+                      }}
                     >
                       {districtTree.map(item => (
                         <TreeSelect.TreeNode
