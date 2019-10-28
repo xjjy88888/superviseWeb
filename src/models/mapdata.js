@@ -4,7 +4,8 @@ import {
   boundaryApi,
   projectPositionApi,
   getInfoByExtent,
-  getHistorySpotTimeByExtent
+  getHistorySpotTimeByExtent,
+  totalByDistrictCodeApi
 } from "../services/httpApi";
 import { routerRedux } from "dva/router";
 export default {
@@ -110,7 +111,19 @@ export default {
         payload: { historiesSpot: arr }
       });
       if (callback) callback(arr);
-    }
+    },
+
+    *totalByDistrictCode({ payload, callback }, { call, put }) {
+      const {
+        data: { result }
+      } = yield call(totalByDistrictCodeApi, payload);
+      yield put({
+        type: "save",
+        payload: { RegionCenterData: result}
+      });
+      if (callback) callback(result);
+    },
+
   },
 
   reducers: {

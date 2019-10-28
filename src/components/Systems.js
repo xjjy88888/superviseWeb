@@ -79,15 +79,7 @@ export default class system extends PureComponent {
   render() {
     const { children } = this.props;
 
-    const user = localStorage.getItem('user');
-    const userName = user ? JSON.parse(user).displayName : '';
-    const isAllPower = userName.indexOf('办事员') === -1;
-
-    if (isAllPower) {
-      menuList = highPowerList.concat(lowPowerList);
-    } else {
-      menuList = lowPowerList;
-    }
+    menuList = highPowerList.concat(lowPowerList);
 
     return (
       <Layouts>

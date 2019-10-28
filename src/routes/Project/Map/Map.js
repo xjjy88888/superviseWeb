@@ -956,7 +956,6 @@ export default class homePage extends PureComponent {
       iconUrl: require('leaflet/dist/images/marker-icon.png'),
       shadowUrl: require('leaflet/dist/images/marker-shadow.png')
     });
-    // const { ZSgeojsonLayer } = this;
     const map = L.map('map', {
       zoomControl: false,
       //crs: L.CRS.EPSG3857,
@@ -1452,12 +1451,10 @@ export default class homePage extends PureComponent {
 
   // 根据行政区划名称匹配对应的区域统计圆圈图层
   HLZSLayerbyName = (name) => {
-    //console.log('HLZSLayerbyName',this.ZSgeojsonLayer.getLayers());
     let layers = this.ZSgeojsonLayer.getLayers();
     if(layers.length>0){
       for(let i = 0;i<layers.length;i++){
           if(layers[i].options.name && layers[i].options.name === name){
-            //  layers[i].setStyle(ZSGeoJsonHLightStyle);
             layers[i].setStyle(Object.assign(ZSGeoJsonHLightStyle, {name:name}));
              break;
           }        
@@ -1466,7 +1463,6 @@ export default class homePage extends PureComponent {
   }
 
   resetZSLayerbyName = (name) => {
-    //console.log('resetZSLayerbyName',this.ZSgeojsonLayer.getLayers());
     let layers = this.ZSgeojsonLayer.getLayers();
     if(layers.length>0){
       for(let i = 0;i<layers.length;i++){

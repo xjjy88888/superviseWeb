@@ -544,7 +544,6 @@ export default class sider extends PureComponent {
     } = this.props;
     if (isProjectSupervise) {
       this.queryProjectSupervise(items);
-      emitter.emit(`queryProjectFilter`, items);
     } else {
       this.showSpin(true);
       dispatch({
@@ -574,16 +573,18 @@ export default class sider extends PureComponent {
       projectSupervise: { projectSuperviseList }
     } = this.props;
     this.showSpin(true);
+    const payload = {
+      ...items,
+      IsExclusive: true,
+      IsShared: true,
+      items: items.SkipCount === 0 ? [] : projectSuperviseList.items
+    };
     dispatch({
       type: 'projectSupervise/queryProjectSupervise',
-      payload: {
-        ...items,
-        IsExclusive: true,
-        IsShared: true,
-        items: items.SkipCount === 0 ? [] : projectSuperviseList.items
-      },
+      payload,
       callback: (success, response) => {
         this.showSpin(false);
+        emitter.emit(`queryProjectFilter`, payload);
       }
     });
   };

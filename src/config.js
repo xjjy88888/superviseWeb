@@ -408,7 +408,10 @@ const config = {
 
     projectSuperviseCancelDeleteUrl: `${domainApi}ProjectRegulation/CancelDelete`,
 
-    projectSuperviseForeverDeleteUrl: `${domainApi}ProjectRegulation/HardDelete`
+    projectSuperviseForeverDeleteUrl: `${domainApi}ProjectRegulation/HardDelete`,
+
+    //获取当前用户行政级别下的总数
+    totalByDistrictCodeUrl: `${domainApi}ProjectRegulation/TotalByDistrictCode`,
   },
 
   //工具箱

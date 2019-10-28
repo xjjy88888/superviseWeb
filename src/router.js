@@ -17,10 +17,6 @@ import ProjectMap from './routes/Project/Map/Map';
 import CesiumMap from './routes/Project/Map/CesiumMap';
 
 function RouterConfig({ history }) {
-  const user = localStorage.getItem('user');
-  const userName = user ? JSON.parse(user).displayName : '';
-  const isAllPower = userName ? userName.indexOf('办事员') !== -1 : true;
-
   return (
     <Router history={history}>
       <Switch>
@@ -28,7 +24,7 @@ function RouterConfig({ history }) {
         <Route path="/login" exact component={Login} />
         <Route path="/index" exact component={Home} />
         <Route path="/region" exact component={RegionMap} />
-        <Route path="/system" exact component={isAllPower ? Review : Company} />
+        <Route path="/system" exact component={Review} />
         <Route path="/system/user/review" component={Review} exact />
         <Route path="/system/user/society" component={Society} exact />
         <Route path="/system/user/admin" component={Admin} exact />

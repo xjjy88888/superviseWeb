@@ -84,6 +84,7 @@ const highLightGeoJsonStyle = {
 let regiongeojsonLayer = null;//行政区划矢量图层
 let ZSgeojsonLayer = null;//区域统计图层
 let radius = null;//画圆圈半径大小
+let RegionCenterData = [];
 //绘制geojson行政区划图层样式
 const regionGeoJsonStyle = {
   color: '#33CCFF', //#33CCFF #0000FF
@@ -152,6 +153,7 @@ export default class integration extends PureComponent {
       switchDataModal:true,//区域监管、项目监管切换模式
       showProjectSymbol: false,
       projectSymbolValue:1,
+      payload:null,
       //loading: true
     };
     //this.map = null;
@@ -668,6 +670,17 @@ export default class integration extends PureComponent {
         spotRelateProjectId: data.projectId
       });
     });
+    //项目监管请求参数
+    this.eventEmitter = emitter.addListener('queryProjectFilter', payload => {
+      console.log('payload',payload);
+      this.setState({
+        payload: payload
+      });
+      const {switchDataModal} = this.state;
+      if(!switchDataModal){
+        this.requestZStatistics(this.callbackDrawMapZStatistics);       
+      }
+    });
   }
 
   // 切换到区域监管
@@ -691,6 +704,8 @@ export default class integration extends PureComponent {
     }
     //行政区划图层
     regiongeojsonLayer.setStyle({opacity:0,fillOpacity:0});
+    //区域统计图层
+    this.clearXMJGGeojsonLayer(ZSgeojsonLayer);
   }
 
   // 切换到项目监管
@@ -720,6 +735,70 @@ export default class integration extends PureComponent {
       // 创建行政区划渲染
       me.createRegion();
     }
+    //创建区域统计渲染
+    me.createZStatistics();
+  }
+
+  // 创建区域统计渲染
+  createZStatistics = () => {
+    if(!radius){
+      // setTimeout(() => {
+        const zoom = map.getZoom();
+        if(zoom<=7){//省级行政区划
+          radius = 15000;
+        }
+        else if(zoom>7 && zoom <=9){//市级行政区划
+          radius = 5000;
+        }
+        else{//区县级行政区划
+          radius = 1500;
+        }
+      // }, 2000);
+    }
+    if(RegionCenterData.length>0){
+      this.drawMapZStatistics(RegionCenterData);  
+    }
+    else{
+      this.requestZStatistics(this.callbackDrawMapZStatistics);
+    }
+  }
+
+  drawMapZStatistics = (RegionCenterData) =>{
+    if(RegionCenterData.length>0){
+      this.clearXMJGGeojsonLayer(ZSgeojsonLayer);
+      RegionCenterData.forEach((item) => {
+        if(item.totalCount>0){
+          const myIcon = L.divIcon({
+            html: item.totalCount,
+            className: 'my-div-icon',
+            iconSize:16
+          });
+          ZSgeojsonLayer.addLayer(L.circle([item.pointY,item.pointX],radius,Object.assign(ZSGeoJsonStyle, {name:item.name})));
+          ZSgeojsonLayer.addLayer(L.marker([item.pointY,item.pointX], { icon: myIcon }));
+        }
+      });
+    }  
+  }
+
+  requestZStatistics = (callback) =>{
+    const {payload} = this.state;
+    const params = {
+      ...payload,
+      // MaxResultCount: null,
+      // SkipCount: null
+    };
+    // console.log('params',params);
+    this.props.dispatch({
+      type: 'mapdata/totalByDistrictCode',
+      payload:params,
+      callback: callback
+    });   
+  }
+
+  callbackDrawMapZStatistics = data => {
+    console.log('callbackDrawMapZStatistics',data);
+    RegionCenterData = data;
+    this.drawMapZStatistics(data);  
   }
 
   // 创建行政区划渲染
@@ -1403,6 +1482,10 @@ export default class integration extends PureComponent {
       pane: 'regiongeoJsonZIndex'
     });
     map.addLayer(regiongeojsonLayer);
+
+    //区域统计图层
+    ZSgeojsonLayer = L.featureGroup([],{pane: 'regiongeoJsonZIndex'});
+    map.addLayer(ZSgeojsonLayer);   
 
   };
   //监听地图点击事件
