@@ -1233,8 +1233,6 @@ export default class homePage extends PureComponent {
     const { map, imgTextButtonHtml } = this;
     const me = this;
     L.easyButton(imgTextButtonHtml('./img/projectSymbol.png','项目符号化'), () => {
-      //message.warning('区域范围之外的数据没有权限操作', 1);
-      //showProjectSymbol
       const { showProjectSymbol } = me.state;
       this.setState({ showProjectSymbol: !showProjectSymbol });
     }).addTo(map).setPosition('topright');

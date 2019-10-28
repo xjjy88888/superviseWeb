@@ -544,6 +544,7 @@ export default class sider extends PureComponent {
     } = this.props;
     if (isProjectSupervise) {
       this.queryProjectSupervise(items);
+      emitter.emit(`queryProjectFilter`, items);
     } else {
       this.showSpin(true);
       dispatch({
