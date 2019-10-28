@@ -1282,8 +1282,8 @@ export default class sider extends PureComponent {
                   style={
                     item.id === clickId
                       ? {
-                          color: 'green',
-                          fontSize: 20
+                          color: 'green'
+                          // fontSize: 20
                         }
                       : {}
                   }
