@@ -1,12 +1,11 @@
 import React, { PureComponent } from 'react';
-import { Menu, Icon, Dropdown, Avatar, Layout, Typography } from 'antd';
+import { Menu, Icon, Dropdown, Avatar, Layout } from 'antd';
 import { connect } from 'dva';
 import { Link } from 'dva/router';
 import { LocaleProvider } from 'antd';
 import zh_CN from 'antd/lib/locale-provider/zh_CN';
 
-const { Header, Footer, Sider, Content } = Layout;
-const { Text, Paragraph, Title } = Typography;
+const { Header, Content } = Layout;
 
 const menuList = [
   {
@@ -94,10 +93,19 @@ export default class layouts extends PureComponent {
     const displayName = user ? user.displayName : '';
     const departmentName = user ? user.departmentName : '';
 
+    const themeColor = '#426374';
+
     return (
       <LocaleProvider locale={zh_CN}>
         <Layout>
-          <Header style={{ position: 'relative', height: 46, zIndex: 1001 }}>
+          <Header
+            style={{
+              position: 'relative',
+              height: 47,
+              zIndex: 1001,
+              backgroundColor: themeColor
+            }}
+          >
             <span
               style={{
                 lineHeight: '43px',
@@ -106,7 +114,7 @@ export default class layouts extends PureComponent {
                 height: '100%'
               }}
             >
-              <Avatar src="./img/logo.png" />/
+              <Avatar src="./img/logo.png" />
               <Link
                 to="/region"
                 style={{
@@ -120,6 +128,10 @@ export default class layouts extends PureComponent {
             <Menu
               mode="horizontal"
               theme="dark"
+              style={{
+                backgroundColor: themeColor,
+                width: '100%'
+              }}
               selectedKeys={[this.state.current]}
             >
               {menuList.map((item, index) =>

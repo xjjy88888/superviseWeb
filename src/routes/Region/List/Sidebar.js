@@ -2908,8 +2908,8 @@ export default class sider extends PureComponent {
                             emitter.emit('showSiderbarDetail', {
                               from: 'panorama',
                               show: true,
-                              edit: false,
-                              type: 'edit',
+                              edit: true,
+                              type: 'add',
                               id: null,
                               projectId: projectItem.id,
                               item: {}
