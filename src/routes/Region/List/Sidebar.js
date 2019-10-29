@@ -1146,14 +1146,13 @@ export default class sider extends PureComponent {
       }
     ];
 
-    const list =
-      key === 'project' && isProjectSupervise
-        ? projectSuperviseList.items
-        : key === 'project' && !isProjectSupervise
-        ? projectList.items
-        : key === 'spot'
-        ? spotList.items
-        : pointList.items;
+    const list = isProjectSupervise
+      ? projectSuperviseList.items
+      : key === 'project'
+      ? projectList.items
+      : key === 'spot'
+      ? spotList.items
+      : pointList.items;
 
     const dataSourceTable = list.map((item, index) => {
       return {
@@ -1168,17 +1167,17 @@ export default class sider extends PureComponent {
           <span>
             <span>
               共有
-              {key === 'project' && isProjectSupervise
+              {isProjectSupervise
                 ? projectSuperviseList.items.length
-                : key === 'project' && !isProjectSupervise
+                : key === 'project'
                 ? projectList.items.length
                 : key === 'spot'
                 ? spotList.items.length
                 : pointList.items.length}
               /
-              {key === 'project' && isProjectSupervise
+              {isProjectSupervise
                 ? projectSuperviseList.totalCount
-                : key === 'project' && !isProjectSupervise
+                : key === 'project'
                 ? projectList.totalCount
                 : key === 'spot'
                 ? spotList.totalCount
@@ -1188,7 +1187,6 @@ export default class sider extends PureComponent {
             <span
               style={{
                 display: key !== 'point' ? 'inherit' : 'none'
-                // float: "right"
               }}
             >
               <Button
@@ -1248,7 +1246,7 @@ export default class sider extends PureComponent {
                 onClick={() => {
                   this.setState({ clickId: item.id });
                   resetFields();
-                  //编辑
+                  //编辑1
                   if (key === 'project') {
                     this.setState({
                       showProjectDetail: true,
@@ -1287,14 +1285,13 @@ export default class sider extends PureComponent {
                       : {}
                   }
                 >
-                  {key === 'project'
+                  {key === 'project' || isProjectSupervise
                     ? item.projectName
                     : key === 'spot'
                     ? item.mapNum
                     : item.createTime + '  ' + item.name}
                 </b>
               </span>
-              {/* 定位 */}
               <Icon
                 type="environment"
                 style={{
@@ -1422,7 +1419,11 @@ export default class sider extends PureComponent {
               cursor: 'pointer'
             }}
             onClick={() => {
-              this.setState({ isProjectSupervise: !isProjectSupervise });
+              this.closeAll();
+              this.setState({
+                isProjectSupervise: !isProjectSupervise,
+                key: `project`
+              });
               emitter.emit('switchData', {
                 state: isProjectSupervise
               });
@@ -1432,7 +1433,11 @@ export default class sider extends PureComponent {
             <br />
             监管
           </Tag>
-          <Menu mode="horizontal" defaultSelectedKeys={['project']}>
+          <Menu
+            mode="horizontal"
+            defaultSelectedKeys={['project']}
+            selectedKeys={[key]}
+          >
             {(isProjectSupervise ? tabsProject : tabs).map(item => (
               <Menu.Item key={item.key} onClick={this.switchMenu}>
                 {item.title}
