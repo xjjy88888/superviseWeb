@@ -126,7 +126,7 @@ class Info extends PureComponent {
       this.setState({ loading: true });
       dispatch({
         type: 'departs/departsTree',
-        payload: { IsFilter: true },
+        payload: { IsFilter: false },
         callback: (success, error, result) => {
           this.setState({ loading: false });
           if (success && fn) {
