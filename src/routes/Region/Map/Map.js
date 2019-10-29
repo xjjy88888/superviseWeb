@@ -9,7 +9,8 @@ import {
   Select,
   notification,
   message,
-  Radio
+  Radio,
+  Progress
 } from 'antd';
 import Sidebar from '../List/Sidebar';
 import SidebarDetail from '../List/SiderbarDetail';
@@ -81,9 +82,9 @@ const highLightGeoJsonStyle = {
   fillOpacity: 0.8
 };
 /*-------------------------------------项目监管部分-------------------------------------*/
-let regiongeojsonLayer = null;//行政区划矢量图层
-let ZSgeojsonLayer = null;//区域统计图层
-let radius = null;//画圆圈半径大小
+let regiongeojsonLayer = null; //行政区划矢量图层
+let ZSgeojsonLayer = null; //区域统计图层
+let radius = null; //画圆圈半径大小
 let RegionCenterData = [];
 //绘制geojson行政区划图层样式
 const regionGeoJsonStyle = {
@@ -131,7 +132,7 @@ export default class integration extends PureComponent {
       //loading: false,
       showButton: false,
       showHistoryContrast: false,
-      showQYJGPanel:true,
+      showQYJGPanel: true,
       showSiderbar: true,
       showSiderbarDetail: false,
       showProblem: false,
@@ -150,10 +151,12 @@ export default class integration extends PureComponent {
       photoPreviewUrl: null,
       imageTimeText: '',
       showImageTimeText: true,
-      switchDataModal:true,//区域监管、项目监管切换模式
+      switchDataModal: true, //区域监管、项目监管切换模式
       showProjectSymbol: false,
-      projectSymbolValue:1,
-      payload:null,
+      projectSymbolValue: 1,
+      payload: null,
+      percent: 0,
+      showProgress: false
       //loading: true
     };
     //this.map = null;
@@ -180,10 +183,11 @@ export default class integration extends PureComponent {
       me.clearGeojsonLayer();
       map.closePopup();
       //切换模式
-      if(v.state){//区域监管
+      if (v.state) {
+        //区域监管
         this.switchQYJG();
-      }
-      else{//项目监管
+      } else {
+        //项目监管
         this.switchXMJG();
       }
     });
@@ -672,19 +676,19 @@ export default class integration extends PureComponent {
     });
     //项目监管请求参数
     this.eventEmitter = emitter.addListener('queryProjectFilter', payload => {
-      console.log('payload',payload);
+      console.log('payload', payload);
       this.setState({
         payload: payload
       });
-      const {switchDataModal} = this.state;
-      if(!switchDataModal){
-        this.requestZStatistics(this.callbackDrawMapZStatistics);       
+      const { switchDataModal } = this.state;
+      if (!switchDataModal) {
+        this.requestZStatistics(this.callbackDrawMapZStatistics);
       }
     });
   }
 
   // 切换到区域监管
-  switchQYJG = () =>{
+  switchQYJG = () => {
     const { showQYJGPanel } = this.state;
     /*-------------------------------------区域监管部分-------------------------------------*/
     //显示区域监管的图表联动、地图分屏、地图历史对比、图斑面板
@@ -692,24 +696,24 @@ export default class integration extends PureComponent {
       showQYJGPanel: !showQYJGPanel
     });
     //添加项目红线、扰动图斑图层到图层管理控件
-    userconfig.layersControl.addOverlay(userconfig.projectWmsLayer,'项目红线');
-    userconfig.layersControl.addOverlay(userconfig.spotWmsLayer,'扰动图斑');
+    userconfig.layersControl.addOverlay(userconfig.projectWmsLayer, '项目红线');
+    userconfig.layersControl.addOverlay(userconfig.spotWmsLayer, '扰动图斑');
     //显示项目红线、扰动图斑图层
     userconfig.projectWmsLayer.setOpacity(1);
     userconfig.spotWmsLayer.setOpacity(1);
-    userconfig.geoJsonLayer.setStyle({opacity:1,fillOpacity:0});
+    userconfig.geoJsonLayer.setStyle({ opacity: 1, fillOpacity: 0 });
     /*-------------------------------------项目监管部分-------------------------------------*/
-    if(userconfig.easyProjectSymbolButton){
+    if (userconfig.easyProjectSymbolButton) {
       userconfig.easyProjectSymbolButton.remove();
     }
     //行政区划图层
-    regiongeojsonLayer.setStyle({opacity:0,fillOpacity:0});
+    regiongeojsonLayer.setStyle({ opacity: 0, fillOpacity: 0 });
     //区域统计图层
     this.clearXMJGGeojsonLayer(ZSgeojsonLayer);
-  }
+  };
 
   // 切换到项目监管
-  switchXMJG = () =>{
+  switchXMJG = () => {
     const me = this;
     const { showQYJGPanel } = this.state;
     /*-------------------------------------区域监管部分-------------------------------------*/
@@ -723,83 +727,103 @@ export default class integration extends PureComponent {
     //隐藏项目红线、扰动图斑图层
     userconfig.projectWmsLayer.setOpacity(0);
     userconfig.spotWmsLayer.setOpacity(0);
-    userconfig.geoJsonLayer.setStyle({opacity:0,fillOpacity:0});
+    userconfig.geoJsonLayer.setStyle({ opacity: 0, fillOpacity: 0 });
     /*-------------------------------------项目监管部分-------------------------------------*/
     this.createProjectSymbolButton();
     //行政区划图层
     let regionLayers = regiongeojsonLayer.getLayers();
-    if(regionLayers.length>0){
-      regiongeojsonLayer.setStyle({opacity:0.8,fillOpacity:0.1});
-    }
-    else{
+    if (regionLayers.length > 0) {
+      regiongeojsonLayer.setStyle({ opacity: 0.8, fillOpacity: 0.1 });
+    } else {
       // 创建行政区划渲染
       me.createRegion();
     }
     //创建区域统计渲染
     me.createZStatistics();
-  }
+  };
 
   // 创建区域统计渲染
   createZStatistics = () => {
-    if(!radius){
+    if (!radius) {
       // setTimeout(() => {
-        const zoom = map.getZoom();
-        if(zoom<=7){//省级行政区划
-          radius = 15000;
-        }
-        else if(zoom>7 && zoom <=9){//市级行政区划
-          radius = 5000;
-        }
-        else{//区县级行政区划
-          radius = 1500;
-        }
+      const zoom = map.getZoom();
+      if (zoom <= 7) {
+        //省级行政区划
+        radius = 15000;
+      } else if (zoom > 7 && zoom <= 9) {
+        //市级行政区划
+        radius = 5000;
+      } else {
+        //区县级行政区划
+        radius = 1500;
+      }
       // }, 2000);
     }
-    if(RegionCenterData.length>0){
-      this.drawMapZStatistics(RegionCenterData);  
-    }
-    else{
+    if (RegionCenterData.length > 0) {
+      this.drawMapZStatistics(RegionCenterData);
+    } else {
       this.requestZStatistics(this.callbackDrawMapZStatistics);
     }
-  }
+  };
 
-  drawMapZStatistics = (RegionCenterData) =>{
-    if(RegionCenterData.length>0){
+  drawMapZStatistics = RegionCenterData => {
+    if (RegionCenterData.length > 0) {
       this.clearXMJGGeojsonLayer(ZSgeojsonLayer);
-      RegionCenterData.forEach((item) => {
-        if(item.totalCount>0){
+      RegionCenterData.forEach(item => {
+        if (item.totalCount > 0) {
           const myIcon = L.divIcon({
             html: item.totalCount,
             className: 'my-div-icon',
-            iconSize:16
+            iconSize: 16
           });
-          ZSgeojsonLayer.addLayer(L.circle([item.pointY,item.pointX],radius,Object.assign(ZSGeoJsonStyle, {name:item.name})));
-          ZSgeojsonLayer.addLayer(L.marker([item.pointY,item.pointX], { icon: myIcon }));
+          ZSgeojsonLayer.addLayer(
+            L.circle(
+              [item.pointY, item.pointX],
+              radius,
+              Object.assign(ZSGeoJsonStyle, { name: item.name })
+            )
+          );
+          ZSgeojsonLayer.addLayer(
+            L.marker([item.pointY, item.pointX], { icon: myIcon })
+          );
         }
       });
-    }  
-  }
+    }
+  };
 
-  requestZStatistics = (callback) =>{
-    const {payload} = this.state;
+  requestZStatistics = callback => {
+    const { payload } = this.state;
     const params = {
-      ...payload,
+      ...payload
       // MaxResultCount: null,
       // SkipCount: null
     };
     // console.log('params',params);
+    this.setState({ showProgress: true });
+    this.loadProgress();
     this.props.dispatch({
       type: 'mapdata/totalByDistrictCode',
-      payload:params,
+      payload: params,
       callback: callback
-    });   
-  }
+    });
+  };
+
+  loadProgress = () => {
+    for (let i = 0; i < 100000; i++) {
+      let percent = this.state.percent + 10;
+      if (percent >= 100) {
+        percent = 0;
+      }
+      this.setState({ percent: percent });
+    }
+  };
 
   callbackDrawMapZStatistics = data => {
-    console.log('callbackDrawMapZStatistics',data);
+    console.log('callbackDrawMapZStatistics', data);
+    this.setState({ showProgress: false });
     RegionCenterData = data;
-    this.drawMapZStatistics(data);  
-  }
+    this.drawMapZStatistics(data);
+  };
 
   // 创建行政区划渲染
   createRegion = () => {
@@ -812,18 +836,20 @@ export default class integration extends PureComponent {
   };
 
   onClickRegiongeojsonLayer = e => {
-    const {switchDataModal} = this.state;
-    if(!switchDataModal){//项目监管
+    const { switchDataModal } = this.state;
+    if (!switchDataModal) {
+      //项目监管
       const zoom = map.getZoom();
-      if(zoom<config.pointLevel){
-        map.flyTo(e.latlng,config.pointLevel);
-      } 
-    }  
-  }
+      if (zoom < config.pointLevel) {
+        map.flyTo(e.latlng, config.pointLevel);
+      }
+    }
+  };
 
   onMoveoverRegiongeojsonLayer = e => {
-    const {switchDataModal} = this.state;
-    if(!switchDataModal){//项目监管
+    const { switchDataModal } = this.state;
+    if (!switchDataModal) {
+      //项目监管
       //console.log('onMoveoverRegiongeojsonLayer',e);
       e.layer.setStyle(regionGeoJsonHLightStyle);
       e.layer.bringToFront();
@@ -833,14 +859,15 @@ export default class integration extends PureComponent {
   };
 
   onMoveoutRegiongeojsonLayer = e => {
-    const {switchDataModal} = this.state;
-    if(!switchDataModal){//项目监管
+    const { switchDataModal } = this.state;
+    if (!switchDataModal) {
+      //项目监管
       //console.log('onMoveoutRegiongeojsonLayer',e);
       e.layer.setStyle(regionGeoJsonStyle);
       //设置区域统计圆圈图层默认样式
-      //this.resetZSLayerbyName(e.layer.feature.properties.name);   
+      //this.resetZSLayerbyName(e.layer.feature.properties.name);
     }
-  }; 
+  };
 
   /*
    * 绘制行政区划图形函数
@@ -852,9 +879,9 @@ export default class integration extends PureComponent {
   /*
    * 清空绘制图形函数
    */
-  clearXMJGGeojsonLayer = (geojsonLayer) => {
-    if(geojsonLayer){
-       geojsonLayer.clearLayers();      
+  clearXMJGGeojsonLayer = geojsonLayer => {
+    if (geojsonLayer) {
+      geojsonLayer.clearLayers();
     }
   };
 
@@ -943,28 +970,31 @@ export default class integration extends PureComponent {
       payload: { geojsonUrl },
       callback: callback
     });
-  }; 
+  };
 
   // 创建项目类型符号化按钮
   createProjectSymbolButton = () => {
     const { imgTextButtonHtml } = this;
     const me = this;
-    userconfig.easyProjectSymbolButton = L.easyButton(imgTextButtonHtml('./img/projectSymbol.png','项目符号化'), () => {
-      const { showProjectSymbol } = me.state;
-      this.setState({ showProjectSymbol: !showProjectSymbol });
-    }).addTo(map).setPosition('topright');
+    userconfig.easyProjectSymbolButton = L.easyButton(
+      imgTextButtonHtml('./img/projectSymbol.png', '项目符号化'),
+      () => {
+        const { showProjectSymbol } = me.state;
+        this.setState({ showProjectSymbol: !showProjectSymbol });
+      }
+    )
+      .addTo(map)
+      .setPosition('topright');
   };
-  
+
   // 获取图标文本按钮html
   imgTextButtonHtml = (icon, title, text) => {
     if (text) {
       return `<div class="global-map-button-icon"><img src="${icon}"></img></div><div class="global-map-button-text">${text}</div>`;
-    }
-    else {
+    } else {
       if (title) {
         return `<img src="${icon}" style='width:20px;height:20px;margin-top:-5px;margin-left:-1px;' title='${title}'></img>`;
-      }
-      else{
+      } else {
         return `<img src="${icon}" style='width:20px;height:20px;margin-top:-5px;margin-left:-1px;'></img>`;
       }
     }
@@ -976,7 +1006,7 @@ export default class integration extends PureComponent {
     } else {
       return `iconfont ${icon} global-icon-normal`;
     }
-  };   
+  };
 
   // 定位问题点
   async locateProblemPoint(problemPointInfos, id) {
@@ -1473,7 +1503,7 @@ export default class integration extends PureComponent {
     //检查照片列表
     picLayerGroup = L.featureGroup().addTo(map);
     //me.setState({ loading: false });
-  /*-------------------------------------项目监管部分-------------------------------------*/
+    /*-------------------------------------项目监管部分-------------------------------------*/
     //行政区划图层
     map.createPane('regiongeoJsonZIndex');
     map.getPane('regiongeoJsonZIndex').style.zIndex = 1;
@@ -1484,9 +1514,8 @@ export default class integration extends PureComponent {
     map.addLayer(regiongeojsonLayer);
 
     //区域统计图层
-    ZSgeojsonLayer = L.featureGroup([],{pane: 'regiongeoJsonZIndex'});
-    map.addLayer(ZSgeojsonLayer);   
-
+    ZSgeojsonLayer = L.featureGroup([], { pane: 'regiongeoJsonZIndex' });
+    map.addLayer(ZSgeojsonLayer);
   };
   //监听地图点击事件
   onBaseLayerChange = e => {
@@ -1509,14 +1538,14 @@ export default class integration extends PureComponent {
   };
   onClickMap = e => {
     const me = this;
-    const {switchDataModal} = this.state;
+    const { switchDataModal } = this.state;
     let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
     if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {
       message.warning('区域范围之外的数据没有权限操作', 1);
       return;
     }
 
-    if(switchDataModal){
+    if (switchDataModal) {
       /*-------------------------------------区域监管部分-------------------------------------*/
       userconfig.mapPoint = e.latlng;
       //地图定位判断
@@ -1581,8 +1610,7 @@ export default class integration extends PureComponent {
           me.callbackPointQueryWFSService
         );
       }
-    }
-    else{
+    } else {
       /*-------------------------------------项目监管部分-------------------------------------*/
     }
   };
@@ -1619,7 +1647,7 @@ export default class integration extends PureComponent {
 
   onMoveendMap = e => {
     const me = this;
-    const {switchDataModal} = this.state;
+    const { switchDataModal } = this.state;
     let zoom = map.getZoom();
     let bounds = map.getBounds();
     //console.log("zoom",zoom);
@@ -1631,39 +1659,38 @@ export default class integration extends PureComponent {
       });
     }
 
-    if(switchDataModal){
+    if (switchDataModal) {
       /*-------------------------------------区域监管部分-------------------------------------*/
-        //图属联动空间过滤
-        const { chartStatus } = this.state;
-        if (zoom >= config.mapInitParams.zoom && chartStatus) {
-          let polygon = 'polygon((';
-          polygon +=
-            bounds.getSouthWest().lng + ' ' + bounds.getSouthWest().lat + ',';
-          polygon +=
-            bounds.getSouthWest().lng + ' ' + bounds.getNorthEast().lat + ',';
-          polygon +=
-            bounds.getNorthEast().lng + ' ' + bounds.getNorthEast().lat + ',';
-          polygon +=
-            bounds.getNorthEast().lng + ' ' + bounds.getSouthWest().lat + ',';
-          polygon += bounds.getSouthWest().lng + ' ' + bounds.getSouthWest().lat;
-          polygon += '))';
+      //图属联动空间过滤
+      const { chartStatus } = this.state;
+      if (zoom >= config.mapInitParams.zoom && chartStatus) {
+        let polygon = 'polygon((';
+        polygon +=
+          bounds.getSouthWest().lng + ' ' + bounds.getSouthWest().lat + ',';
+        polygon +=
+          bounds.getSouthWest().lng + ' ' + bounds.getNorthEast().lat + ',';
+        polygon +=
+          bounds.getNorthEast().lng + ' ' + bounds.getNorthEast().lat + ',';
+        polygon +=
+          bounds.getNorthEast().lng + ' ' + bounds.getSouthWest().lat + ',';
+        polygon += bounds.getSouthWest().lng + ' ' + bounds.getSouthWest().lat;
+        polygon += '))';
 
-          emitter.emit('chartLinkage', {
-            open: true,
-            type: 'spot',
-            polygon: polygon
-          });
-        }
-        //根据地图当前范围获取对应历史影像数据
-        const { showHistoryContrast } = me.state;
-        if (showHistoryContrast) {
-          //历史影像查询
-          me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
-        }
-    }else{
+        emitter.emit('chartLinkage', {
+          open: true,
+          type: 'spot',
+          polygon: polygon
+        });
+      }
+      //根据地图当前范围获取对应历史影像数据
+      const { showHistoryContrast } = me.state;
+      if (showHistoryContrast) {
+        //历史影像查询
+        me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
+      }
+    } else {
       /*-------------------------------------项目监管部分-------------------------------------*/
     }
-
   };
   /*根据地图当前范围获取对应历史影像数据
    *@method getInfoByExtent
@@ -2755,7 +2782,7 @@ export default class integration extends PureComponent {
 
   /*
    * 项目符号化类型切换函数
-  */
+   */
   onChangeProjectSymbol = e => {
     console.log('radio checked', e.target.value);
     // const zoom = this.map.getZoom();
@@ -2771,7 +2798,7 @@ export default class integration extends PureComponent {
     //   }
     // }
     this.setState({
-      projectSymbolValue: e.target.value,
+      projectSymbolValue: e.target.value
     });
   };
 
@@ -2779,7 +2806,7 @@ export default class integration extends PureComponent {
     const radioStyle = {
       display: 'block',
       height: '25px',
-      lineHeight: '25px',
+      lineHeight: '25px'
     };
     const {
       showButton,
@@ -2797,6 +2824,8 @@ export default class integration extends PureComponent {
       showImageTimeText,
       showProjectSymbol,
       projectSymbolValue,
+      percent,
+      showProgress
       //loading
     } = this.state;
     const {
@@ -2847,6 +2876,18 @@ export default class integration extends PureComponent {
               height: '100%'
             }}
           />
+          {/* 项目监管请求后台接口进度条 */}
+          <div
+            style={{
+              display: showProgress ? 'block' : 'none',
+              position: 'absolute',
+              bottom: 14,
+              right: 500,
+              zIndex: 1000
+            }}
+          >
+            <Progress type="circle" percent={percent} width={30} />
+          </div>
           {/* 监管影像时间显示信息 */}
           <div
             style={{
@@ -2918,7 +2959,7 @@ export default class integration extends PureComponent {
           <div
             style={{
               position: 'absolute',
-              display: showQYJGPanel? 'block' : 'none',
+              display: showQYJGPanel ? 'block' : 'none',
               top: 65,
               right: 120,
               height: 0,
@@ -2975,7 +3016,7 @@ export default class integration extends PureComponent {
           {/* 图例说明、历史对比 */}
           <div
             style={{
-              display: showQYJGPanel? 'block' : 'none',
+              display: showQYJGPanel ? 'block' : 'none',
               position: 'absolute',
               bottom: 40,
               right: 20,
@@ -3163,9 +3204,9 @@ export default class integration extends PureComponent {
               ))}
             </Select>
           </div>
-        
-         {/* 项目符号化 */}
-           <div
+
+          {/* 项目符号化 */}
+          <div
             style={{
               display: showProjectSymbol ? 'block' : 'none',
               position: 'absolute',
@@ -3173,11 +3214,14 @@ export default class integration extends PureComponent {
               right: 13,
               zIndex: 1000,
               background: '#fff',
-              padding:'5px',
-              borderRadius:'5px'
+              padding: '5px',
+              borderRadius: '5px'
             }}
           >
-            <Radio.Group onChange={this.onChangeProjectSymbol} value={projectSymbolValue}>
+            <Radio.Group
+              onChange={this.onChangeProjectSymbol}
+              value={projectSymbolValue}
+            >
               <Radio style={radioStyle} value={1}>
                 项目总数
               </Radio>
@@ -3201,7 +3245,6 @@ export default class integration extends PureComponent {
               </Radio>
             </Radio.Group>
           </div>
-
         </div>
       </Layouts>
     );

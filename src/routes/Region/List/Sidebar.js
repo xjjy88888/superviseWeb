@@ -137,7 +137,6 @@ export default class sider extends PureComponent {
       previewImage: '',
       fileList: [],
       projectFileList: [],
-      showReply: false,
       showPlan: false,
       clickId: null,
       isProjectSupervise: false
@@ -666,8 +665,7 @@ export default class sider extends PureComponent {
           showProjectDetail: success,
           departList: [...departList, ...arr],
           ParentId: result.attachment ? result.attachment.id : 0,
-          showPlan: result.isNeedPlan ? true : false,
-          showReply: result.isReply ? true : false
+          showPlan: result.isNeedPlan ? true : false
         });
 
         if (result.attachment) {
@@ -1104,7 +1102,6 @@ export default class sider extends PureComponent {
       sort_key,
       projectFileList,
       departList,
-      showReply,
       showPlan,
       clickId,
       isProjectSupervise
@@ -2126,21 +2123,13 @@ export default class sider extends PureComponent {
                           </span>
                         </p>
                         <p style={{ marginBottom: 10 }}>
-                          <span>批复情况：</span>
-                          <span>
-                            {projectItem.isReply ? '已批复' : '未批复'}
-                          </span>
+                          <span>批复文号：</span>
+                          <span>{projectItem.replyNum}</span>
                         </p>
-                        <div style={{ display: showReply ? 'block' : 'none' }}>
-                          <p style={{ marginBottom: 10 }}>
-                            <span>批复文号：</span>
-                            <span>{projectItem.replyNum}</span>
-                          </p>
-                          <p style={{ marginBottom: 10 }}>
-                            <span>批复时间：</span>
-                            <span>{projectItem.replyTime}</span>
-                          </p>
-                        </div>
+                        <p style={{ marginBottom: 10 }}>
+                          <span>批复时间：</span>
+                          <span>{projectItem.replyTime}</span>
+                        </p>
                         <p style={{ marginBottom: 10 }}>
                           <span>责任面积：</span>
                           <span>{projectItem.expand.respArea}公顷</span>
@@ -3282,32 +3271,16 @@ export default class sider extends PureComponent {
                       </Select>
                     )}
                   </Form.Item>
-                  <Form.Item label="批复情况" {...formItemLayout}>
-                    {getFieldDecorator('isReply', {
-                      valuePropName: 'checked',
-                      initialValue: projectItem.isReply
-                    })(
-                      <Switch
-                        checkedChildren="已批复"
-                        unCheckedChildren="未批复"
-                        onChange={v => {
-                          this.setState({ showReply: v });
-                        }}
-                      />
-                    )}
+                  <Form.Item label="批复文号" {...formItemLayout}>
+                    {getFieldDecorator('replyNum', {
+                      initialValue: projectItem.replyNum
+                    })(<Input />)}
                   </Form.Item>
-                  <div style={{ display: showReply ? 'block' : 'none' }}>
-                    <Form.Item label="批复文号" {...formItemLayout}>
-                      {getFieldDecorator('replyNum', {
-                        initialValue: projectItem.replyNum
-                      })(<Input />)}
-                    </Form.Item>
-                    <Form.Item label="批复时间" {...formItemLayout}>
-                      {getFieldDecorator('replyTime', {
-                        initialValue: dateInitFormat(projectItem.replyTime)
-                      })(<DatePicker />)}
-                    </Form.Item>
-                  </div>
+                  <Form.Item label="批复时间" {...formItemLayout}>
+                    {getFieldDecorator('replyTime', {
+                      initialValue: dateInitFormat(projectItem.replyTime)
+                    })(<DatePicker />)}
+                  </Form.Item>
                   <Form.Item label="责任面积" {...formItemLayout}>
                     {getFieldDecorator('respArea', {
                       initialValue: projectItem.expand.respArea

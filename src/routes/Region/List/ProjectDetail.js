@@ -99,7 +99,7 @@ export default class projectDetail extends PureComponent {
           callback: success => {
             if (success) {
               emitter.emit('deleteSuccess', {});
-              this.setState({ show: false, });
+              this.setState({ show: false });
             }
           }
         });
@@ -183,13 +183,12 @@ export default class projectDetail extends PureComponent {
     const {
       user: { dicList }
     } = this.props;
+    let result = [];
     if (type) {
-      return dicList.filter(item => {
-        return item.dictTypeName === type;
-      });
-    } else {
-      return [];
+      const filter = dicList.filter(item => item.dictTypeName === type);
+      result = filter;
     }
+    return result;
   };
 
   getDepart = (obj, key) => {
@@ -788,7 +787,7 @@ export default class projectDetail extends PureComponent {
                       allowClear
                       optionFilterProp="children"
                     >
-                      {this.dictList('防治区类型').map(item => (
+                      {this.dictList('国家或省级防治区类型').map(item => (
                         <Select.Option value={item.id} key={item.id}>
                           {item.dictTableValue}
                         </Select.Option>
