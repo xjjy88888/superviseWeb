@@ -144,24 +144,26 @@ export default class Inspect extends PureComponent {
           });
           this.setState({ fileList: list, attachmentId: result.attachment.id });
         }
-        signatureList.map(item => {
-          console.log(result[item.key]);
-          const data = result[item.key];
-          const signList = data
-            ? [
-                {
-                  uid: data.id,
-                  name: data.fileName,
-                  status: 'done',
-                  url: config.url.annexPreviewUrl + data.id
-                }
-              ]
-            : [];
-          this.setState({
-            [item.key + 'List']: signList,
-            [item.key + 'Id']: data ? data.id : null
+        if (success) {
+          signatureList.map(item => {
+            console.log(result[item.key]);
+            const data = result[item.key];
+            const signList = data
+              ? [
+                  {
+                    uid: data.id,
+                    name: data.fileName,
+                    status: 'done',
+                    url: config.url.annexPreviewUrl + data.id
+                  }
+                ]
+              : [];
+            this.setState({
+              [item.key + 'List']: signList,
+              [item.key + 'Id']: data ? data.id : null
+            });
           });
-        });
+        }
       }
     });
   };
