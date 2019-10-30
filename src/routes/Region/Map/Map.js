@@ -2060,6 +2060,7 @@ export default class integration extends PureComponent {
       }
     } else {
       /*-------------------------------------项目监管部分-------------------------------------*/
+      me.clearGeojsonLayer();
       me.clearXMJGGeojsonLayer(tempspotgeojsonLayer);
       me.clearXMJGGeojsonLayer(temprenlinegeojsonLayer);
       if (marker) marker.remove();

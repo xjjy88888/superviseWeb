@@ -1,4 +1,4 @@
-import { notification } from "antd";
+import { notification } from 'antd';
 import {
   inspectFormApi,
   inspectCreateUpdateApi,
@@ -6,11 +6,11 @@ import {
   inspectDeleteApi,
   inspectByIdApi,
   inspectExportApi
-} from "../services/httpApi";
-import { inspectFormData } from "../utils/util";
+} from '../services/httpApi';
+import { inspectFormData } from '../utils/util';
 
 export default {
-  namespace: "inspect",
+  namespace: 'inspect',
 
   state: {
     inspectForm: [],
@@ -31,11 +31,11 @@ export default {
       if (callback) callback(success, error, result);
       if (success) {
         yield put({
-          type: "save",
+          type: 'save',
           payload: { inspectForm: inspectFormData(result) }
         });
       } else {
-        notification["error"]({
+        notification['error']({
           message: `查询检查表模板失败：${error.message}`,
           duration: 1
         });
@@ -49,9 +49,9 @@ export default {
       } = yield call(inspectListApi, payload);
       if (callback) callback(success, error, result);
       if (success) {
-        yield put({ type: "save", payload: { inspectList: result.items } });
+        yield put({ type: 'save', payload: { inspectList: result.items } });
       } else {
-        notification["error"]({
+        notification['error']({
           message: `查询检查表列表失败：${error.message}`,
           duration: 1
         });
@@ -64,9 +64,9 @@ export default {
         data: { success, error, result }
       } = yield call(inspectCreateUpdateApi, payload);
       if (callback) callback(success, error, result);
-      notification[success ? "success" : "error"]({
-        message: `${payload.id ? "编辑" : "新建"}检查表${
-          success ? "成功" : "失败"
+      notification[success ? 'success' : 'error']({
+        message: `${payload.id ? '编辑' : '新建'}检查表${
+          success ? '成功' : '失败'
         }`,
         duration: 1
       });
@@ -78,17 +78,17 @@ export default {
         data: { success, error, result }
       } = yield call(inspectDeleteApi, payload);
       if (callback) callback(success, error, result);
-      notification[success ? "success" : "error"]({
-        message: `删除检查表${success ? "成功" : "失败"}`,
+      notification[success ? 'success' : 'error']({
+        message: `删除检查表${success ? '成功' : '失败'}`,
         duration: 1
       });
     },
 
     //检查表_详情
     *inspectById({ payload, callback }, { call, put }) {
-      if (payload.from === "add") {
+      if (payload.from === 'add') {
         yield put({
-          type: "save",
+          type: 'save',
           payload: { inspectInfo: { checkInfoLists: null } }
         });
         if (callback) callback(false);
@@ -98,9 +98,9 @@ export default {
         } = yield call(inspectByIdApi, payload);
         if (callback) callback(success, error, result);
         if (success) {
-          yield put({ type: "save", payload: { inspectInfo: result } });
+          yield put({ type: 'save', payload: { inspectInfo: result } });
         } else {
-          notification["error"]({
+          notification['error']({
             message: `查询检查表详情失败`,
             duration: 1
           });
@@ -113,8 +113,8 @@ export default {
       const {
         data: { success, error, result }
       } = yield call(inspectExportApi, payload);
-      notification[success ? "success" : "error"]({
-        message: `导出检查表${success ? "成功" : "失败"}`,
+      notification[success ? 'success' : 'error']({
+        message: `导出检查表${success ? '成功' : '失败'}`,
         duration: 1
       });
       if (callback) callback(success, error, result);

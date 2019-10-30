@@ -438,6 +438,17 @@ export default class projectSupervision extends PureComponent {
             ? item.pointX + `，` + item.pointY
             : ``
       },
+      {
+        title: '检查记录',
+        dataIndex: 'monitorCheckNum',
+        key: 'monitorCheckNum',
+        width: 100,
+        render: (i, item) => (
+          <Link to={'/region?from=project&id=' + item.id}>
+            <a>{i}</a>
+          </Link>
+        )
+      },
       !isImport
         ? {
             title: '项目源',
@@ -659,7 +670,7 @@ export default class projectSupervision extends PureComponent {
               onChange={this.handleTableChange}
               pagination={pagination}
               loading={loading}
-              scroll={{ x: 2900 }}
+              scroll={{ x: 3000 }}
               style={{ padding: 20 }}
             />
           </Content>
