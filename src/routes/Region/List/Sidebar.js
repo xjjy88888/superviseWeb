@@ -379,6 +379,13 @@ export default class sider extends PureComponent {
 
   onScroll() {
     const {
+      project: { projectList },
+      spot: { spotList },
+      point: { pointList },
+      projectSupervise: { projectSuperviseList }
+    } = this.props;
+
+    const {
       row_pro,
       row_spot,
       row_point,
@@ -387,15 +394,12 @@ export default class sider extends PureComponent {
       query_point,
       key,
       Sorting,
-      queryInfo
+      queryInfo,
+      isProjectSupervise
     } = this.state;
+
     const { clientHeight, scrollHeight, scrollTop } = this.scrollDom;
     const isBottom = clientHeight + parseInt(scrollTop, 0) + 1 >= scrollHeight;
-    const {
-      project: { projectList },
-      spot: { spotList },
-      point: { pointList }
-    } = this.props;
     // console.log(
     //   clientHeight,
     //   scrollHeight,
@@ -410,7 +414,9 @@ export default class sider extends PureComponent {
         if (projectList.items.length < projectList.totalCount) {
           this.queryProject({
             ...queryInfo,
-            Count: projectList.totalCount,
+            Count: isProjectSupervise
+              ? projectSuperviseList.totalCount
+              : projectList.totalCount,
             SkipCount: row_pro,
             Sorting: Sorting,
             ProjectName: query_pro

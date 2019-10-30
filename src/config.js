@@ -2,7 +2,7 @@ const l = window.location;
 const isFormal = l.href.split('/')[3] === 'stbcjg';
 const isLocal = l.hostname === 'localhost';
 
-console.log(`%c当前版本：v2.0.15`, 'color:green;font-size:30px');
+console.log(`%c当前版本：v2.0.16`, 'color:green;font-size:30px');
 
 console.log(isLocal ? '本地环境' : isFormal ? '正式环境' : '测试环境');
 
@@ -416,8 +416,7 @@ const config = {
     //获取当前用户行政级别下的所有统计数据
     statisticsByDistrictCodeUrl: `${domainApi}ProjectRegulation/StatisticsByDistrictCode`,
     //获取项目点列表
-    getAllPointUrl: `${domainApi}ProjectRegulation/GetAllPointPost`,
-
+    getAllPointUrl: `${domainApi}ProjectRegulation/GetAllPointPost`
   },
 
   //工具箱
@@ -1009,6 +1008,32 @@ const config = {
       title: '项目红线',
       background: color_back_redLine,
       border: color_border_redLine
+    }
+  ],
+  legend_xmjg: [
+    {
+      title: '项目总数',
+      imgUrl: `./img/projectPoint_XMZS.png`
+    },
+    {
+      title: '立项级别',
+      imgUrl: `./img/projectPoint_LXJB.png`
+    },
+    {
+      title: '合规性',
+      imgUrl: `./img/projectPoint_HGX.png`
+    },
+    {
+      title: '项目类别',
+      imgUrl: `./img/projectPoint_XMLB.png`
+    },
+    {
+      title: '项目性质',
+      imgUrl: `./img/projectPoint_XMXZ.png`
+    },
+    {
+      title: '建设状态',
+      imgUrl: `./img/projectPoint_JSZT.png`
     }
   ]
 };

@@ -78,7 +78,7 @@ export default class projectSupervision extends PureComponent {
         ProjectShowArchive,
         isRecycleBin,
         isImport,
-        isRegulationShared: true
+        isRegulationShared: isImport
       },
       callback: (success, result) => {
         const pagination = { ...this.state.pagination };

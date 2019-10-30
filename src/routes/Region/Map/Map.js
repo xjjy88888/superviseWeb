@@ -182,6 +182,7 @@ export default class integration extends PureComponent {
       showProgress_ZS:false,
       showProgress_Pie:false,
       showProgress_ProjectPoint:false,
+      showXMJGPanel: false,
       //loading: true
     };
     //this.map = null;
@@ -757,20 +758,29 @@ export default class integration extends PureComponent {
   // 切换到区域监管
   switchQYJG = () => {
     const { showQYJGPanel } = this.state;
+    const { showXMJGPanel } = this.state;
     /*-------------------------------------区域监管部分-------------------------------------*/
     //显示区域监管的图表联动、地图分屏、地图历史对比、图斑面板
     this.setState({
       showQYJGPanel: !showQYJGPanel
     });
     //添加项目红线、扰动图斑图层到图层管理控件
-    userconfig.layersControl.addOverlay(userconfig.projectWmsLayer, '项目红线');
-    userconfig.layersControl.addOverlay(userconfig.spotWmsLayer, '扰动图斑');
+    if(userconfig.layersControl){
+      userconfig.layersControl.addOverlay(userconfig.projectWmsLayer, '项目红线');
+      userconfig.layersControl.addOverlay(userconfig.spotWmsLayer, '扰动图斑');
+    }
     //显示项目红线、扰动图斑图层
     userconfig.projectWmsLayer.setOpacity(1);
     userconfig.spotWmsLayer.setOpacity(1);
     userconfig.geoJsonLayer.setStyle({ opacity: 1, fillOpacity: 0 });
     /*-------------------------------------项目监管部分-------------------------------------*/
-    userconfig.layersControl.removeLayer(projectPointLayer);//项目点图层
+    //显示图斑面板
+    this.setState({
+      showXMJGPanel: !showXMJGPanel
+    });
+    if(userconfig.layersControl){
+      userconfig.layersControl.removeLayer(projectPointLayer);//项目点图层
+    }
     if(userconfig.easyProjectSymbolButton){
       userconfig.easyProjectSymbolButton.remove();
     }
@@ -791,20 +801,29 @@ export default class integration extends PureComponent {
   switchXMJG = () => {
     const me = this;
     const { showQYJGPanel } = this.state;
+    const { showXMJGPanel } = this.state;
     /*-------------------------------------区域监管部分-------------------------------------*/
     //隐藏区域监管的图表联动、地图分屏、地图历史对比、图斑面板
     this.setState({
       showQYJGPanel: !showQYJGPanel
     });
     //移除项目红线、扰动图斑图层到图层管理控件
-    userconfig.layersControl.removeLayer(userconfig.projectWmsLayer);
-    userconfig.layersControl.removeLayer(userconfig.spotWmsLayer);
+    if(userconfig.layersControl){
+      userconfig.layersControl.removeLayer(userconfig.projectWmsLayer);
+      userconfig.layersControl.removeLayer(userconfig.spotWmsLayer);
+    }
     //隐藏项目红线、扰动图斑图层
     userconfig.projectWmsLayer.setOpacity(0);
     userconfig.spotWmsLayer.setOpacity(0);
     userconfig.geoJsonLayer.setStyle({ opacity: 0, fillOpacity: 0 });
     /*-------------------------------------项目监管部分-------------------------------------*/
-    userconfig.layersControl.addOverlay(projectPointLayer,'项目点');//项目点图层
+    //显示图斑面板
+    this.setState({
+      showXMJGPanel: !showXMJGPanel
+    });
+    if(userconfig.layersControl){
+      userconfig.layersControl.addOverlay(projectPointLayer,'项目点');//项目点图层
+    }
     this.createProjectSymbolButton();
     //行政区划图层
     let regionLayers = regiongeojsonLayer.getLayers();
@@ -3257,6 +3276,7 @@ export default class integration extends PureComponent {
       drawState,
       showHistoryContrast,
       showQYJGPanel,
+      showXMJGPanel,
       selectLeftV,
       selectSpotLeftV,
       selectSpotRightV,
@@ -3711,6 +3731,36 @@ export default class integration extends PureComponent {
               </Radio> */}
             </Radio.Group>
           </div>
+
+          {/* 项目监管 图例说明 */}
+          <div
+            style={{
+              display: showXMJGPanel ? 'block' : 'none',
+              position: 'absolute',
+              bottom: 40,
+              right: 20,
+              zIndex: 1000,
+              background: '#fff'
+            }}
+          >
+            <Popover
+              content={
+                <div>
+                  {config.legend_xmjg.map((item, index) => (
+                    <p key={index}>
+                      <img alt={item.imgUrl} src={item.imgUrl} />
+                      <span>{item.title}</span>
+                    </p>
+                  ))}
+                </div>
+              }
+              title=""
+              trigger="hover"
+            >
+              <Button icon="bars" />
+            </Popover>
+          </div>
+
         </div>
       </Layouts>
     );
