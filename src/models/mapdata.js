@@ -5,7 +5,9 @@ import {
   projectPositionApi,
   getInfoByExtent,
   getHistorySpotTimeByExtent,
-  totalByDistrictCodeApi
+  totalByDistrictCodeApi,
+  statisticsByDistrictCodeApi,
+  getAllPointApi
 } from "../services/httpApi";
 import { routerRedux } from "dva/router";
 export default {
@@ -123,6 +125,28 @@ export default {
       });
       if (callback) callback(result);
     },
+
+    *statisticsByDistrictCode({ payload, callback }, { call, put }) {
+      const {
+        data: { result }
+      } = yield call(statisticsByDistrictCodeApi, payload);
+      yield put({
+        type: "save",
+        payload: { RegionPieData: result}
+      });
+      if (callback) callback(result);
+    }, 
+    
+    *getAllPoint({ payload, callback }, { call, put }) {
+      const {
+        data: { result }
+      } = yield call(getAllPointApi, payload);
+      yield put({
+        type: "save",
+        payload: { ProjectPointsData: result}
+      });
+      if (callback) callback(result);
+    },  
 
   },
 

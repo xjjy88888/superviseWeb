@@ -185,9 +185,10 @@
         geoserverUrl += "/geoserver/ZKYGIS";
         var mapHistorySpotLayerName = isFormal ? "ZKYGIS:bs_spot_history" : "ZKYGIS:bs_spot_history_t";
         //后台接口Url
-        domain = isLocal ? "http://183.6.178.124:8001/stbct" : l.origin + "/stbc"+ isFormal ? "" : "t";
-        domain += "/";
-        //console.log("domain",domain);
+        // domain = isLocal ? "http://183.6.178.124:8001/stbct" : l.origin + "/stbc"+ isFormal ? "" : "t";
+        // domain += "/";
+        domain = isLocal ? 'http://183.6.178.124:8001/stbct/' : `${l.origin}/stbc${isFormal ? '' : 't'}/`;
+        console.log("domain",domain);
         getImageInfoByExtentUrl = "http://210.36.22.122/BasemapService/rest/image/latest/getInfoByExtent";
         imageBaseUrl = "http://www.stbcjg.cn/BasemapService/rest/image/";
         baseLayerUrl = imageBaseUrl+'latest/tile/{z}/{y}/{x}';

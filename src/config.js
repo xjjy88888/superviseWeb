@@ -2,13 +2,14 @@ const l = window.location;
 const isFormal = l.href.split('/')[3] === 'stbcjg';
 const isLocal = l.hostname === 'localhost';
 
-console.log(`%c当前版本：v2.0.14`, 'color:green;font-size:30px');
+console.log(`%c当前版本：v2.0.15`, 'color:green;font-size:30px');
 
 console.log(isLocal ? '本地环境' : isFormal ? '正式环境' : '测试环境');
 
 const domain = isLocal
   ? 'http://183.6.178.124:8001/stbct/'
   : `${l.origin}/stbc${isFormal ? '' : 't'}/`;
+// const domain = `https://www.zkygis.cn/stbc/`;
 
 const domainApi = domain + 'api/services/app/';
 
@@ -412,6 +413,11 @@ const config = {
 
     //获取当前用户行政级别下的总数
     totalByDistrictCodeUrl: `${domainApi}ProjectRegulation/TotalByDistrictCode`,
+    //获取当前用户行政级别下的所有统计数据
+    statisticsByDistrictCodeUrl: `${domainApi}ProjectRegulation/StatisticsByDistrictCode`,
+    //获取项目点列表
+    getAllPointUrl: `${domainApi}ProjectRegulation/GetAllPointPost`,
+
   },
 
   //工具箱

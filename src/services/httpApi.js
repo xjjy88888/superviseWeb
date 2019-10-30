@@ -1407,8 +1407,100 @@ export async function projectSuperviseForeverDeleteApi(params) {
 }
 
 export async function totalByDistrictCodeApi(params) {
-  console.log('1410',params);
+  // console.log('1410',params);
   return request(`${config.url.totalByDistrictCodeUrl}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      'Content-Type': 'application/json-patch+json'
+    },
+    body: JSON.stringify({
+      ...params,
+      MaxResultCount: params.MaxResultCount || '10',
+      ReplyTimeBegin:
+        params.ReplyTime && params.ReplyTime.length
+          ? dateFormat(params.ReplyTime[0]._d)
+          : '',
+      ReplyTimeEnd:
+        params.ReplyTime && params.ReplyTime.length
+          ? dateFormat(params.ReplyTime[1]._d)
+          : '',
+      ProjectCate: params.ProjectCate
+        ? params.ProjectCate.map(v => v).join(',')
+        : '',
+      HasScopes: params.HasScopes
+        ? params.HasScopes.map(v => v).join(',')
+        : '',
+      ProjectNat: params.ProjectNat
+        ? params.ProjectNat.map(v => v).join(',')
+        : '',
+      ProjectStatus: params.ProjectStatus
+        ? params.ProjectStatus.map(v => v).join(',')
+        : '',
+      VecType: params.VecType ? params.VecType.map(v => v).join(',') : '',
+      HasSpot: params.HasSpot ? params.HasSpot.map(v => v).join(',') : '',
+      ProjectType: params.ProjectType
+        ? params.ProjectType.map(v => v).join(',')
+        : '',
+      Compliance: params.Compliance
+        ? params.Compliance.map(v => v).join(',')
+        : '',
+      ProjectLevel: params.ProjectLevel
+        ? params.ProjectLevel.map(v => v).join(',')
+        : ''
+    })
+  });
+}
+
+export async function statisticsByDistrictCodeApi(params) {
+  //console.log('1456',params);
+  return request(`${config.url.statisticsByDistrictCodeUrl}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      'Content-Type': 'application/json-patch+json'
+    },
+    body: JSON.stringify({
+      ...params,
+      MaxResultCount: params.MaxResultCount || '10',
+      ReplyTimeBegin:
+        params.ReplyTime && params.ReplyTime.length
+          ? dateFormat(params.ReplyTime[0]._d)
+          : '',
+      ReplyTimeEnd:
+        params.ReplyTime && params.ReplyTime.length
+          ? dateFormat(params.ReplyTime[1]._d)
+          : '',
+      ProjectCate: params.ProjectCate
+        ? params.ProjectCate.map(v => v).join(',')
+        : '',
+      HasScopes: params.HasScopes
+        ? params.HasScopes.map(v => v).join(',')
+        : '',
+      ProjectNat: params.ProjectNat
+        ? params.ProjectNat.map(v => v).join(',')
+        : '',
+      ProjectStatus: params.ProjectStatus
+        ? params.ProjectStatus.map(v => v).join(',')
+        : '',
+      VecType: params.VecType ? params.VecType.map(v => v).join(',') : '',
+      HasSpot: params.HasSpot ? params.HasSpot.map(v => v).join(',') : '',
+      ProjectType: params.ProjectType
+        ? params.ProjectType.map(v => v).join(',')
+        : '',
+      Compliance: params.Compliance
+        ? params.Compliance.map(v => v).join(',')
+        : '',
+      ProjectLevel: params.ProjectLevel
+        ? params.ProjectLevel.map(v => v).join(',')
+        : ''
+    })
+  });
+}
+
+export async function getAllPointApi(params) {
+  console.log('1502',params);
+  return request(`${config.url.getAllPointUrl}`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken()}`,
