@@ -411,12 +411,16 @@ export default class sider extends PureComponent {
         return;
       }
       if (key === 'project') {
-        if (projectList.items.length < projectList.totalCount) {
+        const pl = isProjectSupervise
+          ? projectSuperviseList.items.length
+          : projectList.items.length;
+        const pt = isProjectSupervise
+          ? projectSuperviseList.totalCount
+          : projectList.totalCount;
+        if (pl < pt) {
           this.queryProject({
             ...queryInfo,
-            Count: isProjectSupervise
-              ? projectSuperviseList.totalCount
-              : projectList.totalCount,
+            Count: pt,
             SkipCount: row_pro,
             Sorting: Sorting,
             ProjectName: query_pro
@@ -1426,6 +1430,7 @@ export default class sider extends PureComponent {
             }}
             onClick={() => {
               this.closeAll();
+              this.scrollDom.scrollTop = 0;
               this.setState({
                 isProjectSupervise: !isProjectSupervise,
                 key: `project`
