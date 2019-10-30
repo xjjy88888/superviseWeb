@@ -314,7 +314,7 @@ export default class projectSupervision extends PureComponent {
         dataIndex: 'projectName',
         key: 'projectName',
         fixed: 'left',
-        width: 420,
+        width: 430,
         ...this.getColumnSearchProps('projectName'),
         render: (i, item) => (
           <Link to={'/region?from=project&id=' + item.id}>
@@ -376,7 +376,7 @@ export default class projectSupervision extends PureComponent {
         title: '项目类型',
         dataIndex: 'projectTypeId',
         key: 'projectTypeId',
-        width: 120,
+        width: 130,
         filters: this.getDictList(`项目类型`),
         render: i => this.getDictLabel(i)
       },
@@ -408,7 +408,7 @@ export default class projectSupervision extends PureComponent {
         title: '涉及县',
         dataIndex: 'districtCodes',
         key: 'districtCodes',
-        width: 200,
+        width: 240,
         render: i => {
           const text = this.getDistrictLabel(i);
           return (
@@ -429,7 +429,7 @@ export default class projectSupervision extends PureComponent {
         title: '坐标',
         dataIndex: 'coordinate',
         key: 'coordinate',
-        width: 120,
+        width: 260,
         render: (i, item) =>
           item.pointX &&
           item.pointY &&
@@ -659,7 +659,7 @@ export default class projectSupervision extends PureComponent {
               onChange={this.handleTableChange}
               pagination={pagination}
               loading={loading}
-              scroll={{ x: 2700 }}
+              scroll={{ x: 2900 }}
               style={{ padding: 20 }}
             />
           </Content>

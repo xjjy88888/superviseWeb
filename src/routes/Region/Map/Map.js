@@ -207,7 +207,9 @@ export default class integration extends PureComponent {
       });
       //清空地图状态
       me.clearGeojsonLayer();
-      map.closePopup();
+      if(map){
+        map.closePopup();
+      }
       //切换模式
       if (v.state) {
         //区域监管
