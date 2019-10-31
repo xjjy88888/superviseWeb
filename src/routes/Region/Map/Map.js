@@ -748,12 +748,12 @@ export default class integration extends PureComponent {
     this.setState({
       switchDataModal: v.state
     });
-    //清空地图状态
+    // 清空地图状态
     this.clearGeojsonLayer();
     if (map) {
       map.closePopup();
     }
-    //切换模式
+    // 切换模式
     if (v.state) {
       //区域监管
       this.switchQYJG();
