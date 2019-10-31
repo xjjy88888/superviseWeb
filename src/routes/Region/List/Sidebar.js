@@ -1116,7 +1116,7 @@ export default class sider extends PureComponent {
       departList,
       showPlan,
       clickId,
-      isProjectSupervise
+      isProjectSupervise,
     } = this.state;
 
     const departSelectListAll = unique(departSelectList.concat(departList));
