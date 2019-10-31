@@ -19,6 +19,7 @@ import emitter from '../../../utils/event';
 import config from '../../../config';
 import { getFile, unique } from '../../../utils/util';
 import { dateInitFormat, dateFormat, accessToken } from '../../../utils/util';
+import Spins from '../../../components/Spins';
 
 let yearDataSource = [];
 let self;
@@ -39,7 +40,9 @@ export default class projectDetail extends PureComponent {
       expandFileList: [],
       changeFileList: [],
       expandParentId: 0,
-      changeParentId: 0
+      changeParentId: 0,
+      showSpin: false,
+      isHttp: false
     };
     this.map = null;
     this.saveRef = ref => {
@@ -93,17 +96,23 @@ export default class projectDetail extends PureComponent {
           actStartTime: v.actStartTime ? dateFormat(v.actStartTime._d) : null,
           actCompTime: v.actCompTime ? dateFormat(v.actCompTime._d) : null
         };
-        this.projectCreateUpdate(values)
+        this.projectCreateUpdate(values);
       });
     });
   }
 
   projectCreateUpdate = payload => {
     const { dispatch } = this.props;
+    const { isHttp } = this.state;
+    if (isHttp) {
+      return;
+    }
+    this.setState({ showSpin: true, isHttp: true });
     dispatch({
       type: 'project/projectCreateUpdate',
       payload,
       callback: success => {
+        this.setState({ showSpin: false, isHttp: false });
         if (success) {
           emitter.emit('deleteSuccess', {});
           this.setState({ show: false });
@@ -372,11 +381,12 @@ export default class projectDetail extends PureComponent {
   };
 
   render() {
-    const { show, edit, departList } = this.state;
     const {
       form: { getFieldDecorator, setFieldsValue },
       project: { projectInfo, departSelectList }
     } = this.props;
+
+    const { show, edit, departList, showSpin } = this.state;
 
     const projectItem = projectInfo;
     const departSelectListAll = unique(departSelectList.concat(departList));
@@ -396,6 +406,7 @@ export default class projectDetail extends PureComponent {
         }}
         ref={this.saveRef}
       >
+        <Spins show={showSpin} />
         <Icon
           type="left"
           style={{

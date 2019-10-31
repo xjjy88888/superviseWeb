@@ -129,14 +129,13 @@ export default {
 
     // 项目新建编辑
     *projectCreateUpdate({ payload, callback }, { call, put }) {
-      console.log(payload.isProjectSupervise);
       const {
-        data: { success, error }
+        data: { success,  }
       } = yield call(
         payload.isProjectSupervise
           ? projectSuperviseCreateUpdateApi
           : projectCreateUpdateApi,
-        payload,
+        payload
       );
       notification[success ? `success` : `error`]({
         message: `${payload.id ? '编辑' : '新建'}${success ? `成功` : `失败`}`

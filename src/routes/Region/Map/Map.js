@@ -1992,6 +1992,7 @@ export default class integration extends PureComponent {
       message.warning('区域范围之外的数据没有权限操作', 1);
       return;
     }
+    me.clearGeojsonLayer();
 
     if (switchDataModal) {
       /*-------------------------------------区域监管部分-------------------------------------*/
@@ -2011,7 +2012,6 @@ export default class integration extends PureComponent {
         });
         return;
       }
-      me.clearGeojsonLayer();
       //点查WMS图层
       let point = { x: e.latlng.lng, y: e.latlng.lat };
       //图斑关联判断spotStatus
@@ -2060,7 +2060,6 @@ export default class integration extends PureComponent {
       }
     } else {
       /*-------------------------------------项目监管部分-------------------------------------*/
-      me.clearGeojsonLayer();
       me.clearXMJGGeojsonLayer(tempspotgeojsonLayer);
       me.clearXMJGGeojsonLayer(temprenlinegeojsonLayer);
       if (marker) marker.remove();
