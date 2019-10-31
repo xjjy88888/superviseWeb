@@ -578,6 +578,7 @@ export default class sider extends PureComponent {
 
   queryProjectSupervise = items => {
     const {
+      queryProjectFilter,
       dispatch,
       projectSupervise: { projectSuperviseList }
     } = this.props;
@@ -593,7 +594,7 @@ export default class sider extends PureComponent {
       payload,
       callback: (success, response) => {
         this.showSpin(false);
-        emitter.emit(`queryProjectFilter`, payload);
+        queryProjectFilter(payload);
       }
     });
   };
