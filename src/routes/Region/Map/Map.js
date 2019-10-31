@@ -3357,7 +3357,7 @@ export default class integration extends PureComponent {
     const {
       mapdata: { histories, historiesSpot }
     } = this.props;
-    
+
     return (
       <Layouts>
         <Sidebar
