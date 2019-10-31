@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { createForm } from 'rc-form';
@@ -8,7 +9,6 @@ import {
   Input,
   Button,
   Table,
-  Select,
   message,
   Tree,
   Typography,
@@ -171,8 +171,14 @@ export default class area extends PureComponent {
       loading
     } = this.state;
 
-    const dataSource = districtList.map(item => {
-      return { ...item, key: item.id };
+    const dataSource = districtList.map(i => {
+      return {
+        ...i,
+        key: i.id,
+        label: i.label || ``,
+        code: i.code || ``,
+        description: i.description || ``
+      };
     });
 
     const columns = [

@@ -1,9 +1,10 @@
-import React, { PureComponent } from "react";
-import { Icon, Input, Button, Table, message, Modal } from "antd";
-import { createForm } from "rc-form";
-import { connect } from "dva";
-import Systems from "../../../components/Systems";
-import emitter from "../../../utils/event";
+import React, { PureComponent } from 'react';
+import { Icon, Input, Button, Table, message, Modal } from 'antd';
+import { createForm } from 'rc-form';
+import { connect } from 'dva';
+import Systems from '../../../components/Systems';
+import emitter from '../../../utils/event';
+import Highlighter from 'react-highlight-words';
 
 let self;
 
@@ -26,7 +27,7 @@ export default class review extends PureComponent {
     self = this;
     this.refresh();
 
-    this.eventEmitter = emitter.addListener("refreshSystem", v => {
+    this.eventEmitter = emitter.addListener('refreshSystem', v => {
       this.refresh();
     });
   }
@@ -39,12 +40,13 @@ export default class review extends PureComponent {
     const { dispatch } = this.props;
     this.setState({ loading: true });
     dispatch({
-      type: "user/userDelete",
+      type: 'user/userDelete',
       payload: { ids: v.map(i => i.id) },
       callback: success => {
         if (success) {
           this.setState({
-            loading: false,selectedRows:[]
+            loading: false,
+            selectedRows: []
           });
           this.refresh();
         }
@@ -56,7 +58,7 @@ export default class review extends PureComponent {
     const { dispatch } = this.props;
     this.setState({ loading: true });
     dispatch({
-      type: "user/userExamine",
+      type: 'user/userExamine',
       payload: {
         items: arr.map(item => {
           return {
@@ -78,8 +80,8 @@ export default class review extends PureComponent {
     const { dispatch } = this.props;
     this.setState({ loading: true });
     dispatch({
-      type: "user/userList",
-      payload: { ...params, IsActive: false, UserType: "" },
+      type: 'user/userList',
+      payload: { ...params, IsActive: false, UserType: '' },
       callback: (success, error, result) => {
         const pagination = { ...this.state.pagination };
         pagination.total = result.totalCount;
@@ -96,8 +98,8 @@ export default class review extends PureComponent {
     console.log(filters, sorter);
     const Sorting = `${
       sorter.columnKey
-        ? `${sorter.columnKey === "name" ? "userName" : sorter.columnKey} ${
-            sorter.order === "descend" ? "desc" : "asc"
+        ? `${sorter.columnKey === 'name' ? 'userName' : sorter.columnKey} ${
+            sorter.order === 'descend' ? 'desc' : 'asc'
           }`
         : ``
     }`;
@@ -128,7 +130,7 @@ export default class review extends PureComponent {
             setSelectedKeys(e.target.value ? [e.target.value] : [])
           }
           onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
-          style={{ width: 188, marginBottom: 8, display: "block" }}
+          style={{ width: 188, marginBottom: 8, display: 'block' }}
         />
         <Button
           type="primary"
@@ -149,7 +151,7 @@ export default class review extends PureComponent {
       </div>
     ),
     filterIcon: filtered => (
-      <Icon type="search" style={{ color: filtered ? "#1890ff" : undefined }} />
+      <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
     ),
     onFilter: (value, record) =>
       record[dataIndex]
@@ -160,15 +162,15 @@ export default class review extends PureComponent {
       if (visible) {
         setTimeout(() => this.searchInput.select());
       }
-    }
-    // render: text => (
-    //   <Highlighter
-    //     highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-    //     searchWords={[this.state.searchText]}
-    //     autoEscape
-    //     textToHighlight={text.toString()}
-    //   />
-    // )
+    },
+    render: text => (
+      <Highlighter
+        highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+        searchWords={[this.state.searchText]}
+        autoEscape
+        textToHighlight={text.toString()}
+      />
+    )
   });
 
   handleSearch = (selectedKeys, confirm) => {
@@ -178,7 +180,7 @@ export default class review extends PureComponent {
 
   handleReset = clearFilters => {
     clearFilters();
-    this.setState({ searchText: "" });
+    this.setState({ searchText: '' });
   };
 
   render() {
@@ -186,43 +188,43 @@ export default class review extends PureComponent {
 
     const columns = [
       {
-        title: "账号",
-        dataIndex: "name",
+        title: '账号',
+        dataIndex: 'name',
         sorter: (a, b) => a.name.length - b.name.length,
-        ...this.getColumnSearchProps("name")
+        ...this.getColumnSearchProps('name')
       },
       {
-        title: "姓名",
-        dataIndex: "displayName",
+        title: '姓名',
+        dataIndex: 'displayName',
         sorter: (a, b) => a.displayName.length - b.displayName.length,
-        ...this.getColumnSearchProps("displayName")
+        ...this.getColumnSearchProps('displayName')
       },
       {
-        title: "电话",
-        dataIndex: "phoneNumber",
+        title: '电话',
+        dataIndex: 'phoneNumber',
         sorter: (a, b) => a.phoneNumber - b.phoneNumber,
-        ...this.getColumnSearchProps("phoneNumber")
+        ...this.getColumnSearchProps('phoneNumber')
       },
       {
-        title: "用户类型",
+        title: '用户类型',
         render: item => <span>{item.userType === 1 ? `社会` : `行政`}用户</span>
       },
       {
-        title: "创建时间",
-        dataIndex: "creationTime"
+        title: '创建时间',
+        dataIndex: 'creationTime'
       },
       {
-        title: "操作",
-        key: "operation",
+        title: '操作',
+        key: 'operation',
         render: (item, record) => (
           <span>
             <a
               style={{ marginRight: 20 }}
               onClick={() => {
-                emitter.emit("showRegister", {
+                emitter.emit('showRegister', {
                   show: true,
                   type: item.userType === 1 ? `society` : `admin`,
-                  status: "edit",
+                  status: 'edit',
                   item
                 });
               }}
@@ -233,11 +235,11 @@ export default class review extends PureComponent {
               style={{ marginRight: 20 }}
               onClick={() => {
                 Modal.confirm({
-                  title: "通过",
-                  content: "是否确定要审核通过",
-                  okText: "是",
-                  cancelText: "否",
-                  okType: "danger",
+                  title: '通过',
+                  content: '是否确定要审核通过',
+                  okText: '是',
+                  cancelText: '否',
+                  okType: 'danger',
                   onOk() {
                     self.userExamine([
                       {
@@ -255,11 +257,11 @@ export default class review extends PureComponent {
             <a
               onClick={() => {
                 Modal.confirm({
-                  title: "删除",
-                  content: "是否确定要删除",
-                  okText: "是",
-                  cancelText: "否",
-                  okType: "danger",
+                  title: '删除',
+                  content: '是否确定要删除',
+                  okText: '是',
+                  cancelText: '否',
+                  okType: 'danger',
                   onOk() {
                     self.userDelete([{ id: item.id }]);
                   },
@@ -291,16 +293,16 @@ export default class review extends PureComponent {
             onClick={() => {
               const l = selectedRows.length;
               if (l === 0) {
-                message.warning("请选择需要通过的账号");
+                message.warning('请选择需要通过的账号');
                 return;
               }
 
               Modal.confirm({
-                title: "通过",
-                content: "是否确定要审核通过",
-                okText: "是",
-                cancelText: "否",
-                okType: "danger",
+                title: '通过',
+                content: '是否确定要审核通过',
+                okText: '是',
+                cancelText: '否',
+                okType: 'danger',
                 onOk() {
                   self.userExamine(selectedRows);
                 },
@@ -317,15 +319,15 @@ export default class review extends PureComponent {
             onClick={() => {
               const l = selectedRows.length;
               if (l === 0) {
-                message.warning("请选择需要删除的账号");
+                message.warning('请选择需要删除的账号');
                 return;
               }
               Modal.confirm({
-                title: "删除",
-                content: "是否确定要删除",
-                okText: "是",
-                cancelText: "否",
-                okType: "danger",
+                title: '删除',
+                content: '是否确定要删除',
+                okText: '是',
+                cancelText: '否',
+                okType: 'danger',
                 onOk() {
                   self.userDelete(selectedRows);
                 },

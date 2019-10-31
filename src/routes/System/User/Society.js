@@ -4,6 +4,7 @@ import { createForm } from 'rc-form';
 import { connect } from 'dva';
 import Systems from '../../../components/Systems';
 import emitter from '../../../utils/event';
+import Highlighter from 'react-highlight-words';
 
 let self;
 
@@ -156,15 +157,15 @@ export default class review extends PureComponent {
       if (visible) {
         setTimeout(() => this.searchInput.select());
       }
-    }
-    // render: text => (
-    //   <Highlighter
-    //     highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-    //     searchWords={[this.state.searchText]}
-    //     autoEscape
-    //     textToHighlight={text.toString()}
-    //   />
-    // )
+    },
+    render: text => (
+      <Highlighter
+        highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+        searchWords={[this.state.searchText]}
+        autoEscape
+        textToHighlight={text.toString()}
+      />
+    )
   });
 
   handleSearch = (dataIndex, selectedKeys, confirm) => {

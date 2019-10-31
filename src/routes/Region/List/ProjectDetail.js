@@ -76,7 +76,7 @@ export default class projectDetail extends PureComponent {
     });
     this.eventEmitter = emitter.addListener('projectCreateUpdate', data => {
       const { expandParentId, changeParentId } = this.state;
-      //submit
+      // submit
       this.props.form.validateFields((err, v) => {
         console.log(v);
         const values = {
@@ -93,19 +93,24 @@ export default class projectDetail extends PureComponent {
           actStartTime: v.actStartTime ? dateFormat(v.actStartTime._d) : null,
           actCompTime: v.actCompTime ? dateFormat(v.actCompTime._d) : null
         };
-        dispatch({
-          type: 'project/projectCreateUpdate',
-          payload: values,
-          callback: success => {
-            if (success) {
-              emitter.emit('deleteSuccess', {});
-              this.setState({ show: false });
-            }
-          }
-        });
+        this.projectCreateUpdate(values)
       });
     });
   }
+
+  projectCreateUpdate = payload => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'project/projectCreateUpdate',
+      payload,
+      callback: success => {
+        if (success) {
+          emitter.emit('deleteSuccess', {});
+          this.setState({ show: false });
+        }
+      }
+    });
+  };
 
   queryProjectById = id => {
     const { dispatch } = this.props;

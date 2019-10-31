@@ -49,10 +49,17 @@ export default class company extends PureComponent {
       callback: (success, error, result) => {
         const pagination = { ...this.state.pagination };
         pagination.total = result.totalCount;
+        const dataSource = result.items.map(i => {
+          return {
+            ...i,
+            name: i.name || ``,
+            description: i.description || ``
+          };
+        });
         this.setState({
           loading: false,
-          dataSource: result.items,
-          pagination
+          dataSource,
+          pagination,
         });
       }
     });

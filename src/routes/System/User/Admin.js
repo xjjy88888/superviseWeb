@@ -16,6 +16,7 @@ import {
   Modal
 } from 'antd';
 import emitter from '../../../utils/event';
+import Highlighter from 'react-highlight-words';
 
 const { Sider, Content } = Layout;
 const { Title } = Typography;
@@ -89,15 +90,20 @@ export default class area extends PureComponent {
       callback: (success, error, result) => {
         const pagination = { ...this.state.pagination };
         pagination.total = result.totalCount;
+        const dataSource = result.items.map((i, index) => {
+          return {
+            ...i,
+            key: index,
+            name: i.name || ``,
+            displayName: i.displayName || ``,
+            phoneNumber: i.phoneNumber || ``,
+            creationTime: i.creationTime || ``
+          };
+        });
         this.setState({
           pagination,
           loading: false,
-          dataSource: result.items.map((item, index) => {
-            return {
-              ...item,
-              key: index
-            };
-          })
+          dataSource
         });
       }
     });
@@ -173,15 +179,15 @@ export default class area extends PureComponent {
       if (visible) {
         setTimeout(() => this.searchInput.select());
       }
-    }
-    // render: text => (
-    //   <Highlighter
-    //     highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-    //     searchWords={[this.state.searchText]}
-    //     autoEscape
-    //     textToHighlight={text.toString()}
-    //   />
-    // )
+    },
+    render: text => (
+      <Highlighter
+        highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+        searchWords={[this.state.searchText]}
+        autoEscape
+        textToHighlight={text.toString()}
+      />
+    )
   });
 
   handleSearch = (selectedKeys, confirm) => {

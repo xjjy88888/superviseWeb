@@ -4,6 +4,7 @@ import { connect } from 'dva';
 import { createForm } from 'rc-form';
 import Systems from '../../components/Systems';
 import MustFill from '../../components/MustFill';
+import Highlighter from 'react-highlight-words';
 import {
   Form,
   Icon,
@@ -174,15 +175,15 @@ export default class area extends PureComponent {
       if (visible) {
         setTimeout(() => this.searchInput.select());
       }
-    }
-    // render: text => (
-    //   <Highlighter
-    //     highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-    //     searchWords={[this.state.searchText]}
-    //     autoEscape
-    //     textToHighlight={text.toString()}
-    //   />
-    // )
+    },
+    render: text => (
+      <Highlighter
+        highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+        searchWords={[this.state.searchText]}
+        autoEscape
+        textToHighlight={text.toString()}
+      />
+    )
   });
 
   handleSearch = (selectedKeys, confirm) => {
