@@ -1066,6 +1066,7 @@ export default class sider extends PureComponent {
 
   render() {
     const {
+      switchData,
       dispatch,
       form: { getFieldDecorator, resetFields, setFieldsValue, getFieldValue },
       district: { districtTree, districtTreeFilter },
@@ -1436,7 +1437,7 @@ export default class sider extends PureComponent {
                 isProjectSupervise: !isProjectSupervise,
                 key: `project`
               });
-              emitter.emit('switchData', {
+              switchData({
                 state: isProjectSupervise
               });
             }}

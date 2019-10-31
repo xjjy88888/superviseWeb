@@ -9,8 +9,7 @@ import {
   Select,
   notification,
   message,
-  Radio,
-  Progress
+  Radio
 } from 'antd';
 import Sidebar from '../List/Sidebar';
 import SidebarDetail from '../List/SiderbarDetail';
@@ -57,9 +56,10 @@ import Layouts from '../../../components/Layouts';
 // import Spins from "../../../components/Spins";
 import './index.less';
 import Contrast from './Contrast';
+import { getUrl } from '../../../utils/util';
 
 let userconfig = {};
-let map;
+let map = null;
 /*-------------------------------------区域监管部分-------------------------------------*/
 let marker;
 let picLayerGroup;
@@ -195,30 +195,17 @@ export default class integration extends PureComponent {
   componentDidMount() {
     const me = this;
     const { dispatch } = this.props;
-    //区域监管以及项目监管之间切换监听事件
-    this.eventEmitter = emitter.addListener(`switchData`, v => {
-      console.log(
-        `switchData`,
-        v,
-        `${v.state ? `项目` : `区域`}监管切换到${v.state ? `区域` : `项目`}监管`
-      );
+    //判断项目监管列表跳转过来
+    const urlFrom = getUrl(`from`);
+    const urlIsProject = getUrl(`isProject`);
+    //判断项目监管列表跳转过来
+    if (urlFrom === `project` && urlIsProject === `true`) {
+      this.setState({ isProjectSupervise: true });
       this.setState({
-        switchDataModal: v.state
+        switchDataModal: false
       });
-      //清空地图状态
-      me.clearGeojsonLayer();
-      if (map) {
-        map.closePopup();
-      }
-      //切换模式
-      if (v.state) {
-        //区域监管
-        this.switchQYJG();
-      } else {
-        //项目监管
-        this.switchXMJG();
-      }
-    });
+    }
+
     dispatch({
       type: 'mapdata/GetBoundAsync',
       callback: boundary => {
@@ -426,16 +413,6 @@ export default class integration extends PureComponent {
                     return;
                   }
                   marker = L.marker(latLng).addTo(map);
-                  // if (switchDataModal) {//区域监管状态下
-                  //   marker = L.marker(latLng).addTo(map);
-                  // }else{//项目监管状态下
-                  //   const myIcon = L.icon({
-                  //     iconUrl: './img/marker-icon-2x.png',
-                  //     iconSize: [20, 32]
-                  //   });
-                  //   marker = L.marker(latLng,{icon: myIcon }).addTo(map);
-                  // }
-
                   if (map.getZoom() >= config.mapInitParams.zoom) {
                     if (latLng) me.automaticToMap(latLng);
                   } else {
@@ -741,20 +718,48 @@ export default class integration extends PureComponent {
       payload: payload
     });
     const { switchDataModal } = this.state;
+    console.log('switchDataModal745', switchDataModal);
     if (!switchDataModal) {
       const { projectSymbolValue } = this.state;
-      const zoom = map.getZoom();
-      if (zoom >= config.pointLevel) {
-        //切换项目点符号类型
-        this.requestProjectPoints(this.callbackDrawMapProjectPoints);
-      } else {
-        //切换区域统计类型
-        if (projectSymbolValue === '项目总数') {
-          this.requestZStatistics(this.callbackDrawMapZStatistics); //区域总数统计
+      if (map) {
+        const zoom = map.getZoom();
+        if (zoom >= config.pointLevel) {
+          //切换项目点符号类型
+          this.requestProjectPoints(this.callbackDrawMapProjectPoints);
         } else {
-          this.requestPieZStatistics(this.callbackDrawMapPieZStatistics); //区域饼状图统计
+          //切换区域统计类型
+          if (projectSymbolValue === '项目总数') {
+            this.requestZStatistics(this.callbackDrawMapZStatistics); //区域总数统计
+          } else {
+            this.requestPieZStatistics(this.callbackDrawMapPieZStatistics); //区域饼状图统计
+          }
         }
       }
+    }
+  };
+
+  // 区域监管以及项目监管之间切换监听事件
+  switchData = v => {
+    console.log(
+      `switchData`,
+      v,
+      `${v.state ? `项目` : `区域`}监管切换到${v.state ? `区域` : `项目`}监管`
+    );
+    this.setState({
+      switchDataModal: v.state
+    });
+    //清空地图状态
+    this.clearGeojsonLayer();
+    if (map) {
+      map.closePopup();
+    }
+    //切换模式
+    if (v.state) {
+      //区域监管
+      this.switchQYJG();
+    } else {
+      //项目监管
+      this.switchXMJG();
     }
   };
 
@@ -776,9 +781,15 @@ export default class integration extends PureComponent {
       userconfig.layersControl.addOverlay(userconfig.spotWmsLayer, '扰动图斑');
     }
     //显示项目红线、扰动图斑图层
-    userconfig.projectWmsLayer.setOpacity(1);
-    userconfig.spotWmsLayer.setOpacity(1);
-    userconfig.geoJsonLayer.setStyle({ opacity: 1, fillOpacity: 0 });
+    if (userconfig.projectWmsLayer) {
+      userconfig.projectWmsLayer.setOpacity(1);
+    }
+    if (userconfig.spotWmsLayer) {
+      userconfig.spotWmsLayer.setOpacity(1);
+    }
+    if (userconfig.geoJsonLayer) {
+      userconfig.geoJsonLayer.setStyle({ opacity: 1, fillOpacity: 0 });
+    }
     /*-------------------------------------项目监管部分-------------------------------------*/
     //显示图斑面板
     this.setState({
@@ -789,18 +800,29 @@ export default class integration extends PureComponent {
     }
     if (userconfig.easyProjectSymbolButton) {
       userconfig.easyProjectSymbolButton.remove();
+      userconfig.easyProjectSymbolButton = null;
     }
     this.setState({ showProjectSymbol: false });
     //行政区划图层
-    regiongeojsonLayer.setStyle({ opacity: 0, fillOpacity: 0 });
+    if (regiongeojsonLayer) {
+      regiongeojsonLayer.setStyle({ opacity: 0, fillOpacity: 0 });
+    }
     //区域统计图层
-    this.clearXMJGGeojsonLayer(ZSgeojsonLayer);
+    if (ZSgeojsonLayer) {
+      this.clearXMJGGeojsonLayer(ZSgeojsonLayer);
+    }
     //项目点图层
-    this.clearXMJGGeojsonLayer(projectPointLayer);
+    if (projectPointLayer) {
+      this.clearXMJGGeojsonLayer(projectPointLayer);
+    }
     //临时绘制关联项目红线
-    this.clearXMJGGeojsonLayer(temprenlinegeojsonLayer);
+    if (temprenlinegeojsonLayer) {
+      this.clearXMJGGeojsonLayer(temprenlinegeojsonLayer);
+    }
     //临时绘制扰动图斑
-    this.clearXMJGGeojsonLayer(tempspotgeojsonLayer);
+    if (tempspotgeojsonLayer) {
+      this.clearXMJGGeojsonLayer(tempspotgeojsonLayer);
+    }
   };
 
   // 切换到项目监管
@@ -819,9 +841,15 @@ export default class integration extends PureComponent {
       userconfig.layersControl.removeLayer(userconfig.spotWmsLayer);
     }
     //隐藏项目红线、扰动图斑图层
-    userconfig.projectWmsLayer.setOpacity(0);
-    userconfig.spotWmsLayer.setOpacity(0);
-    userconfig.geoJsonLayer.setStyle({ opacity: 0, fillOpacity: 0 });
+    if (userconfig.projectWmsLayer) {
+      userconfig.projectWmsLayer.setOpacity(0);
+    }
+    if (userconfig.spotWmsLayer) {
+      userconfig.spotWmsLayer.setOpacity(0);
+    }
+    if (userconfig.geoJsonLayer) {
+      userconfig.geoJsonLayer.setStyle({ opacity: 0, fillOpacity: 0 });
+    }
     /*-------------------------------------项目监管部分-------------------------------------*/
     //显示图斑面板
     this.setState({
@@ -832,14 +860,16 @@ export default class integration extends PureComponent {
     }
     this.createProjectSymbolButton();
     //行政区划图层
-    let regionLayers = regiongeojsonLayer.getLayers();
-    if (regionLayers.length > 0) {
-      regiongeojsonLayer.setStyle({ opacity: 0.8, fillOpacity: 0.1 });
-      const bounds = regiongeojsonLayer.getBounds();
-      map.fitBounds(bounds);
-    } else {
-      // 创建行政区划渲染
-      me.createRegion();
+    if (regiongeojsonLayer) {
+      let regionLayers = regiongeojsonLayer.getLayers();
+      if (regionLayers.length > 0) {
+        regiongeojsonLayer.setStyle({ opacity: 0.8, fillOpacity: 0.1 });
+        const bounds = regiongeojsonLayer.getBounds();
+        map.fitBounds(bounds);
+      } else {
+        // 创建行政区划渲染
+        me.createRegion();
+      }
     }
     //创建区域统计渲染
     const { projectSymbolValue } = this.state;
@@ -857,8 +887,6 @@ export default class integration extends PureComponent {
       }
     }
     //项目点图层
-    //me.setOpacityFeatureGroup(1,projectPointLayer);
-    //projectPointLayer.setStyle({opacity:1,fillOpacity:1});
     //添加所有项目点要素
     me.addAllProjectPoints(me.callbackProjectPoints, projectSymbolValue);
   };
@@ -881,7 +909,6 @@ export default class integration extends PureComponent {
         );
       }
     } else {
-      //this.requestProjectPoints(this.callbackDrawMapProjectPoints);
       this.requestProjectPoints(callback);
     }
   };
@@ -947,7 +974,7 @@ export default class integration extends PureComponent {
 
   addProjectPointClusterLayers = (ProjectPointsData, projectSymbolValue) => {
     //const {projectSymbolValue} = this.state;
-    console.log('projectSymbolValue', projectSymbolValue);
+    console.log('projectSymbolValue981', projectSymbolValue);
     if (ProjectPointsData && ProjectPointsData.items.length > 0) {
       this.clearXMJGGeojsonLayer(projectPointLayer);
       let markerList = [];
@@ -1240,7 +1267,7 @@ export default class integration extends PureComponent {
   };
 
   callbackZStatistics = data => {
-    console.log('callbackDrawMapZStatistics', data);
+    console.log('callbackZStatistics', data);
     this.setState({ showProgress_ZS: false });
     RegionCenterData = data;
   };
@@ -1423,15 +1450,17 @@ export default class integration extends PureComponent {
   createProjectSymbolButton = () => {
     const { imgTextButtonHtml } = this;
     const me = this;
-    userconfig.easyProjectSymbolButton = L.easyButton(
-      imgTextButtonHtml('./img/projectSymbol.png', '项目符号化'),
-      () => {
-        const { showProjectSymbol } = me.state;
-        this.setState({ showProjectSymbol: !showProjectSymbol });
-      }
-    )
-      .addTo(map)
-      .setPosition('topright');
+    if (!userconfig.easyProjectSymbolButton && map) {
+      userconfig.easyProjectSymbolButton = L.easyButton(
+        imgTextButtonHtml('./img/projectSymbol.png', '项目符号化'),
+        () => {
+          const { showProjectSymbol } = me.state;
+          this.setState({ showProjectSymbol: !showProjectSymbol });
+        }
+      )
+        .addTo(map)
+        .setPosition('topright');
+    }
   };
 
   // 获取图标文本按钮html
@@ -1862,7 +1891,6 @@ export default class integration extends PureComponent {
    */
   automaticToMap = latLng => {
     const me = this;
-    const { clientWidth, clientHeight } = me.refDom;
     const {
       showSiderbar,
       showSiderbarDetail,
@@ -1874,16 +1902,19 @@ export default class integration extends PureComponent {
     const offsetSiderbarDetail = showSiderbarDetail ? 200 : 0;
     const offsetQuery = showQuery ? 225 : 0;
     const offsetProblem = showProblem ? 215 : 0;
-    if (clientWidth && clientHeight) {
-      point.x =
-        point.x -
-        clientWidth / 2 -
-        offsetSiderbar -
-        offsetSiderbarDetail -
-        offsetProblem -
-        offsetQuery;
-      point.y = point.y - clientHeight / 2;
-      map.panBy(point);
+    if (me.refDom.clientWidth && me.refDom.clientHeight) {
+      const { clientWidth, clientHeight } = me.refDom;
+      if (clientWidth && clientHeight) {
+        point.x =
+          point.x -
+          clientWidth / 2 -
+          offsetSiderbar -
+          offsetSiderbarDetail -
+          offsetProblem -
+          offsetQuery;
+        point.y = point.y - clientHeight / 2;
+        map.panBy(point);
+      }
     }
   };
 
@@ -2578,7 +2609,7 @@ export default class integration extends PureComponent {
       me.overlayWMSLayers();
       //地图模态层效果
       me.loadmodalLayer();
-    }, 900);
+    }, 1500);
   };
   /*
    * 加载地图模态层效果
@@ -2656,6 +2687,17 @@ export default class integration extends PureComponent {
       completedColor: '#3388FF'
     });
     measureControl.addTo(map);
+    //判断地图初始化是否项目监管状态
+    const { switchDataModal } = this.state;
+    console.log('switchDataModal2675', switchDataModal);
+    if (!switchDataModal) {
+      userconfig.projectWmsLayer.setOpacity(0);
+      userconfig.spotWmsLayer.setOpacity(0);
+      userconfig.layersControl.removeLayer(userconfig.projectWmsLayer);
+      userconfig.layersControl.removeLayer(userconfig.spotWmsLayer);
+      //项目监管
+      this.switchXMJG();
+    }
   };
   /*
    *加载默认图层控件
@@ -2741,10 +2783,6 @@ export default class integration extends PureComponent {
     });
     this.districtBoundLayer = districtBoundLayer;
 
-    // const overlays = (userconfig.overlays = {
-    //   项目红线: userconfig.projectWmsLayer,
-    //   扰动图斑: userconfig.spotWmsLayer
-    // });
     const overlays = (userconfig.overlays = {
       [this.getImageTitle(
         tdtImageLabel.title,
@@ -3317,12 +3355,15 @@ export default class integration extends PureComponent {
       //loading
     } = this.state;
     const {
-      // dispatch,
       mapdata: { histories, historiesSpot }
     } = this.props;
+    
     return (
       <Layouts>
-        <Sidebar queryProjectFilter={this.queryProjectFilter} />
+        <Sidebar
+          queryProjectFilter={this.queryProjectFilter}
+          switchData={this.switchData}
+        />
         <SidebarDetail />
         <Tool />
         <Chart />

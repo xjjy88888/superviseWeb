@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import { notification } from 'antd';
 import {
   projectListApi,
@@ -130,7 +131,7 @@ export default {
     // 项目新建编辑
     *projectCreateUpdate({ payload, callback }, { call, put }) {
       const {
-        data: { success,  }
+        data: { success }
       } = yield call(
         payload.isProjectSupervise
           ? projectSuperviseCreateUpdateApi
