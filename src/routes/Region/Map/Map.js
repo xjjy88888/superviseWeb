@@ -724,10 +724,10 @@ export default class integration extends PureComponent {
       if (map) {
         const zoom = map.getZoom();
         if (zoom >= config.pointLevel) {
-          //切换项目点符号类型
+          // 切换项目点符号类型
           this.requestProjectPoints(this.callbackDrawMapProjectPoints);
         } else {
-          //切换区域统计类型
+          // 切换区域统计类型
           if (projectSymbolValue === '项目总数') {
             this.requestZStatistics(this.callbackDrawMapZStatistics); //区域总数统计
           } else {

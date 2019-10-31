@@ -1143,7 +1143,7 @@ export default class sider extends PureComponent {
       },
       {
         title: '图斑',
-        key: ['spot']
+        key: ['spot'],
       },
       {
         title: '标注点',
