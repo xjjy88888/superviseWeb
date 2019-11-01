@@ -91,7 +91,8 @@ export default class projectSupervision extends PureComponent {
               productDepartmentName: i.productDepartmentName || ``,
               replyDepartmentName: i.replyDepartmentName || ``,
               supDepartmentName: i.supDepartmentName || ``,
-              replyNum: i.replyNum || ``
+              replyNum: i.replyNum || ``,
+              monitorCheckTime: i.monitorCheckTime || ``
             };
           }),
           pagination
@@ -134,11 +135,22 @@ export default class projectSupervision extends PureComponent {
   };
 
   handleTableChange = (pagination, filters, sorter) => {
-    console.log(pagination, filters, sorter);
+    let Sorting = ``;
+    if (sorter.columnKey === `monitorCheckTime`) {
+      Sorting =
+        sorter.order === 'descend'
+          ? 'MonitorCheckTime.HasValue desc,MonitorCheckTime desc'
+          : 'MonitorCheckTime.HasValue desc,MonitorCheckTime';
+    } else if (sorter.columnKey) {
+      Sorting =
+        sorter.columnKey + (sorter.order === 'descend' ? ' desc' : ' asc');
+    }
+    console.log(Sorting, sorter);
     this.setState({
       pagination: pagination
     });
     this.projectSuperviseList({
+      Sorting,
       SkipCount: (pagination.current - 1) * pagination.pageSize,
       MaxResultCount: pagination.pageSize,
       ProjectLevel: filters.projectLevelId || [],
@@ -200,7 +212,6 @@ export default class projectSupervision extends PureComponent {
           ref={node => {
             this.searchInput = node;
           }}
-          // placeholder={`Search ${dataIndex}`}
           value={selectedKeys[0]}
           onChange={e =>
             setSelectedKeys(e.target.value ? [e.target.value] : [])
@@ -354,13 +365,15 @@ export default class projectSupervision extends PureComponent {
         title: '批复时间',
         dataIndex: 'replyTime',
         key: 'replyTime',
-        width: 120
+        width: 120,
+        sorter: true
       },
       {
         title: '立项级别',
         dataIndex: 'projectLevelId',
         key: 'projectLevelId',
-        width: 120,
+        width: 130,
+        sorter: true,
         filters: this.getDictList(`立项级别`),
         render: i => this.getDictLabel(i)
       },
@@ -369,6 +382,7 @@ export default class projectSupervision extends PureComponent {
         dataIndex: 'complianceId',
         key: 'complianceId',
         width: 150,
+        sorter: true,
         filters: this.getDictList(`扰动合规性`),
         render: i => this.getDictLabel(i)
       },
@@ -377,6 +391,7 @@ export default class projectSupervision extends PureComponent {
         dataIndex: 'projectTypeId',
         key: 'projectTypeId',
         width: 130,
+        sorter: true,
         filters: this.getDictList(`项目类型`),
         render: i => this.getDictLabel(i)
       },
@@ -384,7 +399,8 @@ export default class projectSupervision extends PureComponent {
         title: '项目类别',
         dataIndex: 'projectCateId',
         key: 'projectCateId',
-        width: 120,
+        width: 130,
+        sorter: true,
         filters: this.getDictList(`项目类别`),
         render: i => this.getDictLabel(i)
       },
@@ -392,7 +408,8 @@ export default class projectSupervision extends PureComponent {
         title: '项目性质',
         dataIndex: 'projectNatId',
         key: 'projectNatId',
-        width: 120,
+        width: 130,
+        sorter: true,
         filters: this.getDictList(`项目性质`),
         render: i => this.getDictLabel(i)
       },
@@ -400,7 +417,8 @@ export default class projectSupervision extends PureComponent {
         title: '建设状态',
         dataIndex: 'projectStatusId',
         key: 'projectStatusId',
-        width: 120,
+        width: 130,
+        sorter: true,
         filters: this.getDictList(`建设状态`),
         render: i => this.getDictLabel(i)
       },
@@ -442,12 +460,20 @@ export default class projectSupervision extends PureComponent {
         title: '检查记录',
         dataIndex: 'monitorCheckNum',
         key: 'monitorCheckNum',
-        width: 100,
+        width: 110,
+        sorter: true,
         render: (i, item) => (
           <Link to={'/region?from=project&id=' + item.id}>
             <a>{i}</a>
           </Link>
         )
+      },
+      {
+        title: '检查日期',
+        dataIndex: 'monitorCheckTime',
+        key: 'monitorCheckTime',
+        sorter: true,
+        width: 110
       },
       !isImport
         ? {
@@ -670,7 +696,7 @@ export default class projectSupervision extends PureComponent {
               onChange={this.handleTableChange}
               pagination={pagination}
               loading={loading}
-              scroll={{ x: 3000 }}
+              scroll={{ x: 2900 }}
               style={{ padding: 20 }}
             />
           </Content>
