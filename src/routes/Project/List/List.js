@@ -425,19 +425,19 @@ export default class projectSupervision extends PureComponent {
         key: 'addressInfo',
         width: 120
       },
-      {
-        title: '坐标',
-        dataIndex: 'coordinate',
-        key: 'coordinate',
-        width: 260,
-        render: (i, item) =>
-          item.pointX &&
-          item.pointY &&
-          item.pointX !== `0` &&
-          item.pointY !== `0`
-            ? item.pointX + `，` + item.pointY
-            : ``
-      },
+      // {
+      //   title: '坐标',
+      //   dataIndex: 'coordinate',
+      //   key: 'coordinate',
+      //   width: 260,
+      //   render: (i, item) =>
+      //     item.pointX &&
+      //     item.pointY &&
+      //     item.pointX !== `0` &&
+      //     item.pointY !== `0`
+      //       ? item.pointX + `，` + item.pointY
+      //       : ``
+      // },
       {
         title: '检查记录',
         dataIndex: 'monitorCheckNum',

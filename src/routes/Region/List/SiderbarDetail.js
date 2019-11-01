@@ -1499,7 +1499,8 @@ export default class siderbarDetail extends PureComponent {
                           emitter.emit('siteLocation', {
                             state: 'position',
                             Longitude: x,
-                            Latitude: y
+                            Latitude: y,
+                            type: 'point'
                           });
                         }}
                       />
@@ -1633,7 +1634,8 @@ export default class siderbarDetail extends PureComponent {
                           emitter.emit('siteLocation', {
                             state: 'position',
                             Longitude: x,
-                            Latitude: y
+                            Latitude: y,
+                            type: 'panorama'
                           });
                         }}
                       />

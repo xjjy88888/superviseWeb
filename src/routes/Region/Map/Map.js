@@ -287,6 +287,7 @@ export default class integration extends PureComponent {
 
     // 位置定位
     this.eventEmitter = emitter.addListener('siteLocation', data => {
+      console.log('位置定位',data);
       userconfig.state = 'position';
       //地图获取定位点
       jQuery(userconfig.geoJsonLayer.getPane())
@@ -349,7 +350,11 @@ export default class integration extends PureComponent {
         }
 
         let fullviewURL = config.url.panoramaPreviewUrl + v.urlConfig;
-        marker = L.marker([v.pointY, v.pointX])
+        const myIcon = L.icon({
+          iconUrl: './img/camer.png',
+          iconSize: [24, 24]
+        });
+        marker = L.marker([v.pointY, v.pointX],{icon: myIcon})
           .addTo(map)
           .on('click', function(e) {
             //console.log("marker", e);
@@ -2045,25 +2050,31 @@ export default class integration extends PureComponent {
       return;
     }
     me.clearGeojsonLayer();
+    userconfig.mapPoint = e.latlng;
+    //地图定位判断
+    if (userconfig.state === 'position') {
+      //地图获取经纬度
+      jQuery(userconfig.geoJsonLayer.getPane())
+        .find('path')
+        .css({
+          cursor: 'pointer'
+        });
+      userconfig.state = '';
+      emitter.emit('siteLocationBack', {
+        latitude: userconfig.mapPoint.lat,
+        longitude: userconfig.mapPoint.lng
+      });
+      if (marker) marker.remove();
+      const myIcon = L.icon({
+        iconUrl: './img/marker-icon.png',
+        iconSize: [25, 41]
+      });
+      marker = L.marker([userconfig.mapPoint.lat, userconfig.mapPoint.lng],{icon: myIcon}).addTo(map);
+      return;
+    }
 
     if (switchDataModal) {
       /*-------------------------------------区域监管部分-------------------------------------*/
-      userconfig.mapPoint = e.latlng;
-      //地图定位判断
-      if (userconfig.state === 'position') {
-        //地图获取经纬度
-        jQuery(userconfig.geoJsonLayer.getPane())
-          .find('path')
-          .css({
-            cursor: 'pointer'
-          });
-        userconfig.state = '';
-        emitter.emit('siteLocationBack', {
-          latitude: userconfig.mapPoint.lat,
-          longitude: userconfig.mapPoint.lng
-        });
-        return;
-      }
       //点查WMS图层
       let point = { x: e.latlng.lng, y: e.latlng.lat };
       //图斑关联判断spotStatus

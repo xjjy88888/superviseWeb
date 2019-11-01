@@ -1116,7 +1116,7 @@ export default class sider extends PureComponent {
       departList,
       showPlan,
       clickId,
-      isProjectSupervise,
+      isProjectSupervise
     } = this.state;
 
     const departSelectListAll = unique(departSelectList.concat(departList));
@@ -1143,7 +1143,7 @@ export default class sider extends PureComponent {
       },
       {
         title: '图斑',
-        key: ['spot'],
+        key: ['spot']
       },
       {
         title: '标注点',
@@ -3124,7 +3124,8 @@ export default class sider extends PureComponent {
                             emitter.emit('siteLocation', {
                               state: 'position',
                               Longitude: x,
-                              Latitude: y
+                              Latitude: y,
+                              type: 'project'
                             });
                           }}
                         />
