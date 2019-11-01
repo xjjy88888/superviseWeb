@@ -61,9 +61,20 @@ import { getUrl } from '../../../utils/util';
 let userconfig = {};
 let map = null;
 /*-------------------------------------区域监管部分-------------------------------------*/
-let marker;
-let picLayerGroup;
+let marker = null;
+let picLayerGroup = null;
 let problemPointLayer = L.layerGroup([]);
+
+/*-------------------------------------项目监管部分-------------------------------------*/
+let regiongeojsonLayer = null; //行政区划矢量图层
+let ZSgeojsonLayer = null; //区域统计图层
+let projectPointLayer = null; //项目点图层
+let temprenlinegeojsonLayer = null; //临时绘制关联项目红线
+let tempspotgeojsonLayer = null; //临时绘制扰动图斑
+let radius = null; //画圆圈半径大小
+let RegionCenterData = [];
+let RegionPieData = [];
+let ProjectPointsData = null;
 
 const DISTRICT_FILL_COLOR = 'rgba(230,0,0,0)';
 // const DISTRICT_COLOR = '#bfbfbf';
@@ -84,17 +95,6 @@ const highLightGeoJsonStyle = {
   fillColor: '#7CFC00',
   fillOpacity: 0.8
 };
-/*-------------------------------------项目监管部分-------------------------------------*/
-let regiongeojsonLayer = null; //行政区划矢量图层
-let ZSgeojsonLayer = null; //区域统计图层
-let projectPointLayer = null; //项目点图层
-let temprenlinegeojsonLayer = null; //临时绘制关联项目红线
-let tempspotgeojsonLayer = null; //临时绘制扰动图斑
-let radius = null; //画圆圈半径大小
-let RegionCenterData = [];
-let RegionPieData = [];
-let ProjectPointsData = null;
-
 //临时绘制关联项目红线以及扰动图斑图层样式
 const tempRedlineGeoJsonStyle = {
   color: '#e60000', //#33CCFF #0000FF
@@ -193,7 +193,23 @@ export default class integration extends PureComponent {
   }
 
   componentDidMount() {
-    console.log('userconfig',userconfig);
+    /*-------------------------------------区域监管部分-------------------------------------*/
+    userconfig = {};
+    map = null;
+    marker = null;
+    picLayerGroup = null;
+    problemPointLayer = L.layerGroup([]);
+    /*-------------------------------------项目监管部分-------------------------------------*/
+    regiongeojsonLayer = null; //行政区划矢量图层
+    ZSgeojsonLayer = null; //区域统计图层
+    projectPointLayer = null; //项目点图层
+    temprenlinegeojsonLayer = null; //临时绘制关联项目红线
+    tempspotgeojsonLayer = null; //临时绘制扰动图斑
+    radius = null; //画圆圈半径大小
+    RegionCenterData = [];
+    RegionPieData = [];
+    ProjectPointsData = null;
+    // console.log('userconfig',userconfig.spotWmsLayer);
     const me = this;
     const { dispatch } = this.props;
     //判断项目监管列表跳转过来
@@ -1338,6 +1354,18 @@ export default class integration extends PureComponent {
     }
   };
 
+  //区域统计图层点击事件监听
+  onClickZSgeojsonLayer = e => {
+    const { switchDataModal } = this.state;
+    if (!switchDataModal) {
+      //项目监管
+      const zoom = map.getZoom();
+      if (zoom < config.pointLevel) {
+        map.flyTo(e.latlng, config.pointLevel);
+      }
+    }
+  }
+
   // 根据行政区划名称匹配对应的区域统计圆圈图层
   HLZSLayerbyName = name => {
     let layers = ZSgeojsonLayer.getLayers();
@@ -2028,6 +2056,7 @@ export default class integration extends PureComponent {
     //区域统计图层
     ZSgeojsonLayer = L.featureGroup([], { pane: 'regiongeoJsonZIndex' });
     map.addLayer(ZSgeojsonLayer);
+    ZSgeojsonLayer.on('click', me.onClickZSgeojsonLayer);
 
     // 项目点
     projectPointLayer = L.markerClusterGroup({
