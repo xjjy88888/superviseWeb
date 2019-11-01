@@ -193,6 +193,7 @@ export default class integration extends PureComponent {
   }
 
   componentDidMount() {
+    console.log('userconfig',userconfig);
     const me = this;
     const { dispatch } = this.props;
     //判断项目监管列表跳转过来
@@ -289,6 +290,7 @@ export default class integration extends PureComponent {
     this.eventEmitter = emitter.addListener('siteLocation', data => {
       console.log('位置定位',data);
       userconfig.state = 'position';
+      userconfig.siteLocationtype = data.type;
       //地图获取定位点
       jQuery(userconfig.geoJsonLayer.getPane())
         .find('path')
@@ -804,8 +806,13 @@ export default class integration extends PureComponent {
       userconfig.layersControl.removeLayer(projectPointLayer); //项目点图层
     }
     if (userconfig.easyProjectSymbolButton) {
-      userconfig.easyProjectSymbolButton.remove();
-      userconfig.easyProjectSymbolButton = null;
+      // userconfig.easyProjectSymbolButton.remove();
+      // userconfig.easyProjectSymbolButton = null;
+      jQuery(userconfig.easyProjectSymbolButton.getContainer())
+      .find('button')
+      .css({
+        display: 'none'
+      });
     }
     this.setState({ showProjectSymbol: false });
     //行政区划图层
@@ -863,7 +870,16 @@ export default class integration extends PureComponent {
     if (userconfig.layersControl) {
       userconfig.layersControl.addOverlay(projectPointLayer, '项目点'); //项目点图层
     }
-    this.createProjectSymbolButton();
+    if (!userconfig.easyProjectSymbolButton) {
+      this.createProjectSymbolButton();
+    }
+    else{
+      jQuery(userconfig.easyProjectSymbolButton.getContainer())
+      .find('button')
+      .css({
+        display: 'block'
+      });
+    }
     //行政区划图层
     if (regiongeojsonLayer) {
       let regionLayers = regiongeojsonLayer.getLayers();
@@ -878,6 +894,7 @@ export default class integration extends PureComponent {
     }
     //创建区域统计渲染
     const { projectSymbolValue } = this.state;
+    console.log('projectSymbolValue896',projectSymbolValue);
     if (projectSymbolValue === '项目总数') {
       me.createZStatistics(); //区域总数统计
       //预先请求区域饼状图数据
@@ -979,7 +996,7 @@ export default class integration extends PureComponent {
 
   addProjectPointClusterLayers = (ProjectPointsData, projectSymbolValue) => {
     //const {projectSymbolValue} = this.state;
-    console.log('projectSymbolValue981', projectSymbolValue);
+    console.log('projectSymbolValue998', projectSymbolValue);
     if (ProjectPointsData && ProjectPointsData.items.length > 0) {
       this.clearXMJGGeojsonLayer(projectPointLayer);
       let markerList = [];
@@ -1455,7 +1472,7 @@ export default class integration extends PureComponent {
   createProjectSymbolButton = () => {
     const { imgTextButtonHtml } = this;
     const me = this;
-    if (!userconfig.easyProjectSymbolButton && map) {
+    if (map) {
       userconfig.easyProjectSymbolButton = L.easyButton(
         imgTextButtonHtml('./img/projectSymbol.png', '项目符号化'),
         () => {
@@ -2059,16 +2076,26 @@ export default class integration extends PureComponent {
         .css({
           cursor: 'pointer'
         });
+      let myIcon = '';
+      if(userconfig.siteLocationtype === 'panorama'){//全景点
+        myIcon = L.icon({
+          iconUrl: './img/camer.png',
+          iconSize: [24, 24]
+        });       
+      }
+      else{
+        myIcon = L.icon({
+          iconUrl: './img/marker-icon.png',
+          iconSize: [17, 31]
+        });
+      }
       userconfig.state = '';
+      userconfig.siteLocationtype = '';
       emitter.emit('siteLocationBack', {
         latitude: userconfig.mapPoint.lat,
         longitude: userconfig.mapPoint.lng
       });
       if (marker) marker.remove();
-      const myIcon = L.icon({
-        iconUrl: './img/marker-icon.png',
-        iconSize: [25, 41]
-      });
       marker = L.marker([userconfig.mapPoint.lat, userconfig.mapPoint.lng],{icon: myIcon}).addTo(map);
       return;
     }
@@ -2708,6 +2735,9 @@ export default class integration extends PureComponent {
       userconfig.layersControl.removeLayer(userconfig.spotWmsLayer);
       //项目监管
       this.switchXMJG();
+      // setTimeout(() => {
+      //   this.switchXMJG();
+      // }, 5000);
     }
   };
   /*
