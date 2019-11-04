@@ -12,6 +12,7 @@ export default {
 
   state: {
     departsTree: [],
+    departsTreeFilter: [],
     departsList: { totalCount: 0, items: [] }
   },
 
@@ -20,7 +21,7 @@ export default {
   },
 
   effects: {
-    // 行政部门_树状列表1
+    // 行政部门_树状列表
     *departsTree({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result }
@@ -28,7 +29,11 @@ export default {
       if (success) {
         yield put({
           type: 'save',
-          payload: { departsTree: result.items }
+          payload: {
+            [payload.IsFilter
+              ? `departsTreeFilter`
+              : `departsTree`]: result.items
+          }
         });
       } else {
         notification['error']({

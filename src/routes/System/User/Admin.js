@@ -203,7 +203,7 @@ export default class area extends PureComponent {
     const {
       dispatch,
       form: { getFieldDecorator, validateFields },
-      departs: { departsTree }
+      departs: { departsTreeFilter }
     } = this.props;
 
     const {
@@ -315,7 +315,7 @@ export default class area extends PureComponent {
                 });
               }}
             >
-              {departsTree.map(item => (
+              {departsTreeFilter.map(item => (
                 <Tree.TreeNode
                   title={item.label}
                   key={item.value}

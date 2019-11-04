@@ -176,6 +176,7 @@ export default class integration extends PureComponent {
       photoPreviewUrl: null,
       imageTimeText: '',
       showImageTimeText: true,
+      showHistoryIMG: false,//历史监管影像
       switchDataModal: true, //区域监管、项目监管切换模式
       projectSymbolValue: '项目总数',
       payload: null,
@@ -1212,21 +1213,23 @@ export default class integration extends PureComponent {
   createZStatistics = () => {
     if (!radius) {
       setTimeout(() => {
-        const zoom = map.getZoom();
-        if (zoom <= 7) {
-          //省级行政区划
-          radius = 15000;
-        } else if (zoom > 7 && zoom <= 9) {
-          //市级行政区划
-          radius = 5000;
-        } else {
-          //区县级行政区划
-          radius = 1500;
-        }
-        if (RegionCenterData.length > 0) {
-          this.drawMapZStatistics(RegionCenterData);
-        } else {
-          this.requestZStatistics(this.callbackDrawMapZStatistics);
+        if(map && map.getZoom()){
+          const zoom = map.getZoom();
+          if (zoom <= 7) {
+            //省级行政区划
+            radius = 17000;
+          } else if (zoom > 7 && zoom <= 9) {
+            //市级行政区划
+            radius = 7000;
+          } else {
+            //区县级行政区划
+            radius = 2000;
+          }
+          if (RegionCenterData.length > 0) {
+            this.drawMapZStatistics(RegionCenterData);
+          } else {
+            this.requestZStatistics(this.callbackDrawMapZStatistics);
+          }
         }
       }, 2000);
     } else {
@@ -2227,43 +2230,66 @@ export default class integration extends PureComponent {
         me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
       }
     } else {
-      /*-------------------------------------项目监管部分-------------------------------------*/
-      if (zoom >= config.pointLevel) {
-        //隐藏区域统计图层
-        if (ZSgeojsonLayer && ZSgeojsonLayer.getLayers().length > 0) {
-          me.clearXMJGGeojsonLayer(ZSgeojsonLayer);
+        /*-------------------------------------项目监管部分-------------------------------------*/
+        if (zoom >= config.pointLevel) {
+          //隐藏区域统计图层
+          if (ZSgeojsonLayer && ZSgeojsonLayer.getLayers().length > 0) {
+            me.clearXMJGGeojsonLayer(ZSgeojsonLayer);
+          }
+          //显示项目点聚合图层
+          if (projectPointLayer && projectPointLayer.getLayers().length <= 0) {
+            const { projectSymbolValue } = me.state;
+            me.addAllProjectPoints(
+              me.callbackDrawMapProjectPoints,
+              projectSymbolValue
+            );
+          }
         }
-        // if(temprenlinegeojsonLayer.getLayers().length>0){
-        //   me.clearXMJGGeojsonLayer(temprenlinegeojsonLayer);
-        // }
-        // if(tempspotgeojsonLayer.getLayers().length>0){
-        //   me.clearXMJGGeojsonLayer(tempspotgeojsonLayer);
-        // }
-        //显示项目点聚合图层
-        if (projectPointLayer && projectPointLayer.getLayers().length <= 0) {
+        else {
+          //隐藏项目点聚合图层
+          if (projectPointLayer && projectPointLayer.getLayers().length > 0) {
+            me.clearXMJGGeojsonLayer(projectPointLayer);
+          }
+          //显示区域统计图层
           const { projectSymbolValue } = me.state;
-          me.addAllProjectPoints(
-            me.callbackDrawMapProjectPoints,
-            projectSymbolValue
-          );
-        }
-      } else {
-        //隐藏项目点聚合图层
-        if (projectPointLayer && projectPointLayer.getLayers().length > 0) {
-          me.clearXMJGGeojsonLayer(projectPointLayer);
-        }
-        //显示区域统计图层
-        const { projectSymbolValue } = me.state;
-        if (projectSymbolValue === '项目总数') {
-          if (ZSgeojsonLayer && ZSgeojsonLayer.getLayers().length <= 0) {
-            me.createZStatistics(); //区域总数统计
-          }
-        } else {
-          if (ZSgeojsonLayer && ZSgeojsonLayer.getLayers().length <= 0) {
-            me.createZSPie(projectSymbolValue); //区域饼状图统计
+          if (projectSymbolValue === '项目总数') {
+            if (ZSgeojsonLayer && ZSgeojsonLayer.getLayers().length <= 0) {
+              me.createZStatistics(); //区域总数统计
+            }
+          } else {
+            if (ZSgeojsonLayer && ZSgeojsonLayer.getLayers().length <= 0) {
+              me.createZSPie(projectSymbolValue); //区域饼状图统计
+            }
           }
         }
-      }
+        //根据地图当前级别zoom,动态改变圆圈半径大小
+        if (zoom <= 7) {
+          //省级行政区划
+          radius = 17000;
+        }
+        else if (zoom === 8) {
+          //市级行政区划
+          radius = 12000;
+        }
+        else if (zoom === 9) {
+          //市级行政区划
+          radius = 7000;
+        }
+        else if (zoom === 10) {
+          //市级行政区划
+          radius = 3500;
+        }
+        else {
+          //区县级行政区划
+          radius = 2000;
+        }
+        ZSgeojsonLayer.eachLayer(function (layer) {
+          //console.log('2278',zoom,radius);
+          if(layer.options.radius){
+            layer.setRadius(radius);
+          }
+        });
+
     }
   };
   /*根据地图当前范围获取对应历史影像数据
@@ -3379,6 +3405,7 @@ export default class integration extends PureComponent {
       photoPreviewUrl,
       imageTimeText,
       showImageTimeText,
+      showHistoryIMG,
       // showProjectSymbol,
       projectSymbolValue,
       showProgress_ZS,
@@ -3489,6 +3516,25 @@ export default class integration extends PureComponent {
               }}
             >
               监管影像时间:{imageTimeText}
+            </span>
+          </div>
+          {/*历史监管影像时间轴控件信息 */}
+          <div
+            style={{
+              display: showHistoryIMG ? 'block' : 'none',
+              position: 'absolute',
+              bottom: 5,
+              left: 360,
+              zIndex: 1000,
+              background: '#fff'
+            }}
+          >
+            <span
+              style={{
+                padding: '0 10px'
+              }}
+            >
+              历史监管影像时间轴控件
             </span>
           </div>
           {/* 照片预览*/}
@@ -3608,6 +3654,27 @@ export default class integration extends PureComponent {
               background: '#fff'
             }}
           >
+            <Popover content="历史影像" title="" trigger="hover">
+              <Button
+                // icon="ordered-list"
+                icon="dash"
+                onClick={() => {
+                  this.setState({
+                    showHistoryIMG: !showHistoryIMG
+                  });
+                  this.setState({
+                    showImageTimeText: !showImageTimeText
+                  });                
+                  // emitter.emit('showSiderbar', {
+                  //   show: showHistoryContrast
+                  // });
+                  // setTimeout(() => {
+                  //   this.showHistoryMap();
+                  // }, 200);
+                }}
+              />
+            </Popover>
+            <br />
             <Popover content="地图分屏" title="" trigger="hover">
               <Button
                 icon="column-width"
@@ -3799,6 +3866,27 @@ export default class integration extends PureComponent {
               background: '#fff'
             }}
           >
+            <Popover content="历史影像" title="" trigger="hover">
+              <Button
+                // icon="ordered-list"
+                icon="dash"
+                onClick={() => {
+                  this.setState({
+                    showHistoryIMG: !showHistoryIMG
+                  });
+                  this.setState({
+                    showImageTimeText: !showImageTimeText
+                  });                
+                  // emitter.emit('showSiderbar', {
+                  //   show: showHistoryContrast
+                  // });
+                  // setTimeout(() => {
+                  //   this.showHistoryMap();
+                  // }, 200);
+                }}
+              />
+            </Popover>
+            <br />
             <Popover
               content={
                 <div>
@@ -3855,7 +3943,7 @@ export default class integration extends PureComponent {
               title=""
               trigger="hover"
             >
-              <Button icon="picture" />
+              <Button icon="environment" />
             </Popover>
           </div>
         </div>
