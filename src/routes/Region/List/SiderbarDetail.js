@@ -348,6 +348,7 @@ export default class siderbarDetail extends PureComponent {
 
   render() {
     const {
+      mapLocation,
       dispatch,
       form: { getFieldDecorator, resetFields, validateFields, getFieldValue },
       district: { districtTree },
@@ -1389,7 +1390,7 @@ export default class siderbarDetail extends PureComponent {
                     }}
                     onClick={e => {
                       e.stopPropagation();
-                      emitter.emit('mapLocation', {
+                      mapLocation({
                         item: item,
                         key: 'spot'
                       });

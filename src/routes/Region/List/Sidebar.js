@@ -1067,6 +1067,7 @@ export default class sider extends PureComponent {
   render() {
     const {
       switchData,
+      mapLocation,
       dispatch,
       form: { getFieldDecorator, resetFields, setFieldsValue, getFieldValue },
       district: { districtTree, districtTreeFilter },
@@ -1319,15 +1320,15 @@ export default class sider extends PureComponent {
                       type: 'point/queryPointById',
                       payload: { id: item.id },
                       callback: v => {
-                        emitter.emit('mapLocation', {
+                        mapLocation({
                           item: v,
                           key: key
                         });
                       }
                     });
                   } else {
-                    emitter.emit('mapLocation', {
-                      item: item,
+                    mapLocation({
+                      item,
                       key: key
                     });
                   }
@@ -2076,7 +2077,7 @@ export default class sider extends PureComponent {
                     zIndex: 1
                   }}
                   onClick={() => {
-                    emitter.emit('mapLocation', {
+                    mapLocation({
                       item: projectItem,
                       key: key
                     });
@@ -2342,7 +2343,7 @@ export default class sider extends PureComponent {
                             onClick={e => {
                               e.stopPropagation();
                               if (item.problemPoints.length) {
-                                emitter.emit('mapLocation', {
+                                mapLocation({
                                   item: item.problemPoints,
                                   id: item.problemPoints[0].id,
                                   key: 'problemPoint'
@@ -2456,7 +2457,7 @@ export default class sider extends PureComponent {
                                 }}
                                 onClick={e => {
                                   e.stopPropagation();
-                                  emitter.emit('mapLocation', {
+                                  mapLocation({
                                     item: item.problemPoints,
                                     id: ite.id,
                                     key: 'problemPoint'
@@ -2708,8 +2709,8 @@ export default class sider extends PureComponent {
                           }}
                           onClick={e => {
                             e.stopPropagation();
-                            emitter.emit('mapLocation', {
-                              item: item,
+                            mapLocation({
+                              item,
                               key: 'spot'
                             });
                           }}
@@ -2813,8 +2814,8 @@ export default class sider extends PureComponent {
                           }}
                           onClick={e => {
                             e.stopPropagation();
-                            emitter.emit('mapLocation', {
-                              item: item,
+                            mapLocation({
+                              item,
                               key: 'redLine'
                             });
                           }}
