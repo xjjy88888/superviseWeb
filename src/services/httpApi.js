@@ -1428,9 +1428,7 @@ export async function totalByDistrictCodeApi(params) {
       ProjectCate: params.ProjectCate
         ? params.ProjectCate.map(v => v).join(',')
         : '',
-      HasScopes: params.HasScopes
-        ? params.HasScopes.map(v => v).join(',')
-        : '',
+      HasScopes: params.HasScopes ? params.HasScopes.map(v => v).join(',') : '',
       ProjectNat: params.ProjectNat
         ? params.ProjectNat.map(v => v).join(',')
         : '',
@@ -1474,9 +1472,7 @@ export async function statisticsByDistrictCodeApi(params) {
       ProjectCate: params.ProjectCate
         ? params.ProjectCate.map(v => v).join(',')
         : '',
-      HasScopes: params.HasScopes
-        ? params.HasScopes.map(v => v).join(',')
-        : '',
+      HasScopes: params.HasScopes ? params.HasScopes.map(v => v).join(',') : '',
       ProjectNat: params.ProjectNat
         ? params.ProjectNat.map(v => v).join(',')
         : '',
@@ -1499,7 +1495,7 @@ export async function statisticsByDistrictCodeApi(params) {
 }
 
 export async function getAllPointApi(params) {
-  console.log('1502',params);
+  console.log('1502', params);
   return request(`${config.url.getAllPointUrl}`, {
     method: 'POST',
     headers: {
@@ -1520,9 +1516,7 @@ export async function getAllPointApi(params) {
       ProjectCate: params.ProjectCate
         ? params.ProjectCate.map(v => v).join(',')
         : '',
-      HasScopes: params.HasScopes
-        ? params.HasScopes.map(v => v).join(',')
-        : '',
+      HasScopes: params.HasScopes ? params.HasScopes.map(v => v).join(',') : '',
       ProjectNat: params.ProjectNat
         ? params.ProjectNat.map(v => v).join(',')
         : '',
@@ -1541,5 +1535,14 @@ export async function getAllPointApi(params) {
         ? params.ProjectLevel.map(v => v).join(',')
         : ''
     })
+  });
+}
+
+export async function interpretListApi() {
+  return request(`${config.url.interpretListUrl}`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
   });
 }

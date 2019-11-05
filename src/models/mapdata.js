@@ -60,6 +60,7 @@ export default {
         payload: { imageTimeResult: result.result,histories:[...histories].reverse() }
       });
       if (callback) callback([...histories].reverse());
+      //console.log('histories',[...histories].reverse());
     },
     //根据地图当前范围获取对应历史扰动图斑数据接口
     *getHistorySpotTimeByExtent({ payload, callback }, { call, put }) {

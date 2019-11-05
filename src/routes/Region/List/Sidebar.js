@@ -166,6 +166,7 @@ export default class sider extends PureComponent {
     this.queryDistrict();
     this.queryDict();
     this.queryBasinOrgan();
+    this.interpretList();
     this.eventEmitter = emitter.addListener('deleteSuccess', () => {
       const { key, query_pro, query_spot, query_point } = this.state;
       const v =
@@ -534,6 +535,14 @@ export default class sider extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'user/queryDict'
+    });
+  };
+
+  interpretList = () => {
+    console.log(`interpretList`);
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'spot/interpretList'
     });
   };
 
@@ -1073,7 +1082,7 @@ export default class sider extends PureComponent {
       district: { districtTree, districtTreeFilter },
       user: { basinOrganList },
       project: { projectList, projectInfo, projectListAdd, departSelectList },
-      spot: { spotList, projectInfoSpotList },
+      spot: { spotList, projectInfoSpotList, interpretList },
       point: { pointList },
       redLine: { redLineList },
       inspect: { inspectList },
@@ -1464,7 +1473,7 @@ export default class sider extends PureComponent {
             onSearch={v => {
               this.search(v);
             }}
-            style={{ padding: '20px 20px', width: 300 }}
+            style={{ padding: 20, width: 300 }}
             enterButton
           />
           {/* 新建 */}
@@ -1535,6 +1544,16 @@ export default class sider extends PureComponent {
               }}
             />
           </Popover>
+          <Select allowClear
+            style={{ margin: '0 20px 20px 20px', width: 260 }}
+            onChange={v => {
+              console.log(v);
+            }}
+          >
+            {interpretList.map(item => (
+              <Select.Option key={item}>{item}</Select.Option>
+            ))}
+          </Select>
           <Button.Group buttonstyle="solid" style={{ padding: '0px 15px' }}>
             {sort.map((item, index) => (
               <Button

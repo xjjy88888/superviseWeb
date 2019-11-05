@@ -743,7 +743,7 @@ export default class integration extends PureComponent {
         this.queryWFSServiceByProperty(
           data.item.id,
           'id',
-          config.mapHistorySpotLayerName,
+          config.mapSpotLayerName,
           this.callbackLocationNoPopup
         );
       } else {
@@ -1769,28 +1769,39 @@ export default class integration extends PureComponent {
     const me = this;
     if (data.success) {
       data = data.result;
+      let geojsondata = {
+        type: 'FeatureCollection',
+        features: []
+      };      
       //console.log("data", data);
-      me.clearGeojsonLayer();
-      me.loadGeojsonLayer(data, geoJsonStyle);
+      // me.clearGeojsonLayer();
+      // me.loadGeojsonLayer(data, geoJsonStyle);
       if (data.features.length > 0) {
         let content = '';
         for (let i = 0; i < data.features.length; i++) {
           let feature = data.features[i];
-          //console.log("feature", feature);
-          if (i === data.features.length - 1) {
-            me.getWinContent(feature.properties, data => {
-              content += data[0].innerHTML;
-            });
-          } else {
-            me.getWinContent(feature.properties, data => {
-              content += data[0].innerHTML + '<br>';
-            });
+          //过滤历史图斑记录
+          if(!feature.properties.archive_time){
+            geojsondata.features.push(feature);
+            if (i === data.features.length - 1) {
+              me.getWinContent(feature.properties, data => {
+                content += data[0].innerHTML;
+              });
+            }
+            else {
+              me.getWinContent(feature.properties, data => {
+                content += data[0].innerHTML + '<br>';
+              });
+            }
           }
+          //console.log("feature", feature);
           //项目红线高亮关联扰动图斑
           if (!feature.properties.map_num) {
             me.querySpotByProjectId(feature.properties.project_id);
           }
         }
+        me.clearGeojsonLayer();
+        me.loadGeojsonLayer(geojsondata, geoJsonStyle);
         if (map.getZoom() < config.mapInitParams.zoom) {
           map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
             maxZoom: config.mapInitParams.zoom
@@ -2199,6 +2210,12 @@ export default class integration extends PureComponent {
         me.setState({ imageTimeText: data[0] });
       });
     }
+    const { showHistoryIMG } = me.state;
+    if (showHistoryIMG) {
+      me.getInfoByExtent(zoom, bounds, data => {
+        me.setState({ imageTimeText: data[0] });
+      });
+    }
 
     if (switchDataModal) {
       /*-------------------------------------区域监管部分-------------------------------------*/
@@ -2503,8 +2520,6 @@ export default class integration extends PureComponent {
 
   creatElements = (properties, callback) => {
     console.log(properties);
-    // const spot = this.getDictValue(spotId);
-    // const spot = "";
     let elements;
     const obj = {
       show: true,
@@ -2512,79 +2527,71 @@ export default class integration extends PureComponent {
       id: properties.map_num ? properties.id : properties.project_id,
       from: properties.map_num ? 'spot' : 'project'
     };
-    // if (properties.project_id) {
-    // this.getProjectInfo(properties.project_id).then(data => {
-    // const data = "";
+    // elements = properties.map_num
+    //   ? (properties.archive_time ? jQuery(`<div></div>`) : jQuery(
+    //     `<div>图斑编号:${properties.map_num}</br>
+    //   ${
+    //     properties.project_name
+    //       ? '关联项目:' + properties.project_name + '</br>'
+    //       : ''
+    //   }${
+    //       properties.interference_compliance
+    //         ? '扰动范围:' + properties.interference_compliance + '</br>'
+    //         : ''
+    //     }<a onclick='goDetail(${JSON.stringify(
+    //       obj
+    //     )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
+    //       obj
+    //     )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+    //       obj
+    //     )})' style='display:none'>图形删除</a></div>`
+    //   ))
+    //   : jQuery(
+    //       `<div>项目:${properties.project_name}</br>
+    //       <a onclick='goDetail(${JSON.stringify(
+    //         obj
+    //       )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
+    //         obj
+    //       )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+    //         obj
+    //       )})' style='display:none'>图形删除</a></div>`
+    //     );
     elements = properties.map_num
-      ? jQuery(
-          `<div>图斑编号:${properties.map_num}</br>
-        ${
-          properties.project_name
-            ? '关联项目:' + properties.project_name + '</br>'
-            : ''
-        }${
-            properties.interference_compliance
-              ? '扰动范围:' + properties.interference_compliance + '</br>'
-              : ''
-          }<a onclick='goDetail(${JSON.stringify(
-            obj
-          )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
-            obj
-          )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
-            obj
-          )})' style='display:none'>图形删除</a></div>`
-        )
-      : jQuery(
-          `<div>项目:${properties.project_name}</br>
-          <a onclick='goDetail(${JSON.stringify(
-            obj
-          )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
-            obj
-          )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
-            obj
-          )})' style='display:none'>图形删除</a></div>`
-        );
-    //console.log(elements);
+    ? jQuery(
+      `<div>图斑编号:${properties.map_num}</br>
+    ${
+      properties.project_name
+        ? '关联项目:' + properties.project_name + '</br>'
+        : ''
+    }${
+        properties.interference_compliance
+          ? '扰动范围:' + properties.interference_compliance + '</br>'
+          : ''
+      }<a onclick='goDetail(${JSON.stringify(
+        obj
+      )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
+        obj
+      )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+        obj
+      )})' style='display:none'>图形删除</a></div>`
+    )
+    : jQuery(
+        `<div>项目:${properties.project_name}</br>
+        <a onclick='goDetail(${JSON.stringify(
+          obj
+        )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
+          obj
+        )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+          obj
+        )})' style='display:none'>图形删除</a></div>`
+      );
     callback(elements);
-    // });
-    // } else {
-    //   elements = properties.map_num
-    //     ? jQuery(
-    //         `<div>图斑编号:${properties.map_num}</br>
-    // ${
-    //   properties.project_name ? `关联项目:${properties.project_name}</br>` : ""
-    // }${
-    //           properties.interference_compliance
-    //             ? "扰动范围:" + properties.interference_compliance + "</br>"
-    //             : ""
-    //         }<a onclick='goDetail(${JSON.stringify(
-    //           obj
-    //         )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
-    //           obj
-    //         )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
-    //           obj
-    //         )})' style='display:none'>图形删除</a></div>`
-    //       )
-    //     : jQuery(
-    //         `<div>项目:</br>
-    //   <a onclick='goDetail(${JSON.stringify(
-    //     obj
-    //   )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
-    //           obj
-    //         )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
-    //           obj
-    //         )})' style='display:none'>图形删除</a></div>`
-    //       );
-    //   //console.log(elements);
-    //   callback(elements);
-    // }
+
   };
 
   getWinContent = (properties, callback) => {
     if (properties.map_num) {
-      // this.getSpotInfo(properties.id).then(spot => {
       this.creatElements(properties, callback);
-      // });
     } else {
       this.creatElements(properties, callback, '');
     }
@@ -3350,7 +3357,7 @@ export default class integration extends PureComponent {
           format: 'image/png', //返回的数据格式
           transparent: true,
           maxZoom: config.mapInitParams.maxZoom,
-          cql_filter: 'archive_time <= ' + selectSpotLeftV
+          cql_filter: 'archive_time >= ' + selectSpotLeftV
         });
       }
       if (selectSpotRightV.indexOf('现状') !== -1) {
@@ -3368,7 +3375,7 @@ export default class integration extends PureComponent {
           format: 'image/png', //返回的数据格式
           transparent: true,
           maxZoom: config.mapInitParams.maxZoom,
-          cql_filter: 'archive_time <= ' + selectSpotRightV
+          cql_filter: 'archive_time >= ' + selectSpotRightV
         });
       }
       map.addLayer(spotleftwms);
@@ -3531,13 +3538,36 @@ export default class integration extends PureComponent {
               background: '#fff'
             }}
           >
-            <span
+            {/* <span
               style={{
                 padding: '0 10px'
               }}
             >
               历史监管影像时间轴控件
+            </span> */}
+            <span
+              style={{
+                padding: '0 10px',
+                display: 'none'
+              }}
+            >
+              监管影像:
             </span>
+            <Select
+              // value={[selectLeftV]}
+              placeholder="请选择"
+              // onChange={this.onChangeSelectLeft}
+              style={{
+                width: 150,
+                // display: 'none'
+              }}
+            >
+              {histories.map((item, id) => (
+                <Select.Option key={id} value={item}>
+                  {item}
+                </Select.Option>
+              ))}
+            </Select>
           </div>
           {/* 照片预览*/}
           <Modal

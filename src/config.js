@@ -412,6 +412,8 @@ const config = {
 
     projectSuperviseForeverDeleteUrl: `${domainApi}ProjectRegulation/HardDelete`,
 
+    interpretListUrl: `${domainApi}Spot/GetTaskLevelAndInterBatch`,
+
     //获取当前用户行政级别下的总数
     totalByDistrictCodeUrl: `${domainApi}ProjectRegulation/TotalByDistrictCode`,
     //获取当前用户行政级别下的所有统计数据
