@@ -1546,24 +1546,27 @@ export default class sider extends PureComponent {
               }}
             />
           </Popover>
-          <Select
-            allowClear
-            style={{ margin: '0 20px 20px 20px', width: 260 }}
-            onChange={TaskLevelAndInterBatch => {
-              this.setState({ TaskLevelAndInterBatch });
-              this.querySpot({
-                ...queryInfo,
-                SkipCount: 0,
-                MapNum: query_spot,
-                from: 'query',
-                TaskLevelAndInterBatch
-              });
-            }}
-          >
-            {interpretList.map(item => (
-              <Select.Option key={item}>{item}</Select.Option>
-            ))}
-          </Select>
+          {key === `spot` ? (
+            <Select
+              allowClear
+              placeholder="解译期次"
+              style={{ margin: '0 20px 20px 20px', width: 260 }}
+              onChange={TaskLevelAndInterBatch => {
+                this.setState({ TaskLevelAndInterBatch });
+                this.querySpot({
+                  ...queryInfo,
+                  SkipCount: 0,
+                  MapNum: query_spot,
+                  from: 'query',
+                  TaskLevelAndInterBatch
+                });
+              }}
+            >
+              {interpretList.map(item => (
+                <Select.Option key={item}>{item}</Select.Option>
+              ))}
+            </Select>
+          ) : null}
           <Button.Group buttonstyle="solid" style={{ padding: '0px 15px' }}>
             {sort.map((item, index) => (
               <Button
