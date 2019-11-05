@@ -298,9 +298,11 @@ export default class siderbarDetail extends PureComponent {
                 ? v.districtCodeId.pop()
                 : '',
             id: type === 'edit' ? spotInfo.id : '',
-            interBatch: String(v.interBatch1) + String(v.interBatch2)
+            interBatch:
+              String(v.interBatch1 || ``) + String(v.interBatch2 || ``),
+            taskLevel: v.taskLevel || null
           },
-          callback: (success, response) => {
+          callback: success => {
             emitter.emit('deleteDraw', {});
             if (success) {
               notification['success']({
@@ -915,7 +917,7 @@ export default class siderbarDetail extends PureComponent {
                       ? String(spotItem.interBatch).slice(0, 4)
                       : ''
                   })(
-                    <Select disabled={!edit} style={{ width: 80 }}>
+                    <Select allowClear disabled={!edit} style={{ width: 80 }}>
                       {yearList.map(i => (
                         <Select.Option value={String(i)} key={i}>
                           {i}
@@ -928,7 +930,7 @@ export default class siderbarDetail extends PureComponent {
                       ? String(spotItem.interBatch).slice(4)
                       : ''
                   })(
-                    <Select disabled={!edit} style={{ width: 80 }}>
+                    <Select allowClear disabled={!edit} style={{ width: 80 }}>
                       {[
                         '01',
                         '02',
@@ -950,6 +952,41 @@ export default class siderbarDetail extends PureComponent {
                     </Select>
                   )}
                 </Input.Group>
+              </Form.Item>
+              <Form.Item label="任务级别" {...formItemLayout}>
+                {getFieldDecorator('taskLevel', {
+                  initialValue: spotItem.taskLevel
+                })(
+                  <Select
+                    showSearch
+                    allowClear
+                    disabled={!edit}
+                    optionFilterProp="children"
+                  >
+                    {[
+                      {
+                        label: '部级',
+                        value: 0
+                      },
+                      {
+                        label: '省级',
+                        value: 1
+                      },
+                      {
+                        label: '市级',
+                        value: 2
+                      },
+                      {
+                        label: '县级',
+                        value: 3
+                      }
+                    ].map(item => (
+                      <Select.Option value={item.value} key={item.value}>
+                        {item.label}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                )}
               </Form.Item>
               <Form.Item label="扰动类型" {...formItemLayout}>
                 {getFieldDecorator('interferenceTypeId', {
