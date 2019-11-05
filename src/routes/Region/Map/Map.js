@@ -2788,8 +2788,9 @@ export default class integration extends PureComponent {
           layers: config.mapSpotLayerName, //需要加载的图层
           format: 'image/png', //返回的数据格式
           transparent: true,
-          maxZoom: config.mapInitParams.maxZoom
+          maxZoom: config.mapInitParams.maxZoom,
           // cql_filter: "map_num == 201808_450521_0515"
+          cql_filter: 'archive_time is null'
         }
       ).addTo(map);
     } else {
@@ -2810,8 +2811,9 @@ export default class integration extends PureComponent {
           layers: config.mapSpotLayerName, //需要加载的图层
           format: 'image/png', //返回的数据格式
           transparent: true,
-          maxZoom: config.mapInitParams.maxZoom
+          maxZoom: config.mapInitParams.maxZoom,
           // cql_filter: "is_deleted == false"
+          cql_filter: 'archive_time is null'
         })
         .addTo(map);
     }
