@@ -139,7 +139,8 @@ export default class sider extends PureComponent {
       projectFileList: [],
       showPlan: false,
       clickId: null,
-      isProjectSupervise: false
+      isProjectSupervise: false,
+      TaskLevelAndInterBatch: null
     };
     this.map = null;
   }
@@ -610,7 +611,7 @@ export default class sider extends PureComponent {
 
   querySpot = items => {
     loading = true;
-    const { polygon, key, showCheck } = this.state;
+    const { polygon, key, showCheck, TaskLevelAndInterBatch } = this.state;
     const {
       dispatch,
       spot: { spotList }
@@ -619,6 +620,7 @@ export default class sider extends PureComponent {
     dispatch({
       type: 'spot/querySpot',
       payload: {
+        TaskLevelAndInterBatch,
         polygon: polygon,
         ...items,
         items: items.SkipCount === 0 ? [] : spotList.items
@@ -1544,10 +1546,18 @@ export default class sider extends PureComponent {
               }}
             />
           </Popover>
-          <Select allowClear
+          <Select
+            allowClear
             style={{ margin: '0 20px 20px 20px', width: 260 }}
-            onChange={v => {
-              console.log(v);
+            onChange={TaskLevelAndInterBatch => {
+              this.setState({ TaskLevelAndInterBatch });
+              this.querySpot({
+                ...queryInfo,
+                SkipCount: 0,
+                MapNum: query_spot,
+                from: 'query',
+                TaskLevelAndInterBatch
+              });
             }}
           >
             {interpretList.map(item => (
