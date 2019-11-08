@@ -177,6 +177,27 @@
       return index;
     }  
 
+    function getDatetime() {
+        var d = new Date();
+        var year = d.getFullYear();
+        var month = change(d.getMonth() + 1);
+        var day = change(d.getDate());
+        //var hour = change(d.getHours());
+        //var minute = change(d.getMinutes());
+        //var second = change(d.getSeconds());       
+        function change(t) {
+            if (t < 10) {
+                return "0" + t;
+            } else {
+                return t;
+            }
+        }
+        // var time = year + '-' + month + '-' + day + ' ' 
+        //         + hour + ':' + minute + ':' + second;
+        var time = year + '-' + month + '-' + day;
+        return time;
+    }
+
     $(function(){
         var l = window.location;
         var isFormal = l.href.split("/")[3] === "stbcjg";
@@ -199,16 +220,35 @@
         console.log('spotHistoryList',spotHistoryList);
         timeSpotList = [];
         timeSpotIds = [];
+        //先判断最后一个图斑记录是现状图斑还是历史图斑
+        if(spotHistoryList[spotHistoryList.length-1].archiveTime){//历史图斑
+           //剔除最后一个记录
+           spotHistoryList.splice(spotHistoryList.length-1, 1);
+        }
         if(spotHistoryList.length>0){
           //动态构造扰动图斑历史时间轴刻度
           for(var i=spotHistoryList.length-1;i >= 0;i--){
-            timeSpotList.push(spotHistoryList[i].archiveTime);
+            var archiveTime = '';
+            if(spotHistoryList[i].archiveTime){//历史图斑
+              archiveTime = spotHistoryList[i].archiveTime;
+            }
+            else{//现状图斑
+              // console.log('getDatetime()',getDatetime());
+              archiveTime = getDatetime();
+            }
+            timeSpotList.push(archiveTime);
             timeSpotIds.push(spotHistoryList[i].id);
              if(i == spotHistoryList.length-1){
-              $('#timelineDomBody').append('<div data-time="'+spotHistoryList[i].archiveTime+'"><div id="map"><div id="imgageTimeText" style="background:rgba(0, 0, 0, 0.45);height:20px;left:0px;bottom:34px;color:#fff;position:absolute;z-index:999;font-size:13px;"></div></div></div>');
+              if(spotHistoryList[i].archiveTime){
+                $('#timelineDomBody').append('<div data-time="'+archiveTime+'"><div id="map"><div id="imgageTimeText" style="background:rgba(0, 0, 0, 0.45);height:20px;left:0px;bottom:34px;color:#fff;position:absolute;z-index:999;font-size:13px;"></div></div></div>');
+              }
+              else{
+                $('#timelineDomBody').append('<div data-time="现状图斑"><div id="map"><div id="imgageTimeText" style="background:rgba(0, 0, 0, 0.45);height:20px;left:0px;bottom:34px;color:#fff;position:absolute;z-index:999;font-size:13px;"></div></div></div>');
+              }
+              //$('#timelineDomBody').append('<div data-time="'+archiveTime+'"><div id="map"><div id="imgageTimeText" style="background:rgba(0, 0, 0, 0.45);height:20px;left:0px;bottom:34px;color:#fff;position:absolute;z-index:999;font-size:13px;"></div></div></div>');
              }
              else{
-              $('#timelineDomBody').append('<div data-time="'+spotHistoryList[i].archiveTime+'" style="display:none"></div>');
+              $('#timelineDomBody').append('<div data-time="'+archiveTime+'" style="display:none"></div>');
              }
           }
         }

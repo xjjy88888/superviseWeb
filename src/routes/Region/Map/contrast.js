@@ -12,7 +12,7 @@ import jQuery from "jquery";
 import emitter from "../../../utils/event";
 // import { relativeTimeThreshold } from "moment";
 
-let userconfig = {};
+let contrastconfig = {};
 @connect(({ user, mapdata, project, spot }) => ({
   user,
   mapdata,
@@ -43,23 +43,24 @@ export default class splitScreen extends PureComponent {
         me.props.dispatch({
           type: "mapdata/GetBoundAsync",
           callback: boundary => {
-            userconfig.geojson = JSON.parse(boundary.result);
+            contrastconfig.geojson = JSON.parse(boundary.result);
             this.isload = true;
             // 创建地图
-            me.createMap(v.center,v.zoom); 
+            me.createMap(v.center,v.zoom,v.isGetInfoByExtent); 
           }
         });
       }
       else{
         setTimeout(() => {
-          userconfig.LMap.setView(v.center,v.zoom);
-          userconfig.RMap.setView(v.center,v.zoom);
+          contrastconfig.LMap.setView(v.center,v.zoom);
+          contrastconfig.RMap.setView(v.center,v.zoom);
         }, 500);        
       }
     });
     //防止切换元素dom触发地图点击事件
     const leftel = document.getElementById('leftDIV');
-    L.DomEvent.addListener(leftel, 'dblclick', L.DomEvent.stop);
+    L.DomEvent.disableClickPropagation(leftel);
+    /*L.DomEvent.addListener(leftel, 'dblclick', L.DomEvent.stop);
     L.DomEvent.addListener(leftel, 'mousedown', L.DomEvent.stop);
     L.DomEvent.addListener(leftel, 'mouseup', L.DomEvent.stop);
     L.DomEvent.addListener(leftel, 'click', function (e) {
@@ -67,9 +68,11 @@ export default class splitScreen extends PureComponent {
       // L.DomEvent.preventDefault(e);
       // L.DomEvent.stopPropagation(e);
       // L.DomEvent.stop(e);
-    });
+      //L.DomEvent.disableClickPropagation(leftel);
+    });*/
     const rightel = document.getElementById('rightDIV');
-    L.DomEvent.addListener(rightel, 'dblclick', L.DomEvent.stop);
+    L.DomEvent.disableClickPropagation(rightel);//停止给定事件传播到父元素,这里父元素指地图map
+    /*L.DomEvent.addListener(rightel, 'dblclick', L.DomEvent.stop);
     L.DomEvent.addListener(rightel, 'mousedown', L.DomEvent.stop);
     L.DomEvent.addListener(rightel, 'mouseup', L.DomEvent.stop);
     L.DomEvent.addListener(rightel, 'click', function (e) {
@@ -77,12 +80,13 @@ export default class splitScreen extends PureComponent {
       // L.DomEvent.preventDefault(e);
       // L.DomEvent.stopPropagation(e);
       // L.DomEvent.stop(e);
-    });
+      //L.DomEvent.disableClickPropagation(rightel);
+    });*/
 
 
   }
   // 创建地图
-  createMap = (center,zoom) => {
+  createMap = (center,zoom,isGetInfoByExtent) => {
     const me = this;
     delete L.Icon.Default.prototype._getIconUrl;
     L.Icon.Default.mergeOptions({
@@ -90,43 +94,43 @@ export default class splitScreen extends PureComponent {
       iconUrl: require("leaflet/dist/images/marker-icon.png"),
       shadowUrl: require("leaflet/dist/images/marker-shadow.png")
     });
-    userconfig.LMap = L.map("LMap", {
+    contrastconfig.LMap = L.map("LMap", {
       zoomControl: false,
       attributionControl: false
     });
     //地图缩放控件
     L.control
       .zoom({ zoomInTitle: "放大", zoomOutTitle: "缩小", position: "topleft" })
-      .addTo(userconfig.LMap);
-    userconfig.RMap = L.map("RMap", {
+      .addTo(contrastconfig.LMap);
+      contrastconfig.RMap = L.map("RMap", {
       zoomControl: false,
       attributionControl: false
     });
     //地图缩放控件
     L.control
       .zoom({ zoomInTitle: "放大", zoomOutTitle: "缩小", position: "topright" })
-      .addTo(userconfig.RMap);
+      .addTo(contrastconfig.RMap);
     //获取项目区域范围
-    me.getRegionGeometry(center,zoom);
+    me.getRegionGeometry(center,zoom,isGetInfoByExtent);
   };
   /*
    *地图鼠标移动监听事件
    */
   onMoveMap = e => {
-    if (userconfig.marker) userconfig.marker.remove();
+    if (contrastconfig.marker) contrastconfig.marker.remove();
     let myIcon = L.icon({
       iconUrl: "./img/hand_pointer.png",
       iconSize: [17, 23]
     });
     if (e.target._container.id === "LMap") {
       //操作右侧地图
-      userconfig.marker = L.marker(e.latlng, { icon: myIcon }).addTo(
-        userconfig.RMap
+      contrastconfig.marker = L.marker(e.latlng, { icon: myIcon }).addTo(
+        contrastconfig.RMap
       );
     } else {
       //操作左侧地图
-      userconfig.marker = L.marker(e.latlng, { icon: myIcon }).addTo(
-        userconfig.LMap
+      contrastconfig.marker = L.marker(e.latlng, { icon: myIcon }).addTo(
+        contrastconfig.LMap
       );
     }
   };
@@ -137,20 +141,20 @@ export default class splitScreen extends PureComponent {
     const me = this;
     if (e.target._container.id === "LMap") {
       //左侧地图
-      userconfig.map = userconfig.LMap;
+      contrastconfig.map = contrastconfig.LMap;
     } else {
       //右侧地图
-      userconfig.map = userconfig.RMap;
+      contrastconfig.map = contrastconfig.RMap;
     }
-    userconfig.LMap.closePopup();
-    userconfig.RMap.closePopup();
+    contrastconfig.LMap.closePopup();
+    contrastconfig.RMap.closePopup();
     me.clearGeojsonLayer();
     let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
-    if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {
+    if (!turf.booleanPointInPolygon(turfpoint, contrastconfig.polygon)) {
       message.warning("区域范围之外的数据没有权限操作", 1);
       return;
     }
-    userconfig.mapPoint = e.latlng;
+    contrastconfig.mapPoint = e.latlng;
     //点查WMS图层
     const point = { x: e.latlng.lng, y: e.latlng.lat };
     //普通点查
@@ -204,27 +208,29 @@ export default class splitScreen extends PureComponent {
         for (let i = 0; i < data.features.length; i++) {
           let feature = data.features[i];
           if (i === data.features.length - 1) {
+            // eslint-disable-next-line no-loop-func
             me.getWinContent(feature.properties, data => {
               content += data[0].innerHTML;
             });
           } else {
+            // eslint-disable-next-line no-loop-func
             me.getWinContent(feature.properties, data => {
               content += data[0].innerHTML + "<br>";
             });
           }
         }
-        if (userconfig.map.getZoom() < config.mapInitParams.zoom) {
-          userconfig.map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
+        if (contrastconfig.map.getZoom() < config.mapInitParams.zoom) {
+          contrastconfig.map.fitBounds(contrastconfig.projectgeojsonLayer.getBounds(), {
             maxZoom: config.mapInitParams.zoom
           });
         }
-        userconfig.map.openPopup(content, userconfig.mapPoint);
+        contrastconfig.map.openPopup(content, contrastconfig.mapPoint);
       } else {
-        userconfig.map.closePopup();
+        contrastconfig.map.closePopup();
       }
     } else {
       message.warning("地图匹配不到相关数据", 1);
-      userconfig.map.closePopup();
+      contrastconfig.map.closePopup();
     }
   };
   /*点选查询图层
@@ -267,24 +273,24 @@ export default class splitScreen extends PureComponent {
    * 绘制图形函数
    */
   loadGeojsonLayer = (geojson, style) => {
-    userconfig.projectgeojsonLayer = L.Proj.geoJson(geojson, {
+    contrastconfig.projectgeojsonLayer = L.Proj.geoJson(geojson, {
       style: style
-    }).addTo(userconfig.map);
+    }).addTo(contrastconfig.map);
   };
   /*
    * 清空绘制图形函数
    */
   clearGeojsonLayer = () => {
-    if (userconfig.projectgeojsonLayer) {
-      userconfig.projectgeojsonLayer.clearLayers();
-      userconfig.map.removeLayer(userconfig.projectgeojsonLayer);
-      userconfig.projectgeojsonLayer = null;
+    if (contrastconfig.projectgeojsonLayer) {
+      contrastconfig.projectgeojsonLayer.clearLayers();
+      contrastconfig.map.removeLayer(contrastconfig.projectgeojsonLayer);
+      contrastconfig.projectgeojsonLayer = null;
     }
   };
   /*
    *获取项目区域范围
    */
-  getRegionGeometry = (mapcenter,mapzoom) => {
+  getRegionGeometry = (mapcenter,mapzoom,isGetInfoByExtent) => {
     const me = this;
     //调用后台接口形式改造
     let geojson = {
@@ -294,40 +300,46 @@ export default class splitScreen extends PureComponent {
           type: "Feature",
           geometry: {
             type: "MultiPolygon",
-            coordinates: userconfig.geojson.coordinates
+            coordinates: contrastconfig.geojson.coordinates
           }
         }
       ]
     };
-    userconfig.geojson = geojson;
+    contrastconfig.geojson = geojson;
     //加载地图geoJsonLayer图层
-    me.loadMapgeoJsonLayer(userconfig.LMap);
-    me.loadMapgeoJsonLayer(userconfig.RMap);
+    me.loadMapgeoJsonLayer(contrastconfig.LMap);
+    me.loadMapgeoJsonLayer(contrastconfig.RMap);
     //加载影像底图
-    userconfig.leftImgLayer = me.loadMapbaseLayer(
-      userconfig.LMap,
+    contrastconfig.leftImgLayer = me.loadMapbaseLayer(
+      contrastconfig.LMap,
       config.onlineBasemaps[0].url
     );
-    userconfig.rightImgLayer = me.loadMapbaseLayer(
-      userconfig.RMap,
+    if(!contrastconfig.LMap.hasLayer(contrastconfig.leftImgLayer)){
+      contrastconfig.LMap.addLayer(contrastconfig.leftImgLayer);
+    }
+    contrastconfig.rightImgLayer = me.loadMapbaseLayer(
+      contrastconfig.RMap,
       config.onlineBasemaps[0].url
     );
+    if(!contrastconfig.RMap.hasLayer(contrastconfig.rightImgLayer)){
+      contrastconfig.RMap.addLayer(contrastconfig.rightImgLayer);
+    }
     //构造面
-    userconfig.polygon = turf.multiPolygon(
+    contrastconfig.polygon = turf.multiPolygon(
       geojson.features[0].geometry.coordinates
     );
     setTimeout(() => {
-      userconfig.zoom = userconfig.LMap.getZoom() + 1;
+      contrastconfig.zoom = contrastconfig.LMap.getZoom() + 1;
       //加载geoserver发布的WMS地图服务
-      me.overlayWMSLayers(userconfig.LMap);
-      me.overlayWMSLayers(userconfig.RMap);
+      me.overlayWMSLayers(contrastconfig.LMap);
+      me.overlayWMSLayers(contrastconfig.RMap);
       //地图模态层效果
       me.loadmodalLayer();
       setTimeout(() => {
         //监听地图移动完成事件
-        userconfig.maps = [userconfig.LMap, userconfig.RMap];
+        contrastconfig.maps = [contrastconfig.LMap, contrastconfig.RMap];
         // eslint-disable-next-line array-callback-return
-        userconfig.maps.map(function(t) {
+        contrastconfig.maps.map(function(t) {
           // console.log(t);
           t.on({ drag: maplink, zoom: maplink });
         }); //地图联动实现
@@ -338,24 +350,36 @@ export default class splitScreen extends PureComponent {
           let bounds = e.target.getBounds();
           me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
           // eslint-disable-next-line array-callback-return
-          userconfig.maps.map(function(t) {
+          contrastconfig.maps.map(function(t) {
             t.setView(_this.getCenter(), _this.getZoom());
           });
         }
         //监听地图移动事件
-        userconfig.LMap.on("mousemove", me.onMoveMap);
+        contrastconfig.LMap.on("mousemove", me.onMoveMap);
         //监听地图移动事件
-        userconfig.RMap.on("mousemove", me.onMoveMap);
+        contrastconfig.RMap.on("mousemove", me.onMoveMap);
         //监听地图点击事件
-        userconfig.LMap.on("click", me.onClickMap);
+        contrastconfig.LMap.on("click", me.onClickMap);
         //监听地图点击事件
-        userconfig.RMap.on("click", me.onClickMap);
-        userconfig.LMap.setView(mapcenter,mapzoom);
-        userconfig.RMap.setView(mapcenter,mapzoom);
+        contrastconfig.RMap.on("click", me.onClickMap);
+        contrastconfig.LMap.setView(mapcenter,mapzoom);
+        contrastconfig.RMap.setView(mapcenter,mapzoom);
         //根据地图当前范围获取对应历史影像数据
-        let zoom = userconfig.LMap.getZoom();
-        let bounds = userconfig.LMap.getBounds();
-        me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, true);
+        if(isGetInfoByExtent){
+          let zoom = contrastconfig.LMap.getZoom();
+          let bounds = contrastconfig.LMap.getBounds();
+          me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, true);
+        }
+        // let point = contrastconfig.LMap.latLngToContainerPoint(mapcenter);
+        // point.x =point.x - 0.00001;
+        // point.y = point.y - 0.00001;
+        // contrastconfig.LMap.panBy(point);
+        // contrastconfig.RMap.panBy(point);
+        // let point = mapcenter;
+        // point.lat = point.lat - 0.00001;
+        // point.lng = point.lng - 0.00001; 
+        // contrastconfig.LMap.panTo(point);
+        // contrastconfig.RMap.panTo(point);
       }, 500);
     }, 500);
   };
@@ -369,7 +393,8 @@ export default class splitScreen extends PureComponent {
       pane: "tileLayerZIndex",
       maxZoom: config.mapInitParams.maxZoom,
       errorTileUrl:config.errorTileUrl
-    }).addTo(map); //影像图
+    // }).addTo(map); //影像图
+    }); //影像图
     return layer;
   };
   /*
@@ -379,7 +404,7 @@ export default class splitScreen extends PureComponent {
     // L.Proj.GeoJSON继承于L.GeoJSON，可调样式
     map.createPane("geoJsonZIndex");
     map.getPane("geoJsonZIndex").style.zIndex = 1;
-    userconfig.geoJsonLayer = L.Proj.geoJson(userconfig.geojson, {
+    contrastconfig.geoJsonLayer = L.Proj.geoJson(contrastconfig.geojson, {
       style: {
         color: "#0070FF",
         weight: 3,
@@ -389,16 +414,16 @@ export default class splitScreen extends PureComponent {
       },
       pane: "geoJsonZIndex"
     }).addTo(map);
-    let bounds = userconfig.geoJsonLayer.getBounds();
+    let bounds = contrastconfig.geoJsonLayer.getBounds();
     map.fitBounds(bounds);
   };
   /*
    * 加载geoserver发布的WMS地图服务
    */
   overlayWMSLayers = map => {
-    let bounds = userconfig.geoJsonLayer.getBounds();
+    let bounds = contrastconfig.geoJsonLayer.getBounds();
     map.setMaxBounds(bounds);
-    map.setMinZoom(userconfig.zoom);
+    map.setMinZoom(contrastconfig.zoom);
     //加载项目红线图层wms
     L.tileLayer
       .wms(config.mapUrl.geoserverUrl + "/wms?", {
@@ -427,7 +452,7 @@ export default class splitScreen extends PureComponent {
       ]
     ];
     let boundGeo = turf.polygon(boundCoord);
-    let modalJson = turf.difference(boundGeo, userconfig.polygon);
+    let modalJson = turf.difference(boundGeo, contrastconfig.polygon);
     let lLayer = L.Proj.geoJson(modalJson, {
       style: {
         color: "#0070FF",
@@ -436,7 +461,7 @@ export default class splitScreen extends PureComponent {
         fillColor: "rgba(0, 0, 0, 0.45)",
         fillOpacity: 1
       }
-    }).addTo(userconfig.LMap);
+    }).addTo(contrastconfig.LMap);
     jQuery(lLayer.getPane())
       .find("path")
       .css({
@@ -451,7 +476,7 @@ export default class splitScreen extends PureComponent {
         fillColor: "rgba(0, 0, 0, 0.45)",
         fillOpacity: 1
       }
-    }).addTo(userconfig.RMap);
+    }).addTo(contrastconfig.RMap);
     jQuery(rLayer.getPane())
       .find("path")
       .css({
@@ -468,7 +493,7 @@ export default class splitScreen extends PureComponent {
    */
   getInfoByExtent = (zoom, bounds, callback, isLoadSideBySide) => {
     const me = this;
-    userconfig.isLoadSideBySide = isLoadSideBySide;
+    contrastconfig.isLoadSideBySide = isLoadSideBySide;
     let urlString = config.mapUrl.getInfoByExtent;
     let xyMin = proj4("EPSG:4326", "EPSG:3857", [
       bounds.getSouthWest().lng,
@@ -498,7 +523,7 @@ export default class splitScreen extends PureComponent {
    */
   queryWFSServiceByExtent = (typeName, callback) => {
     const me = this;
-    let bounds = userconfig.LMap.getBounds();
+    let bounds = contrastconfig.LMap.getBounds();
     let polygon = bounds.getSouthWest().lng + "," + bounds.getSouthWest().lat;
     polygon +=
       " " + bounds.getSouthWest().lng + "," + bounds.getNorthEast().lat;
@@ -508,19 +533,7 @@ export default class splitScreen extends PureComponent {
       " " + bounds.getNorthEast().lng + "," + bounds.getSouthWest().lat;
     polygon +=
       " " + bounds.getSouthWest().lng + "," + bounds.getSouthWest().lat;
-    // let filter =
-    //   '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
-    // filter += "<Intersects>";
-    // filter += "<PropertyName>geom</PropertyName>";
-    // filter += "<gml:Polygon>";
-    // filter += "<gml:outerBoundaryIs>";
-    // filter += "<gml:LinearRing>";
-    // filter += "<gml:coordinates>" + polygon + "</gml:coordinates>";
-    // filter += "</gml:LinearRing>";
-    // filter += "</gml:outerBoundaryIs>";
-    // filter += "</gml:Polygon>";
-    // filter += "</Intersects>";
-    // filter += "</Filter>";
+
     let filter =
       '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
     filter += '<And>';
@@ -563,12 +576,12 @@ export default class splitScreen extends PureComponent {
    */
   callbackGetInfoByExtent = data => {
     if (
-      userconfig.isLoadSideBySide ||
-      userconfig.sideBySideZoom !== userconfig.LMap.getZoom()
+      contrastconfig.isLoadSideBySide ||
+      contrastconfig.sideBySideZoom !== contrastconfig.LMap.getZoom()
     ) {
       this.setState({ selectLeftV: data[0] });
       this.setState({ selectRightV: data[0] });
-      userconfig.sideBySideZoom = userconfig.LMap.getZoom();
+      contrastconfig.sideBySideZoom = contrastconfig.LMap.getZoom();
       //历史扰动图斑查询
       this.queryWFSServiceByExtent(
         config.mapSpotLayerName,
@@ -688,19 +701,25 @@ export default class splitScreen extends PureComponent {
    * 移除左地图的图层列表
    */
   removeLMapLayers = () => {
-    if (userconfig.leftImgLayer)
-      userconfig.LMap.removeLayer(userconfig.leftImgLayer);
-    if (userconfig.leftSpotLayer)
-      userconfig.LMap.removeLayer(userconfig.leftSpotLayer);
+    if (contrastconfig.leftImgLayer && contrastconfig.LMap.hasLayer(contrastconfig.leftImgLayer)){
+      contrastconfig.LMap.removeLayer(contrastconfig.leftImgLayer);
+    }
+    if (contrastconfig.leftSpotLayer && contrastconfig.LMap.hasLayer(contrastconfig.leftSpotLayer)){
+      contrastconfig.LMap.removeLayer(contrastconfig.leftSpotLayer);
+    }
+
   };
   /*
    * 移除右地图的图层列表
    */
   removeRMapLayers = () => {
-    if (userconfig.rightImgLayer)
-      userconfig.RMap.removeLayer(userconfig.rightImgLayer);
-    if (userconfig.rightSpotLayer)
-      userconfig.RMap.removeLayer(userconfig.rightSpotLayer);
+    if (contrastconfig.rightImgLayer && contrastconfig.RMap.hasLayer(contrastconfig.rightImgLayer)){
+      contrastconfig.RMap.removeLayer(contrastconfig.rightImgLayer);
+    }
+    if (contrastconfig.rightSpotLayer && contrastconfig.RMap.hasLayer(contrastconfig.rightSpotLayer)){
+      contrastconfig.RMap.removeLayer(contrastconfig.rightSpotLayer);
+    }
+
   };
   /*
    * 新建左地图的图层列表
@@ -713,17 +732,20 @@ export default class splitScreen extends PureComponent {
         "/" +
         selectLeftV.replace(/\//g, "-") +
         "/tile/{z}/{y}/{x}";
-      userconfig.leftImgLayer = this.loadMapbaseLayer(
-        userconfig.LMap,
+        contrastconfig.leftImgLayer = this.loadMapbaseLayer(
+          contrastconfig.LMap,
         leftLayerUrl
       ); //左侧影像
+      if(!contrastconfig.LMap.hasLayer(contrastconfig.leftImgLayer)){
+        contrastconfig.LMap.addLayer(contrastconfig.leftImgLayer);
+      }
     }
     //加载历史扰动图斑
-    userconfig.leftSpotLayer = null;
+    contrastconfig.leftSpotLayer = null;
     if (selectSpotLeftV) {
       if (selectSpotLeftV.indexOf("现状") !== -1) {
         //现状扰动图斑
-        userconfig.leftSpotLayer = L.tileLayer.wms(
+        contrastconfig.leftSpotLayer = L.tileLayer.wms(
           config.mapUrl.geoserverUrl + "/wms?",
           {
             layers: config.mapSpotLayerName, //需要加载的图层
@@ -737,7 +759,7 @@ export default class splitScreen extends PureComponent {
         const leftspotIds = this.getSpotIdsByHistorySpots(this.getLimitSpotByTargetDate(selectSpotLeftV));
         //console.log('leftspotIds',leftspotIds);
         //历史扰动图斑
-        userconfig.leftSpotLayer = L.tileLayer.wms(
+        contrastconfig.leftSpotLayer = L.tileLayer.wms(
           config.mapUrl.geoserverUrl + "/wms?",
           {
             layers: config.mapSpotLayerName, //需要加载的图层
@@ -749,7 +771,10 @@ export default class splitScreen extends PureComponent {
           }
         );
       }
-      userconfig.LMap.addLayer(userconfig.leftSpotLayer);
+      //contrastconfig.LMap.addLayer(contrastconfig.leftSpotLayer);
+      if(!contrastconfig.LMap.hasLayer(contrastconfig.leftSpotLayer)){
+        contrastconfig.LMap.addLayer(contrastconfig.leftSpotLayer);
+      }
     }
   };
   /*
@@ -763,17 +788,20 @@ export default class splitScreen extends PureComponent {
         "/" +
         selectRightV.replace(/\//g, "-") +
         "/tile/{z}/{y}/{x}";
-      userconfig.rightImgLayer = this.loadMapbaseLayer(
-        userconfig.RMap,
+        contrastconfig.rightImgLayer = this.loadMapbaseLayer(
+        contrastconfig.RMap,
         rightLayerUrl
       ); //右侧影像
+      if(!contrastconfig.RMap.hasLayer(contrastconfig.rightImgLayer)){
+        contrastconfig.RMap.addLayer(contrastconfig.rightImgLayer);
+      }
     }
     //加载历史扰动图斑
-    userconfig.rightSpotLayer = null;
+    contrastconfig.rightSpotLayer = null;
     if (selectSpotRightV) {
       if (selectSpotRightV.indexOf("现状") !== -1) {
         //现状扰动图斑
-        userconfig.rightSpotLayer = L.tileLayer.wms(
+        contrastconfig.rightSpotLayer = L.tileLayer.wms(
           config.mapUrl.geoserverUrl + "/wms?",
           {
             layers: config.mapSpotLayerName, //需要加载的图层
@@ -786,7 +814,7 @@ export default class splitScreen extends PureComponent {
       } else {
         const rightspotIds = this.getSpotIdsByHistorySpots(this.getLimitSpotByTargetDate(selectSpotRightV));
         //历史扰动图斑
-        userconfig.rightSpotLayer = L.tileLayer.wms(
+        contrastconfig.rightSpotLayer = L.tileLayer.wms(
           config.mapUrl.geoserverUrl + "/wms?",
           {
             layers: config.mapSpotLayerName, //需要加载的图层
@@ -798,15 +826,16 @@ export default class splitScreen extends PureComponent {
           }
         );
       }
-      userconfig.RMap.addLayer(userconfig.rightSpotLayer);
+      //contrastconfig.RMap.addLayer(contrastconfig.rightSpotLayer);
+      if(!contrastconfig.RMap.hasLayer(contrastconfig.rightSpotLayer)){
+        contrastconfig.RMap.addLayer(contrastconfig.rightSpotLayer);
+      }
     }
   };
   /*
    * 左地图的影像列表切换
    */
   onChangeSelectLeft = v => {
-    //console.log("668",v);
-    //v.stopPropagation();
     this.setState({ selectLeftV: v });
     //移除左地图的图层列表
     this.removeLMapLayers();

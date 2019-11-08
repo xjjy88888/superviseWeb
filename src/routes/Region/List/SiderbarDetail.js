@@ -1233,7 +1233,7 @@ export default class siderbarDetail extends PureComponent {
                       });
                       localStorage.setItem(
                         'spotHistoryList',
-                        JSON.stringify(spotHistoryList)
+                        JSON.stringify(spotHistoryList.concat([spotInfo]))
                       );
                     } else {
                       notification['warning']({

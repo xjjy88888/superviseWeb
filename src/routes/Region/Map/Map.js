@@ -76,7 +76,6 @@ let radius = null; //画圆圈半径大小
 let RegionCenterData = [];
 let RegionPieData = [];
 let ProjectPointsData = null;
-let me;
 
 const DISTRICT_FILL_COLOR = 'rgba(230,0,0,0)';
 // const DISTRICT_COLOR = '#bfbfbf';
@@ -1299,7 +1298,6 @@ export default class integration extends PureComponent {
 
   // 创建行政区划渲染
   createRegion = () => {
-    //const me = this;
     this.getNextRegions();
   };
 
@@ -1664,13 +1662,6 @@ export default class integration extends PureComponent {
       map.off('click');
       me.clearPlotGraphic();
       me.clearGeojsonLayer();
-      // let style = {
-      //   color: "#33CCFF", //#33CCFF #e60000
-      //   weight: 3,
-      //   opacity: 1,
-      //   fillColor: "#e6d933", //#33CCFF #e6d933
-      //   fillOpacity: 0.1
-      // };
       me.loadGeojsonLayer(data, geoJsonStyle);
       //编辑图形
       userconfig.projectgeojsonLayer.pm.enable({
@@ -1740,13 +1731,6 @@ export default class integration extends PureComponent {
       data = data.result;
       if (data.features.length > 0) {
         me.clearGeojsonLayer();
-        // let style = {
-        //   color: "#33CCFF", //#33CCFF #e60000
-        //   weight: 3,
-        //   opacity: 1,
-        //   fillColor: "#e6d933", //#33CCFF #e6d933
-        //   fillOpacity: 0.1
-        // };
         me.loadGeojsonLayer(data, geoJsonStyle);
         if (map.getZoom() < config.mapInitParams.zoom) {
           map.fitBounds(userconfig.projectgeojsonLayer.getBounds(), {
@@ -1777,8 +1761,6 @@ export default class integration extends PureComponent {
         features: []
       };
       //console.log("data", data);
-      // me.clearGeojsonLayer();
-      // me.loadGeojsonLayer(data, geoJsonStyle);
       if (data.features.length > 0) {
         let content = '';
         for (let i = 0; i < data.features.length; i++) {
@@ -1848,13 +1830,6 @@ export default class integration extends PureComponent {
     if (data.success) {
       data = data.result;
       me.clearGeojsonLayer();
-      // let style = {
-      //   color: "#33CCFF", //#33CCFF #e60000
-      //   weight: 3,
-      //   opacity: 1,
-      //   fillColor: "#e6d933", //#33CCFF #e6d933
-      //   fillOpacity: 0.1
-      // };
       me.loadGeojsonLayer(data, geoJsonStyle);
       me.setState({
         spotStatus: 'end' //start：开始，end：结束
@@ -1996,7 +1971,6 @@ export default class integration extends PureComponent {
     map.pm.addControls(options);
     //检查照片列表
     picLayerGroup = L.featureGroup().addTo(map);
-    //me.setState({ loading: false });
 
     // 监听地图点击事件
     map.on('click', me.onClickMap);
@@ -2496,60 +2470,6 @@ export default class integration extends PureComponent {
       callback: callback
     });
   };
-  /*
-   * 匹配气泡窗口信息模版函数
-   */
-
-  // getProjectInfo = id => {
-  //   return new Promise((resolve, reject) => {
-  //     const { dispatch } = this.props;
-  //     dispatch({
-  //       type: "project/queryProjectById",
-  //       payload: {
-  //         id: id,
-  //         refresh: false
-  //       },
-  //       callback: (result, success) => {
-  //         if (success && result) {
-  //           resolve(result.projectBase.name);
-  //         } else {
-  //           resolve("");
-  //         }
-  //       }
-  //     });
-  //   });
-  // };
-
-  // getDictValue = id => {
-  //   const {
-  //     user: { dicList }
-  //   } = this.props;
-  //   if (id) {
-  //     const filter = dicList.filter(item => {
-  //       return item.id === id;
-  //     });
-  //     return filter.map(item => item.value).join(",");
-  //   } else {
-  //     return "";
-  //   }
-  // };
-
-  // getSpotInfo = id => {
-  //   return new Promise((resolve, reject) => {
-  //     const { dispatch } = this.props;
-  //     dispatch({
-  //       type: "spot/querySpotById",
-  //       payload: {
-  //         id: id,
-  //         refresh: false
-  //       },
-  //       callback: data => {
-  //         const v = data ? data.interferenceComplianceId : "";
-  //         resolve(v);
-  //       }
-  //     });
-  //   });
-  // };
 
   creatElements = (properties, callback) => {
     console.log(properties);
@@ -3304,6 +3224,10 @@ export default class integration extends PureComponent {
     userconfig.sideBySide = L.control
       .sideBySide(userconfig.leftLayers, userconfig.rightLayers)
       .addTo(map);
+
+    const dom = userconfig.sideBySide.getContainer();
+    L.DomEvent.disableClickPropagation(dom);//停止给定事件传播到父元素,这里父元素指地图map
+
   };
   /*
    * 移除卷帘效果
@@ -3906,7 +3830,8 @@ export default class integration extends PureComponent {
                   emitter.emit('showContrast', {
                     show: true,
                     center: center,
-                    zoom: zoom
+                    zoom: zoom,
+                    isGetInfoByExtent: userconfig.zoom === zoom
                   });
                 }}
               />
