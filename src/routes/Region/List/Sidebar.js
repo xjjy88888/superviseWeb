@@ -180,6 +180,7 @@ export default class sider extends PureComponent {
         showProjectDetail: false
       });
       this.search(v);
+      this.interpretList();
     });
     this.eventEmitter = emitter.addListener('spotRelate', v => {
       const len = v.spotId.length;
@@ -1079,6 +1080,7 @@ export default class sider extends PureComponent {
     const {
       switchData,
       mapLocation,
+      switchInterpret,
       dispatch,
       form: { getFieldDecorator, resetFields, setFieldsValue, getFieldValue },
       district: { districtTree, districtTreeFilter },
@@ -1552,6 +1554,7 @@ export default class sider extends PureComponent {
               placeholder="解译期次"
               style={{ margin: '0 20px 20px 20px', width: 260 }}
               onChange={TaskLevelAndInterBatch => {
+                switchInterpret(TaskLevelAndInterBatch);
                 this.setState({ TaskLevelAndInterBatch });
                 this.querySpot({
                   ...queryInfo,

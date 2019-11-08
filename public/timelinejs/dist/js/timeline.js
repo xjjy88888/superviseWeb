@@ -266,7 +266,8 @@
       }) 
 			//动态刷新历史扰动图斑
 			spotWmsLayer.setParams({
-			  cql_filter: "archive_time ="+dateToUtc(timeSpotList[self.options.startItem])
+        //cql_filter: "archive_time ="+dateToUtc(timeSpotList[self.options.startItem])
+        cql_filter: "id = " + timeSpotIds[self.options.startItem]
 			});
 		},
 

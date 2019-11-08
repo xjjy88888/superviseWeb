@@ -671,10 +671,22 @@ export async function getInfoByExtent(params) {
 
 //根据地图当前范围获取对应历史扰动图斑数据接口
 export async function getHistorySpotTimeByExtent(params) {
-  return request(params.geojsonUrl, {
-    method: 'GET',
+  // return request(params.geojsonUrl, {
+  //   method: 'GET',
+  //   dataType: 'json',
+  //   headers: {}
+  // });
+  return request(`${config.url.queryWFSLayer}`, {
+    method: 'POST',
     dataType: 'json',
-    headers: {}
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      'Content-Type': 'application/json-patch+json'
+    },
+    body: JSON.stringify({
+      method: 'get',
+      url: params.geojsonUrl
+    })
   });
 }
 

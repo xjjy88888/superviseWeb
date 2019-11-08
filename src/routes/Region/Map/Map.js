@@ -60,6 +60,7 @@ import { getUrl } from '../../../utils/util';
 
 let userconfig = {};
 let map = null;
+let ImgListLayer = null;
 /*-------------------------------------区域监管部分-------------------------------------*/
 let marker = null;
 let picLayerGroup = null;
@@ -176,14 +177,15 @@ export default class integration extends PureComponent {
       photoPreviewUrl: null,
       imageTimeText: '',
       showImageTimeText: true,
-      showHistoryIMG: false,//历史监管影像
+      showHistoryIMG: false, //历史监管影像
       switchDataModal: true, //区域监管、项目监管切换模式
       projectSymbolValue: '项目总数',
       payload: null,
       showProgress_ZS: false,
       showProgress_Pie: false,
       showProgress_ProjectPoint: false,
-      showXMJGPanel: false
+      showXMJGPanel: false,
+      selectIMG: ''
       //loading: true
     };
     //this.map = null;
@@ -197,6 +199,7 @@ export default class integration extends PureComponent {
     /*-------------------------------------区域监管部分-------------------------------------*/
     userconfig = {};
     map = null;
+    ImgListLayer = null;
     marker = null;
     picLayerGroup = null;
     problemPointLayer = L.layerGroup([]);
@@ -211,7 +214,7 @@ export default class integration extends PureComponent {
     RegionPieData = [];
     ProjectPointsData = null;
     // console.log('userconfig',userconfig.spotWmsLayer);
-    me = this;
+    const me = this;
     const { dispatch } = this.props;
     //判断项目监管列表跳转过来
     const urlFrom = getUrl(`from`);
@@ -647,7 +650,7 @@ export default class integration extends PureComponent {
   // 地图定位
   mapLocation = data => {
     const { dispatch } = this.props;
-
+    const me = this;
     console.log(data);
     userconfig.poupLatLng = null;
     if (data.key === 'project') {
@@ -1213,7 +1216,7 @@ export default class integration extends PureComponent {
   createZStatistics = () => {
     if (!radius) {
       setTimeout(() => {
-        if(map && map.getZoom()){
+        if (map && map.getZoom()) {
           const zoom = map.getZoom();
           if (zoom <= 7) {
             //省级行政区划
@@ -1772,7 +1775,7 @@ export default class integration extends PureComponent {
       let geojsondata = {
         type: 'FeatureCollection',
         features: []
-      };      
+      };
       //console.log("data", data);
       // me.clearGeojsonLayer();
       // me.loadGeojsonLayer(data, geoJsonStyle);
@@ -1781,14 +1784,13 @@ export default class integration extends PureComponent {
         for (let i = 0; i < data.features.length; i++) {
           let feature = data.features[i];
           //过滤历史图斑记录
-          if(!feature.properties.archive_time){
+          if (!feature.properties.archive_time) {
             geojsondata.features.push(feature);
             if (i === data.features.length - 1) {
               me.getWinContent(feature.properties, data => {
                 content += data[0].innerHTML;
               });
-            }
-            else {
+            } else {
               me.getWinContent(feature.properties, data => {
                 content += data[0].innerHTML + '<br>';
               });
@@ -2057,6 +2059,20 @@ export default class integration extends PureComponent {
     } else {
       this.setState({ showImageTimeText: false });
     }
+
+    //隐藏影像历史列表下拉框
+    this.setState({ showHistoryIMG: false });
+    //移除影像图层
+    if (ImgListLayer) {
+      map.removeLayer(ImgListLayer);
+    }
+    //设置默认底图可见
+    if (userconfig.baseLayer)
+      userconfig.baseLayer = this.getBasemapLayer(
+        userconfig.baseLayer,
+        this.onlineBasemapLayers
+      );
+    userconfig.baseLayer.setOpacity(1);
   };
   getBasemapLayer = (baseLayer, onlineBasemapLayers) => {
     let layer = onlineBasemapLayers[0];
@@ -2200,22 +2216,31 @@ export default class integration extends PureComponent {
   onMoveendMap = e => {
     const me = this;
     const { switchDataModal } = this.state;
+    if(!map){
+      return;
+    }
     let zoom = map.getZoom();
     let bounds = map.getBounds();
     //console.log("zoom",zoom);
     //根据地图当前范围获取对应监管影像时间
-    const { showImageTimeText } = me.state;
+    me.getInfoByExtent(zoom, bounds, data => {
+      me.setState({ imageTimeText: data[0] });
+      me.setState({ selectIMG: data[0] });
+    });
+    /*const { showImageTimeText } = me.state;
     if (showImageTimeText) {
       me.getInfoByExtent(zoom, bounds, data => {
         me.setState({ imageTimeText: data[0] });
+        me.setState({ selectIMG: data[0] });
       });
     }
     const { showHistoryIMG } = me.state;
     if (showHistoryIMG) {
       me.getInfoByExtent(zoom, bounds, data => {
         me.setState({ imageTimeText: data[0] });
+        me.setState({ selectIMG: data[0] });
       });
-    }
+    }*/
 
     if (switchDataModal) {
       /*-------------------------------------区域监管部分-------------------------------------*/
@@ -2246,67 +2271,67 @@ export default class integration extends PureComponent {
         //历史影像查询
         me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
       }
-    } else {
-        /*-------------------------------------项目监管部分-------------------------------------*/
-        if (zoom >= config.pointLevel) {
-          //隐藏区域统计图层
-          if (ZSgeojsonLayer && ZSgeojsonLayer.getLayers().length > 0) {
-            me.clearXMJGGeojsonLayer(ZSgeojsonLayer);
-          }
-          //显示项目点聚合图层
-          if (projectPointLayer && projectPointLayer.getLayers().length <= 0) {
-            const { projectSymbolValue } = me.state;
-            me.addAllProjectPoints(
-              me.callbackDrawMapProjectPoints,
-              projectSymbolValue
-            );
-          }
+    }
+    else {
+      /*-------------------------------------项目监管部分-------------------------------------*/
+      if (zoom >= config.pointLevel) {
+        //隐藏区域统计图层
+        if (ZSgeojsonLayer && ZSgeojsonLayer.getLayers().length > 0) {
+          me.clearXMJGGeojsonLayer(ZSgeojsonLayer);
         }
-        else {
-          //隐藏项目点聚合图层
-          if (projectPointLayer && projectPointLayer.getLayers().length > 0) {
-            me.clearXMJGGeojsonLayer(projectPointLayer);
-          }
-          //显示区域统计图层
+        //显示项目点聚合图层
+        if (projectPointLayer && projectPointLayer.getLayers().length <= 0) {
           const { projectSymbolValue } = me.state;
-          if (projectSymbolValue === '项目总数') {
-            if (ZSgeojsonLayer && ZSgeojsonLayer.getLayers().length <= 0) {
-              me.createZStatistics(); //区域总数统计
-            }
-          } else {
-            if (ZSgeojsonLayer && ZSgeojsonLayer.getLayers().length <= 0) {
-              me.createZSPie(projectSymbolValue); //区域饼状图统计
-            }
+          me.addAllProjectPoints(
+            me.callbackDrawMapProjectPoints,
+            projectSymbolValue
+          );
+        }
+      }
+      else {
+        //隐藏项目点聚合图层
+        if (projectPointLayer && projectPointLayer.getLayers().length > 0) {
+          me.clearXMJGGeojsonLayer(projectPointLayer);
+        }
+        //显示区域统计图层
+        const { projectSymbolValue } = me.state;
+        if (projectSymbolValue === '项目总数') {
+          if (ZSgeojsonLayer && ZSgeojsonLayer.getLayers().length <= 0) {
+            me.createZStatistics(); //区域总数统计
           }
         }
-        //根据地图当前级别zoom,动态改变圆圈半径大小
-        if (zoom <= 7) {
-          //省级行政区划
-          radius = 17000;
-        }
-        else if (zoom === 8) {
-          //市级行政区划
-          radius = 12000;
-        }
-        else if (zoom === 9) {
-          //市级行政区划
-          radius = 7000;
-        }
-        else if (zoom === 10) {
-          //市级行政区划
-          radius = 3500;
-        }
         else {
-          //区县级行政区划
-          radius = 2000;
+          if (ZSgeojsonLayer && ZSgeojsonLayer.getLayers().length <= 0) {
+            me.createZSPie(projectSymbolValue); //区域饼状图统计
+          }
         }
+      }
+      //根据地图当前级别zoom,动态改变圆圈半径大小
+      if (zoom <= 7) {
+        //省级行政区划
+        radius = 17000;
+      } else if (zoom === 8) {
+        //市级行政区划
+        radius = 12000;
+      } else if (zoom === 9) {
+        //市级行政区划
+        radius = 7000;
+      } else if (zoom === 10) {
+        //市级行政区划
+        radius = 3500;
+      } else {
+        //区县级行政区划
+        radius = 2000;
+      }
+      if(ZSgeojsonLayer){
         ZSgeojsonLayer.eachLayer(function (layer) {
-          //console.log('2278',zoom,radius);
+          //console.log('radius',zoom,radius);
           if(layer.options.radius){
             layer.setRadius(radius);
           }
         });
-
+      }
+      
     }
   };
   /*根据地图当前范围获取对应历史影像数据
@@ -2400,6 +2425,7 @@ export default class integration extends PureComponent {
     //console.log(polygon);
     let filter =
       '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
+    filter += '<And>';
     filter += '<Intersects>';
     filter += '<PropertyName>geom</PropertyName>';
     filter += '<gml:Polygon>';
@@ -2410,8 +2436,15 @@ export default class integration extends PureComponent {
     filter += '</gml:outerBoundaryIs>';
     filter += '</gml:Polygon>';
     filter += '</Intersects>';
+    filter += '<Not>';
+    filter += '<PropertyIsNull>';
+    filter += '<PropertyName>archive_time</PropertyName>';
+    filter += '</PropertyIsNull>';
+    filter += '</Not>';
+    filter += '</And>';
     filter += '</Filter>';
-    let urlString = config.mapUrl.geoserverUrl + '/ows';
+    // let urlString = config.mapUrl.geoserverUrl + '/ows';
+    let urlString = config.mapUrl.geoserverQueryUrl + '/ows';
     let param = {
       service: 'WFS',
       version: '1.0.0',
@@ -2527,66 +2560,36 @@ export default class integration extends PureComponent {
       id: properties.map_num ? properties.id : properties.project_id,
       from: properties.map_num ? 'spot' : 'project'
     };
-    // elements = properties.map_num
-    //   ? (properties.archive_time ? jQuery(`<div></div>`) : jQuery(
-    //     `<div>图斑编号:${properties.map_num}</br>
-    //   ${
-    //     properties.project_name
-    //       ? '关联项目:' + properties.project_name + '</br>'
-    //       : ''
-    //   }${
-    //       properties.interference_compliance
-    //         ? '扰动范围:' + properties.interference_compliance + '</br>'
-    //         : ''
-    //     }<a onclick='goDetail(${JSON.stringify(
-    //       obj
-    //     )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
-    //       obj
-    //     )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
-    //       obj
-    //     )})' style='display:none'>图形删除</a></div>`
-    //   ))
-    //   : jQuery(
-    //       `<div>项目:${properties.project_name}</br>
-    //       <a onclick='goDetail(${JSON.stringify(
-    //         obj
-    //       )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
-    //         obj
-    //       )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
-    //         obj
-    //       )})' style='display:none'>图形删除</a></div>`
-    //     );
     elements = properties.map_num
-    ? jQuery(
-      `<div>图斑编号:${properties.map_num}</br>
+      ? jQuery(
+          `<div>图斑编号:${properties.map_num}</br>
     ${
       properties.project_name
         ? '关联项目:' + properties.project_name + '</br>'
         : ''
     }${
-        properties.interference_compliance
-          ? '扰动范围:' + properties.interference_compliance + '</br>'
-          : ''
-      }<a onclick='goDetail(${JSON.stringify(
-        obj
-      )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
-        obj
-      )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
-        obj
-      )})' style='display:none'>图形删除</a></div>`
-    )
-    : jQuery(
-        `<div>项目:${properties.project_name}</br>
+            properties.interference_compliance
+              ? '扰动范围:' + properties.interference_compliance + '</br>'
+              : ''
+          }<a onclick='goDetail(${JSON.stringify(
+            obj
+          )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
+            obj
+          )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+            obj
+          )})' style='display:none'>图形删除</a></div>`
+        )
+      : jQuery(
+          `<div>项目:${properties.project_name}</br>
         <a onclick='goDetail(${JSON.stringify(
           obj
         )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
-          obj
-        )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
-          obj
-        )})' style='display:none'>图形删除</a></div>`
-      );
+            obj
+          )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
+            obj
+          )})' style='display:none'>图形删除</a></div>`
+        );
     callback(elements);
-
   };
 
   getWinContent = (properties, callback) => {
@@ -2765,9 +2768,6 @@ export default class integration extends PureComponent {
       userconfig.layersControl.removeLayer(userconfig.spotWmsLayer);
       //项目监管
       this.switchXMJG();
-      // setTimeout(() => {
-      //   this.switchXMJG();
-      // }, 5000);
     }
   };
   /*
@@ -3168,7 +3168,7 @@ export default class integration extends PureComponent {
       userconfig.sideBySideZoom = map.getZoom();
       //历史扰动图斑查询
       this.queryWFSServiceByExtent(
-        config.mapHistorySpotLayerName,
+        config.mapSpotLayerName,
         this.callbackgetHistorySpotTimeByExtent
       );
     }
@@ -3184,6 +3184,106 @@ export default class integration extends PureComponent {
     this.removeSideBySide();
     this.addSideBySide();
   };
+
+  /*
+   * 匹配选择下拉框日期最接近的历史图斑数据
+   */
+  getLimitSpotByTargetDate = (strDate) => {
+    const {
+      mapdata: { historiesSpotProperties }
+    } = this.props;
+    //console.log('历史扰动图斑数据',historiesSpotProperties);
+    var arrDate = [];
+    var historiesSpotData = [];
+    var targetDate = this.strToDate(strDate.split("T")[0]);
+    for(var i = 0; i<historiesSpotProperties.length;i++){
+       var imageDate = historiesSpotProperties[i].archive_time;
+       arrDate.push(this.strToDate(imageDate.split("T")[0]));
+    }
+    var len = arrDate.length;
+    for (var j = 0; j < len; j++) {
+      var date = this.limitDateIndex(arrDate, targetDate).date;
+      var index = this.limitDateIndex(arrDate, targetDate).index;
+      historiesSpotProperties.forEach(item => {
+        if (
+          date === this.strToDate(item.archive_time.split('T')[0]) &&
+          JSON.stringify(historiesSpotData).indexOf(
+            JSON.stringify(item.spot_id)
+          ) === -1
+        ) {
+          historiesSpotData.push(item); // 进行动态的操作
+        }
+      });
+      arrDate.splice(index, 1);
+    }
+    //console.log('匹配日期数组最接近目标日期值',historiesSpotData);
+    const targethistoriesSpotData =  this.greaterOrEqualDates(historiesSpotData,targetDate);
+    //console.log('匹配最终目标历史图斑数组值',targethistoriesSpotData);
+    return targethistoriesSpotData;   
+  }
+  /*
+   * 根据过滤后的历史图斑数组,动态拼接图斑id字符串
+  */
+  getSpotIdsByHistorySpots = (historySpots) => {
+    var spotIds =  "";
+    if(historySpots && historySpots.length>0){
+      var len = historySpots.length;
+      for(var i = 0; i<len; i++){
+          var data = historySpots[i];
+          if (i === len - 1) {
+            // spotIds += "'" + data.spot_id + "'";
+            spotIds += data.spot_id;
+          }
+          else {
+            // spotIds += "'" + data.spot_id  + "',";
+            spotIds += data.spot_id  + ",";
+          }
+      }
+    }
+    return spotIds;
+  }
+  /*
+   * 字符串格式日期转换Date
+   */
+  strToDate = strDate => {
+    var OneMonth = strDate.substring(5, strDate.lastIndexOf('-'));
+    var OneDay = strDate.substring(
+      strDate.length,
+      strDate.lastIndexOf('-') + 1
+    );
+    var OneYear = strDate.substring(0, strDate.indexOf('-'));
+    return Date.parse(OneMonth + '/' + OneDay + '/' + OneYear);
+  };
+  /*
+   * 匹配日期数组最接近目标日期的日期索引以及数据
+   */
+  limitDateIndex = (arrDate, targetDate) => {
+    var newArr = [];
+    // eslint-disable-next-line array-callback-return
+    arrDate.map(function(x) {
+      // 对数组各个数值求差值
+      newArr.push(Math.abs(x - targetDate));
+    });
+    // 求最小值的索引
+    var index = newArr.indexOf(Math.min.apply(null, newArr));
+    // return index;
+    return { index: index, date: arrDate[index] };
+  };
+  /*
+   * 匹配大于或者等于目标日期的数组值
+   */
+  greaterOrEqualDates = (historiesSpotData, targetDate) => {
+    const me = this;
+    var newArr = [];
+    // eslint-disable-next-line array-callback-return
+    historiesSpotData.map(function(x){      
+      if(me.strToDate(x.archive_time.split("T")[0]) >= targetDate){
+        newArr.push(x);       
+      }
+    });
+    return newArr;
+  }
+
   /*
    * 新建卷帘效果
    */
@@ -3325,6 +3425,7 @@ export default class integration extends PureComponent {
         selectLeftV.replace(/\//g, '-') +
         '/tile/{z}/{y}/{x}';
       leftImgLayer = L.tileLayer(leftLayerUrl, {
+        pane: 'tileLayerZIndex',
         maxZoom: config.mapInitParams.maxZoom,
         errorTileUrl: config.errorTileUrl
       }); //左侧影像
@@ -3335,6 +3436,7 @@ export default class integration extends PureComponent {
         selectRightV.replace(/\//g, '-') +
         '/tile/{z}/{y}/{x}';
       rightImgLayer = L.tileLayer(rightLayerUrl, {
+        pane: 'tileLayerZIndex',
         maxZoom: config.mapInitParams.maxZoom,
         errorTileUrl: config.errorTileUrl
       }); //右侧影像
@@ -3348,16 +3450,20 @@ export default class integration extends PureComponent {
           layers: config.mapSpotLayerName, //需要加载的图层
           format: 'image/png', //返回的数据格式
           transparent: true,
-          maxZoom: config.mapInitParams.maxZoom
+          maxZoom: config.mapInitParams.maxZoom,
+          cql_filter: 'archive_time is null'
         });
       } else {
+        const leftspotIds = this.getSpotIdsByHistorySpots(this.getLimitSpotByTargetDate(selectSpotLeftV));
+        //console.log('spotIds',spotIds);
         //历史扰动图斑
         spotleftwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + '/wms?', {
-          layers: config.mapHistorySpotLayerName, //需要加载的图层
+          layers: config.mapSpotLayerName, //需要加载的图层
           format: 'image/png', //返回的数据格式
           transparent: true,
           maxZoom: config.mapInitParams.maxZoom,
-          cql_filter: 'archive_time >= ' + selectSpotLeftV
+          //cql_filter: "archive_time >= " + selectSpotLeftV
+          cql_filter: "spot_id in ("+leftspotIds+") and archive_time >= " + selectSpotLeftV
         });
       }
       if (selectSpotRightV.indexOf('现状') !== -1) {
@@ -3366,16 +3472,19 @@ export default class integration extends PureComponent {
           layers: config.mapSpotLayerName, //需要加载的图层
           format: 'image/png', //返回的数据格式
           transparent: true,
-          maxZoom: config.mapInitParams.maxZoom
+          maxZoom: config.mapInitParams.maxZoom,
+          cql_filter: 'archive_time is null'
         });
       } else {
+        const rightspotIds = this.getSpotIdsByHistorySpots(this.getLimitSpotByTargetDate(selectSpotRightV));
         //历史扰动图斑
         spotrightwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + '/wms?', {
-          layers: config.mapHistorySpotLayerName, //需要加载的图层
+          layers: config.mapSpotLayerName, //需要加载的图层
           format: 'image/png', //返回的数据格式
           transparent: true,
           maxZoom: config.mapInitParams.maxZoom,
-          cql_filter: 'archive_time >= ' + selectSpotRightV
+          // cql_filter: 'archive_time >= ' + selectSpotRightV
+          cql_filter: "spot_id in ("+rightspotIds+") and archive_time >= " + selectSpotRightV
         });
       }
       map.addLayer(spotleftwms);
@@ -3390,6 +3499,114 @@ export default class integration extends PureComponent {
       //历史影像优先
       userconfig.leftLayers = [spotleftwms, leftImgLayer];
       userconfig.rightLayers = [spotrightwms, rightImgLayer];
+    }
+  };
+
+  /*
+   * 影像列表切换
+   */
+  onChangeSelectImg = v => {
+    this.setState({ selectIMG: v });
+    //刷新选择影像列表对应影像
+    if (v) {
+      this.loadImgLayerByselectIMG(v);
+    }
+  };
+  loadImgLayerByselectIMG = v => {
+    //刷新选择影像列表对应影像
+    if (v) {
+      let leftLayerUrl =
+        config.imageBaseUrl + '/' + v.replace(/\//g, '-') + '/tile/{z}/{y}/{x}';
+      if (ImgListLayer) {
+        map.removeLayer(ImgListLayer);
+      }
+      ImgListLayer = this.loadMapbaseLayer(map, leftLayerUrl); //影像
+    }
+  };
+
+  /*
+   * 加载地图影像图层
+   */
+  loadMapbaseLayer = (map, url) => {
+    let layer = L.tileLayer(url, {
+      pane: 'tileLayerZIndex',
+      minZoom: config.tdtImageLabel.minZoom,
+      maxZoom: config.tdtImageLabel.maxZoom,
+      errorTileUrl: config.tdtImageLabel.errorTileUrl
+    }).addTo(map); //影像图
+    return layer;
+  };
+
+  showIMGListMap = () => {
+    const { showHistoryIMG, showImageTimeText } = this.state;
+    //判断当前底图是否等于监管影像
+    if (userconfig.baseLayer._url === config.onlineBasemaps[0].url) {
+      // this.setState({ showImageTimeText: true });
+      this.setState({
+        showImageTimeText: !showImageTimeText
+      });
+    } else {
+      this.setState({ showImageTimeText: false });
+    }
+    this.setState({
+      showHistoryIMG: !showHistoryIMG
+    });
+    setTimeout(() => {
+      if (this.state.showHistoryIMG) {
+        //加载当前影像图层
+        const { selectIMG } = this.state;
+        if (selectIMG) {
+          this.loadImgLayerByselectIMG(selectIMG);
+        }
+        //设置默认底图隐藏
+        if (userconfig.baseLayer)
+          userconfig.baseLayerr = this.getBasemapLayer(
+            userconfig.baseLayer,
+            this.onlineBasemapLayers
+          );
+        userconfig.baseLayer.setOpacity(0);
+      } else {
+        //移除影像图层
+        if (ImgListLayer) {
+          map.removeLayer(ImgListLayer);
+        }
+        //设置默认底图可见
+        if (userconfig.baseLayer)
+          userconfig.baseLayer = this.getBasemapLayer(
+            userconfig.baseLayer,
+            this.onlineBasemapLayers
+          );
+        userconfig.baseLayer.setOpacity(1);
+      }
+    }, 200);
+  };
+
+  switchInterpret = v => {
+    console.log(`切换解译期次`, v);
+    if(v){
+      const taskLevel = v.split("-")[0];
+      let task_level =3;
+      if(taskLevel === '部级'){
+        task_level = 0;
+      }
+      else if(taskLevel === '省级'){
+        task_level = 1;
+      }
+      else if(taskLevel === '市级'){
+        task_level = 2;
+      }
+      else if(taskLevel === '县级'){
+        task_level = 3;
+      }
+      const inter_batch = v.split("-")[1];
+      userconfig.spotWmsLayer.setParams({
+        cql_filter: 'archive_time is null and inter_batch = '+inter_batch+' and task_level = '+task_level
+      });
+    }
+    else{
+      userconfig.spotWmsLayer.setParams({
+        cql_filter: 'archive_time is null'
+      });
     }
   };
 
@@ -3419,7 +3636,8 @@ export default class integration extends PureComponent {
       projectSymbolValue,
       showProgress_ZS,
       showProgress_Pie,
-      showProgress_ProjectPoint
+      showProgress_ProjectPoint,
+      selectIMG
       //loading
     } = this.state;
     const {
@@ -3432,6 +3650,7 @@ export default class integration extends PureComponent {
           queryProjectFilter={this.queryProjectFilter}
           switchData={this.switchData}
           mapLocation={this.mapLocation}
+          switchInterpret={this.switchInterpret}
         />
         <SidebarDetail mapLocation={this.mapLocation} />
         <Tool />
@@ -3454,18 +3673,6 @@ export default class integration extends PureComponent {
             width: '100vw'
           }}
         >
-          {/* <div
-            style={{
-              display: loading ? "block" : "none",
-              boxSizing: "border-box",
-              width: "100%",
-              height: "100%",
-              backgroundColor: "#fff",
-              zIndex: 10000
-            }}
-          >
-            <Spins show={true} />
-          </div> */}
           <div
             id="map"
             style={{
@@ -3532,34 +3739,27 @@ export default class integration extends PureComponent {
             style={{
               display: showHistoryIMG ? 'block' : 'none',
               position: 'absolute',
-              bottom: 5,
-              left: 360,
+              // bottom: 5,
+              // left: 360,
+              top: 58,
+              right: 240,
               zIndex: 1000,
               background: '#fff'
             }}
           >
-            {/* <span
+            <span
               style={{
                 padding: '0 10px'
               }}
             >
-              历史监管影像时间轴控件
-            </span> */}
-            <span
-              style={{
-                padding: '0 10px',
-                display: 'none'
-              }}
-            >
-              监管影像:
+              历史影像:
             </span>
             <Select
-              // value={[selectLeftV]}
+              value={[selectIMG]}
               placeholder="请选择"
-              // onChange={this.onChangeSelectLeft}
+              onChange={this.onChangeSelectImg}
               style={{
-                width: 150,
-                // display: 'none'
+                width: 150
               }}
             >
               {histories.map((item, id) => (
@@ -3691,18 +3891,7 @@ export default class integration extends PureComponent {
                 // icon="ordered-list"
                 icon="dash"
                 onClick={() => {
-                  this.setState({
-                    showHistoryIMG: !showHistoryIMG
-                  });
-                  this.setState({
-                    showImageTimeText: !showImageTimeText
-                  });                
-                  // emitter.emit('showSiderbar', {
-                  //   show: showHistoryContrast
-                  // });
-                  // setTimeout(() => {
-                  //   this.showHistoryMap();
-                  // }, 200);
+                  this.showIMGListMap();
                 }}
               />
             </Popover>
@@ -3903,18 +4092,7 @@ export default class integration extends PureComponent {
                 // icon="ordered-list"
                 icon="dash"
                 onClick={() => {
-                  this.setState({
-                    showHistoryIMG: !showHistoryIMG
-                  });
-                  this.setState({
-                    showImageTimeText: !showImageTimeText
-                  });                
-                  // emitter.emit('showSiderbar', {
-                  //   show: showHistoryContrast
-                  // });
-                  // setTimeout(() => {
-                  //   this.showHistoryMap();
-                  // }, 200);
+                  this.showIMGListMap();
                 }}
               />
             </Popover>

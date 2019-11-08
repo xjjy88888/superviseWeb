@@ -300,7 +300,7 @@ export default class siderbarDetail extends PureComponent {
             id: type === 'edit' ? spotInfo.id : '',
             interBatch:
               String(v.interBatch1 || ``) + String(v.interBatch2 || ``),
-            taskLevel: v.taskLevel || null
+            taskLevel: isNaN(v.taskLevel) ? null : v.taskLevel
           },
           callback: success => {
             emitter.emit('deleteDraw', {});

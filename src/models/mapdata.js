@@ -13,7 +13,7 @@ import { routerRedux } from "dva/router";
 export default {
   namespace: "mapdata",
 
-  state: { histories: [], historiesSpot: [], imageTimeResult: null },
+  state: { histories: [], historiesSpot: [], historiesSpotProperties: [],imageTimeResult: null },
 
   subscriptions: {
     setup({ dispatch, history }) {
@@ -65,6 +65,8 @@ export default {
     //根据地图当前范围获取对应历史扰动图斑数据接口
     *getHistorySpotTimeByExtent({ payload, callback }, { call, put }) {
       const { data: result } = yield call(getHistorySpotTimeByExtent, payload);
+      const spotresult = result.result;
+      //console.log('历史扰动图斑数据',spotresult);
       const formatNumber = n => {
         n = n.toString();
         return n[1] ? n : "0" + n;
@@ -81,13 +83,16 @@ export default {
         return [year, month, day].map(formatNumber).join("-") + "现状";
       };
       let historiesSpot = {};
-      if (result.features.length > 0) {
-        for (let i = 0; i < result.features.length; i++) {
-          let item = result.features[i];
-          let time = item.properties.archive_time;
-          let strtime = time.split("T")[0];
-          // strtime = strtime.replace(/-/g, "/");
-          historiesSpot[strtime] = time;
+      let historiesSpotProperties = [];
+      if (spotresult.features.length > 0) {
+        for (let i = 0; i < spotresult.features.length; i++) {
+          let item = spotresult.features[i];
+          if(item.properties.archive_time){
+            historiesSpotProperties.push({spot_id:item.properties.spot_id,archive_time:item.properties.archive_time});
+            let time = item.properties.archive_time;
+            let strtime = time.split("T")[0];
+            historiesSpot[strtime] = time;
+          }
         }
       }
       historiesSpot[formatTime(new Date())] = formatTime(new Date());
@@ -102,7 +107,6 @@ export default {
         return newObj; //返回排好序的新对象
       };
       historiesSpot = objKeySort(historiesSpot); //函数执行
-      // console.log(historiesSpot);
       var arr = [];
       for (let j in historiesSpot) {
         arr.push({ id: j, value: historiesSpot[j] });
@@ -111,7 +115,7 @@ export default {
       arr.reverse();
       yield put({
         type: "save",
-        payload: { historiesSpot: arr }
+        payload: { historiesSpot: arr,historiesSpotProperties:historiesSpotProperties }
       });
       if (callback) callback(arr);
     },

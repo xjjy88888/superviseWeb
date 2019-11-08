@@ -57,6 +57,29 @@ export default class splitScreen extends PureComponent {
         }, 500);        
       }
     });
+    //防止切换元素dom触发地图点击事件
+    const leftel = document.getElementById('leftDIV');
+    L.DomEvent.addListener(leftel, 'dblclick', L.DomEvent.stop);
+    L.DomEvent.addListener(leftel, 'mousedown', L.DomEvent.stop);
+    L.DomEvent.addListener(leftel, 'mouseup', L.DomEvent.stop);
+    L.DomEvent.addListener(leftel, 'click', function (e) {
+      //e.stopPropagation();
+      // L.DomEvent.preventDefault(e);
+      // L.DomEvent.stopPropagation(e);
+      // L.DomEvent.stop(e);
+    });
+    const rightel = document.getElementById('rightDIV');
+    L.DomEvent.addListener(rightel, 'dblclick', L.DomEvent.stop);
+    L.DomEvent.addListener(rightel, 'mousedown', L.DomEvent.stop);
+    L.DomEvent.addListener(rightel, 'mouseup', L.DomEvent.stop);
+    L.DomEvent.addListener(rightel, 'click', function (e) {
+      //e.stopPropagation();
+      // L.DomEvent.preventDefault(e);
+      // L.DomEvent.stopPropagation(e);
+      // L.DomEvent.stop(e);
+    });
+
+
   }
   // 创建地图
   createMap = (center,zoom) => {
@@ -485,20 +508,41 @@ export default class splitScreen extends PureComponent {
       " " + bounds.getNorthEast().lng + "," + bounds.getSouthWest().lat;
     polygon +=
       " " + bounds.getSouthWest().lng + "," + bounds.getSouthWest().lat;
+    // let filter =
+    //   '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
+    // filter += "<Intersects>";
+    // filter += "<PropertyName>geom</PropertyName>";
+    // filter += "<gml:Polygon>";
+    // filter += "<gml:outerBoundaryIs>";
+    // filter += "<gml:LinearRing>";
+    // filter += "<gml:coordinates>" + polygon + "</gml:coordinates>";
+    // filter += "</gml:LinearRing>";
+    // filter += "</gml:outerBoundaryIs>";
+    // filter += "</gml:Polygon>";
+    // filter += "</Intersects>";
+    // filter += "</Filter>";
     let filter =
       '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
-    filter += "<Intersects>";
-    filter += "<PropertyName>geom</PropertyName>";
-    filter += "<gml:Polygon>";
-    filter += "<gml:outerBoundaryIs>";
-    filter += "<gml:LinearRing>";
-    filter += "<gml:coordinates>" + polygon + "</gml:coordinates>";
-    filter += "</gml:LinearRing>";
-    filter += "</gml:outerBoundaryIs>";
-    filter += "</gml:Polygon>";
-    filter += "</Intersects>";
-    filter += "</Filter>";
-    let urlString = config.mapUrl.geoserverUrl + "/ows";
+    filter += '<And>';
+    filter += '<Intersects>';
+    filter += '<PropertyName>geom</PropertyName>';
+    filter += '<gml:Polygon>';
+    filter += '<gml:outerBoundaryIs>';
+    filter += '<gml:LinearRing>';
+    filter += '<gml:coordinates>' + polygon + '</gml:coordinates>';
+    filter += '</gml:LinearRing>';
+    filter += '</gml:outerBoundaryIs>';
+    filter += '</gml:Polygon>';
+    filter += '</Intersects>';
+    filter += '<Not>';
+    filter += '<PropertyIsNull>';
+    filter += '<PropertyName>archive_time</PropertyName>';
+    filter += '</PropertyIsNull>';
+    filter += '</Not>';
+    filter += '</And>';
+    filter += '</Filter>';    
+    // let urlString = config.mapUrl.geoserverUrl + "/ows";
+    let urlString = config.mapUrl.geoserverQueryUrl + '/ows';
     let param = {
       service: "WFS",
       version: "1.0.0",
@@ -527,7 +571,7 @@ export default class splitScreen extends PureComponent {
       userconfig.sideBySideZoom = userconfig.LMap.getZoom();
       //历史扰动图斑查询
       this.queryWFSServiceByExtent(
-        config.mapHistorySpotLayerName,
+        config.mapSpotLayerName,
         this.callbackgetHistorySpotTimeByExtent
       );
     }
@@ -547,6 +591,99 @@ export default class splitScreen extends PureComponent {
       this.addRMapLayers();
     }, 200);
   };
+
+    /*
+   * 匹配选择下拉框日期最接近的历史图斑数据
+   */
+  getLimitSpotByTargetDate = (strDate) => {
+    const {
+      mapdata: { historiesSpotProperties }
+    } = this.props;
+    //console.log('历史扰动图斑数据',historiesSpotProperties);
+    var arrDate = [];
+    var historiesSpotData = [];
+    var targetDate = this.strToDate(strDate.split("T")[0]);
+    for(var i = 0; i<historiesSpotProperties.length;i++){
+       var imageDate = historiesSpotProperties[i].archive_time;
+       arrDate.push(this.strToDate(imageDate.split("T")[0]));
+    }
+    var len = arrDate.length;
+    for(var j = 0; j<len;j++){
+      var date = this.limitDateIndex(arrDate,targetDate).date;
+      var index = this.limitDateIndex(arrDate,targetDate).index;
+      // eslint-disable-next-line no-loop-func
+      historiesSpotProperties.forEach(item=>{
+        if(date === this.strToDate(item.archive_time.split("T")[0]) && JSON.stringify(historiesSpotData).indexOf(JSON.stringify(item.spot_id))===-1){
+          historiesSpotData.push(item); // 进行动态的操作
+        }
+      })
+      arrDate.splice(index,1);
+    }
+    //console.log('匹配日期数组最接近目标日期值',historiesSpotData);
+    const targethistoriesSpotData =  this.greaterOrEqualDates(historiesSpotData,targetDate);
+    //console.log('匹配最终目标历史图斑数组值',targethistoriesSpotData);
+    return targethistoriesSpotData;   
+  }
+  /*
+   * 根据过滤后的历史图斑数组,动态拼接图斑id字符串
+  */
+  getSpotIdsByHistorySpots = (historySpots) => {
+    var spotIds =  "";
+    if(historySpots && historySpots.length>0){
+      var len = historySpots.length;
+      for(var i = 0; i<len; i++){
+          var data = historySpots[i];
+          if (i === len - 1) {
+            // spotIds += "'" + data.spot_id + "'";
+            spotIds += data.spot_id;
+          }
+          else {
+            // spotIds += "'" + data.spot_id  + "',";
+            spotIds += data.spot_id  + ",";
+          }
+      }
+    }
+    return spotIds;
+  }
+  /*
+   * 字符串格式日期转换Date
+   */
+  strToDate = (strDate) => {
+    var OneMonth = strDate.substring(5, strDate.lastIndexOf("-"));
+    var OneDay = strDate.substring(strDate.length, strDate.lastIndexOf("-") + 1);
+    var OneYear = strDate.substring(0, strDate.indexOf("-"));
+    return Date.parse(OneMonth + "/" + OneDay + "/" + OneYear);
+  }
+  /*
+   * 匹配日期数组最接近目标日期的日期索引以及数据
+   */
+  limitDateIndex = (arrDate, targetDate) => {
+    var newArr = [];
+    // eslint-disable-next-line array-callback-return
+    arrDate.map(function(x){
+      // 对数组各个数值求差值
+      newArr.push(Math.abs(x - targetDate));
+    });
+    // 求最小值的索引
+    var index = newArr.indexOf(Math.min.apply(null, newArr));
+    // return index;
+    return {index:index,date:arrDate[index]};
+  }
+  /*
+   * 匹配大于或者等于目标日期的数组值
+   */
+  greaterOrEqualDates = (historiesSpotData, targetDate) => {
+    const me = this;
+    var newArr = [];
+    // eslint-disable-next-line array-callback-return
+    historiesSpotData.map(function(x){      
+      if(me.strToDate(x.archive_time.split("T")[0]) >= targetDate){
+        newArr.push(x);       
+      }
+    });
+    return newArr;
+  }
+  
   /*
    * 移除左地图的图层列表
    */
@@ -592,19 +729,23 @@ export default class splitScreen extends PureComponent {
             layers: config.mapSpotLayerName, //需要加载的图层
             format: "image/png", //返回的数据格式
             transparent: true,
-            maxZoom: config.mapInitParams.maxZoom
+            maxZoom: config.mapInitParams.maxZoom,
+            cql_filter: 'archive_time is null'
           }
         );
       } else {
+        const leftspotIds = this.getSpotIdsByHistorySpots(this.getLimitSpotByTargetDate(selectSpotLeftV));
+        //console.log('leftspotIds',leftspotIds);
         //历史扰动图斑
         userconfig.leftSpotLayer = L.tileLayer.wms(
           config.mapUrl.geoserverUrl + "/wms?",
           {
-            layers: config.mapHistorySpotLayerName, //需要加载的图层
+            layers: config.mapSpotLayerName, //需要加载的图层
             format: "image/png", //返回的数据格式
             transparent: true,
             maxZoom: config.mapInitParams.maxZoom,
-            cql_filter: "archive_time <= " + selectSpotLeftV
+            // cql_filter: "archive_time >= " + selectSpotLeftV
+            cql_filter: "spot_id in ("+leftspotIds+") and archive_time >= " + selectSpotLeftV
           }
         );
       }
@@ -638,19 +779,22 @@ export default class splitScreen extends PureComponent {
             layers: config.mapSpotLayerName, //需要加载的图层
             format: "image/png", //返回的数据格式
             transparent: true,
-            maxZoom: config.mapInitParams.maxZoom
+            maxZoom: config.mapInitParams.maxZoom,
+            cql_filter: 'archive_time is null'
           }
         );
       } else {
+        const rightspotIds = this.getSpotIdsByHistorySpots(this.getLimitSpotByTargetDate(selectSpotRightV));
         //历史扰动图斑
         userconfig.rightSpotLayer = L.tileLayer.wms(
           config.mapUrl.geoserverUrl + "/wms?",
           {
-            layers: config.mapHistorySpotLayerName, //需要加载的图层
+            layers: config.mapSpotLayerName, //需要加载的图层
             format: "image/png", //返回的数据格式
             transparent: true,
             maxZoom: config.mapInitParams.maxZoom,
-            cql_filter: "archive_time <= " + selectSpotRightV
+            // cql_filter: "archive_time >= " + selectSpotRightV
+            cql_filter: "spot_id in ("+rightspotIds+") and archive_time >= " + selectSpotRightV
           }
         );
       }
@@ -732,16 +876,13 @@ export default class splitScreen extends PureComponent {
         <div
           style={{ flex: 1, border: "1px solid #cccccc" }}
           id="LMap"
-          onClick={e => {
-            e.stopPropagation();
-            //console.log(e, 742);
-          }}
         >
           {/*历史影像图切换*/}
-          <div
+          <div id="leftDIV"
             // onClick={e => {
             //   console.log("e",e);
             //   e.stopPropagation();
+            //   L.DomEvent.stop(e);
             // }}
             style={{
               position: "absolute",
@@ -800,7 +941,7 @@ export default class splitScreen extends PureComponent {
           </div>
         </div>
         <div style={{ flex: 1, border: "1px solid #cccccc" }} id="RMap">
-          <div
+          <div id="rightDIV"
             style={{
               position: "absolute",
               top: 10,
