@@ -1507,7 +1507,7 @@ export async function statisticsByDistrictCodeApi(params) {
 }
 
 export async function getAllPointApi(params) {
-  console.log('1502', params);
+  console.log('项目监管请求项目点参数params', params);
   return request(`${config.url.getAllPointUrl}`, {
     method: 'POST',
     headers: {

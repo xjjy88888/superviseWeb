@@ -144,11 +144,12 @@ const ZSGeoJsonHLightStyle = {
   fillOpacity: 0.3
 };
 
-@connect(({ user, mapdata, project, spot }) => ({
+@connect(({ user, mapdata, project, spot, projectSupervise }) => ({
   user,
   mapdata,
   project,
-  spot
+  spot,
+  projectSupervise
 }))
 export default class integration extends PureComponent {
   constructor(props) {
@@ -601,7 +602,7 @@ export default class integration extends PureComponent {
       payload: payload
     });
     const { switchDataModal } = this.state;
-    console.log('switchDataModal745', switchDataModal);
+    console.log('switchDataModal', switchDataModal);
     if (!switchDataModal) {
       const { projectSymbolValue } = this.state;
       if (map) {
@@ -995,7 +996,6 @@ export default class integration extends PureComponent {
   };
 
   addProjectPointClusterLayers = (ProjectPointsData, projectSymbolValue) => {
-    //const {projectSymbolValue} = this.state;
     console.log('projectSymbolValue998', projectSymbolValue);
     if (ProjectPointsData && ProjectPointsData.items.length > 0) {
       this.clearXMJGGeojsonLayer(projectPointLayer);
@@ -1068,10 +1068,15 @@ export default class integration extends PureComponent {
   };
 
   requestProjectPoints = callback => {
+    const {
+      projectSupervise: { projectSuperviseList }
+    } = this.props;
+    //projectSuperviseList.totalCount
     const { payload } = this.state;
     const params = {
       ...payload,
-      MaxResultCount: 1000
+      MaxResultCount: projectSuperviseList && projectSuperviseList.totalCount ? projectSuperviseList.totalCount : 1000
+      // MaxResultCount: 1000
       // SkipCount: null
     };
     this.setState({ showProgress_ProjectPoint: true });
