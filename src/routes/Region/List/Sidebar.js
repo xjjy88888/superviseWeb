@@ -1,7 +1,7 @@
 /* eslint-disable array-callback-return */
-import React, { PureComponent } from 'react';
-import { connect } from 'dva';
-import { createForm } from 'rc-form';
+import React, { PureComponent } from "react";
+import { connect } from "dva";
+import { createForm } from "rc-form";
 import {
   Menu,
   Icon,
@@ -27,21 +27,21 @@ import {
   Table,
   Collapse,
   Typography
-} from 'antd';
-import locale from 'antd/lib/date-picker/locale/zh_CN';
-import 'leaflet/dist/leaflet.css';
-import emitter from '../../../utils/event';
-import config from '../../../config';
-import { Link } from 'dva/router';
-import data from '../../../data';
+} from "antd";
+import locale from "antd/lib/date-picker/locale/zh_CN";
+import "leaflet/dist/leaflet.css";
+import emitter from "../../../utils/event";
+import config from "../../../config";
+import { Link } from "dva/router";
+import data from "../../../data";
 import {
   dateInitFormat,
   accessToken,
   getFile,
   unique,
   getUrl
-} from '../../../utils/util';
-import Spins from '../../../components/Spins';
+} from "../../../utils/util";
+import Spins from "../../../components/Spins";
 
 let self;
 let loading = false;
@@ -105,36 +105,36 @@ export default class sider extends PureComponent {
       row_pro: 10,
       row_spot: 10,
       row_point: 10,
-      query_pro: '',
-      query_spot: '',
-      query_point: '',
-      key: 'project',
-      createDepartKey: '',
-      sort_by: '',
-      sort_key: '',
+      query_pro: "",
+      query_spot: "",
+      query_point: "",
+      key: "project",
+      createDepartKey: "",
+      sort_by: "",
+      sort_key: "",
       queryInfo: {},
       inputDisabled: true,
       select: [],
       departList: [],
-      problem: { title: '', records: [] },
-      placeholder: '项目名称',
+      problem: { title: "", records: [] },
+      placeholder: "项目名称",
       sort: [
         {
-          value: '名称',
-          key: 'ProjectBase.Name'
+          value: "名称",
+          key: "ProjectBase.Name"
         },
         {
-          value: '操作时间',
-          key: 'ProjectBase.ModifyTime'
+          value: "操作时间",
+          key: "ProjectBase.ModifyTime"
         },
         {
-          value: '立项级别',
-          key: 'ProjectLevel.Key'
+          value: "立项级别",
+          key: "ProjectLevel.Key"
         }
       ],
       listData: [],
       previewVisible: false,
-      previewImage: '',
+      previewImage: "",
       fileList: [],
       projectFileList: [],
       showPlan: false,
@@ -168,12 +168,12 @@ export default class sider extends PureComponent {
     this.queryDict();
     this.queryBasinOrgan();
     this.interpretList();
-    this.eventEmitter = emitter.addListener('deleteSuccess', () => {
+    this.eventEmitter = emitter.addListener("deleteSuccess", () => {
       const { key, query_pro, query_spot, query_point } = this.state;
       const v =
-        key === 'project'
+        key === "project"
           ? query_pro
-          : key === 'spot'
+          : key === "spot"
           ? query_spot
           : query_point;
       this.setState({
@@ -182,22 +182,22 @@ export default class sider extends PureComponent {
       this.search(v);
       this.interpretList();
     });
-    this.eventEmitter = emitter.addListener('spotRelate', v => {
+    this.eventEmitter = emitter.addListener("spotRelate", v => {
       const len = v.spotId.length;
-      if (v.status === 'end' && len !== 0) {
+      if (v.status === "end" && len !== 0) {
         console.log(v);
         if (len === 1) {
           if (v.spotId[0].projectId && v.spotId[0].projectId === v.projectId) {
-            notification['warning']({
+            notification["warning"]({
               message: `该图斑已关联该项目`
             });
           } else if (v.spotId[0].projectId) {
             Modal.confirm({
-              title: '关联图斑',
-              content: '该图斑已关联项目，是否确定更改关联项目？',
-              okText: '确定',
-              okType: 'danger',
-              cancelText: '取消',
+              title: "关联图斑",
+              content: "该图斑已关联项目，是否确定更改关联项目？",
+              okText: "确定",
+              okType: "danger",
+              cancelText: "取消",
               onOk() {
                 self.spotRelate(v.spotId[0].spotId, v.projectId);
               },
@@ -207,70 +207,70 @@ export default class sider extends PureComponent {
             this.spotRelate(v.spotId[0].spotId, v.projectId);
           }
         } else {
-          notification['warning']({
+          notification["warning"]({
             message: `每次只能关联1个图斑，请重新选择`
           });
         }
       }
     });
-    this.eventEmitter = emitter.addListener('projectInfoRefresh', v => {
+    this.eventEmitter = emitter.addListener("projectInfoRefresh", v => {
       if (v.projectId) {
         this.queryProjectInfo(v.projectId);
       }
     });
-    this.eventEmitter = emitter.addListener('showCreateDepart', v => {
+    this.eventEmitter = emitter.addListener("showCreateDepart", v => {
       console.log(v);
       this.setState({
         showCreateDepart: v.show,
         createDepartKey: v.key
       });
     });
-    this.eventEmitter = emitter.addListener('projectCreateUpdateBack', () => {
+    this.eventEmitter = emitter.addListener("projectCreateUpdateBack", () => {
       this.closeAll();
       this.setState({
         showProjectDetail: false
       });
     });
-    this.eventEmitter = emitter.addListener('siteLocationBack', data => {
+    this.eventEmitter = emitter.addListener("siteLocationBack", data => {
       this.props.form.setFieldsValue({
         pointX: data.longitude, //经度
         pointY: data.latitude //维度
       });
     });
-    this.eventEmitter = emitter.addListener('showSiderbar', data => {
+    this.eventEmitter = emitter.addListener("showSiderbar", data => {
       this.setState({
         show: data.show
       });
     });
-    this.eventEmitter = emitter.addListener('hideQuery', data => {
+    this.eventEmitter = emitter.addListener("hideQuery", data => {
       this.setState({
         showQuery: !data.hide
       });
     });
-    this.eventEmitter = emitter.addListener('hideProjectDetail', data => {
+    this.eventEmitter = emitter.addListener("hideProjectDetail", data => {
       this.setState({
         showProjectAllInfo: !data.hide
       });
     });
-    this.eventEmitter = emitter.addListener('screenshotBack', v => {
-      console.log('屏幕截图', v);
+    this.eventEmitter = emitter.addListener("screenshotBack", v => {
+      console.log("屏幕截图", v);
       if (v.img) {
         this.annexUploadBase64(v);
       } else {
-        notification['warning']({
+        notification["warning"]({
           message: `未获取到数据，请重新截图`
         });
       }
     });
     // 图表联动
-    this.eventEmitter = emitter.addListener('chartLinkage', data => {
+    this.eventEmitter = emitter.addListener("chartLinkage", data => {
       if (this.scrollDom) {
         this.scrollDom.scrollTop = 0;
       }
       this.setState({
         polygon: data.polygon
       });
-      if (self.state.key === 'spot') {
+      if (self.state.key === "spot") {
         this.querySpot({
           SkipCount: 0,
           polygon: data.polygon
@@ -283,13 +283,13 @@ export default class sider extends PureComponent {
       }
     });
     //search
-    this.eventEmitter = emitter.addListener('queryInfo', data => {
+    this.eventEmitter = emitter.addListener("queryInfo", data => {
       console.log(data);
       if (this.scrollDom) {
         this.scrollDom.scrollTop = 0;
       }
       const { query_pro, query_spot, query_point } = this.state;
-      emitter.emit('checkResult', {
+      emitter.emit("checkResult", {
         show: false,
         result: []
       });
@@ -298,21 +298,21 @@ export default class sider extends PureComponent {
         if (
           data.info[i] &&
           (data.info[i].length ||
-            typeof data.info[i] === 'number' ||
-            typeof data.info[i] === 'boolean')
+            typeof data.info[i] === "number" ||
+            typeof data.info[i] === "boolean")
         ) {
           queryHighlight = true;
         }
       }
       this.setState({
         showCheck: false,
-        sort_by: '',
-        sort_key: '',
+        sort_by: "",
+        sort_key: "",
         queryInfo: data.info,
         ShowArchive: data.ShowArchive,
         queryHighlight: queryHighlight
       });
-      if (data.from === 'project') {
+      if (data.from === "project") {
         this.setState({
           row_pro: 10
         });
@@ -321,7 +321,7 @@ export default class sider extends PureComponent {
           SkipCount: 0,
           ProjectName: query_pro
         });
-      } else if (data.from === 'spot') {
+      } else if (data.from === "spot") {
         this.setState({ row_spot: 10 });
         this.querySpot({
           ...data.info,
@@ -338,24 +338,24 @@ export default class sider extends PureComponent {
       }
     });
     if (this.scrollDom) {
-      this.scrollDom.addEventListener('scroll', () => {
+      this.scrollDom.addEventListener("scroll", () => {
         this.onScroll(this);
       });
     }
-    this.eventEmitter = emitter.addListener('showCheck', data => {
+    this.eventEmitter = emitter.addListener("showCheck", data => {
       this.setState({
         showCheck: data.show
       });
     });
-    this.eventEmitter = emitter.addListener('showProjectSpotInfo', data => {
-      if (data.from === 'project') {
+    this.eventEmitter = emitter.addListener("showProjectSpotInfo", data => {
+      if (data.from === "project") {
         this.setState({
           showProjectDetail: data.show, //地图跳转到项目详情
           projectEdit: data.edit
         });
         this.queryProjectById(data.id);
         this.queryProjectInfo(data.id);
-      } else if (data.from === 'spot') {
+      } else if (data.from === "spot") {
       } else {
       }
     });
@@ -374,7 +374,7 @@ export default class sider extends PureComponent {
 
   componentWillUnmount() {
     if (this.scrollDom) {
-      this.scrollDom.removeEventListener('scroll', () => {
+      this.scrollDom.removeEventListener("scroll", () => {
         this.onScroll(this);
       });
     }
@@ -413,7 +413,7 @@ export default class sider extends PureComponent {
       if (loading) {
         return;
       }
-      if (key === 'project') {
+      if (key === "project") {
         const pl = isProjectSupervise
           ? projectSuperviseList.items.length
           : projectList.items.length;
@@ -430,7 +430,7 @@ export default class sider extends PureComponent {
           });
           this.setState({ row_pro: row_pro + 10 });
         }
-      } else if (key === 'spot') {
+      } else if (key === "spot") {
         if (spotList.items.length < spotList.totalCount) {
           this.querySpot({
             ...queryInfo,
@@ -459,13 +459,13 @@ export default class sider extends PureComponent {
     const { dispatch } = this.props;
     const { ParentId, projectFileList } = this.state;
     dispatch({
-      type: 'annex/annexUploadBase64Api',
+      type: "annex/annexUploadBase64Api",
       payload: {
         Id: ParentId,
-        'FileBase64.FileName': Math.random()
+        "FileBase64.FileName": Math.random()
           .toString(36)
           .substr(2),
-        'FileBase64.Base64': v.img,
+        "FileBase64.Base64": v.img,
         Longitude: v.longitude,
         Latitude: v.latitude,
         Azimuth: 0
@@ -482,11 +482,11 @@ export default class sider extends PureComponent {
             longitude: item.longitude,
             azimuth: item.azimuth,
             fileExtend: item.fileExtend,
-            status: 'done'
+            status: "done"
           };
           this.setState({ projectFileList: [...projectFileList, obj] });
         } else {
-          notification['error']({
+          notification["error"]({
             message: `屏幕截图上传失败：${error.message}`
           });
         }
@@ -497,14 +497,14 @@ export default class sider extends PureComponent {
   spotRelate = (spotId, projectId) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'spot/spotCreateUpdate',
+      type: "spot/spotCreateUpdate",
       payload: {
         id: spotId,
         projectId: projectId
       },
       callback: success => {
         if (success) {
-          notification['success']({
+          notification["success"]({
             message: `关联扰动图斑成功`
           });
           this.querySpotByProjectId(projectId);
@@ -520,13 +520,13 @@ export default class sider extends PureComponent {
   queryDistrict = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'district/districtTree',
+      type: "district/districtTree",
       payload: {
         IsFilter: false
       }
     });
     dispatch({
-      type: 'district/districtTree',
+      type: "district/districtTree",
       payload: {
         IsFilter: true
       }
@@ -536,22 +536,26 @@ export default class sider extends PureComponent {
   queryDict = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'user/queryDict'
+      type: "user/queryDict"
     });
   };
 
   interpretList = () => {
-    console.log(`interpretList`);
     const { dispatch } = this.props;
     dispatch({
-      type: 'spot/interpretList'
+      type: "spot/interpretList",
+      callback: (success, result) => {
+        if (success && result.length) {
+          this.setState({ TaskLevelAndInterBatch: result[0] });
+        }
+      }
     });
   };
 
   queryBasinOrgan = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'user/basinOrgan'
+      type: "user/basinOrgan"
     });
   };
 
@@ -567,7 +571,7 @@ export default class sider extends PureComponent {
     } else {
       this.showSpin(true);
       dispatch({
-        type: 'project/queryProject',
+        type: "project/queryProject",
         payload: {
           ...items,
           polygon: polygon,
@@ -576,8 +580,8 @@ export default class sider extends PureComponent {
         callback: (success, response) => {
           loading = false;
           this.showSpin(false);
-          if (!showCheck && success && key === 'project') {
-            emitter.emit('checkResult', {
+          if (!showCheck && success && key === "project") {
+            emitter.emit("checkResult", {
               show: false,
               result: response.items
             });
@@ -601,7 +605,7 @@ export default class sider extends PureComponent {
       items: items.SkipCount === 0 ? [] : projectSuperviseList.items
     };
     dispatch({
-      type: 'projectSupervise/queryProjectSupervise',
+      type: "projectSupervise/queryProjectSupervise",
       payload,
       callback: (success, response) => {
         this.showSpin(false);
@@ -619,7 +623,7 @@ export default class sider extends PureComponent {
     } = this.props;
     this.showSpin(true);
     dispatch({
-      type: 'spot/querySpot',
+      type: "spot/querySpot",
       payload: {
         TaskLevelAndInterBatch,
         polygon: polygon,
@@ -629,8 +633,8 @@ export default class sider extends PureComponent {
       callback: (success, response) => {
         loading = false;
         this.showSpin(false);
-        if (!showCheck && success && key === 'spot') {
-          emitter.emit('checkResult', {
+        if (!showCheck && success && key === "spot") {
+          emitter.emit("checkResult", {
             show: false,
             result: response.items
           });
@@ -647,7 +651,7 @@ export default class sider extends PureComponent {
     } = this.props;
     this.showSpin(true);
     dispatch({
-      type: 'point/queryPoint',
+      type: "point/queryPoint",
       payload: {
         ...items,
         items: items.SkipCount === 0 ? [] : pointList.items
@@ -665,7 +669,7 @@ export default class sider extends PureComponent {
     this.showSpin(true);
     this.setState({ isProjectUpdate: false });
     dispatch({
-      type: 'project/queryProjectById',
+      type: "project/queryProjectById",
       payload: {
         id: id,
         refresh: true
@@ -701,7 +705,7 @@ export default class sider extends PureComponent {
               latitude: item.latitude,
               longitude: item.longitude,
               azimuth: item.azimuth,
-              status: 'done'
+              status: "done"
             };
           });
           this.setState({ projectFileList: list });
@@ -716,7 +720,7 @@ export default class sider extends PureComponent {
     const { dispatch } = this.props;
     this.showSpin(true);
     dispatch({
-      type: 'spot/querySpotByProjectId',
+      type: "spot/querySpotByProjectId",
       payload: {
         ProjectId: id,
         MaxResultCount: 1000,
@@ -733,7 +737,7 @@ export default class sider extends PureComponent {
     const { dispatch } = this.props;
     this.showSpin(true);
     dispatch({
-      type: 'redLine/queryRedLineList',
+      type: "redLine/queryRedLineList",
       payload: {
         ProjectId: id
       },
@@ -746,7 +750,7 @@ export default class sider extends PureComponent {
   inspectList = id => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'inspect/inspectList',
+      type: "inspect/inspectList",
       payload: {
         ProjectId: id
       }
@@ -756,7 +760,7 @@ export default class sider extends PureComponent {
   panoramaList = id => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'panorama/panoramaList',
+      type: "panorama/panoramaList",
       payload: {
         projectId: id,
         MaxResultCount: 1000
@@ -766,29 +770,29 @@ export default class sider extends PureComponent {
 
   switchMenu = e => {
     this.scrollDom.scrollTop = 0;
-    emitter.emit('emptyPoint', {});
-    emitter.emit('showSiderbarDetail', {
+    emitter.emit("emptyPoint", {});
+    emitter.emit("showSiderbarDetail", {
       show: false,
-      from: 'spot'
+      from: "spot"
     });
-    emitter.emit('showQuery', {
+    emitter.emit("showQuery", {
       show: false
     });
-    emitter.emit('showTool', {
+    emitter.emit("showTool", {
       show: false,
-      type: 'control'
+      type: "control"
     });
-    emitter.emit('showChart', {
+    emitter.emit("showChart", {
       show: false
     });
-    emitter.emit('checkResult', {
+    emitter.emit("checkResult", {
       show: false,
       result: []
     });
     const k = e.key;
-    if (k === 'project') {
+    if (k === "project") {
       this.queryProject({ SkipCount: 0 });
-    } else if (k === 'spot') {
+    } else if (k === "spot") {
       this.querySpot({ SkipCount: 0 });
     } else {
       this.queryPoint({ SkipCount: 0 });
@@ -799,50 +803,50 @@ export default class sider extends PureComponent {
       ShowArchive: false,
       key: k,
       placeholder:
-        k === 'project' ? '项目名称' : k === 'spot' ? '图斑编号' : '关联项目',
+        k === "project" ? "项目名称" : k === "spot" ? "图斑编号" : "关联项目",
       sort:
-        k === 'project'
+        k === "project"
           ? [
               {
-                value: '名称',
-                key: 'ProjectBase.Name'
+                value: "名称",
+                key: "ProjectBase.Name"
               },
               {
-                value: '操作时间',
-                key: 'ProjectBase.ModifyTime'
+                value: "操作时间",
+                key: "ProjectBase.ModifyTime"
               },
               {
-                value: '立项级别',
-                key: 'ProjectLevel.Key'
+                value: "立项级别",
+                key: "ProjectLevel.Key"
               }
             ]
-          : k === 'spot'
+          : k === "spot"
           ? [
               {
-                value: '编号',
-                key: 'MapNum'
+                value: "编号",
+                key: "MapNum"
               },
               {
-                value: '操作时间',
-                key: 'ModifyTime'
+                value: "操作时间",
+                key: "ModifyTime"
               },
               {
-                value: '复核状态',
-                key: 'IsReview'
+                value: "复核状态",
+                key: "IsReview"
               }
             ]
           : [
               {
-                value: '描述',
-                key: 'Description'
+                value: "描述",
+                key: "Description"
               },
               {
-                value: '标注时间',
-                key: 'CreateTime'
+                value: "标注时间",
+                key: "CreateTime"
               },
               {
-                value: '关联项目',
-                key: 'Project.Id'
+                value: "关联项目",
+                key: "Project.Id"
               }
             ]
     });
@@ -852,7 +856,7 @@ export default class sider extends PureComponent {
     if (e.length) {
       const isRoot = isNaN(e[0].slice(0, 1));
       this.setState({ showProblem: true });
-      emitter.emit('showProblem', {
+      emitter.emit("showProblem", {
         show: true
       });
       this.setState({ previewVisible: false });
@@ -864,29 +868,29 @@ export default class sider extends PureComponent {
   };
 
   toColor = v => {
-    if (v === '一般') {
-      return 'green';
-    } else if (v === '较重') {
-      return 'orange';
+    if (v === "一般") {
+      return "green";
+    } else if (v === "较重") {
+      return "orange";
     } else {
-      return 'magenta';
+      return "magenta";
     }
   };
 
   closeAll = () => {
-    emitter.emit('showSiderbarDetail', {
+    emitter.emit("showSiderbarDetail", {
       show: false,
-      from: 'spot',
-      item: { id: '2017154_14848_4848' }
+      from: "spot",
+      item: { id: "2017154_14848_4848" }
     });
-    emitter.emit('showProjectDetail', {
+    emitter.emit("showProjectDetail", {
       show: false,
       edit: false
     });
-    emitter.emit('showInspect', {
+    emitter.emit("showInspect", {
       show: false
     });
-    emitter.emit('showProblemPoint', {
+    emitter.emit("showProblemPoint", {
       show: false
     });
   };
@@ -899,7 +903,7 @@ export default class sider extends PureComponent {
       });
       return filter[0].id;
     } else {
-      return '';
+      return "";
     }
   };
 
@@ -913,7 +917,7 @@ export default class sider extends PureComponent {
     // const isAdd = key !== "supDepartmentId" && key !== "replyDepartmentId";
     if (departSearch) {
       dispatch({
-        type: 'user/departVaild',
+        type: "user/departVaild",
         payload: {
           name: departSearch
         },
@@ -952,9 +956,9 @@ export default class sider extends PureComponent {
       const filter = dicList.filter(item => {
         return item.id === id;
       });
-      return filter.map(item => item.dictTableValue).join(',');
+      return filter.map(item => item.dictTableValue).join(",");
     } else {
-      return '';
+      return "";
     }
   };
 
@@ -975,7 +979,7 @@ export default class sider extends PureComponent {
     if (obj) {
       return obj[key];
     } else {
-      return '';
+      return "";
     }
   };
 
@@ -983,17 +987,17 @@ export default class sider extends PureComponent {
   projectDelete = id => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'project/projectDelete',
+      type: "project/projectDelete",
       payload: {
         id: id
       },
       callback: success => {
         if (success) {
           this.setState({ showProjectDetail: false });
-          emitter.emit('deleteSuccess', {
+          emitter.emit("deleteSuccess", {
             success: true
           });
-          emitter.emit('showProjectDetail', {
+          emitter.emit("showProjectDetail", {
             show: false,
             edit: false
           });
@@ -1026,16 +1030,16 @@ export default class sider extends PureComponent {
     if (this.scrollDom) {
       this.scrollDom.scrollTop = 0;
     }
-    emitter.emit('checkResult', {
+    emitter.emit("checkResult", {
       show: false,
       result: []
     });
     this.setState({
       showCheck: false,
-      sort_by: '',
-      sort_key: ''
+      sort_by: "",
+      sort_key: ""
     });
-    if (key === 'project') {
+    if (key === "project") {
       this.setState({
         query_pro: v,
         row_pro: 10
@@ -1044,15 +1048,15 @@ export default class sider extends PureComponent {
         ...queryInfo,
         SkipCount: 0,
         ProjectName: v,
-        from: 'query'
+        from: "query"
       });
-    } else if (key === 'spot') {
+    } else if (key === "spot") {
       this.setState({ query_spot: v, row_spot: 10 });
       this.querySpot({
         ...queryInfo,
         SkipCount: 0,
         MapNum: v,
-        from: 'query'
+        from: "query"
       });
     } else {
       this.setState({ query_point: v, row_point: 10 });
@@ -1060,7 +1064,7 @@ export default class sider extends PureComponent {
         ...queryInfo,
         SkipCount: 0,
         ProjectName: v,
-        from: 'query'
+        from: "query"
       });
     }
   };
@@ -1068,7 +1072,7 @@ export default class sider extends PureComponent {
   queryDepartList = (v, t) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'project/departList',
+      type: "project/departList",
       payload: {
         name: v,
         kind: t
@@ -1130,7 +1134,8 @@ export default class sider extends PureComponent {
       departList,
       showPlan,
       clickId,
-      isProjectSupervise
+      isProjectSupervise,
+      TaskLevelAndInterBatch
     } = this.state;
 
     const departSelectListAll = unique(departSelectList.concat(departList));
@@ -1139,44 +1144,44 @@ export default class sider extends PureComponent {
       ? projectInfo
       : {
           projectBase: {},
-          productDepartment: { name: '', id: '' },
+          productDepartment: { name: "", id: "" },
           expand: {
-            designStartTime: '',
-            designCompTime: '',
-            actStartTime: '',
-            actCompTime: ''
+            designStartTime: "",
+            designCompTime: "",
+            actStartTime: "",
+            actCompTime: ""
           }
         };
 
-    const showPoint = key === 'point';
+    const showPoint = key === "point";
 
     const tabs = [
       {
-        title: '项目',
-        key: ['project']
+        title: "项目",
+        key: ["project"]
       },
       {
-        title: '图斑',
-        key: ['spot']
+        title: "图斑",
+        key: ["spot"]
       },
       {
-        title: '标注点',
-        key: ['point']
+        title: "标注点",
+        key: ["point"]
       }
     ];
 
     const tabsProject = [
       {
-        title: '项目',
-        key: ['project']
+        title: "项目",
+        key: ["project"]
       }
     ];
 
     const list = isProjectSupervise
       ? projectSuperviseList.items
-      : key === 'project'
+      : key === "project"
       ? projectList.items
-      : key === 'spot'
+      : key === "spot"
       ? spotList.items
       : pointList.items;
 
@@ -1195,85 +1200,85 @@ export default class sider extends PureComponent {
               共有
               {isProjectSupervise
                 ? projectSuperviseList.items.length
-                : key === 'project'
+                : key === "project"
                 ? projectList.items.length
-                : key === 'spot'
+                : key === "spot"
                 ? spotList.items.length
                 : pointList.items.length}
               /
               {isProjectSupervise
                 ? projectSuperviseList.totalCount
-                : key === 'project'
+                : key === "project"
                 ? projectList.totalCount
-                : key === 'spot'
+                : key === "spot"
                 ? spotList.totalCount
                 : pointList.totalCount}
               条
             </span>
             <span
               style={{
-                display: key !== 'point' ? 'inherit' : 'none'
+                display: key !== "point" ? "inherit" : "none"
               }}
             >
               <Button
-                icon={showCheck ? 'shopping' : ''}
+                icon={showCheck ? "shopping" : ""}
                 style={{ marginLeft: 20 }}
                 onClick={() => {
-                  emitter.emit('showSiderbarDetail', {
+                  emitter.emit("showSiderbarDetail", {
                     show: false
                   });
-                  emitter.emit('showTool', {
+                  emitter.emit("showTool", {
                     show: true,
-                    type: 'tool',
+                    type: "tool",
                     key: key,
                     ShowArchive: ShowArchive,
                     checkResult:
-                      key === 'project'
+                      key === "project"
                         ? projectList.items
-                        : key === 'spot'
+                        : key === "spot"
                         ? spotList.items
                         : pointList.items
                   });
-                  emitter.emit('showQuery', {
+                  emitter.emit("showQuery", {
                     show: false
                   });
                 }}
               >
-                {showCheck ? '' : '工具箱'}
+                {showCheck ? "" : "工具箱"}
               </Button>
               <Button
-                icon={showCheck ? 'dashboard' : ''}
+                icon={showCheck ? "dashboard" : ""}
                 // style={{ float: "right" }}
                 onClick={() => {
-                  emitter.emit('showSiderbarDetail', {
+                  emitter.emit("showSiderbarDetail", {
                     show: false
                   });
-                  emitter.emit('showTool', {
+                  emitter.emit("showTool", {
                     show: true,
-                    type: 'control',
+                    type: "control",
                     key: key
                   });
-                  emitter.emit('showQuery', {
+                  emitter.emit("showQuery", {
                     show: false
                   });
                 }}
               >
-                {showCheck ? '' : '仪表盘'}
+                {showCheck ? "" : "仪表盘"}
               </Button>
             </span>
           </span>
         ),
-        dataIndex: 'name',
+        dataIndex: "name",
         render: (v, item) => (
           <span>
             <p>
               <span
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: "pointer" }}
                 onClick={() => {
                   this.setState({ clickId: item.id });
                   resetFields();
                   //编辑1
-                  if (key === 'project') {
+                  if (key === "project") {
                     this.setState({
                       showProjectDetail: true,
                       projectEdit: false,
@@ -1284,19 +1289,19 @@ export default class sider extends PureComponent {
                     this.queryProjectById(item.id);
                     this.queryProjectInfo(item.id);
                   } else {
-                    emitter.emit('showSiderbarDetail', {
-                      show: key !== 'project',
+                    emitter.emit("showSiderbarDetail", {
+                      show: key !== "project",
                       from: key,
                       id: item.id,
                       edit: false,
                       fromList: true,
-                      type: 'edit'
+                      type: "edit"
                     });
                   }
-                  emitter.emit('showTool', {
+                  emitter.emit("showTool", {
                     show: false
                   });
-                  emitter.emit('showQuery', {
+                  emitter.emit("showQuery", {
                     show: false
                   });
                 }}
@@ -1305,32 +1310,32 @@ export default class sider extends PureComponent {
                   style={
                     item.id === clickId
                       ? {
-                          color: 'green'
+                          color: "green"
                           // fontSize: 20
                         }
                       : {}
                   }
                 >
-                  {key === 'project' || isProjectSupervise
+                  {key === "project" || isProjectSupervise
                     ? item.projectName
-                    : key === 'spot'
+                    : key === "spot"
                     ? item.mapNum
-                    : item.createTime + '  ' + item.name}
+                    : item.createTime + "  " + item.name}
                 </b>
               </span>
               <Icon
                 type="environment"
                 style={{
-                  float: 'right',
+                  float: "right",
                   fontSize: 18,
-                  cursor: 'point',
-                  color: '#1890ff'
+                  cursor: "point",
+                  color: "#1890ff"
                 }}
                 onClick={e => {
                   e.stopPropagation();
-                  if (key === 'point') {
+                  if (key === "point") {
                     dispatch({
-                      type: 'point/queryPointById',
+                      type: "point/queryPointById",
                       payload: { id: item.id },
                       callback: v => {
                         mapLocation({
@@ -1349,19 +1354,19 @@ export default class sider extends PureComponent {
               />
             </p>
             <span>
-              {key === 'project'
-                ? `建设单位：${item.productDepartmentName || ''}`
-                : key === 'spot'
-                ? `关联项目：${item.projectName || ''}`
-                : `关联项目：${item.projectName || ''}`}
+              {key === "project"
+                ? `建设单位：${item.productDepartmentName || ""}`
+                : key === "spot"
+                ? `关联项目：${item.projectName || ""}`
+                : `关联项目：${item.projectName || ""}`}
             </span>
             <br />
             <span>
-              {key === 'project'
-                ? `批复机构：${item.replyDepartmentName || ''}`
-                : key === 'spot'
-                ? `扰动合规性：${item.interferenceCompliance || ''}`
-                : `描述：${item.description || ''}`}
+              {key === "project"
+                ? `批复机构：${item.replyDepartmentName || ""}`
+                : key === "spot"
+                ? `扰动合规性：${item.interferenceCompliance || ""}`
+                : `描述：${item.description || ""}`}
             </span>
           </span>
         )
@@ -1371,7 +1376,7 @@ export default class sider extends PureComponent {
     const rowSelectionTable = {
       onChange: (selectedRowKeys, selectedRows) => {
         console.log(selectedRows);
-        emitter.emit('checkResult', {
+        emitter.emit("checkResult", {
           show: true,
           result: selectedRows
         });
@@ -1381,68 +1386,68 @@ export default class sider extends PureComponent {
     return (
       <div
         style={{
-          position: 'absolute',
-          left: show ? 0 : '-350px',
+          position: "absolute",
+          left: show ? 0 : "-350px",
           top: 0,
           zIndex: 1000,
           width: 350,
-          height: '100%',
+          height: "100%",
           paddingTop: 46,
-          backgroundColor: 'transparent'
+          backgroundColor: "transparent"
         }}
         ref={e => (this.refDom = e)}
       >
         <Icon
-          type={show ? 'left' : 'right'}
+          type={show ? "left" : "right"}
           style={{
             fontSize: 30,
-            position: 'absolute',
+            position: "absolute",
             right: -50,
-            top: '48%',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            borderRadius: '50%',
+            top: "48%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            borderRadius: "50%",
             padding: 10,
-            cursor: 'pointer'
+            cursor: "pointer"
           }}
           onClick={() => {
             this.setState({
               show: !show
               //  showProjectDetail: false
             });
-            emitter.emit('showSiderbar', {
+            emitter.emit("showSiderbar", {
               show: !show
             });
           }}
         />
         <div
           style={{
-            display: showProjectDetail ? 'none' : 'block',
-            height: '100%',
-            overflow: 'hidden',
-            backgroundColor: '#fff'
+            display: showProjectDetail ? "none" : "block",
+            height: "100%",
+            overflow: "hidden",
+            backgroundColor: "#fff"
           }}
         >
           <Link to="/project">
             <Icon
               type="menu-unfold"
               style={{
-                display: isProjectSupervise ? 'block' : 'none',
-                position: 'absolute',
+                display: isProjectSupervise ? "block" : "none",
+                position: "absolute",
                 right: 64,
                 top: 60,
                 fontSize: 20,
-                color: '#1890ff'
+                color: "#1890ff"
               }}
             />
           </Link>
           <Tag
-            color={isProjectSupervise ? 'volcano' : 'cyan'}
+            color={isProjectSupervise ? "volcano" : "cyan"}
             style={{
-              position: 'absolute',
+              position: "absolute",
               right: 0,
               top: 49,
-              userSelect: 'none',
-              cursor: 'pointer'
+              userSelect: "none",
+              cursor: "pointer"
             }}
             onClick={() => {
               this.closeAll();
@@ -1462,7 +1467,7 @@ export default class sider extends PureComponent {
           </Tag>
           <Menu
             mode="horizontal"
-            defaultSelectedKeys={['project']}
+            defaultSelectedKeys={["project"]}
             selectedKeys={[key]}
           >
             {(isProjectSupervise ? tabsProject : tabs).map(item => (
@@ -1483,32 +1488,32 @@ export default class sider extends PureComponent {
           {/* 新建 */}
           <Popover
             content={
-              key === 'project'
-                ? '新建项目'
-                : key === 'spot'
-                ? '新建图斑，第一步：绘制图形'
-                : '新建标注点'
+              key === "project"
+                ? "新建项目"
+                : key === "spot"
+                ? "新建图斑，第一步：绘制图形"
+                : "新建标注点"
             }
             title=""
             trigger="hover"
           >
             <Icon
               type={
-                key === 'project'
-                  ? 'plus'
-                  : key === 'spot'
-                  ? 'border-inner'
-                  : 'compass'
+                key === "project"
+                  ? "plus"
+                  : key === "spot"
+                  ? "border-inner"
+                  : "compass"
               }
               style={{
                 fontSize: 20,
-                position: 'relative',
+                position: "relative",
                 top: 23,
-                cursor: 'pointer',
-                color: '#1890ff'
+                cursor: "pointer",
+                color: "#1890ff"
               }}
               onClick={() => {
-                if (key === 'project') {
+                if (key === "project") {
                   this.setState({
                     showProjectDetail: true,
                     projectEdit: true,
@@ -1518,31 +1523,31 @@ export default class sider extends PureComponent {
                     ParentId: 0
                   });
                   resetFields();
-                  emitter.emit('showProjectDetail', {
+                  emitter.emit("showProjectDetail", {
                     show: true,
                     edit: true,
-                    id: ''
+                    id: ""
                   });
-                } else if (key === 'spot') {
-                  emitter.emit('drawGraphics', {
+                } else if (key === "spot") {
+                  emitter.emit("drawGraphics", {
                     draw: true,
-                    state: 'add',
-                    type: 'spot',
-                    projectId: '',
+                    state: "add",
+                    type: "spot",
+                    projectId: "",
                     fromList: true
                   });
-                  emitter.emit('showSiderbarDetail', {
+                  emitter.emit("showSiderbarDetail", {
                     show: false,
                     edit: true,
                     from: key,
-                    type: 'add'
+                    type: "add"
                   });
                 } else {
-                  emitter.emit('showSiderbarDetail', {
-                    show: key !== 'project',
+                  emitter.emit("showSiderbarDetail", {
+                    show: key !== "project",
                     edit: true,
                     from: key,
-                    type: 'add'
+                    type: "add"
                   });
                 }
               }}
@@ -1551,8 +1556,9 @@ export default class sider extends PureComponent {
           {key === `spot` ? (
             <Select
               allowClear
+              value={TaskLevelAndInterBatch}
               placeholder="解译期次"
-              style={{ margin: '0 20px 20px 20px', width: 260 }}
+              style={{ margin: "0 20px 20px 20px", width: 260 }}
               onChange={TaskLevelAndInterBatch => {
                 switchInterpret(TaskLevelAndInterBatch);
                 this.setState({ TaskLevelAndInterBatch });
@@ -1560,7 +1566,7 @@ export default class sider extends PureComponent {
                   ...queryInfo,
                   SkipCount: 0,
                   MapNum: query_spot,
-                  from: 'query',
+                  from: "query",
                   TaskLevelAndInterBatch
                 });
               }}
@@ -1570,23 +1576,23 @@ export default class sider extends PureComponent {
               ))}
             </Select>
           ) : null}
-          <Button.Group buttonstyle="solid" style={{ padding: '0px 15px' }}>
+          <Button.Group buttonstyle="solid" style={{ padding: "0px 15px" }}>
             {sort.map((item, index) => (
               <Button
                 style={{
-                  userSelect: 'none',
-                  border: 'rgb(217, 217, 217) 1px solid',
-                  color: sort_key === item.key && sort_by ? '#fff' : '#000',
+                  userSelect: "none",
+                  border: "rgb(217, 217, 217) 1px solid",
+                  color: sort_key === item.key && sort_by ? "#fff" : "#000",
                   backgroundColor:
-                    sort_key === item.key && sort_by ? '#1890ff' : '#fff'
+                    sort_key === item.key && sort_by ? "#1890ff" : "#fff"
                 }}
                 key={item.key}
                 value={item.key}
                 onClick={() => {
                   const by =
-                    item.key === sort_key && sort_by && sort_by === 'Desc'
-                      ? 'Asc'
-                      : 'Desc';
+                    item.key === sort_key && sort_by && sort_by === "Desc"
+                      ? "Asc"
+                      : "Desc";
                   const Sorting_new = `${item.key} ${by}`;
                   this.setState({
                     sort_key: item.key,
@@ -1594,7 +1600,7 @@ export default class sider extends PureComponent {
                     Sorting: Sorting_new
                   });
                   this.scrollDom.scrollTop = 0;
-                  if (key === 'project') {
+                  if (key === "project") {
                     this.setState({
                       row_pro: 10
                     });
@@ -1604,7 +1610,7 @@ export default class sider extends PureComponent {
                       SkipCount: 0,
                       ProjectName: query_pro
                     });
-                  } else if (key === 'spot') {
+                  } else if (key === "spot") {
                     this.setState({
                       row_spot: 10
                     });
@@ -1629,10 +1635,10 @@ export default class sider extends PureComponent {
               >
                 {item.value}
                 <Icon
-                  type={sort_by === 'Desc' ? 'caret-down' : 'caret-up'}
+                  type={sort_by === "Desc" ? "caret-down" : "caret-up"}
                   style={{
                     display:
-                      sort_key === item.key && sort_by ? 'inherit  ' : 'none',
+                      sort_key === item.key && sort_by ? "inherit  " : "none",
                     fontSize: 5
                   }}
                 />
@@ -1640,21 +1646,21 @@ export default class sider extends PureComponent {
             ))}
           </Button.Group>
           <Button
-            type={queryHighlight ? 'primary' : ''}
+            type={queryHighlight ? "primary" : ""}
             style={{
-              display: showPoint ? 'none' : 'inline'
+              display: showPoint ? "none" : "inline"
             }}
             onClick={() => {
               const { key, showQuery } = this.state;
               this.setState({ showQuery: !showQuery });
-              emitter.emit('showSiderbarDetail', {
+              emitter.emit("showSiderbarDetail", {
                 show: false
               });
-              emitter.emit('showTool', {
+              emitter.emit("showTool", {
                 show: false,
-                type: 'tool'
+                type: "tool"
               });
-              emitter.emit('showQuery', {
+              emitter.emit("showQuery", {
                 show: !showQuery,
                 type: key,
                 isProjectSupervise
@@ -1667,7 +1673,7 @@ export default class sider extends PureComponent {
           <div
             ref={e => (this.scrollDom = e)}
             style={{
-              overflow: 'auto',
+              overflow: "auto",
               height: clientHeight ? clientHeight - 202 : 500,
               width: 350
             }}
@@ -1682,22 +1688,22 @@ export default class sider extends PureComponent {
         </div>
         <div
           style={{
-            display: showProjectDetail ? 'block' : 'none',
-            overflow: 'auto',
+            display: showProjectDetail ? "block" : "none",
+            overflow: "auto",
             padding: 20,
-            height: '100%',
-            backgroundColor: '#fff'
+            height: "100%",
+            backgroundColor: "#fff"
           }}
         >
           <div
             style={{
-              display: showCompany ? 'block' : 'none',
-              position: 'relation'
+              display: showCompany ? "block" : "none",
+              position: "relation"
             }}
           >
             <p
               style={{
-                position: 'absolute',
+                position: "absolute",
                 top: 62,
                 left: 256
               }}
@@ -1706,8 +1712,8 @@ export default class sider extends PureComponent {
                 icon="close"
                 shape="circle"
                 style={{
-                  float: 'right',
-                  color: '#1890ff',
+                  float: "right",
+                  color: "#1890ff",
                   fontSize: 18,
                   zIndex: 1
                 }}
@@ -1719,18 +1725,18 @@ export default class sider extends PureComponent {
                 icon="check"
                 shape="circle"
                 style={{
-                  float: 'right',
-                  color: '#1890ff',
+                  float: "right",
+                  color: "#1890ff",
                   fontSize: 18,
                   zIndex: 1
                 }}
                 onClick={() => {
                   this.setState({ showProblem: false });
-                  emitter.emit('showProblem', {
+                  emitter.emit("showProblem", {
                     show: false
                   });
-                  notification['success']({
-                    message: '编辑成功'
+                  notification["success"]({
+                    message: "编辑成功"
                   });
                 }}
               />
@@ -1741,7 +1747,7 @@ export default class sider extends PureComponent {
                   title={
                     <b
                       style={{
-                        color: index === 7 ? 'red' : '#000'
+                        color: index === 7 ? "red" : "#000"
                       }}
                     >
                       {item.title}
@@ -1764,30 +1770,30 @@ export default class sider extends PureComponent {
             </Tree>
             <div
               style={{
-                display: showProblem ? 'block' : 'none',
-                position: 'absolute',
+                display: showProblem ? "block" : "none",
+                position: "absolute",
                 top: 48,
                 left: 350,
                 width: 430,
                 bottom: 0,
-                background: '#fff'
+                background: "#fff"
               }}
             >
               <Icon
-                type={'left'}
+                type={"left"}
                 style={{
                   fontSize: 30,
-                  position: 'absolute',
+                  position: "absolute",
                   right: -50,
-                  top: '48%',
-                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                  borderRadius: '50%',
+                  top: "48%",
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                  borderRadius: "50%",
                   padding: 10,
-                  cursor: 'pointer'
+                  cursor: "pointer"
                 }}
                 onClick={() => {
                   this.setState({ showProblem: false });
-                  emitter.emit('showProblem', {
+                  emitter.emit("showProblem", {
                     show: false
                   });
                 }}
@@ -1796,35 +1802,35 @@ export default class sider extends PureComponent {
                 icon="check"
                 shape="circle"
                 style={{
-                  color: '#1890ff',
+                  color: "#1890ff",
                   fontSize: 18,
-                  position: 'absolute',
+                  position: "absolute",
                   right: 30,
                   top: 15,
                   zIndex: 1
                 }}
                 onClick={() => {
                   this.setState({ showProblem: false });
-                  emitter.emit('showProblem', {
+                  emitter.emit("showProblem", {
                     show: false
                   });
-                  notification['success']({
-                    message: '编辑成功'
+                  notification["success"]({
+                    message: "编辑成功"
                   });
                 }}
               />
               <div
                 style={{
-                  overflow: 'auto',
-                  padding: '20px 10px 20px 20px',
-                  height: '100%'
+                  overflow: "auto",
+                  padding: "20px 10px 20px 20px",
+                  height: "100%"
                 }}
               >
                 <p>{problem.title}</p>
                 <div
                   style={{
-                    display: previewVisible_min ? 'block' : 'none',
-                    position: 'fixed',
+                    display: previewVisible_min ? "block" : "none",
+                    position: "fixed",
                     zIndex: 1,
                     width: 380
                   }}
@@ -1833,13 +1839,13 @@ export default class sider extends PureComponent {
                     type="close"
                     style={{
                       fontSize: 18,
-                      position: 'absolute',
+                      position: "absolute",
                       top: 0,
                       right: 0
                     }}
                     onClick={() => {
                       this.setState({ previewVisible_min: false });
-                      emitter.emit('imgLocation', {
+                      emitter.emit("imgLocation", {
                         Latitude: 0,
                         Longitude: 0,
                         show: false
@@ -1848,7 +1854,7 @@ export default class sider extends PureComponent {
                   />
                   <img
                     alt="example"
-                    style={{ width: '100%', cursor: 'pointer' }}
+                    style={{ width: "100%", cursor: "pointer" }}
                     src={previewImage}
                     onClick={() => {
                       this.setState({
@@ -1872,7 +1878,7 @@ export default class sider extends PureComponent {
                     </div>
                     <Collapse
                       bordered={false}
-                      style={{ position: 'relative', left: -18 }}
+                      style={{ position: "relative", left: -18 }}
                       onChange={() =>
                         this.setState({ previewVisible_min: false })
                       }
@@ -1889,11 +1895,11 @@ export default class sider extends PureComponent {
                           fileList={fileList}
                           onPreview={file => {
                             switch (file.fileExtend) {
-                              case 'pdf':
-                              case 'doc':
-                              case 'docx':
-                              case 'ppt':
-                              case 'pptx':
+                              case "pdf":
+                              case "doc":
+                              case "docx":
+                              case "ppt":
+                              case "pptx":
                                 window.open(file.url);
                                 break;
                               default:
@@ -1916,7 +1922,7 @@ export default class sider extends PureComponent {
                             icon="picture"
                             onClick={e => {
                               e.stopPropagation();
-                              emitter.emit('screenshot', {
+                              emitter.emit("screenshot", {
                                 show: true
                               });
                             }}
@@ -1933,7 +1939,7 @@ export default class sider extends PureComponent {
           </div>
           <div
             style={{
-              display: showCompany ? 'none' : 'block'
+              display: showCompany ? "none" : "block"
             }}
           >
             <Spins show={showSpin} />
@@ -1944,15 +1950,15 @@ export default class sider extends PureComponent {
                 left: 173,
                 top: 62,
                 zIndex: 1,
-                position: 'absolute'
+                position: "absolute"
               }}
             >
               <Button
                 icon="rollback"
                 shape="circle"
                 style={{
-                  float: 'right',
-                  color: '#1890ff',
+                  float: "right",
+                  color: "#1890ff",
                   fontSize: 18,
                   zIndex: 1
                 }}
@@ -1961,7 +1967,7 @@ export default class sider extends PureComponent {
                   if (projectEdit) {
                     Modal.confirm({
                       title: `确定放弃填写的内容？`,
-                      content: '',
+                      content: "",
                       onOk() {
                         self.setState({ showProjectDetail: false });
                         self.closeAll();
@@ -1973,11 +1979,11 @@ export default class sider extends PureComponent {
                       showProjectDetail: false,
                       projectEdit: false
                     });
-                    emitter.emit('showSiderbarDetail', {
+                    emitter.emit("showSiderbarDetail", {
                       show: false,
-                      from: 'spot'
+                      from: "spot"
                     });
-                    emitter.emit('showProjectDetail', {
+                    emitter.emit("showProjectDetail", {
                       show: false,
                       edit: false
                     });
@@ -1986,11 +1992,11 @@ export default class sider extends PureComponent {
                 }}
               />
               <Button
-                icon={projectEdit ? 'check' : 'edit'}
+                icon={projectEdit ? "check" : "edit"}
                 shape="circle"
                 style={{
-                  float: 'right',
-                  color: '#1890ff',
+                  float: "right",
+                  color: "#1890ff",
                   fontSize: 18,
                   zIndex: 1
                 }}
@@ -2001,27 +2007,27 @@ export default class sider extends PureComponent {
                       if (!err) {
                         console.log(v);
                         if (v.districtCodes.length === 0) {
-                          notification['warning']({
-                            message: '请选择涉及县'
+                          notification["warning"]({
+                            message: "请选择涉及县"
                           });
                           return;
                         }
                         const data = {
                           ...v,
                           attachmentId: ParentId,
-                          districtCodes: v.districtCodes.join(','),
+                          districtCodes: v.districtCodes.join(","),
                           districtCodeId:
                             v.districtCodeId && v.districtCodeId.length
                               ? v.districtCodeId.pop()
-                              : '',
-                          id: isProjectUpdate ? projectItem.id : '',
+                              : "",
+                          id: isProjectUpdate ? projectItem.id : "",
                           isNeedPlan: v.isNeedPlan ? true : false,
                           isReply: v.isReply ? true : false,
                           isProjectSupervise
                         };
-                        emitter.emit('projectCreateUpdate', data);
+                        emitter.emit("projectCreateUpdate", data);
                       } else {
-                        notification['warning']({
+                        notification["warning"]({
                           message: err.projectName.errors[0].message
                         });
                       }
@@ -2030,7 +2036,7 @@ export default class sider extends PureComponent {
                     this.setState({
                       projectEdit: !projectEdit
                     });
-                    emitter.emit('showProjectDetail', {
+                    emitter.emit("showProjectDetail", {
                       show: true,
                       edit: true,
                       id: projectItem.id
@@ -2041,8 +2047,8 @@ export default class sider extends PureComponent {
             </p>
             <div
               style={{
-                display: previewVisible_min_left ? 'block' : 'none',
-                position: 'fixed',
+                display: previewVisible_min_left ? "block" : "none",
+                position: "fixed",
                 zIndex: 2,
                 width: 305,
                 height: 305
@@ -2052,13 +2058,13 @@ export default class sider extends PureComponent {
                 type="close"
                 style={{
                   fontSize: 18,
-                  position: 'absolute',
+                  position: "absolute",
                   top: 10,
                   right: 10
                 }}
                 onClick={() => {
                   this.setState({ previewVisible_min_left: false });
-                  emitter.emit('imgLocation', {
+                  emitter.emit("imgLocation", {
                     Latitude: 0,
                     Longitude: 0,
                     show: false
@@ -2067,7 +2073,7 @@ export default class sider extends PureComponent {
               />
               <img
                 alt="example"
-                style={{ width: '100%', height: '100%', cursor: 'pointer' }}
+                style={{ width: "100%", height: "100%", cursor: "pointer" }}
                 src={previewImage}
                 onClick={() => {
                   this.setState({
@@ -2079,7 +2085,7 @@ export default class sider extends PureComponent {
             </div>
             <div
               style={{
-                display: projectEdit ? 'none' : 'block'
+                display: projectEdit ? "none" : "block"
               }}
             >
               <p>
@@ -2087,7 +2093,7 @@ export default class sider extends PureComponent {
               </p>
               <p
                 style={{
-                  position: 'relative',
+                  position: "relative",
                   left: 10,
                   marginTop: 10
                   // borderBottom: "solid 1px #dedede",
@@ -2099,15 +2105,15 @@ export default class sider extends PureComponent {
                   {this.find(
                     districtTreeFilter,
                     projectItem.projectBase.districtCodeId,
-                    'label'
+                    "label"
                   )}
                   {projectItem.projectBase.addressInfo}
                 </span>
                 <Icon
                   type="environment"
                   style={{
-                    float: 'right',
-                    color: '#1890ff',
+                    float: "right",
+                    color: "#1890ff",
                     fontSize: 18,
                     zIndex: 1
                   }}
@@ -2123,17 +2129,17 @@ export default class sider extends PureComponent {
               <List
                 style={{
                   width: 310,
-                  position: 'relation',
+                  position: "relation",
                   paddingRight: 30
                 }}
               >
-                <Collapse bordered={false} defaultActiveKey={['1', '2']}>
+                <Collapse bordered={false} defaultActiveKey={["1", "2"]}>
                   <Collapse.Panel header={<b>基本信息</b>} key="1">
                     <div
                       style={{
                         // borderBottom: "solid 1px #dedede",
                         // paddingBottom: 10,
-                        position: 'relative'
+                        position: "relative"
                       }}
                     >
                       <p style={{ marginBottom: 10 }}>
@@ -2141,14 +2147,14 @@ export default class sider extends PureComponent {
                         <span>
                           {this.getDepart(
                             projectItem.productDepartment,
-                            'name'
+                            "name"
                           )}
                         </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>监管单位：</span>
                         <span>
-                          {this.getDepart(projectItem.supDepartment, 'name')}
+                          {this.getDepart(projectItem.supDepartment, "name")}
                         </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
@@ -2156,23 +2162,23 @@ export default class sider extends PureComponent {
                         <span>
                           {projectItem.riverBasinOU
                             ? projectItem.riverBasinOU.name
-                            : ''}
+                            : ""}
                         </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>编报方案：</span>
                         <span>
-                          {projectItem.isNeedPlan ? '需要' : '不需要'}
+                          {projectItem.isNeedPlan ? "需要" : "不需要"}
                         </span>
                       </p>
 
-                      <div style={{ display: showPlan ? 'block' : 'none' }}>
+                      <div style={{ display: showPlan ? "block" : "none" }}>
                         <p style={{ marginBottom: 10 }}>
                           <span>批复机构：</span>
                           <span>
                             {this.getDepart(
                               projectItem.replyDepartment,
-                              'name'
+                              "name"
                             )}
                           </span>
                         </p>
@@ -2230,25 +2236,25 @@ export default class sider extends PureComponent {
                         <span>
                           {(projectItem.projectBase.districtCodes || [])
                             .map(item => item.name)
-                            .join('，')}
+                            .join("，")}
                         </span>
                       </p>
-                      <p style={{ textAlign: 'justify' }}>
+                      <p style={{ textAlign: "justify" }}>
                         <span>备注：</span>
                         <span>{projectItem.description}</span>
                       </p>
                       <a
                         style={{
-                          position: 'absolute',
+                          position: "absolute",
                           right: 40,
                           bottom: 0,
-                          userSelect: 'none'
+                          userSelect: "none"
                         }}
                         onClick={() => {
                           this.setState({
                             showProjectAllInfo: !showProjectAllInfo
                           });
-                          emitter.emit('showProjectDetail', {
+                          emitter.emit("showProjectDetail", {
                             show: !showProjectAllInfo,
                             edit: false,
                             id: projectItem.id
@@ -2259,20 +2265,20 @@ export default class sider extends PureComponent {
                       </a>
                       <a
                         style={{
-                          display: isProjectUpdate ? 'inherit' : 'none',
-                          position: 'absolute',
+                          display: isProjectUpdate ? "inherit" : "none",
+                          position: "absolute",
                           right: 0,
                           bottom: 0,
-                          userSelect: 'none'
+                          userSelect: "none"
                         }}
                         onClick={() => {
                           Modal.confirm({
-                            title: '是否确定要删除这条项目数据？',
+                            title: "是否确定要删除这条项目数据？",
                             content:
-                              ' 删除项目信息、项目关联的红线、项目关联的责任追究；删除项目关联的扰动图斑里的关联项目ID。 ',
-                            okText: '确定',
-                            okType: 'danger',
-                            cancelText: '取消',
+                              " 删除项目信息、项目关联的红线、项目关联的责任追究；删除项目关联的扰动图斑里的关联项目ID。 ",
+                            okText: "确定",
+                            okType: "danger",
+                            cancelText: "取消",
                             onOk() {
                               self.projectDelete(projectItem.id);
                             },
@@ -2293,15 +2299,15 @@ export default class sider extends PureComponent {
                           style={{
                             marginLeft: 10,
                             fontSize: 16,
-                            color: '#1890ff'
+                            color: "#1890ff"
                           }}
                           onClick={e => {
                             e.stopPropagation();
-                            emitter.emit('showInspect', {
+                            emitter.emit("showInspect", {
                               show: true,
                               id: null,
                               projectId: projectItem.id,
-                              from: 'add'
+                              from: "add"
                             });
                           }}
                         />
@@ -2313,14 +2319,14 @@ export default class sider extends PureComponent {
                     {inspectList.map((item, index) => (
                       <p
                         key={index}
-                        style={{ cursor: 'pointer' }}
+                        style={{ cursor: "pointer" }}
                         onClick={() => {
                           this.closeAll();
-                          emitter.emit('showInspect', {
+                          emitter.emit("showInspect", {
                             show: true,
                             id: item.id,
                             projectId: projectItem.id,
-                            from: 'edit'
+                            from: "edit"
                           });
                         }}
                       >
@@ -2329,23 +2335,23 @@ export default class sider extends PureComponent {
                           <Icon
                             type="delete"
                             style={{
-                              float: 'right',
+                              float: "right",
                               fontSize: 18,
-                              color: '#1890ff',
+                              color: "#1890ff",
                               marginLeft: 15
                             }}
                             onClick={e => {
                               e.stopPropagation();
                               Modal.confirm({
-                                title: '删除检查表',
-                                content: '是否确定要删除这条检查表？',
-                                okText: '确定',
-                                okType: 'danger',
-                                cancelText: '取消',
+                                title: "删除检查表",
+                                content: "是否确定要删除这条检查表？",
+                                okText: "确定",
+                                okType: "danger",
+                                cancelText: "取消",
                                 onOk() {
                                   self.showSpin(true);
                                   dispatch({
-                                    type: 'inspect/inspectDelete',
+                                    type: "inspect/inspectDelete",
                                     payload: {
                                       id: item.id
                                     },
@@ -2353,7 +2359,7 @@ export default class sider extends PureComponent {
                                       self.showSpin(false);
                                       if (success) {
                                         self.closeAll();
-                                        emitter.emit('projectInfoRefresh', {
+                                        emitter.emit("projectInfoRefresh", {
                                           projectId: projectItem.id
                                         });
                                       }
@@ -2368,11 +2374,11 @@ export default class sider extends PureComponent {
                             type="environment"
                             style={{
                               display: item.problemPoints.length
-                                ? 'block'
-                                : 'none',
-                              float: 'right',
+                                ? "block"
+                                : "none",
+                              float: "right",
                               fontSize: 18,
-                              color: '#1890ff',
+                              color: "#1890ff",
                               marginLeft: 15
                             }}
                             onClick={e => {
@@ -2381,7 +2387,7 @@ export default class sider extends PureComponent {
                                 mapLocation({
                                   item: item.problemPoints,
                                   id: item.problemPoints[0].id,
-                                  key: 'problemPoint'
+                                  key: "problemPoint"
                                 });
                               }
                             }}
@@ -2389,15 +2395,15 @@ export default class sider extends PureComponent {
                           <Icon
                             type="picture"
                             style={{
-                              display: item.attachment ? 'block' : 'none',
-                              float: 'right',
+                              display: item.attachment ? "block" : "none",
+                              float: "right",
                               fontSize: 18,
-                              color: '#1890ff',
+                              color: "#1890ff",
                               marginLeft: 15
                             }}
                             onClick={e => {
                               e.stopPropagation();
-                              emitter.emit('pictureLocation', {
+                              emitter.emit("pictureLocation", {
                                 item: item.attachment.child
                               });
                             }}
@@ -2405,19 +2411,19 @@ export default class sider extends PureComponent {
                           <Icon
                             type="plus"
                             style={{
-                              float: 'right',
+                              float: "right",
                               fontSize: 18,
-                              color: '#1890ff'
+                              color: "#1890ff"
                             }}
                             onClick={e => {
                               e.stopPropagation();
                               this.closeAll();
-                              emitter.emit('showProblemPoint', {
+                              emitter.emit("showProblemPoint", {
                                 show: true,
                                 id: null,
                                 inspectId: item.id,
                                 projectId: projectItem.id,
-                                from: 'add'
+                                from: "add"
                               });
                             }}
                           />
@@ -2426,19 +2432,19 @@ export default class sider extends PureComponent {
                         {item.problemPoints.map((ite, idx) => (
                           <p
                             key={idx}
-                            style={{ paddingLeft: 30, margin: '5px 0' }}
+                            style={{ paddingLeft: 30, margin: "5px 0" }}
                           >
                             <span>
                               <span
                                 onClick={e => {
                                   e.stopPropagation();
                                   this.closeAll();
-                                  emitter.emit('showProblemPoint', {
+                                  emitter.emit("showProblemPoint", {
                                     show: true,
                                     id: ite.id,
                                     inspectId: item.id,
                                     projectId: projectItem.id,
-                                    from: 'edit'
+                                    from: "edit"
                                   });
                                 }}
                               >
@@ -2447,23 +2453,23 @@ export default class sider extends PureComponent {
                               <Icon
                                 type="delete"
                                 style={{
-                                  float: 'right',
+                                  float: "right",
                                   fontSize: 18,
-                                  color: '#1890ff',
+                                  color: "#1890ff",
                                   marginLeft: 15
                                 }}
                                 onClick={e => {
                                   e.stopPropagation();
                                   Modal.confirm({
-                                    title: '删除问题点',
-                                    content: '是否确定要删除这个问题点？',
-                                    okText: '确定',
-                                    okType: 'danger',
-                                    cancelText: '取消',
+                                    title: "删除问题点",
+                                    content: "是否确定要删除这个问题点？",
+                                    okText: "确定",
+                                    okType: "danger",
+                                    cancelText: "取消",
                                     onOk() {
                                       self.showSpin(true);
                                       dispatch({
-                                        type: 'problemPoint/problemPointDelete',
+                                        type: "problemPoint/problemPointDelete",
                                         payload: {
                                           id: ite.id
                                         },
@@ -2471,7 +2477,7 @@ export default class sider extends PureComponent {
                                           self.showSpin(false);
                                           if (success) {
                                             self.closeAll();
-                                            emitter.emit('projectInfoRefresh', {
+                                            emitter.emit("projectInfoRefresh", {
                                               projectId: projectItem.id
                                             });
                                           }
@@ -2485,9 +2491,9 @@ export default class sider extends PureComponent {
                               <Icon
                                 type="environment"
                                 style={{
-                                  float: 'right',
+                                  float: "right",
                                   fontSize: 18,
-                                  color: '#1890ff',
+                                  color: "#1890ff",
                                   marginLeft: 15
                                 }}
                                 onClick={e => {
@@ -2495,21 +2501,21 @@ export default class sider extends PureComponent {
                                   mapLocation({
                                     item: item.problemPoints,
                                     id: ite.id,
-                                    key: 'problemPoint'
+                                    key: "problemPoint"
                                   });
                                 }}
                               />
                               <Icon
                                 type="picture"
                                 style={{
-                                  display: ite.attachment ? 'block' : 'none',
-                                  float: 'right',
+                                  display: ite.attachment ? "block" : "none",
+                                  float: "right",
                                   fontSize: 18,
-                                  color: '#1890ff'
+                                  color: "#1890ff"
                                 }}
                                 onClick={e => {
                                   e.stopPropagation();
-                                  emitter.emit('pictureLocation', {
+                                  emitter.emit("pictureLocation", {
                                     item: ite.attachment.child
                                   });
                                 }}
@@ -2529,12 +2535,12 @@ export default class sider extends PureComponent {
                           style={{
                             marginLeft: 10,
                             fontSize: 16,
-                            color: '#1890ff'
+                            color: "#1890ff"
                           }}
                           onClick={e => {
                             e.stopPropagation();
-                            notification['info']({
-                              message: '新建监督执法记录'
+                            notification["info"]({
+                              message: "新建监督执法记录"
                             });
                           }}
                         />
@@ -2543,7 +2549,7 @@ export default class sider extends PureComponent {
                     key="3"
                   >
                     <p
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: "pointer" }}
                       onClick={() => {
                         this.setState({ showCompany: true });
                         this.closeAll();
@@ -2553,37 +2559,37 @@ export default class sider extends PureComponent {
                       <Icon
                         type="delete"
                         style={{
-                          float: 'right',
+                          float: "right",
                           fontSize: 18,
-                          cursor: 'point',
-                          color: '#1890ff'
+                          cursor: "point",
+                          color: "#1890ff"
                         }}
                         onClick={e => {
                           e.stopPropagation();
-                          notification['info']({
-                            message: '删除监督执法记录'
+                          notification["info"]({
+                            message: "删除监督执法记录"
                           });
                         }}
                       />
                       <Icon
                         type="file-text"
                         style={{
-                          float: 'right',
+                          float: "right",
                           fontSize: 16,
-                          cursor: 'point',
-                          color: '#1890ff',
+                          cursor: "point",
+                          color: "#1890ff",
                           marginRight: 10
                         }}
                         onClick={e => {
                           e.stopPropagation();
-                          notification['info']({
-                            message: '查看监督执法记录报告'
+                          notification["info"]({
+                            message: "查看监督执法记录报告"
                           });
                         }}
                       />
                     </p>
                     <p
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: "pointer" }}
                       onClick={() => {
                         this.setState({ showCompany: true });
                         this.closeAll();
@@ -2593,31 +2599,31 @@ export default class sider extends PureComponent {
                       <Icon
                         type="delete"
                         style={{
-                          float: 'right',
+                          float: "right",
                           fontSize: 18,
-                          cursor: 'point',
-                          color: '#1890ff'
+                          cursor: "point",
+                          color: "#1890ff"
                         }}
                         onClick={e => {
                           e.stopPropagation();
-                          notification['info']({
-                            message: '删除监督执法记录'
+                          notification["info"]({
+                            message: "删除监督执法记录"
                           });
                         }}
                       />
                       <Icon
                         type="file-text"
                         style={{
-                          float: 'right',
+                          float: "right",
                           fontSize: 16,
-                          cursor: 'point',
-                          color: '#1890ff',
+                          cursor: "point",
+                          color: "#1890ff",
                           marginRight: 10
                         }}
                         onClick={e => {
                           e.stopPropagation();
-                          notification['info']({
-                            message: '查看监督执法记录报告'
+                          notification["info"]({
+                            message: "查看监督执法记录报告"
                           });
                         }}
                       />
@@ -2632,23 +2638,23 @@ export default class sider extends PureComponent {
                           style={{
                             marginLeft: 10,
                             fontSize: 16,
-                            color: '#1890ff'
+                            color: "#1890ff"
                           }}
                           onClick={e => {
                             e.stopPropagation();
-                            emitter.emit('drawGraphics', {
+                            emitter.emit("drawGraphics", {
                               draw: true,
-                              state: 'add',
-                              type: 'spot',
+                              state: "add",
+                              type: "spot",
                               fromList: false,
                               projectId: projectItem.id,
                               projectName: projectItem.projectBase.name
                             });
-                            emitter.emit('showSiderbarDetail', {
+                            emitter.emit("showSiderbarDetail", {
                               show: false,
                               edit: true,
                               from: key,
-                              type: 'add'
+                              type: "add"
                             });
                           }}
                         />
@@ -2657,14 +2663,14 @@ export default class sider extends PureComponent {
                           style={{
                             marginLeft: 10,
                             fontSize: 16,
-                            color: '#1890ff'
+                            color: "#1890ff"
                           }}
                           onClick={e => {
                             e.stopPropagation();
                             //图斑关联
-                            emitter.emit('spotRelate', {
-                              status: 'start', //start：开始，end：结束
-                              spotId: '',
+                            emitter.emit("spotRelate", {
+                              status: "start", //start：开始，end：结束
+                              spotId: "",
                               projectId: projectItem.id
                             });
                           }}
@@ -2672,7 +2678,7 @@ export default class sider extends PureComponent {
                         <Switch
                           checkedChildren="归档图斑"
                           unCheckedChildren="现状数据"
-                          style={{ position: 'relative', left: 10, top: -2 }}
+                          style={{ position: "relative", left: 10, top: -2 }}
                           onChange={(v, e) => {
                             e.stopPropagation();
                             this.setState({ isArchivalSpot: v });
@@ -2688,14 +2694,14 @@ export default class sider extends PureComponent {
                     {projectInfoSpotList.items.map((item, index) => (
                       <p
                         key={index}
-                        style={{ cursor: 'pointer' }}
+                        style={{ cursor: "pointer" }}
                         onClick={() => {
                           this.closeAll();
-                          emitter.emit('showSiderbarDetail', {
+                          emitter.emit("showSiderbarDetail", {
                             show: true,
                             edit: false,
-                            from: 'spot',
-                            type: 'edit',
+                            from: "spot",
+                            type: "edit",
                             id: item.id,
                             fromList: false,
                             projectId: projectItem.id
@@ -2703,28 +2709,28 @@ export default class sider extends PureComponent {
                         }}
                       >
                         {item.mapNum}
-                        {isArchivalSpot ? item.archiveTime.slice(0, 10) : ''}
+                        {isArchivalSpot ? item.archiveTime.slice(0, 10) : ""}
                         <Icon
                           type="disconnect"
                           style={{
-                            float: 'right',
+                            float: "right",
                             fontSize: 18,
-                            cursor: 'point',
-                            color: '#1890ff'
+                            cursor: "point",
+                            color: "#1890ff"
                           }}
                           onClick={e => {
                             e.stopPropagation();
                             dispatch({
-                              type: 'project/projectUnbindSpotApi',
+                              type: "project/projectUnbindSpotApi",
                               payload: {
                                 projectId: projectItem.id,
                                 spotId: item.id
                               },
                               callback: (success, error, result) => {
-                                notification[success ? 'success' : 'error']({
+                                notification[success ? "success" : "error"]({
                                   message: `取消关联扰动图斑${
-                                    success ? '成功' : '失败'
-                                  }${success ? '' : `：${error.message}`}`
+                                    success ? "成功" : "失败"
+                                  }${success ? "" : `：${error.message}`}`
                                 });
                                 if (success) {
                                   this.querySpotByProjectId(projectItem.id);
@@ -2736,17 +2742,17 @@ export default class sider extends PureComponent {
                         <Icon
                           type="environment"
                           style={{
-                            float: 'right',
+                            float: "right",
                             fontSize: 16,
-                            cursor: 'point',
-                            color: '#1890ff',
+                            cursor: "point",
+                            color: "#1890ff",
                             marginRight: isArchivalSpot ? 0 : 10
                           }}
                           onClick={e => {
                             e.stopPropagation();
                             mapLocation({
                               item,
-                              key: 'spot'
+                              key: "spot"
                             });
                           }}
                         />
@@ -2762,23 +2768,23 @@ export default class sider extends PureComponent {
                           style={{
                             marginLeft: 10,
                             fontSize: 16,
-                            color: '#1890ff'
+                            color: "#1890ff"
                           }}
                           onClick={e => {
                             e.stopPropagation();
-                            emitter.emit('drawGraphics', {
+                            emitter.emit("drawGraphics", {
                               draw: true,
-                              state: 'add',
-                              type: 'redLine',
+                              state: "add",
+                              type: "redLine",
                               projectId: projectItem.id,
                               fromList: false,
                               projectName: projectItem.projectBase.name
                             });
-                            emitter.emit('showSiderbarDetail', {
+                            emitter.emit("showSiderbarDetail", {
                               show: false,
                               edit: true,
                               from: key,
-                              type: 'add'
+                              type: "add"
                             });
                           }}
                         />
@@ -2789,14 +2795,14 @@ export default class sider extends PureComponent {
                     {redLineList.items.map((item, index) => (
                       <p
                         key={index}
-                        style={{ cursor: 'pointer' }}
+                        style={{ cursor: "pointer" }}
                         onClick={() => {
                           this.closeAll();
-                          emitter.emit('showSiderbarDetail', {
+                          emitter.emit("showSiderbarDetail", {
                             show: true,
                             edit: false,
-                            from: 'redLine',
-                            type: 'edit',
+                            from: "redLine",
+                            type: "edit",
                             id: item.id,
                             projectId: projectItem.id
                           });
@@ -2806,28 +2812,28 @@ export default class sider extends PureComponent {
                         <Icon
                           type="delete"
                           style={{
-                            float: 'right',
+                            float: "right",
                             fontSize: 18,
-                            cursor: 'point',
-                            color: '#1890ff'
+                            cursor: "point",
+                            color: "#1890ff"
                           }}
                           onClick={e => {
                             e.stopPropagation();
                             Modal.confirm({
-                              title: '删除',
-                              content: '是否确定要删除这条项目红线数据？',
-                              okText: '确定',
-                              okType: 'danger',
-                              cancelText: '取消',
+                              title: "删除",
+                              content: "是否确定要删除这条项目红线数据？",
+                              okText: "确定",
+                              okType: "danger",
+                              cancelText: "取消",
                               onOk() {
                                 dispatch({
-                                  type: 'redLine/redLineDelete',
+                                  type: "redLine/redLineDelete",
                                   payload: {
                                     id: item.id
                                   },
                                   callback: success => {
                                     if (success) {
-                                      emitter.emit('projectInfoRefresh', {
+                                      emitter.emit("projectInfoRefresh", {
                                         projectId: projectItem.id
                                       });
                                     }
@@ -2841,17 +2847,17 @@ export default class sider extends PureComponent {
                         <Icon
                           type="environment"
                           style={{
-                            float: 'right',
+                            float: "right",
                             fontSize: 16,
-                            cursor: 'point',
-                            color: '#1890ff',
+                            cursor: "point",
+                            color: "#1890ff",
                             marginRight: 10
                           }}
                           onClick={e => {
                             e.stopPropagation();
                             mapLocation({
                               item,
-                              key: 'redLine'
+                              key: "redLine"
                             });
                           }}
                         />
@@ -2867,12 +2873,12 @@ export default class sider extends PureComponent {
                           style={{
                             marginLeft: 10,
                             fontSize: 16,
-                            color: '#1890ff'
+                            color: "#1890ff"
                           }}
                           onClick={e => {
                             e.stopPropagation();
-                            notification['info']({
-                              message: '新建责任点'
+                            notification["info"]({
+                              message: "新建责任点"
                             });
                           }}
                         />
@@ -2885,10 +2891,10 @@ export default class sider extends PureComponent {
                       <Icon
                         type="environment"
                         style={{
-                          float: 'right',
+                          float: "right",
                           fontSize: 18,
-                          cursor: 'point',
-                          color: '#1890ff'
+                          cursor: "point",
+                          color: "#1890ff"
                         }}
                       />
                     </p>
@@ -2897,10 +2903,10 @@ export default class sider extends PureComponent {
                       <Icon
                         type="environment"
                         style={{
-                          float: 'right',
+                          float: "right",
                           fontSize: 18,
-                          cursor: 'point',
-                          color: '#1890ff'
+                          cursor: "point",
+                          color: "#1890ff"
                         }}
                       />
                     </p>
@@ -2909,10 +2915,10 @@ export default class sider extends PureComponent {
                       <Icon
                         type="environment"
                         style={{
-                          float: 'right',
+                          float: "right",
                           fontSize: 18,
-                          cursor: 'point',
-                          color: '#1890ff'
+                          cursor: "point",
+                          color: "#1890ff"
                         }}
                       />
                     </p>
@@ -2921,10 +2927,10 @@ export default class sider extends PureComponent {
                       <Icon
                         type="environment"
                         style={{
-                          float: 'right',
+                          float: "right",
                           fontSize: 18,
-                          cursor: 'point',
-                          color: '#1890ff'
+                          cursor: "point",
+                          color: "#1890ff"
                         }}
                       />
                     </p>
@@ -2933,10 +2939,10 @@ export default class sider extends PureComponent {
                       <Icon
                         type="environment"
                         style={{
-                          float: 'right',
+                          float: "right",
                           fontSize: 18,
-                          cursor: 'point',
-                          color: '#1890ff'
+                          cursor: "point",
+                          color: "#1890ff"
                         }}
                       />
                     </p>
@@ -2950,15 +2956,15 @@ export default class sider extends PureComponent {
                           style={{
                             marginLeft: 10,
                             fontSize: 16,
-                            color: '#1890ff'
+                            color: "#1890ff"
                           }}
                           onClick={e => {
                             e.stopPropagation();
-                            emitter.emit('showSiderbarDetail', {
-                              from: 'panorama',
+                            emitter.emit("showSiderbarDetail", {
+                              from: "panorama",
                               show: true,
                               edit: true,
-                              type: 'add',
+                              type: "add",
                               id: null,
                               projectId: projectItem.id,
                               item: {}
@@ -2972,14 +2978,14 @@ export default class sider extends PureComponent {
                     {panoramaList.items.map((item, index) => (
                       <p
                         key={index}
-                        style={{ cursor: 'pointer' }}
+                        style={{ cursor: "pointer" }}
                         onClick={() => {
                           this.closeAll();
-                          emitter.emit('showSiderbarDetail', {
-                            from: 'panorama',
+                          emitter.emit("showSiderbarDetail", {
+                            from: "panorama",
                             show: true,
                             edit: false,
-                            type: 'edit',
+                            type: "edit",
                             id: item.id,
                             projectId: projectItem.id,
                             item
@@ -2990,28 +2996,28 @@ export default class sider extends PureComponent {
                         <Icon
                           type="delete"
                           style={{
-                            float: 'right',
+                            float: "right",
                             fontSize: 18,
-                            cursor: 'point',
-                            color: '#1890ff'
+                            cursor: "point",
+                            color: "#1890ff"
                           }}
                           onClick={e => {
                             e.stopPropagation();
                             Modal.confirm({
-                              title: '删除',
-                              content: '是否确定要删除？',
-                              okText: '确定',
-                              okType: 'danger',
-                              cancelText: '取消',
+                              title: "删除",
+                              content: "是否确定要删除？",
+                              okText: "确定",
+                              okType: "danger",
+                              cancelText: "取消",
                               onOk() {
                                 dispatch({
-                                  type: 'panorama/panoramaDelete',
+                                  type: "panorama/panoramaDelete",
                                   payload: {
                                     id: item.id
                                   },
                                   callback: success => {
                                     if (success) {
-                                      emitter.emit('projectInfoRefresh', {
+                                      emitter.emit("projectInfoRefresh", {
                                         projectId: projectItem.id
                                       });
                                     }
@@ -3025,15 +3031,15 @@ export default class sider extends PureComponent {
                         <Icon
                           type="environment"
                           style={{
-                            float: 'right',
+                            float: "right",
                             fontSize: 16,
-                            cursor: 'point',
-                            color: '#1890ff',
+                            cursor: "point",
+                            color: "#1890ff",
                             marginRight: 10
                           }}
                           onClick={e => {
                             e.stopPropagation();
-                            emitter.emit('fullViewLocation', {
+                            emitter.emit("fullViewLocation", {
                               ...item
                             });
                           }}
@@ -3046,26 +3052,26 @@ export default class sider extends PureComponent {
             </div>
             <div
               style={{
-                display: projectEdit ? 'block' : 'none',
+                display: projectEdit ? "block" : "none",
                 paddingTop: 30
               }}
             >
               <Form
                 // layout="inline"
-                style={{ position: 'relative', paddingBottom: 10 }}
+                style={{ position: "relative", paddingBottom: 10 }}
               >
                 <Form.Item
                   label={
                     <span>
-                      <b style={{ color: 'red' }}>*</b>
+                      <b style={{ color: "red" }}>*</b>
                       项目名
                     </span>
                   }
                   {...formItemLayout}
                 >
-                  {getFieldDecorator('projectName', {
+                  {getFieldDecorator("projectName", {
                     initialValue: projectItem.projectBase.name,
-                    rules: [{ required: true, message: '项目名不能为空' }]
+                    rules: [{ required: true, message: "项目名不能为空" }]
                   })(
                     <AutoComplete
                       style={{ width: 200 }}
@@ -3077,7 +3083,7 @@ export default class sider extends PureComponent {
                       }
                       onChange={v => {
                         dispatch({
-                          type: 'project/queryProjectAdd',
+                          type: "project/queryProjectAdd",
                           payload: {
                             SkipCount: 0,
                             MaxResultCount: 5,
@@ -3086,28 +3092,28 @@ export default class sider extends PureComponent {
                         });
                       }}
                       onBlur={() => {
-                        const v = getFieldValue('projectName');
+                        const v = getFieldValue("projectName");
                         if (v) {
                           dispatch({
-                            type: 'project/projectVerify',
+                            type: "project/projectVerify",
                             payload: {
                               name: v
                             },
                             callback: (success, result) => {
                               if (!result.isValid) {
                                 setFieldsValue({
-                                  projectName: ''
+                                  projectName: ""
                                 });
                                 if (result.isArchive) {
-                                  notification['warning']({
+                                  notification["warning"]({
                                     message: `该项目名已存在并且已归档，请重新输入`
                                   });
                                 }
-                                notification['warning']({
+                                notification["warning"]({
                                   message: `该项目名已存在，请重新输入`
                                 });
                               } else {
-                                notification['success']({
+                                notification["success"]({
                                   message: `该项目名可用`
                                 });
                               }
@@ -3119,11 +3125,11 @@ export default class sider extends PureComponent {
                   )}
                 </Form.Item>
                 <Form.Item label="所在地区" {...formItemLayout}>
-                  {getFieldDecorator('districtCodeId', {
+                  {getFieldDecorator("districtCodeId", {
                     initialValue: this.find(
                       districtTreeFilter,
                       projectItem.projectBase.districtCodeId,
-                      'value'
+                      "value"
                     )
                   })(
                     <Cascader
@@ -3134,34 +3140,34 @@ export default class sider extends PureComponent {
                   )}
                 </Form.Item>
                 <Form.Item label="详细地址" {...formItemLayout}>
-                  {getFieldDecorator('addressInfo', {
+                  {getFieldDecorator("addressInfo", {
                     initialValue: projectItem.projectBase.addressInfo
                   })(<Input />)}
                 </Form.Item>
                 <Form.Item label="坐标" {...formItemLayout}>
-                  {getFieldDecorator('pointX', {
+                  {getFieldDecorator("pointX", {
                     initialValue: projectItem.projectBase.pointX
                   })(<Input placeholder="经度" style={{ width: 72 }} />)}
-                  {getFieldDecorator('pointY', {
+                  {getFieldDecorator("pointY", {
                     initialValue: projectItem.projectBase.pointY
                   })(
                     <Input
                       placeholder="纬度"
-                      style={{ width: 110, position: 'relative', top: -2 }}
+                      style={{ width: 110, position: "relative", top: -2 }}
                       addonAfter={
                         <Icon
                           type="environment"
                           style={{
-                            color: '#1890ff'
+                            color: "#1890ff"
                           }}
                           onClick={() => {
-                            const x = getFieldValue('pointX');
-                            const y = getFieldValue('pointY');
-                            emitter.emit('siteLocation', {
-                              state: 'position',
+                            const x = getFieldValue("pointX");
+                            const y = getFieldValue("pointY");
+                            emitter.emit("siteLocation", {
+                              state: "position",
                               Longitude: x,
                               Latitude: y,
-                              type: 'project'
+                              type: "project"
                             });
                           }}
                         />
@@ -3171,29 +3177,29 @@ export default class sider extends PureComponent {
                 </Form.Item>
                 <Form.Item
                   label={
-                    <span style={{ userSelect: 'none' }}>
+                    <span style={{ userSelect: "none" }}>
                       建设单位
                       <Icon
                         type="plus"
                         style={{
-                          color: '#1890ff'
+                          color: "#1890ff"
                         }}
                         onClick={() => {
                           this.setState({
                             showCreateDepart: true,
-                            createDepartKey: 'productDepartmentId'
+                            createDepartKey: "productDepartmentId"
                           });
-                          setFieldsValue({ productDepartmentId: '' });
+                          setFieldsValue({ productDepartmentId: "" });
                         }}
                       />
                     </span>
                   }
                   {...formItemLayout}
                 >
-                  {getFieldDecorator('productDepartmentId', {
+                  {getFieldDecorator("productDepartmentId", {
                     initialValue: this.getDepart(
                       projectItem.productDepartment,
-                      'id'
+                      "id"
                     )
                   })(
                     <Select
@@ -3212,7 +3218,7 @@ export default class sider extends PureComponent {
                         this.queryDepartList(v, 2);
                       }}
                       onBlur={() => {
-                        this.getDepartList('productDepartmentId');
+                        this.getDepartList("productDepartmentId");
                       }}
                       onSelect={(v, e) => {
                         this.setState({ departSearch: e.props.children });
@@ -3227,10 +3233,10 @@ export default class sider extends PureComponent {
                   )}
                 </Form.Item>
                 <Form.Item label="监管单位" {...formItemLayout}>
-                  {getFieldDecorator('supDepartmentId', {
+                  {getFieldDecorator("supDepartmentId", {
                     initialValue: this.getDepart(
                       projectItem.supDepartment,
-                      'id'
+                      "id"
                     )
                   })(
                     <Select
@@ -3247,7 +3253,7 @@ export default class sider extends PureComponent {
                         this.queryDepartList(v, 1);
                       }}
                       onBlur={() => {
-                        this.getDepartList('supDepartmentId');
+                        this.getDepartList("supDepartmentId");
                       }}
                       onSelect={() => {
                         this.setState({ isSelect: true });
@@ -3262,10 +3268,10 @@ export default class sider extends PureComponent {
                   )}
                 </Form.Item>
                 <Form.Item label="流域管理机构" {...formItemLayout}>
-                  {getFieldDecorator('riverBasinOUId', {
+                  {getFieldDecorator("riverBasinOUId", {
                     initialValue: projectItem.riverBasinOU
                       ? projectItem.riverBasinOU.id
-                      : ''
+                      : ""
                   })(
                     <Select showSearch allowClear optionFilterProp="children">
                       {basinOrganList.map(item => (
@@ -3277,8 +3283,8 @@ export default class sider extends PureComponent {
                   )}
                 </Form.Item>
                 <Form.Item label="编报方案" {...formItemLayout}>
-                  {getFieldDecorator('isNeedPlan', {
-                    valuePropName: 'checked',
+                  {getFieldDecorator("isNeedPlan", {
+                    valuePropName: "checked",
                     initialValue: projectItem.isNeedPlan
                   })(
                     <Switch
@@ -3290,12 +3296,12 @@ export default class sider extends PureComponent {
                     />
                   )}
                 </Form.Item>
-                <div style={{ display: showPlan ? 'block' : 'none' }}>
+                <div style={{ display: showPlan ? "block" : "none" }}>
                   <Form.Item label="批复机构" {...formItemLayout}>
-                    {getFieldDecorator('replyDepartmentId', {
+                    {getFieldDecorator("replyDepartmentId", {
                       initialValue: this.getDepart(
                         projectItem.replyDepartment,
-                        'id'
+                        "id"
                       )
                     })(
                       <Select
@@ -3312,7 +3318,7 @@ export default class sider extends PureComponent {
                           this.queryDepartList(v, 1);
                         }}
                         onBlur={() => {
-                          this.getDepartList('supDepartmentId');
+                          this.getDepartList("supDepartmentId");
                         }}
                         onSelect={() => {
                           this.setState({ isSelect: true });
@@ -3327,26 +3333,26 @@ export default class sider extends PureComponent {
                     )}
                   </Form.Item>
                   <Form.Item label="批复文号" {...formItemLayout}>
-                    {getFieldDecorator('replyNum', {
+                    {getFieldDecorator("replyNum", {
                       initialValue: projectItem.replyNum
                     })(<Input />)}
                   </Form.Item>
                   <Form.Item label="批复时间" {...formItemLayout}>
-                    {getFieldDecorator('replyTime', {
+                    {getFieldDecorator("replyTime", {
                       initialValue: dateInitFormat(projectItem.replyTime)
                     })(<DatePicker />)}
                   </Form.Item>
                   <Form.Item label="责任面积" {...formItemLayout}>
-                    {getFieldDecorator('respArea', {
+                    {getFieldDecorator("respArea", {
                       initialValue: projectItem.expand.respArea
                     })(<Input addonAfter="公顷" />)}
                   </Form.Item>
                   <Form.Item label="立项级别" {...formItemLayout}>
-                    {getFieldDecorator('projectLevelId', {
+                    {getFieldDecorator("projectLevelId", {
                       initialValue: projectItem.projectLevelId
                     })(
                       <Select showSearch allowClear optionFilterProp="children">
-                        {this.dictList('立项级别').map(item => (
+                        {this.dictList("立项级别").map(item => (
                           <Select.Option value={item.id} key={item.id}>
                             {item.dictTableValue}
                           </Select.Option>
@@ -3356,7 +3362,7 @@ export default class sider extends PureComponent {
                   </Form.Item>
                 </div>
                 <Form.Item label="扰动合规性" {...formItemLayout}>
-                  {getFieldDecorator('complianceId', {
+                  {getFieldDecorator("complianceId", {
                     initialValue: projectItem.expand.complianceId
                   })(
                     <Select
@@ -3370,7 +3376,7 @@ export default class sider extends PureComponent {
                           : false
                       }
                     >
-                      {this.dictList('扰动合规性').map(item => (
+                      {this.dictList("扰动合规性").map(item => (
                         <Select.Option value={item.id} key={item.id}>
                           {item.dictTableValue}
                         </Select.Option>
@@ -3379,11 +3385,11 @@ export default class sider extends PureComponent {
                   )}
                 </Form.Item>
                 <Form.Item label="项目类别" {...formItemLayout}>
-                  {getFieldDecorator('projectCateId', {
+                  {getFieldDecorator("projectCateId", {
                     initialValue: projectItem.expand.projectCateId
                   })(
                     <Select showSearch allowClear optionFilterProp="children">
-                      {this.dictList('项目类别').map(item => (
+                      {this.dictList("项目类别").map(item => (
                         <Select.Option value={item.id} key={item.id}>
                           {item.dictTableValue}
                         </Select.Option>
@@ -3392,11 +3398,11 @@ export default class sider extends PureComponent {
                   )}
                 </Form.Item>
                 <Form.Item label="项目类型" {...formItemLayout}>
-                  {getFieldDecorator('projectTypeId', {
+                  {getFieldDecorator("projectTypeId", {
                     initialValue: projectItem.expand.projectTypeId
                   })(
                     <Select showSearch allowClear optionFilterProp="children">
-                      {this.dictList('项目类型').map(item => (
+                      {this.dictList("项目类型").map(item => (
                         <Select.Option value={item.id} key={item.id}>
                           {item.dictTableValue}
                         </Select.Option>
@@ -3405,11 +3411,11 @@ export default class sider extends PureComponent {
                   )}
                 </Form.Item>
                 <Form.Item label="建设状态" {...formItemLayout}>
-                  {getFieldDecorator('projectStatusId', {
+                  {getFieldDecorator("projectStatusId", {
                     initialValue: projectItem.projectStatusId
                   })(
                     <Select showSearch allowClear optionFilterProp="children">
-                      {this.dictList('建设状态').map(item => (
+                      {this.dictList("建设状态").map(item => (
                         <Select.Option value={item.id} key={item.id}>
                           {item.dictTableValue}
                         </Select.Option>
@@ -3418,11 +3424,11 @@ export default class sider extends PureComponent {
                   )}
                 </Form.Item>
                 <Form.Item label="项目性质" {...formItemLayout}>
-                  {getFieldDecorator('projectNatId', {
+                  {getFieldDecorator("projectNatId", {
                     initialValue: projectItem.expand.projectNatId
                   })(
                     <Select showSearch allowClear optionFilterProp="children">
-                      {this.dictList('项目性质').map(item => (
+                      {this.dictList("项目性质").map(item => (
                         <Select.Option value={item.id} key={item.id}>
                           {item.dictTableValue}
                         </Select.Option>
@@ -3433,14 +3439,14 @@ export default class sider extends PureComponent {
                 <Form.Item
                   label={
                     <span>
-                      <b style={{ color: 'red' }}>*</b>
+                      <b style={{ color: "red" }}>*</b>
                       涉及县
                     </span>
                   }
                   {...formItemLayout}
                 >
-                  {getFieldDecorator('districtCodes', {
-                    valuePropName: 'value',
+                  {getFieldDecorator("districtCodes", {
+                    valuePropName: "value",
                     initialValue: districtTree[0].children
                       ? (projectItem.projectBase.districtCodes || []).map(
                           item => item.id
@@ -3460,7 +3466,7 @@ export default class sider extends PureComponent {
                       showSearch
                       allowClear
                       multiple
-                      dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                      dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
                       filterTreeNode={(a, b) => {
                         if (b.props.title.indexOf(a) > -1) {
                           return true;
@@ -3505,22 +3511,22 @@ export default class sider extends PureComponent {
                   )}
                 </Form.Item>
                 <Form.Item label="备注" {...formItemLayout}>
-                  {getFieldDecorator('description', {
+                  {getFieldDecorator("description", {
                     initialValue: projectItem.description
                   })(<Input.TextArea autosize />)}
                 </Form.Item>
                 <a
                   style={{
-                    position: 'absolute',
+                    position: "absolute",
                     right: 40,
                     bottom: 0,
-                    userSelect: 'none'
+                    userSelect: "none"
                   }}
                   onClick={() => {
                     this.setState({
                       showProjectAllInfo: !showProjectAllInfo
                     });
-                    emitter.emit('showProjectDetail', {
+                    emitter.emit("showProjectDetail", {
                       show: !showProjectAllInfo,
                       edit: true,
                       id: projectItem.id
@@ -3531,29 +3537,29 @@ export default class sider extends PureComponent {
                 </a>
                 <a
                   style={{
-                    display: isProjectUpdate ? 'inherit' : 'none',
-                    position: 'absolute',
+                    display: isProjectUpdate ? "inherit" : "none",
+                    position: "absolute",
                     right: 0,
                     bottom: 0,
-                    userSelect: 'none'
+                    userSelect: "none"
                   }}
                   onClick={() => {
                     Modal.confirm({
-                      title: '是否确定要删除这条项目数据？',
+                      title: "是否确定要删除这条项目数据？",
                       content: (
                         <span>
                           删除项目信息、项目关联的红线、项目关联的责任追究；
                           删除项目关联的扰动图斑里的关联项目ID。
                         </span>
                       ),
-                      okText: '确定',
-                      okType: 'danger',
-                      cancelText: '取消',
+                      okText: "确定",
+                      okType: "danger",
+                      cancelText: "取消",
                       onOk() {
                         self.projectDelete(projectItem.id);
                       },
                       onCancel() {
-                        console.log('Cancel');
+                        console.log("Cancel");
                       }
                     });
                   }}
@@ -3588,29 +3594,29 @@ export default class sider extends PureComponent {
                     longitude: item.longitude,
                     azimuth: item.azimuth,
                     fileExtend: item.fileExtend,
-                    status: 'done'
+                    status: "done"
                   };
                   this.setState({
                     projectFileList: [...projectFileList, obj]
                   });
                 }}
                 onError={(v, response) => {
-                  notification['error']({
+                  notification["error"]({
                     message: `附件上传失败：${response.error.message}`
                   });
                 }}
                 onPreview={file => {
                   switch (file.fileExtend) {
-                    case 'pdf':
+                    case "pdf":
                       window.open(file.url);
                       break;
-                    case 'doc':
-                    case 'docx':
-                    case 'xls':
-                    case 'xlsx':
-                    case 'ppt':
-                    case 'pptx':
-                      window.open(file.url + '&isDown=true');
+                    case "doc":
+                    case "docx":
+                    case "xls":
+                    case "xlsx":
+                    case "ppt":
+                    case "pptx":
+                      window.open(file.url + "&isDown=true");
                       break;
                     default:
                       this.setState({
@@ -3618,7 +3624,7 @@ export default class sider extends PureComponent {
                         previewVisible_min_left: true
                       });
                       if (file.latitude || file.longitude) {
-                        emitter.emit('imgLocation', {
+                        emitter.emit("imgLocation", {
                           Latitude: file.latitude,
                           Longitude: file.longitude,
                           direction: file.azimuth,
@@ -3632,18 +3638,18 @@ export default class sider extends PureComponent {
                 }}
                 onChange={({ fileList }) => {
                   const data = fileList.map(item => {
-                    return { ...item, status: 'done' };
+                    return { ...item, status: "done" };
                   });
                   this.setState({
                     projectFileList: data
                   });
                 }}
                 onRemove={file => {
-                  console.log('onRemove', file);
+                  console.log("onRemove", file);
                   return new Promise((resolve, reject) => {
                     if (projectEdit) {
                       dispatch({
-                        type: 'annex/annexDelete',
+                        type: "annex/annexDelete",
                         payload: {
                           FileId: file.uid,
                           Id: projectItem.attachment
@@ -3660,7 +3666,7 @@ export default class sider extends PureComponent {
                       });
                     } else {
                       reject();
-                      notification['info']({
+                      notification["info"]({
                         message: `请先开始编辑项目`
                       });
                     }
@@ -3677,7 +3683,7 @@ export default class sider extends PureComponent {
                         icon="picture"
                         onClick={e => {
                           e.stopPropagation();
-                          emitter.emit('screenshot', {
+                          emitter.emit("screenshot", {
                             show: true
                           });
                         }}
@@ -3690,27 +3696,27 @@ export default class sider extends PureComponent {
               </Upload>
             </div>
             <Modal
-              width={'50vw'}
+              width={"50vw"}
               visible={previewVisible}
               footer={null}
               onCancel={() => {
                 this.setState({ previewVisible: false });
               }}
             >
-              <img alt="example" style={{ width: '100%' }} src={previewImage} />
+              <img alt="example" style={{ width: "100%" }} src={previewImage} />
             </Modal>
             <div>
               <Button
                 icon="cloud-download"
                 style={{
                   display:
-                    projectItem.isArchive || projectEdit ? 'none' : 'block',
+                    projectItem.isArchive || projectEdit ? "none" : "block",
                   marginTop: 20
                 }}
                 onClick={() => {
-                  this.setState({ archiveTime: '' });
+                  this.setState({ archiveTime: "" });
                   Modal.confirm({
-                    title: '项目归档',
+                    title: "项目归档",
                     content: (
                       <span>
                         <Typography.Text type="warning">
@@ -3734,7 +3740,7 @@ export default class sider extends PureComponent {
                         if (archiveTime) {
                           resolve();
                           dispatch({
-                            type: 'project/projectArchive',
+                            type: "project/projectArchive",
                             payload: {
                               id: projectItem.id,
                               ArchiveTime: archiveTime
@@ -3742,12 +3748,12 @@ export default class sider extends PureComponent {
                             callback: success => {
                               if (success) {
                                 self.setState({ showProjectDetail: false });
-                                emitter.emit('deleteSuccess', {});
+                                emitter.emit("deleteSuccess", {});
                               }
                             }
                           });
                         } else {
-                          notification['warning']({
+                          notification["warning"]({
                             message: `请选择归档时间`
                           });
                           reject();
@@ -3764,19 +3770,19 @@ export default class sider extends PureComponent {
                 icon="rollback"
                 style={{
                   display:
-                    projectItem.isArchive || projectEdit ? 'block' : 'none',
+                    projectItem.isArchive || projectEdit ? "block" : "none",
                   marginLeft: 20
                 }}
                 onClick={() => {
                   dispatch({
-                    type: 'project/projectUnArchive',
+                    type: "project/projectUnArchive",
                     payload: {
                       id: projectItem.id
                     },
                     callback: success => {
                       if (success) {
                         self.setState({ showProjectDetail: false });
-                        emitter.emit('deleteSuccess', {});
+                        emitter.emit("deleteSuccess", {});
                       }
                     }
                   });
@@ -3792,17 +3798,17 @@ export default class sider extends PureComponent {
                 this.props.form.validateFields((err, v) => {
                   console.log(v);
                   dispatch({
-                    type: 'project/departCreate',
+                    type: "project/departCreate",
                     payload: v,
                     callback: (success, result) => {
                       if (success) {
                         self.setState({ showCreateDepart: false });
                         setFieldsValue({ [createDepartKey]: result.id });
-                        notification['success']({
+                        notification["success"]({
                           message: `单位新建成功`
                         });
 
-                        emitter.emit('departNameReset', {
+                        emitter.emit("departNameReset", {
                           key: createDepartKey,
                           name: result.name,
                           id: result.id
@@ -3820,17 +3826,20 @@ export default class sider extends PureComponent {
                 <Row gutter={24}>
                   <Col span={12}>
                     <Form.Item label="单位名称" {...formItemLayout}>
-                      {getFieldDecorator('name', {})(<Input />)}
+                      {getFieldDecorator("name", {})(<Input />)}
                     </Form.Item>
                   </Col>
                   <Col span={12}>
                     <Form.Item label="单位地址" {...formItemLayout}>
-                      {getFieldDecorator('address', {})(<Input />)}
+                      {getFieldDecorator("address", {})(<Input />)}
                     </Form.Item>
                   </Col>
                   <Col span={12}>
                     <Form.Item label="单位类型" {...formItemLayout}>
-                      {getFieldDecorator('depType', {})(
+                      {getFieldDecorator(
+                        "depType",
+                        {}
+                      )(
                         <Select style={{ width: 120 }}>
                           <Select.Option value="1">生产建设单位</Select.Option>
                           <Select.Option value="2">方案编制单位</Select.Option>
@@ -3847,52 +3856,52 @@ export default class sider extends PureComponent {
                   </Col>
                   <Col span={12}>
                     <Form.Item label="单位描述" {...formItemLayout}>
-                      {getFieldDecorator('description', {})(<Input />)}
+                      {getFieldDecorator("description", {})(<Input />)}
                     </Form.Item>
                   </Col>
                   <Col span={12}>
                     <Form.Item label="联系电话" {...formItemLayout}>
-                      {getFieldDecorator('phone', {})(<Input />)}
+                      {getFieldDecorator("phone", {})(<Input />)}
                     </Form.Item>
                   </Col>
                   <Col span={12}>
                     <Form.Item label="单位邮编" {...formItemLayout}>
-                      {getFieldDecorator('zipcode', {})(<Input />)}
+                      {getFieldDecorator("zipcode", {})(<Input />)}
                     </Form.Item>
                   </Col>
                   <Col span={12}>
                     <Form.Item label="联系人id" {...formItemLayout}>
-                      {getFieldDecorator('contactId', {})(<Input />)}
+                      {getFieldDecorator("contactId", {})(<Input />)}
                     </Form.Item>
                   </Col>
                   <Col span={12}>
                     <Form.Item label="单位资质" {...formItemLayout}>
-                      {getFieldDecorator('intelligence', {})(<Input />)}
+                      {getFieldDecorator("intelligence", {})(<Input />)}
                     </Form.Item>
                   </Col>
                   <Col span={12}>
                     <Form.Item label="法人代表" {...formItemLayout}>
-                      {getFieldDecorator('legal', {})(<Input />)}
+                      {getFieldDecorator("legal", {})(<Input />)}
                     </Form.Item>
                   </Col>
                   <Col span={12}>
                     <Form.Item label="传真" {...formItemLayout}>
-                      {getFieldDecorator('fax', {})(<Input />)}
+                      {getFieldDecorator("fax", {})(<Input />)}
                     </Form.Item>
                   </Col>
                   <Col span={12}>
                     <Form.Item label="主要投资方1" {...formItemLayout}>
-                      {getFieldDecorator('investors1', {})(<Input />)}
+                      {getFieldDecorator("investors1", {})(<Input />)}
                     </Form.Item>
                   </Col>
                   <Col span={12}>
                     <Form.Item label="主要投资方2" {...formItemLayout}>
-                      {getFieldDecorator('investors2', {})(<Input />)}
+                      {getFieldDecorator("investors2", {})(<Input />)}
                     </Form.Item>
                   </Col>
                   <Col span={12}>
                     <Form.Item label="主要投资方3" {...formItemLayout}>
-                      {getFieldDecorator('investors3', {})(<Input />)}
+                      {getFieldDecorator("investors3", {})(<Input />)}
                     </Form.Item>
                   </Col>
                 </Row>

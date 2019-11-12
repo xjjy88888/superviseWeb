@@ -1,4 +1,4 @@
-import { notification } from 'antd';
+import { notification } from "antd";
 import {
   spotListApi,
   spotPolygonByIdApi,
@@ -12,15 +12,15 @@ import {
   spotHistoryApi,
   spotOldImgApi,
   interpretListApi
-} from '../services/httpApi';
+} from "../services/httpApi";
 
 export default {
-  namespace: 'spot',
+  namespace: "spot",
 
   state: {
     spotList: { totalCount: 0, items: [] },
     projectInfoSpotList: { totalCount: 0, items: [] },
-    spotInfo: { mapNum: '', provinceCityDistrict: [null, null, null] },
+    spotInfo: { mapNum: "", provinceCityDistrict: [null, null, null] },
     projectSelectListSpot: [],
     spotHistoryList: [],
     interpretList: []
@@ -42,10 +42,10 @@ export default {
           items: [...items_old, ...spotList.items],
           totalCount: spotList.totalCount
         };
-        yield put({ type: 'save', payload: { spotList: response } });
+        yield put({ type: "save", payload: { spotList: response } });
         if (callback) callback(success, response);
       } else {
-        notification['error']({
+        notification["error"]({
           message: `查询图斑列表失败：${error.message}`
         });
         if (callback) callback(success);
@@ -64,14 +64,14 @@ export default {
             : [];
           if (payload.refresh) {
             yield put({
-              type: 'save',
+              type: "save",
               payload: { spotInfo: result, projectSelectListSpot }
             });
           }
         }
         if (callback) callback(result);
       } else {
-        notification['error']({
+        notification["error"]({
           message: `查询图斑信息失败：${error.message}`
         });
       }
@@ -86,9 +86,9 @@ export default {
         if (callback) callback(success, response);
       } else {
         if (callback) callback(success);
-        notification['error']({
-          message: `${payload.id ? '编辑' : '新建'}图斑失败：${
-            error.validationErrors ? error.validationErrors[0].message : ''
+        notification["error"]({
+          message: `${payload.id ? "编辑" : "新建"}图斑失败：${
+            error.validationErrors ? error.validationErrors[0].message : ""
           }`
         });
       }
@@ -100,9 +100,9 @@ export default {
         data: { success, error }
       } = yield call(spotDeleteApi, payload);
       if (callback) callback(success);
-      notification[success ? 'success' : 'error']({
-        message: `删除图斑${success ? '成功' : '失败'}${
-          success ? '' : `：${error.message}`
+      notification[success ? "success" : "error"]({
+        message: `删除图斑${success ? "成功" : "失败"}${
+          success ? "" : `：${error.message}`
         }`
       });
     },
@@ -113,9 +113,9 @@ export default {
         data: { success, error }
       } = yield call(spotDeleteMulApi, payload);
       if (callback) callback(success);
-      notification[success ? 'success' : 'error']({
-        message: `批量删除图斑${success ? '成功' : '失败'}${
-          success ? '' : `：${error.message}`
+      notification[success ? "success" : "error"]({
+        message: `批量删除图斑${success ? "成功" : "失败"}${
+          success ? "" : `：${error.message}`
         }`
       });
     },
@@ -126,9 +126,9 @@ export default {
         data: { success, error }
       } = yield call(spotArchiveApi, payload);
       if (callback) callback(success);
-      notification[success ? 'success' : 'error']({
-        message: `图斑归档${success ? '成功' : '失败'}${
-          success ? '' : `：${error.message}`
+      notification[success ? "success" : "error"]({
+        message: `图斑归档${success ? "成功" : "失败"}${
+          success ? "" : `：${error.message}`
         }`
       });
     },
@@ -139,9 +139,9 @@ export default {
         data: { success, error }
       } = yield call(spotUnArchiveApi, payload);
       if (callback) callback(success);
-      notification[success ? 'success' : 'error']({
-        message: `图斑撤销归档${success ? '成功' : '失败'}${
-          success ? '' : `：${error.message}`
+      notification[success ? "success" : "error"]({
+        message: `图斑撤销归档${success ? "成功" : "失败"}${
+          success ? "" : `：${error.message}`
         }`
       });
     },
@@ -153,9 +153,9 @@ export default {
       } = yield call(spotListApi, payload);
       if (callback) callback(success, projectInfoSpotList);
       if (success) {
-        yield put({ type: 'save', payload: { projectInfoSpotList } });
+        yield put({ type: "save", payload: { projectInfoSpotList } });
       } else {
-        notification['error']({
+        notification["error"]({
           message: `查询项目关联图斑列表失败：${error.message}`
         });
       }
@@ -186,11 +186,11 @@ export default {
       });
       if (success) {
         yield put({
-          type: 'save',
+          type: "save",
           payload: { projectSelectListSpot }
         });
       } else {
-        notification['error']({
+        notification["error"]({
           message: `查询关联项目列表失败：${error.message}`
         });
       }
@@ -211,11 +211,11 @@ export default {
       } = yield call(spotHistoryApi, payload);
       if (success) {
         yield put({
-          type: 'save',
+          type: "save",
           payload: { spotHistoryList: result }
         });
       } else {
-        notification['error']({
+        notification["error"]({
           message: `查询图斑历史失败：${error.message}`
         });
       }
@@ -233,9 +233,10 @@ export default {
       const {
         data: { success, result }
       } = yield call(interpretListApi, payload);
+      if (callback) callback(success, result);
       if (success) {
         yield put({
-          type: 'save',
+          type: "save",
           payload: { interpretList: result }
         });
       }
