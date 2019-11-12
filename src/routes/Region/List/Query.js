@@ -165,8 +165,8 @@ export default class Query extends PureComponent {
               resetFields();
               emitter.emit("queryInfo", {
                 from: type,
-                info: {}
-                // ProjectShowArchive: false,
+                info: {},
+                ProjectShowArchive: false
                 // SpotShowArchive: false
               });
             }}
@@ -375,9 +375,9 @@ export default class Query extends PureComponent {
                 {}
               )(<Checkbox.Group options={["共享", "独有"]} />)}
             </Form.Item>
-            {/* <Form.Item label="显示数据" {...formItemLayoutlong}>
-              {getFieldDecorator('ProjectShowArchive', {
-                valuePropName: 'checked',
+            <Form.Item label="显示数据" {...formItemLayoutlong}>
+              {getFieldDecorator("ProjectShowArchive", {
+                valuePropName: "checked",
                 initialValue: false
               })(
                 <Switch
@@ -385,7 +385,7 @@ export default class Query extends PureComponent {
                   unCheckedChildren="现状数据"
                 />
               )}
-            </Form.Item> */}
+            </Form.Item>
             <Form.Item
               label="回收站数据"
               {...formItemLayoutlong}

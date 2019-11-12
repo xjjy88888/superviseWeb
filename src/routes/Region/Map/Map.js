@@ -1307,12 +1307,22 @@ export default class integration extends PureComponent {
   };
 
   onClickRegiongeojsonLayer = e => {
+    console.log('onClickRegiongeojsonLayer',e);
     const { switchDataModal } = this.state;
     if (!switchDataModal) {
       //项目监管
       const zoom = map.getZoom();
       if (zoom < config.pointLevel) {
-        map.flyTo(e.latlng, config.pointLevel);
+        userconfig.pointsInPolygon_XMJG = [];
+        if(ProjectPointsData && ProjectPointsData.length>0){
+
+        }
+        if(userconfig.pointsInPolygon_XMJG.length>0){
+          map.flyTo(e.latlng, config.pointLevel);
+        }
+        else{
+          message.warning('点击当前区域范围之内没有项目点数据可操作', 1);         
+        }
       }
     }
   };
@@ -1342,15 +1352,46 @@ export default class integration extends PureComponent {
 
   //区域统计图层点击事件监听
   onClickZSgeojsonLayer = e => {
+    console.log('onClickZSgeojsonLayer',e);
     const { switchDataModal } = this.state;
     if (!switchDataModal) {
       //项目监管
       const zoom = map.getZoom();
       if (zoom < config.pointLevel) {
-        map.flyTo(e.latlng, config.pointLevel);
+        let regionPolygon = this.getRegionPolygonbyPoint(e.latlng);
+        userconfig.pointsInPolygon_XMJG = [];
+        if(ProjectPointsData && ProjectPointsData.length>0){
+
+        }
+        if(userconfig.pointsInPolygon_XMJG.length>0){
+          map.flyTo(e.latlng, config.pointLevel);
+        }
+        else{
+          message.warning('点击当前区域范围之内没有项目点数据可操作', 1);         
+        }
       }
     }
   };
+
+  // 根据点匹配对应的行政区域面
+  getRegionPolygonbyPoint = latlng => {
+    let regionPolygon = null;
+    if(regiongeojsonLayer){
+      let polygon = null;
+      let turfpoint = null;
+      regiongeojsonLayer.eachLayer(function (layer) {
+        //构造面
+        polygon = turf.multiPolygon(
+          layer.feature.geometry.coordinates
+        );
+        turfpoint = turf.point([latlng.lng, latlng.lat]);
+        if (turf.booleanPointInPolygon(turfpoint, polygon)) {
+          regionPolygon = polygon;
+        }
+      });
+    }
+    return regionPolygon;
+  }
 
   // 根据行政区划名称匹配对应的区域统计圆圈图层
   HLZSLayerbyName = name => {
@@ -2200,7 +2241,8 @@ export default class integration extends PureComponent {
     }
     let zoom = map.getZoom();
     let bounds = map.getBounds();
-    //console.log("zoom",zoom);
+    // console.log("zoom",zoom);
+    // console.log("userconfig.zoom",userconfig.zoom);
     //根据地图当前范围获取对应监管影像时间
     me.getInfoByExtent(zoom, bounds, data => {
       me.setState({ imageTimeText: data[0] });
@@ -2276,7 +2318,10 @@ export default class integration extends PureComponent {
         const { projectSymbolValue } = me.state;
         if (projectSymbolValue === '项目总数') {
           if (ZSgeojsonLayer && ZSgeojsonLayer.getLayers().length <= 0) {
-            me.createZStatistics(); //区域总数统计
+            //预防初始化时候加载两次请求
+            if(userconfig.zoom !== zoom){
+              me.createZStatistics(); //区域总数统计
+            }
           }
         }
         else {
