@@ -541,12 +541,13 @@ export default class sider extends PureComponent {
   };
 
   interpretList = () => {
-    const { dispatch } = this.props;
+    const { switchInterpret, dispatch } = this.props;
     dispatch({
       type: "spot/interpretList",
       callback: (success, result) => {
         if (success && result.length) {
           this.setState({ TaskLevelAndInterBatch: result[0] });
+          switchInterpret(result[0]);
         }
       }
     });

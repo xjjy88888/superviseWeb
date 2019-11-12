@@ -213,7 +213,7 @@ export default class integration extends PureComponent {
     RegionCenterData = [];
     RegionPieData = [];
     ProjectPointsData = null;
-    // console.log('userconfig',userconfig.spotWmsLayer);
+
     const me = this;
     const { dispatch } = this.props;
     //判断项目监管列表跳转过来
@@ -996,7 +996,7 @@ export default class integration extends PureComponent {
   };
 
   addProjectPointClusterLayers = (ProjectPointsData, projectSymbolValue) => {
-    console.log('projectSymbolValue998', projectSymbolValue);
+    //console.log('projectSymbolValue998', projectSymbolValue);
     if (ProjectPointsData && ProjectPointsData.items.length > 0) {
       this.clearXMJGGeojsonLayer(projectPointLayer);
       let markerList = [];
@@ -1307,21 +1307,22 @@ export default class integration extends PureComponent {
   };
 
   onClickRegiongeojsonLayer = e => {
-    console.log('onClickRegiongeojsonLayer',e);
+    //console.log('onClickRegiongeojsonLayer',e);
     const { switchDataModal } = this.state;
     if (!switchDataModal) {
       //项目监管
       const zoom = map.getZoom();
       if (zoom < config.pointLevel) {
-        userconfig.pointsInPolygon_XMJG = [];
-        if(ProjectPointsData && ProjectPointsData.length>0){
-
-        }
+        let regionPolygon = this.getRegionPolygonbyPoint(e.latlng);
+        console.log('regionPolygon',regionPolygon);
+        userconfig.pointsInPolygon_XMJG = this.getPointsbyRegionPolygon(regionPolygon,ProjectPointsData);
+        console.log('userconfig.pointsInPolygon_XMJG',userconfig.pointsInPolygon_XMJG);
         if(userconfig.pointsInPolygon_XMJG.length>0){
-          map.flyTo(e.latlng, config.pointLevel);
+          // map.flyTo(e.latlng, config.pointLevel);
+          map.fitBounds(userconfig.pointsInPolygon_XMJG);
         }
         else{
-          message.warning('点击当前区域范围之内没有项目点数据可操作', 1);         
+          message.warning('点击该区域范围内没有项目点', 1);         
         }
       }
     }
@@ -1352,26 +1353,45 @@ export default class integration extends PureComponent {
 
   //区域统计图层点击事件监听
   onClickZSgeojsonLayer = e => {
-    console.log('onClickZSgeojsonLayer',e);
+    //console.log('onClickZSgeojsonLayer',e);
     const { switchDataModal } = this.state;
     if (!switchDataModal) {
       //项目监管
       const zoom = map.getZoom();
       if (zoom < config.pointLevel) {
         let regionPolygon = this.getRegionPolygonbyPoint(e.latlng);
-        userconfig.pointsInPolygon_XMJG = [];
-        if(ProjectPointsData && ProjectPointsData.length>0){
-
-        }
+        console.log('regionPolygon',regionPolygon);
+        userconfig.pointsInPolygon_XMJG = this.getPointsbyRegionPolygon(regionPolygon,ProjectPointsData);
+        console.log('userconfig.pointsInPolygon_XMJG',userconfig.pointsInPolygon_XMJG);
         if(userconfig.pointsInPolygon_XMJG.length>0){
-          map.flyTo(e.latlng, config.pointLevel);
+          //map.flyTo(e.latlng, config.pointLevel);
+          map.fitBounds(userconfig.pointsInPolygon_XMJG);
         }
         else{
-          message.warning('点击当前区域范围之内没有项目点数据可操作', 1);         
+          message.warning('点击该区域范围内没有项目点', 1);         
         }
       }
     }
   };
+
+  // 获取行政区域面内的项目点
+  getPointsbyRegionPolygon = (regionPolygon,ProjectPointsData) => {
+    let pointsInPolygon_XMJG = [];
+    if(ProjectPointsData && ProjectPointsData.items.length>0){
+      for(let i =0;i<ProjectPointsData.items.length;i++){
+        let data = ProjectPointsData.items[i];
+        let pointJson = this.WKT2GeoJSON(data.point);
+        if (pointJson[0] !== 0 && pointJson[1] !== 0) {
+         let turfpoint = turf.point(pointJson);
+         if (turf.booleanPointInPolygon(turfpoint, regionPolygon)) {
+          // pointsInPolygon_XMJG.push(pointJson);
+          pointsInPolygon_XMJG.push([pointJson[1],pointJson[0]]);
+         }
+        }
+      }
+    }
+    return pointsInPolygon_XMJG;   
+  }
 
   // 根据点匹配对应的行政区域面
   getRegionPolygonbyPoint = latlng => {
@@ -2767,7 +2787,7 @@ export default class integration extends PureComponent {
           transparent: true,
           maxZoom: config.mapInitParams.maxZoom,
           // cql_filter: "map_num == 201808_450521_0515"
-          cql_filter: 'archive_time is null'
+          cql_filter: userconfig.cql_filter ? userconfig.cql_filter : 'archive_time is null'
         }
       ).addTo(map);
     } else {
@@ -2790,7 +2810,8 @@ export default class integration extends PureComponent {
           transparent: true,
           maxZoom: config.mapInitParams.maxZoom,
           // cql_filter: "is_deleted == false"
-          cql_filter: 'archive_time is null'
+          // cql_filter: 'archive_time is null'
+          cql_filter: userconfig.cql_filter ? userconfig.cql_filter : 'archive_time is null'
         })
         .addTo(map);
     }
@@ -3557,6 +3578,7 @@ export default class integration extends PureComponent {
 
   switchInterpret = v => {
     console.log(`切换解译期次`, v);
+    userconfig.cql_filter = 'archive_time is null';
     if(v){
       const taskLevel = v.split("-")[0];
       let task_level =3;
@@ -3573,15 +3595,19 @@ export default class integration extends PureComponent {
         task_level = 3;
       }
       const inter_batch = v.split("-")[1];
-      userconfig.spotWmsLayer.setParams({
-        cql_filter: 'archive_time is null and inter_batch = '+inter_batch+' and task_level = '+task_level
-      });
+      // userconfig.cql_filter = 'archive_time is null and inter_batch = '+inter_batch+' and task_level = '+task_level;
+      userconfig.cql_filter = 'inter_batch = '+inter_batch+' and task_level = '+task_level;
     }
     else{
+      userconfig.cql_filter = 'archive_time is null';
+    }
+
+    if(userconfig.spotWmsLayer){
       userconfig.spotWmsLayer.setParams({
-        cql_filter: 'archive_time is null'
+        cql_filter: userconfig.cql_filter
       });
     }
+
   };
 
   render() {
