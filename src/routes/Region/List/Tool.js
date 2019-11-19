@@ -15,7 +15,7 @@ import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
 import "echarts";
 import config from "../../../config";
-import { accessToken } from "../../../utils/util";
+import { accessToken, dateFormat } from "../../../utils/util";
 
 const url = config.download;
 
@@ -36,7 +36,8 @@ export default class siderbarDetail extends PureComponent {
       showCheck: false,
       ShowArchive: false,
       key: "project",
-      showSpin: false
+      showSpin: false,
+      queryInfo: {}
     };
     this.charRef = ref => {
       this.chartDom = ref;
@@ -59,9 +60,28 @@ export default class siderbarDetail extends PureComponent {
         checkResult: data.result
       });
     });
+    this.eventEmitter = emitter.addListener("queryInfo", data => {
+      console.log(data.info);
+      const queryInfo = data.info;
+      if (queryInfo.ReplyTime && queryInfo.ReplyTime.length) {
+        queryInfo.ReplyTimeBegin = dateFormat(queryInfo.ReplyTime[0]._d);
+        queryInfo.ReplyTimeEnd = dateFormat(queryInfo.ReplyTime[1]._d);
+      }
+      for (let i in queryInfo) {
+        if (Array.isArray(queryInfo[i])) {
+          queryInfo[i] = queryInfo[i].join(",");
+        }
+      }
+      console.log(queryInfo);
+      this.setState({
+        queryInfo
+      });
+    });
   }
 
   render() {
+    const { dispatch } = this.props;
+
     const {
       show,
       type,
@@ -71,9 +91,9 @@ export default class siderbarDetail extends PureComponent {
       funcType,
       funcTypeText,
       ShowArchive,
-      showSpin
+      showSpin,
+      queryInfo
     } = this.state;
-    const { dispatch } = this.props;
     return (
       <div
         style={{
@@ -127,111 +147,109 @@ export default class siderbarDetail extends PureComponent {
           </span>
           {config.toolbox.map((item, index) =>
             key === "spot" &&
-              (item.key === "upload_excel" ||
-                item.key === "download_excel") ? null : (
-                <div key={index}>
-                  <Button
-                    style={{ margin: `15px 10px 0 10px` }}
-                    icon={item.icon}
-                    onClick={() => {
-                      switch (item.key) {
-                        //勾选管理
-                        case "checklist":
-                          emitter.emit("showCheck", {
-                            show: !showCheck
-                          });
-                          this.setState({
-                            showCheck: !showCheck,
-                            checkResult: showCheck ? checkResult : []
-                          });
-                          break;
-                        // 模板下载(Shapfile)
-                        case "download_shapfile":
-                          console.log(url);
-                          window.open(
-                            `${url}Shapefile/${
+            (item.key === "upload_excel" ||
+              item.key === "download_excel") ? null : (
+              <div key={index}>
+                <Button
+                  style={{ margin: `15px 10px 0 10px` }}
+                  icon={item.icon}
+                  onClick={() => {
+                    switch (item.key) {
+                      //勾选管理
+                      case "checklist":
+                        emitter.emit("showCheck", {
+                          show: !showCheck
+                        });
+                        this.setState({
+                          showCheck: !showCheck,
+                          checkResult: showCheck ? checkResult : []
+                        });
+                        break;
+                      // 模板下载(Shapfile)
+                      case "download_shapfile":
+                        console.log(url);
+                        window.open(
+                          `${url}Shapefile/${
                             key === "project" ? "项目模板" : "图斑模板"
-                            }.zip`,
-                            "_blank"
-                          );
-                          notification["success"]({
-                            message: `下载${
-                              key === "project" ? "项目" : "图斑"
-                              }模板(Shapfile)成功`
+                          }.zip`,
+                          "_blank"
+                        );
+                        notification["success"]({
+                          message: `下载${
+                            key === "project" ? "项目" : "图斑"
+                          }模板(Shapfile)成功`
+                        });
+                        break;
+                      // 拓扑检测工具下载
+                      case "topologyCheck":
+                        const topologyCheckUrl = config.topologyCheckUrl;
+                        console.log(topologyCheckUrl);
+                        window.open(topologyCheckUrl);
+                        notification["success"]({
+                          message: `下载拓扑检测工具成功`
+                        });
+                        break;
+                      // 导出数据-导出附件数据-归档数据-删除
+                      case "export":
+                      case "attach":
+                      case "archiving":
+                      case "delete":
+                        if (showCheck && checkResult.length === 0) {
+                          notification["warning"]({
+                            message: `至少选择一条数据进行${item.label}`
                           });
-                          break;
-                        // 拓扑检测工具下载
-                        case "topologyCheck":
-                          const topologyCheckUrl = config.topologyCheckUrl
-                          console.log(topologyCheckUrl);
-                          window.open(
-                            topologyCheckUrl,
-                          );
-                          notification["success"]({
-                            message: `下载拓扑检测工具成功`
-                          });
-                          break;
-                        // 导出数据-导出附件数据-归档数据-删除
-                        case "export":
-                        case "attach":
-                        case "archiving":
-                        case "delete":
-                          if (showCheck && checkResult.length === 0) {
-                            notification["warning"]({
-                              message: `至少选择一条数据进行${item.label}`
-                            });
-                          } else {
-                            this.setState({
-                              visible: true
-                            });
-                          }
+                        } else {
                           this.setState({
-                            funcType: item.key,
-                            funcTypeText: item.label
+                            visible: true
                           });
-                          break;
-                        // 模板下载(Excel)
-                        // case "download_excel":
-                        //   window.open(
-                        //     `${url}Excel/项目红线范围（无图形）.xlsx`,
-                        //     "_blank"
-                        //   );
-                        //   notification["success"]({
-                        //     message: `下载项目模板(Excel)成功`
-                        //   });
-                        //   break;
-                        // 模板说明
-                        case "template_description":
-                          window.open(config.templateDescription, "_blank");
-                          notification["success"]({
-                            message: `下载${
-                              key === "project" ? "项目" : "图斑"
-                              }模板说明成功`
-                          });
-                          break;
-                        //数据抽稀
-                        case "data_sparse":
-                          emitter.emit("showSparse", {
-                            show: true
-                          });
-                          break;
-                        default:
-                          break;
-                      }
-                    }}
-                  >
-                    {item.key === "export" ||
-                      item.key === "attach" ||
-                      item.key === "archiving" ||
-                      item.key === "delete"
-                      ? `${item.label}${showCheck ? "勾选" : "列表"}${
-                      item.key === "attach" ? "附件" : ""
+                        }
+                        this.setState({
+                          funcType: item.key,
+                          funcTypeText: item.label
+                        });
+                        break;
+                      // 模板下载(Excel)
+                      // case "download_excel":
+                      //   window.open(
+                      //     `${url}Excel/项目红线范围（无图形）.xlsx`,
+                      //     "_blank"
+                      //   );
+                      //   notification["success"]({
+                      //     message: `下载项目模板(Excel)成功`
+                      //   });
+                      //   break;
+                      // 模板说明
+                      case "template_description":
+                        window.open(config.templateDescription, "_blank");
+                        notification["success"]({
+                          message: `下载${
+                            key === "project" ? "项目" : "图斑"
+                          }模板说明成功`
+                        });
+                        break;
+                      //数据抽稀
+                      case "data_sparse":
+                        emitter.emit("showSparse", {
+                          show: true
+                        });
+                        break;
+                      default:
+                        break;
+                    }
+                  }}
+                >
+                  {item.key === "export" ||
+                  item.key === "attach" ||
+                  item.key === "archiving" ||
+                  item.key === "delete"
+                    ? `${item.label}${showCheck ? "勾选" : "列表"}${
+                        item.key === "attach" ? "附件" : ""
                       }数据`
-                      : item.label}
-                  </Button>
-                  <br />
-                </div>
-              )
+                    : item.label}
+                </Button>
+                <br />
+              </div>
+            )
           )}
           <Modal
             title={`${funcTypeText}${key === "project" ? "项目" : "图斑"}数据`}
@@ -242,10 +260,15 @@ export default class siderbarDetail extends PureComponent {
               });
               if (funcType === "export" || funcType === "attach") {
                 //导出
+                const obj = showCheck
+                  ? {
+                      ids: checkResult.map(item => item.id)
+                    }
+                  : queryInfo;
                 dispatch({
                   type: "annex/export",
                   payload: {
-                    ids: checkResult.map(item => item.id),
+                    ...obj,
                     isArchive: ShowArchive,
                     key: key === "project" ? "Project" : "Spot",
                     isAttach: funcType === "attach"
@@ -272,15 +295,17 @@ export default class siderbarDetail extends PureComponent {
           >
             <p>
               <span>
-                将要
-                {funcTypeText}
+                {showCheck
+                  ? `将要
+                ${funcTypeText}
                 的数据有
-                {checkResult.length}条：
-                {checkResult
+                ${checkResult.length}条：
+                ${checkResult
                   .map(item =>
                     key === "project" ? item.projectName : item.mapNum
                   )
-                  .join("，")}
+                  .join("，")}`
+                  : `将要${funcTypeText}全部数据`}
               </span>
             </p>
 
@@ -288,7 +313,7 @@ export default class siderbarDetail extends PureComponent {
               type="warning"
               message={`${
                 funcType === "export" ? "" : "归档后的数据将不再显示和操作，"
-                }是否确定${funcTypeText}？`}
+              }是否确定${funcTypeText}？`}
               showIcon
             />
           </Modal>
@@ -304,8 +329,8 @@ export default class siderbarDetail extends PureComponent {
                     key === "project"
                       ? "project/projectDeleteMul"
                       : key === "spot"
-                        ? "spot/spotDeleteMul"
-                        : "point/pointDeleteMul",
+                      ? "spot/spotDeleteMul"
+                      : "point/pointDeleteMul",
                   payload: {
                     id: checkResult.map(item => item.id)
                   },
@@ -373,7 +398,7 @@ export default class siderbarDetail extends PureComponent {
               notification["error"]({
                 message: `${key === "project" ? "项目" : "图斑"}附件上传失败：${
                   v.error.message
-                  }`
+                }`
               });
             }}
           >

@@ -217,7 +217,7 @@ const config = {
     dictUrl: `${domainApi}DictTable/GetAll`,
 
     // 部门新建
-    departCreateUrl: `${domainApi}SocialDepartmentDto/Create`,
+    departCreateUrl: `${domainApi}SocialDepartment/Create`,
 
     // 部门列表
     departListUrl: `${domainApi}Department/GetAll`,
