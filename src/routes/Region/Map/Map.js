@@ -1,6 +1,6 @@
 /* eslint-disable no-loop-func */
-import React, { PureComponent } from 'react';
-import { connect } from 'dva';
+import React, { PureComponent } from "react";
+import { connect } from "dva";
 import {
   Button,
   Switch,
@@ -10,53 +10,53 @@ import {
   notification,
   message,
   Radio
-} from 'antd';
-import Sidebar from '../List/Sidebar';
-import SidebarDetail from '../List/SiderbarDetail';
-import Tool from '../List/Tool';
-import Sparse from './Sparse';
-import Panorama from './Panorama';
-import Chart from '../List/Chart';
-import Query from '../List/Query';
-import Inspect from '../List/Inspect';
-import ProblemPoint from '../List/ProblemPoint';
-import ProjectDetail from '../List/ProjectDetail';
-import HistoryPlay from './HistoryPlay';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+} from "antd";
+import Sidebar from "../List/Sidebar";
+import SidebarDetail from "../List/SiderbarDetail";
+import Tool from "../List/Tool";
+import Sparse from "./Sparse";
+import Panorama from "./Panorama";
+import Chart from "../List/Chart";
+import Query from "../List/Query";
+import Inspect from "../List/Inspect";
+import ProblemPoint from "../List/ProblemPoint";
+import ProjectDetail from "../List/ProjectDetail";
+import HistoryPlay from "./HistoryPlay";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 // import DynamicMapLayer from 'esri-leaflet/src/Layers/DynamicMapLayer';
-import proj4 from 'proj4';
-import 'proj4leaflet';
-import 'leaflet.pm/dist/leaflet.pm.css';
-import 'leaflet.pm';
-import 'leaflet-navbar/Leaflet.NavBar.css';
-import 'leaflet-navbar';
-import 'leaflet-side-by-side';
-import 'leaflet-measure/dist/leaflet-measure.css';
-import 'leaflet-measure/dist/leaflet-measure.cn';
-import 'leaflet.vectorgrid'; //矢量瓦片
-import 'leaflet.markercluster/dist/MarkerCluster.css';
-import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
-import 'leaflet.markercluster';
-import 'leaflet-easybutton/src/easy-button.css';
-import 'leaflet-easybutton';
-import echarts from 'echarts/lib/echarts';
-import LeaftWMS from 'leaflet.wms';
-import * as turf from '@turf/turf';
-import domtoimage from 'dom-to-image';
+import proj4 from "proj4";
+import "proj4leaflet";
+import "leaflet.pm/dist/leaflet.pm.css";
+import "leaflet.pm";
+import "leaflet-navbar/Leaflet.NavBar.css";
+import "leaflet-navbar";
+import "leaflet-side-by-side";
+import "leaflet-measure/dist/leaflet-measure.css";
+import "leaflet-measure/dist/leaflet-measure.cn";
+import "leaflet.vectorgrid"; //矢量瓦片
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+import "leaflet.markercluster";
+import "leaflet-easybutton/src/easy-button.css";
+import "leaflet-easybutton";
+import echarts from "echarts/lib/echarts";
+import LeaftWMS from "leaflet.wms";
+import * as turf from "@turf/turf";
+import domtoimage from "dom-to-image";
 //import '@h21-map/leaflet-path-drag';
 //import 'leaflet-editable';
 //import { greatCircle, point, circle } from '@turf/turf';
-import 'antd-mobile/dist/antd-mobile.css';
-import config from '../../../config';
-import emitter from '../../../utils/event';
-import jQuery from 'jquery';
+import "antd-mobile/dist/antd-mobile.css";
+import config from "../../../config";
+import emitter from "../../../utils/event";
+import jQuery from "jquery";
 // import { validateId } from "@turf/helpers";
-import Layouts from '../../../components/Layouts';
+import Layouts from "../../../components/Layouts";
 // import Spins from "../../../components/Spins";
-import './index.less';
-import Contrast from './Contrast';
-import { getUrl } from '../../../utils/util';
+import "./index.less";
+import Contrast from "./Contrast";
+import { getUrl } from "../../../utils/util";
 
 let userconfig = {};
 let map = null;
@@ -77,70 +77,70 @@ let RegionCenterData = [];
 let RegionPieData = [];
 let ProjectPointsData = null;
 
-const DISTRICT_FILL_COLOR = 'rgba(230,0,0,0)';
+const DISTRICT_FILL_COLOR = "rgba(230,0,0,0)";
 // const DISTRICT_COLOR = '#bfbfbf';
-const DISTRICT_COLOR = '#0070FF';
+const DISTRICT_COLOR = "#0070FF";
 //绘制geojson图层样式
 const geoJsonStyle = {
-  color: '#33CCFF', //#33CCFF #e60000
+  color: "#33CCFF", //#33CCFF #e60000
   weight: 3,
   opacity: 1,
-  fillColor: '#e6d933', //#33CCFF #e6d933
+  fillColor: "#e6d933", //#33CCFF #e6d933
   fillOpacity: 0.1
 };
 //项目红线关联扰动图斑高亮样式
 const highLightGeoJsonStyle = {
-  color: '#0000FF',
+  color: "#0000FF",
   weight: 3,
   opacity: 1,
-  fillColor: '#7CFC00',
+  fillColor: "#7CFC00",
   fillOpacity: 0.8
 };
 //临时绘制关联项目红线以及扰动图斑图层样式
 const tempRedlineGeoJsonStyle = {
-  color: '#e60000', //#33CCFF #0000FF
+  color: "#e60000", //#33CCFF #0000FF
   weight: 2,
   opacity: 1,
-  fillColor: '#e60000',
+  fillColor: "#e60000",
   fillOpacity: 0.1
 };
 const tempSpotGeoJsonStyle = {
-  color: '#ffd700',
+  color: "#ffd700",
   weight: 2,
   opacity: 1,
-  fillColor: '#ffd700',
+  fillColor: "#ffd700",
   fillOpacity: 0.1
 };
 //绘制geojson行政区划图层样式
 const regionGeoJsonStyle = {
-  color: '#33CCFF', //#33CCFF #0000FF
+  color: "#33CCFF", //#33CCFF #0000FF
   weight: 2,
   opacity: 0.8,
-  fillColor: '#33CCFF',
+  fillColor: "#33CCFF",
   fillOpacity: 0.1
 };
 //绘制geojson行政区划图层高亮样式
 const regionGeoJsonHLightStyle = {
-  color: '#FF0000',
+  color: "#FF0000",
   weight: 3,
   opacity: 1,
-  fillColor: '#FF0000',
+  fillColor: "#FF0000",
   fillOpacity: 0
 };
 //绘制geojson区域统计图层样式
 const ZSGeoJsonStyle = {
-  color: '#33CCFF',
+  color: "#33CCFF",
   weight: 2,
   opacity: 0.6,
-  fillColor: '#33CCFF',
+  fillColor: "#33CCFF",
   fillOpacity: 0.3
 };
 //绘制geojson区域统计图层高亮样式
 const ZSGeoJsonHLightStyle = {
-  color: '#FF0000',
+  color: "#FF0000",
   weight: 2,
   opacity: 0.6,
-  fillColor: '#FF0000',
+  fillColor: "#FF0000",
   fillOpacity: 0.3
 };
 
@@ -163,29 +163,29 @@ export default class integration extends PureComponent {
       showSiderbarDetail: false,
       showProblem: false,
       showQuery: false,
-      drawType: 'spot',
-      drawState: 'add',
+      drawType: "spot",
+      drawState: "add",
       chartStatus: false,
-      selectLeftV: '',
-      selectSpotLeftV: '',
-      selectRightV: '',
-      selectSpotRightV: '',
-      spotStatus: '',
+      selectLeftV: "",
+      selectSpotLeftV: "",
+      selectRightV: "",
+      selectSpotRightV: "",
+      spotStatus: "",
       projectId: null, //针对新建图形的项目红线id
       addGraphLayer: null, //针对新建图形的图层
       showPhotoPreview: false,
       photoPreviewUrl: null,
-      imageTimeText: '',
+      imageTimeText: "",
       showImageTimeText: true,
       showHistoryIMG: false, //历史监管影像
       switchDataModal: true, //区域监管、项目监管切换模式
-      projectSymbolValue: '项目总数',
+      projectSymbolValue: "项目总数",
       payload: null,
       showProgress_ZS: false,
       showProgress_Pie: false,
       showProgress_ProjectPoint: false,
       showXMJGPanel: false,
-      selectIMG: ''
+      selectIMG: ""
       //loading: true
     };
     //this.map = null;
@@ -213,6 +213,7 @@ export default class integration extends PureComponent {
     RegionCenterData = [];
     RegionPieData = [];
     ProjectPointsData = null;
+    userconfig.isloadMap = false;
 
     const me = this;
     const { dispatch } = this.props;
@@ -228,7 +229,7 @@ export default class integration extends PureComponent {
     }
 
     dispatch({
-      type: 'mapdata/GetBoundAsync',
+      type: "mapdata/GetBoundAsync",
       callback: boundary => {
         userconfig.geojson = JSON.parse(boundary.result);
         // 创建地图
@@ -237,25 +238,25 @@ export default class integration extends PureComponent {
     });
     //气泡窗口详情查看
     window.goDetail = obj => {
-      emitter.emit('showProjectSpotInfo', { ...obj, edit: false });
+      emitter.emit("showProjectSpotInfo", { ...obj, edit: false });
     };
     //气泡窗口编辑
     window.goEditGraphic = obj => {
       me.setState({
-        drawState: 'edit',
-        drawType: obj.from === 'spot' ? 'spot' : 'redLine'
+        drawState: "edit",
+        drawType: obj.from === "spot" ? "spot" : "redLine"
       });
-      if (obj.from === 'project') {
+      if (obj.from === "project") {
         me.queryWFSServiceByProperty(
           obj.id,
-          'project_id',
+          "project_id",
           config.mapProjectLayerName,
           me.callbackEditQueryWFSService
         );
-      } else if (obj.from === 'spot') {
+      } else if (obj.from === "spot") {
         me.queryWFSServiceByProperty(
           obj.id,
-          'id',
+          "id",
           config.mapSpotLayerName,
           me.callbackEditQueryWFSService
         );
@@ -264,12 +265,12 @@ export default class integration extends PureComponent {
     //气泡窗口图形删除
     window.goDeleteGraphic = obj => {
       Modal.confirm({
-        title: '你确定要删除该图形?',
-        content: '删除之后该图形无法恢复',
+        title: "你确定要删除该图形?",
+        content: "删除之后该图形无法恢复",
         onOk() {
-          if (obj.from === 'project') {
+          if (obj.from === "project") {
             me.props.dispatch({
-              type: 'project/removeProjectScopeGraphic',
+              type: "project/removeProjectScopeGraphic",
               payload: {
                 project_id: obj.id
               },
@@ -278,9 +279,9 @@ export default class integration extends PureComponent {
                 map.closePopup();
               }
             });
-          } else if (obj.from === 'spot') {
+          } else if (obj.from === "spot") {
             me.props.dispatch({
-              type: 'project/removeSpotGraphic',
+              type: "project/removeSpotGraphic",
               payload: {
                 spot_tbid: obj.id
               },
@@ -297,30 +298,30 @@ export default class integration extends PureComponent {
         }
       });
     };
-    this.eventEmitter = emitter.addListener('deleteDraw', () => {
+    this.eventEmitter = emitter.addListener("deleteDraw", () => {
       this.clearPlotGraphic();
       this.reDrawWMSLayers();
     });
-    this.eventEmitter = emitter.addListener('emptyPoint', () => {
+    this.eventEmitter = emitter.addListener("emptyPoint", () => {
       //清空标注点
       if (marker) marker.remove();
     });
 
     // 位置定位
-    this.eventEmitter = emitter.addListener('siteLocation', data => {
-      console.log('位置定位', data);
-      userconfig.state = 'position';
+    this.eventEmitter = emitter.addListener("siteLocation", data => {
+      console.log("位置定位", data);
+      userconfig.state = "position";
       userconfig.siteLocationtype = data.type;
       //地图获取定位点
       jQuery(userconfig.geoJsonLayer.getPane())
-        .find('path')
+        .find("path")
         .css({
-          cursor: 'crosshair'
+          cursor: "crosshair"
         });
     });
     // 检查照片定位
-    this.eventEmitter = emitter.addListener('pictureLocation', data => {
-      console.log('181', data.item);
+    this.eventEmitter = emitter.addListener("pictureLocation", data => {
+      console.log("181", data.item);
       const items = data.item;
       let picPoints = [];
       items.forEach(item => {
@@ -336,8 +337,8 @@ export default class integration extends PureComponent {
           let latLng = [item.latitude, item.longitude];
           let marker = L.marker(latLng)
             .addTo(map)
-            .on('click', function(e) {
-              console.log('item.id', item.id);
+            .on("click", function(e) {
+              console.log("item.id", item.id);
               me.setState({
                 showPhotoPreview: true,
                 photoPreviewUrl: config.url.annexPreviewUrl + item.id
@@ -351,12 +352,12 @@ export default class integration extends PureComponent {
             maxZoom: config.mapInitParams.zoom
           });
       } else {
-        message.warning('附件照片无可用位置信息', 1);
+        message.warning("附件照片无可用位置信息", 1);
       }
     });
     // 全景定位
-    this.eventEmitter = emitter.addListener('fullViewLocation', v => {
-      console.log('fullViewLocation', v);
+    this.eventEmitter = emitter.addListener("fullViewLocation", v => {
+      console.log("fullViewLocation", v);
       //全景定位
       if (v.pointX && v.pointY) {
         if (marker) marker.remove();
@@ -373,30 +374,30 @@ export default class integration extends PureComponent {
 
         let fullviewURL = config.url.panoramaPreviewUrl + v.urlConfig;
         const myIcon = L.icon({
-          iconUrl: './img/camer.png',
+          iconUrl: "./img/camer.png",
           iconSize: [24, 24]
         });
         marker = L.marker([v.pointY, v.pointX], { icon: myIcon })
           .addTo(map)
-          .on('click', function(e) {
+          .on("click", function(e) {
             //console.log("marker", e);
-            emitter.emit('showPanorama', {
+            emitter.emit("showPanorama", {
               show: true,
               fullviewURL: fullviewURL
             });
           });
       }
     });
-    this.eventEmitter = emitter.addListener('mapLocation', data => {});
+    this.eventEmitter = emitter.addListener("mapLocation", data => {});
     //照片定位
-    this.eventEmitter = emitter.addListener('imgLocation', data => {
+    this.eventEmitter = emitter.addListener("imgLocation", data => {
       if (data.show) {
         if (data.Latitude && data.Longitude) {
           let latLng = [data.Latitude, data.Longitude];
           //direction 方位角
           let picName = me.getPicByAzimuth(data.direction);
           let myIcon = L.icon({
-            iconUrl: './img/' + picName + '.png',
+            iconUrl: "./img/" + picName + ".png",
             iconSize: [60, 60]
           });
           if (marker) marker.remove();
@@ -411,8 +412,8 @@ export default class integration extends PureComponent {
             }, 500);
           }
         } else {
-          notification['warning']({
-            message: '该附件照片无位置信息，无法在地图定位'
+          notification["warning"]({
+            message: "该附件照片无位置信息，无法在地图定位"
           });
         }
       } else {
@@ -420,30 +421,30 @@ export default class integration extends PureComponent {
       }
     });
     //屏幕截图
-    this.eventEmitter = emitter.addListener('screenshot', data => {
-      me.setState({ drawType: 'screenshot', drawState: 'add' });
+    this.eventEmitter = emitter.addListener("screenshot", data => {
+      me.setState({ drawType: "screenshot", drawState: "add" });
       //移除地图监听事件
-      map.off('click');
+      map.off("click");
       //显示屏幕截图绘制保存取消菜单按钮
       me.setState({ showButton: true });
       //绘制图形之前
       if (userconfig.screenLayer) {
-        map.pm.disableDraw('Rectangle');
-        map.off('pm:create');
+        map.pm.disableDraw("Rectangle");
+        map.off("pm:create");
         map.removeLayer(userconfig.screenLayer);
         userconfig.screenLayer = null;
       }
       //绘制矩形
-      map.pm.enableDraw('Rectangle', {
-        finishOn: 'dblclick',
+      map.pm.enableDraw("Rectangle", {
+        finishOn: "dblclick",
         allowSelfIntersection: false,
         tooltips: false
       });
-      map.on('pm:create', e => {
+      map.on("pm:create", e => {
         //监听地图点击事件
-        map.on('click', me.onClickMap);
+        map.on("click", me.onClickMap);
         //截图进度条显示
-        const hide = message.loading('屏幕截图操作进行中...', 0);
+        const hide = message.loading("屏幕截图操作进行中...", 0);
 
         userconfig.screenLayer = e.layer;
         let northEast = userconfig.screenLayer.getBounds()._northEast;
@@ -469,7 +470,7 @@ export default class integration extends PureComponent {
             ? northEastPoint.y
             : southWestPoint.y;
         //获取当前地图元素dom节点node,用于屏幕截图
-        let node = document.getElementById('map');
+        let node = document.getElementById("map");
         /*domtoimage.toPng(node, {
           width: width,
           height: height
@@ -481,7 +482,7 @@ export default class integration extends PureComponent {
               //关闭屏幕截图操作
               setTimeout(hide, 10);
               message.warning(
-                '屏幕截图结果为空,建议放大地图,重新截图操作试试看',
+                "屏幕截图结果为空,建议放大地图,重新截图操作试试看",
                 2
               );
               return;
@@ -492,11 +493,11 @@ export default class integration extends PureComponent {
             //document.body.appendChild(img);
             img.onload = function() {
               //要先确保图片完整获取到，这是个异步事件
-              let canvas = document.createElement('canvas'); //创建canvas元素
+              let canvas = document.createElement("canvas"); //创建canvas元素
               canvas.width = width;
               canvas.height = height;
               canvas
-                .getContext('2d')
+                .getContext("2d")
                 .drawImage(img, minx, miny, width, height, 0, 0, width, height); //将图片绘制到canvas中
               dataUrl = canvas.toDataURL(); //转换图片为dataURL
               //保存截图以及中心点经纬度
@@ -505,16 +506,16 @@ export default class integration extends PureComponent {
               userconfig.imglat = centerPoint.lat;
               //关闭屏幕截图操作
               setTimeout(hide, 10);
-              message.success('屏幕截图成功', 2);
+              message.success("屏幕截图成功", 2);
             };
           })
           .catch(function(error) {
-            console.error('oops, something went wrong!', error);
+            console.error("oops, something went wrong!", error);
           });
       });
     });
     //绘制图形-新建
-    this.eventEmitter = emitter.addListener('drawGraphics', data => {
+    this.eventEmitter = emitter.addListener("drawGraphics", data => {
       if (data.draw) {
         me.setState({
           drawState: data.state,
@@ -525,39 +526,39 @@ export default class integration extends PureComponent {
         });
         const { addGraphLayer } = me.state;
         //移除地图监听事件
-        map.off('click');
+        map.off("click");
         me.clearPlotGraphic();
         if (addGraphLayer) {
           map.removeLayer(addGraphLayer);
           me.setState({ addGraphLayer: null });
         }
         //绘制图形之前
-        map.on('pm:drawstart', ({ workingLayer }) => {
-          workingLayer.on('pm:vertexadded', e => {
+        map.on("pm:drawstart", ({ workingLayer }) => {
+          workingLayer.on("pm:vertexadded", e => {
             let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
             //if (!turf.booleanContains(userconfig.polygon, turfpoint)) {
             if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {
-              map.pm.disableDraw('Polygon');
-              emitter.emit('showSiderbarDetail', {
+              map.pm.disableDraw("Polygon");
+              emitter.emit("showSiderbarDetail", {
                 show: false,
                 from: me.state.drawType,
                 type: me.state.drawState,
-                item: { id: '' }
+                item: { id: "" }
               });
               me.setState({ showButton: false });
               return;
             }
           });
         });
-        map.pm.enableDraw('Polygon', {
-          finishOn: 'dblclick',
+        map.pm.enableDraw("Polygon", {
+          finishOn: "dblclick",
           allowSelfIntersection: false,
           tooltips: false
         });
         //显示编辑菜单按钮
         me.setState({ showButton: true });
         //编辑图形
-        map.on('pm:create', e => {
+        map.on("pm:create", e => {
           me.setState({ addGraphLayer: e.layer });
           e.layer.pm.enable({
             allowSelfIntersection: false
@@ -566,28 +567,28 @@ export default class integration extends PureComponent {
       }
     });
     //监听侧边栏显隐
-    this.eventEmitter = emitter.addListener('showSiderbar', data => {
+    this.eventEmitter = emitter.addListener("showSiderbar", data => {
       this.setState({
         showSiderbar: data.show
       });
     });
-    this.eventEmitter = emitter.addListener('showSiderbarDetail', data => {
+    this.eventEmitter = emitter.addListener("showSiderbarDetail", data => {
       this.setState({
         showSiderbarDetail: data.show
       });
     });
-    this.eventEmitter = emitter.addListener('showQuery', data => {
+    this.eventEmitter = emitter.addListener("showQuery", data => {
       this.setState({
         showQuery: data.show
       });
     });
-    this.eventEmitter = emitter.addListener('showProblem', data => {
+    this.eventEmitter = emitter.addListener("showProblem", data => {
       this.setState({
         showProblem: data.show
       });
     });
     //图斑关联
-    this.eventEmitter = emitter.addListener('spotRelate', data => {
+    this.eventEmitter = emitter.addListener("spotRelate", data => {
       this.setState({
         spotStatus: data.status, //start：开始，end：结束
         spotRelateProjectId: data.projectId
@@ -597,12 +598,12 @@ export default class integration extends PureComponent {
 
   // 项目监管请求参数
   queryProjectFilter = payload => {
-    console.log('queryProjectFilter', payload);
+    console.log("queryProjectFilter", payload);
     this.setState({
       payload: payload
     });
     const { switchDataModal } = this.state;
-    console.log('switchDataModal', switchDataModal);
+    console.log("switchDataModal", switchDataModal);
     if (!switchDataModal) {
       const { projectSymbolValue } = this.state;
       if (map) {
@@ -612,7 +613,7 @@ export default class integration extends PureComponent {
           this.requestProjectPoints(this.callbackDrawMapProjectPoints);
         } else {
           // 切换区域统计类型
-          if (projectSymbolValue === '项目总数') {
+          if (projectSymbolValue === "项目总数") {
             this.requestZStatistics(this.callbackDrawMapZStatistics); //区域总数统计
           } else {
             this.requestPieZStatistics(this.callbackDrawMapPieZStatistics); //区域饼状图统计
@@ -653,17 +654,17 @@ export default class integration extends PureComponent {
     const me = this;
     console.log(data);
     userconfig.poupLatLng = null;
-    if (data.key === 'project') {
+    if (data.key === "project") {
       //项目
       dispatch({
-        type: 'mapdata/queryProjectPosition',
+        type: "mapdata/queryProjectPosition",
         payload: {
           id: data.item.id
         },
         callback: response => {
           if (response.success) {
             if (response.result.pointX === 0 || response.result.pointY === 0) {
-              message.warning('项目无可用位置信息', 1);
+              message.warning("项目无可用位置信息", 1);
               return;
             }
             let point = {
@@ -674,28 +675,28 @@ export default class integration extends PureComponent {
             userconfig.poupLatLng = latLng;
             if (marker) marker.remove();
             switch (response.result.type) {
-              case 'ProjectScope': //项目红线
+              case "ProjectScope": //项目红线
                 me.queryWFSServiceByProperty(
                   response.result.id,
-                  'id',
+                  "id",
                   config.mapProjectLayerName,
                   me.callbackLocationQueryWFSService
                 );
                 break;
-              case 'Spot': //扰动图斑
+              case "Spot": //扰动图斑
                 me.queryWFSServiceByProperty(
                   response.result.id,
-                  'id',
+                  "id",
                   config.mapSpotLayerName,
                   me.callbackLocationQueryWFSService
                 );
                 break;
-              case 'ProjectPoint': //项目点
+              case "ProjectPoint": //项目点
                 let turfpoint = turf.point([latLng[1], latLng[0]]);
                 if (
                   !turf.booleanPointInPolygon(turfpoint, userconfig.polygon)
                 ) {
-                  message.warning('项目点位置超出区域范围之外', 1);
+                  message.warning("项目点位置超出区域范围之外", 1);
                   return;
                 }
                 marker = L.marker(latLng).addTo(map);
@@ -715,14 +716,14 @@ export default class integration extends PureComponent {
                   //查询关联项目红线
                   me.queryRegionByProperty(
                     id,
-                    'project_id',
+                    "project_id",
                     config.mapProjectLayerName,
                     me.callbackRelateRedLineQueryWFSService
                   );
                   //查询关联扰动图斑
                   me.queryRegionByProperty(
                     id,
-                    'project_id',
+                    "project_id",
                     config.mapSpotLayerName,
                     me.callbackRelateSpotQueryWFSService
                   );
@@ -731,13 +732,13 @@ export default class integration extends PureComponent {
               default:
             }
           } else {
-            message.warning('项目无可用位置信息', 1);
+            message.warning("项目无可用位置信息", 1);
           }
         }
       });
-    } else if (data.key === 'spot') {
-      if (data.item.mapNum === '') {
-        message.warning('地图定位不到相关数据', 1);
+    } else if (data.key === "spot") {
+      if (data.item.mapNum === "") {
+        message.warning("地图定位不到相关数据", 1);
         return;
       }
 
@@ -745,7 +746,7 @@ export default class integration extends PureComponent {
         //历史扰动图斑
         this.queryWFSServiceByProperty(
           data.item.id,
-          'id',
+          "id",
           config.mapSpotLayerName,
           this.callbackLocationNoPopup
         );
@@ -753,16 +754,16 @@ export default class integration extends PureComponent {
         //现状扰动图斑
         this.queryWFSServiceByProperty(
           data.item.id,
-          'id',
+          "id",
           config.mapSpotLayerName,
           this.callbackLocationQueryWFSService
         );
       }
-    } else if (data.key === 'point') {
+    } else if (data.key === "point") {
       let latLng = [data.item.pointY, data.item.pointX];
       let turfpoint = turf.point([latLng[1], latLng[0]]);
       if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {
-        message.warning('当前标注点不是区域范围之内的点', 2);
+        message.warning("当前标注点不是区域范围之内的点", 2);
         return;
       }
       //标注点定位
@@ -777,15 +778,15 @@ export default class integration extends PureComponent {
           if (latLng) me.automaticToMap(latLng);
         }, 500);
       }
-    } else if (data.key === 'redLine') {
+    } else if (data.key === "redLine") {
       //防治责任范围定位
       me.queryWFSServiceByProperty(
         data.item.id,
-        'id',
+        "id",
         config.mapProjectLayerName,
         me.callbackLocationQueryWFSService
       );
-    } else if (data.key === 'problemPoint') {
+    } else if (data.key === "problemPoint") {
       //问题点定位
       me.locateProblemPoint(data.item, data.id);
     }
@@ -804,9 +805,9 @@ export default class integration extends PureComponent {
     if (userconfig.layersControl) {
       userconfig.layersControl.addOverlay(
         userconfig.projectWmsLayer,
-        '项目红线'
+        "项目红线"
       );
-      userconfig.layersControl.addOverlay(userconfig.spotWmsLayer, '扰动图斑');
+      userconfig.layersControl.addOverlay(userconfig.spotWmsLayer, "扰动图斑");
     }
     //显示项目红线、扰动图斑图层
     if (userconfig.projectWmsLayer) {
@@ -879,7 +880,7 @@ export default class integration extends PureComponent {
       showXMJGPanel: !showXMJGPanel
     });
     if (userconfig.layersControl) {
-      userconfig.layersControl.addOverlay(projectPointLayer, '项目点'); //项目点图层
+      userconfig.layersControl.addOverlay(projectPointLayer, "项目点"); //项目点图层
     }
     //行政区划图层
     if (regiongeojsonLayer) {
@@ -895,8 +896,8 @@ export default class integration extends PureComponent {
     }
     //创建区域统计渲染
     const { projectSymbolValue } = this.state;
-    console.log('projectSymbolValue896', projectSymbolValue);
-    if (projectSymbolValue === '项目总数') {
+    console.log("projectSymbolValue896", projectSymbolValue);
+    if (projectSymbolValue === "项目总数") {
       me.createZStatistics(); //区域总数统计
       //预先请求区域饼状图数据
       if (RegionPieData.length <= 0) {
@@ -941,18 +942,18 @@ export default class integration extends PureComponent {
     const { switchDataModal } = this.state;
     if (!switchDataModal) {
       //项目监管
-      console.log('e.layer.options.properties', e.layer.options.properties);
+      console.log("e.layer.options.properties", e.layer.options.properties);
       //查询关联项目红线
       this.queryRegionByProperty(
         e.layer.options.properties.id,
-        'project_id',
+        "project_id",
         config.mapProjectLayerName,
         this.callbackRelateRedLineQueryWFSService
       );
       //查询关联扰动图斑
       this.queryRegionByProperty(
         e.layer.options.properties.id,
-        'project_id',
+        "project_id",
         config.mapSpotLayerName,
         this.callbackRelateSpotQueryWFSService
       );
@@ -1001,19 +1002,19 @@ export default class integration extends PureComponent {
       this.clearXMJGGeojsonLayer(projectPointLayer);
       let markerList = [];
       let iconUrl =
-        projectSymbolValue === '项目总数'
-          ? './img/projectPoint_XMZS.png'
-          : projectSymbolValue === '立项级别'
-          ? './img/projectPoint_LXJB.png'
-          : projectSymbolValue === '合规性'
-          ? './img/projectPoint_HGX.png'
-          : projectSymbolValue === '项目类别'
-          ? './img/projectPoint_XMLB.png'
-          : projectSymbolValue === '项目性质'
-          ? './img/projectPoint_XMXZ.png'
-          : projectSymbolValue === '建设状态'
-          ? './img/projectPoint_JSZT.png'
-          : './img/projectPoint_XMZS.png';
+        projectSymbolValue === "项目总数"
+          ? "./img/projectPoint_XMZS.png"
+          : projectSymbolValue === "立项级别"
+          ? "./img/projectPoint_LXJB.png"
+          : projectSymbolValue === "合规性"
+          ? "./img/projectPoint_HGX.png"
+          : projectSymbolValue === "项目类别"
+          ? "./img/projectPoint_XMLB.png"
+          : projectSymbolValue === "项目性质"
+          ? "./img/projectPoint_XMXZ.png"
+          : projectSymbolValue === "建设状态"
+          ? "./img/projectPoint_JSZT.png"
+          : "./img/projectPoint_XMZS.png";
       const myIcon = L.icon({
         iconUrl: iconUrl,
         iconSize: [24, 24]
@@ -1044,7 +1045,7 @@ export default class integration extends PureComponent {
   };
 
   WKT2GeoJSON = wkt => {
-    let data = wkt.split(' ');
+    let data = wkt.split(" ");
     let left = data[0];
     let right = data[1];
     let x = left.substring(6, left.length);
@@ -1054,7 +1055,7 @@ export default class integration extends PureComponent {
   };
 
   callbackDrawMapProjectPoints = data => {
-    console.log('callbackDrawMapProjectPoints', data);
+    console.log("callbackDrawMapProjectPoints", data);
     this.setState({ showProgress_ProjectPoint: false });
     ProjectPointsData = data;
     const { projectSymbolValue } = this.state;
@@ -1062,7 +1063,7 @@ export default class integration extends PureComponent {
   };
 
   callbackProjectPoints = data => {
-    console.log('callbackProjectPoints', data);
+    console.log("callbackProjectPoints", data);
     this.setState({ showProgress_ProjectPoint: false });
     ProjectPointsData = data;
   };
@@ -1075,13 +1076,16 @@ export default class integration extends PureComponent {
     const { payload } = this.state;
     const params = {
       ...payload,
-      MaxResultCount: projectSuperviseList && projectSuperviseList.totalCount ? projectSuperviseList.totalCount : 1000
+      MaxResultCount:
+        projectSuperviseList && projectSuperviseList.totalCount
+          ? projectSuperviseList.totalCount
+          : 1000
       // MaxResultCount: 1000
       // SkipCount: null
     };
     this.setState({ showProgress_ProjectPoint: true });
     this.props.dispatch({
-      type: 'mapdata/getAllPoint',
+      type: "mapdata/getAllPoint",
       payload: params,
       callback: callback
     });
@@ -1091,7 +1095,7 @@ export default class integration extends PureComponent {
    * 项目符号化类型切换函数
    */
   onChangeProjectSymbol = e => {
-    console.log('radio checked', e.target.value);
+    console.log("radio checked", e.target.value);
     this.setState({
       projectSymbolValue: e.target.value
     });
@@ -1104,7 +1108,7 @@ export default class integration extends PureComponent {
       );
     } else {
       //切换区域统计类型
-      if (e.target.value === '项目总数') {
+      if (e.target.value === "项目总数") {
         this.createZStatistics();
       } else {
         this.createZSPie(e.target.value);
@@ -1134,7 +1138,7 @@ export default class integration extends PureComponent {
             //符合饼状图类型过滤条件
             const myIcon = L.divIcon({
               html: `<div id="cMark${index}" style="width:40px;height:40px;position:relative;background-color:transparent;"></div>`,
-              className: 'leaflet-echart-icon',
+              className: "leaflet-echart-icon",
               iconSize: [40, 40]
             });
             ZSgeojsonLayer.addLayer(
@@ -1145,27 +1149,27 @@ export default class integration extends PureComponent {
             );
             let option = {
               tooltip: {
-                trigger: 'item',
-                formatter: '{a} <br/>{b}: {c} ({d}%)'
+                trigger: "item",
+                formatter: "{a} <br/>{b}: {c} ({d}%)"
               },
               series: [
                 {
                   name: `${result[i].type}`,
-                  type: 'pie',
+                  type: "pie",
                   hoverAnimation: false, //是否开启hover在扇区上的放大动画效果
-                  radius: '100%',
-                  center: ['50%', '50%'],
+                  radius: "100%",
+                  center: ["50%", "50%"],
                   label: {
                     //饼图图形上的文本标签
                     normal: {
                       show: true,
-                      position: 'inner', //标签的位置
+                      position: "inner", //标签的位置
                       textStyle: {
                         // fontWeight : 300 ,
                         fontSize: 10 //文字的字体大小
                       },
                       //formatter:'{d}%'
-                      formatter: '{c}'
+                      formatter: "{c}"
                     }
                   },
                   //{value:50,name:'高速50KM',itemStyle:{normal:{color:'#FE0000'}}},
@@ -1174,7 +1178,7 @@ export default class integration extends PureComponent {
                     emphasis: {
                       shadowBlur: 10,
                       shadowOffsetX: 0,
-                      shadowColor: 'rgba(0, 0, 0, 0.5)'
+                      shadowColor: "rgba(0, 0, 0, 0.5)"
                     }
                   }
                 }
@@ -1188,7 +1192,7 @@ export default class integration extends PureComponent {
   };
 
   callbackDrawMapPieZStatistics = data => {
-    console.log('callbackDrawMapPieZStatistics', data);
+    console.log("callbackDrawMapPieZStatistics", data);
     this.setState({ showProgress_Pie: false });
     RegionPieData = data;
     const { projectSymbolValue } = this.state;
@@ -1196,7 +1200,7 @@ export default class integration extends PureComponent {
   };
 
   callbackPieZStatistics = data => {
-    console.log('callbackDrawMapPieZStatistics', data);
+    console.log("callbackDrawMapPieZStatistics", data);
     this.setState({ showProgress_Pie: false });
     RegionPieData = data;
   };
@@ -1210,7 +1214,7 @@ export default class integration extends PureComponent {
     };
     this.setState({ showProgress_Pie: true });
     this.props.dispatch({
-      type: 'mapdata/statisticsByDistrictCode',
+      type: "mapdata/statisticsByDistrictCode",
       payload: params,
       callback: callback
     });
@@ -1255,7 +1259,7 @@ export default class integration extends PureComponent {
         if (item.totalCount > 0) {
           const myIcon = L.divIcon({
             html: item.totalCount,
-            className: 'my-div-icon',
+            className: "my-div-icon",
             iconSize: 16
           });
           ZSgeojsonLayer.addLayer(
@@ -1282,21 +1286,21 @@ export default class integration extends PureComponent {
     };
     this.setState({ showProgress_ZS: true });
     this.props.dispatch({
-      type: 'mapdata/totalByDistrictCode',
+      type: "mapdata/totalByDistrictCode",
       payload: params,
       callback: callback
     });
   };
 
   callbackDrawMapZStatistics = data => {
-    console.log('callbackDrawMapZStatistics', data);
+    console.log("callbackDrawMapZStatistics", data);
     this.setState({ showProgress_ZS: false });
     RegionCenterData = data;
     this.drawMapZStatistics(data);
   };
 
   callbackZStatistics = data => {
-    console.log('callbackZStatistics', data);
+    console.log("callbackZStatistics", data);
     this.setState({ showProgress_ZS: false });
     RegionCenterData = data;
   };
@@ -1314,15 +1318,20 @@ export default class integration extends PureComponent {
       const zoom = map.getZoom();
       if (zoom < config.pointLevel) {
         let regionPolygon = this.getRegionPolygonbyPoint(e.latlng);
-        console.log('regionPolygon',regionPolygon);
-        userconfig.pointsInPolygon_XMJG = this.getPointsbyRegionPolygon(regionPolygon,ProjectPointsData);
-        console.log('userconfig.pointsInPolygon_XMJG',userconfig.pointsInPolygon_XMJG);
-        if(userconfig.pointsInPolygon_XMJG.length>0){
+        console.log("regionPolygon", regionPolygon);
+        userconfig.pointsInPolygon_XMJG = this.getPointsbyRegionPolygon(
+          regionPolygon,
+          ProjectPointsData
+        );
+        console.log(
+          "userconfig.pointsInPolygon_XMJG",
+          userconfig.pointsInPolygon_XMJG
+        );
+        if (userconfig.pointsInPolygon_XMJG.length > 0) {
           // map.flyTo(e.latlng, config.pointLevel);
           map.fitBounds(userconfig.pointsInPolygon_XMJG);
-        }
-        else{
-          message.warning('点击该区域范围内没有项目点', 1);         
+        } else {
+          message.warning("点击该区域范围内没有项目点", 1);
         }
       }
     }
@@ -1360,50 +1369,53 @@ export default class integration extends PureComponent {
       const zoom = map.getZoom();
       if (zoom < config.pointLevel) {
         let regionPolygon = this.getRegionPolygonbyPoint(e.latlng);
-        console.log('regionPolygon',regionPolygon);
-        userconfig.pointsInPolygon_XMJG = this.getPointsbyRegionPolygon(regionPolygon,ProjectPointsData);
-        console.log('userconfig.pointsInPolygon_XMJG',userconfig.pointsInPolygon_XMJG);
-        if(userconfig.pointsInPolygon_XMJG.length>0){
+        console.log("regionPolygon", regionPolygon);
+        userconfig.pointsInPolygon_XMJG = this.getPointsbyRegionPolygon(
+          regionPolygon,
+          ProjectPointsData
+        );
+        console.log(
+          "userconfig.pointsInPolygon_XMJG",
+          userconfig.pointsInPolygon_XMJG
+        );
+        if (userconfig.pointsInPolygon_XMJG.length > 0) {
           //map.flyTo(e.latlng, config.pointLevel);
           map.fitBounds(userconfig.pointsInPolygon_XMJG);
-        }
-        else{
-          message.warning('点击该区域范围内没有项目点', 1);         
+        } else {
+          message.warning("点击该区域范围内没有项目点", 1);
         }
       }
     }
   };
 
   // 获取行政区域面内的项目点
-  getPointsbyRegionPolygon = (regionPolygon,ProjectPointsData) => {
+  getPointsbyRegionPolygon = (regionPolygon, ProjectPointsData) => {
     let pointsInPolygon_XMJG = [];
-    if(ProjectPointsData && ProjectPointsData.items.length>0){
-      for(let i =0;i<ProjectPointsData.items.length;i++){
+    if (ProjectPointsData && ProjectPointsData.items.length > 0) {
+      for (let i = 0; i < ProjectPointsData.items.length; i++) {
         let data = ProjectPointsData.items[i];
         let pointJson = this.WKT2GeoJSON(data.point);
         if (pointJson[0] !== 0 && pointJson[1] !== 0) {
-         let turfpoint = turf.point(pointJson);
-         if (turf.booleanPointInPolygon(turfpoint, regionPolygon)) {
-          // pointsInPolygon_XMJG.push(pointJson);
-          pointsInPolygon_XMJG.push([pointJson[1],pointJson[0]]);
-         }
+          let turfpoint = turf.point(pointJson);
+          if (turf.booleanPointInPolygon(turfpoint, regionPolygon)) {
+            // pointsInPolygon_XMJG.push(pointJson);
+            pointsInPolygon_XMJG.push([pointJson[1], pointJson[0]]);
+          }
         }
       }
     }
-    return pointsInPolygon_XMJG;   
-  }
+    return pointsInPolygon_XMJG;
+  };
 
   // 根据点匹配对应的行政区域面
   getRegionPolygonbyPoint = latlng => {
     let regionPolygon = null;
-    if(regiongeojsonLayer){
+    if (regiongeojsonLayer) {
       let polygon = null;
       let turfpoint = null;
-      regiongeojsonLayer.eachLayer(function (layer) {
+      regiongeojsonLayer.eachLayer(function(layer) {
         //构造面
-        polygon = turf.multiPolygon(
-          layer.feature.geometry.coordinates
-        );
+        polygon = turf.multiPolygon(layer.feature.geometry.coordinates);
         turfpoint = turf.point([latlng.lng, latlng.lat]);
         if (turf.booleanPointInPolygon(turfpoint, polygon)) {
           regionPolygon = polygon;
@@ -1411,7 +1423,7 @@ export default class integration extends PureComponent {
       });
     }
     return regionPolygon;
-  }
+  };
 
   // 根据行政区划名称匹配对应的区域统计圆圈图层
   HLZSLayerbyName = name => {
@@ -1458,19 +1470,19 @@ export default class integration extends PureComponent {
 
   //获取当前账号行政区下一级行政区数据
   getNextRegions = () => {
-    const user = localStorage.getItem('user');
+    const user = localStorage.getItem("user");
     if (user) {
       const curuser = JSON.parse(user);
       const parentid = curuser.departmentDistrictCodeId;
       //  console.log('curuser',curuser);
       this.queryRegionByProperty(
         parentid,
-        'parent_id',
+        "parent_id",
         config.districtBound.mapDistrictLayerName,
         this.callbackRegionQueryWFSService
       );
     } else {
-      message.warning('区域范围之外的数据没有权限操作', 1);
+      message.warning("区域范围之外的数据没有权限操作", 1);
     }
   };
 
@@ -1484,13 +1496,13 @@ export default class integration extends PureComponent {
       const bounds = regiongeojsonLayer.getBounds();
       map.fitBounds(bounds);
     } else {
-      const user = localStorage.getItem('user');
+      const user = localStorage.getItem("user");
       if (user) {
         const curuser = JSON.parse(user);
         const id = curuser.departmentDistrictCodeId;
         this.queryRegionByProperty(
           id,
-          'id',
+          "id",
           config.districtBound.mapDistrictLayerName,
           this.callbackLastRegionQueryWFSService
         );
@@ -1521,23 +1533,23 @@ export default class integration extends PureComponent {
     const me = this;
     let filter =
       '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
-    filter += '<PropertyIsEqualTo>';
-    filter += '<PropertyName>' + propertyName + '</PropertyName>';
-    filter += '<Literal>' + propertyValue + '</Literal>';
-    filter += '</PropertyIsEqualTo>';
-    filter += '</Filter>';
-    let urlString = config.mapUrl.geoserverUrl + '/ows';
+    filter += "<PropertyIsEqualTo>";
+    filter += "<PropertyName>" + propertyName + "</PropertyName>";
+    filter += "<Literal>" + propertyValue + "</Literal>";
+    filter += "</PropertyIsEqualTo>";
+    filter += "</Filter>";
+    let urlString = config.mapUrl.geoserverUrl + "/ows";
     let param = {
-      service: 'WFS',
-      version: '1.0.0',
-      request: 'GetFeature',
+      service: "WFS",
+      version: "1.0.0",
+      request: "GetFeature",
       typeName: typeName,
-      outputFormat: 'application/json',
+      outputFormat: "application/json",
       filter: filter
     };
     let geojsonUrl = urlString + L.Util.getParamString(param, urlString);
     me.props.dispatch({
-      type: 'mapdata/queryRegionWFSLayer',
+      type: "mapdata/queryRegionWFSLayer",
       payload: { geojsonUrl },
       callback: callback
     });
@@ -1641,10 +1653,10 @@ export default class integration extends PureComponent {
     // 内容及单击事件
     const elements = jQuery(
       `<div>
-        ${toPopupItemStr('问题点名称', item.name)}
-        ${toPopupItemStr('问题点备注', item.description)}
-        ${toPopupItemStr('经度', latlng.lng)}
-        ${toPopupItemStr('纬度', latlng.lat)}
+        ${toPopupItemStr("问题点名称", item.name)}
+        ${toPopupItemStr("问题点备注", item.description)}
+        ${toPopupItemStr("经度", latlng.lng)}
+        ${toPopupItemStr("纬度", latlng.lat)}
       </div>`
     );
     return elements;
@@ -1652,7 +1664,7 @@ export default class integration extends PureComponent {
 
   // 转为popup项
   toPopupItemStr = (name, value) => {
-    return value ? `<b>${name}：</b>${value}<br>` : '';
+    return value ? `<b>${name}：</b>${value}<br>` : "";
   };
 
   /*
@@ -1661,7 +1673,7 @@ export default class integration extends PureComponent {
   async addProblemPointsToMap(geojson, problemPointLayer) {
     for (let i = 0; i < geojson.features.length; i++) {
       const myIcon = L.icon({
-        iconUrl: './img/problemPointMarker.png',
+        iconUrl: "./img/problemPointMarker.png",
         iconSize: [32, 32]
       });
       let marker = L.marker(
@@ -1681,7 +1693,7 @@ export default class integration extends PureComponent {
     let item = null;
     try {
       geojson = {
-        type: 'FeatureCollection',
+        type: "FeatureCollection",
         features: []
       };
       //构造geojson数据源
@@ -1695,10 +1707,10 @@ export default class integration extends PureComponent {
               id: item.id
             };
             let obj = {
-              type: 'Feature',
+              type: "Feature",
               properties: properties,
               geometry: {
-                type: 'Point',
+                type: "Point",
                 coordinates: [item.pointX, item.pointY]
               }
             };
@@ -1725,7 +1737,7 @@ export default class integration extends PureComponent {
       //显示编辑菜单按钮
       me.setState({ showButton: true });
       //移除地图监听事件
-      map.off('click');
+      map.off("click");
       me.clearPlotGraphic();
       me.clearGeojsonLayer();
       me.loadGeojsonLayer(data, geoJsonStyle);
@@ -1736,7 +1748,7 @@ export default class integration extends PureComponent {
       //移动图形
       //map.pm.toggleGlobalDragMode();
     } else {
-      message.warning('匹配不到相关编辑', 1);
+      message.warning("匹配不到相关编辑", 1);
     }
   };
   /*
@@ -1754,7 +1766,7 @@ export default class integration extends PureComponent {
             maxZoom: config.mapInitParams.zoom
           });
         }
-        let content = '';
+        let content = "";
         for (let i = 0; i < data.features.length; i++) {
           let feature = data.features[i];
           if (i === data.features.length - 1) {
@@ -1763,7 +1775,7 @@ export default class integration extends PureComponent {
             });
           } else {
             me.getWinContent(feature.properties, data => {
-              content += data[0].innerHTML + '<br><br>';
+              content += data[0].innerHTML + "<br><br>";
             });
           }
           //项目红线高亮关联扰动图斑
@@ -1782,10 +1794,10 @@ export default class integration extends PureComponent {
           }
         }, 500);
       } else {
-        message.warning('项目无可用位置信息', 1);
+        message.warning("项目无可用位置信息", 1);
       }
     } else {
-      message.warning('项目无可用位置信息', 1);
+      message.warning("项目无可用位置信息", 1);
     }
   };
   /*
@@ -1809,10 +1821,10 @@ export default class integration extends PureComponent {
           }
         }
       } else {
-        message.warning('项目无可用位置信息', 1);
+        message.warning("项目无可用位置信息", 1);
       }
     } else {
-      message.warning('项目无可用位置信息', 1);
+      message.warning("项目无可用位置信息", 1);
     }
   };
   /*
@@ -1823,12 +1835,12 @@ export default class integration extends PureComponent {
     if (data.success) {
       data = data.result;
       let geojsondata = {
-        type: 'FeatureCollection',
+        type: "FeatureCollection",
         features: []
       };
       //console.log("data", data);
       if (data.features.length > 0) {
-        let content = '';
+        let content = "";
         for (let i = 0; i < data.features.length; i++) {
           let feature = data.features[i];
           //过滤历史图斑记录
@@ -1840,7 +1852,7 @@ export default class integration extends PureComponent {
               });
             } else {
               me.getWinContent(feature.properties, data => {
-                content += data[0].innerHTML + '<br>';
+                content += data[0].innerHTML + "<br>";
               });
             }
           }
@@ -1862,7 +1874,7 @@ export default class integration extends PureComponent {
         map.closePopup();
       }
     } else {
-      message.warning('地图匹配不到相关数据', 1);
+      message.warning("地图匹配不到相关数据", 1);
       map.closePopup();
     }
   };
@@ -1871,7 +1883,7 @@ export default class integration extends PureComponent {
   querySpotByProjectId = ProjectId => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'spot/querySpotPolygonByProjectId',
+      type: "spot/querySpotPolygonByProjectId",
       payload: {
         ProjectId: ProjectId
       },
@@ -1898,33 +1910,33 @@ export default class integration extends PureComponent {
       me.clearGeojsonLayer();
       me.loadGeojsonLayer(data, geoJsonStyle);
       me.setState({
-        spotStatus: 'end' //start：开始，end：结束
+        spotStatus: "end" //start：开始，end：结束
       });
       if (data.features.length > 0) {
         let spotIds = [];
         for (let i = 0; i < data.features.length; i++) {
           let item = data.features[i];
-          let spotId = item.properties.id ? item.properties.id : '';
+          let spotId = item.properties.id ? item.properties.id : "";
           let project_id = item.properties.project_id
             ? item.properties.project_id
-            : '';
+            : "";
           spotIds.push({ spotId: spotId, projectId: project_id });
         }
         //图斑关联
-        emitter.emit('spotRelate', {
-          status: 'end', //start：开始，end：结束
+        emitter.emit("spotRelate", {
+          status: "end", //start：开始，end：结束
           spotId: spotIds,
           projectId: me.state.spotRelateProjectId
         });
       } else {
         //图斑关联
-        emitter.emit('spotRelate', {
-          status: 'end', //start：开始，end：结束
+        emitter.emit("spotRelate", {
+          status: "end", //start：开始，end：结束
           spotId: []
         });
       }
     } else {
-      message.warning('地图匹配不到相关数据', 1);
+      message.warning("地图匹配不到相关数据", 1);
       map.closePopup();
     }
   };
@@ -1935,22 +1947,22 @@ export default class integration extends PureComponent {
     let pic;
     pic =
       azimuth === 0
-        ? 'north'
+        ? "north"
         : azimuth < 90
-        ? 'east_north'
+        ? "east_north"
         : azimuth === 90
-        ? 'east'
+        ? "east"
         : azimuth < 180
-        ? 'east_south'
+        ? "east_south"
         : azimuth === 180
-        ? 'south'
+        ? "south"
         : azimuth < 270
-        ? 'west_south'
+        ? "west_south"
         : azimuth === 270
-        ? 'west'
+        ? "west"
         : azimuth < 360
-        ? 'west_north'
-        : 'north';
+        ? "west_north"
+        : "north";
     return pic;
   };
   /*
@@ -1992,19 +2004,19 @@ export default class integration extends PureComponent {
     /* This code is needed to properly load the images in the Leaflet CSS */
     delete L.Icon.Default.prototype._getIconUrl;
     L.Icon.Default.mergeOptions({
-      iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-      iconUrl: require('leaflet/dist/images/marker-icon.png'),
-      shadowUrl: require('leaflet/dist/images/marker-shadow.png')
+      iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
+      iconUrl: require("leaflet/dist/images/marker-icon.png"),
+      shadowUrl: require("leaflet/dist/images/marker-shadow.png")
     });
-    map = L.map('map', {
+    map = L.map("map", {
       zoomControl: false,
       attributionControl: false,
       //editable: true
       layers: [problemPointLayer]
     }).setView(config.mapInitParams.center, config.mapInitParams.zoom);
 
-    map.createPane('tileLayerZIndex');
-    map.getPane('tileLayerZIndex').style.zIndex = 0;
+    map.createPane("tileLayerZIndex");
+    map.getPane("tileLayerZIndex").style.zIndex = 0;
     const { onlineBasemaps } = config;
     // 在线底图
     this.onlineBasemapLayers = onlineBasemaps.map(item => {
@@ -2012,7 +2024,7 @@ export default class integration extends PureComponent {
         minZoom: item.minZoom,
         maxZoom: item.maxZoom,
         subdomains: item.subdomains,
-        pane: 'tileLayerZIndex',
+        pane: "tileLayerZIndex",
         errorTileUrl: item.errorTileUrl
       });
     });
@@ -2022,7 +2034,7 @@ export default class integration extends PureComponent {
     // 编辑图形工具
     // 定义图层绘制控件选择项
     const options = {
-      position: 'topright', // toolbar position, options are 'topleft', 'topright', 'bottomleft', 'bottomright'
+      position: "topright", // toolbar position, options are 'topleft', 'topright', 'bottomleft', 'bottomright'
       drawMarker: false, // adds button to draw markers
       drawPolyline: false, // adds button to draw a polyline
       drawRectangle: false, // adds button to draw a rectangle
@@ -2039,46 +2051,46 @@ export default class integration extends PureComponent {
     picLayerGroup = L.featureGroup().addTo(map);
 
     // 监听地图点击事件
-    map.on('click', me.onClickMap);
+    map.on("click", me.onClickMap);
     // 监听地图移动完成事件
-    map.on('moveend', me.onMoveendMap);
+    map.on("moveend", me.onMoveendMap);
     // 监听地图底图切换事件
-    map.on('baselayerchange', me.onBaseLayerChange);
+    map.on("baselayerchange", me.onBaseLayerChange);
     // 监听地图鼠标移动事件
-    map.on('mousemove', me.showImageInfos);
+    map.on("mousemove", me.showImageInfos);
     // 获取项目区域范围
     me.getRegionGeometry();
 
     /*-------------------------------------项目监管部分-------------------------------------*/
     //行政区划图层
-    map.createPane('regiongeoJsonZIndex');
-    map.getPane('regiongeoJsonZIndex').style.zIndex = 1;
+    map.createPane("regiongeoJsonZIndex");
+    map.getPane("regiongeoJsonZIndex").style.zIndex = 1;
     regiongeojsonLayer = L.Proj.geoJson(null, {
       style: regionGeoJsonStyle,
-      pane: 'regiongeoJsonZIndex'
+      pane: "regiongeoJsonZIndex"
     });
     map.addLayer(regiongeojsonLayer);
     //监听行政区划图层鼠标事件
-    regiongeojsonLayer.on('click', me.onClickRegiongeojsonLayer);
-    regiongeojsonLayer.on('mouseover', me.onMoveoverRegiongeojsonLayer);
-    regiongeojsonLayer.on('mouseout', me.onMoveoutRegiongeojsonLayer);
+    regiongeojsonLayer.on("click", me.onClickRegiongeojsonLayer);
+    regiongeojsonLayer.on("mouseover", me.onMoveoverRegiongeojsonLayer);
+    regiongeojsonLayer.on("mouseout", me.onMoveoutRegiongeojsonLayer);
 
     //临时绘制关联项目红线以及扰动图斑
     temprenlinegeojsonLayer = L.Proj.geoJson(null, {
       style: tempRedlineGeoJsonStyle,
-      pane: 'regiongeoJsonZIndex'
+      pane: "regiongeoJsonZIndex"
     });
     map.addLayer(temprenlinegeojsonLayer);
     tempspotgeojsonLayer = L.Proj.geoJson(null, {
       style: tempSpotGeoJsonStyle,
-      pane: 'regiongeoJsonZIndex'
+      pane: "regiongeoJsonZIndex"
     });
     map.addLayer(tempspotgeojsonLayer);
 
     //区域统计图层
-    ZSgeojsonLayer = L.featureGroup([], { pane: 'regiongeoJsonZIndex' });
+    ZSgeojsonLayer = L.featureGroup([], { pane: "regiongeoJsonZIndex" });
     map.addLayer(ZSgeojsonLayer);
-    ZSgeojsonLayer.on('click', me.onClickZSgeojsonLayer);
+    ZSgeojsonLayer.on("click", me.onClickZSgeojsonLayer);
 
     // 项目点
     projectPointLayer = L.markerClusterGroup({
@@ -2088,7 +2100,7 @@ export default class integration extends PureComponent {
       maxClusterRadius: 80 //默认80
     });
     map.addLayer(projectPointLayer);
-    projectPointLayer.on('click', me.onClickProjectPointLayer);
+    projectPointLayer.on("click", me.onClickProjectPointLayer);
   };
   //监听地图点击事件
   onBaseLayerChange = e => {
@@ -2128,35 +2140,35 @@ export default class integration extends PureComponent {
     const { switchDataModal } = this.state;
     let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
     if (!turf.booleanPointInPolygon(turfpoint, userconfig.polygon)) {
-      message.warning('区域范围之外的数据没有权限操作', 1);
+      message.warning("区域范围之外的数据没有权限操作", 1);
       return;
     }
     me.clearGeojsonLayer();
     userconfig.mapPoint = e.latlng;
     //地图定位判断
-    if (userconfig.state === 'position') {
+    if (userconfig.state === "position") {
       //地图获取经纬度
       jQuery(userconfig.geoJsonLayer.getPane())
-        .find('path')
+        .find("path")
         .css({
-          cursor: 'pointer'
+          cursor: "pointer"
         });
-      let myIcon = '';
-      if (userconfig.siteLocationtype === 'panorama') {
+      let myIcon = "";
+      if (userconfig.siteLocationtype === "panorama") {
         //全景点
         myIcon = L.icon({
-          iconUrl: './img/camer.png',
+          iconUrl: "./img/camer.png",
           iconSize: [24, 24]
         });
       } else {
         myIcon = L.icon({
-          iconUrl: './img/marker-icon.png',
+          iconUrl: "./img/marker-icon.png",
           iconSize: [17, 31]
         });
       }
-      userconfig.state = '';
-      userconfig.siteLocationtype = '';
-      emitter.emit('siteLocationBack', {
+      userconfig.state = "";
+      userconfig.siteLocationtype = "";
+      emitter.emit("siteLocationBack", {
         latitude: userconfig.mapPoint.lat,
         longitude: userconfig.mapPoint.lng
       });
@@ -2173,7 +2185,7 @@ export default class integration extends PureComponent {
       let point = { x: e.latlng.lng, y: e.latlng.lat };
       //图斑关联判断spotStatus
       const { spotStatus } = me.state;
-      if (spotStatus === 'start') {
+      if (spotStatus === "start") {
         //图斑关联点查
         me.queryWFSServiceByPoint(
           point,
@@ -2182,7 +2194,7 @@ export default class integration extends PureComponent {
         );
       } else {
         //普通点查
-        let LayersName = '';
+        let LayersName = "";
         const { showHistoryContrast } = me.state;
         if (showHistoryContrast) {
           //地图卷帘模式下
@@ -2233,7 +2245,7 @@ export default class integration extends PureComponent {
     if (showImageTimeText && imageTimeResult) {
       let tileInfos = imageTimeResult.tileInfos;
       if (tileInfos.length > 0) {
-        let pt = proj4('EPSG:4326', 'EPSG:3857', [e.latlng.lng, e.latlng.lat]);
+        let pt = proj4("EPSG:4326", "EPSG:3857", [e.latlng.lng, e.latlng.lat]);
         for (let i = 0; i < tileInfos.length; i++) {
           let item = tileInfos[i];
           if (
@@ -2243,7 +2255,7 @@ export default class integration extends PureComponent {
             pt[1] <= item.ymax
           ) {
             let data = item.data;
-            if (data && data.hasOwnProperty('takenDate')) {
+            if (data && data.hasOwnProperty("takenDate")) {
               me.setState({ imageTimeText: data.takenDate });
             }
             return true;
@@ -2256,7 +2268,7 @@ export default class integration extends PureComponent {
   onMoveendMap = e => {
     const me = this;
     const { switchDataModal } = this.state;
-    if(!map){
+    if (!map) {
       return;
     }
     let zoom = map.getZoom();
@@ -2288,21 +2300,21 @@ export default class integration extends PureComponent {
       //图属联动空间过滤
       const { chartStatus } = this.state;
       if (zoom >= config.mapInitParams.zoom && chartStatus) {
-        let polygon = 'polygon((';
+        let polygon = "polygon((";
         polygon +=
-          bounds.getSouthWest().lng + ' ' + bounds.getSouthWest().lat + ',';
+          bounds.getSouthWest().lng + " " + bounds.getSouthWest().lat + ",";
         polygon +=
-          bounds.getSouthWest().lng + ' ' + bounds.getNorthEast().lat + ',';
+          bounds.getSouthWest().lng + " " + bounds.getNorthEast().lat + ",";
         polygon +=
-          bounds.getNorthEast().lng + ' ' + bounds.getNorthEast().lat + ',';
+          bounds.getNorthEast().lng + " " + bounds.getNorthEast().lat + ",";
         polygon +=
-          bounds.getNorthEast().lng + ' ' + bounds.getSouthWest().lat + ',';
-        polygon += bounds.getSouthWest().lng + ' ' + bounds.getSouthWest().lat;
-        polygon += '))';
+          bounds.getNorthEast().lng + " " + bounds.getSouthWest().lat + ",";
+        polygon += bounds.getSouthWest().lng + " " + bounds.getSouthWest().lat;
+        polygon += "))";
 
-        emitter.emit('chartLinkage', {
+        emitter.emit("chartLinkage", {
           open: true,
-          type: 'spot',
+          type: "spot",
           polygon: polygon
         });
       }
@@ -2312,8 +2324,7 @@ export default class integration extends PureComponent {
         //历史影像查询
         me.getInfoByExtent(zoom, bounds, me.callbackGetInfoByExtent, false);
       }
-    }
-    else {
+    } else {
       /*-------------------------------------项目监管部分-------------------------------------*/
       if (zoom >= config.pointLevel) {
         //隐藏区域统计图层
@@ -2328,23 +2339,22 @@ export default class integration extends PureComponent {
             projectSymbolValue
           );
         }
-      }
-      else {
+      } else {
         //隐藏项目点聚合图层
         if (projectPointLayer && projectPointLayer.getLayers().length > 0) {
           me.clearXMJGGeojsonLayer(projectPointLayer);
         }
         //显示区域统计图层
         const { projectSymbolValue } = me.state;
-        if (projectSymbolValue === '项目总数') {
+        if (projectSymbolValue === "项目总数") {
           if (ZSgeojsonLayer && ZSgeojsonLayer.getLayers().length <= 0) {
             //预防初始化时候加载两次请求
-            if(userconfig.zoom !== zoom){
+            if (userconfig.isloadMap) {
               me.createZStatistics(); //区域总数统计
             }
+            userconfig.isloadMap = true;
           }
-        }
-        else {
+        } else {
           if (ZSgeojsonLayer && ZSgeojsonLayer.getLayers().length <= 0) {
             me.createZSPie(projectSymbolValue); //区域饼状图统计
           }
@@ -2367,15 +2377,14 @@ export default class integration extends PureComponent {
         //区县级行政区划
         radius = 2000;
       }
-      if(ZSgeojsonLayer){
-        ZSgeojsonLayer.eachLayer(function (layer) {
+      if (ZSgeojsonLayer) {
+        ZSgeojsonLayer.eachLayer(function(layer) {
           //console.log('radius',zoom,radius);
-          if(layer.options.radius){
+          if (layer.options.radius) {
             layer.setRadius(radius);
           }
         });
       }
-      
     }
   };
   /*根据地图当前范围获取对应历史影像数据
@@ -2390,11 +2399,11 @@ export default class integration extends PureComponent {
     const me = this;
     userconfig.isLoadSideBySide = isLoadSideBySide;
     let urlString = config.mapUrl.getInfoByExtent;
-    let xyMin = proj4('EPSG:4326', 'EPSG:3857', [
+    let xyMin = proj4("EPSG:4326", "EPSG:3857", [
       bounds.getSouthWest().lng,
       bounds.getSouthWest().lat
     ]);
-    let xyMax = proj4('EPSG:4326', 'EPSG:3857', [
+    let xyMax = proj4("EPSG:4326", "EPSG:3857", [
       bounds.getNorthEast().lng,
       bounds.getNorthEast().lat
     ]);
@@ -2407,7 +2416,7 @@ export default class integration extends PureComponent {
     };
     let geojsonUrl = urlString + L.Util.getParamString(param, urlString);
     me.props.dispatch({
-      type: 'mapdata/getInfoByExtent',
+      type: "mapdata/getInfoByExtent",
       payload: { geojsonUrl },
       callback: callback
     });
@@ -2428,23 +2437,23 @@ export default class integration extends PureComponent {
     const me = this;
     let filter =
       '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
-    filter += '<PropertyIsEqualTo>';
-    filter += '<PropertyName>' + propertyName + '</PropertyName>';
-    filter += '<Literal>' + propertyValue + '</Literal>';
-    filter += '</PropertyIsEqualTo>';
-    filter += '</Filter>';
-    let urlString = config.mapUrl.geoserverQueryUrl + '/ows';
+    filter += "<PropertyIsEqualTo>";
+    filter += "<PropertyName>" + propertyName + "</PropertyName>";
+    filter += "<Literal>" + propertyValue + "</Literal>";
+    filter += "</PropertyIsEqualTo>";
+    filter += "</Filter>";
+    let urlString = config.mapUrl.geoserverQueryUrl + "/ows";
     let param = {
-      service: 'WFS',
-      version: '1.0.0',
-      request: 'GetFeature',
+      service: "WFS",
+      version: "1.0.0",
+      request: "GetFeature",
       typeName: typeName,
-      outputFormat: 'application/json',
+      outputFormat: "application/json",
       filter: filter
     };
     let geojsonUrl = urlString + L.Util.getParamString(param, urlString);
     me.props.dispatch({
-      type: 'mapdata/queryWFSLayer',
+      type: "mapdata/queryWFSLayer",
       payload: { geojsonUrl },
       callback: callback
     });
@@ -2457,49 +2466,49 @@ export default class integration extends PureComponent {
   queryWFSServiceByExtent = (typeName, callback) => {
     const me = this;
     let bounds = map.getBounds();
-    let polygon = bounds.getSouthWest().lng + ',' + bounds.getSouthWest().lat;
+    let polygon = bounds.getSouthWest().lng + "," + bounds.getSouthWest().lat;
     polygon +=
-      ' ' + bounds.getSouthWest().lng + ',' + bounds.getNorthEast().lat;
+      " " + bounds.getSouthWest().lng + "," + bounds.getNorthEast().lat;
     polygon +=
-      ' ' + bounds.getNorthEast().lng + ',' + bounds.getNorthEast().lat;
+      " " + bounds.getNorthEast().lng + "," + bounds.getNorthEast().lat;
     polygon +=
-      ' ' + bounds.getNorthEast().lng + ',' + bounds.getSouthWest().lat;
+      " " + bounds.getNorthEast().lng + "," + bounds.getSouthWest().lat;
     polygon +=
-      ' ' + bounds.getSouthWest().lng + ',' + bounds.getSouthWest().lat;
+      " " + bounds.getSouthWest().lng + "," + bounds.getSouthWest().lat;
     //console.log(polygon);
     let filter =
       '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
-    filter += '<And>';
-    filter += '<Intersects>';
-    filter += '<PropertyName>geom</PropertyName>';
-    filter += '<gml:Polygon>';
-    filter += '<gml:outerBoundaryIs>';
-    filter += '<gml:LinearRing>';
-    filter += '<gml:coordinates>' + polygon + '</gml:coordinates>';
-    filter += '</gml:LinearRing>';
-    filter += '</gml:outerBoundaryIs>';
-    filter += '</gml:Polygon>';
-    filter += '</Intersects>';
-    filter += '<Not>';
-    filter += '<PropertyIsNull>';
-    filter += '<PropertyName>archive_time</PropertyName>';
-    filter += '</PropertyIsNull>';
-    filter += '</Not>';
-    filter += '</And>';
-    filter += '</Filter>';
+    filter += "<And>";
+    filter += "<Intersects>";
+    filter += "<PropertyName>geom</PropertyName>";
+    filter += "<gml:Polygon>";
+    filter += "<gml:outerBoundaryIs>";
+    filter += "<gml:LinearRing>";
+    filter += "<gml:coordinates>" + polygon + "</gml:coordinates>";
+    filter += "</gml:LinearRing>";
+    filter += "</gml:outerBoundaryIs>";
+    filter += "</gml:Polygon>";
+    filter += "</Intersects>";
+    filter += "<Not>";
+    filter += "<PropertyIsNull>";
+    filter += "<PropertyName>archive_time</PropertyName>";
+    filter += "</PropertyIsNull>";
+    filter += "</Not>";
+    filter += "</And>";
+    filter += "</Filter>";
     // let urlString = config.mapUrl.geoserverUrl + '/ows';
-    let urlString = config.mapUrl.geoserverQueryUrl + '/ows';
+    let urlString = config.mapUrl.geoserverQueryUrl + "/ows";
     let param = {
-      service: 'WFS',
-      version: '1.0.0',
-      request: 'GetFeature',
+      service: "WFS",
+      version: "1.0.0",
+      request: "GetFeature",
       typeName: typeName,
-      outputFormat: 'application/json',
+      outputFormat: "application/json",
       filter: filter
     };
     let geojsonUrl = urlString + L.Util.getParamString(param, urlString);
     me.props.dispatch({
-      type: 'mapdata/getHistorySpotTimeByExtent',
+      type: "mapdata/getHistorySpotTimeByExtent",
       payload: { geojsonUrl },
       callback: callback
     });
@@ -2512,30 +2521,30 @@ export default class integration extends PureComponent {
    */
   queryWFSServiceByPoint = (point, typeName, callback) => {
     const me = this;
-    point = point.x + ',' + point.y;
+    point = point.x + "," + point.y;
     let filter =
       '<Filter xmlns="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">';
-    filter += '<Intersects>';
-    filter += '<PropertyName>geom</PropertyName>';
-    filter += '<gml:Point>';
-    filter += '<gml:coordinates>' + point + '</gml:coordinates>';
-    filter += '</gml:Point>';
-    filter += '</Intersects>';
-    filter += '</Filter>';
-    let urlString = config.mapUrl.geoserverQueryUrl + '/ows';
+    filter += "<Intersects>";
+    filter += "<PropertyName>geom</PropertyName>";
+    filter += "<gml:Point>";
+    filter += "<gml:coordinates>" + point + "</gml:coordinates>";
+    filter += "</gml:Point>";
+    filter += "</Intersects>";
+    filter += "</Filter>";
+    let urlString = config.mapUrl.geoserverQueryUrl + "/ows";
     let param = {
-      service: 'WFS',
-      version: '1.0.0',
-      request: 'GetFeature',
+      service: "WFS",
+      version: "1.0.0",
+      request: "GetFeature",
       typeName: typeName,
-      outputFormat: 'application/json',
+      outputFormat: "application/json",
       //maxFeatures: 100,
       filter: filter
       //srsName: epsg
     };
     let geojsonUrl = urlString + L.Util.getParamString(param, urlString);
     me.props.dispatch({
-      type: 'mapdata/queryWFSLayer',
+      type: "mapdata/queryWFSLayer",
       payload: { geojsonUrl },
       callback: callback
     });
@@ -2546,21 +2555,21 @@ export default class integration extends PureComponent {
     let elements;
     const obj = {
       show: true,
-      type: 'edit',
+      type: "edit",
       id: properties.map_num ? properties.id : properties.project_id,
-      from: properties.map_num ? 'spot' : 'project'
+      from: properties.map_num ? "spot" : "project"
     };
     elements = properties.map_num
       ? jQuery(
           `<div>图斑编号:${properties.map_num}</br>
     ${
       properties.project_name
-        ? '关联项目:' + properties.project_name + '</br>'
-        : ''
+        ? "关联项目:" + properties.project_name + "</br>"
+        : ""
     }${
             properties.interference_compliance
-              ? '扰动范围:' + properties.interference_compliance + '</br>'
-              : ''
+              ? "扰动范围:" + properties.interference_compliance + "</br>"
+              : ""
           }<a onclick='goDetail(${JSON.stringify(
             obj
           )})'>详情</a>    <a onclick='goEditGraphic(${JSON.stringify(
@@ -2586,7 +2595,7 @@ export default class integration extends PureComponent {
     if (properties.map_num) {
       this.creatElements(properties, callback);
     } else {
-      this.creatElements(properties, callback, '');
+      this.creatElements(properties, callback, "");
     }
   };
   /*
@@ -2631,12 +2640,12 @@ export default class integration extends PureComponent {
 
     //调用后台接口形式改造
     let geojson = {
-      type: 'FeatureCollection',
+      type: "FeatureCollection",
       features: [
         {
-          type: 'Feature',
+          type: "Feature",
           geometry: {
-            type: 'MultiPolygon',
+            type: "MultiPolygon",
             coordinates: userconfig.geojson.coordinates
           }
         }
@@ -2645,17 +2654,17 @@ export default class integration extends PureComponent {
     userconfig.geojson = geojson;
     //me.geojson2Multipolygon(userconfig.geojson,0);
     // L.Proj.GeoJSON继承于L.GeoJSON，可调样式
-    map.createPane('geoJsonZIndex');
-    map.getPane('geoJsonZIndex').style.zIndex = 1;
+    map.createPane("geoJsonZIndex");
+    map.getPane("geoJsonZIndex").style.zIndex = 1;
     userconfig.geoJsonLayer = L.Proj.geoJson(geojson, {
       style: {
-        color: '#0070FF',
+        color: "#0070FF",
         weight: 3,
         opacity: 1,
         //"fillColor":"",
         fillOpacity: 0
       },
-      pane: 'geoJsonZIndex'
+      pane: "geoJsonZIndex"
     }).addTo(map);
     let bounds = userconfig.geoJsonLayer.getBounds();
     map.fitBounds(bounds);
@@ -2693,17 +2702,17 @@ export default class integration extends PureComponent {
     let modalJson = turf.difference(boundGeo, userconfig.polygon);
     let tempLayer = L.Proj.geoJson(modalJson, {
       style: {
-        color: '#0070FF',
+        color: "#0070FF",
         weight: 3,
         opacity: 0,
-        fillColor: 'rgba(0, 0, 0, 0.45)',
+        fillColor: "rgba(0, 0, 0, 0.45)",
         fillOpacity: 1
       }
     }).addTo(map);
     jQuery(tempLayer.getPane())
-      .find('path')
+      .find("path")
       .css({
-        cursor: 'not-allowed'
+        cursor: "not-allowed"
       });
   };
   /*
@@ -2718,7 +2727,7 @@ export default class integration extends PureComponent {
     userconfig.layersControl = this.loadLayersControl();
     //地图缩放控件
     L.control
-      .zoom({ zoomInTitle: '放大', zoomOutTitle: '缩小', position: 'topright' })
+      .zoom({ zoomInTitle: "放大", zoomOutTitle: "缩小", position: "topright" })
       .addTo(map);
     //地图视图控件
     // L.control
@@ -2731,26 +2740,26 @@ export default class integration extends PureComponent {
     //   .addTo(map);
     //地图比例尺控件
     const scale = L.control
-      .scale({ imperial: false, position: 'bottomright' })
+      .scale({ imperial: false, position: "bottomright" })
       .addTo(map);
     jQuery(scale.getContainer())
-      .find('div')
+      .find("div")
       .css({
-        background: 'rgba(255, 255, 255, 1)',
-        border: '1px solid #000',
-        borderTop: 'none'
+        background: "rgba(255, 255, 255, 1)",
+        border: "1px solid #000",
+        borderTop: "none"
       });
     //量算工具
     var measureControl = new L.Control.Measure({
-      primaryLengthUnit: 'kilometers',
-      primaryAreaUnit: 'sqmeters',
-      activeColor: '#3388FF',
-      completedColor: '#3388FF'
+      primaryLengthUnit: "kilometers",
+      primaryAreaUnit: "sqmeters",
+      activeColor: "#3388FF",
+      completedColor: "#3388FF"
     });
     measureControl.addTo(map);
     //判断地图初始化是否项目监管状态
     const { switchDataModal } = this.state;
-    console.log('switchDataModal2675', switchDataModal);
+    console.log("switchDataModal2675", switchDataModal);
     if (!switchDataModal) {
       userconfig.projectWmsLayer.setOpacity(0);
       userconfig.spotWmsLayer.setOpacity(0);
@@ -2764,15 +2773,15 @@ export default class integration extends PureComponent {
    *加载默认图层控件
    */
   loadLayersControl = () => {
-    const frequentEdit = localStorage.getItem('frequentEdit');
+    const frequentEdit = localStorage.getItem("frequentEdit");
     // console.log("是否频繁编辑", frequentEdit, typeof frequentEdit);
-    if (frequentEdit === '1') {
+    if (frequentEdit === "1") {
       //加载项目红线图层wms
       userconfig.projectWmsLayer = LeaftWMS.overlay(
-        config.mapUrl.geoserverUrl + '/wms?',
+        config.mapUrl.geoserverUrl + "/wms?",
         {
           layers: config.mapProjectLayerName, //需要加载的图层
-          format: 'image/png', //返回的数据格式
+          format: "image/png", //返回的数据格式
           transparent: true,
           maxZoom: config.mapInitParams.maxZoom
         }
@@ -2780,23 +2789,25 @@ export default class integration extends PureComponent {
 
       //加载图斑图层wms
       userconfig.spotWmsLayer = LeaftWMS.overlay(
-        config.mapUrl.geoserverUrl + '/wms?',
+        config.mapUrl.geoserverUrl + "/wms?",
         {
           layers: config.mapSpotLayerName, //需要加载的图层
-          format: 'image/png', //返回的数据格式
+          format: "image/png", //返回的数据格式
           transparent: true,
           maxZoom: config.mapInitParams.maxZoom,
           // cql_filter: "map_num == 201808_450521_0515"
-          cql_filter: userconfig.cql_filter ? userconfig.cql_filter : 'archive_time is null'
+          cql_filter: userconfig.cql_filter
+            ? userconfig.cql_filter
+            : "archive_time is null"
         }
       ).addTo(map);
     } else {
       //默认加载瓦片地图模式
       //加载项目红线图层wms
       userconfig.projectWmsLayer = L.tileLayer
-        .wms(config.mapUrl.geoserverUrl + '/wms?', {
+        .wms(config.mapUrl.geoserverUrl + "/wms?", {
           layers: config.mapProjectLayerName, //需要加载的图层
-          format: 'image/png', //返回的数据格式
+          format: "image/png", //返回的数据格式
           transparent: true,
           maxZoom: config.mapInitParams.maxZoom
         })
@@ -2804,14 +2815,16 @@ export default class integration extends PureComponent {
 
       //加载图斑图层wms
       userconfig.spotWmsLayer = L.tileLayer
-        .wms(config.mapUrl.geoserverUrl + '/wms?', {
+        .wms(config.mapUrl.geoserverUrl + "/wms?", {
           layers: config.mapSpotLayerName, //需要加载的图层
-          format: 'image/png', //返回的数据格式
+          format: "image/png", //返回的数据格式
           transparent: true,
           maxZoom: config.mapInitParams.maxZoom,
           // cql_filter: "is_deleted == false"
           // cql_filter: 'archive_time is null'
-          cql_filter: userconfig.cql_filter ? userconfig.cql_filter : 'archive_time is null'
+          cql_filter: userconfig.cql_filter
+            ? userconfig.cql_filter
+            : "archive_time is null"
         })
         .addTo(map);
     }
@@ -2839,9 +2852,9 @@ export default class integration extends PureComponent {
     //   minZoom:districtBound.minZoom,
     //   maxZoom:districtBound.maxZoom
     // });
-    const districtBoundLayer = L.tileLayer.wms(districtBound.url + '/wms?', {
+    const districtBoundLayer = L.tileLayer.wms(districtBound.url + "/wms?", {
       layers: districtBound.mapDistrictLayerName, //需要加载的图层
-      format: 'image/png', //返回的数据格式
+      format: "image/png", //返回的数据格式
       transparent: true,
       maxZoom: districtBound.maxZoom
     });
@@ -2857,19 +2870,19 @@ export default class integration extends PureComponent {
         DISTRICT_COLOR,
         DISTRICT_FILL_COLOR,
         true,
-        'overlayMapsTile'
+        "overlayMapsTile"
       )]: districtBoundLayer,
       项目红线: userconfig.projectWmsLayer,
       扰动图斑: userconfig.spotWmsLayer
     });
     //底图切换控件
     const layersControl = L.control
-      .layers(baseMaps, overlays, { position: 'topright' })
+      .layers(baseMaps, overlays, { position: "topright" })
       .addTo(map);
     // 修改图标样式
     L.DomUtil.addClass(
       layersControl.getContainer().firstChild,
-      'iconfont icon-layer global-icon-normal'
+      "iconfont icon-layer global-icon-normal"
     );
     return layersControl;
   };
@@ -2878,11 +2891,11 @@ export default class integration extends PureComponent {
   getTitle = (text, borderColor, fillColor, isBorderDashed, className) => {
     if (className) {
       return `<i style='display:inline-block;border:${
-        isBorderDashed ? 'dashed' : 'solid'
+        isBorderDashed ? "dashed" : "solid"
       } 2px ${borderColor};background:${fillColor};width:20px;height:20px;position:relative;top:4px;'></i><span style='padding-left:1px;'>${text}</span><div class='${className}'></div>`;
     } else {
       return `<i style='display:inline-block;border:${
-        isBorderDashed ? 'dashed' : 'solid'
+        isBorderDashed ? "dashed" : "solid"
       } 2px ${borderColor};background:${fillColor};width:20px;height:20px;position:relative;top:4px;'></i><span style='padding-left:1px;'>${text}</span>`;
     }
   };
@@ -2925,14 +2938,14 @@ export default class integration extends PureComponent {
       map.removeLayer(addGraphLayer);
       this.setState({ addGraphLayer: null });
     }
-    map.pm.disableDraw('Polygon');
+    map.pm.disableDraw("Polygon");
   };
   /*
    * 取消编辑图形
    */
   cancelEditGraphic = () => {
     this.setState({ showButton: false });
-    map.on('click', this.onClickMap);
+    map.on("click", this.onClickMap);
     //禁止编辑图形
     userconfig.projectgeojsonLayer.pm.disable();
     //禁止移动图形
@@ -2944,7 +2957,7 @@ export default class integration extends PureComponent {
    */
   cancelAddGraphic = () => {
     this.setState({ showButton: false });
-    map.on('click', this.onClickMap);
+    map.on("click", this.onClickMap);
     const { addGraphLayer, drawType, drawState } = this.state;
     //禁止编辑图形
     if (addGraphLayer) {
@@ -2952,12 +2965,12 @@ export default class integration extends PureComponent {
       map.removeLayer(addGraphLayer);
       this.setState({ addGraphLayer: null });
     }
-    map.pm.disableDraw('Polygon');
-    emitter.emit('showSiderbarDetail', {
+    map.pm.disableDraw("Polygon");
+    emitter.emit("showSiderbarDetail", {
       show: false,
       from: drawType,
       type: drawState,
-      item: { id: '' }
+      item: { id: "" }
     });
   };
   /*
@@ -2965,8 +2978,8 @@ export default class integration extends PureComponent {
    */
   cancelScreenshot = () => {
     this.setState({ showButton: false });
-    map.pm.disableDraw('Rectangle');
-    map.off('pm:create');
+    map.pm.disableDraw("Rectangle");
+    map.off("pm:create");
     //监听地图点击事件
     // map.on("click", this.onClickMap);
     if (userconfig.screenLayer) {
@@ -2979,7 +2992,7 @@ export default class integration extends PureComponent {
    */
   saveAddGraphic = () => {
     const me = this;
-    map.on('click', this.onClickMap);
+    map.on("click", this.onClickMap);
     const {
       addGraphLayer,
       drawType,
@@ -2994,7 +3007,7 @@ export default class integration extends PureComponent {
       addGraphLayer.pm.disable();
       let geojson = addGraphLayer.toGeoJSON();
       let polygon = me.geojson2Multipolygon(geojson, 1);
-      emitter.emit('showSiderbarDetail', {
+      emitter.emit("showSiderbarDetail", {
         polygon: polygon,
         show: true,
         type: drawState,
@@ -3003,10 +3016,10 @@ export default class integration extends PureComponent {
         projectId: projectId,
         projectName: projectName,
         fromList: fromList,
-        id: ''
+        id: ""
       });
     } else {
-      notification['warning']({
+      notification["warning"]({
         message: `请绘制图形`
       });
     }
@@ -3025,7 +3038,7 @@ export default class integration extends PureComponent {
     e.stopPropagation();
     const me = this;
     this.setState({ showButton: false });
-    map.on('click', this.onClickMap);
+    map.on("click", this.onClickMap);
     //禁止编辑图形
     userconfig.projectgeojsonLayer.pm.disable();
     // 禁止移动图形
@@ -3033,7 +3046,7 @@ export default class integration extends PureComponent {
 
     let geojson = userconfig.projectgeojsonLayer.toGeoJSON();
     let polygon = me.geojson2Multipolygon(geojson, 0);
-    emitter.emit('showSiderbarDetail', {
+    emitter.emit("showSiderbarDetail", {
       polygon: polygon,
       show: true,
       from: drawType,
@@ -3050,11 +3063,11 @@ export default class integration extends PureComponent {
    */
   saveScreenshot = e => {
     if (!userconfig.dataImgUrl) {
-      message.warning('屏幕截图结果为空,建议放大地图,重新截图操作试试看', 2);
+      message.warning("屏幕截图结果为空,建议放大地图,重新截图操作试试看", 2);
       return;
     }
     this.cancelScreenshot();
-    emitter.emit('screenshotBack', {
+    emitter.emit("screenshotBack", {
       longitude: userconfig.imglng,
       latitude: userconfig.imglat,
       img: userconfig.dataImgUrl
@@ -3065,17 +3078,17 @@ export default class integration extends PureComponent {
    * @type 0代表编辑图形;1代表新建图形
    */
   geojson2Multipolygon = (geojson, type) => {
-    let polygon = '';
+    let polygon = "";
     let coordinates;
     type === 0
       ? (coordinates = geojson.features[0].geometry.coordinates)
       : (coordinates = geojson.geometry.coordinates);
-    polygon += 'multipolygon((';
+    polygon += "multipolygon((";
     //let coordinates = geojson.features[0].geometry.coordinates;
     for (let i = 0; i < coordinates.length; i++) {
       let coordinate = coordinates[i];
       if (i === coordinates.length - 1) {
-        polygon += '(';
+        polygon += "(";
         for (let j = 0; j < coordinate.length; j++) {
           let xy = coordinate[j];
           if (type === 0) {
@@ -3083,38 +3096,38 @@ export default class integration extends PureComponent {
             for (let n = 0; n < xy.length; n++) {
               let data = xy[n];
               if (n === xy.length - 1) {
-                polygon += data[0] + ' ' + data[1];
+                polygon += data[0] + " " + data[1];
               } else {
-                polygon += data[0] + ' ' + data[1] + ',';
+                polygon += data[0] + " " + data[1] + ",";
               }
             }
           } else {
             //新建图形
             if (j === coordinate.length - 1) {
-              polygon += xy[0] + ' ' + xy[1];
+              polygon += xy[0] + " " + xy[1];
             } else {
-              polygon += xy[0] + ' ' + xy[1] + ',';
+              polygon += xy[0] + " " + xy[1] + ",";
             }
           }
         }
-        polygon += ')';
+        polygon += ")";
       } else {
-        polygon += '(';
+        polygon += "(";
         for (let j = 0; j < coordinate.length; j++) {
           let xy = coordinate[j];
           for (let n = 0; n < xy.length; n++) {
             let data = xy[n];
             if (n === xy.length - 1) {
-              polygon += data[0] + ' ' + data[1];
+              polygon += data[0] + " " + data[1];
             } else {
-              polygon += data[0] + ' ' + data[1] + ',';
+              polygon += data[0] + " " + data[1] + ",";
             }
           }
         }
-        polygon += '),';
+        polygon += "),";
       }
     }
-    polygon += '))';
+    polygon += "))";
     //console.log('polygon',polygon);
     return polygon;
   };
@@ -3130,7 +3143,7 @@ export default class integration extends PureComponent {
       //历史影像查询
       this.getInfoByExtent(zoom, bounds, this.callbackGetInfoByExtent, true);
       //隐藏图层控件
-      jQuery(userconfig.layersControl.getContainer()).css('display', 'none');
+      jQuery(userconfig.layersControl.getContainer()).css("display", "none");
     } else {
       //移除卷帘效果
       this.removeSideBySide();
@@ -3143,7 +3156,7 @@ export default class integration extends PureComponent {
       map.addLayer(userconfig.baseLayer);
       map.addLayer(userconfig.spotWmsLayer);
       //显示图层控件
-      jQuery(userconfig.layersControl.getContainer()).css('display', 'block');
+      jQuery(userconfig.layersControl.getContainer()).css("display", "block");
     }
   };
   /*
@@ -3179,7 +3192,7 @@ export default class integration extends PureComponent {
   /*
    * 匹配选择下拉框日期最接近的历史图斑数据
    */
-  getLimitSpotByTargetDate = (strDate) => {
+  getLimitSpotByTargetDate = strDate => {
     const {
       mapdata: { historiesSpotProperties }
     } = this.props;
@@ -3187,9 +3200,9 @@ export default class integration extends PureComponent {
     var arrDate = [];
     var historiesSpotData = [];
     var targetDate = this.strToDate(strDate.split("T")[0]);
-    for(var i = 0; i<historiesSpotProperties.length;i++){
-       var imageDate = historiesSpotProperties[i].archive_time;
-       arrDate.push(this.strToDate(imageDate.split("T")[0]));
+    for (var i = 0; i < historiesSpotProperties.length; i++) {
+      var imageDate = historiesSpotProperties[i].archive_time;
+      arrDate.push(this.strToDate(imageDate.split("T")[0]));
     }
     var len = arrDate.length;
     for (var j = 0; j < len; j++) {
@@ -3197,7 +3210,7 @@ export default class integration extends PureComponent {
       var index = this.limitDateIndex(arrDate, targetDate).index;
       historiesSpotProperties.forEach(item => {
         if (
-          date === this.strToDate(item.archive_time.split('T')[0]) &&
+          date === this.strToDate(item.archive_time.split("T")[0]) &&
           JSON.stringify(historiesSpotData).indexOf(
             JSON.stringify(item.spot_id)
           ) === -1
@@ -3208,42 +3221,44 @@ export default class integration extends PureComponent {
       arrDate.splice(index, 1);
     }
     //console.log('匹配日期数组最接近目标日期值',historiesSpotData);
-    const targethistoriesSpotData =  this.greaterOrEqualDates(historiesSpotData,targetDate);
+    const targethistoriesSpotData = this.greaterOrEqualDates(
+      historiesSpotData,
+      targetDate
+    );
     //console.log('匹配最终目标历史图斑数组值',targethistoriesSpotData);
-    return targethistoriesSpotData;   
-  }
+    return targethistoriesSpotData;
+  };
   /*
    * 根据过滤后的历史图斑数组,动态拼接图斑id字符串
-  */
-  getSpotIdsByHistorySpots = (historySpots) => {
-    var spotIds =  "";
-    if(historySpots && historySpots.length>0){
+   */
+  getSpotIdsByHistorySpots = historySpots => {
+    var spotIds = "";
+    if (historySpots && historySpots.length > 0) {
       var len = historySpots.length;
-      for(var i = 0; i<len; i++){
-          var data = historySpots[i];
-          if (i === len - 1) {
-            // spotIds += "'" + data.spot_id + "'";
-            spotIds += data.spot_id;
-          }
-          else {
-            // spotIds += "'" + data.spot_id  + "',";
-            spotIds += data.spot_id  + ",";
-          }
+      for (var i = 0; i < len; i++) {
+        var data = historySpots[i];
+        if (i === len - 1) {
+          // spotIds += "'" + data.spot_id + "'";
+          spotIds += data.spot_id;
+        } else {
+          // spotIds += "'" + data.spot_id  + "',";
+          spotIds += data.spot_id + ",";
+        }
       }
     }
     return spotIds;
-  }
+  };
   /*
    * 字符串格式日期转换Date
    */
   strToDate = strDate => {
-    var OneMonth = strDate.substring(5, strDate.lastIndexOf('-'));
+    var OneMonth = strDate.substring(5, strDate.lastIndexOf("-"));
     var OneDay = strDate.substring(
       strDate.length,
-      strDate.lastIndexOf('-') + 1
+      strDate.lastIndexOf("-") + 1
     );
-    var OneYear = strDate.substring(0, strDate.indexOf('-'));
-    return Date.parse(OneMonth + '/' + OneDay + '/' + OneYear);
+    var OneYear = strDate.substring(0, strDate.indexOf("-"));
+    return Date.parse(OneMonth + "/" + OneDay + "/" + OneYear);
   };
   /*
    * 匹配日期数组最接近目标日期的日期索引以及数据
@@ -3267,13 +3282,13 @@ export default class integration extends PureComponent {
     const me = this;
     var newArr = [];
     // eslint-disable-next-line array-callback-return
-    historiesSpotData.map(function(x){      
-      if(me.strToDate(x.archive_time.split("T")[0]) >= targetDate){
-        newArr.push(x);       
+    historiesSpotData.map(function(x) {
+      if (me.strToDate(x.archive_time.split("T")[0]) >= targetDate) {
+        newArr.push(x);
       }
     });
     return newArr;
-  }
+  };
 
   /*
    * 新建卷帘效果
@@ -3297,8 +3312,7 @@ export default class integration extends PureComponent {
       .addTo(map);
 
     const dom = userconfig.sideBySide.getContainer();
-    L.DomEvent.disableClickPropagation(dom);//停止给定事件传播到父元素,这里父元素指地图map
-
+    L.DomEvent.disableClickPropagation(dom); //停止给定事件传播到父元素,这里父元素指地图map
   };
   /*
    * 移除卷帘效果
@@ -3346,7 +3360,7 @@ export default class integration extends PureComponent {
       selectSpotLeftV,
       selectSpotRightV
     } = this.state;
-    userconfig.setTopLayer = 'imgLayer';
+    userconfig.setTopLayer = "imgLayer";
     // const { selectRightV } = this.state;
     this.addLRLayers(v, selectRightV, selectSpotLeftV, selectSpotRightV);
     userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
@@ -3361,7 +3375,7 @@ export default class integration extends PureComponent {
       // selectSpotLeftV,
       selectSpotRightV
     } = this.state;
-    userconfig.setTopLayer = 'spotLayer';
+    userconfig.setTopLayer = "spotLayer";
     // const { selectLeftV } = this.state;
     this.addLRLayers(selectLeftV, selectRightV, v, selectSpotRightV);
     userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
@@ -3376,7 +3390,7 @@ export default class integration extends PureComponent {
       selectSpotLeftV,
       selectSpotRightV
     } = this.state;
-    userconfig.setTopLayer = 'imgLayer';
+    userconfig.setTopLayer = "imgLayer";
     // const { selectLeftV } = this.state;
     this.addLRLayers(selectLeftV, v, selectSpotLeftV, selectSpotRightV);
     userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
@@ -3391,7 +3405,7 @@ export default class integration extends PureComponent {
       selectSpotLeftV
       // selectSpotRightV
     } = this.state;
-    userconfig.setTopLayer = 'spotLayer';
+    userconfig.setTopLayer = "spotLayer";
     // const { selectLeftV } = this.state;
     this.addLRLayers(selectLeftV, selectRightV, selectSpotLeftV, v);
     userconfig.sideBySide.setLeftLayers(userconfig.leftLayers);
@@ -3416,22 +3430,22 @@ export default class integration extends PureComponent {
       //历史影像存在
       let leftLayerUrl =
         config.imageBaseUrl +
-        '/' +
-        selectLeftV.replace(/\//g, '-') +
-        '/tile/{z}/{y}/{x}';
+        "/" +
+        selectLeftV.replace(/\//g, "-") +
+        "/tile/{z}/{y}/{x}";
       leftImgLayer = L.tileLayer(leftLayerUrl, {
-        pane: 'tileLayerZIndex',
+        pane: "tileLayerZIndex",
         maxZoom: config.mapInitParams.maxZoom,
         errorTileUrl: config.errorTileUrl
       }); //左侧影像
       map.addLayer(leftImgLayer);
       let rightLayerUrl =
         config.imageBaseUrl +
-        '/' +
-        selectRightV.replace(/\//g, '-') +
-        '/tile/{z}/{y}/{x}';
+        "/" +
+        selectRightV.replace(/\//g, "-") +
+        "/tile/{z}/{y}/{x}";
       rightImgLayer = L.tileLayer(rightLayerUrl, {
-        pane: 'tileLayerZIndex',
+        pane: "tileLayerZIndex",
         maxZoom: config.mapInitParams.maxZoom,
         errorTileUrl: config.errorTileUrl
       }); //右侧影像
@@ -3439,54 +3453,66 @@ export default class integration extends PureComponent {
     }
     //加载历史扰动图斑
     if (selectSpotLeftV && selectSpotRightV) {
-      if (selectSpotLeftV.indexOf('现状') !== -1) {
+      if (selectSpotLeftV.indexOf("现状") !== -1) {
         //现状扰动图斑
-        spotleftwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + '/wms?', {
+        spotleftwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
           layers: config.mapSpotLayerName, //需要加载的图层
-          format: 'image/png', //返回的数据格式
+          format: "image/png", //返回的数据格式
           transparent: true,
           maxZoom: config.mapInitParams.maxZoom,
-          cql_filter: 'archive_time is null'
+          cql_filter: "archive_time is null"
         });
       } else {
-        const leftspotIds = this.getSpotIdsByHistorySpots(this.getLimitSpotByTargetDate(selectSpotLeftV));
+        const leftspotIds = this.getSpotIdsByHistorySpots(
+          this.getLimitSpotByTargetDate(selectSpotLeftV)
+        );
         //console.log('spotIds',spotIds);
         //历史扰动图斑
-        spotleftwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + '/wms?', {
+        spotleftwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
           layers: config.mapSpotLayerName, //需要加载的图层
-          format: 'image/png', //返回的数据格式
+          format: "image/png", //返回的数据格式
           transparent: true,
           maxZoom: config.mapInitParams.maxZoom,
           //cql_filter: "archive_time >= " + selectSpotLeftV
-          cql_filter: "spot_id in ("+leftspotIds+") and archive_time >= " + selectSpotLeftV
+          cql_filter:
+            "spot_id in (" +
+            leftspotIds +
+            ") and archive_time >= " +
+            selectSpotLeftV
         });
       }
-      if (selectSpotRightV.indexOf('现状') !== -1) {
+      if (selectSpotRightV.indexOf("现状") !== -1) {
         //现状扰动图斑
-        spotrightwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + '/wms?', {
+        spotrightwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
           layers: config.mapSpotLayerName, //需要加载的图层
-          format: 'image/png', //返回的数据格式
+          format: "image/png", //返回的数据格式
           transparent: true,
           maxZoom: config.mapInitParams.maxZoom,
-          cql_filter: 'archive_time is null'
+          cql_filter: "archive_time is null"
         });
       } else {
-        const rightspotIds = this.getSpotIdsByHistorySpots(this.getLimitSpotByTargetDate(selectSpotRightV));
+        const rightspotIds = this.getSpotIdsByHistorySpots(
+          this.getLimitSpotByTargetDate(selectSpotRightV)
+        );
         //历史扰动图斑
-        spotrightwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + '/wms?', {
+        spotrightwms = L.tileLayer.wms(config.mapUrl.geoserverUrl + "/wms?", {
           layers: config.mapSpotLayerName, //需要加载的图层
-          format: 'image/png', //返回的数据格式
+          format: "image/png", //返回的数据格式
           transparent: true,
           maxZoom: config.mapInitParams.maxZoom,
           // cql_filter: 'archive_time >= ' + selectSpotRightV
-          cql_filter: "spot_id in ("+rightspotIds+") and archive_time >= " + selectSpotRightV
+          cql_filter:
+            "spot_id in (" +
+            rightspotIds +
+            ") and archive_time >= " +
+            selectSpotRightV
         });
       }
       map.addLayer(spotleftwms);
       map.addLayer(spotrightwms);
     }
 
-    if (userconfig.setTopLayer === 'spotLayer') {
+    if (userconfig.setTopLayer === "spotLayer") {
       //历史扰动图斑优先
       userconfig.leftLayers = [leftImgLayer, spotleftwms];
       userconfig.rightLayers = [rightImgLayer, spotrightwms];
@@ -3511,7 +3537,7 @@ export default class integration extends PureComponent {
     //刷新选择影像列表对应影像
     if (v) {
       let leftLayerUrl =
-        config.imageBaseUrl + '/' + v.replace(/\//g, '-') + '/tile/{z}/{y}/{x}';
+        config.imageBaseUrl + "/" + v.replace(/\//g, "-") + "/tile/{z}/{y}/{x}";
       if (ImgListLayer) {
         map.removeLayer(ImgListLayer);
       }
@@ -3524,7 +3550,7 @@ export default class integration extends PureComponent {
    */
   loadMapbaseLayer = (map, url) => {
     let layer = L.tileLayer(url, {
-      pane: 'tileLayerZIndex',
+      pane: "tileLayerZIndex",
       minZoom: config.tdtImageLabel.minZoom,
       maxZoom: config.tdtImageLabel.maxZoom,
       errorTileUrl: config.tdtImageLabel.errorTileUrl
@@ -3578,43 +3604,39 @@ export default class integration extends PureComponent {
 
   switchInterpret = v => {
     console.log(`切换解译期次`, v);
-    userconfig.cql_filter = 'archive_time is null';
-    if(v){
+    userconfig.cql_filter = "archive_time is null";
+    if (v) {
       const taskLevel = v.split("-")[0];
-      let task_level =3;
-      if(taskLevel === '部级'){
+      let task_level = 3;
+      if (taskLevel === "部级") {
         task_level = 0;
-      }
-      else if(taskLevel === '省级'){
+      } else if (taskLevel === "省级") {
         task_level = 1;
-      }
-      else if(taskLevel === '市级'){
+      } else if (taskLevel === "市级") {
         task_level = 2;
-      }
-      else if(taskLevel === '县级'){
+      } else if (taskLevel === "县级") {
         task_level = 3;
       }
       const inter_batch = v.split("-")[1];
       // userconfig.cql_filter = 'archive_time is null and inter_batch = '+inter_batch+' and task_level = '+task_level;
-      userconfig.cql_filter = 'inter_batch = '+inter_batch+' and task_level = '+task_level;
-    }
-    else{
-      userconfig.cql_filter = 'archive_time is null';
+      userconfig.cql_filter =
+        "inter_batch = " + inter_batch + " and task_level = " + task_level;
+    } else {
+      userconfig.cql_filter = "archive_time is null";
     }
 
-    if(userconfig.spotWmsLayer){
+    if (userconfig.spotWmsLayer) {
       userconfig.spotWmsLayer.setParams({
         cql_filter: userconfig.cql_filter
       });
     }
-
   };
 
   render() {
     const radioStyle = {
-      display: 'block',
-      height: '25px',
-      lineHeight: '25px'
+      display: "block",
+      height: "25px",
+      lineHeight: "25px"
     };
     const {
       showButton,
@@ -3666,26 +3688,26 @@ export default class integration extends PureComponent {
         <div
           ref={this.saveRef}
           style={{
-            position: 'absolute',
+            position: "absolute",
             top: 0,
             paddingTop: 46,
-            height: '100vh',
-            width: '100vw'
+            height: "100vh",
+            width: "100vw"
           }}
         >
           <div
             id="map"
             style={{
-              boxSizing: 'border-box',
-              width: '100%',
-              height: '100%'
+              boxSizing: "border-box",
+              width: "100%",
+              height: "100%"
             }}
           />
           {/* 项目监管请求后台接口进度条 */}
           <div
             style={{
-              display: showProgress_ZS ? 'block' : 'none',
-              position: 'absolute',
+              display: showProgress_ZS ? "block" : "none",
+              position: "absolute",
               bottom: 14,
               right: 400,
               zIndex: 1000
@@ -3695,8 +3717,8 @@ export default class integration extends PureComponent {
           </div>
           <div
             style={{
-              display: showProgress_Pie ? 'block' : 'none',
-              position: 'absolute',
+              display: showProgress_Pie ? "block" : "none",
+              position: "absolute",
               bottom: 14,
               right: 450,
               zIndex: 1000
@@ -3706,8 +3728,8 @@ export default class integration extends PureComponent {
           </div>
           <div
             style={{
-              display: showProgress_ProjectPoint ? 'block' : 'none',
-              position: 'absolute',
+              display: showProgress_ProjectPoint ? "block" : "none",
+              position: "absolute",
               bottom: 14,
               right: 500,
               zIndex: 1000
@@ -3718,17 +3740,17 @@ export default class integration extends PureComponent {
           {/* 监管影像时间显示信息 */}
           <div
             style={{
-              display: showImageTimeText ? 'block' : 'none',
-              position: 'absolute',
+              display: showImageTimeText ? "block" : "none",
+              position: "absolute",
               bottom: 5,
               right: 150,
               zIndex: 1000,
-              background: '#fff'
+              background: "#fff"
             }}
           >
             <span
               style={{
-                padding: '0 10px'
+                padding: "0 10px"
               }}
             >
               监管影像时间:{imageTimeText}
@@ -3737,19 +3759,19 @@ export default class integration extends PureComponent {
           {/*历史监管影像时间轴控件信息 */}
           <div
             style={{
-              display: showHistoryIMG ? 'block' : 'none',
-              position: 'absolute',
+              display: showHistoryIMG ? "block" : "none",
+              position: "absolute",
               // bottom: 5,
               // left: 360,
               top: 58,
               right: 240,
               zIndex: 1000,
-              background: '#fff'
+              background: "#fff"
             }}
           >
             <span
               style={{
-                padding: '0 10px'
+                padding: "0 10px"
               }}
             >
               历史影像:
@@ -3780,15 +3802,15 @@ export default class integration extends PureComponent {
           >
             <img
               alt="example"
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               src={photoPreviewUrl}
             />
           </Modal>
           {/* 编辑图形-保存、取消保存按钮 */}
           <div
             style={{
-              display: showButton ? 'block' : 'none',
-              position: 'absolute',
+              display: showButton ? "block" : "none",
+              position: "absolute",
               top: 65,
               right: 240,
               zIndex: 1000
@@ -3797,20 +3819,20 @@ export default class integration extends PureComponent {
             <Button
               icon="rollback"
               onClick={
-                drawType === 'screenshot'
+                drawType === "screenshot"
                   ? this.cancelScreenshot
-                  : drawState === 'edit'
+                  : drawState === "edit"
                   ? this.cancelEditGraphic
                   : this.cancelAddGraphic
               }
             />
-            <Popover content={'第二步：填写属性信息'}>
+            <Popover content={"第二步：填写属性信息"}>
               <Button
                 icon="arrow-right"
                 onClick={
-                  drawType === 'screenshot'
+                  drawType === "screenshot"
                     ? this.saveScreenshot
-                    : drawState === 'edit'
+                    : drawState === "edit"
                     ? this.saveEditGraphic
                     : this.saveAddGraphic
                 }
@@ -3820,13 +3842,13 @@ export default class integration extends PureComponent {
           {/*图标联动按钮 */}
           <div
             style={{
-              position: 'absolute',
-              display: showQYJGPanel ? 'block' : 'none',
+              position: "absolute",
+              display: showQYJGPanel ? "block" : "none",
               top: 65,
               right: 120,
               height: 0,
               zIndex: 999,
-              background: 'transparent'
+              background: "transparent"
             }}
           >
             <Switch
@@ -3839,37 +3861,37 @@ export default class integration extends PureComponent {
                 e.stopPropagation();
                 this.setState({ chartStatus: v });
                 console.log(v, e);
-                let polygon = '';
+                let polygon = "";
                 if (map.getZoom() >= config.mapInitParams.zoom) {
                   let bounds = map.getBounds();
-                  polygon = 'polygon((';
+                  polygon = "polygon((";
                   polygon +=
                     bounds.getSouthWest().lng +
-                    ' ' +
+                    " " +
                     bounds.getSouthWest().lat +
-                    ',';
+                    ",";
                   polygon +=
                     bounds.getSouthWest().lng +
-                    ' ' +
+                    " " +
                     bounds.getNorthEast().lat +
-                    ',';
+                    ",";
                   polygon +=
                     bounds.getNorthEast().lng +
-                    ' ' +
+                    " " +
                     bounds.getNorthEast().lat +
-                    ',';
+                    ",";
                   polygon +=
                     bounds.getNorthEast().lng +
-                    ' ' +
+                    " " +
                     bounds.getSouthWest().lat +
-                    ',';
+                    ",";
                   polygon +=
-                    bounds.getSouthWest().lng + ' ' + bounds.getSouthWest().lat;
-                  polygon += '))';
-                  emitter.emit('chartLinkage', {
+                    bounds.getSouthWest().lng + " " + bounds.getSouthWest().lat;
+                  polygon += "))";
+                  emitter.emit("chartLinkage", {
                     open: v,
-                    type: 'spot',
-                    polygon: v ? polygon : ''
+                    type: "spot",
+                    polygon: v ? polygon : ""
                   });
                 }
               }}
@@ -3878,12 +3900,12 @@ export default class integration extends PureComponent {
           {/* 图例说明、历史对比 */}
           <div
             style={{
-              display: showQYJGPanel ? 'block' : 'none',
-              position: 'absolute',
+              display: showQYJGPanel ? "block" : "none",
+              position: "absolute",
               bottom: 40,
               right: 20,
               zIndex: 1000,
-              background: '#fff'
+              background: "#fff"
             }}
           >
             <Popover content="历史影像" title="" trigger="hover">
@@ -3903,7 +3925,7 @@ export default class integration extends PureComponent {
                   const center = map.getCenter();
                   const zoom = map.getZoom();
                   //console.log(center,zoom);
-                  emitter.emit('showContrast', {
+                  emitter.emit("showContrast", {
                     show: true,
                     center: center,
                     zoom: zoom,
@@ -3920,7 +3942,7 @@ export default class integration extends PureComponent {
                   this.setState({
                     showHistoryContrast: !showHistoryContrast
                   });
-                  emitter.emit('showSiderbar', {
+                  emitter.emit("showSiderbar", {
                     show: showHistoryContrast
                   });
                   setTimeout(() => {
@@ -3938,13 +3960,13 @@ export default class integration extends PureComponent {
                       <span
                         style={{
                           background: item.background,
-                          border: `${index < 2 ? 'dotted' : 'solid'} 2px ${
+                          border: `${index < 2 ? "dotted" : "solid"} 2px ${
                             item.border
                           }`,
                           width: 13,
                           height: 13,
-                          display: 'inline-block',
-                          position: 'relative',
+                          display: "inline-block",
+                          position: "relative",
                           top: 2,
                           right: 6
                         }}
@@ -3963,19 +3985,19 @@ export default class integration extends PureComponent {
           {/* 历史对比地图切换 */}
           <div
             style={{
-              display: showHistoryContrast ? 'block' : 'none',
-              position: 'absolute',
+              display: showHistoryContrast ? "block" : "none",
+              position: "absolute",
               top: 65,
               left: 15,
               zIndex: 1000,
-              background: '#fff'
+              background: "#fff"
             }}
           >
             {/* 左侧历史影像切换 */}
             <span
               style={{
-                padding: '0 10px',
-                display: 'none'
+                padding: "0 10px",
+                display: "none"
               }}
             >
               影像:
@@ -3986,7 +4008,7 @@ export default class integration extends PureComponent {
               onChange={this.onChangeSelectLeft}
               style={{
                 width: 150,
-                display: 'none'
+                display: "none"
               }}
             >
               {histories.map((item, id) => (
@@ -3999,7 +4021,7 @@ export default class integration extends PureComponent {
             <span
               style={{
                 marginLeft: 10,
-                padding: '0 10px'
+                padding: "0 10px"
               }}
             >
               图斑:
@@ -4021,19 +4043,19 @@ export default class integration extends PureComponent {
           </div>
           <div
             style={{
-              display: showHistoryContrast ? 'block' : 'none',
-              position: 'absolute',
+              display: showHistoryContrast ? "block" : "none",
+              position: "absolute",
               top: 65,
               right: 240,
               zIndex: 1001,
-              background: '#fff'
+              background: "#fff"
             }}
           >
             {/* 右侧历史影像切换 */}
             <span
               style={{
-                padding: '0 10px',
-                display: 'none'
+                padding: "0 10px",
+                display: "none"
               }}
             >
               影像:
@@ -4044,7 +4066,7 @@ export default class integration extends PureComponent {
               onChange={this.onChangeSelectRight}
               style={{
                 width: 150,
-                display: 'none'
+                display: "none"
               }}
             >
               {histories.map((item, id) => (
@@ -4057,7 +4079,7 @@ export default class integration extends PureComponent {
             <span
               style={{
                 marginLeft: 10,
-                padding: '0 10px'
+                padding: "0 10px"
               }}
             >
               图斑:
@@ -4080,12 +4102,12 @@ export default class integration extends PureComponent {
           {/* 项目监管 图例说明 */}
           <div
             style={{
-              display: showXMJGPanel ? 'block' : 'none',
-              position: 'absolute',
+              display: showXMJGPanel ? "block" : "none",
+              position: "absolute",
               bottom: 40,
               right: 20,
               zIndex: 1000,
-              background: '#fff'
+              background: "#fff"
             }}
           >
             <Popover content="历史影像" title="" trigger="hover">
@@ -4105,22 +4127,22 @@ export default class integration extends PureComponent {
                     onChange={this.onChangeProjectSymbol}
                     value={projectSymbolValue}
                   >
-                    <Radio style={radioStyle} value={'项目总数'}>
+                    <Radio style={radioStyle} value={"项目总数"}>
                       项目总数
                     </Radio>
-                    <Radio style={radioStyle} value={'立项级别'}>
+                    <Radio style={radioStyle} value={"立项级别"}>
                       立项级别
                     </Radio>
-                    <Radio style={radioStyle} value={'合规性'}>
+                    <Radio style={radioStyle} value={"合规性"}>
                       合规性
                     </Radio>
-                    <Radio style={radioStyle} value={'项目类别'}>
+                    <Radio style={radioStyle} value={"项目类别"}>
                       项目类别
                     </Radio>
-                    <Radio style={radioStyle} value={'项目性质'}>
+                    <Radio style={radioStyle} value={"项目性质"}>
                       项目性质
                     </Radio>
-                    <Radio style={radioStyle} value={'建设状态'}>
+                    <Radio style={radioStyle} value={"建设状态"}>
                       建设状态
                     </Radio>
                     {/* <Radio style={radioStyle} value={'矢量化类型'}>
