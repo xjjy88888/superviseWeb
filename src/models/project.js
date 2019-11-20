@@ -1,5 +1,5 @@
 /* eslint-disable array-callback-return */
-import { notification } from 'antd';
+import { notification } from "antd";
 import {
   projectListApi,
   projectByIdApi,
@@ -19,22 +19,22 @@ import {
   projectUnbindSpotApi,
   projectArchiveApi,
   projectSuperviseCreateUpdateApi
-} from '../services/httpApi';
+} from "../services/httpApi";
 
 export default {
-  namespace: 'project',
+  namespace: "project",
 
   state: {
     projectList: { totalCount: 0, items: [] },
-    projectInfoRedLineList: { totalCount: '', items: [] },
+    projectInfoRedLineList: { totalCount: "", items: [] },
     projectInfo: {
       projectBase: {},
-      productDepartment: { name: '', id: '' },
+      productDepartment: { name: "", id: "" },
       expand: {
-        designStartTime: '',
-        designCompTime: '',
-        actStartTime: '',
-        actCompTime: ''
+        designStartTime: "",
+        designCompTime: "",
+        actStartTime: "",
+        actCompTime: ""
       }
     },
     departSelectList: [],
@@ -58,9 +58,9 @@ export default {
           totalCount: projectList.totalCount
         };
         if (callback) callback(success, response);
-        yield put({ type: 'save', payload: { projectList: response } });
+        yield put({ type: "save", payload: { projectList: response } });
       } else {
-        notification['error']({
+        notification["error"]({
           message: `查询项目列表失败：${error.message}`
         });
         if (callback) callback(success);
@@ -74,9 +74,9 @@ export default {
       } = yield call(projectListApi, payload);
       if (success) {
         const d = result.items.map(item => item.projectName);
-        yield put({ type: 'save', payload: { projectListAdd: d } });
+        yield put({ type: "save", payload: { projectListAdd: d } });
       } else {
-        notification['error']({
+        notification["error"]({
           message: `新建项目名模糊查询失败：${error.message}`
         });
       }
@@ -91,15 +91,15 @@ export default {
         if (result) {
           let departSelectList = [];
           const list = [
-            'productDepartment',
-            'supDepartment',
+            "productDepartment",
+            "supDepartment",
             "replyDepartment",
-            'projectDepartment',
-            'monitorDepartment',
-            'supervisionDepartment',
-            'getDepartName',
-            'constructionDepartment',
-            'reportDepartment'
+            "projectDepartment",
+            "monitorDepartment",
+            "supervisionDepartment",
+            "getDepartName",
+            "constructionDepartment",
+            "reportDepartment",
           ];
           list.map(item => {
             if (result[item]) {
@@ -111,7 +111,7 @@ export default {
           });
           if (payload.refresh) {
             yield put({
-              type: 'save',
+              type: "save",
               payload: {
                 projectInfo: result,
                 departSelectList: [...new Set(departSelectList)]
@@ -121,7 +121,7 @@ export default {
         }
         if (callback) callback(result, success);
       } else {
-        notification['error']({
+        notification["error"]({
           message: `查询项目信息失败：${error.message}`
         });
       }
@@ -138,7 +138,7 @@ export default {
         payload
       );
       notification[success ? `success` : `error`]({
-        message: `${payload.id ? '编辑' : '新建'}${success ? `成功` : `失败`}`
+        message: `${payload.id ? "编辑" : "新建"}${success ? `成功` : `失败`}`
       });
       if (callback) callback(success);
     },
@@ -149,9 +149,9 @@ export default {
         data: { success, error }
       } = yield call(projectDeleteApi, payload);
       if (callback) callback(success);
-      notification[success ? 'success' : 'error']({
-        message: `删除项目${success ? '成功' : '失败'}${
-          success ? '' : `：${error.message}`
+      notification[success ? "success" : "error"]({
+        message: `删除项目${success ? "成功" : "失败"}${
+          success ? "" : `：${error.message}`
         }`
       });
     },
@@ -162,9 +162,9 @@ export default {
         data: { success, error }
       } = yield call(projectDeleteMulApi, payload);
       if (callback) callback(success);
-      notification[success ? 'success' : 'error']({
-        message: `批量删除项目${success ? '成功' : '失败'}${
-          success ? '' : `：${error.message}`
+      notification[success ? "success" : "error"]({
+        message: `批量删除项目${success ? "成功" : "失败"}${
+          success ? "" : `：${error.message}`
         }`
       });
     },
@@ -175,9 +175,9 @@ export default {
         data: { success, error }
       } = yield call(projectArchiveApi, payload);
       if (callback) callback(success);
-      notification[success ? 'success' : 'error']({
-        message: `项目归档${success ? '成功' : '失败'}${
-          success ? '' : `：${error.message}`
+      notification[success ? "success" : "error"]({
+        message: `项目归档${success ? "成功" : "失败"}${
+          success ? "" : `：${error.message}`
         }`
       });
     },
@@ -188,9 +188,9 @@ export default {
         data: { success, error }
       } = yield call(projectUnArchiveApi, payload);
       if (callback) callback(success);
-      notification[success ? 'success' : 'error']({
-        message: `撤销归档${success ? '成功' : '失败'}${
-          success ? '' : `：${error.message}`
+      notification[success ? "success" : "error"]({
+        message: `撤销归档${success ? "成功" : "失败"}${
+          success ? "" : `：${error.message}`
         }`
       });
     },
@@ -202,7 +202,7 @@ export default {
       } = yield call(projectVerifyApi, payload);
       if (callback) callback(success, result);
       if (!success) {
-        notification['error']({
+        notification["error"]({
           message: `项目重名验证失败${error.message}`
         });
       }
@@ -230,11 +230,11 @@ export default {
           return { label: item.name, value: item.id };
         });
         yield put({
-          type: 'save',
+          type: "save",
           payload: { departSelectList }
         });
       } else {
-        notification['error']({
+        notification["error"]({
           message: `查询单位列表失败：${error.message}`
         });
       }
@@ -249,11 +249,11 @@ export default {
         if (callback) callback(success, result);
         const departSelectList = [{ label: result.name, value: result.id }];
         yield put({
-          type: 'save',
+          type: "save",
           payload: { departSelectList }
         });
       } else {
-        notification['error']({
+        notification["error"]({
           message: `单位新建失败：${error.message}`
         });
       }
@@ -269,46 +269,46 @@ export default {
 
     *updateSpotGraphic({ payload, callback }, { call, put }) {
       const { data: obj } = yield call(updateSpotGraphic, payload);
-      notification[obj ? 'success' : 'error']({
-        message: obj ? '编辑图斑图形成功' : '编辑图斑图形失败'
+      notification[obj ? "success" : "error"]({
+        message: obj ? "编辑图斑图形成功" : "编辑图斑图形失败"
       });
-      yield put({ type: 'save', payload: { obj } });
+      yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);
     },
 
     *addSpotGraphic({ payload, callback }, { call, put }) {
       const { data: obj } = yield call(addSpotGraphic, payload);
-      notification[obj ? 'success' : 'error']({
-        message: obj ? '新建图斑图形成功' : '新建图斑图形失败'
+      notification[obj ? "success" : "error"]({
+        message: obj ? "新建图斑图形成功" : "新建图斑图形失败"
       });
-      yield put({ type: 'save', payload: { obj } });
+      yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);
     },
 
     *removeSpotGraphic({ payload, callback }, { call, put }) {
       const { data: obj } = yield call(removeSpotGraphic, payload.spot_tbid);
-      notification[obj ? 'success' : 'error']({
-        message: obj ? '删除图斑图形成功' : '删除图斑图形失败'
+      notification[obj ? "success" : "error"]({
+        message: obj ? "删除图斑图形成功" : "删除图斑图形失败"
       });
-      yield put({ type: 'save', payload: { obj } });
+      yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);
     },
 
     *updateProjectScopeGraphic({ payload, callback }, { call, put }) {
       const { data: obj } = yield call(updateProjectScopeGraphic, payload);
-      notification[obj ? 'success' : 'error']({
-        message: obj ? '编辑项目红线图形成功' : '编辑项目红线图形失败'
+      notification[obj ? "success" : "error"]({
+        message: obj ? "编辑项目红线图形成功" : "编辑项目红线图形失败"
       });
-      yield put({ type: 'save', payload: { obj } });
+      yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);
     },
 
     *addProjectScopeGraphic({ payload, callback }, { call, put }) {
       const { data: obj } = yield call(addProjectScopeGraphic, payload);
-      notification[obj ? 'success' : 'error']({
-        message: obj ? '新建项目红线图形成功' : '新建项目红线图形失败'
+      notification[obj ? "success" : "error"]({
+        message: obj ? "新建项目红线图形成功" : "新建项目红线图形失败"
       });
-      yield put({ type: 'save', payload: { obj } });
+      yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);
     },
 
@@ -317,10 +317,10 @@ export default {
         removeProjectScopeGraphic,
         payload.project_id
       );
-      notification[obj ? 'success' : 'error']({
-        message: obj ? '删除项目红线图形成功' : '删除项目红线图形失败'
+      notification[obj ? "success" : "error"]({
+        message: obj ? "删除项目红线图形成功" : "删除项目红线图形失败"
       });
-      yield put({ type: 'save', payload: { obj } });
+      yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);
     }
   },
