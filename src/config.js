@@ -2,7 +2,7 @@ const l = window.location;
 const isFormal = l.href.split("/")[3] === "stbcjg";
 const isLocal = l.hostname === "localhost";
 
-console.log(`%c当前版本：v2.0.29`, "color:green;font-size:30px");
+console.log(`%c当前版本：v2.0.30`, "color:green;font-size:30px");
 
 console.log(isLocal ? "本地环境" : isFormal ? "正式环境" : "测试环境");
 

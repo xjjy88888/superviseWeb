@@ -1082,7 +1082,7 @@ export default class siderbarDetail extends PureComponent {
                 {getFieldDecorator("districtCodeId", {
                   initialValue: this.find(
                     districtTree,
-                    spotItem.districtCodeId,
+                    String(spotItem.districtCodeId),
                     "value"
                   )
                 })(
