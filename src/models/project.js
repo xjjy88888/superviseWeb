@@ -93,8 +93,7 @@ export default {
           const list = [
             'productDepartment',
             'supDepartment',
-            // "replyDepartment",
-
+            "replyDepartment",
             'projectDepartment',
             'monitorDepartment',
             'supervisionDepartment',

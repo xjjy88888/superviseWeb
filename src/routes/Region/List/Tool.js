@@ -60,6 +60,13 @@ export default class siderbarDetail extends PureComponent {
         checkResult: data.result
       });
     });
+    this.eventEmitter = emitter.addListener("sidebarQuery", v => {
+      console.log("siderQuery", v);
+      const queryInfo = { ...this.state.queryInfo, ...v };
+      this.setState({
+        queryInfo
+      });
+    });
     this.eventEmitter = emitter.addListener("queryInfo", data => {
       console.log(data.info);
       const queryInfo = data.info;
@@ -74,7 +81,10 @@ export default class siderbarDetail extends PureComponent {
       }
       console.log(queryInfo);
       this.setState({
-        queryInfo
+        queryInfo: {
+          ...this.state.queryInfo,
+          ...queryInfo
+        }
       });
     });
   }

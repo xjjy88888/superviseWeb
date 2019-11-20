@@ -546,8 +546,12 @@ export default class sider extends PureComponent {
       type: "spot/interpretList",
       callback: (success, result) => {
         if (success && result.length) {
-          this.setState({ TaskLevelAndInterBatch: result[0] });
-          switchInterpret(result[0]);
+          const TaskLevelAndInterBatch = result[0];
+          this.setState({ TaskLevelAndInterBatch });
+          emitter.emit("sidebarQuery", {
+            TaskLevelAndInterBatch
+          });
+          switchInterpret(TaskLevelAndInterBatch);
         }
       }
     });
@@ -1039,6 +1043,9 @@ export default class sider extends PureComponent {
       showCheck: false,
       sort_by: "",
       sort_key: ""
+    });
+    emitter.emit("sidebarQuery", {
+      [key === "project" ? `projectName` : `mapNum`]: v
     });
     if (key === "project") {
       this.setState({
@@ -1568,6 +1575,9 @@ export default class sider extends PureComponent {
                   SkipCount: 0,
                   MapNum: query_spot,
                   from: "query",
+                  TaskLevelAndInterBatch
+                });
+                emitter.emit("sidebarQuery", {
                   TaskLevelAndInterBatch
                 });
               }}
