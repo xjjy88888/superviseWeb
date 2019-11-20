@@ -300,7 +300,8 @@ export default class siderbarDetail extends PureComponent {
             id: type === "edit" ? spotInfo.id : "",
             interBatch:
               String(v.interBatch1 || ``) + String(v.interBatch2 || ``),
-            taskLevel: isNaN(v.taskLevel) ? null : v.taskLevel
+            taskLevel: isNaN(v.taskLevel) ? null : v.taskLevel,
+            description: v.description_spot
           },
           callback: success => {
             emitter.emit("deleteDraw", {});
@@ -1109,7 +1110,7 @@ export default class siderbarDetail extends PureComponent {
                 })(<TextArea autosize={true} disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="备注" {...formItemLayout}>
-                {getFieldDecorator("description", {
+                {getFieldDecorator("description_spot", {
                   initialValue: spotItem.description
                 })(<TextArea autosize={true} disabled={!edit} />)}
               </Form.Item>
