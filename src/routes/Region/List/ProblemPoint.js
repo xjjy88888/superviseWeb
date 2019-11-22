@@ -205,7 +205,6 @@ export default class problemPoint extends PureComponent {
         }}
         ref={this.saveRef}
       >
-
         <div
           style={{
             display: previewVisible_min ? "block" : "none",
@@ -294,13 +293,13 @@ export default class problemPoint extends PureComponent {
               validateFields((error, v) => {
                 console.log(error, v);
 
-                if (!v.pointX || !v.pointY) {
-                  notification["warning"]({
-                    message: `请在地图上选择问题点位置`,
-                    duration: 1
-                  });
-                  return;
-                }
+                // if (!v.pointX || !v.pointY) {
+                //   notification["warning"]({
+                //     message: `请在地图上选择问题点位置`,
+                //     duration: 1
+                //   });
+                //   return;
+                // }
                 if (!v.name) {
                   notification["warning"]({
                     message: `请填写问题点`,
@@ -323,7 +322,7 @@ export default class problemPoint extends PureComponent {
                     id: id,
                     monitorCheckListId: inspectId,
                     problemId: radioChecked,
-                    attachmentId: attachmentId
+                    attachmentId
                   },
                   callback: (success, error, result) => {
                     if (success) {
@@ -352,7 +351,7 @@ export default class problemPoint extends PureComponent {
                   self.setState({ show: false });
                   emitter.emit("deleteDraw", {});
                 },
-                onCancel() { }
+                onCancel() {}
               });
             }}
           />
@@ -370,38 +369,6 @@ export default class problemPoint extends PureComponent {
           <Form.Item
             label={
               <span>
-                坐标 <Text type="danger">*</Text>
-              </span>
-            }
-            {...formItemLayout}
-          >
-            {getFieldDecorator("pointX", {
-              initialValue: problemPointInfo.pointX
-            })(<Input placeholder="经度" style={{ width: 103 }} disabled />)}
-            {getFieldDecorator("pointY", {
-              initialValue: problemPointInfo.pointY
-            })(
-              <Input
-                disabled
-                placeholder="纬度"
-                style={{ width: 140, position: "relative", top: -2 }}
-                addonAfter={
-                  <Icon
-                    type="environment"
-                    style={{
-                      color: "#1890ff"
-                    }}
-                    onClick={() => {
-                      emitter.emit("siteLocation", {});
-                    }}
-                  />
-                }
-              />
-            )}
-          </Form.Item>
-          <Form.Item
-            label={
-              <span>
                 问题点 <Text type="danger">*</Text>
               </span>
             }
@@ -411,19 +378,7 @@ export default class problemPoint extends PureComponent {
               initialValue: problemPointInfo.name
             })(<Input style={{ width: 240 }} />)}
           </Form.Item>
-          <Form.Item label="描述" {...formItemLayout}>
-            {getFieldDecorator("description", {
-              initialValue: problemPointInfo.description
-            })(<Input.TextArea autosize />)}
-          </Form.Item>
-          <Form.Item
-            label={
-              <span>
-                问题类型
-              </span>
-            }
-            {...formItemLayout}
-          >
+          <Form.Item label={<span>问题类型</span>} {...formItemLayout}>
             {getFieldDecorator("problemId", {
               initialValue: this.cascaderInit(problemPointInfo.problem)
             })(
@@ -466,6 +421,36 @@ export default class problemPoint extends PureComponent {
               </List.Item>
             ))}
           </List>
+          <Form.Item label={<span>坐标</span>} {...formItemLayout}>
+            {getFieldDecorator("pointX", {
+              initialValue: problemPointInfo.pointX
+            })(<Input placeholder="经度" style={{ width: 103 }} disabled />)}
+            {getFieldDecorator("pointY", {
+              initialValue: problemPointInfo.pointY
+            })(
+              <Input
+                disabled
+                placeholder="纬度"
+                style={{ width: 140, position: "relative", top: -2 }}
+                addonAfter={
+                  <Icon
+                    type="environment"
+                    style={{
+                      color: "#1890ff"
+                    }}
+                    onClick={() => {
+                      emitter.emit("siteLocation", {});
+                    }}
+                  />
+                }
+              />
+            )}
+          </Form.Item>
+          <Form.Item label="备注" {...formItemLayout}>
+            {getFieldDecorator("description", {
+              initialValue: problemPointInfo.description
+            })(<Input.TextArea autosize />)}
+          </Form.Item>
           <div
             style={{ minHeight: fileList.length ? 120 : 0, margin: "0 30px" }}
           >

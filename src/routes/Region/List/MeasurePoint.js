@@ -21,7 +21,6 @@ import config from "../../../config";
 import { getFile, accessToken } from "../../../utils/util";
 
 let self;
-let isOnChange = false;
 const { Text } = Typography;
 
 const formItemLayout = {
@@ -55,7 +54,6 @@ export default class measurePoint extends PureComponent {
   }
 
   componentDidMount() {
-    isOnChange = false;
     self = this;
     const {
       form: { resetFields, setFieldsValue }
@@ -69,7 +67,6 @@ export default class measurePoint extends PureComponent {
       });
 
       if (v.show) {
-        isOnChange = false;
         resetFields();
         this.setState({ showSpin: true });
         this.measurePointById(v);

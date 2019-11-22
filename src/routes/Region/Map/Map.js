@@ -65,7 +65,8 @@ let ImgListLayer = null;
 /*-------------------------------------区域监管部分-------------------------------------*/
 let marker = null;
 let picLayerGroup = null;
-let problemPointLayer = L.layerGroup([]);
+let problemPointLayer = L.layerGroup([]); //问题点
+let measurePointLayer = L.layerGroup([]); //措施点
 
 /*-------------------------------------项目监管部分-------------------------------------*/
 let regiongeojsonLayer = null; //行政区划矢量图层
@@ -189,8 +190,6 @@ export default class integration extends PureComponent {
       selectIMG: ""
       //loading: true
     };
-    //this.map = null;
-    //this.problemPointLayer = L.layerGroup([]);
     this.saveRef = v => {
       this.refDom = v;
     };
@@ -204,6 +203,7 @@ export default class integration extends PureComponent {
     marker = null;
     picLayerGroup = null;
     problemPointLayer = L.layerGroup([]);
+    measurePointLayer = L.layerGroup([]);
     /*-------------------------------------项目监管部分-------------------------------------*/
     regiongeojsonLayer = null; //行政区划矢量图层
     ZSgeojsonLayer = null; //区域统计图层
@@ -389,7 +389,7 @@ export default class integration extends PureComponent {
           });
       }
     });
-    this.eventEmitter = emitter.addListener("mapLocation", data => {});
+    // this.eventEmitter = emitter.addListener("mapLocation", data => {});
     //照片定位
     this.eventEmitter = emitter.addListener("imgLocation", data => {
       if (data.show) {
@@ -791,6 +791,11 @@ export default class integration extends PureComponent {
       //问题点定位
       me.locateProblemPoint(data.item, data.id);
     }
+    else if (data.key === "measurePoint") {
+      //措施点定位
+      me.locateMeasurePoint(data.item, data.id);
+    }
+
   };
 
   // 切换到区域监管
@@ -1577,6 +1582,115 @@ export default class integration extends PureComponent {
     }
   };
 
+  // 定位措施点
+  async locateMeasurePoint(measurePointInfos, id) {
+    if (measurePointInfos.length <= 0) return;
+    await this.clearMeasurePoints();
+    await this.addMeasurePoints(measurePointInfos);
+    if (measurePointInfos.length > 0) {
+      for (let i = 0; i < measurePointInfos.length; i++) {
+        let index = measurePointInfos.findIndex(
+          measurePointInfo => measurePointInfo.id === id
+        );
+        if (index !== -1) {
+          //地图范围跳转
+          const FeatureCollection = problemPointLayer.toGeoJSON();
+          let Bounds = [];
+          if (FeatureCollection.features.length > 0) {
+            for (let i = 0; i < FeatureCollection.features.length; i++) {
+              let feature = FeatureCollection.features[i];
+              Bounds.push([
+                feature.geometry.coordinates[1],
+                feature.geometry.coordinates[0]
+              ]);
+            }
+            map.fitBounds(Bounds, {
+              maxZoom: config.mapInitParams.zoom
+            });
+          }
+
+          let measurePointInfo = measurePointInfos[index];
+          let latLng = L.latLng(
+            measurePointInfo.pointY,
+            measurePointInfo.pointX
+          );
+          if(latLng){
+            const elements = this.getMeasurePopupContent(
+              measurePointInfo,
+              latLng
+            );
+            map.openPopup(elements[0], latLng);
+          }
+          else{
+            message.warning("措施点的坐标为空", 1);
+          }
+          break;
+        }
+      }
+    }
+
+  }
+  // 清除措施点
+  async clearMeasurePoints() {
+    if(measurePointLayer){
+      measurePointLayer.clearLayers();      
+    }
+    map.closePopup();
+  }
+  //新建措施点要素
+  async addMeasurePoints(measurePointInfos) {
+    const me = this;
+    //查询数据源构造geojson
+    let geojson = me.data2GeoJSON(measurePointInfos);
+    if (geojson) {
+      await me.addMeasurePointsToMap(geojson, measurePointLayer);
+    }
+    measurePointLayer.eachLayer(function(layer) {
+      layer.unbindPopup();
+      const elements = me.getMeasurePopupContent(
+        layer.options.properties,
+        layer._latlng
+      );
+      layer.bindPopup(elements[0]);
+    });
+  } 
+  /*
+   * 措施点单击内容函数
+   */
+  getMeasurePopupContent(item, latlng) {
+    const { toPopupItemStr } = this;
+    // 内容及单击事件
+    const elements = jQuery(
+      `<div>
+        ${toPopupItemStr("措施点名称", item.name)}
+        ${toPopupItemStr("经度", latlng.lng)}
+        ${toPopupItemStr("纬度", latlng.lat)}
+      </div>`
+    );
+    return elements;
+  }
+  /*
+   * 加载聚合图层
+   */
+  async addMeasurePointsToMap(geojson, measurePointLayer) {
+    for (let i = 0; i < geojson.features.length; i++) {
+      const myIcon = L.icon({
+        iconUrl: "./img/measurePointMarker.png",
+        iconSize: [32, 32]
+      });
+      let marker = L.marker(
+        new L.LatLng(
+          geojson.features[i].geometry.coordinates[1],
+          geojson.features[i].geometry.coordinates[0]
+        ),
+        { properties: geojson.features[i].properties, icon: myIcon }
+      );
+      measurePointLayer.addLayer(marker);
+    }
+  }
+
+  
+
   // 定位问题点
   async locateProblemPoint(problemPointInfos, id) {
     if (problemPointInfos.length <= 0) return;
@@ -1610,11 +1724,16 @@ export default class integration extends PureComponent {
             problemPointInfo.pointY,
             problemPointInfo.pointX
           );
-          const elements = this.getProblemPopupContent(
-            problemPointInfo,
-            latLng
-          );
-          map.openPopup(elements[0], latLng);
+          if(latLng){
+            const elements = this.getProblemPopupContent(
+              problemPointInfo,
+              latLng
+            );
+            map.openPopup(elements[0], latLng);
+          }
+          else{
+            message.warning("问题点的坐标为空", 1);
+          }
           break;
         }
       }
@@ -1623,8 +1742,9 @@ export default class integration extends PureComponent {
 
   // 清除问题点
   async clearProblemPoints() {
-    const { problemPointLayer } = this;
-    problemPointLayer.clearLayers();
+    if(problemPointLayer){
+      problemPointLayer.clearLayers();      
+    }
     map.closePopup();
   }
 
@@ -1634,9 +1754,9 @@ export default class integration extends PureComponent {
     //查询数据源构造geojson
     let geojson = me.data2GeoJSON(problemPointInfos);
     if (geojson) {
-      await me.addProblemPointsToMap(geojson, me.problemPointLayer);
+      await me.addProblemPointsToMap(geojson, problemPointLayer);
     }
-    me.problemPointLayer.eachLayer(function(layer) {
+    problemPointLayer.eachLayer(function(layer) {
       layer.unbindPopup();
       const elements = me.getProblemPopupContent(
         layer.options.properties,
@@ -1703,7 +1823,7 @@ export default class integration extends PureComponent {
           item = items[i];
           if (item.pointX && item.pointY) {
             let properties = {
-              description: item.description,
+              description: item.description ? item.description : '',
               name: item.name,
               id: item.id
             };
@@ -2001,7 +2121,6 @@ export default class integration extends PureComponent {
   // 创建地图
   createMap = () => {
     const me = this;
-    // const { problemPointLayer } = this;
     /* This code is needed to properly load the images in the Leaflet CSS */
     delete L.Icon.Default.prototype._getIconUrl;
     L.Icon.Default.mergeOptions({

@@ -226,7 +226,7 @@ export default class sider extends PureComponent {
       });
     });
     this.eventEmitter = emitter.addListener("projectCreateUpdateBack", () => {
-      this.closeAll();
+      this.hide();
       this.setState({
         showProjectDetail: false
       });
@@ -773,8 +773,7 @@ export default class sider extends PureComponent {
     });
   };
 
-  switchMenu = e => {
-    this.scrollDom.scrollTop = 0;
+  hide = () => {
     emitter.emit("emptyPoint", {});
     emitter.emit("showSiderbarDetail", {
       show: false,
@@ -794,6 +793,24 @@ export default class sider extends PureComponent {
       show: false,
       result: []
     });
+    emitter.emit("showProblemPoint", {
+      show: false
+    });
+    emitter.emit("showMeasurePoint", {
+      show: false
+    });
+    emitter.emit("showProjectDetail", {
+      show: false,
+      edit: false
+    });
+    emitter.emit("showInspect", {
+      show: false
+    });
+  };
+
+  switchMenu = e => {
+    this.hide();
+    this.scrollDom.scrollTop = 0;
     const k = e.key;
     if (k === "project") {
       this.queryProject({ SkipCount: 0 });
@@ -880,24 +897,6 @@ export default class sider extends PureComponent {
     } else {
       return "magenta";
     }
-  };
-
-  closeAll = () => {
-    emitter.emit("showSiderbarDetail", {
-      show: false,
-      from: "spot",
-      item: { id: "2017154_14848_4848" }
-    });
-    emitter.emit("showProjectDetail", {
-      show: false,
-      edit: false
-    });
-    emitter.emit("showInspect", {
-      show: false
-    });
-    emitter.emit("showProblemPoint", {
-      show: false
-    });
   };
 
   getDepartKey = value => {
@@ -1458,7 +1457,7 @@ export default class sider extends PureComponent {
               cursor: "pointer"
             }}
             onClick={() => {
-              this.closeAll();
+              this.hide();
               this.scrollDom.scrollTop = 0;
               this.setState({
                 isProjectSupervise: !isProjectSupervise,
@@ -1981,7 +1980,7 @@ export default class sider extends PureComponent {
                       content: "",
                       onOk() {
                         self.setState({ showProjectDetail: false });
-                        self.closeAll();
+                        self.hide();
                       },
                       onCancel() {}
                     });
@@ -1998,7 +1997,7 @@ export default class sider extends PureComponent {
                       show: false,
                       edit: false
                     });
-                    self.closeAll();
+                    self.hide();
                   }
                 }}
               />
@@ -2332,7 +2331,7 @@ export default class sider extends PureComponent {
                         key={index}
                         style={{ cursor: "pointer" }}
                         onClick={() => {
-                          this.closeAll();
+                          this.hide();
                           emitter.emit("showInspect", {
                             show: true,
                             id: item.id,
@@ -2369,7 +2368,7 @@ export default class sider extends PureComponent {
                                     callback: success => {
                                       self.showSpin(false);
                                       if (success) {
-                                        self.closeAll();
+                                        self.hide();
                                         emitter.emit("projectInfoRefresh", {
                                           projectId: projectItem.id
                                         });
@@ -2422,13 +2421,33 @@ export default class sider extends PureComponent {
                           <Icon
                             type="plus"
                             style={{
+                              color: `#13c2c2`, //措施
                               float: "right",
                               fontSize: 18,
-                              color: "#1890ff"
+                              marginLeft: 10
                             }}
                             onClick={e => {
                               e.stopPropagation();
-                              this.closeAll();
+                              this.hide();
+                              emitter.emit("showMeasurePoint", {
+                                show: true,
+                                id: null,
+                                inspectId: item.id,
+                                projectId: projectItem.id,
+                                from: "add"
+                              });
+                            }}
+                          />
+                          <Icon
+                            type="plus"
+                            style={{
+                              color: `#eb2f96`, //问题
+                              float: "right",
+                              fontSize: 18
+                            }}
+                            onClick={e => {
+                              e.stopPropagation();
+                              this.hide();
                               emitter.emit("showProblemPoint", {
                                 show: true,
                                 id: null,
@@ -2449,7 +2468,7 @@ export default class sider extends PureComponent {
                               <span
                                 onClick={e => {
                                   e.stopPropagation();
-                                  this.closeAll();
+                                  this.hide();
                                   emitter.emit("showProblemPoint", {
                                     show: true,
                                     id: ite.id,
@@ -2490,7 +2509,7 @@ export default class sider extends PureComponent {
                                         callback: success => {
                                           self.showSpin(false);
                                           if (success) {
-                                            self.closeAll();
+                                            self.hide();
                                             emitter.emit("projectInfoRefresh", {
                                               projectId: projectItem.id
                                             });
@@ -2522,7 +2541,11 @@ export default class sider extends PureComponent {
                               <Icon
                                 type="picture"
                                 style={{
-                                  display: ite.attachment ? "block" : "none",
+                                  display:
+                                    ite.attachment &&
+                                    ite.attachment.child.length
+                                      ? "block"
+                                      : "none",
                                   float: "right",
                                   fontSize: 18,
                                   color: "#1890ff"
@@ -2547,7 +2570,7 @@ export default class sider extends PureComponent {
                               <span
                                 onClick={e => {
                                   e.stopPropagation();
-                                  this.closeAll();
+                                  this.hide();
                                   emitter.emit("showMeasurePoint", {
                                     show: true,
                                     id: ite.id,
@@ -2588,7 +2611,7 @@ export default class sider extends PureComponent {
                                         callback: success => {
                                           self.showSpin(false);
                                           if (success) {
-                                            self.closeAll();
+                                            self.hide();
                                             emitter.emit("projectInfoRefresh", {
                                               projectId: projectItem.id
                                             });
@@ -2613,14 +2636,18 @@ export default class sider extends PureComponent {
                                   mapLocation({
                                     item: item.measurePoints,
                                     id: ite.id,
-                                    key: "measure"
+                                    key: "measurePoint"
                                   });
                                 }}
                               />
                               <Icon
                                 type="picture"
                                 style={{
-                                  display: ite.attachment ? "block" : "none",
+                                  display:
+                                    ite.attachment &&
+                                    ite.attachment.child.length
+                                      ? "block"
+                                      : "none",
                                   float: "right",
                                   fontSize: 18,
                                   color: "#1890ff"
@@ -2664,7 +2691,7 @@ export default class sider extends PureComponent {
                       style={{ cursor: "pointer" }}
                       onClick={() => {
                         this.setState({ showCompany: true });
-                        this.closeAll();
+                        this.hide();
                       }}
                     >
                       2019/3/22 监督执法记录
@@ -2704,7 +2731,7 @@ export default class sider extends PureComponent {
                       style={{ cursor: "pointer" }}
                       onClick={() => {
                         this.setState({ showCompany: true });
-                        this.closeAll();
+                        this.hide();
                       }}
                     >
                       2019/3/22 监督执法记录
@@ -2808,7 +2835,7 @@ export default class sider extends PureComponent {
                         key={index}
                         style={{ cursor: "pointer" }}
                         onClick={() => {
-                          this.closeAll();
+                          this.hide();
                           emitter.emit("showSiderbarDetail", {
                             show: true,
                             edit: false,
@@ -2909,7 +2936,7 @@ export default class sider extends PureComponent {
                         key={index}
                         style={{ cursor: "pointer" }}
                         onClick={() => {
-                          this.closeAll();
+                          this.hide();
                           emitter.emit("showSiderbarDetail", {
                             show: true,
                             edit: false,
@@ -3092,7 +3119,7 @@ export default class sider extends PureComponent {
                         key={index}
                         style={{ cursor: "pointer" }}
                         onClick={() => {
-                          this.closeAll();
+                          this.hide();
                           emitter.emit("showSiderbarDetail", {
                             from: "panorama",
                             show: true,
