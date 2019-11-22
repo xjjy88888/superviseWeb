@@ -20,6 +20,7 @@ import Chart from "../List/Chart";
 import Query from "../List/Query";
 import Inspect from "../List/Inspect";
 import ProblemPoint from "../List/ProblemPoint";
+import MeasurePoint from "../List/MeasurePoint";
 import ProjectDetail from "../List/ProjectDetail";
 import HistoryPlay from "./HistoryPlay";
 import "leaflet/dist/leaflet.css";
@@ -3683,6 +3684,7 @@ export default class integration extends PureComponent {
         <ProjectDetail />
         <Inspect />
         <ProblemPoint />
+        <MeasurePoint />
         <HistoryPlay />
         <Contrast />
         <div

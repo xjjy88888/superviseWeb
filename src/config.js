@@ -286,13 +286,13 @@ const config = {
     problemPointListUrl: `${domainApi}ProblemPoint/GetAll`,
 
     // 措施点_详情
-    measureByIdUrl: `${domainApi}MeasurePoint/Get`,
+    measurePointByIdUrl: `${domainApi}MeasurePoint/Get`,
 
     // 措施点_新建编辑
-    measureCreateUpdateUrl: `${domainApi}MeasurePoint/`,
+    measurePointCreateUpdateUrl: `${domainApi}MeasurePoint/`,
 
     // 措施点_删除
-    measureDeleteUrl: `${domainApi}MeasurePoint/Delete`,
+    measurePointDeleteUrl: `${domainApi}MeasurePoint/Delete`,
 
     // 字典类型_列表
     dictTypeListUrl: `${domainApi}DictType/GetAll`,

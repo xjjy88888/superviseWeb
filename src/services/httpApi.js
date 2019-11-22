@@ -818,8 +818,8 @@ export async function problemPointListApi(params) {
 }
 
 // 措施点_详情
-export async function measureByIdApi(params) {
-  return request(`${config.url.measureByIdUrl}?Id=${params.id}`, {
+export async function measurePointByIdApi(params) {
+  return request(`${config.url.measurePointByIdUrl}?Id=${params.id}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
@@ -828,9 +828,9 @@ export async function measureByIdApi(params) {
 }
 
 // 措施点_新建编辑
-export async function measureCreateUpdateApi(params) {
+export async function measurePointCreateUpdateApi(params) {
   return request(
-    `${config.url.measureCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
+    `${config.url.measurePointCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
     {
       method: "POST",
       headers: {
@@ -843,8 +843,8 @@ export async function measureCreateUpdateApi(params) {
 }
 
 // 措施点_删除
-export async function measureDeleteApi(params) {
-  return request(`${config.url.measureDeleteUrl}?id=${params.id}`, {
+export async function measurePointDeleteApi(params) {
+  return request(`${config.url.measurePointDeleteUrl}?id=${params.id}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,

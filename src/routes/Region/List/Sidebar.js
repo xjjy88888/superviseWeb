@@ -2581,7 +2581,7 @@ export default class sider extends PureComponent {
                                     onOk() {
                                       self.showSpin(true);
                                       dispatch({
-                                        type: "measure/measureDelete",
+                                        type: "measurePoint/measurePointDelete",
                                         payload: {
                                           id: ite.id
                                         },

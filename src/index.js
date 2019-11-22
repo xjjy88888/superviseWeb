@@ -24,7 +24,7 @@ app.model(require('./models/role').default);
 app.model(require('./models/departs').default);
 app.model(require('./models/panorama').default);
 app.model(require('./models/projectSupervise').default);
-app.model(require('./models/measure').default)
+app.model(require('./models/measurePoint').default)
 
 // 4. Router
 app.router(require('./router').default);

@@ -1,23 +1,23 @@
 import { notification } from "antd";
 import {
-  measureCreateUpdateApi,
-  measureDeleteApi,
-  measureByIdApi
+  measurePointCreateUpdateApi,
+  measurePointDeleteApi,
+  measurePointByIdApi
 } from "../services/httpApi";
 
 const initialState = {
-  measureId: "605312469782495232",
+  measurePointId: "605312469782495232",
   location: null,
-  measureInfo: {},
+  measurePointInfo: {},
   imageInfos: [],
   refresh: true,
   problemType: [],
-  measureList: { totalCount: 0, items: [] },
+  measurePointList: { totalCount: 0, items: [] },
   from: "edit"
 };
 
 export default {
-  namespace: "measure",
+  namespace: "measurePoint",
 
   state: initialState,
 
@@ -27,23 +27,23 @@ export default {
 
   effects: {
     //措施点_详情
-    *measureById({ payload, callback }, { call, put }) {
+    *measurePointById({ payload, callback }, { call, put }) {
       if (payload.from === "add") {
         yield put({
           type: "save",
-          payload: { measureInfo: {} }
+          payload: { measurePointInfo: {} }
         });
         if (callback) callback(false);
       } else {
         const {
           data: { success, error, result }
-        } = yield call(measureByIdApi, payload);
+        } = yield call(measurePointByIdApi, payload);
         if (success) {
           if (callback) callback(success, error, result);
           yield put({
             type: "save",
             payload: {
-              measureInfo: result
+              measurePointInfo: result
             }
           });
         } else {
@@ -56,10 +56,10 @@ export default {
     },
 
     // 措施点_新建编辑
-    *measureCreateUpdate({ payload, callback }, { call, put }) {
+    *measurePointCreateUpdate({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result }
-      } = yield call(measureCreateUpdateApi, payload);
+      } = yield call(measurePointCreateUpdateApi, payload);
       if (callback) callback(success, error, result);
       notification[success ? "success" : "error"]({
         message: `${payload.id ? "编辑" : "新建"}措施点${
@@ -70,10 +70,10 @@ export default {
     },
 
     //措施点_删除
-    *measureDelete({ payload, callback }, { call, put }) {
+    *measurePointDelete({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result }
-      } = yield call(measureDeleteApi, payload);
+      } = yield call(measurePointDeleteApi, payload);
       if (callback) callback(success, error, result);
       notification[success ? "success" : "error"]({
         message: `删除措施点${success ? "成功" : "失败"}`,
