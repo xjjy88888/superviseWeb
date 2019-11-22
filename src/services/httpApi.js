@@ -1,12 +1,12 @@
-import config from '../config';
-import request from '../utils/request';
-import CryptoJS from 'crypto-js';
-import { dateFormat, accessToken } from '../utils/util';
+import config from "../config";
+import request from "../utils/request";
+import CryptoJS from "crypto-js";
+import { dateFormat, accessToken } from "../utils/util";
 
 // 初始化
 export async function initApi() {
   return request(`${config.url.initUrl}`, {
-    method: 'GET'
+    method: "GET"
   });
 }
 
@@ -14,9 +14,9 @@ export async function initApi() {
 export async function loginApi(params) {
   const passwordMd5 = CryptoJS.MD5(params.password).toString();
   return request(config.url.loginUrl, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'content-type': 'application/json'
+      "content-type": "application/json"
     },
     body: JSON.stringify({ ...params, password: passwordMd5 })
   });
@@ -28,45 +28,45 @@ export async function projectListApi(params) {
   return request(
     params.isChart ? config.url.projectChartUrl : config.url.projectListUrl,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
-        'Content-Type': 'application/json-patch+json'
+        "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify({
         ...params,
-        MaxResultCount: params.MaxResultCount || '10',
+        MaxResultCount: params.MaxResultCount || "10",
         ReplyTimeBegin:
           params.ReplyTime && params.ReplyTime.length
             ? dateFormat(params.ReplyTime[0]._d)
-            : '',
+            : "",
         ReplyTimeEnd:
           params.ReplyTime && params.ReplyTime.length
             ? dateFormat(params.ReplyTime[1]._d)
-            : '',
+            : "",
         ProjectCate: params.ProjectCate
-          ? params.ProjectCate.map(v => v).join(',')
-          : '',
+          ? params.ProjectCate.map(v => v).join(",")
+          : "",
         HasScopes: params.HasScopes
-          ? params.HasScopes.map(v => v).join(',')
-          : '',
+          ? params.HasScopes.map(v => v).join(",")
+          : "",
         ProjectNat: params.ProjectNat
-          ? params.ProjectNat.map(v => v).join(',')
-          : '',
+          ? params.ProjectNat.map(v => v).join(",")
+          : "",
         ProjectStatus: params.ProjectStatus
-          ? params.ProjectStatus.map(v => v).join(',')
-          : '',
-        VecType: params.VecType ? params.VecType.map(v => v).join(',') : '',
-        HasSpot: params.HasSpot ? params.HasSpot.map(v => v).join(',') : '',
+          ? params.ProjectStatus.map(v => v).join(",")
+          : "",
+        VecType: params.VecType ? params.VecType.map(v => v).join(",") : "",
+        HasSpot: params.HasSpot ? params.HasSpot.map(v => v).join(",") : "",
         ProjectType: params.ProjectType
-          ? params.ProjectType.map(v => v).join(',')
-          : '',
+          ? params.ProjectType.map(v => v).join(",")
+          : "",
         Compliance: params.Compliance
-          ? params.Compliance.map(v => v).join(',')
-          : '',
+          ? params.Compliance.map(v => v).join(",")
+          : "",
         ProjectLevel: params.ProjectLevel
-          ? params.ProjectLevel.map(v => v).join(',')
-          : ''
+          ? params.ProjectLevel.map(v => v).join(",")
+          : ""
       })
     }
   );
@@ -75,7 +75,7 @@ export async function projectListApi(params) {
 // 项目信息
 export async function projectByIdApi(id) {
   return request(`${config.url.projectByIdUrl}?id=${id}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -87,10 +87,10 @@ export async function projectCreateUpdateApi(params) {
   return request(
     params.id ? config.url.projectUpdateUrl : config.url.projectCreateUrl,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
-        'Content-Type': 'application/json-patch+json'
+        "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify(params)
     }
@@ -100,10 +100,10 @@ export async function projectCreateUpdateApi(params) {
 // 项目删除
 export async function projectDeleteApi(params) {
   return request(`${config.url.projectDeleteUrl}?id=${params.id}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     }
   });
 }
@@ -111,10 +111,10 @@ export async function projectDeleteApi(params) {
 // 项目批量删除
 export async function projectDeleteMulApi(params) {
   return request(`${config.url.projectDeleteMulUrl}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify(params.id)
   });
@@ -125,7 +125,7 @@ export async function projectArchiveApi(params) {
   return request(
     `${config.url.projectArchiveUrl}?id=${params.id}&ArchiveTime=${params.ArchiveTime}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
@@ -136,7 +136,7 @@ export async function projectArchiveApi(params) {
 // 项目撤销归档
 export async function projectUnArchiveApi(params) {
   return request(`${config.url.projectUnArchiveUrl}?id=${params.id}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -146,7 +146,7 @@ export async function projectUnArchiveApi(params) {
 // 项目重名验证
 export async function projectVerifyApi(params) {
   return request(`${config.url.projectVerifyUrl}?name=${params.name}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -158,7 +158,7 @@ export async function projectUnbindSpotApi(params) {
   return request(
     `${config.url.projectUnbindSpotUrl}?projectId=${params.projectId}&spotId=${params.spotId}`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
@@ -172,26 +172,26 @@ export async function spotListApi(params) {
   return request(
     params.isChart ? config.url.spotChartUrl : config.url.spotListUrl,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
-        'Content-Type': 'application/json-patch+json'
+        "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify({
         ...params,
-        MaxResultCount: params.MaxResultCount || '10',
+        MaxResultCount: params.MaxResultCount || "10",
         InterferenceType: params.InterferenceType
-          ? params.InterferenceType.map(v => v).join(',')
-          : '',
+          ? params.InterferenceType.map(v => v).join(",")
+          : "",
         InterferenceCompliance: params.InterferenceCompliance
-          ? params.InterferenceCompliance.map(v => v).join(',')
-          : '',
+          ? params.InterferenceCompliance.map(v => v).join(",")
+          : "",
         BuildStatus: params.BuildStatus
-          ? params.BuildStatus.map(v => v).join(',')
-          : '',
+          ? params.BuildStatus.map(v => v).join(",")
+          : "",
         InterferenceVaryType: params.InterferenceVaryType
-          ? params.InterferenceVaryType.map(v => v).join(',')
-          : ''
+          ? params.InterferenceVaryType.map(v => v).join(",")
+          : ""
       })
     }
   );
@@ -200,7 +200,7 @@ export async function spotListApi(params) {
 // 图斑列表
 export async function spotPolygonByIdApi(ProjectId) {
   return request(`${config.url.spotPolygonByIdUrl}?ProjectId=${ProjectId}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -210,7 +210,7 @@ export async function spotPolygonByIdApi(ProjectId) {
 // 图斑信息
 export async function spotByIdApi(id) {
   return request(`${config.url.spotByIdUrl}?id=${id}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -222,10 +222,10 @@ export async function spotCreateUpdateApi(params) {
   return request(
     params.id ? config.url.spotUpdateUrl : config.url.spotCreateUrl,
     {
-      method: params.id ? 'POST' : 'POST',
+      method: params.id ? "POST" : "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
-        'Content-Type': 'application/json-patch+json'
+        "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify(params)
     }
@@ -235,7 +235,7 @@ export async function spotCreateUpdateApi(params) {
 // 图斑删除
 export async function spotDeleteApi(params) {
   return request(`${config.url.spotDeleteUrl}?id=${params.id}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -245,10 +245,10 @@ export async function spotDeleteApi(params) {
 // 图斑批量删除
 export async function spotDeleteMulApi(params) {
   return request(`${config.url.spotDeleteMulUrl}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify(params.id)
   });
@@ -259,7 +259,7 @@ export async function spotArchiveApi(params) {
   return request(
     `${config.url.spotArchiveUrl}?id=${params.id}&ArchiveTime=${params.ArchiveTime}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
@@ -270,7 +270,7 @@ export async function spotArchiveApi(params) {
 // 图斑撤销归档
 export async function spotUnArchiveApi(params) {
   return request(`${config.url.spotUnArchiveUrl}?id=${params.id}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -280,7 +280,7 @@ export async function spotUnArchiveApi(params) {
 // 图斑历史
 export async function spotHistoryApi(params) {
   return request(`${config.url.spotHistoryUrl}?spotId=${params.id}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -290,7 +290,7 @@ export async function spotHistoryApi(params) {
 // 图斑同步旧系统附件
 export async function spotOldImgApi(params) {
   return request(`${config.url.spotOldImgUrl}?Id=${params.id}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -301,10 +301,10 @@ export async function spotOldImgApi(params) {
 export async function pointListApi(params) {
   return request(
     `${config.url.pointListUrl}?MaxResultCount=10&SkipCount=${params.SkipCount}` +
-      `&Sorting=${params.Sorting || ''}` +
-      `&ProjectName=${params.ProjectName || ''}`,
+      `&Sorting=${params.Sorting || ""}` +
+      `&ProjectName=${params.ProjectName || ""}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
@@ -315,7 +315,7 @@ export async function pointListApi(params) {
 // 标注点信息
 export async function pointByIdApi(id) {
   return request(`${config.url.pointByIdUrl}?id=${id}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -327,10 +327,10 @@ export async function pointCreateUpdateApi(params) {
   return request(
     params.id ? config.url.pointUpdateUrl : config.url.pointCreateUrl,
     {
-      method: params.id ? 'POST' : 'POST',
+      method: params.id ? "POST" : "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
-        'Content-Type': 'application/json-patch+json'
+        "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify(params)
     }
@@ -340,7 +340,7 @@ export async function pointCreateUpdateApi(params) {
 // 标注点删除
 export async function pointDeleteApi(params) {
   return request(`${config.url.pointDeleteUrl}?id=${params.id}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -350,7 +350,7 @@ export async function pointDeleteApi(params) {
 // 标注点批量删除
 export async function pointDeleteMulApi(params) {
   return request(`${config.url.pointDeleteMulUrl}?ids=${params.id}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -362,7 +362,7 @@ export async function redLineListApi(ProjectId) {
   return request(
     `${config.url.redLineListUrl}?SkipCount=0&MaxResultCount=20&ProjectId=${ProjectId}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
@@ -373,7 +373,7 @@ export async function redLineListApi(ProjectId) {
 // 项目红线信息
 export async function redLineByIdApi(id) {
   return request(`${config.url.redLineByIdUrl}?id=${id}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -385,10 +385,10 @@ export async function redLineCreateUpdateApi(params) {
   return request(
     params.id ? config.url.redLineUpdateUrl : config.url.redLineCreateUrl,
     {
-      method: params.id ? 'POST' : 'POST',
+      method: params.id ? "POST" : "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
-        'Content-Type': 'application/json-patch+json'
+        "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify(params)
     }
@@ -398,7 +398,7 @@ export async function redLineCreateUpdateApi(params) {
 // 项目红线删除
 export async function redLineDeleteApi(params) {
   return request(`${config.url.redLineDeleteUrl}?id=${params.id}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -408,7 +408,7 @@ export async function redLineDeleteApi(params) {
 // 项目红线批量删除
 export async function redLineDeleteMulApi(params) {
   return request(`${config.url.redLineDeleteMulUrl}?ids=${params.id}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -417,12 +417,12 @@ export async function redLineDeleteMulApi(params) {
 
 // 导出项目/图斑(附件)数据
 export async function exportApi(params) {
-  const url = `${params.key}${params.isAttach ? 'File' : ''}Export`;
+  const url = `${params.key}${params.isAttach ? "File" : ""}Export`;
   return request(config.url.exportUrl + url, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify(params)
   });
@@ -431,7 +431,7 @@ export async function exportApi(params) {
 // 流域机构列表
 export async function basinOrganizationApi() {
   return request(`${config.url.basinOrganizationUrl}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -441,7 +441,7 @@ export async function basinOrganizationApi() {
 // 字典
 export async function dictApi() {
   return request(`${config.url.dictUrl}?SkipCount=0&MaxResultCount=10000`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -451,10 +451,10 @@ export async function dictApi() {
 // 部门新建
 export async function departCreateApi(params) {
   return request(config.url.departCreateUrl, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify(params)
   });
@@ -465,7 +465,7 @@ export async function departListApi(params) {
   return request(
     `${config.url.departListUrl}?name=${params.name}&kind=${params.kind}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
@@ -476,7 +476,7 @@ export async function departListApi(params) {
 // 部门校验
 export async function departVaildApi(params) {
   return request(`${config.url.departVaildUrl}?name=${params.name}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -488,7 +488,7 @@ export async function annexDeleteApi(params) {
   return request(
     `${config.url.annexDeleteUrl}?FileId=${params.FileId}&Id=${params.Id}`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
@@ -499,15 +499,15 @@ export async function annexDeleteApi(params) {
 // 附件上传base64
 export async function annexUploadBase64Api(params) {
   let formData = new FormData();
-  formData.append('Id', params.Id);
-  formData.append('FileBase64.FileName', params['FileBase64.FileName']);
-  formData.append('FileBase64.Base64', params['FileBase64.Base64']);
-  formData.append('Longitude', params.Longitude);
-  formData.append('Latitude', params.Latitude);
-  formData.append('Azimuth', params.Azimuth);
+  formData.append("Id", params.Id);
+  formData.append("FileBase64.FileName", params["FileBase64.FileName"]);
+  formData.append("FileBase64.Base64", params["FileBase64.Base64"]);
+  formData.append("Longitude", params.Longitude);
+  formData.append("Latitude", params.Latitude);
+  formData.append("Azimuth", params.Azimuth);
 
   return request(config.url.annexUploadUrl, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     },
@@ -518,7 +518,7 @@ export async function annexUploadBase64Api(params) {
 // 项目位置
 export async function projectPositionApi(id) {
   return request(`${config.url.projectPositionUrl}?id=${id}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -528,7 +528,7 @@ export async function projectPositionApi(id) {
 // 获取边界
 export async function boundaryApi(id) {
   return request(`${config.url.boundaryUrl}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -538,9 +538,9 @@ export async function boundaryApi(id) {
 // 腾讯地图
 export async function txRegionApi(id) {
   return request(`${config.url.txRegionUrl}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
-      contentType: 'application/json;charset=utf-8'
+      contentType: "application/json;charset=utf-8"
     }
   });
 }
@@ -550,7 +550,7 @@ export async function updateSpotGraphic(params) {
   return request(
     `${config.url.updateSpotGraphic}?obj=${JSON.stringify(params)}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
@@ -561,7 +561,7 @@ export async function updateSpotGraphic(params) {
 //新建扰动图斑图形信息
 export async function addSpotGraphic(params) {
   return request(`${config.url.addSpotGraphic}?obj=${JSON.stringify(params)}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -571,7 +571,7 @@ export async function addSpotGraphic(params) {
 //删除扰动图斑图形信息
 export async function removeSpotGraphic(spot_tbid) {
   return request(`${config.url.removeSpotGraphic}?spot_tbid=${spot_tbid}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -583,7 +583,7 @@ export async function updateProjectScopeGraphic(params) {
   return request(
     `${config.url.updateProjectScopeGraphic}?obj=${JSON.stringify(params)}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
@@ -596,7 +596,7 @@ export async function addProjectScopeGraphic(params) {
   return request(
     `${config.url.addProjectScopeGraphic}?obj=${JSON.stringify(params)}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
@@ -609,7 +609,7 @@ export async function removeProjectScopeGraphic(project_id) {
   return request(
     `${config.url.removeProjectScopeGraphic}?project_id=${project_id}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
@@ -621,8 +621,8 @@ export async function removeProjectScopeGraphic(project_id) {
 
 export async function queryRegionWFSLayer(params) {
   return request(params.geojsonUrl, {
-    method: 'GET',
-    dataType: 'json',
+    method: "GET",
+    dataType: "json",
     headers: {}
   });
 }
@@ -639,14 +639,14 @@ export async function queryRegionWFSLayer(params) {
 export async function queryWFSLayer(params) {
   //console.log(params);
   return request(`${config.url.queryWFSLayer}`, {
-    method: 'POST',
-    dataType: 'json',
+    method: "POST",
+    dataType: "json",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify({
-      method: 'get',
+      method: "get",
       url: params.geojsonUrl
     })
   });
@@ -656,14 +656,14 @@ export async function queryWFSLayer(params) {
 export async function getInfoByExtent(params) {
   //return request(`${config.mapUrl.getInfoByExtent}`, {
   return request(`${config.url.queryWFSLayer}`, {
-    method: 'POST',
-    dataType: 'json',
+    method: "POST",
+    dataType: "json",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify({
-      method: 'get',
+      method: "get",
       url: params.geojsonUrl
     })
   });
@@ -677,14 +677,14 @@ export async function getHistorySpotTimeByExtent(params) {
   //   headers: {}
   // });
   return request(`${config.url.queryWFSLayer}`, {
-    method: 'POST',
-    dataType: 'json',
+    method: "POST",
+    dataType: "json",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify({
-      method: 'get',
+      method: "get",
       url: params.geojsonUrl
     })
   });
@@ -693,7 +693,7 @@ export async function getHistorySpotTimeByExtent(params) {
 // 检查表_模板
 export async function inspectFormApi(params) {
   return request(`${config.url.inspectFormUrl}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -703,7 +703,7 @@ export async function inspectFormApi(params) {
 // 检查表_项目id查询列表
 export async function inspectListApi(params) {
   return request(`${config.url.inspectListUrl}?ProjectId=${params.ProjectId}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -713,12 +713,12 @@ export async function inspectListApi(params) {
 // 检查表_新建编辑
 export async function inspectCreateUpdateApi(params) {
   return request(
-    `${config.url.inspectCreateUpdateUrl}${params.id ? 'Update' : 'Create'}`,
+    `${config.url.inspectCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
-        'Content-Type': 'application/json-patch+json'
+        "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify(params)
     }
@@ -728,10 +728,10 @@ export async function inspectCreateUpdateApi(params) {
 // 检查表_删除
 export async function inspectDeleteApi(params) {
   return request(`${config.url.inspectDeleteUrl}?id=${params.id}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     }
   });
 }
@@ -739,7 +739,7 @@ export async function inspectDeleteApi(params) {
 // 检查表_详情
 export async function inspectByIdApi(params) {
   return request(`${config.url.inspectByIdUrl}?Id=${params.id}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -749,7 +749,7 @@ export async function inspectByIdApi(params) {
 // 检查表_导出
 export async function inspectExportApi(params) {
   return request(`${config.url.inspectExportUrl}?id=${params.id}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -759,7 +759,7 @@ export async function inspectExportApi(params) {
 // 问题点_问题类型
 export async function problemTypeApi() {
   return request(`${config.url.problemTypeUrl}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -769,7 +769,7 @@ export async function problemTypeApi() {
 // 问题点_详情
 export async function problemPointByIdApi(params) {
   return request(`${config.url.problemPointByIdUrl}?Id=${params.id}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -780,13 +780,13 @@ export async function problemPointByIdApi(params) {
 export async function problemPointCreateUpdateApi(params) {
   return request(
     `${config.url.problemPointCreateUpdateUrl}${
-      params.id ? 'Update' : 'Create'
+      params.id ? "Update" : "Create"
     }`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
-        'Content-Type': 'application/json-patch+json'
+        "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify(params)
     }
@@ -796,10 +796,10 @@ export async function problemPointCreateUpdateApi(params) {
 // 问题点_删除
 export async function problemPointDeleteApi(params) {
   return request(`${config.url.problemPointDeleteUrl}?id=${params.id}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     }
   });
 }
@@ -809,7 +809,7 @@ export async function problemPointListApi(params) {
   return request(
     `${config.url.problemPointListUrl}?SkipCount=${params.SkipCount}&MaxResultCount=${params.MaxResultCount}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
@@ -817,12 +817,48 @@ export async function problemPointListApi(params) {
   );
 }
 
+// 措施点_详情
+export async function measureByIdApi(params) {
+  return request(`${config.url.measureByIdUrl}?Id=${params.id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
+// 措施点_新建编辑
+export async function measureCreateUpdateApi(params) {
+  return request(
+    `${config.url.measureCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify(params)
+    }
+  );
+}
+
+// 措施点_删除
+export async function measureDeleteApi(params) {
+  return request(`${config.url.measureDeleteUrl}?id=${params.id}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    }
+  });
+}
+
 // 字典类型_列表
 export async function dictTypeListApi() {
   return request(
     `${config.url.dictTypeListUrl}?SkipCount=0&MaxResultCount=1000`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
@@ -833,12 +869,12 @@ export async function dictTypeListApi() {
 // 字典类型_新建编辑
 export async function dictTypeCreateUpdateApi(params) {
   return request(
-    `${config.url.dictTypeCreateUpdateUrl}${params.id ? 'Update' : 'Create'}`,
+    `${config.url.dictTypeCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
-        'Content-Type': 'application/json-patch+json'
+        "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify(params)
     }
@@ -848,10 +884,10 @@ export async function dictTypeCreateUpdateApi(params) {
 // 字典类型_删除
 export async function dictTypeDeleteApi(id) {
   return request(`${config.url.dictTypeDeleteUrl}?id=${id}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     }
   });
 }
@@ -859,10 +895,10 @@ export async function dictTypeDeleteApi(id) {
 // 字典类型_批量删除
 export async function dictTypeDeleteMulApi(params) {
   return request(`${config.url.dictTypeDeleteMulUrl}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify(params.id)
   });
@@ -873,7 +909,7 @@ export async function dictDataListApi(id) {
   return request(
     `${config.url.dictDataListUrl}?SkipCount=0&MaxResultCount=1000&DictTypeId=${id}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
@@ -884,12 +920,12 @@ export async function dictDataListApi(id) {
 // 字典数据_新建编辑
 export async function dictDataCreateUpdateApi(params) {
   return request(
-    `${config.url.dictDataCreateUpdateUrl}${params.id ? 'Update' : 'Create'}`,
+    `${config.url.dictDataCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
-        'Content-Type': 'application/json-patch+json'
+        "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify(params)
     }
@@ -899,10 +935,10 @@ export async function dictDataCreateUpdateApi(params) {
 // 字典数据_删除
 export async function dictDataDeleteApi(id) {
   return request(`${config.url.dictDataDeleteUrl}?id=${id}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     }
   });
 }
@@ -910,10 +946,10 @@ export async function dictDataDeleteApi(id) {
 // 字典数据_批量删除
 export async function dictDataDeleteMulApi(params) {
   return request(`${config.url.dictDataDeleteMulUrl}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify(params.id)
   });
@@ -922,7 +958,7 @@ export async function dictDataDeleteMulApi(params) {
 // 行政区域_列表
 export async function districtTreeApi(params) {
   return request(`${config.url.districtTreeUrl}?IsFilter=${params.IsFilter}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -932,12 +968,12 @@ export async function districtTreeApi(params) {
 // 行政区域_新建编辑
 export async function districtCreateUpdateApi(params) {
   return request(
-    `${config.url.districtCreateUpdateUrl}${params.id ? 'Update' : 'Create'}`,
+    `${config.url.districtCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
-        'Content-Type': 'application/json-patch+json'
+        "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify(params)
     }
@@ -947,10 +983,10 @@ export async function districtCreateUpdateApi(params) {
 // 行政区域_删除
 export async function districtDeleteApi(id) {
   return request(`${config.url.districtDeleteUrl}?id=${id}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     }
   });
 }
@@ -958,10 +994,10 @@ export async function districtDeleteApi(id) {
 // 行政区域_批量删除
 export async function districtDeleteMulApi(params) {
   return request(`${config.url.districtDeleteMulUrl}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify(params.id)
   });
@@ -972,13 +1008,13 @@ export async function companyListApi(params) {
   return request(
     `${config.url.companyListUrl}?SkipCount=${
       params.SkipCount
-    }&MaxResultCount=${params.MaxResultCount}&Name=${params.Name || ''}${
+    }&MaxResultCount=${params.MaxResultCount}&Name=${params.Name || ""}${
       params.isBuild
-        ? '&DepTypes=1'
-        : '&DepTypes=2&DepTypes=3&DepTypes=4&DepTypes=5&DepTypes=6&DepTypes=7'
+        ? "&DepTypes=1"
+        : "&DepTypes=2&DepTypes=3&DepTypes=4&DepTypes=5&DepTypes=6&DepTypes=7"
     }`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
@@ -989,12 +1025,12 @@ export async function companyListApi(params) {
 // 单位_新建编辑
 export async function companyCreateUpdateApi(params) {
   return request(
-    `${config.url.companyCreateUpdateUrl}${params.id ? 'Update' : 'Create'}`,
+    `${config.url.companyCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
-        'Content-Type': 'application/json-patch+json'
+        "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify(params)
     }
@@ -1004,10 +1040,10 @@ export async function companyCreateUpdateApi(params) {
 // 单位_删除
 export async function companyDeleteApi(id) {
   return request(`${config.url.companyDeleteUrl}?id=${id}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     }
   });
 }
@@ -1015,10 +1051,10 @@ export async function companyDeleteApi(id) {
 // 单位_批量删除
 export async function companyDeleteMulApi(params) {
   return request(`${config.url.companyDeleteMulUrl}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify(params.id)
   });
@@ -1027,7 +1063,7 @@ export async function companyDeleteMulApi(params) {
 // 行政部门_树状列表1
 export async function departsTreeApi(params) {
   return request(`${config.url.departsTreeUrl}?IsFilter=${params.IsFilter}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -1040,9 +1076,9 @@ export async function departsListApi(params) {
     `${config.url.departsListUrl}?SkipCount=${
       params.SkipCount
     }&MaxResultCount=${params.MaxResultCount}&ParentId=${params.ParentId ||
-      ''}`,
+      ""}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
@@ -1053,12 +1089,12 @@ export async function departsListApi(params) {
 // 行政部门_新建编辑
 export async function departsCreateUpdateApi(params) {
   return request(
-    `${config.url.departsCreateUpdateUrl}${params.id ? 'Update' : 'Create'}`,
+    `${config.url.departsCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
-        'Content-Type': 'application/json-patch+json'
+        "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify(params)
     }
@@ -1068,10 +1104,10 @@ export async function departsCreateUpdateApi(params) {
 // 行政部门_删除
 export async function departsDeleteApi(id) {
   return request(`${config.url.departsDeleteUrl}?id=${id}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     }
   });
 }
@@ -1079,10 +1115,10 @@ export async function departsDeleteApi(id) {
 // 行政部门_批量删除
 export async function departsDeleteMulApi(params) {
   return request(`${config.url.departsDeleteMulUrl}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify(params.id)
   });
@@ -1096,7 +1132,7 @@ export async function roleListApi(params) {
     }&Name=${params.name || ``}&DisplayName=${params.displayName ||
       ``}&Sorting=${params.Sorting || ``}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
@@ -1108,12 +1144,12 @@ export async function roleListApi(params) {
 export async function roleCreateUpdateApi(params) {
   console.log(params);
   return request(
-    `${config.url.roleCreateUpdateUrl}${params.id ? 'Update' : 'Create'}`,
+    `${config.url.roleCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
-        'Content-Type': 'application/json-patch+json'
+        "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify(params)
     }
@@ -1123,10 +1159,10 @@ export async function roleCreateUpdateApi(params) {
 // 角色_删除
 export async function roleDeleteApi(params) {
   return request(`${config.url.roleDeleteUrl}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify(params.ids)
   });
@@ -1135,7 +1171,7 @@ export async function roleDeleteApi(params) {
 // 权限列表
 export async function powerListApi(params) {
   return request(`${config.url.powerListUrl}?userType=${params.userType}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -1154,7 +1190,7 @@ export async function userListApi(params) {
       ``}&PhoneNumber=${params.phoneNumber || ``}&Sorting=${params.Sorting ||
       ``}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
@@ -1172,13 +1208,13 @@ export async function userCreateUpdateApi(params) {
     `${
       params.isLogin
         ? config.url.userCreateOutsideUrl
-        : `${config.url.userCreateUpdateUrl}${params.id ? 'Update' : 'Create'}`
+        : `${config.url.userCreateUpdateUrl}${params.id ? "Update" : "Create"}`
     }`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
-        'Content-Type': 'application/json-patch+json'
+        "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify(data)
     }
@@ -1189,7 +1225,7 @@ export async function userCreateUpdateApi(params) {
 export async function userInfoApi(params) {
   console.log(params);
   return request(`${config.url.userInfoUrl}?Id=${params.id}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -1199,10 +1235,10 @@ export async function userInfoApi(params) {
 // 用户_审核
 export async function userExamineApi(params) {
   return request(`${config.url.userExamineUrl}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify(params.items)
   });
@@ -1210,7 +1246,7 @@ export async function userExamineApi(params) {
 
 // 用户_新建设置权限
 export async function userSetPowerApi(params) {
-  console.log('用户设置权限', params);
+  console.log("用户设置权限", params);
   return request(
     `${
       params.isActive
@@ -1218,10 +1254,10 @@ export async function userSetPowerApi(params) {
         : config.url.userSetPowerOutsideUrl
     }`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
-        'Content-Type': 'application/json-patch+json'
+        "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify(params)
     }
@@ -1231,10 +1267,10 @@ export async function userSetPowerApi(params) {
 // 用户_删除
 export async function userDeleteApi(params) {
   return request(`${config.url.userDeleteUrl}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify(params.ids)
   });
@@ -1245,7 +1281,7 @@ export async function userProjectApi(params) {
   return request(
     `${config.url.userProjectUrl}?SkipCount=0&MaxResultCount=10&Name=${params.name}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
@@ -1258,7 +1294,7 @@ export async function userCompanyApi(params) {
   return request(
     `${config.url.userCompanyUrl}?SkipCount=0&MaxResultCount=10&Name=${params.name}`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken()}`
       }
@@ -1269,10 +1305,10 @@ export async function userCompanyApi(params) {
 export async function panoramaListApi(params) {
   delete params.items;
   return request(config.url.panoramaListUrl, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify(params)
   });
@@ -1280,12 +1316,12 @@ export async function panoramaListApi(params) {
 
 export async function panoramaCreateUpdateApi(params) {
   return request(
-    `${config.url.panoramaCreateUpdateUrl}${params.id ? 'Update' : 'Create'}`,
+    `${config.url.panoramaCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
-        'Content-Type': 'application/json-patch+json'
+        "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify(params)
     }
@@ -1294,10 +1330,10 @@ export async function panoramaCreateUpdateApi(params) {
 
 export async function panoramaDeleteApi(params) {
   return request(`${config.url.panoramaDeleteUrl}?id=${params.id}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     }
   });
 }
@@ -1308,45 +1344,45 @@ export async function projectSuperviseListApi(params) {
       params.isRecycleBin ? `GetRecycleBinByPost` : `GetAllByPost`
     }`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
-        'Content-Type': 'application/json-patch+json'
+        "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify({
         ...params,
-        MaxResultCount: params.MaxResultCount || '10',
+        MaxResultCount: params.MaxResultCount || "10",
         ReplyTimeBegin:
           params.ReplyTime && params.ReplyTime.length
             ? dateFormat(params.ReplyTime[0]._d)
-            : '',
+            : "",
         ReplyTimeEnd:
           params.ReplyTime && params.ReplyTime.length
             ? dateFormat(params.ReplyTime[1]._d)
-            : '',
+            : "",
         ProjectCate: params.ProjectCate
-          ? params.ProjectCate.map(v => v).join(',')
-          : '',
+          ? params.ProjectCate.map(v => v).join(",")
+          : "",
         HasScopes: params.HasScopes
-          ? params.HasScopes.map(v => v).join(',')
-          : '',
+          ? params.HasScopes.map(v => v).join(",")
+          : "",
         ProjectNat: params.ProjectNat
-          ? params.ProjectNat.map(v => v).join(',')
-          : '',
+          ? params.ProjectNat.map(v => v).join(",")
+          : "",
         ProjectStatus: params.ProjectStatus
-          ? params.ProjectStatus.map(v => v).join(',')
-          : '',
-        VecType: params.VecType ? params.VecType.map(v => v).join(',') : '',
-        HasSpot: params.HasSpot ? params.HasSpot.map(v => v).join(',') : '',
+          ? params.ProjectStatus.map(v => v).join(",")
+          : "",
+        VecType: params.VecType ? params.VecType.map(v => v).join(",") : "",
+        HasSpot: params.HasSpot ? params.HasSpot.map(v => v).join(",") : "",
         ProjectType: params.ProjectType
-          ? params.ProjectType.map(v => v).join(',')
-          : '',
+          ? params.ProjectType.map(v => v).join(",")
+          : "",
         Compliance: params.Compliance
-          ? params.Compliance.map(v => v).join(',')
-          : '',
+          ? params.Compliance.map(v => v).join(",")
+          : "",
         ProjectLevel: params.ProjectLevel
-          ? params.ProjectLevel.map(v => v).join(',')
-          : ''
+          ? params.ProjectLevel.map(v => v).join(",")
+          : ""
       })
     }
   );
@@ -1354,12 +1390,12 @@ export async function projectSuperviseListApi(params) {
 
 export async function projectSuperviseCreateUpdateApi(params) {
   return request(
-    `${config.url.projectSuperviseUrl}${params.id ? 'Update' : 'Create'}`,
+    `${config.url.projectSuperviseUrl}${params.id ? "Update" : "Create"}`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken()}`,
-        'Content-Type': 'application/json-patch+json'
+        "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify(params)
     }
@@ -1368,17 +1404,17 @@ export async function projectSuperviseCreateUpdateApi(params) {
 
 export async function projectSuperviseDeleteApi(id) {
   return request(`${config.url.projectSuperviseDeleteUrl}?id=${id}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     }
   });
 }
 
 export async function projectShareApi(id) {
   return request(`${config.url.projectShareUrl}?Id=${id}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }
@@ -1387,10 +1423,10 @@ export async function projectShareApi(id) {
 
 export async function projectImportApi(params) {
   return request(`${config.url.projectImportUrl}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify(params)
   });
@@ -1398,10 +1434,10 @@ export async function projectImportApi(params) {
 
 export async function projectSuperviseCancelDeleteApi(params) {
   return request(`${config.url.projectSuperviseCancelDeleteUrl}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify(params)
   });
@@ -1409,10 +1445,10 @@ export async function projectSuperviseCancelDeleteApi(params) {
 
 export async function projectSuperviseForeverDeleteApi(params) {
   return request(`${config.url.projectSuperviseForeverDeleteUrl}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify(params)
   });
@@ -1421,43 +1457,43 @@ export async function projectSuperviseForeverDeleteApi(params) {
 export async function totalByDistrictCodeApi(params) {
   // console.log('1410',params);
   return request(`${config.url.totalByDistrictCodeUrl}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify({
       ...params,
-      MaxResultCount: params.MaxResultCount || '10',
+      MaxResultCount: params.MaxResultCount || "10",
       ReplyTimeBegin:
         params.ReplyTime && params.ReplyTime.length
           ? dateFormat(params.ReplyTime[0]._d)
-          : '',
+          : "",
       ReplyTimeEnd:
         params.ReplyTime && params.ReplyTime.length
           ? dateFormat(params.ReplyTime[1]._d)
-          : '',
+          : "",
       ProjectCate: params.ProjectCate
-        ? params.ProjectCate.map(v => v).join(',')
-        : '',
-      HasScopes: params.HasScopes ? params.HasScopes.map(v => v).join(',') : '',
+        ? params.ProjectCate.map(v => v).join(",")
+        : "",
+      HasScopes: params.HasScopes ? params.HasScopes.map(v => v).join(",") : "",
       ProjectNat: params.ProjectNat
-        ? params.ProjectNat.map(v => v).join(',')
-        : '',
+        ? params.ProjectNat.map(v => v).join(",")
+        : "",
       ProjectStatus: params.ProjectStatus
-        ? params.ProjectStatus.map(v => v).join(',')
-        : '',
-      VecType: params.VecType ? params.VecType.map(v => v).join(',') : '',
-      HasSpot: params.HasSpot ? params.HasSpot.map(v => v).join(',') : '',
+        ? params.ProjectStatus.map(v => v).join(",")
+        : "",
+      VecType: params.VecType ? params.VecType.map(v => v).join(",") : "",
+      HasSpot: params.HasSpot ? params.HasSpot.map(v => v).join(",") : "",
       ProjectType: params.ProjectType
-        ? params.ProjectType.map(v => v).join(',')
-        : '',
+        ? params.ProjectType.map(v => v).join(",")
+        : "",
       Compliance: params.Compliance
-        ? params.Compliance.map(v => v).join(',')
-        : '',
+        ? params.Compliance.map(v => v).join(",")
+        : "",
       ProjectLevel: params.ProjectLevel
-        ? params.ProjectLevel.map(v => v).join(',')
-        : ''
+        ? params.ProjectLevel.map(v => v).join(",")
+        : ""
     })
   });
 }
@@ -1465,94 +1501,94 @@ export async function totalByDistrictCodeApi(params) {
 export async function statisticsByDistrictCodeApi(params) {
   //console.log('1456',params);
   return request(`${config.url.statisticsByDistrictCodeUrl}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify({
       ...params,
-      MaxResultCount: params.MaxResultCount || '10',
+      MaxResultCount: params.MaxResultCount || "10",
       ReplyTimeBegin:
         params.ReplyTime && params.ReplyTime.length
           ? dateFormat(params.ReplyTime[0]._d)
-          : '',
+          : "",
       ReplyTimeEnd:
         params.ReplyTime && params.ReplyTime.length
           ? dateFormat(params.ReplyTime[1]._d)
-          : '',
+          : "",
       ProjectCate: params.ProjectCate
-        ? params.ProjectCate.map(v => v).join(',')
-        : '',
-      HasScopes: params.HasScopes ? params.HasScopes.map(v => v).join(',') : '',
+        ? params.ProjectCate.map(v => v).join(",")
+        : "",
+      HasScopes: params.HasScopes ? params.HasScopes.map(v => v).join(",") : "",
       ProjectNat: params.ProjectNat
-        ? params.ProjectNat.map(v => v).join(',')
-        : '',
+        ? params.ProjectNat.map(v => v).join(",")
+        : "",
       ProjectStatus: params.ProjectStatus
-        ? params.ProjectStatus.map(v => v).join(',')
-        : '',
-      VecType: params.VecType ? params.VecType.map(v => v).join(',') : '',
-      HasSpot: params.HasSpot ? params.HasSpot.map(v => v).join(',') : '',
+        ? params.ProjectStatus.map(v => v).join(",")
+        : "",
+      VecType: params.VecType ? params.VecType.map(v => v).join(",") : "",
+      HasSpot: params.HasSpot ? params.HasSpot.map(v => v).join(",") : "",
       ProjectType: params.ProjectType
-        ? params.ProjectType.map(v => v).join(',')
-        : '',
+        ? params.ProjectType.map(v => v).join(",")
+        : "",
       Compliance: params.Compliance
-        ? params.Compliance.map(v => v).join(',')
-        : '',
+        ? params.Compliance.map(v => v).join(",")
+        : "",
       ProjectLevel: params.ProjectLevel
-        ? params.ProjectLevel.map(v => v).join(',')
-        : ''
+        ? params.ProjectLevel.map(v => v).join(",")
+        : ""
     })
   });
 }
 
 export async function getAllPointApi(params) {
-  console.log('项目监管请求项目点参数params', params);
+  console.log("项目监管请求项目点参数params", params);
   return request(`${config.url.getAllPointUrl}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json-patch+json'
+      "Content-Type": "application/json-patch+json"
     },
     body: JSON.stringify({
       ...params,
-      MaxResultCount: params.MaxResultCount || '10',
+      MaxResultCount: params.MaxResultCount || "10",
       ReplyTimeBegin:
         params.ReplyTime && params.ReplyTime.length
           ? dateFormat(params.ReplyTime[0]._d)
-          : '',
+          : "",
       ReplyTimeEnd:
         params.ReplyTime && params.ReplyTime.length
           ? dateFormat(params.ReplyTime[1]._d)
-          : '',
+          : "",
       ProjectCate: params.ProjectCate
-        ? params.ProjectCate.map(v => v).join(',')
-        : '',
-      HasScopes: params.HasScopes ? params.HasScopes.map(v => v).join(',') : '',
+        ? params.ProjectCate.map(v => v).join(",")
+        : "",
+      HasScopes: params.HasScopes ? params.HasScopes.map(v => v).join(",") : "",
       ProjectNat: params.ProjectNat
-        ? params.ProjectNat.map(v => v).join(',')
-        : '',
+        ? params.ProjectNat.map(v => v).join(",")
+        : "",
       ProjectStatus: params.ProjectStatus
-        ? params.ProjectStatus.map(v => v).join(',')
-        : '',
-      VecType: params.VecType ? params.VecType.map(v => v).join(',') : '',
-      HasSpot: params.HasSpot ? params.HasSpot.map(v => v).join(',') : '',
+        ? params.ProjectStatus.map(v => v).join(",")
+        : "",
+      VecType: params.VecType ? params.VecType.map(v => v).join(",") : "",
+      HasSpot: params.HasSpot ? params.HasSpot.map(v => v).join(",") : "",
       ProjectType: params.ProjectType
-        ? params.ProjectType.map(v => v).join(',')
-        : '',
+        ? params.ProjectType.map(v => v).join(",")
+        : "",
       Compliance: params.Compliance
-        ? params.Compliance.map(v => v).join(',')
-        : '',
+        ? params.Compliance.map(v => v).join(",")
+        : "",
       ProjectLevel: params.ProjectLevel
-        ? params.ProjectLevel.map(v => v).join(',')
-        : ''
+        ? params.ProjectLevel.map(v => v).join(",")
+        : ""
     })
   });
 }
 
 export async function interpretListApi() {
   return request(`${config.url.interpretListUrl}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken()}`
     }

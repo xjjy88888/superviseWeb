@@ -1,10 +1,8 @@
 import { notification } from "antd";
 import {
-  measureListApi,
   measureCreateUpdateApi,
   measureDeleteApi,
-  measureByIdApi,
-  problemTypeApi
+  measureByIdApi
 } from "../services/httpApi";
 
 const initialState = {
@@ -28,74 +26,8 @@ export default {
   },
 
   effects: {
-    // 问题点_问题类型
-    *problemType({ payload, callback }, { call, put }) {
-      const {
-        data: { success, error, result }
-      } = yield call(problemTypeApi, payload);
-      if (callback) callback(success, error, result);
-
-      const res = result.map(item => {
-        if (item.label === "措施缺陷") {
-          return { ...item, children: item.children[0].children };
-        } else {
-          return item;
-        }
-      });
-      const re = res.map(item => {
-        if (item.label === "措施缺陷") {
-          const arr = item.children.map(ite => {
-            return {
-              label: ite.label,
-              value: ite.value,
-              data: ite.children
-            };
-          });
-          return {
-            label: item.label,
-            value: item.value,
-            children: arr
-          };
-        } else {
-          const arr = item.children.map(ite => {
-            const arr2 = ite.children.map(it => {
-              return {
-                label: it.label,
-                value: it.value,
-                data: it.children
-              };
-            });
-            return {
-              label: ite.label,
-              value: ite.value,
-              children: arr2
-            };
-          });
-          return {
-            label: item.label,
-            value: item.value,
-            children: arr
-          };
-        }
-      });
-
-      if (success) {
-        yield put({
-          type: "save",
-          payload: { problemType: re }
-        });
-      } else {
-        notification["error"]({
-          message: `查询问题类型失败`,
-          duration: 1
-        });
-      }
-    },
-
-    //问题点_详情
+    //措施点_详情
     *measureById({ payload, callback }, { call, put }) {
-      console.log(payload);
-
       if (payload.from === "add") {
         yield put({
           type: "save",
@@ -116,56 +48,37 @@ export default {
           });
         } else {
           notification["error"]({
-            message: `查询问题点详情失败`,
+            message: `查询措施点详情失败`,
             duration: 1
           });
         }
       }
     },
 
-    // 问题点_新建编辑
+    // 措施点_新建编辑
     *measureCreateUpdate({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result }
       } = yield call(measureCreateUpdateApi, payload);
       if (callback) callback(success, error, result);
       notification[success ? "success" : "error"]({
-        message: `${payload.id ? "编辑" : "新建"}问题点${
+        message: `${payload.id ? "编辑" : "新建"}措施点${
           success ? "成功" : "失败"
         }`,
         duration: 1
       });
     },
 
-    //问题点_删除
+    //措施点_删除
     *measureDelete({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result }
       } = yield call(measureDeleteApi, payload);
       if (callback) callback(success, error, result);
       notification[success ? "success" : "error"]({
-        message: `删除问题点${success ? "成功" : "失败"}`,
+        message: `删除措施点${success ? "成功" : "失败"}`,
         duration: 1
       });
-    },
-
-    //问题点_列表
-    *measureList({ payload, callback }, { call, put }) {
-      const {
-        data: { success, error, result }
-      } = yield call(measureListApi, payload);
-      if (callback) callback(success, error, result);
-      if (success) {
-        yield put({
-          type: "save",
-          payload: { measureList: result }
-        });
-      } else {
-        notification["error"]({
-          message: `查询问题点列表失败`,
-          duration: 1
-        });
-      }
     }
   },
 
