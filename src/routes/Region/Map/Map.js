@@ -302,10 +302,24 @@ export default class integration extends PureComponent {
     this.eventEmitter = emitter.addListener("deleteDraw", () => {
       this.clearPlotGraphic();
       this.reDrawWMSLayers();
+      this.clearProblemPoints();
+      this.clearMeasurePoints();
+      if (marker) marker.remove();
     });
     this.eventEmitter = emitter.addListener("emptyPoint", () => {
       //清空标注点
       if (marker) marker.remove();
+    });
+
+    //清空指定的问题点或者措施点
+    this.eventEmitter = emitter.addListener("deleteLocationPoint", v => {
+      console.log("deleteLocationPoint", v);
+      if(v.key === 'problemPoint'){//问题点
+         this.deleteProblemPoint(v.item.id);
+      }
+      else if(v.key === 'measurePoint'){//措施点
+         this.deleteMeasurePoint(v.item.id);
+      }
     });
 
     // 位置定位
@@ -790,12 +804,10 @@ export default class integration extends PureComponent {
     } else if (data.key === "problemPoint") {
       //问题点定位
       me.locateProblemPoint(data.item, data.id);
-    }
-    else if (data.key === "measurePoint") {
+    } else if (data.key === "measurePoint") {
       //措施点定位
       me.locateMeasurePoint(data.item, data.id);
     }
-
   };
 
   // 切换到区域监管
@@ -1614,26 +1626,35 @@ export default class integration extends PureComponent {
             measurePointInfo.pointY,
             measurePointInfo.pointX
           );
-          if(latLng){
+          if (latLng) {
             const elements = this.getMeasurePopupContent(
               measurePointInfo,
               latLng
             );
             map.openPopup(elements[0], latLng);
-          }
-          else{
+          } else {
             message.warning("措施点的坐标为空", 1);
           }
           break;
         }
       }
     }
-
   }
   // 清除措施点
   async clearMeasurePoints() {
-    if(measurePointLayer){
-      measurePointLayer.clearLayers();      
+    if (measurePointLayer) {
+      measurePointLayer.clearLayers();
+    }
+    map.closePopup();
+  }
+  // 清除指定措施点
+  async deleteMeasurePoint(id) {
+    if (measurePointLayer) {
+      measurePointLayer.eachLayer(function(layer) {
+        if(layer.options.properties.id === id){
+          measurePointLayer.removeLayer(layer);
+        }
+      });
     }
     map.closePopup();
   }
@@ -1653,7 +1674,7 @@ export default class integration extends PureComponent {
       );
       layer.bindPopup(elements[0]);
     });
-  } 
+  }
   /*
    * 措施点单击内容函数
    */
@@ -1689,8 +1710,6 @@ export default class integration extends PureComponent {
     }
   }
 
-  
-
   // 定位问题点
   async locateProblemPoint(problemPointInfos, id) {
     if (problemPointInfos.length <= 0) return;
@@ -1724,14 +1743,13 @@ export default class integration extends PureComponent {
             problemPointInfo.pointY,
             problemPointInfo.pointX
           );
-          if(latLng){
+          if (latLng) {
             const elements = this.getProblemPopupContent(
               problemPointInfo,
               latLng
             );
             map.openPopup(elements[0], latLng);
-          }
-          else{
+          } else {
             message.warning("问题点的坐标为空", 1);
           }
           break;
@@ -1742,8 +1760,20 @@ export default class integration extends PureComponent {
 
   // 清除问题点
   async clearProblemPoints() {
-    if(problemPointLayer){
-      problemPointLayer.clearLayers();      
+    if (problemPointLayer) {
+      problemPointLayer.clearLayers();
+    }
+    map.closePopup();
+  }
+
+  // 清除指定问题点
+  async deleteProblemPoint(id) {
+    if (problemPointLayer) {
+      problemPointLayer.eachLayer(function(layer) {
+        if(layer.options.properties.id === id){
+          problemPointLayer.removeLayer(layer);
+        }
+      });
     }
     map.closePopup();
   }
@@ -1823,7 +1853,7 @@ export default class integration extends PureComponent {
           item = items[i];
           if (item.pointX && item.pointY) {
             let properties = {
-              description: item.description ? item.description : '',
+              description: item.description ? item.description : "",
               name: item.name,
               id: item.id
             };
@@ -2132,7 +2162,7 @@ export default class integration extends PureComponent {
       zoomControl: false,
       attributionControl: false,
       //editable: true
-      layers: [problemPointLayer]
+      layers: [problemPointLayer,measurePointLayer]
     }).setView(config.mapInitParams.center, config.mapInitParams.zoom);
 
     map.createPane("tileLayerZIndex");

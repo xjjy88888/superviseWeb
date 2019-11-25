@@ -776,8 +776,7 @@ export default class sider extends PureComponent {
   hide = () => {
     emitter.emit("emptyPoint", {});
     emitter.emit("showSiderbarDetail", {
-      show: false,
-      from: "spot"
+      show: false
     });
     emitter.emit("showQuery", {
       show: false
@@ -1973,6 +1972,7 @@ export default class sider extends PureComponent {
                   zIndex: 1
                 }}
                 onClick={() => {
+                  emitter.emit("deleteDraw");
                   const { projectEdit } = this.state;
                   if (projectEdit) {
                     Modal.confirm({
@@ -2513,6 +2513,13 @@ export default class sider extends PureComponent {
                                             emitter.emit("projectInfoRefresh", {
                                               projectId: projectItem.id
                                             });
+                                            emitter.emit(
+                                              "deleteLocationPoint",
+                                              {
+                                                item: ite,
+                                                key: "problemPoint"
+                                              }
+                                            );
                                           }
                                         }
                                       });
@@ -2615,6 +2622,13 @@ export default class sider extends PureComponent {
                                             emitter.emit("projectInfoRefresh", {
                                               projectId: projectItem.id
                                             });
+                                            emitter.emit(
+                                              "deleteLocationPoint",
+                                              {
+                                                item: ite,
+                                                key: "measurePoint"
+                                              }
+                                            );
                                           }
                                         }
                                       });
@@ -3099,6 +3113,7 @@ export default class sider extends PureComponent {
                           }}
                           onClick={e => {
                             e.stopPropagation();
+                            this.hide();
                             emitter.emit("showSiderbarDetail", {
                               from: "panorama",
                               show: true,

@@ -130,7 +130,7 @@ export default class measurePoint extends PureComponent {
   render() {
     const {
       dispatch,
-      form: { getFieldDecorator, validateFields },
+      form: { getFieldDecorator, validateFields, getFieldValue },
       inspect: { inspectInfo },
       measurePoint: { problemType, measurePointInfo }
     } = this.props;
@@ -352,7 +352,14 @@ export default class measurePoint extends PureComponent {
                       color: "#1890ff"
                     }}
                     onClick={() => {
-                      emitter.emit("siteLocation", {});
+                      const x = getFieldValue("pointX");
+                      const y = getFieldValue("pointY");
+                      emitter.emit("siteLocation", {
+                        state: "position",
+                        Longitude: x,
+                        Latitude: y,
+                        type: "measurePoint"
+                      });
                     }}
                   />
                 }

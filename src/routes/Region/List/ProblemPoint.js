@@ -170,7 +170,7 @@ export default class problemPoint extends PureComponent {
   render() {
     const {
       dispatch,
-      form: { getFieldDecorator, validateFields },
+      form: { getFieldDecorator, validateFields, getFieldValue },
       inspect: { inspectInfo },
       problemPoint: { problemType, problemPointInfo }
     } = this.props;
@@ -439,7 +439,14 @@ export default class problemPoint extends PureComponent {
                       color: "#1890ff"
                     }}
                     onClick={() => {
-                      emitter.emit("siteLocation", {});
+                      const x = getFieldValue("pointX");
+                      const y = getFieldValue("pointY");
+                      emitter.emit("siteLocation", {
+                        state: "position",
+                        Longitude: x,
+                        Latitude: y,
+                        type: "problemPoint"
+                      });
                     }}
                   />
                 }
