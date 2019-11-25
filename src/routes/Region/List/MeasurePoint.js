@@ -43,7 +43,7 @@ export default class measurePoint extends PureComponent {
       projectId: null,
       inspectId: null,
       problemTypeData: [],
-      showSpin: false,
+      loading: false,
       fileList: [],
       attachmentId: 0,
       from: null,
@@ -68,7 +68,6 @@ export default class measurePoint extends PureComponent {
 
       if (v.show) {
         resetFields();
-        this.setState({ showSpin: true });
         this.measurePointById(v);
       }
     });
@@ -95,6 +94,7 @@ export default class measurePoint extends PureComponent {
 
   measurePointById = v => {
     const { dispatch } = this.props;
+    this.setState({ loading: true });
     dispatch({
       type: "measurePoint/measurePointById",
       payload: {
@@ -102,7 +102,7 @@ export default class measurePoint extends PureComponent {
         from: v.from
       },
       callback: (success, error, result) => {
-        this.setState({ showSpin: false, fileList: [] });
+        this.setState({ loading: false, fileList: [] });
         if (success) {
           if (result.attachment) {
             const list = result.attachment.child.map(item => {
@@ -138,7 +138,7 @@ export default class measurePoint extends PureComponent {
     const {
       show,
       id,
-      showSpin,
+      loading,
       fileList,
       attachmentId,
       problemTypeData,
@@ -211,7 +211,7 @@ export default class measurePoint extends PureComponent {
         >
           <img alt="example" style={{ width: "100%" }} src={previewImage} />
         </Modal>
-        <Spins show={showSpin} />
+        <Spins show={loading} />
         <Icon
           type="left"
           style={{
@@ -265,7 +265,7 @@ export default class measurePoint extends PureComponent {
                     ...v,
                     id: id,
                     monitorCheckListId: inspectId,
-                    attachmentId: attachmentId
+                    attachmentId
                   },
                   callback: (success, error, result) => {
                     if (success) {
@@ -380,10 +380,11 @@ export default class measurePoint extends PureComponent {
               data={{ Id: attachmentId }}
               listType="picture-card"
               fileList={fileList}
+              beforeUpload={() => {
+                this.setState({ loading: true });
+              }}
               onSuccess={v => {
-                this.setState({
-                  attachmentId: v.result.id
-                });
+                this.setState({ loading: false, attachmentId: v.result.id });
                 const item = v.result.child[0];
                 const obj = {
                   uid: item.id,

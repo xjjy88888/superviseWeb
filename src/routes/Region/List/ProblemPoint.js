@@ -43,7 +43,7 @@ export default class problemPoint extends PureComponent {
       projectId: null,
       inspectId: null,
       problemTypeData: [],
-      showSpin: false,
+      loading: false,
       fileList: [],
       attachmentId: 0,
       radioChecked: null,
@@ -72,7 +72,6 @@ export default class problemPoint extends PureComponent {
       if (v.show) {
         isOnChange = false;
         resetFields();
-        this.setState({ showSpin: true });
         this.problemType(v);
       }
     });
@@ -87,9 +86,11 @@ export default class problemPoint extends PureComponent {
 
   problemType = v => {
     const { dispatch } = this.props;
+    this.setState({ loading: true });
     dispatch({
       type: "problemPoint/problemType",
       callback: (success, error, result) => {
+        this.setState({ loading: false });
         if (success) {
           this.problemPointById(v);
         }
@@ -99,6 +100,7 @@ export default class problemPoint extends PureComponent {
 
   problemPointById = v => {
     const { dispatch } = this.props;
+    this.setState({ loading: true });
     dispatch({
       type: "problemPoint/problemPointById",
       payload: {
@@ -106,7 +108,7 @@ export default class problemPoint extends PureComponent {
         from: v.from
       },
       callback: (success, error, result) => {
-        this.setState({ showSpin: false, fileList: [] });
+        this.setState({ loading: false, fileList: [] });
         if (success) {
           this.setState({
             radioChecked: result.problem ? result.problem.id : null
@@ -178,7 +180,7 @@ export default class problemPoint extends PureComponent {
     const {
       show,
       id,
-      showSpin,
+      loading,
       fileList,
       attachmentId,
       problemTypeData,
@@ -252,7 +254,7 @@ export default class problemPoint extends PureComponent {
         >
           <img alt="example" style={{ width: "100%" }} src={previewImage} />
         </Modal>
-        <Spins show={showSpin} />
+        <Spins show={loading} />
         <Icon
           type="left"
           style={{
@@ -467,10 +469,11 @@ export default class problemPoint extends PureComponent {
               data={{ Id: attachmentId }}
               listType="picture-card"
               fileList={fileList}
+              beforeUpload={() => {
+                this.setState({ loading: true });
+              }}
               onSuccess={v => {
-                this.setState({
-                  attachmentId: v.result.id
-                });
+                this.setState({ loading: false, attachmentId: v.result.id });
                 const item = v.result.child[0];
                 const obj = {
                   uid: item.id,
