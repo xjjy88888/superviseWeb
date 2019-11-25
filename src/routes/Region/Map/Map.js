@@ -2310,7 +2310,20 @@ export default class integration extends PureComponent {
           iconUrl: "./img/camer.png",
           iconSize: [24, 24]
         });
-      } else {
+      }
+      else if(userconfig.siteLocationtype === "problemPoint"){//问题点
+        myIcon = L.icon({
+          iconUrl: "./img/problemPointMarker.png",
+          iconSize: [32, 32]
+        });
+      }
+      else if(userconfig.siteLocationtype === "measurePoint"){//措施点
+        myIcon = L.icon({
+          iconUrl: "./img/measurePointMarker.png",
+          iconSize: [32, 32]
+        });
+      }
+      else {
         myIcon = L.icon({
           iconUrl: "./img/marker-icon.png",
           iconSize: [17, 31]
