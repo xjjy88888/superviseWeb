@@ -1606,7 +1606,7 @@ export default class integration extends PureComponent {
         );
         if (index !== -1) {
           //地图范围跳转
-          const FeatureCollection = problemPointLayer.toGeoJSON();
+          const FeatureCollection = measurePointLayer.toGeoJSON();
           let Bounds = [];
           if (FeatureCollection.features.length > 0) {
             for (let i = 0; i < FeatureCollection.features.length; i++) {
