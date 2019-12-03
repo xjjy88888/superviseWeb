@@ -774,7 +774,7 @@ export default class sider extends PureComponent {
   };
 
   hide = () => {
-    emitter.emit("emptyPoint", {});
+    emitter.emit("emptyPoint");
     emitter.emit("showSiderbarDetail", {
       show: false
     });
@@ -3902,7 +3902,7 @@ export default class sider extends PureComponent {
                             callback: success => {
                               if (success) {
                                 self.setState({ showProjectDetail: false });
-                                emitter.emit("deleteSuccess", {});
+                                emitter.emit("deleteSuccess");
                               }
                             }
                           });
@@ -3936,7 +3936,7 @@ export default class sider extends PureComponent {
                     callback: success => {
                       if (success) {
                         self.setState({ showProjectDetail: false });
-                        emitter.emit("deleteSuccess", {});
+                        emitter.emit("deleteSuccess");
                       }
                     }
                   });
@@ -3947,6 +3947,7 @@ export default class sider extends PureComponent {
             </div>
             <Modal
               title="新建单位"
+              width="50%"
               visible={showCreateDepart}
               onOk={() => {
                 this.props.form.validateFields((err, v) => {
@@ -3979,83 +3980,63 @@ export default class sider extends PureComponent {
               <Form>
                 <Row gutter={24}>
                   <Col span={12}>
-                    <Form.Item label="单位名称" {...formItemLayout}>
-                      {getFieldDecorator("name", {})(<Input />)}
-                    </Form.Item>
-                  </Col>
-                  <Col span={12}>
-                    <Form.Item label="单位地址" {...formItemLayout}>
-                      {getFieldDecorator("address", {})(<Input />)}
-                    </Form.Item>
-                  </Col>
-                  <Col span={12}>
-                    <Form.Item label="单位类型" {...formItemLayout}>
-                      {getFieldDecorator(
-                        "depType",
-                        {}
-                      )(
-                        <Select style={{ width: 120 }}>
-                          <Select.Option value="1">生产建设单位</Select.Option>
-                          <Select.Option value="2">方案编制单位</Select.Option>
-                          <Select.Option value="3">设计单位</Select.Option>
-                          <Select.Option value="4">施工单位</Select.Option>
-                          <Select.Option value="5">监测单位</Select.Option>
-                          <Select.Option value="6">监理单位</Select.Option>
-                          <Select.Option value="7">
-                            验收报告编制单位
-                          </Select.Option>
-                        </Select>
-                      )}
-                    </Form.Item>
-                  </Col>
-                  <Col span={12}>
-                    <Form.Item label="单位描述" {...formItemLayout}>
-                      {getFieldDecorator("description", {})(<Input />)}
-                    </Form.Item>
-                  </Col>
-                  <Col span={12}>
-                    <Form.Item label="联系电话" {...formItemLayout}>
-                      {getFieldDecorator("phone", {})(<Input />)}
-                    </Form.Item>
-                  </Col>
-                  <Col span={12}>
-                    <Form.Item label="单位邮编" {...formItemLayout}>
-                      {getFieldDecorator("zipcode", {})(<Input />)}
-                    </Form.Item>
-                  </Col>
-                  <Col span={12}>
-                    <Form.Item label="联系人id" {...formItemLayout}>
-                      {getFieldDecorator("contactId", {})(<Input />)}
+                    <Form.Item label="单位名" {...formItemLayout}>
+                      {getFieldDecorator("name")(<Input />)}
                     </Form.Item>
                   </Col>
                   <Col span={12}>
                     <Form.Item label="单位资质" {...formItemLayout}>
-                      {getFieldDecorator("intelligence", {})(<Input />)}
+                      {getFieldDecorator("intelligence")(<Input />)}
                     </Form.Item>
                   </Col>
                   <Col span={12}>
-                    <Form.Item label="法人代表" {...formItemLayout}>
-                      {getFieldDecorator("legal", {})(<Input />)}
+                    <Form.Item label="法人" {...formItemLayout}>
+                      {getFieldDecorator("legal")(<Input />)}
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="地址" {...formItemLayout}>
+                      {getFieldDecorator("address")(<Input />)}
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="电话" {...formItemLayout}>
+                      {getFieldDecorator("phone")(<Input />)}
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="邮编" {...formItemLayout}>
+                      {getFieldDecorator("zipcode")(<Input />)}
                     </Form.Item>
                   </Col>
                   <Col span={12}>
                     <Form.Item label="传真" {...formItemLayout}>
-                      {getFieldDecorator("fax", {})(<Input />)}
+                      {getFieldDecorator("fax")(<Input />)}
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="联系人id" {...formItemLayout}>
+                      {getFieldDecorator("contactId")(<Input />)}
                     </Form.Item>
                   </Col>
                   <Col span={12}>
                     <Form.Item label="主要投资方1" {...formItemLayout}>
-                      {getFieldDecorator("investors1", {})(<Input />)}
+                      {getFieldDecorator("investors1")(<Input />)}
                     </Form.Item>
                   </Col>
                   <Col span={12}>
                     <Form.Item label="主要投资方2" {...formItemLayout}>
-                      {getFieldDecorator("investors2", {})(<Input />)}
+                      {getFieldDecorator("investors2")(<Input />)}
                     </Form.Item>
                   </Col>
                   <Col span={12}>
                     <Form.Item label="主要投资方3" {...formItemLayout}>
-                      {getFieldDecorator("investors3", {})(<Input />)}
+                      {getFieldDecorator("investors3")(<Input />)}
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="备注" {...formItemLayout}>
+                      {getFieldDecorator("description")(<Input />)}
                     </Form.Item>
                   </Col>
                 </Row>
