@@ -2160,6 +2160,23 @@ export default class sider extends PureComponent {
                             "name"
                           )}
                         </span>
+                        <span
+                          style={{
+                            display: this.getDepart(
+                              projectItem.productDepartment,
+                              "phone"
+                            )
+                              ? "inline"
+                              : "none"
+                          }}
+                        >
+                          （电话：
+                          {this.getDepart(
+                            projectItem.productDepartment,
+                            "phone"
+                          )}
+                          ）
+                        </span>
                       </p>
                       <p style={{ marginBottom: 10 }}>
                         <span>监管单位：</span>
@@ -3982,6 +3999,23 @@ export default class sider extends PureComponent {
                   <Col span={12}>
                     <Form.Item label="单位名" {...formItemLayout}>
                       {getFieldDecorator("name")(<Input />)}
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="单位类型" {...formItemLayout}>
+                      {getFieldDecorator("depType")(
+                        <Select style={{ width: "100%" }}>
+                          <Select.Option value="1">建设单位</Select.Option>
+                          <Select.Option value="2">方案编制单位</Select.Option>
+                          <Select.Option value="3">设计单位</Select.Option>
+                          <Select.Option value="4">施工单位</Select.Option>
+                          <Select.Option value="5">监测单位</Select.Option>
+                          <Select.Option value="6">监理单位</Select.Option>
+                          <Select.Option value="7">
+                            验收报告编制单位
+                          </Select.Option>
+                        </Select>
+                      )}
                     </Form.Item>
                   </Col>
                   <Col span={12}>

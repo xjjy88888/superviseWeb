@@ -368,7 +368,7 @@ export default class company extends PureComponent {
           >
             删除
           </Button>
-          <Button
+          {/* <Button
             icon="upload"
             style={{ margin: 10 }}
             onClick={() => {
@@ -385,7 +385,7 @@ export default class company extends PureComponent {
             }}
           >
             模板下载
-          </Button>
+          </Button> */}
         </span>
         <Table
           columns={columns}
