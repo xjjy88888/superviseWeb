@@ -2479,7 +2479,13 @@ export default class sider extends PureComponent {
                         {item.problemPoints.map((ite, idx) => (
                           <p
                             key={idx}
-                            style={{ paddingLeft: 30, margin: "5px 0" }}
+                            style={{
+                              padding: 3,
+                              margin: "5px 0 5px 15px",
+                              overflow: "hidden",
+                              border: "dashed 1px #dedede",
+                              borderRadius: 5
+                            }}
                           >
                             <span>
                               <span
@@ -2501,9 +2507,43 @@ export default class sider extends PureComponent {
                                 {ite.name}
                               </span>
                               <Icon
+                                type="picture"
+                                style={{
+                                  display:
+                                    ite.attachment &&
+                                    ite.attachment.child.length
+                                      ? "inline"
+                                      : "none",
+                                  fontSize: 18,
+                                  color: "#1890ff",
+                                  marginLeft: 15
+                                }}
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  emitter.emit("pictureLocation", {
+                                    item: ite.attachment.child
+                                  });
+                                }}
+                              />
+                              <Icon
+                                type="environment"
+                                style={{
+                                  fontSize: 18,
+                                  color: "#1890ff",
+                                  marginLeft: 15
+                                }}
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  mapLocation({
+                                    item: item.problemPoints,
+                                    id: ite.id,
+                                    key: "problemPoint"
+                                  });
+                                }}
+                              />
+                              <Icon
                                 type="delete"
                                 style={{
-                                  float: "right",
                                   fontSize: 18,
                                   color: "#1890ff",
                                   marginLeft: 15
@@ -2545,42 +2585,6 @@ export default class sider extends PureComponent {
                                   });
                                 }}
                               />
-                              <Icon
-                                type="environment"
-                                style={{
-                                  float: "right",
-                                  fontSize: 18,
-                                  color: "#1890ff",
-                                  marginLeft: 15
-                                }}
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  mapLocation({
-                                    item: item.problemPoints,
-                                    id: ite.id,
-                                    key: "problemPoint"
-                                  });
-                                }}
-                              />
-                              <Icon
-                                type="picture"
-                                style={{
-                                  display:
-                                    ite.attachment &&
-                                    ite.attachment.child.length
-                                      ? "block"
-                                      : "none",
-                                  float: "right",
-                                  fontSize: 18,
-                                  color: "#1890ff"
-                                }}
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  emitter.emit("pictureLocation", {
-                                    item: ite.attachment.child
-                                  });
-                                }}
-                              />
                             </span>
                           </p>
                         ))}
@@ -2588,109 +2592,107 @@ export default class sider extends PureComponent {
                         {item.measurePoints.map((ite, idx) => (
                           <p
                             key={idx}
-                            style={{ paddingLeft: 30, margin: "5px 0" }}
+                            style={{
+                              padding: 3,
+                              margin: "5px 0 5px 15px",
+                              overflow: "hidden",
+                              border: "dashed 1px #dedede",
+                              borderRadius: 5
+                            }}
                           >
-                            <span>
-                              <span
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  this.hide();
-                                  emitter.emit("showMeasurePoint", {
-                                    show: true,
-                                    id: ite.id,
-                                    inspectId: item.id,
-                                    projectId: projectItem.id,
-                                    from: "edit"
-                                  });
-                                }}
-                              >
-                                <Tag color="cyan" style={{ margin: 5 }}>
-                                  措施
-                                </Tag>
-                                {ite.name}
-                              </span>
-                              <Icon
-                                type="delete"
-                                style={{
-                                  float: "right",
-                                  fontSize: 18,
-                                  color: "#1890ff",
-                                  marginLeft: 15
-                                }}
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  Modal.confirm({
-                                    title: "删除措施点",
-                                    content: "是否确定要删除这个措施点？",
-                                    okText: "确定",
-                                    okType: "danger",
-                                    cancelText: "取消",
-                                    onOk() {
-                                      self.showSpin(true);
-                                      dispatch({
-                                        type: "measurePoint/measurePointDelete",
-                                        payload: {
-                                          id: ite.id
-                                        },
-                                        callback: success => {
-                                          self.showSpin(false);
-                                          if (success) {
-                                            self.hide();
-                                            emitter.emit("projectInfoRefresh", {
-                                              projectId: projectItem.id
-                                            });
-                                            emitter.emit(
-                                              "deleteLocationPoint",
-                                              {
-                                                item: ite,
-                                                key: "measurePoint"
-                                              }
-                                            );
-                                          }
-                                        }
-                                      });
-                                    },
-                                    onCancel() {}
-                                  });
-                                }}
-                              />
-                              <Icon
-                                type="environment"
-                                style={{
-                                  float: "right",
-                                  fontSize: 18,
-                                  color: "#1890ff",
-                                  marginLeft: 15
-                                }}
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  mapLocation({
-                                    item: item.measurePoints,
-                                    id: ite.id,
-                                    key: "measurePoint"
-                                  });
-                                }}
-                              />
-                              <Icon
-                                type="picture"
-                                style={{
-                                  display:
-                                    ite.attachment &&
-                                    ite.attachment.child.length
-                                      ? "block"
-                                      : "none",
-                                  float: "right",
-                                  fontSize: 18,
-                                  color: "#1890ff"
-                                }}
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  emitter.emit("pictureLocation", {
-                                    item: ite.attachment.child
-                                  });
-                                }}
-                              />
+                            <span
+                              onClick={e => {
+                                e.stopPropagation();
+                                this.hide();
+                                emitter.emit("showMeasurePoint", {
+                                  show: true,
+                                  id: ite.id,
+                                  inspectId: item.id,
+                                  projectId: projectItem.id,
+                                  from: "edit"
+                                });
+                              }}
+                            >
+                              <Tag color="cyan" style={{ margin: 5 }}>
+                                措施
+                              </Tag>
+                              {ite.name}
                             </span>
+                            <Icon
+                              type="picture"
+                              style={{
+                                display:
+                                  ite.attachment && ite.attachment.child.length
+                                    ? "inline"
+                                    : "none",
+                                fontSize: 18,
+                                color: "#1890ff",
+                                marginLeft: 15
+                              }}
+                              onClick={e => {
+                                e.stopPropagation();
+                                emitter.emit("pictureLocation", {
+                                  item: ite.attachment.child
+                                });
+                              }}
+                            />
+                            <Icon
+                              type="environment"
+                              style={{
+                                fontSize: 18,
+                                color: "#1890ff",
+                                marginLeft: 15
+                              }}
+                              onClick={e => {
+                                e.stopPropagation();
+                                mapLocation({
+                                  item: item.measurePoints,
+                                  id: ite.id,
+                                  key: "measurePoint"
+                                });
+                              }}
+                            />
+                            <Icon
+                              type="delete"
+                              style={{
+                                fontSize: 18,
+                                color: "#1890ff",
+                                marginLeft: 15
+                              }}
+                              onClick={e => {
+                                e.stopPropagation();
+                                Modal.confirm({
+                                  title: "删除措施点",
+                                  content: "是否确定要删除这个措施点？",
+                                  okText: "确定",
+                                  okType: "danger",
+                                  cancelText: "取消",
+                                  onOk() {
+                                    self.showSpin(true);
+                                    dispatch({
+                                      type: "measurePoint/measurePointDelete",
+                                      payload: {
+                                        id: ite.id
+                                      },
+                                      callback: success => {
+                                        self.showSpin(false);
+                                        if (success) {
+                                          self.hide();
+                                          emitter.emit("projectInfoRefresh", {
+                                            projectId: projectItem.id
+                                          });
+                                          emitter.emit("deleteLocationPoint", {
+                                            item: ite,
+                                            key: "measurePoint"
+                                          });
+                                        }
+                                      }
+                                    });
+                                  },
+                                  onCancel() {}
+                                });
+                              }}
+                            />
                           </p>
                         ))}
                       </p>
