@@ -101,7 +101,11 @@ export default {
           yield put({ type: "save", payload: { inspectInfo: result } });
         } else {
           notification["error"]({
-            message: `查询检查表详情失败`,
+            message: `查询检查表详情失败：${
+              error.validationErrors
+                ? error.validationErrors[0].message
+                : error.message
+            }`,
             duration: 1
           });
         }
