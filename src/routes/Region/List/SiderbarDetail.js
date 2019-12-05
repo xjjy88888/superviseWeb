@@ -1650,6 +1650,7 @@ export default class siderbarDetail extends PureComponent {
                   initialValue: item.pointX
                 })(
                   <Input
+                    allowClear
                     placeholder="经度"
                     disabled={!edit}
                     style={{ width: 98 }}
@@ -1659,6 +1660,7 @@ export default class siderbarDetail extends PureComponent {
                   initialValue: item.pointY
                 })(
                   <Input
+                    allowClear
                     placeholder="纬度"
                     disabled={!edit}
                     style={{ width: 135, position: "relative", top: -2 }}
@@ -1772,12 +1774,16 @@ export default class siderbarDetail extends PureComponent {
                 icon="check"
                 style={{ marginTop: 20 }}
                 onClick={() => {
-                  if (!panoramaUrlConfig) {
-                    message.warning(`请上传全景图`);
-                    return;
-                  }
                   validateFields((err, v) => {
                     console.log(v);
+                    if (!v.pointX_pano || !v.pointY_pano) {
+                      message.warning(`请填写经纬度`);
+                      return;
+                    }
+                    if (!panoramaUrlConfig) {
+                      message.warning(`请上传全景图`);
+                      return;
+                    }
                     this.setState({ showSpin: true });
                     dispatch({
                       type: "panorama/panoramaCreateUpdate",
