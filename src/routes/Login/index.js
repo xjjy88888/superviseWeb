@@ -21,8 +21,9 @@ export default class login extends PureComponent {
 
   componentDidMount() {
     localStorage.setItem("key", "");
+    localStorage.removeItem("user");
     this.props.form.validateFields();
-    this.init();
+    this.init()
   }
 
   init = () => {
@@ -105,7 +106,7 @@ export default class login extends PureComponent {
                 src="./img/logo.png"
                 alt=""
                 style={{ width: 30, marginRight: 10 }}
-                onClick={() => { }}
+                onClick={() => {}}
               />
               水土保持监督管理信息移动采集系统管理端
             </Form.Item>
