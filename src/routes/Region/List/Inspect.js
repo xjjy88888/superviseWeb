@@ -1,7 +1,7 @@
 /* eslint-disable array-callback-return */
-import React, { PureComponent } from 'react';
-import { createForm } from 'rc-form';
-import { connect } from 'dva';
+import React, { PureComponent } from "react";
+import { createForm } from "rc-form";
+import { connect } from "dva";
 import {
   Icon,
   Button,
@@ -14,13 +14,13 @@ import {
   Typography,
   notification,
   Upload
-} from 'antd';
-import emitter from '../../../utils/event';
-import 'leaflet/dist/leaflet.css';
-import moment from 'moment';
-import Spins from '../../../components/Spins';
-import config from '../../../config';
-import { getFile, accessToken } from '../../../utils/util';
+} from "antd";
+import emitter from "../../../utils/event";
+import "leaflet/dist/leaflet.css";
+import moment from "moment";
+import Spins from "../../../components/Spins";
+import config from "../../../config";
+import { getFile, accessToken } from "../../../utils/util";
 
 let self;
 let yearSelect = [];
@@ -35,24 +35,24 @@ const formItemLayout = {
 
 const signatureList = [
   {
-    name: '监督检查',
-    key: 'signImg'
+    name: "监督检查",
+    key: "signImg"
   },
   {
-    name: '建设单位',
-    key: 'proDepCPSignImg'
+    name: "建设单位",
+    key: "proDepCPSignImg"
   },
   {
-    name: '监测单位',
-    key: 'conDepCPSignImg'
+    name: "监测单位",
+    key: "conDepCPSignImg"
   },
   {
-    name: '监理单位',
-    key: 'monDepCPSignImg'
+    name: "监理单位",
+    key: "monDepCPSignImg"
   },
   {
-    name: '施工单位',
-    key: 'supDepCPSignImg'
+    name: "施工单位",
+    key: "supDepCPSignImg"
   }
 ];
 
@@ -85,32 +85,37 @@ export default class Inspect extends PureComponent {
   }
 
   componentDidMount() {
+    const { link } = this.props;
+    link(this);
+
     self = this;
-    const {
-      form: { resetFields }
-    } = this.props;
-    this.eventEmitter = emitter.addListener('showInspect', v => {
-      this.setState({
-        show: v.show,
-        projectId: v.projectId,
-        id: v.id,
-        attachmentId: 0
-      });
-      if (v.show) {
-        resetFields();
-        this.setState({ showSpin: true });
-        this.inspectForm({ ...v });
-      }
-    });
     for (let i = year; i > year - 30; i--) {
       yearSelect.push(String(i));
     }
   }
 
+  show = v => {
+    const {
+      form: { resetFields }
+    } = this.props;
+
+    this.setState({
+      show: v.show,
+      projectId: v.projectId,
+      id: v.id,
+      attachmentId: 0
+    });
+    if (v.show) {
+      resetFields();
+      this.setState({ showSpin: true });
+      this.inspectForm({ ...v });
+    }
+  };
+
   inspectForm = params => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'inspect/inspectForm',
+      type: "inspect/inspectForm",
       payload: { region: params.region },
       callback: (success, error, result) => {
         if (success) {
@@ -125,7 +130,7 @@ export default class Inspect extends PureComponent {
   inspectById = params => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'inspect/inspectById',
+      type: "inspect/inspectById",
       payload: params,
       callback: (success, error, result) => {
         this.setState({ showSpin: false, fileList: [] });
@@ -139,7 +144,7 @@ export default class Inspect extends PureComponent {
               latitude: item.latitude,
               longitude: item.longitude,
               azimuth: item.azimuth,
-              status: 'done'
+              status: "done"
             };
           });
           this.setState({ fileList: list, attachmentId: result.attachment.id });
@@ -153,14 +158,14 @@ export default class Inspect extends PureComponent {
                   {
                     uid: data.id,
                     name: data.fileName,
-                    status: 'done',
+                    status: "done",
                     url: config.url.annexPreviewUrl + data.id
                   }
                 ]
               : [];
             this.setState({
-              [item.key + 'List']: signList,
-              [item.key + 'Id']: data ? data.id : null
+              [item.key + "List"]: signList,
+              [item.key + "Id"]: data ? data.id : null
             });
           });
         }
@@ -174,12 +179,12 @@ export default class Inspect extends PureComponent {
     const { projectId } = this.state;
     this.setState({ showSpin: true });
     dispatch({
-      type: 'inspect/inspectCreateUpdate',
+      type: "inspect/inspectCreateUpdate",
       payload,
       callback: (success, error, result) => {
         this.setState({ showSpin: false });
         if (success) {
-          emitter.emit('projectInfoRefresh', {
+          emitter.emit("projectInfoRefresh", {
             projectId: projectId
           });
           this.setState({ show: false });
@@ -197,12 +202,12 @@ export default class Inspect extends PureComponent {
         item => item.checkTypeId === key
       );
       if (list.length !== 0) {
-        if (type === 'checkbox') {
+        if (type === "checkbox") {
           const initialValue = list[0].value.map(item => {
             return item.checkInfoItemId;
           });
           return initialValue;
-        } else if (type === 'radio') {
+        } else if (type === "radio") {
           return list[0].value[0].checkInfoItemId;
         }
       }
@@ -237,15 +242,15 @@ export default class Inspect extends PureComponent {
           width: 800,
           height: `100%`,
           paddingTop: 60,
-          borderLeft: 'solid 1px #ddd',
+          borderLeft: "solid 1px #ddd",
           backgroundColor: `#fff`
         }}
         ref={this.saveRef}
       >
         <div
           style={{
-            display: previewVisible_min ? 'block' : 'none',
-            position: 'fixed',
+            display: previewVisible_min ? "block" : "none",
+            position: "fixed",
             zIndex: 2,
             width: 350
           }}
@@ -254,13 +259,13 @@ export default class Inspect extends PureComponent {
             type="close"
             style={{
               fontSize: 18,
-              position: 'absolute',
+              position: "absolute",
               top: 0,
               right: 0
             }}
             onClick={() => {
               this.setState({ previewVisible_min: false });
-              emitter.emit('imgLocation', {
+              emitter.emit("imgLocation", {
                 Latitude: 0,
                 Longitude: 0,
                 show: false
@@ -269,7 +274,7 @@ export default class Inspect extends PureComponent {
           />
           <img
             alt="example"
-            style={{ width: '100%', cursor: 'pointer' }}
+            style={{ width: "100%", cursor: "pointer" }}
             src={previewImage}
             onClick={() => {
               this.setState({
@@ -280,21 +285,21 @@ export default class Inspect extends PureComponent {
           />
         </div>
         <Modal
-          width={'50vw'}
+          width={"50vw"}
           visible={previewVisible}
           footer={null}
           onCancel={() => {
             this.setState({ previewVisible: false });
           }}
         >
-          <img alt="example" style={{ width: '100%' }} src={previewImage} />
+          <img alt="example" style={{ width: "100%" }} src={previewImage} />
         </Modal>
         <Spins show={showSpin} />
         <Icon
           type="left"
           style={{
             fontSize: 30,
-            display: show ? 'block' : 'none',
+            display: show ? "block" : "none",
             position: `absolute`,
             right: -50,
             top: `48%`,
@@ -305,15 +310,15 @@ export default class Inspect extends PureComponent {
           }}
           onClick={() => {
             this.setState({ show: false });
-            emitter.emit('hideQuery', {
+            emitter.emit("hideQuery", {
               hide: true
             });
           }}
         />
         <span
           style={{
-            position: 'absolute',
-            color: '#1890ff',
+            position: "absolute",
+            color: "#1890ff",
             right: 25,
             top: 60
           }}
@@ -322,13 +327,13 @@ export default class Inspect extends PureComponent {
             icon="download"
             shape="circle"
             style={{
-              color: '#1890ff',
+              color: "#1890ff",
               fontSize: 18
             }}
             onClick={() => {
               this.setState({ showSpin: true });
               dispatch({
-                type: 'inspect/inspectExport',
+                type: "inspect/inspectExport",
                 payload: {
                   id: id
                 },
@@ -345,7 +350,7 @@ export default class Inspect extends PureComponent {
             icon="check"
             shape="circle"
             style={{
-              color: '#1890ff',
+              color: "#1890ff",
               fontSize: 18
             }}
             // 提交
@@ -354,21 +359,21 @@ export default class Inspect extends PureComponent {
               validateFields((error, v) => {
                 console.log(v);
                 if (!v.checkDate) {
-                  notification['warning']({
+                  notification["warning"]({
                     message: `请选择核查日期`,
                     duration: 1
                   });
                   return;
                 }
                 if (!v.numberYear) {
-                  notification['warning']({
+                  notification["warning"]({
                     message: `请输入编号年份`,
                     duration: 1
                   });
                   return;
                 }
                 if (!v.number) {
-                  notification['warning']({
+                  notification["warning"]({
                     message: `请输入编号序号`,
                     duration: 1
                   });
@@ -383,10 +388,10 @@ export default class Inspect extends PureComponent {
                 // }
                 for (let i in v) {
                   if (v[i]) {
-                    const type = i.split('_')[0];
-                    if (type === 'checkbox') {
+                    const type = i.split("_")[0];
+                    if (type === "checkbox") {
                       data = data.concat(v[i]);
-                    } else if (type === 'radio') {
+                    } else if (type === "radio") {
                       if (v[i].length !== 0) {
                         data.push(v[i]);
                       }
@@ -407,13 +412,13 @@ export default class Inspect extends PureComponent {
                   monitorCheckPeopleName: v.monitorCheckPeopleName,
                   description: v.description,
                   checkDate: v.checkDate
-                    ? v.checkDate.format('YYYY-MM-DD')
-                    : '',
+                    ? v.checkDate.format("YYYY-MM-DD")
+                    : "",
                   checkInfoLists: checkInfoLists
                 };
                 signatureList.map(item => {
-                  inspectCreateUpdateData[item.key + 'Id'] = this.state[
-                    item.key + 'Id'
+                  inspectCreateUpdateData[item.key + "Id"] = this.state[
+                    item.key + "Id"
                   ];
                 });
                 this.inspectCreateUpdate(inspectCreateUpdateData);
@@ -424,30 +429,30 @@ export default class Inspect extends PureComponent {
             icon="rollback"
             shape="circle"
             style={{
-              color: '#1890ff',
+              color: "#1890ff",
               fontSize: 18
             }}
             onClick={() => {
               Modal.confirm({
                 title: `确定放弃填写检查表吗？`,
-                content: '',
+                content: "",
                 onOk() {
                   self.setState({ show: false });
-                  emitter.emit('deleteDraw', {});
+                  emitter.emit("deleteDraw", {});
                 },
                 onCancel() {}
               });
             }}
           />
         </span>
-        <b style={{ fontSize: 16, padding: '0 50px' }}>
+        <b style={{ fontSize: 16, padding: "0 50px" }}>
           {id ? `检查表详情` : `新建检查表`}
         </b>
         <Form
           style={{
             height: window.innerHeight - 100,
             paddingTop: 20,
-            overflow: 'auto'
+            overflow: "auto"
           }}
         >
           <Form.Item
@@ -458,10 +463,10 @@ export default class Inspect extends PureComponent {
             }
             {...formItemLayout}
           >
-            {getFieldDecorator('checkDate', {
+            {getFieldDecorator("checkDate", {
               initialValue: inspectInfo.checkDate
                 ? moment(inspectInfo.checkDate)
-                : ''
+                : ""
             })(<DatePicker style={{ width: 240 }} />)}
           </Form.Item>
           <Form.Item
@@ -472,7 +477,7 @@ export default class Inspect extends PureComponent {
             }
             {...formItemLayout}
           >
-            {getFieldDecorator('numberYear', {
+            {getFieldDecorator("numberYear", {
               initialValue: inspectInfo.numberYear
             })(<Input style={{ width: 240 }} addonAfter={`年`} />)}
           </Form.Item>
@@ -484,21 +489,21 @@ export default class Inspect extends PureComponent {
             }
             {...formItemLayout}
           >
-            {getFieldDecorator('number', { initialValue: inspectInfo.number })(
+            {getFieldDecorator("number", { initialValue: inspectInfo.number })(
               <Input style={{ width: 240 }} addonAfter={`号`} />
             )}
           </Form.Item>
           {inspectForm.map((item, index) => (
             <Form.Item label={item.title} {...formItemLayout} key={index}>
-              {item.type === 'input'
+              {item.type === "input"
                 ? getFieldDecorator(`input_${item.key}`)(<Input allowClear />)
-                : item.type === 'textArea'
+                : item.type === "textArea"
                 ? getFieldDecorator(`textArea_${item.key}`)(
                     <Input.TextArea autosize />
                   )
-                : item.type === 'radio'
+                : item.type === "radio"
                 ? getFieldDecorator(`radio_${item.key}`, {
-                    initialValue: this.getInitialValue('radio', item.key)
+                    initialValue: this.getInitialValue("radio", item.key)
                   })(
                     <Radio.Group name="radiogroup">
                       {item.data.map((item, index) => (
@@ -508,9 +513,9 @@ export default class Inspect extends PureComponent {
                       ))}
                     </Radio.Group>
                   )
-                : item.type === 'checkbox'
+                : item.type === "checkbox"
                 ? getFieldDecorator(`checkbox_${item.key}`, {
-                    initialValue: this.getInitialValue('checkbox', item.key)
+                    initialValue: this.getInitialValue("checkbox", item.key)
                   })(
                     <Checkbox.Group
                       options={item.data.map(item => {
@@ -525,7 +530,7 @@ export default class Inspect extends PureComponent {
             </Form.Item>
           ))}
           <Form.Item label="备注" {...formItemLayout}>
-            {getFieldDecorator('description', {
+            {getFieldDecorator("description", {
               initialValue: inspectInfo.description
             })(<Input.TextArea autosize />)}
           </Form.Item>
@@ -551,16 +556,16 @@ export default class Inspect extends PureComponent {
             return (
               <div
                 style={{
-                  minHeight: this.state[item.key + 'List'].length ? 120 : 0,
+                  minHeight: this.state[item.key + "List"].length ? 120 : 0,
                   margin: 20,
-                  overflow: 'hidden',
+                  overflow: "hidden",
                   paddingLeft: 150
                   // width: 300,
                   // float: 'left',
                 }}
                 key={index}
               >
-                <div style={{ height: 30, width: 140, float: 'left' }}>
+                <div style={{ height: 30, width: 140, float: "left" }}>
                   {item.name}人员签名：
                 </div>
                 <Upload
@@ -568,41 +573,41 @@ export default class Inspect extends PureComponent {
                   headers={{ Authorization: `Bearer ${accessToken()}` }}
                   data={{ IsMultipleFile: false }}
                   listType="picture-card"
-                  fileList={this.state[item.key + 'List']}
+                  fileList={this.state[item.key + "List"]}
                   onSuccess={v => {
                     console.log(v);
                     this.setState({
-                      [item.key + 'Id']: v.result.id
+                      [item.key + "Id"]: v.result.id
                     });
                     const item_ = v.result;
                     const obj = {
                       uid: item_.id,
                       name: item_.fileName,
                       url: config.url.annexPreviewUrl + item_.id,
-                      status: 'done'
+                      status: "done"
                     };
                     this.setState({
-                      [item.key + 'List']: [obj]
+                      [item.key + "List"]: [obj]
                     });
                   }}
                   onError={(v, response) => {
-                    notification['error']({
+                    notification["error"]({
                       message: `附件上传失败：${response.error.message}`,
                       duration: 1
                     });
                   }}
                   onPreview={file => {
                     switch (file.fileExtend) {
-                      case 'pdf':
+                      case "pdf":
                         window.open(file.url);
                         break;
-                      case 'doc':
-                      case 'docx':
-                      case 'xls':
-                      case 'xlsx':
-                      case 'ppt':
-                      case 'pptx':
-                        window.open(file.url + '&isDown=true');
+                      case "doc":
+                      case "docx":
+                      case "xls":
+                      case "xlsx":
+                      case "ppt":
+                      case "pptx":
+                        window.open(file.url + "&isDown=true");
                         break;
                       default:
                         this.setState({
@@ -617,19 +622,19 @@ export default class Inspect extends PureComponent {
                     const data = fileList.map(item => {
                       return {
                         ...item,
-                        status: 'done'
+                        status: "done"
                       };
                     });
-                    this.setState({ [item.key + 'List']: data });
+                    this.setState({ [item.key + "List"]: data });
                   }}
                   onRemove={file => {
                     this.setState({
-                      [item.key + 'List']: [],
-                      [item.key + 'Id']: null
+                      [item.key + "List"]: [],
+                      [item.key + "Id"]: null
                     });
                   }}
                 >
-                  {this.state[item.key + 'List'].length ? null : (
+                  {this.state[item.key + "List"].length ? null : (
                     <div className="ant-upload-text">
                       <Button type="div" icon="plus">
                         上传
@@ -641,7 +646,7 @@ export default class Inspect extends PureComponent {
             );
           })}
           <div
-            style={{ minHeight: fileList.length ? 120 : 0, margin: '0 30px' }}
+            style={{ minHeight: fileList.length ? 120 : 0, margin: "0 30px" }}
           >
             <Upload
               action={config.url.annexUploadUrl}
@@ -662,30 +667,30 @@ export default class Inspect extends PureComponent {
                   longitude: item.longitude,
                   azimuth: item.azimuth,
                   fileExtend: item.fileExtend,
-                  status: 'done'
+                  status: "done"
                 };
                 this.setState({
                   fileList: [...fileList, obj]
                 });
               }}
               onError={(v, response) => {
-                notification['error']({
+                notification["error"]({
                   message: `附件上传失败：${response.error.message}`,
                   duration: 1
                 });
               }}
               onPreview={file => {
                 switch (file.fileExtend) {
-                  case 'pdf':
+                  case "pdf":
                     window.open(file.url);
                     break;
-                  case 'doc':
-                  case 'docx':
-                  case 'xls':
-                  case 'xlsx':
-                  case 'ppt':
-                  case 'pptx':
-                    window.open(file.url + '&isDown=true');
+                  case "doc":
+                  case "docx":
+                  case "xls":
+                  case "xlsx":
+                  case "ppt":
+                  case "pptx":
+                    window.open(file.url + "&isDown=true");
                     break;
                   default:
                     this.setState({
@@ -693,7 +698,7 @@ export default class Inspect extends PureComponent {
                       previewVisible_min: true
                     });
                     if (file.latitude || file.longitude) {
-                      emitter.emit('imgLocation', {
+                      emitter.emit("imgLocation", {
                         Latitude: file.latitude,
                         Longitude: file.longitude,
                         direction: file.azimuth,
@@ -710,7 +715,7 @@ export default class Inspect extends PureComponent {
                 const data = fileList.map(item => {
                   return {
                     ...item,
-                    status: 'done'
+                    status: "done"
                   };
                 });
                 this.setState({ fileList: data });
@@ -718,7 +723,7 @@ export default class Inspect extends PureComponent {
               onRemove={file => {
                 return new Promise((resolve, reject) => {
                   dispatch({
-                    type: 'annex/annexDelete',
+                    type: "annex/annexDelete",
                     payload: {
                       FileId: file.uid,
                       Id: inspectInfo.attachment

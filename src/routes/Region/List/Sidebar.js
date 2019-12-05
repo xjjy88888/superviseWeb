@@ -774,6 +774,7 @@ export default class sider extends PureComponent {
   };
 
   hide = () => {
+    const { showInspect } = this.props;
     emitter.emit("emptyPoint");
     emitter.emit("showSiderbarDetail", {
       show: false
@@ -802,7 +803,7 @@ export default class sider extends PureComponent {
       show: false,
       edit: false
     });
-    emitter.emit("showInspect", {
+    showInspect({
       show: false
     });
   };
@@ -1091,6 +1092,7 @@ export default class sider extends PureComponent {
       switchData,
       mapLocation,
       switchInterpret,
+      showInspect,
       dispatch,
       form: { getFieldDecorator, resetFields, setFieldsValue, getFieldValue },
       district: { districtTree, districtTreeFilter },
@@ -2330,7 +2332,7 @@ export default class sider extends PureComponent {
                           }}
                           onClick={e => {
                             e.stopPropagation();
-                            emitter.emit("showInspect", {
+                            showInspect({
                               show: true,
                               id: null,
                               projectId: projectItem.id,
@@ -2349,7 +2351,7 @@ export default class sider extends PureComponent {
                         style={{ cursor: "pointer" }}
                         onClick={() => {
                           this.hide();
-                          emitter.emit("showInspect", {
+                          showInspect({
                             show: true,
                             id: item.id,
                             projectId: projectItem.id,

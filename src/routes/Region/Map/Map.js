@@ -314,11 +314,12 @@ export default class integration extends PureComponent {
     //清空指定的问题点或者措施点
     this.eventEmitter = emitter.addListener("deleteLocationPoint", v => {
       console.log("deleteLocationPoint", v);
-      if(v.key === 'problemPoint'){//问题点
-         this.deleteProblemPoint(v.item.id);
-      }
-      else if(v.key === 'measurePoint'){//措施点
-         this.deleteMeasurePoint(v.item.id);
+      if (v.key === "problemPoint") {
+        //问题点
+        this.deleteProblemPoint(v.item.id);
+      } else if (v.key === "measurePoint") {
+        //措施点
+        this.deleteMeasurePoint(v.item.id);
       }
     });
 
@@ -1651,7 +1652,7 @@ export default class integration extends PureComponent {
   async deleteMeasurePoint(id) {
     if (measurePointLayer) {
       measurePointLayer.eachLayer(function(layer) {
-        if(layer.options.properties.id === id){
+        if (layer.options.properties.id === id) {
           measurePointLayer.removeLayer(layer);
         }
       });
@@ -1770,7 +1771,7 @@ export default class integration extends PureComponent {
   async deleteProblemPoint(id) {
     if (problemPointLayer) {
       problemPointLayer.eachLayer(function(layer) {
-        if(layer.options.properties.id === id){
+        if (layer.options.properties.id === id) {
           problemPointLayer.removeLayer(layer);
         }
       });
@@ -2162,7 +2163,7 @@ export default class integration extends PureComponent {
       zoomControl: false,
       attributionControl: false,
       //editable: true
-      layers: [problemPointLayer,measurePointLayer]
+      layers: [problemPointLayer, measurePointLayer]
     }).setView(config.mapInitParams.center, config.mapInitParams.zoom);
 
     map.createPane("tileLayerZIndex");
@@ -2310,20 +2311,19 @@ export default class integration extends PureComponent {
           iconUrl: "./img/camer.png",
           iconSize: [24, 24]
         });
-      }
-      else if(userconfig.siteLocationtype === "problemPoint"){//问题点
+      } else if (userconfig.siteLocationtype === "problemPoint") {
+        //问题点
         myIcon = L.icon({
           iconUrl: "./img/problemPointMarker.png",
           iconSize: [32, 32]
         });
-      }
-      else if(userconfig.siteLocationtype === "measurePoint"){//措施点
+      } else if (userconfig.siteLocationtype === "measurePoint") {
+        //措施点
         myIcon = L.icon({
           iconUrl: "./img/measurePointMarker.png",
           iconSize: [32, 32]
         });
-      }
-      else {
+      } else {
         myIcon = L.icon({
           iconUrl: "./img/marker-icon.png",
           iconSize: [17, 31]
@@ -3836,6 +3836,7 @@ export default class integration extends PureComponent {
           switchData={this.switchData}
           mapLocation={this.mapLocation}
           switchInterpret={this.switchInterpret}
+          showInspect={(v) => this.Inspect.show(v)}
         />
         <SidebarDetail mapLocation={this.mapLocation} />
         <Tool />
@@ -3844,7 +3845,7 @@ export default class integration extends PureComponent {
         <Sparse />
         <Panorama />
         <ProjectDetail />
-        <Inspect />
+        <Inspect link={t => (this.Inspect = t)} />
         <ProblemPoint />
         <MeasurePoint />
         <HistoryPlay />
