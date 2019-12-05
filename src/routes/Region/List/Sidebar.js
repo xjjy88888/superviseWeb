@@ -2441,7 +2441,7 @@ export default class sider extends PureComponent {
                               color: `#13c2c2`, //措施
                               float: "right",
                               fontSize: 18,
-                              marginLeft: 10
+                              marginLeft: 15
                             }}
                             onClick={e => {
                               e.stopPropagation();

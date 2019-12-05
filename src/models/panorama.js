@@ -32,11 +32,19 @@ export default {
 
     *panoramaCreateUpdate({ payload, callback }, { call, put }) {
       const {
-        data: { success, result }
+        data: { success, error, result }
       } = yield call(panoramaCreateUpdateApi, payload);
       if (callback) callback(success, result);
       notification[success ? "success" : "error"]({
-        message: `${payload.id ? "编辑" : "新建"}${success ? "成功" : "失败"}`,
+        message: `${payload.id ? "编辑" : "新建"}${
+          success
+            ? "成功"
+            : `失败：${
+                error.validationErrors
+                  ? error.validationErrors[0].message
+                  : error.message
+              }`
+        }`,
         duration: 1
       });
     },
