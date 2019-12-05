@@ -11,7 +11,7 @@ const menuList = [
   {
     title: "首页",
     icon: "home",
-    key: "/index",
+    key: "/region",
     subMenu: []
   },
   {

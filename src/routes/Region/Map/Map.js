@@ -3836,7 +3836,7 @@ export default class integration extends PureComponent {
           switchData={this.switchData}
           mapLocation={this.mapLocation}
           switchInterpret={this.switchInterpret}
-          showInspect={(v) => this.Inspect.show(v)}
+          showInspect={v => this.Inspect.show(v)}
         />
         <SidebarDetail mapLocation={this.mapLocation} />
         <Tool />

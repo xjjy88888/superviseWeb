@@ -1,20 +1,20 @@
 /* eslint-disable array-callback-return */
-import moment from 'moment';
-import { EXIF } from 'exif-js';
-import emitter from './event';
-import jQuery from 'jquery';
-import bigInt from 'big-integer';
+import moment from "moment";
+import { EXIF } from "exif-js";
+import emitter from "./event";
+import jQuery from "jquery";
+import bigInt from "big-integer";
 
 const dateFormat = v => {
-  return v ? moment(new Date(v).getTime()).format('YYYY-MM-DD') : null;
+  return v ? moment(new Date(v).getTime()).format("YYYY-MM-DD") : null;
 };
 
 const dateInitFormat = v => {
-  return v ? moment(v, 'YYYY-MM-DD') : null;
+  return v ? moment(v, "YYYY-MM-DD") : null;
 };
 
 const dateTimeFormat = v => {
-  return v ? moment(new Date(v).getTime()).format('YYYY-MM-DD HH:mm:ss') : null;
+  return v ? moment(new Date(v).getTime()).format("YYYY-MM-DD HH:mm:ss") : null;
 };
 
 const getFile = url => {
@@ -50,7 +50,7 @@ const getFile = url => {
     }
 
     console.log(Longitude, Latitude, direction);
-    emitter.emit('imgLocation', {
+    emitter.emit("imgLocation", {
       Latitude: Latitude,
       Longitude: Longitude,
       direction: direction,
@@ -62,7 +62,7 @@ const getFile = url => {
 const accessToken = () =>
   localStorage.length > 0 && localStorage.user
     ? JSON.parse(localStorage.user).accessToken
-    : '';
+    : "";
 
 const guid = () => {
   const Snowflake = /** @class */ (function() {
@@ -86,16 +86,16 @@ const guid = () => {
       this.sequence = 0;
       if (this.workerId > this.maxWrokerId || this.workerId < 0) {
         throw new Error(
-          'config.worker_id must max than 0 and small than maxWrokerId-[' +
+          "config.worker_id must max than 0 and small than maxWrokerId-[" +
             this.maxWrokerId +
-            ']'
+            "]"
         );
       }
       if (this.dataCenterId > this.maxDataCenterId || this.dataCenterId < 0) {
         throw new Error(
-          'config.data_center_id must max than 0 and small than maxDataCenterId-[' +
+          "config.data_center_id must max than 0 and small than maxDataCenterId-[" +
             this.maxDataCenterId +
-            ']'
+            "]"
         );
       }
       this.workerId = _workerId;
@@ -117,7 +117,7 @@ const guid = () => {
       var timestamp = this.timeGen();
       if (timestamp < this.lastTimestamp) {
         throw new Error(
-          'Clock moved backwards. Refusing to generate id for ' +
+          "Clock moved backwards. Refusing to generate id for " +
             (this.lastTimestamp - timestamp)
         );
       }
@@ -146,12 +146,12 @@ const guid = () => {
 };
 
 const unique = (arr, k) => {
-  const key = k || 'value';
+  const key = k || "value";
   const res = new Map();
   return arr.filter(a => !res.has(a[key]) && res.set(a[key], 1));
 };
 
-const treeToList = (v, parent_name = '', parent_code = '', parent_id = '') => {
+const treeToList = (v, parent_name = "", parent_code = "", parent_id = "") => {
   let child = v.children,
     arr = [];
   arr.push({
@@ -174,7 +174,7 @@ const treeToList = (v, parent_name = '', parent_code = '', parent_id = '') => {
 const inspectFormData = (items, pTitle = null, color = null) => {
   let arr = [];
   items.forEach(item => {
-    if (item.type === 'label') {
+    if (item.type === "label") {
       arr = arr.concat(
         inspectFormData(item.child, item.title, item.color ? item.color : color)
       );
