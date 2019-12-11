@@ -830,7 +830,9 @@ export async function measurePointByIdApi(params) {
 // 措施点_新建编辑
 export async function measurePointCreateUpdateApi(params) {
   return request(
-    `${config.url.measurePointCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
+    `${config.url.measurePointCreateUpdateUrl}${
+      params.id ? "Update" : "Create"
+    }`,
     {
       method: "POST",
       headers: {

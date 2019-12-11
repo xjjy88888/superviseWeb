@@ -3795,6 +3795,10 @@ export default class integration extends PureComponent {
     }
   };
 
+  videoMonitorLocation = params => {
+    console.log("视频监控定位", params);
+  };
+
   render() {
     const radioStyle = {
       display: "block",
@@ -3837,6 +3841,7 @@ export default class integration extends PureComponent {
           mapLocation={this.mapLocation}
           switchInterpret={this.switchInterpret}
           showInspect={v => this.Inspect.show(v)}
+          videoMonitorLocation={this.videoMonitorLocation}
         />
         <SidebarDetail mapLocation={this.mapLocation} />
         <Tool />

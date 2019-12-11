@@ -64,7 +64,8 @@ const formItemLayout = {
     inspect,
     problemPoint,
     panorama,
-    projectSupervise
+    projectSupervise,
+    videoMonitor
   }) => ({
     project,
     spot,
@@ -77,7 +78,8 @@ const formItemLayout = {
     inspect,
     problemPoint,
     panorama,
-    projectSupervise
+    projectSupervise,
+    videoMonitor
   })
 )
 @createForm()
@@ -1093,6 +1095,7 @@ export default class sider extends PureComponent {
       mapLocation,
       switchInterpret,
       showInspect,
+      videoMonitorLocation,
       dispatch,
       form: { getFieldDecorator, resetFields, setFieldsValue, getFieldValue },
       district: { districtTree, districtTreeFilter },
@@ -1103,7 +1106,8 @@ export default class sider extends PureComponent {
       redLine: { redLineList },
       inspect: { inspectList },
       panorama: { panoramaList },
-      projectSupervise: { projectSuperviseList }
+      projectSupervise: { projectSuperviseList },
+      videoMonitor: { videoMonitorList }
     } = this.props;
 
     const {
@@ -3217,6 +3221,106 @@ export default class sider extends PureComponent {
                             emitter.emit("fullViewLocation", {
                               ...item
                             });
+                          }}
+                        />
+                      </p>
+                    ))}
+                  </Collapse.Panel>
+                  <Collapse.Panel
+                    header={
+                      <b>
+                        视频监控：
+                        {videoMonitorList.totalCount}
+                        <Icon
+                          type="plus"
+                          style={{
+                            marginLeft: 10,
+                            fontSize: 16,
+                            color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            // e.stopPropagation();
+                            // this.hide();
+                            // emitter.emit("showSiderbarDetail", {
+                            //   from: "panorama",
+                            //   show: true,
+                            //   edit: true,
+                            //   type: "add",
+                            //   id: null,
+                            //   projectId: projectItem.id,
+                            //   item: {}
+                            // });
+                          }}
+                        />
+                      </b>
+                    }
+                    key="8"
+                  >
+                    {videoMonitorList.items.map((item, index) => (
+                      <p
+                        key={index}
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          // this.hide();
+                          // emitter.emit("showSiderbarDetail", {
+                          //   from: "panorama",
+                          //   show: true,
+                          //   edit: false,
+                          //   type: "edit",
+                          //   id: item.id,
+                          //   projectId: projectItem.id,
+                          //   item
+                          // });
+                        }}
+                      >
+                        设备名称：{item.name}
+                        <Icon
+                          type="delete"
+                          style={{
+                            float: "right",
+                            fontSize: 18,
+                            cursor: "point",
+                            color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            // e.stopPropagation();
+                            // Modal.confirm({
+                            //   title: "删除",
+                            //   content: "是否确定要删除？",
+                            //   okText: "确定",
+                            //   okType: "danger",
+                            //   cancelText: "取消",
+                            //   onOk() {
+                            //     dispatch({
+                            //       type: "panorama/panoramaDelete",
+                            //       payload: {
+                            //         id: item.id
+                            //       },
+                            //       callback: success => {
+                            //         if (success) {
+                            //           emitter.emit("projectInfoRefresh", {
+                            //             projectId: projectItem.id
+                            //           });
+                            //         }
+                            //       }
+                            //     });
+                            //   },
+                            //   onCancel() {}
+                            // });
+                          }}
+                        />
+                        <Icon
+                          type="environment"
+                          style={{
+                            float: "right",
+                            fontSize: 16,
+                            cursor: "point",
+                            color: "#1890ff",
+                            marginRight: 10
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            videoMonitorLocation(item);
                           }}
                         />
                       </p>
