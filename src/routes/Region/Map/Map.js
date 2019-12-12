@@ -3836,7 +3836,7 @@ export default class RegionMap extends PureComponent {
                 jQuery.ajax({
                   type: "POST",
                   url: config.url.deviceAddress,
-                  data: {accessToken:data.accessToken,source:"237983628:1"},
+                  data: {accessToken:data.accessToken,source:params.deviceSerial+":1"},
                   dataType: "json",
                   contentType: "application/x-www-form-urlencoded",
                   success: function (data) {
@@ -3844,6 +3844,7 @@ export default class RegionMap extends PureComponent {
                     data = data.data;
                     if(data && data.length>0){
                       params.url = data[0].hlsHd;
+                      //不相等的话，则调用后台接口修改url
                     }
                     me.openVideoMonitor(params,e.latlng);
                   },
