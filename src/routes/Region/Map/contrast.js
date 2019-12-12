@@ -19,7 +19,7 @@ let contrastconfig = {};
   project,
   spot
 }))
-export default class splitScreen extends PureComponent {
+export default class Contrast extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {

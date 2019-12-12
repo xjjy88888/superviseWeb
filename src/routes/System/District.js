@@ -1,8 +1,8 @@
 /* eslint-disable array-callback-return */
-import React, { PureComponent } from 'react';
-import { connect } from 'dva';
-import { createForm } from 'rc-form';
-import Systems from '../../components/Systems';
+import React, { PureComponent } from "react";
+import { connect } from "dva";
+import { createForm } from "rc-form";
+import Systems from "../../components/Systems";
 import {
   Form,
   Icon,
@@ -15,8 +15,8 @@ import {
   Layout,
   Modal,
   notification
-} from 'antd';
-import Highlighter from 'react-highlight-words';
+} from "antd";
+import Highlighter from "react-highlight-words";
 
 const { Sider, Content } = Layout;
 const { Title } = Typography;
@@ -25,7 +25,7 @@ let self;
 
 @connect(({ district }) => ({ district }))
 @createForm()
-export default class area extends PureComponent {
+export default class district extends PureComponent {
   state = {
     visible: false,
     selectedRows: [],
@@ -45,7 +45,7 @@ export default class area extends PureComponent {
     const { ParentId } = this.state;
     self.setState({ loading: true });
     dispatch({
-      type: 'district/districtTree',
+      type: "district/districtTree",
       payload: {
         IsFilter: true
       },
@@ -75,7 +75,7 @@ export default class area extends PureComponent {
             setSelectedKeys(e.target.value ? [e.target.value] : [])
           }
           onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
-          style={{ width: 188, marginBottom: 8, display: 'block' }}
+          style={{ width: 188, marginBottom: 8, display: "block" }}
         />
         <Button
           type="primary"
@@ -96,7 +96,7 @@ export default class area extends PureComponent {
       </div>
     ),
     filterIcon: filtered => (
-      <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
+      <Icon type="search" style={{ color: filtered ? "#1890ff" : undefined }} />
     ),
     onFilter: (value, record) =>
       record[dataIndex]
@@ -110,7 +110,7 @@ export default class area extends PureComponent {
     },
     render: text => (
       <Highlighter
-        highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+        highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
         searchWords={[this.state.searchText]}
         autoEscape
         textToHighlight={text.toString()}
@@ -125,7 +125,7 @@ export default class area extends PureComponent {
 
   handleReset = clearFilters => {
     clearFilters();
-    this.setState({ searchText: '' });
+    this.setState({ searchText: "" });
   };
 
   getDistrictList = (v, list) => {
@@ -183,26 +183,26 @@ export default class area extends PureComponent {
 
     const columns = [
       {
-        title: '行政区名称',
-        dataIndex: 'label',
+        title: "行政区名称",
+        dataIndex: "label",
         sorter: (a, b) => a.label.length - b.label.length,
-        ...this.getColumnSearchProps('label')
+        ...this.getColumnSearchProps("label")
       },
       {
-        title: '行政区编码',
-        dataIndex: 'code',
+        title: "行政区编码",
+        dataIndex: "code",
         sorter: (a, b) => a.code - b.code,
-        ...this.getColumnSearchProps('code')
+        ...this.getColumnSearchProps("code")
       },
       {
-        title: '备注',
-        dataIndex: 'description',
+        title: "备注",
+        dataIndex: "description",
         sorter: (a, b) => a.description.length - b.description.length,
-        ...this.getColumnSearchProps('description')
+        ...this.getColumnSearchProps("description")
       },
       {
-        title: '操作',
-        key: 'operation',
+        title: "操作",
+        key: "operation",
         render: (item, record) => (
           <span>
             <a
@@ -226,15 +226,15 @@ export default class area extends PureComponent {
             <a
               onClick={() => {
                 Modal.confirm({
-                  title: '删除',
-                  content: '是否确定要删除',
-                  okText: '是',
-                  cancelText: '否',
-                  okType: 'danger',
+                  title: "删除",
+                  content: "是否确定要删除",
+                  okText: "是",
+                  cancelText: "否",
+                  okType: "danger",
                   onOk() {
                     self.setState({ loading: true });
                     dispatch({
-                      type: 'district/districtDelete',
+                      type: "district/districtDelete",
                       payload: record.value,
                       callback: (success, error, result) => {
                         self.setState({ loading: false });
@@ -244,10 +244,10 @@ export default class area extends PureComponent {
                           });
                           self.districtTreeFilter();
                         }
-                        notification[success ? 'success' : 'error']({
+                        notification[success ? "success" : "error"]({
                           message: `删除1条行政区划数据${
-                            success ? '成功' : '失败'
-                          }${success ? '' : `：${error.message}`}`
+                            success ? "成功" : "失败"
+                          }${success ? "" : `：${error.message}`}`
                         });
                       }
                     });
@@ -274,9 +274,9 @@ export default class area extends PureComponent {
         <Layout>
           <Sider
             style={{
-              borderRadius: '10px 0 0 0',
+              borderRadius: "10px 0 0 0",
               height: window.innerHeight - 150,
-              overflow: 'auto'
+              overflow: "auto"
             }}
             width={300}
             theme="light"
@@ -320,8 +320,8 @@ export default class area extends PureComponent {
           </Sider>
           <Content
             style={{
-              borderRadius: '0 10px 0 0',
-              background: '#fff'
+              borderRadius: "0 10px 0 0",
+              background: "#fff"
             }}
           >
             <Title level={4}>
@@ -346,20 +346,20 @@ export default class area extends PureComponent {
                   onClick={() => {
                     const l = selectedRows.length;
                     if (l === 0) {
-                      message.warning('请选择需要删除的行政区');
+                      message.warning("请选择需要删除的行政区");
                       return;
                     }
                     console.log(selectedRows);
                     Modal.confirm({
-                      title: '删除',
-                      content: '是否确定要删除',
-                      okText: '是',
-                      cancelText: '否',
-                      okType: 'danger',
+                      title: "删除",
+                      content: "是否确定要删除",
+                      okText: "是",
+                      cancelText: "否",
+                      okType: "danger",
                       onOk() {
                         self.setState({ loading: true });
                         dispatch({
-                          type: 'district/districtDeleteMul',
+                          type: "district/districtDeleteMul",
                           payload: { id: selectedRows.map(item => item.value) },
                           callback: (success, error, result) => {
                             self.setState({ loading: false });
@@ -369,10 +369,10 @@ export default class area extends PureComponent {
                               });
                               self.districtTreeFilter();
                             }
-                            notification[success ? 'success' : 'error']({
+                            notification[success ? "success" : "error"]({
                               message: `删除${l}条行政区划数据${
-                                success ? '成功' : '失败'
-                              }${success ? '' : `：${error.message}`}`
+                                success ? "成功" : "失败"
+                              }${success ? "" : `：${error.message}`}`
                             });
                           }
                         });
@@ -396,18 +396,18 @@ export default class area extends PureComponent {
               visible={visible}
               onOk={() => {
                 this.props.form.validateFields((err, v) => {
-                  console.log('新建行政区', v);
+                  console.log("新建行政区", v);
                   if (!v.name) {
-                    message.warning('请填写行政区名称');
+                    message.warning("请填写行政区名称");
                     return;
                   }
                   if (!v.code) {
-                    message.warning('请填写行政区编码');
+                    message.warning("请填写行政区编码");
                     return;
                   }
                   self.setState({ loading: true });
                   dispatch({
-                    type: 'district/districtCreateUpdate',
+                    type: "district/districtCreateUpdate",
                     payload: { ...v, id: id, parentId: ParentId },
                     callback: (success, error, result) => {
                       self.setState({ loading: false });
@@ -415,13 +415,13 @@ export default class area extends PureComponent {
                         this.setState({
                           visible: false
                         });
-                        notification['success']({
-                          message: `${id ? '编辑' : '新建'}行政区划成功`
+                        notification["success"]({
+                          message: `${id ? "编辑" : "新建"}行政区划成功`
                         });
                         this.districtTreeFilter();
                       } else {
-                        notification['error']({
-                          message: `${id ? '编辑' : '新建'}行政区划失败：${
+                        notification["error"]({
+                          message: `${id ? "编辑" : "新建"}行政区划失败：${
                             error.message
                           }`
                         });
@@ -439,39 +439,40 @@ export default class area extends PureComponent {
               <Form
                 onSubmit={this.handleSubmit}
                 layout="inline"
-                style={{ textAlign: 'center' }}
+                style={{ textAlign: "center" }}
               >
                 <Form.Item
                   label={
                     <span>
-                      <b style={{ color: 'red' }}>*</b>行政区名称
+                      <b style={{ color: "red" }}>*</b>行政区名称
                     </span>
                   }
                   hasFeedback
                 >
-                  {getFieldDecorator('name', {})(<Input />)}
+                  {getFieldDecorator("name", {})(<Input />)}
                 </Form.Item>
                 <Form.Item
                   label={
                     <span>
-                      <b style={{ color: 'red' }}>*</b>行政区编码
+                      <b style={{ color: "red" }}>*</b>行政区编码
                     </span>
                   }
                   hasFeedback
                 >
-                  {getFieldDecorator('code', {})(<Input />)}
+                  {getFieldDecorator("code", {})(<Input />)}
                 </Form.Item>
                 <Form.Item
                   label={
                     <span>
-                      <b style={{ color: '#fff' }}>*</b>行政区备注
+                      <b style={{ color: "#fff" }}>*</b>行政区备注
                     </span>
                   }
                   hasFeedback
                 >
-                  {getFieldDecorator('description', {})(
-                    <Input.TextArea autosize style={{ width: 180 }} />
-                  )}
+                  {getFieldDecorator(
+                    "description",
+                    {}
+                  )(<Input.TextArea autosize style={{ width: 180 }} />)}
                 </Form.Item>
               </Form>
             </Modal>

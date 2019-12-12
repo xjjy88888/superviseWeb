@@ -27,7 +27,7 @@ const url = config.download;
   user
 }))
 @createForm()
-export default class siderbarDetail extends PureComponent {
+export default class Tool extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {

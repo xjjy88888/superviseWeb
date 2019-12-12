@@ -32,7 +32,7 @@ let self;
 
 @connect(({ departs, district }) => ({ departs, district }))
 @createForm()
-export default class area extends PureComponent {
+export default class departs extends PureComponent {
   state = {
     visible: false,
     selectedRows: [],

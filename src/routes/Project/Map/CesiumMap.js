@@ -12,7 +12,7 @@ import 'ztree/css/zTreeStyle/zTreeStyle.css';
 @connect(({ mapdata }) => ({
   mapdata
 }))
-export default class homePage extends PureComponent {
+export default class CesiumMap extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {

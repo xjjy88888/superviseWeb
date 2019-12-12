@@ -11,7 +11,7 @@ let myChart;
 @connect(({ project }) => ({
   project
 }))
-export default class siderbarDetail extends PureComponent {
+export default class chart extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {

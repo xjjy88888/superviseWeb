@@ -25,7 +25,7 @@ const formItemLayout = {
 
 @createForm()
 @connect(({ company }) => ({ company }))
-export default class company extends PureComponent {
+export default class branch extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {

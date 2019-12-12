@@ -4,7 +4,7 @@ import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
 import "echarts";
 
-export default class siderbarDetail extends PureComponent {
+export default class Sparse extends PureComponent {
   constructor(props) {
     super(props);
     this.state = { show: false };

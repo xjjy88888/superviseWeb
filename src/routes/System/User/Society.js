@@ -10,7 +10,7 @@ let self;
 
 @createForm()
 @connect(({ user }) => ({ user }))
-export default class review extends PureComponent {
+export default class society extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {

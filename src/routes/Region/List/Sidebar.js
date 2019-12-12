@@ -83,7 +83,7 @@ const formItemLayout = {
   })
 )
 @createForm()
-export default class sider extends PureComponent {
+export default class siderbar extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {

@@ -882,7 +882,7 @@ const ZSGeoJsonHLightStyle = {
 @connect(({ mapdata }) => ({
   mapdata
 }))
-export default class homePage extends PureComponent {
+export default class ProjectMap extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {

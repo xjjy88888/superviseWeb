@@ -154,7 +154,7 @@ const ZSGeoJsonHLightStyle = {
   spot,
   projectSupervise
 }))
-export default class integration extends PureComponent {
+export default class RegionMap extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {

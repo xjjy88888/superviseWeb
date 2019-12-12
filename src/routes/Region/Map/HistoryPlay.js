@@ -4,7 +4,7 @@ import emitter from "../../../utils/event";
 import { LocaleProvider } from "antd";
 import zh_CN from "antd/lib/locale-provider/zh_CN";
 
-export default class register extends PureComponent {
+export default class HistoryPlay extends PureComponent {
   constructor(props) {
     super(props);
     this.state = { show: false, hisPlayURL: "" };

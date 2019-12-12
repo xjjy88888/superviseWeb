@@ -25,7 +25,7 @@ let self;
   district
 }))
 @createForm()
-export default class projectSupervision extends PureComponent {
+export default class ProjectList extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
