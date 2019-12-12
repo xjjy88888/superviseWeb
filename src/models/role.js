@@ -4,7 +4,6 @@ import {
   powerListApi,
   roleCreateUpdateApi,
   roleDeleteApi,
-  roleDeleteMulApi
 } from "../services/httpApi";
 
 export default {
@@ -57,19 +56,6 @@ export default {
       if (callback) callback(success);
       notification[success ? "success" : "error"]({
         message: `删除${success ? "成功" : "失败"}${
-          success ? "" : `：${error.message}`
-        }`
-      });
-    },
-
-    // 角色批量删除
-    *roleDeleteMul({ payload, callback }, { call, put }) {
-      const {
-        data: { success, error }
-      } = yield call(roleDeleteMulApi, payload);
-      if (callback) callback(success);
-      notification[success ? "success" : "error"]({
-        message: `批量删除${success ? "成功" : "失败"}${
           success ? "" : `：${error.message}`
         }`
       });

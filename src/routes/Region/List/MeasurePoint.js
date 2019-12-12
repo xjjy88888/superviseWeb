@@ -11,8 +11,7 @@ import {
   Typography,
   notification,
   Upload,
-  Select,
-  List
+  Select
 } from "antd";
 import emitter from "../../../utils/event";
 import "leaflet/dist/leaflet.css";
@@ -132,7 +131,7 @@ export default class measurePoint extends PureComponent {
       dispatch,
       form: { getFieldDecorator, validateFields, getFieldValue },
       inspect: { inspectInfo },
-      measurePoint: { problemType, measurePointInfo }
+      measurePoint: { measurePointInfo }
     } = this.props;
 
     const {
@@ -141,7 +140,6 @@ export default class measurePoint extends PureComponent {
       loading,
       fileList,
       attachmentId,
-      problemTypeData,
       projectId,
       inspectId,
       previewImage,

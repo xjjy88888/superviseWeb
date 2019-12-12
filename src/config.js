@@ -78,6 +78,17 @@ const config = {
   topologyCheckUrl: `http://183.6.178.124:8001/apk/lib/拓扑检测工具.zip`,
 
   url: {
+    //视频监控设备图片接口
+    deviceImgList:`https://www.zkyxxhs.com/gzsj/wechat/third/imgList`,
+    //视频监控设备接口
+    deviceVideo:{
+      "1909030002":`http://hls01open.ys7.com/openlive/d7e10dab781c497e90b305ab09f16ab1.hd.m3u8`,//HLS播放地址高清  流畅地址:http://hls01open.ys7.com/openlive/d7e10dab781c497e90b305ab09f16ab1.m3u8
+      //RTMP播放地址高清：rtmp://rtmp01open.ys7.com/openlive/d7e10dab781c497e90b305ab09f16ab1.hd
+      //RTMP播放地址流畅：rtmp://rtmp01open.ys7.com/openlive/d7e10dab781c497e90b305ab09f16ab1
+      "1909030003":`http://hls01open.ys7.com/openlive/6e8eee5f3b9c4bd487a785168159bb7b.hd.m3u8`,//HLS播放地址高清  流畅地址:http://hls01open.ys7.com/openlive/6e8eee5f3b9c4bd487a785168159bb7b.m3u8
+      //RTMP播放地址高清：rtmp://rtmp01open.ys7.com/openlive/6e8eee5f3b9c4bd487a785168159bb7b.hd
+      //RTMP播放地址流畅：rtmp://rtmp01open.ys7.com/openlive/6e8eee5f3b9c4bd487a785168159bb7b
+    },
     // 初始化
     initUrl: `${domain}AbpUserConfiguration/GetAll`,
 
@@ -293,6 +304,18 @@ const config = {
 
     // 措施点_删除
     measurePointDeleteUrl: `${domainApi}MeasurePoint/Delete`,
+
+    // 视频监控_列表
+    videoMonitorListUrl: `${domainApi}VideoPoint/GetAllByPost`,
+
+    // 视频监控_详情
+    videoMonitorByIdUrl: `${domainApi}VideoPoint/Get`,
+
+    // 视频监控_新建编辑
+    videoMonitorCreateUpdateUrl: `${domainApi}VideoPoint/`,
+
+    // 视频监控_删除
+    videoMonitorDeleteUrl: `${domainApi}VideoPoint/Delete`,
 
     // 字典类型_列表
     dictTypeListUrl: `${domainApi}DictType/GetAll`,

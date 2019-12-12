@@ -22,6 +22,7 @@ import Inspect from "../List/Inspect";
 import ProblemPoint from "../List/ProblemPoint";
 import MeasurePoint from "../List/MeasurePoint";
 import ProjectDetail from "../List/ProjectDetail";
+import VideoMonitor from "../List/VideoMonitor";
 import HistoryPlay from "./HistoryPlay";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -3797,6 +3798,7 @@ export default class integration extends PureComponent {
 
   videoMonitorLocation = params => {
     console.log("视频监控定位", params);
+    map.closePopup();
     //jQuery
     //视频监控定位
     if (params.pointX && params.pointY) {
@@ -3820,86 +3822,68 @@ export default class integration extends PureComponent {
       marker = L.marker([params.pointY, params.pointX], { icon: myIcon })
         .addTo(map)
         .on("click", function(e) {
-          map.closePopup();
-          //console.log("marker", e);
           // emitter.emit("showPanorama", {
           //   show: true,
           //   fullviewURL: fullviewURL
           // });
-          // const elements = jQuery(
-          //   `<div id="m_video2" style="width: 600px; height: 400px;"></div>`
-          // );
-          //window.deviceData = null;
           jQuery.ajax({
-            url : "https://www.zkyxxhs.com/gzsj/wechat/third/imgList",
-            type : 'GET',
-            dataType : 'json',
+            url: config.url.deviceImgList,
+            type: "GET",
+            dataType: "json",
             async: true,
-            data:{emcd:"1909030002",size:5},
-            success : function(data) {
-              console.log('success',data);
-              //window.deviceData = data.data;
+            data: { emcd: params.name, size: 5 },
+            success: function(data) {
+              console.log("success", data);
               data = data.data;
-              if(data && data["1909030002"]){
-                data = data["1909030002"];
-                for(var i=0;i<data.length;i++){
+              if (data && data[params.name]) {
+                data = data[params.name];
+                for (var i = 0; i < data.length; i++) {
                   var imgUrl = data[i];
                   imgUrl = imgUrl.replace(/\\/g, "/");
-                  //console.log('imgUrl',imgUrl);
-                  //content += '<img src="'+imgUrl+'" height="118" width="118" style="padding-top:2px;padding-right:2px;cursor:pointer;"></img>';
-                  jQuery("#m_pic").append('<img src="'+imgUrl+'" height="118" width="118" style="padding-top:2px;padding-right:2px;cursor:pointer;"></img>');
+                  jQuery("#m_pic").append(
+                    '<img src="' +
+                      imgUrl +
+                      '" height="118" width="118" style="padding-top:2px;padding-right:2px;cursor:pointer;"></img>'
+                  );
                 }
                 //监听img点击事件
-                jQuery("#m_pic img").on("click", function (e) {
+                jQuery("#m_pic img").on("click", function(e) {
                   //console.log('img',e.currentTarget.currentSrc);
-                  jQuery("#fullImg").attr("src", e.currentTarget.currentSrc); 
+                  jQuery("#fullImg").attr("src", e.currentTarget.currentSrc);
                   jQuery("#fullImg").show();
                 });
-                jQuery("#fullImg").on("click", function (e) {
+                jQuery("#fullImg").on("click", function(e) {
                   jQuery("#fullImg").hide();
                 });
+              } else {
+                jQuery("#m_pic").append(
+                  '<span style="line-height:118px;margin-left:230px;">设备获取图片异常,请联系管理员</span>'
+                );
               }
             },
-            error : function(msg) {
-              console.log('error',msg);
+            error: function(msg) {
+              console.log("error", msg);
             }
           });
-          //<img id='fullImg' height="100%" width="100%" style="margin:0;position:absolute;left:0;top:0;z-index:9999;display:none;"></img>
-          var content = '<img id="fullImg" height="100%" width="100%" style="padding:13px;position:absolute;left:0;top:0;z-index:9999;display:none;"></img>';
-          content += '<div id="m_video2" style="width: 600px; height: 400px;"></div>';
+          var content =
+            '<img id="fullImg" height="100%" width="100%" style="padding:13px;position:absolute;left:0;top:0;z-index:9999;display:none;"></img>';
+          content +=
+            '<div id="m_video2" style="width: 600px; height: 400px;"></div>';
           content += '<div id="m_pic" style="width: 600px; height: 120px;">';
-          // if(window.deviceData && window.deviceData["1909030002"]){
-          //   var data = window.deviceData["1909030002"];
-          //   for(var i=0;i<data.length;i++){
-          //     var imgUrl = data[i];
-          //     imgUrl = imgUrl.replace(/\\/g, "/");
-          //     //console.log('imgUrl',imgUrl);
-          //     content += '<img src="'+imgUrl+'" height="118" width="118" style="padding-top:2px;padding-right:2px;cursor:pointer;"></img>';
-          //   }
-          // }
-          content += '</div>';
+          content += "</div>";
           //map.openPopup(content, e.latlng,{maxWidth:1000,offset:L.point(0, -25)});
-          map.openPopup(content, e.latlng,{maxWidth:1000});
+          map.openPopup(content, e.latlng, { maxWidth: 1000 });
           var videoObject = {
-            container: '#m_video2', //容器的ID或className
-            variable: 'player',//播放函数名称
-            autoplay:true,//是否自动播放
-            loop:true,//是否需要循环播放
-            live:true,
-            //video: 'rtmp://rtmp01open.ys7.com/openlive/f01018a141094b7fa138b9d0b856507b.hd' //萤石官网测试url
-            //video: 'rtmp://rtmp01open.ys7.com/openlive/d7e10dab781c497e90b305ab09f16ab1'
-            video: 'http://hls01open.ys7.com/openlive/d7e10dab781c497e90b305ab09f16ab1.hd.m3u8'
+            container: "#m_video2", //容器的ID或className
+            variable: "player", //播放函数名称
+            autoplay: true, //是否自动播放
+            loop: true, //是否需要循环播放
+            live: true,
+            // video: 'rtmp://rtmp01open.ys7.com/openlive/f01018a141094b7fa138b9d0b856507b.hd' //萤石官网测试url
+            video: config.url.deviceVideo[params.name]
           };
           // eslint-disable-next-line no-undef
-          var player = new ckplayer(videoObject);    
-          // //监听img点击事件
-          // jQuery("#m_pic img").on("click", function (e) {
-          //   //console.log('img',e.currentTarget.currentSrc);
-          //   jQuery("#fullImg").attr("src", e.currentTarget.currentSrc); 
-          //   jQuery("#fullImg").show();
-          // });
-
-
+          var player = new ckplayer(videoObject);
         });
     }
   };
@@ -3947,6 +3931,7 @@ export default class integration extends PureComponent {
           switchInterpret={this.switchInterpret}
           showInspect={v => this.Inspect.show(v)}
           videoMonitorLocation={this.videoMonitorLocation}
+          showVideoMonitor={v => this.VideoMonitor.show(v)}
         />
         <SidebarDetail mapLocation={this.mapLocation} />
         <Tool />
@@ -3954,6 +3939,7 @@ export default class integration extends PureComponent {
         <Query />
         <Sparse />
         <Panorama />
+        <VideoMonitor link={t => (this.VideoMonitor = t)} />
         <ProjectDetail />
         <Inspect link={t => (this.Inspect = t)} />
         <ProblemPoint />

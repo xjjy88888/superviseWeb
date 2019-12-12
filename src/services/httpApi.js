@@ -855,6 +855,52 @@ export async function measurePointDeleteApi(params) {
   });
 }
 
+export async function videoMonitorListApi(params) {
+  return request(config.url.videoMonitorListUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify(params)
+  });
+}
+
+export async function videoMonitorByIdApi(id) {
+  return request(`${config.url.videoMonitorByIdUrl}?Id=${id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+    }
+  });
+}
+
+export async function videoMonitorCreateUpdateApi(params) {
+  return request(
+    `${config.url.videoMonitorCreateUpdateUrl}${
+      params.id ? "Update" : "Create"
+    }`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify(params)
+    }
+  );
+}
+
+export async function videoMonitorDeleteApi(params) {
+  return request(`${config.url.videoMonitorDeleteUrl}?id=${params.id}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    }
+  });
+}
+
 // 字典类型_列表
 export async function dictTypeListApi() {
   return request(

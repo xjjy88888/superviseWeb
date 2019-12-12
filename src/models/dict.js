@@ -7,7 +7,6 @@ import {
   dictDataCreateUpdateApi,
   dictDataDeleteApi,
   dictTypeDeleteMulApi,
-  dictTypeByIdApi,
   dictDataDeleteMulApi
 } from "../services/httpApi";
 
@@ -100,27 +99,6 @@ export default {
         data: { success, error, result }
       } = yield call(dictDataDeleteMulApi, payload);
       if (callback) callback(success, error, result);
-    },
-
-    // 字典类型信息
-    *querydictTypeById({ payload, callback }, { call, put }) {
-      const {
-        data: { success, error, result }
-      } = yield call(dictTypeByIdApi, payload.id);
-      if (success) {
-        const projectSelectListdictType = result.project
-          ? [{ label: result.project.projectName, value: result.project.id }]
-          : [];
-        yield put({
-          type: "save",
-          payload: { dictTypeInfo: result, projectSelectListdictType }
-        });
-        if (callback) callback(result);
-      } else {
-        notification["error"]({
-          message: `查询字典类型信息失败：${error.message}`
-        });
-      }
     }
   },
 

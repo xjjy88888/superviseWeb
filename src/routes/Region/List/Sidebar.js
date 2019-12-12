@@ -372,6 +372,7 @@ export default class sider extends PureComponent {
     this.queryRedLineList(id);
     this.inspectList(id);
     this.panoramaList(id);
+    this.videoMonitorList(id);
   };
 
   componentWillUnmount() {
@@ -775,8 +776,19 @@ export default class sider extends PureComponent {
     });
   };
 
+  videoMonitorList = id => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "videoMonitor/videoMonitorList",
+      payload: {
+        projectId: id,
+        MaxResultCount: 1000
+      }
+    });
+  };
+
   hide = () => {
-    const { showInspect } = this.props;
+    const { showInspect, showVideoMonitor } = this.props;
     emitter.emit("emptyPoint");
     emitter.emit("showSiderbarDetail", {
       show: false
@@ -806,6 +818,9 @@ export default class sider extends PureComponent {
       edit: false
     });
     showInspect({
+      show: false
+    });
+    showVideoMonitor({
       show: false
     });
   };
@@ -1096,6 +1111,7 @@ export default class sider extends PureComponent {
       switchInterpret,
       showInspect,
       videoMonitorLocation,
+      showVideoMonitor,
       dispatch,
       form: { getFieldDecorator, resetFields, setFieldsValue, getFieldValue },
       district: { districtTree, districtTreeFilter },
@@ -3239,17 +3255,13 @@ export default class sider extends PureComponent {
                             color: "#1890ff"
                           }}
                           onClick={e => {
-                            // e.stopPropagation();
-                            // this.hide();
-                            // emitter.emit("showSiderbarDetail", {
-                            //   from: "panorama",
-                            //   show: true,
-                            //   edit: true,
-                            //   type: "add",
-                            //   id: null,
-                            //   projectId: projectItem.id,
-                            //   item: {}
-                            // });
+                            e.stopPropagation();
+                            this.hide();
+                            showVideoMonitor({
+                              show: true,
+                              id: null,
+                              projectId: projectItem.id
+                            });
                           }}
                         />
                       </b>
@@ -3260,17 +3272,14 @@ export default class sider extends PureComponent {
                       <p
                         key={index}
                         style={{ cursor: "pointer" }}
-                        onClick={() => {
-                          // this.hide();
-                          // emitter.emit("showSiderbarDetail", {
-                          //   from: "panorama",
-                          //   show: true,
-                          //   edit: false,
-                          //   type: "edit",
-                          //   id: item.id,
-                          //   projectId: projectItem.id,
-                          //   item
-                          // });
+                        onClick={e => {
+                          e.stopPropagation();
+                          this.hide();
+                          showVideoMonitor({
+                            show: true,
+                            id: item.id,
+                            projectId: projectItem.id
+                          });
                         }}
                       >
                         设备名称：{item.name}
@@ -3283,30 +3292,30 @@ export default class sider extends PureComponent {
                             color: "#1890ff"
                           }}
                           onClick={e => {
-                            // e.stopPropagation();
-                            // Modal.confirm({
-                            //   title: "删除",
-                            //   content: "是否确定要删除？",
-                            //   okText: "确定",
-                            //   okType: "danger",
-                            //   cancelText: "取消",
-                            //   onOk() {
-                            //     dispatch({
-                            //       type: "panorama/panoramaDelete",
-                            //       payload: {
-                            //         id: item.id
-                            //       },
-                            //       callback: success => {
-                            //         if (success) {
-                            //           emitter.emit("projectInfoRefresh", {
-                            //             projectId: projectItem.id
-                            //           });
-                            //         }
-                            //       }
-                            //     });
-                            //   },
-                            //   onCancel() {}
-                            // });
+                            e.stopPropagation();
+                            Modal.confirm({
+                              title: "删除",
+                              content: "是否确定要删除？",
+                              okText: "确定",
+                              okType: "danger",
+                              cancelText: "取消",
+                              onOk() {
+                                dispatch({
+                                  type: "videoMonitor/videoMonitorDelete",
+                                  payload: {
+                                    id: item.id
+                                  },
+                                  callback: success => {
+                                    if (success) {
+                                      emitter.emit("projectInfoRefresh", {
+                                        projectId: projectItem.id
+                                      });
+                                    }
+                                  }
+                                });
+                              },
+                              onCancel() {}
+                            });
                           }}
                         />
                         <Icon
