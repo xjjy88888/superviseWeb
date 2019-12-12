@@ -3797,6 +3797,111 @@ export default class integration extends PureComponent {
 
   videoMonitorLocation = params => {
     console.log("视频监控定位", params);
+    //jQuery
+    //视频监控定位
+    if (params.pointX && params.pointY) {
+      if (marker) marker.remove();
+
+      let latLng = [params.pointY, params.pointX];
+      if (map.getZoom() >= config.mapInitParams.zoom) {
+        if (latLng) this.automaticToMap(latLng);
+      } else {
+        map.setZoom(config.mapInitParams.zoom);
+        setTimeout(() => {
+          if (latLng) this.automaticToMap(latLng);
+        }, 500);
+      }
+
+      //let fullviewURL = config.url.panoramaPreviewUrl + params.urlConfig;
+      const myIcon = L.icon({
+        iconUrl: "./img/camer.png",
+        iconSize: [24, 24]
+      });
+      marker = L.marker([params.pointY, params.pointX], { icon: myIcon })
+        .addTo(map)
+        .on("click", function(e) {
+          map.closePopup();
+          //console.log("marker", e);
+          // emitter.emit("showPanorama", {
+          //   show: true,
+          //   fullviewURL: fullviewURL
+          // });
+          // const elements = jQuery(
+          //   `<div id="m_video2" style="width: 600px; height: 400px;"></div>`
+          // );
+          //window.deviceData = null;
+          jQuery.ajax({
+            url : "https://www.zkyxxhs.com/gzsj/wechat/third/imgList",
+            type : 'GET',
+            dataType : 'json',
+            async: true,
+            data:{emcd:"1909030002",size:5},
+            success : function(data) {
+              console.log('success',data);
+              //window.deviceData = data.data;
+              data = data.data;
+              if(data && data["1909030002"]){
+                data = data["1909030002"];
+                for(var i=0;i<data.length;i++){
+                  var imgUrl = data[i];
+                  imgUrl = imgUrl.replace(/\\/g, "/");
+                  //console.log('imgUrl',imgUrl);
+                  //content += '<img src="'+imgUrl+'" height="118" width="118" style="padding-top:2px;padding-right:2px;cursor:pointer;"></img>';
+                  jQuery("#m_pic").append('<img src="'+imgUrl+'" height="118" width="118" style="padding-top:2px;padding-right:2px;cursor:pointer;"></img>');
+                }
+                //监听img点击事件
+                jQuery("#m_pic img").on("click", function (e) {
+                  //console.log('img',e.currentTarget.currentSrc);
+                  jQuery("#fullImg").attr("src", e.currentTarget.currentSrc); 
+                  jQuery("#fullImg").show();
+                });
+                jQuery("#fullImg").on("click", function (e) {
+                  jQuery("#fullImg").hide();
+                });
+              }
+            },
+            error : function(msg) {
+              console.log('error',msg);
+            }
+          });
+          //<img id='fullImg' height="100%" width="100%" style="margin:0;position:absolute;left:0;top:0;z-index:9999;display:none;"></img>
+          var content = '<img id="fullImg" height="100%" width="100%" style="padding:13px;position:absolute;left:0;top:0;z-index:9999;display:none;"></img>';
+          content += '<div id="m_video2" style="width: 600px; height: 400px;"></div>';
+          content += '<div id="m_pic" style="width: 600px; height: 120px;">';
+          // if(window.deviceData && window.deviceData["1909030002"]){
+          //   var data = window.deviceData["1909030002"];
+          //   for(var i=0;i<data.length;i++){
+          //     var imgUrl = data[i];
+          //     imgUrl = imgUrl.replace(/\\/g, "/");
+          //     //console.log('imgUrl',imgUrl);
+          //     content += '<img src="'+imgUrl+'" height="118" width="118" style="padding-top:2px;padding-right:2px;cursor:pointer;"></img>';
+          //   }
+          // }
+          content += '</div>';
+          //map.openPopup(content, e.latlng,{maxWidth:1000,offset:L.point(0, -25)});
+          map.openPopup(content, e.latlng,{maxWidth:1000});
+          var videoObject = {
+            container: '#m_video2', //容器的ID或className
+            variable: 'player',//播放函数名称
+            autoplay:true,//是否自动播放
+            loop:true,//是否需要循环播放
+            live:true,
+            //video: 'rtmp://rtmp01open.ys7.com/openlive/f01018a141094b7fa138b9d0b856507b.hd' //萤石官网测试url
+            //video: 'rtmp://rtmp01open.ys7.com/openlive/d7e10dab781c497e90b305ab09f16ab1'
+            video: 'http://hls01open.ys7.com/openlive/d7e10dab781c497e90b305ab09f16ab1.hd.m3u8'
+          };
+          // eslint-disable-next-line no-undef
+          var player = new ckplayer(videoObject);    
+          // //监听img点击事件
+          // jQuery("#m_pic img").on("click", function (e) {
+          //   //console.log('img',e.currentTarget.currentSrc);
+          //   jQuery("#fullImg").attr("src", e.currentTarget.currentSrc); 
+          //   jQuery("#fullImg").show();
+          // });
+
+
+        });
+    }
   };
 
   render() {
