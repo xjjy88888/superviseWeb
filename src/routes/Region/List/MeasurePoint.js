@@ -323,7 +323,12 @@ export default class measurePoint extends PureComponent {
             {getFieldDecorator("measurePointTypeId", {
               initialValue: measurePointInfo.measurePointTypeId
             })(
-              <Select showSearch allowClear optionFilterProp="children">
+              <Select
+                showSearch
+                allowClear
+                optionFilterProp="children"
+                style={{ width: 240 }}
+              >
                 {this.dictList("措施类型").map(item => (
                   <Select.Option value={item.id} key={item.id}>
                     {item.dictTableValue}
@@ -367,7 +372,7 @@ export default class measurePoint extends PureComponent {
           <Form.Item label="备注" {...formItemLayout}>
             {getFieldDecorator("description", {
               initialValue: measurePointInfo.description
-            })(<Input.TextArea allowClear autosize />)}
+            })(<Input.TextArea allowClear autosize style={{ width: 240 }} />)}
           </Form.Item>
           <div
             style={{ minHeight: fileList.length ? 120 : 0, margin: "0 30px" }}

@@ -79,7 +79,15 @@ const config = {
 
   url: {
     //视频监控设备图片接口
+    //AppKey:1be8632eeef34a1b925d4188cf8645de
+    //Secret:ee93460114814575edc2217e2de98e34
+    //测试AccessToken:at.c8xdl4ytd8r6zspd1ad88k5z6r6qo3ct-3usvvizzxx-1fzj49h-9q8zeapk6  有效期至：2019-12-19 18:14:00
+    deviceAccessToken:`https://open.ys7.com/api/lapp/token/get`,
+    appKey:`1be8632eeef34a1b925d4188cf8645de`,
+    appSecret:`ee93460114814575edc2217e2de98e34`,
     deviceImgList:`https://www.zkyxxhs.com/gzsj/wechat/third/imgList`,
+    //获取设备直播地址
+    deviceAddress:`https://open.ys7.com/api/lapp/live/address/get`,
     //视频监控设备接口
     deviceVideo:{
       "1909030002":`http://hls01open.ys7.com/openlive/d7e10dab781c497e90b305ab09f16ab1.hd.m3u8`,//HLS播放地址高清  流畅地址:http://hls01open.ys7.com/openlive/d7e10dab781c497e90b305ab09f16ab1.m3u8

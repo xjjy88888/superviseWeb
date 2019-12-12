@@ -210,6 +210,16 @@ export default class VideoMonitor extends PureComponent {
               initialValue: videoMonitorInfo.name
             })(<Input allowClear style={{ width: 240 }} />)}
           </Form.Item>
+          <Form.Item label="设备序列号" {...formItemLayout}>
+            {getFieldDecorator("deviceSerial", {
+              initialValue: videoMonitorInfo.deviceSerial
+            })(<Input allowClear style={{ width: 240 }} />)}
+          </Form.Item>
+          <Form.Item label="视频接口" {...formItemLayout}>
+            {getFieldDecorator("url", {
+              initialValue: videoMonitorInfo.url
+            })(<Input.TextArea allowClear autosize style={{ width: 240 }} />)}
+          </Form.Item>
           <Form.Item label="坐标" {...formItemLayout}>
             {getFieldDecorator("pointX", {
               initialValue: videoMonitorInfo.pointX
@@ -242,15 +252,10 @@ export default class VideoMonitor extends PureComponent {
               />
             )}
           </Form.Item>
-          <Form.Item label="视频接口" {...formItemLayout}>
-            {getFieldDecorator("url", {
-              initialValue: videoMonitorInfo.url
-            })(<Input.TextArea allowClear autosize />)}
-          </Form.Item>
           <Form.Item label="备注" {...formItemLayout}>
             {getFieldDecorator("description", {
               initialValue: videoMonitorInfo.description
-            })(<Input.TextArea allowClear autosize />)}
+            })(<Input.TextArea allowClear autosize style={{ width: 240 }} />)}
           </Form.Item>
         </Form>
       </div>

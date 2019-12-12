@@ -3797,9 +3797,9 @@ export default class RegionMap extends PureComponent {
   };
 
   videoMonitorLocation = params => {
+    const me = this;
     console.log("视频监控定位", params);
     map.closePopup();
-    //jQuery
     //视频监控定位
     if (params.pointX && params.pointY) {
       if (marker) marker.remove();
@@ -3814,7 +3814,6 @@ export default class RegionMap extends PureComponent {
         }, 500);
       }
 
-      //let fullviewURL = config.url.panoramaPreviewUrl + params.urlConfig;
       const myIcon = L.icon({
         iconUrl: "./img/camer.png",
         iconSize: [24, 24]
@@ -3822,71 +3821,113 @@ export default class RegionMap extends PureComponent {
       marker = L.marker([params.pointY, params.pointX], { icon: myIcon })
         .addTo(map)
         .on("click", function(e) {
-          // emitter.emit("showPanorama", {
-          //   show: true,
-          //   fullviewURL: fullviewURL
-          // });
+          //获取AccessToken
           jQuery.ajax({
-            url: config.url.deviceImgList,
-            type: "GET",
+            type: "POST",
+            url: config.url.deviceAccessToken,
+            data: {appKey:config.url.appKey,appSecret:config.url.appSecret},
             dataType: "json",
-            async: true,
-            data: { emcd: params.name, size: 5 },
-            success: function(data) {
-              console.log("success", data);
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+              console.log('获取AccessToken',data);
               data = data.data;
-              if (data && data[params.name]) {
-                data = data[params.name];
-                for (var i = 0; i < data.length; i++) {
-                  var imgUrl = data[i];
-                  imgUrl = imgUrl.replace(/\\/g, "/");
-                  jQuery("#m_pic").append(
-                    '<img src="' +
-                      imgUrl +
-                      '" height="118" width="118" style="padding-top:2px;padding-right:2px;cursor:pointer;"></img>'
-                  );
-                }
-                //监听img点击事件
-                jQuery("#m_pic img").on("click", function(e) {
-                  //console.log('img',e.currentTarget.currentSrc);
-                  jQuery("#fullImg").attr("src", e.currentTarget.currentSrc);
-                  jQuery("#fullImg").show();
+              if(data && data.accessToken){
+                //获取直播地址
+                jQuery.ajax({
+                  type: "POST",
+                  url: config.url.deviceAddress,
+                  data: {accessToken:data.accessToken,source:"237983628:1"},
+                  dataType: "json",
+                  contentType: "application/x-www-form-urlencoded",
+                  success: function (data) {
+                    console.log('获取设备直播地址',data);
+                    data = data.data;
+                    if(data && data.length>0){
+                      params.url = data[0].hlsHd;
+                    }
+                    me.openVideoMonitor(params,e.latlng);
+                  },
+                  error: function (msg) {
+                    console.log('error',msg);
+                    me.openVideoMonitor(params,e.latlng);
+                  }
                 });
-                jQuery("#fullImg").on("click", function(e) {
-                  jQuery("#fullImg").hide();
-                });
-              } else {
-                jQuery("#m_pic").append(
-                  '<span style="line-height:118px;margin-left:230px;">设备获取图片异常,请联系管理员</span>'
-                );
               }
             },
-            error: function(msg) {
-              console.log("error", msg);
+            error: function (msg) {
+              console.log('error',msg);
+              me.openVideoMonitor(params,e.latlng);
             }
           });
-          var content =
-            '<img id="fullImg" height="100%" width="100%" style="padding:13px;position:absolute;left:0;top:0;z-index:9999;display:none;"></img>';
-          content +=
-            '<div id="m_video2" style="width: 600px; height: 400px;"></div>';
-          content += '<div id="m_pic" style="width: 600px; height: 120px;">';
-          content += "</div>";
-          //map.openPopup(content, e.latlng,{maxWidth:1000,offset:L.point(0, -25)});
-          map.openPopup(content, e.latlng, { maxWidth: 1000 });
-          var videoObject = {
-            container: "#m_video2", //容器的ID或className
-            variable: "player", //播放函数名称
-            autoplay: true, //是否自动播放
-            loop: true, //是否需要循环播放
-            live: true,
-            // video: 'rtmp://rtmp01open.ys7.com/openlive/f01018a141094b7fa138b9d0b856507b.hd' //萤石官网测试url
-            video: config.url.deviceVideo[params.name]
-          };
-          // eslint-disable-next-line no-undef
-          var player = new ckplayer(videoObject);
+
         });
     }
+    else{
+      message.warning("视频监控无可用位置信息", 1);      
+    }
   };
+
+  openVideoMonitor = (params,latlng) => {
+    jQuery.ajax({
+      url: config.url.deviceImgList,
+      type: "GET",
+      dataType: "json",
+      async: true,
+      data: { emcd: params.name, size: 5 },
+      success: function(data) {
+        console.log("success", data);
+        data = data.data;
+        if (data && data[params.name]) {
+          data = data[params.name];
+          for (var i = 0; i < data.length; i++) {
+            var imgUrl = data[i];
+            imgUrl = imgUrl.replace(/\\/g, "/");
+            jQuery("#m_pic").append(
+              '<img src="' +
+                imgUrl +
+                '" height="118" width="118" style="padding-top:2px;padding-right:2px;cursor:pointer;"></img>'
+            );
+          }
+          //监听img点击事件
+          jQuery("#m_pic img").on("click", function(e) {
+            //console.log('img',e.currentTarget.currentSrc);
+            jQuery("#fullImg").attr("src", e.currentTarget.currentSrc);
+            jQuery("#fullImg").show();
+          });
+          jQuery("#fullImg").on("click", function(e) {
+            jQuery("#fullImg").hide();
+          });
+        } else {
+          jQuery("#m_pic").append(
+            '<span style="line-height:118px;margin-left:230px;">设备获取图片异常,请联系管理员</span>'
+          );
+        }
+      },
+      error: function(msg) {
+        console.log("error", msg);
+      }
+    });
+    var content =
+      '<img id="fullImg" height="100%" width="100%" style="padding:13px;position:absolute;left:0;top:0;z-index:9999;display:none;"></img>';
+    content +=
+      '<div id="m_video2" style="width: 600px; height: 400px;"></div>';
+    content += '<div id="m_pic" style="width: 600px; height: 120px;">';
+    content += "</div>";
+    //map.openPopup(content, e.latlng,{maxWidth:1000,offset:L.point(0, -25)});
+    map.openPopup(content, latlng, { maxWidth: 1000 });
+    if(!params.url || params.url.length ===0) params.url="testUrl";
+    var videoObject = {
+      container: "#m_video2", //容器的ID或className
+      variable: "player", //播放函数名称
+      autoplay: true, //是否自动播放
+      loop: true, //是否需要循环播放
+      live: true,
+      // video: 'rtmp://rtmp01open.ys7.com/openlive/f01018a141094b7fa138b9d0b856507b.hd' //萤石官网测试url
+      video: params.url
+    };
+    // eslint-disable-next-line no-undef
+    var player = new ckplayer(videoObject);    
+  }
 
   render() {
     const radioStyle = {

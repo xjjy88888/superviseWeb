@@ -378,14 +378,15 @@ export default class problemPoint extends PureComponent {
           >
             {getFieldDecorator("name", {
               initialValue: problemPointInfo.name
-            })(<Input style={{ width: 240 }} />)}
+            })(<Input allowClear style={{ width: 240 }} />)}
           </Form.Item>
           <Form.Item label={<span>问题类型</span>} {...formItemLayout}>
             {getFieldDecorator("problemId", {
               initialValue: this.cascaderInit(problemPointInfo.problem)
             })(
               <Cascader
-                placeholder="请选择问题类型"
+                style={{ width: 240 }}
+                placeholder=""
                 options={problemType}
                 onChange={(v, a) => {
                   isOnChange = true;
@@ -458,7 +459,7 @@ export default class problemPoint extends PureComponent {
           <Form.Item label="备注" {...formItemLayout}>
             {getFieldDecorator("description", {
               initialValue: problemPointInfo.description
-            })(<Input.TextArea autosize />)}
+            })(<Input.TextArea autosize style={{ width: 240 }} />)}
           </Form.Item>
           <div
             style={{ minHeight: fileList.length ? 120 : 0, margin: "0 30px" }}
