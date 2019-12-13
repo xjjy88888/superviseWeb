@@ -147,12 +147,13 @@ const ZSGeoJsonHLightStyle = {
   fillOpacity: 0.3
 };
 
-@connect(({ user, mapdata, project, spot, projectSupervise }) => ({
+@connect(({ user, mapdata, project, spot, projectSupervise,videoMonitor }) => ({
   user,
   mapdata,
   project,
   spot,
-  projectSupervise
+  projectSupervise,
+  videoMonitor
 }))
 export default class RegionMap extends PureComponent {
   constructor(props) {
@@ -3843,9 +3844,15 @@ export default class RegionMap extends PureComponent {
                     console.log('获取设备直播地址',data);
                     data = data.data;
                     if(data && data.length>0){
-                      params.url = data[0].hlsHd;
+                      const url = data[0].hlsHd;
+                      const paramsData = {...params,url}
                       //不相等的话，则调用后台接口修改url
+                      if(params.url !== data[0].hlsHd){;
+                        me.videoMonitorCreateUpdate(paramsData);
+                      }
+                      params.url = url;
                     }
+                    //console.log('params.url',params.url);
                     me.openVideoMonitor(params,e.latlng);
                   },
                   error: function (msg) {
@@ -3866,6 +3873,19 @@ export default class RegionMap extends PureComponent {
     else{
       message.warning("视频监控无可用位置信息", 1);      
     }
+  };
+
+  
+  videoMonitorCreateUpdate = payload => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "videoMonitor/videoMonitorCreateUpdate",
+      payload,
+      callback: (success, error, result) => {
+        if (success) {
+        }
+      }
+    });
   };
 
   openVideoMonitor = (params,latlng) => {
