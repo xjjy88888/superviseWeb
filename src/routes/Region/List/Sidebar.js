@@ -148,6 +148,8 @@ export default class siderbar extends PureComponent {
   }
 
   componentDidMount() {
+    const { link } = this.props;
+    link(this);
     self = this;
 
     const urlFrom = getUrl(`from`);
@@ -285,60 +287,6 @@ export default class siderbar extends PureComponent {
       }
     });
     //search
-    this.eventEmitter = emitter.addListener("queryInfo", data => {
-      console.log(data);
-      if (this.scrollDom) {
-        this.scrollDom.scrollTop = 0;
-      }
-      const { query_pro, query_spot, query_point } = this.state;
-      emitter.emit("checkResult", {
-        show: false,
-        result: []
-      });
-      let queryHighlight = false;
-      for (let i in data.info) {
-        if (
-          data.info[i] &&
-          (data.info[i].length ||
-            typeof data.info[i] === "number" ||
-            typeof data.info[i] === "boolean")
-        ) {
-          queryHighlight = true;
-        }
-      }
-      this.setState({
-        showCheck: false,
-        sort_by: "",
-        sort_key: "",
-        queryInfo: data.info,
-        ShowArchive: data.ShowArchive,
-        queryHighlight: queryHighlight
-      });
-      if (data.from === "project") {
-        this.setState({
-          row_pro: 10
-        });
-        this.queryProject({
-          ...data.info,
-          SkipCount: 0,
-          ProjectName: query_pro
-        });
-      } else if (data.from === "spot") {
-        this.setState({ row_spot: 10 });
-        this.querySpot({
-          ...data.info,
-          SkipCount: 0,
-          MapNum: query_spot
-        });
-      } else {
-        this.setState({ row_point: 10 });
-        this.queryPoint({
-          ...data.info,
-          SkipCount: 0,
-          ProjectName: query_point
-        });
-      }
-    });
     if (this.scrollDom) {
       this.scrollDom.addEventListener("scroll", () => {
         this.onScroll(this);
@@ -366,6 +314,61 @@ export default class siderbar extends PureComponent {
       clientHeight: clientHeight
     });
   }
+
+  queryInfo = data => {
+    console.log("列表筛选完成", data);
+    if (this.scrollDom) {
+      this.scrollDom.scrollTop = 0;
+    }
+    const { query_pro, query_spot, query_point } = this.state;
+    emitter.emit("checkResult", {
+      show: false,
+      result: []
+    });
+    let queryHighlight = false;
+    for (let i in data.info) {
+      if (
+        data.info[i] &&
+        (data.info[i].length ||
+          typeof data.info[i] === "number" ||
+          typeof data.info[i] === "boolean")
+      ) {
+        queryHighlight = true;
+      }
+    }
+    this.setState({
+      showCheck: false,
+      sort_by: "",
+      sort_key: "",
+      queryInfo: data.info,
+      ShowArchive: data.ShowArchive,
+      queryHighlight: queryHighlight
+    });
+    if (data.from === "project") {
+      this.setState({
+        row_pro: 10
+      });
+      this.queryProject({
+        ...data.info,
+        SkipCount: 0,
+        ProjectName: query_pro
+      });
+    } else if (data.from === "spot") {
+      this.setState({ row_spot: 10 });
+      this.querySpot({
+        ...data.info,
+        SkipCount: 0,
+        MapNum: query_spot
+      });
+    } else {
+      this.setState({ row_point: 10 });
+      this.queryPoint({
+        ...data.info,
+        SkipCount: 0,
+        ProjectName: query_point
+      });
+    }
+  };
 
   queryProjectInfo = id => {
     this.querySpotByProjectId(id);

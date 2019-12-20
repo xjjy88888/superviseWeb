@@ -31,15 +31,13 @@ export default class chart extends PureComponent {
   }
 
   componentDidMount() {
+    const { link } = this.props;
+    link(this);
+
     this.eventEmitter = emitter.addListener("showTool", data => {
       this.setState({
         showTool: data.show,
         type: data.type
-      });
-    });
-    this.eventEmitter = emitter.addListener("queryInfo", v => {
-      this.setState({
-        queryInfo: v.info
       });
     });
     this.eventEmitter = emitter.addListener("showChart", v => {
@@ -58,6 +56,13 @@ export default class chart extends PureComponent {
       clientWidth: clientWidth
     });
   }
+
+  queryInfo = v => {
+    console.log("图标筛选完成", v);
+    this.setState({
+      queryInfo: v.info
+    });
+  };
 
   query = (v, t) => {
     const { dispatch } = this.props;

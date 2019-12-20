@@ -103,6 +103,7 @@ export default class Query extends PureComponent {
 
   render() {
     const {
+      queryInfo,
       form: { getFieldDecorator, resetFields },
       district: { districtTreeFilter }
     } = this.props;
@@ -163,11 +164,10 @@ export default class Query extends PureComponent {
             style={{ margin: "20px 40px 0px 20px" }}
             onClick={() => {
               resetFields();
-              emitter.emit("queryInfo", {
+              queryInfo({
                 from: type,
                 info: {},
                 ProjectShowArchive: false
-                // SpotShowArchive: false
               });
             }}
           >
@@ -182,7 +182,7 @@ export default class Query extends PureComponent {
                   console.log("筛选信息", v);
                   const d1 = v.ProjectDistrictCodes;
                   const d2 = v.SpotDistrictCodes;
-                  emitter.emit("queryInfo", {
+                  const data = {
                     from: type,
                     info: {
                       ...v,
@@ -205,7 +205,8 @@ export default class Query extends PureComponent {
                       IsReview: v.IsReview.length === 1 ? v.IsReview[0] : "",
                       interBatch: (v.interBatch1 || "") + (v.interBatch2 || "")
                     }
-                  });
+                  };
+                  queryInfo(data);
                 }
               });
             }}

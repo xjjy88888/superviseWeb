@@ -45,6 +45,9 @@ export default class Tool extends PureComponent {
   }
 
   componentDidMount() {
+    const { link } = this.props;
+    link(this);
+
     this.eventEmitter = emitter.addListener("showTool", data => {
       this.setState({
         show: data.show,
@@ -67,27 +70,28 @@ export default class Tool extends PureComponent {
         queryInfo
       });
     });
-    this.eventEmitter = emitter.addListener("queryInfo", data => {
-      console.log(data.info);
-      const queryInfo = data.info;
-      if (queryInfo.ReplyTime && queryInfo.ReplyTime.length) {
-        queryInfo.ReplyTimeBegin = dateFormat(queryInfo.ReplyTime[0]._d);
-        queryInfo.ReplyTimeEnd = dateFormat(queryInfo.ReplyTime[1]._d);
-      }
-      for (let i in queryInfo) {
-        if (Array.isArray(queryInfo[i])) {
-          queryInfo[i] = queryInfo[i].join(",");
-        }
-      }
-      console.log(queryInfo);
-      this.setState({
-        queryInfo: {
-          ...this.state.queryInfo,
-          ...queryInfo
-        }
-      });
-    });
   }
+
+  queryInfo = data => {
+    console.log("工具筛选完成", data,);
+    const queryInfo = { ...data.info };
+    if (queryInfo.ReplyTime && queryInfo.ReplyTime.length) {
+      queryInfo.ReplyTimeBegin = dateFormat(queryInfo.ReplyTime[0]._d);
+      queryInfo.ReplyTimeEnd = dateFormat(queryInfo.ReplyTime[1]._d);
+    }
+    for (let i in queryInfo) {
+      if (Array.isArray(queryInfo[i])) {
+        queryInfo[i] = queryInfo[i].join(",");
+      }
+    }
+    console.log(queryInfo);
+    this.setState({
+      queryInfo: {
+        ...this.state.queryInfo,
+        ...queryInfo
+      }
+    });
+  };
 
   render() {
     const { dispatch } = this.props;

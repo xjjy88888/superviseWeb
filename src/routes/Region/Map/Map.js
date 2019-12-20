@@ -147,14 +147,16 @@ const ZSGeoJsonHLightStyle = {
   fillOpacity: 0.3
 };
 
-@connect(({ user, mapdata, project, spot, projectSupervise,videoMonitor }) => ({
-  user,
-  mapdata,
-  project,
-  spot,
-  projectSupervise,
-  videoMonitor
-}))
+@connect(
+  ({ user, mapdata, project, spot, projectSupervise, videoMonitor }) => ({
+    user,
+    mapdata,
+    project,
+    spot,
+    projectSupervise,
+    videoMonitor
+  })
+)
 export default class RegionMap extends PureComponent {
   constructor(props) {
     super(props);
@@ -3826,56 +3828,59 @@ export default class RegionMap extends PureComponent {
           jQuery.ajax({
             type: "POST",
             url: config.url.deviceAccessToken,
-            data: {appKey:config.url.appKey,appSecret:config.url.appSecret},
+            data: {
+              appKey: config.url.appKey,
+              appSecret: config.url.appSecret
+            },
             dataType: "json",
             contentType: "application/x-www-form-urlencoded",
-            success: function (data) {
-              console.log('获取AccessToken',data);
+            success: function(data) {
+              console.log("获取AccessToken", data);
               data = data.data;
-              if(data && data.accessToken){
+              if (data && data.accessToken) {
                 //获取直播地址
                 jQuery.ajax({
                   type: "POST",
                   url: config.url.deviceAddress,
-                  data: {accessToken:data.accessToken,source:params.deviceSerial+":1"},
+                  data: {
+                    accessToken: data.accessToken,
+                    source: params.deviceSerial + ":1"
+                  },
                   dataType: "json",
                   contentType: "application/x-www-form-urlencoded",
-                  success: function (data) {
-                    console.log('获取设备直播地址',data);
+                  success: function(data) {
+                    console.log("获取设备直播地址", data);
                     data = data.data;
-                    if(data && data.length>0){
+                    if (data && data.length > 0) {
                       const url = data[0].hlsHd;
-                      const paramsData = {...params,url}
+                      const paramsData = { ...params, url };
                       //不相等的话，则调用后台接口修改url
-                      if(params.url !== data[0].hlsHd){;
+                      if (params.url !== data[0].hlsHd) {
                         me.videoMonitorCreateUpdate(paramsData);
                       }
                       params.url = url;
                     }
                     //console.log('params.url',params.url);
-                    me.openVideoMonitor(params,e.latlng);
+                    me.openVideoMonitor(params, e.latlng);
                   },
-                  error: function (msg) {
-                    console.log('error',msg);
-                    me.openVideoMonitor(params,e.latlng);
+                  error: function(msg) {
+                    console.log("error", msg);
+                    me.openVideoMonitor(params, e.latlng);
                   }
                 });
               }
             },
-            error: function (msg) {
-              console.log('error',msg);
-              me.openVideoMonitor(params,e.latlng);
+            error: function(msg) {
+              console.log("error", msg);
+              me.openVideoMonitor(params, e.latlng);
             }
           });
-
         });
-    }
-    else{
-      message.warning("视频监控无可用位置信息", 1);      
+    } else {
+      message.warning("视频监控无可用位置信息", 1);
     }
   };
 
-  
   videoMonitorCreateUpdate = payload => {
     const { dispatch } = this.props;
     dispatch({
@@ -3888,7 +3893,7 @@ export default class RegionMap extends PureComponent {
     });
   };
 
-  openVideoMonitor = (params,latlng) => {
+  openVideoMonitor = (params, latlng) => {
     jQuery.ajax({
       url: config.url.deviceImgList,
       type: "GET",
@@ -3930,13 +3935,12 @@ export default class RegionMap extends PureComponent {
     });
     var content =
       '<img id="fullImg" height="100%" width="100%" style="padding:13px;position:absolute;left:0;top:0;z-index:9999;display:none;"></img>';
-    content +=
-      '<div id="m_video2" style="width: 600px; height: 400px;"></div>';
+    content += '<div id="m_video2" style="width: 600px; height: 400px;"></div>';
     content += '<div id="m_pic" style="width: 600px; height: 120px;">';
     content += "</div>";
     //map.openPopup(content, e.latlng,{maxWidth:1000,offset:L.point(0, -25)});
     map.openPopup(content, latlng, { maxWidth: 1000 });
-    if(!params.url || params.url.length ===0) params.url="testUrl";
+    if (!params.url || params.url.length === 0) params.url = "testUrl";
     var videoObject = {
       container: "#m_video2", //容器的ID或className
       variable: "player", //播放函数名称
@@ -3947,8 +3951,8 @@ export default class RegionMap extends PureComponent {
       video: params.url
     };
     // eslint-disable-next-line no-undef
-    var player = new ckplayer(videoObject);    
-  }
+    var player = new ckplayer(videoObject);
+  };
 
   render() {
     const radioStyle = {
@@ -3987,6 +3991,7 @@ export default class RegionMap extends PureComponent {
     return (
       <Layouts>
         <Sidebar
+          link={t => (this.Sidebar = t)}
           queryProjectFilter={this.queryProjectFilter}
           switchData={this.switchData}
           mapLocation={this.mapLocation}
@@ -3996,9 +4001,15 @@ export default class RegionMap extends PureComponent {
           showVideoMonitor={v => this.VideoMonitor.show(v)}
         />
         <SidebarDetail mapLocation={this.mapLocation} />
-        <Tool />
-        <Chart />
-        <Query />
+        <Tool link={t => (this.Tool = t)} />
+        <Chart link={t => (this.Chart = t)} />
+        <Query
+          queryInfo={v => {
+            this.Sidebar.queryInfo(v);
+            this.Tool.queryInfo(v);
+            this.Chart.queryInfo(v);
+          }}
+        />
         <Sparse />
         <Panorama />
         <VideoMonitor link={t => (this.VideoMonitor = t)} />
