@@ -105,7 +105,7 @@ export default class layouts extends PureComponent {
             style={{
               position: "relative",
               height: 47,
-              zIndex: 1001,
+              zIndex: 1002,
               backgroundColor: themeColor
             }}
           >

@@ -18,13 +18,13 @@ export default class ProjectList extends PureComponent {
         id="ProjectList"
         style={{
           position: "absolute",
-          left: -window.innerWidth,
           top: 0,
-          zIndex: 1000,
+          left: -window.innerWidth,
           width: window.innerWidth,
           height: "100%",
           paddingTop: 46,
-          backgroundColor: "#fff"
+          backgroundColor: "#fff",
+          zIndex: 1001
         }}
       >
         区域监管-项目列表
@@ -34,8 +34,8 @@ export default class ProjectList extends PureComponent {
           icon="close"
           style={{
             position: "absolute",
-            top: 50,
-            right: 50,
+            top: 67,
+            right: 20
           }}
           onClick={() => {
             jQuery("#ProjectList").animate({ left: -window.innerWidth });
