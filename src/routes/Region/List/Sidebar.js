@@ -1109,6 +1109,7 @@ export default class siderbar extends PureComponent {
 
   render() {
     const {
+      showProjectList,
       switchData,
       mapLocation,
       switchInterpret,
@@ -1428,6 +1429,25 @@ export default class siderbar extends PureComponent {
         }}
         ref={e => (this.refDom = e)}
       >
+        <Icon
+          type="right"
+          style={{
+            fontSize: 30,
+            position: "absolute",
+            right: -50,
+            top: "20%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            borderRadius: "50%",
+            padding: 10,
+            cursor: "pointer"
+          }}
+          onClick={() => {
+            // this.setState({
+            //   show: false
+            // });
+            showProjectList();
+          }}
+        />
         <Icon
           type={show ? "left" : "right"}
           style={{

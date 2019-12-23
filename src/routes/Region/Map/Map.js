@@ -12,6 +12,7 @@ import {
   Radio
 } from "antd";
 import Sidebar from "../List/Sidebar";
+import ProjectList from "../List/ProjectList";
 import SidebarDetail from "../List/SiderbarDetail";
 import Tool from "../List/Tool";
 import Sparse from "./Sparse";
@@ -3999,7 +4000,9 @@ export default class RegionMap extends PureComponent {
           showInspect={v => this.Inspect.show(v)}
           videoMonitorLocation={this.videoMonitorLocation}
           showVideoMonitor={v => this.VideoMonitor.show(v)}
+          showProjectList={v => this.ProjectList.show(v)}
         />
+        <ProjectList link={t => (this.ProjectList = t)} />
         <SidebarDetail mapLocation={this.mapLocation} />
         <Tool link={t => (this.Tool = t)} />
         <Chart link={t => (this.Chart = t)} />
@@ -4238,7 +4241,7 @@ export default class RegionMap extends PureComponent {
               position: "absolute",
               bottom: 40,
               right: 20,
-              zIndex: 1000,
+              zIndex: 400,
               background: "#fff"
             }}
           >
