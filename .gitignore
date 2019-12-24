@@ -12,3 +12,5 @@ npm-debug.log*
 
 # public
 /public
+
+package-lock.json
