@@ -42,6 +42,7 @@ import {
   getUrl
 } from "../../../utils/util";
 import Spins from "../../../components/Spins";
+import styles from "./style/sidebar.less";
 
 let self;
 let loading = false;
@@ -1431,16 +1432,7 @@ export default class siderbar extends PureComponent {
       >
         <Icon
           type="right"
-          style={{
-            fontSize: 30,
-            position: "absolute",
-            right: -50,
-            top: "20%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            borderRadius: "50%",
-            padding: 10,
-            cursor: "pointer"
-          }}
+          className={styles["show-project-list"]}
           onClick={() => {
             // this.setState({
             //   show: false
