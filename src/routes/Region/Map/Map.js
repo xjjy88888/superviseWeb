@@ -9,7 +9,8 @@ import {
   Select,
   notification,
   message,
-  Radio
+  Radio,
+  Carousel
 } from "antd";
 import Sidebar from "../List/Sidebar";
 import ProjectList from "../List/ProjectList";
@@ -60,6 +61,7 @@ import Layouts from "../../../components/Layouts";
 import "./index.less";
 import Contrast from "./Contrast";
 import { getUrl } from "../../../utils/util";
+import { nonsense } from "antd-mobile/lib/picker";
 
 let userconfig = {};
 let map = null;
@@ -192,7 +194,13 @@ export default class RegionMap extends PureComponent {
       showProgress_Pie: false,
       showProgress_ProjectPoint: false,
       showXMJGPanel: false,
-      selectIMG: ""
+      selectIMG: "",
+      showVedioPreview: false,
+      showVedioPicPreview: false,
+      vedioPicPreviewUrl: null,
+      vedioPicList: [
+        './img/loading.png',
+      ],
       //loading: true
     };
     this.saveRef = v => {
@@ -3895,52 +3903,60 @@ export default class RegionMap extends PureComponent {
   };
 
   openVideoMonitor = (params, latlng) => {
+    const me = this;
     jQuery.ajax({
       url: config.url.deviceImgList,
       type: "GET",
       dataType: "json",
       async: true,
-      data: { emcd: params.name, size: 5 },
+      data: { emcd: params.name, size: 16 },
       success: function(data) {
         console.log("success", data);
         data = data.data;
+        var  vedioPicList = [];
         if (data && data[params.name]) {
           data = data[params.name];
           for (var i = 0; i < data.length; i++) {
             var imgUrl = data[i];
             imgUrl = imgUrl.replace(/\\/g, "/");
-            jQuery("#m_pic").append(
-              '<img src="' +
-                imgUrl +
-                '" height="118" width="118" style="padding-top:2px;padding-right:2px;cursor:pointer;"></img>'
-            );
+            // jQuery("#m_pic").append(
+            //   '<img src="' +
+            //     imgUrl +
+            //     '" height="118" width="118" style="padding-top:2px;padding-right:2px;cursor:pointer;"></img>'
+            // );
+            // var dom = '<img alt="example" style={{ width: "100%" }} src="'+imgUrl+'" />'
+            vedioPicList.push(imgUrl);
           }
           //监听img点击事件
-          jQuery("#m_pic img").on("click", function(e) {
-            //console.log('img',e.currentTarget.currentSrc);
-            jQuery("#fullImg").attr("src", e.currentTarget.currentSrc);
-            jQuery("#fullImg").show();
-          });
-          jQuery("#fullImg").on("click", function(e) {
-            jQuery("#fullImg").hide();
-          });
+          // jQuery("#m_pic img").on("click", function(e) {
+          //   jQuery("#fullImg").attr("src", e.currentTarget.currentSrc);
+          //   jQuery("#fullImg").show();
+          // });
+          // jQuery("#fullImg").on("click", function(e) {
+          //   jQuery("#fullImg").hide();
+          // });
         } else {
-          jQuery("#m_pic").append(
-            '<span style="line-height:118px;margin-left:230px;">设备获取图片异常,请联系管理员</span>'
-          );
+          // jQuery("#m_pic").append(
+          //   '<span style="line-height:118px;margin-left:230px;">设备获取图片异常,请联系管理员</span>'
+          // );
+          vedioPicList.push('./img/error.png');
         }
+        me.setState({
+          vedioPicList: vedioPicList
+        });
       },
       error: function(msg) {
         console.log("error", msg);
       }
     });
-    var content =
-      '<img id="fullImg" height="100%" width="100%" style="padding:13px;position:absolute;left:0;top:0;z-index:9999;display:none;"></img>';
-    content += '<div id="m_video2" style="width: 600px; height: 400px;"></div>';
-    content += '<div id="m_pic" style="width: 600px; height: 120px;">';
-    content += "</div>";
-    //map.openPopup(content, e.latlng,{maxWidth:1000,offset:L.point(0, -25)});
-    map.openPopup(content, latlng, { maxWidth: 1000 });
+    this.setState({
+      showVedioPreview: true
+    });
+    // var content =
+    //   '<img id="fullImg" height="100%" width="100%" style="padding:13px;position:absolute;left:0;top:0;z-index:9999;display:none;"></img>';
+    // content += '<div id="m_video2" style="width: 600px; height: 400px;"></div>';
+    // content += '<div id="m_pic" style="width: 600px; height: 120px;"></div>';
+    //map.openPopup(content, latlng, { maxWidth: 1000 });
     if (!params.url || params.url.length === 0) params.url = "testUrl";
     var videoObject = {
       container: "#m_video2", //容器的ID或className
@@ -3953,6 +3969,16 @@ export default class RegionMap extends PureComponent {
     };
     // eslint-disable-next-line no-undef
     var player = new ckplayer(videoObject);
+  };
+
+  onClick_Img = (e) => {
+    // console.log(e.currentTarget.src);
+    if(e.currentTarget && e.currentTarget.src){
+      this.setState({
+        showVedioPicPreview: true,
+        vedioPicPreviewUrl: e.currentTarget.src
+      });
+    }
   };
 
   render() {
@@ -3982,7 +4008,11 @@ export default class RegionMap extends PureComponent {
       showProgress_ZS,
       showProgress_Pie,
       showProgress_ProjectPoint,
-      selectIMG
+      selectIMG,
+      showVedioPreview,
+      showVedioPicPreview,
+      vedioPicPreviewUrl,
+      vedioPicList
       //loading
     } = this.state;
     const {
@@ -4040,6 +4070,51 @@ export default class RegionMap extends PureComponent {
               height: "100%"
             }}
           />
+          {/* 视频监控图片轮播 */}
+          <Modal
+            visible={showVedioPreview}
+            footer={null}
+            width={660}
+            onCancel={() => {
+              this.setState({ showVedioPreview: false });
+            }}
+          >
+           <div id="videoMoitor" style={{width:600}}>
+            <div id="m_video2" style={{width:600,height:400}}></div> 
+            {/* <div id="m_pic" style={{width:600,height:120}}></div> */}
+            <Carousel autoplay >
+              {vedioPicList.map((item, id) => {
+                // console.log(item)            
+                return(
+                <div>
+                  <img
+                    onClick={this.onClick_Img}
+                    alt="example"
+                    style={{ width: "100%" }}
+                    src={item}
+                  />
+                </div>
+              )})}
+            </Carousel>   
+            </div>
+          </Modal>
+          {/* 视频监控图片放大预览 */}
+          <Modal
+            visible={showVedioPicPreview}
+            footer={null}
+            // width={660}
+            width={"70%"}
+            height={"70%"}
+            onCancel={() => {
+              this.setState({ showVedioPicPreview: false });
+            }}
+          >
+            <img
+              alt="example"
+              style={{ width: "100%" }}
+              src={vedioPicPreviewUrl}
+            />
+          </Modal>
           {/* 项目监管请求后台接口进度条 */}
           <div
             style={{
@@ -4185,14 +4260,14 @@ export default class RegionMap extends PureComponent {
               right: 120,
               height: 0,
               zIndex: 999,
-              background: "transparent"
+              background: "transparent",
             }}
           >
             <Switch
               checkedChildren="图表联动"
               unCheckedChildren="图表联动"
               style={{
-                width: 100
+                width: 100,
               }}
               onClick={(v, e) => {
                 e.stopPropagation();
