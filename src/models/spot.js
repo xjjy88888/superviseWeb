@@ -1,5 +1,6 @@
 import { notification } from "antd";
 import {
+  spotTableListApi,
   spotListApi,
   spotPolygonByIdApi,
   spotByIdApi,
@@ -18,6 +19,7 @@ export default {
   namespace: "spot",
 
   state: {
+    spotTableList: { totalCount: 0, items: [] },
     spotList: { totalCount: 0, items: [] },
     projectInfoSpotList: { totalCount: 0, items: [] },
     spotInfo: { mapNum: "", provinceCityDistrict: [null, null, null] },
@@ -31,6 +33,25 @@ export default {
   },
 
   effects: {
+    // 图斑列表---表格展示
+    *getSpotTableList({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result: spotTableList }
+      } = yield call(spotTableListApi, payload);
+      if (success) {
+        const response = {
+          items: spotTableList.items,
+          totalCount: spotTableList.totalCount
+        };
+        if (callback) callback(success, response);
+        yield put({ type: "save", payload: { spotTableList: response } });
+      } else {
+        notification["error"]({
+          message: `查询图斑列表失败：${error.message}`
+        });
+        if (callback) callback(success);
+      }
+    },
     // 图斑列表
     *querySpot({ payload, callback }, { call, put }) {
       const items_old = payload.items;

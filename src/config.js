@@ -82,18 +82,18 @@ const config = {
     //AppKey:1be8632eeef34a1b925d4188cf8645de
     //Secret:ee93460114814575edc2217e2de98e34
     //测试AccessToken:at.c8xdl4ytd8r6zspd1ad88k5z6r6qo3ct-3usvvizzxx-1fzj49h-9q8zeapk6  有效期至：2019-12-19 18:14:00
-    deviceAccessToken:`https://open.ys7.com/api/lapp/token/get`,
-    appKey:`1be8632eeef34a1b925d4188cf8645de`,
-    appSecret:`ee93460114814575edc2217e2de98e34`,
-    deviceImgList:`https://www.zkyxxhs.com/gzsj/wechat/third/imgList`,
+    deviceAccessToken: `https://open.ys7.com/api/lapp/token/get`,
+    appKey: `1be8632eeef34a1b925d4188cf8645de`,
+    appSecret: `ee93460114814575edc2217e2de98e34`,
+    deviceImgList: `https://www.zkyxxhs.com/gzsj/wechat/third/imgList`,
     //获取设备直播地址
-    deviceAddress:`https://open.ys7.com/api/lapp/live/address/get`,
+    deviceAddress: `https://open.ys7.com/api/lapp/live/address/get`,
     //视频监控设备接口
-    deviceVideo:{
-      "1909030002":`http://hls01open.ys7.com/openlive/d7e10dab781c497e90b305ab09f16ab1.hd.m3u8`,//HLS播放地址高清  流畅地址:http://hls01open.ys7.com/openlive/d7e10dab781c497e90b305ab09f16ab1.m3u8
+    deviceVideo: {
+      "1909030002": `http://hls01open.ys7.com/openlive/d7e10dab781c497e90b305ab09f16ab1.hd.m3u8`, //HLS播放地址高清  流畅地址:http://hls01open.ys7.com/openlive/d7e10dab781c497e90b305ab09f16ab1.m3u8
       //RTMP播放地址高清：rtmp://rtmp01open.ys7.com/openlive/d7e10dab781c497e90b305ab09f16ab1.hd
       //RTMP播放地址流畅：rtmp://rtmp01open.ys7.com/openlive/d7e10dab781c497e90b305ab09f16ab1
-      "1909030003":`http://hls01open.ys7.com/openlive/6e8eee5f3b9c4bd487a785168159bb7b.hd.m3u8`,//HLS播放地址高清  流畅地址:http://hls01open.ys7.com/openlive/6e8eee5f3b9c4bd487a785168159bb7b.m3u8
+      "1909030003": `http://hls01open.ys7.com/openlive/6e8eee5f3b9c4bd487a785168159bb7b.hd.m3u8` //HLS播放地址高清  流畅地址:http://hls01open.ys7.com/openlive/6e8eee5f3b9c4bd487a785168159bb7b.m3u8
       //RTMP播放地址高清：rtmp://rtmp01open.ys7.com/openlive/6e8eee5f3b9c4bd487a785168159bb7b.hd
       //RTMP播放地址流畅：rtmp://rtmp01open.ys7.com/openlive/6e8eee5f3b9c4bd487a785168159bb7b
     },
@@ -102,6 +102,9 @@ const config = {
 
     // 登录
     loginUrl: `${domain}api/TokenAuth/Authenticate`,
+
+    // 项目列表---表格展示
+    projectTableListUrl: `${domainApi}RegionalSupervisionPhone/GetProjectList`,
 
     // 项目列表
     projectListUrl: `${domainApi}Project/GetAllByPost`,
@@ -135,6 +138,9 @@ const config = {
 
     // 项目取消关联图斑
     projectUnbindSpotUrl: `${domainApi}Project/UnbindSpot`,
+
+    // 图斑列表---表格展示
+    spotTableListUrl: `${domainApi}RegionalSupervisionPhone/GetSpotList`,
 
     // 图斑列表
     spotListUrl: `${domainApi}Spot/GetAllByPost`,

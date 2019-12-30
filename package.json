@@ -37,7 +37,7 @@
     "leaflet-navbar": "^1.0.0",
     "leaflet-rotatedmarker": "^0.2.0",
     "leaflet-side-by-side": "^2.1.0",
-    "leaflet.markercluster": "^1.3.0",
+    "leaflet.markercluster": "^1.4.1",
     "leaflet.pm": "^2.0.3",
     "leaflet.vectorgrid": "^1.3.0",
     "leaflet.wms": "^0.2.0",

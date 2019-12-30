@@ -7,25 +7,10 @@ const app = dva({});
 // 2. Plugins
 // app.use({});
 
-// 3. Model1
-app.model(require("./models/user").default);
-app.model(require("./models/mapdata").default);
-app.model(require("./models/project").default);
-app.model(require("./models/point").default);
-app.model(require("./models/spot").default);
-app.model(require("./models/redLine").default);
-app.model(require("./models/annex").default);
-app.model(require("./models/dict").default);
-app.model(require("./models/district").default);
-app.model(require("./models/company").default);
-app.model(require("./models/inspect").default);
-app.model(require("./models/problemPoint").default);
-app.model(require("./models/role").default);
-app.model(require("./models/departs").default);
-app.model(require("./models/panorama").default);
-app.model(require("./models/projectSupervise").default);
-app.model(require("./models/measurePoint").default);
-app.model(require("./models/videoMonitor").default);
+// 3. Models
+require("./models").default.forEach(key => {
+  app.model(key.default);
+});
 
 // 4. Router
 app.router(require("./router").default);

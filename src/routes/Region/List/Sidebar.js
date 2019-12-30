@@ -66,7 +66,8 @@ const formItemLayout = {
     problemPoint,
     panorama,
     projectSupervise,
-    videoMonitor
+    videoMonitor,
+    commonModel
   }) => ({
     project,
     spot,
@@ -80,7 +81,8 @@ const formItemLayout = {
     problemPoint,
     panorama,
     projectSupervise,
-    videoMonitor
+    videoMonitor,
+    commonModel
   })
 )
 @createForm()
@@ -828,11 +830,23 @@ export default class siderbar extends PureComponent {
       show: false
     });
   };
-
+  // 保存当前活跃的menu的key等信息
+  saveCurrentPageInfo = key => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "commonModel/save",
+      payload: {
+        siderBarPageInfo: {
+          activeMenu: key
+        }
+      }
+    });
+  };
   switchMenu = e => {
     this.hide();
     this.scrollDom.scrollTop = 0;
     const k = e.key;
+    this.saveCurrentPageInfo(k);
     if (k === "project") {
       this.queryProject({ SkipCount: 0 });
     } else if (k === "spot") {
@@ -1128,7 +1142,8 @@ export default class siderbar extends PureComponent {
       inspect: { inspectList },
       panorama: { panoramaList },
       projectSupervise: { projectSuperviseList },
-      videoMonitor: { videoMonitorList }
+      videoMonitor: { videoMonitorList },
+      showProjectTableList
     } = this.props;
 
     const {
@@ -1437,20 +1452,15 @@ export default class siderbar extends PureComponent {
             // this.setState({
             //   show: false
             // });
+
             showProjectList();
           }}
         />
         <Icon
           type={show ? "left" : "right"}
+          className={styles["show-project-list"]}
           style={{
-            fontSize: 30,
-            position: "absolute",
-            right: -50,
-            top: "48%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            borderRadius: "50%",
-            padding: 10,
-            cursor: "pointer"
+            top: "48%"
           }}
           onClick={() => {
             this.setState({

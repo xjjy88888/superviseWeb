@@ -56,85 +56,141 @@ export default class ProjectList extends PureComponent {
         title: "项目名称",
         dataIndex: "name",
         key: "name",
-        fixed: "left"
+        fixed: "left",
+        sorter: true
       },
       {
-        title: "建设单位",
-        dataIndex: "age",
-        key: "age",
-        sorter: (a, b) => a.age - b.age,
-        fixed: "left"
+        title: "项目所在省市县",
+        dataIndex: "districtCodeId",
+        key: "districtCodeId",
+        fixed: "left",
+        sorter: true
+      },
+      {
+        title: "详细地址",
+        dataIndex: "addressInfo",
+        key: "addressInfo",
+        fixed: "left",
+        sorter: true
+      },
+      {
+        title: "生产建设单位",
+        dataIndex: "productDepartmentId",
+        key: "productDepartmentId",
+        // sorter: (a, b) => a.age - b.age,
+        fixed: "left",
+        filters: [1, 2, 3, 1, 1, 1, 1, 1]
+      },
+
+      {
+        title: "生产建设单位联系人",
+        dataIndex: "productDepContactPeople",
+        key: "productDepContactPeople"
+      },
+      {
+        title: "监测单位",
+        dataIndex: "monitorDepartmentId",
+        key: "monitorDepartmentId",
+        filters: [1, 2, 3, 1, 1, 1, 1, 1]
+      },
+      {
+        title: "监测单位联系人",
+        dataIndex: "monitorDepContactPeople",
+        key: "monitorDepContactPeople",
+        filters: [1, 2, 3, 1, 1, 1, 1, 1]
+      },
+      {
+        title: "监理单位",
+        dataIndex: "supervisionDepartmentId",
+        key: "supervisionDepartmentId"
+      },
+      {
+        title: "监理单位联系人",
+        dataIndex: "supervisionDepartmentId",
+        key: "supervisionDepartmentId"
+      },
+      {
+        title: "方案编制单位",
+        dataIndex: "projectDepartmentId",
+        key: "projectDepartmentId"
+      },
+      {
+        title: "监管单位",
+        dataIndex: "supDepartmentId",
+        key: "supDepartmentId"
+      },
+      {
+        title: "流域机构Id",
+        dataIndex: "riverBasinOUId",
+        key: "riverBasinOUId"
+      },
+      {
+        title: "是否需要编报方案",
+        dataIndex: "isNeedPlan",
+        key: "isNeedPlan"
       },
       {
         title: "批复机构",
-        dataIndex: "address",
-        key: "address",
-        fixed: "left"
+        dataIndex: "replyDepartmentId",
+        key: "replyDepartmentId"
       },
       {
-        title: "有无图形",
-        dataIndex: "name",
-        key: "name"
+        title: "批复文号",
+        dataIndex: "replyNum",
+        key: "replyNum"
       },
       {
-        title: "项目附件",
-        dataIndex: "age",
-        key: "age"
+        title: "批复时间",
+        dataIndex: "replyTime",
+        key: "replyTime"
       },
       {
-        title: "关联图斑数",
-        dataIndex: "address",
-        key: "address"
+        title: "防治责任范围面积（m^2）",
+        dataIndex: "respArea",
+        key: "respArea"
       },
       {
-        title: "可不编报说明",
-        dataIndex: "name",
-        key: "name"
+        title: "项目类型（36类）",
+        dataIndex: "projectTypeId",
+        key: "projectTypeId"
       },
       {
-        title: "方案报批文件",
-        dataIndex: "age",
-        key: "age"
+        title: "项目类别（01：建设类、02：开发类）",
+        dataIndex: "projectCateId",
+        key: "projectCateId"
       },
       {
-        title: "整改意见",
-        dataIndex: "address",
-        key: "address"
+        title: "水保工程状况（建设状态）",
+        dataIndex: "projectStatusId",
+        key: "projectStatusId"
       },
       {
-        title: "整改报告",
-        dataIndex: "name",
-        key: "name"
+        title: "项目性质（01：新建、02：扩建）",
+        dataIndex: "projectNatId",
+        key: "projectNatId"
+      },
+
+      {
+        title: "项目合规性(扰动合规性)",
+        dataIndex: "complianceId",
+        key: "complianceId"
       },
       {
-        title: "立案文件",
-        dataIndex: "age",
-        key: "age"
+        title: "涉及区县",
+        dataIndex: "districtCodes",
+        key: "districtCodes",
+        fixed: "right"
       },
       {
-        title: "结案文件",
-        dataIndex: "address",
-        key: "address"
+        title: "经纬度(x坐标)",
+        dataIndex: "pointX",
+        key: "pointX",
+        fixed: "right"
       },
       {
-        title: "查处结果",
-        dataIndex: "name",
-        key: "name"
-      },
-      {
-        title: "处置方式",
-        dataIndex: "age",
-        key: "age"
-      },
-      {
-        title: "项目合规性",
-        dataIndex: "address",
-        key: "address"
-      },
-      {
-        title: "立项级别",
-        dataIndex: "address",
-        key: "address",
+        title: "经纬度(Y坐标)",
+        dataIndex: "pointY",
+        key: "pointY",
         fixed: "right"
       }
     ];
@@ -183,7 +239,7 @@ export default class ProjectList extends PureComponent {
 
             //  style={{ height: "10%" }}
           >
-            <Row gutter={16}>
+            {/* <Row gutter={16}>
               <Col className="gutter-row" span={6}>
                 <div className="gutter-box">
                   <label htmlFor="name">项目名称：</label>
@@ -235,7 +291,7 @@ export default class ProjectList extends PureComponent {
                   </Select>
                 </div>
               </Col>
-            </Row>
+            </Row> */}
             <div id="gutter">
               <Row gutter={16}>
                 <Col className="gutter-row" span={6}>
@@ -407,7 +463,7 @@ export default class ProjectList extends PureComponent {
                     <Select
                       id="isChart"
                       defaultValue=""
-                      style={{ width: 120 }}
+                      style={{ width: 12 }}
                       // onChange={handleChange}
                     >
                       <Option value="jack">Jack</Option>

@@ -1,6 +1,7 @@
 /* eslint-disable array-callback-return */
 import { notification } from "antd";
 import {
+  projectTableListApi,
   projectListApi,
   projectByIdApi,
   updateSpotGraphic,
@@ -25,7 +26,9 @@ export default {
   namespace: "project",
 
   state: {
+    showProjectBigTable: true,
     projectList: { totalCount: 0, items: [] },
+    projectTableList: { totalCount: 0, items: [] },
     projectInfoRedLineList: { totalCount: "", items: [] },
     projectInfo: {
       projectBase: {},
@@ -46,6 +49,25 @@ export default {
   },
 
   effects: {
+    // 项目列表---表格展示
+    *getProjectTableList({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result: projectTableList }
+      } = yield call(projectTableListApi, payload);
+      if (success) {
+        const response = {
+          items: projectTableList.items,
+          totalCount: projectTableList.totalCount
+        };
+        if (callback) callback(success, response);
+        yield put({ type: "save", payload: { projectTableList: response } });
+      } else {
+        notification["error"]({
+          message: `查询项目列表失败：${error.message}`
+        });
+        if (callback) callback(success);
+      }
+    },
     // 项目列表
     *queryProject({ payload, callback }, { call, put }) {
       const items_old = payload.items;
@@ -99,7 +121,7 @@ export default {
             "supervisionDepartment",
             "getDepartName",
             "constructionDepartment",
-            "reportDepartment",
+            "reportDepartment"
           ];
           list.map(item => {
             if (result[item]) {

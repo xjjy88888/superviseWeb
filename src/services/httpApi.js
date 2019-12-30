@@ -2,6 +2,7 @@ import config from "../config";
 import request from "../utils/request";
 import CryptoJS from "crypto-js";
 import { dateFormat, accessToken } from "../utils/util";
+import { stringify } from "qs";
 
 // 初始化
 export async function initApi() {
@@ -22,6 +23,16 @@ export async function loginApi(params) {
   });
 }
 
+// 项目列表---表格展示
+export async function projectTableListApi(params) {
+  // delete params.items;
+  return request(`${config.url.projectTableListUrl}?${stringify(params)}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
 // 项目列表
 export async function projectListApi(params) {
   delete params.items;
@@ -164,6 +175,17 @@ export async function projectUnbindSpotApi(params) {
       }
     }
   );
+}
+
+// 图斑列表---表格展示
+export async function spotTableListApi(params) {
+  // delete params.items;
+  return request(`${config.url.spotTableListUrl}?${stringify(params)}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
 }
 
 // 图斑列表
@@ -870,7 +892,7 @@ export async function videoMonitorByIdApi(id) {
   return request(`${config.url.videoMonitorByIdUrl}?Id=${id}`, {
     method: "GET",
     headers: {
-      Authorization: `Bearer ${accessToken()}`,
+      Authorization: `Bearer ${accessToken()}`
     }
   });
 }

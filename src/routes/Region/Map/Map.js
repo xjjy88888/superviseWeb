@@ -3970,7 +3970,6 @@ export default class RegionMap extends PureComponent {
     // eslint-disable-next-line no-undef
     var player = new ckplayer(videoObject);
   };
-
   onClick_Img = (e) => {
     // console.log(e.currentTarget.src);
     if(e.currentTarget && e.currentTarget.src){
@@ -4013,10 +4012,11 @@ export default class RegionMap extends PureComponent {
       showVedioPicPreview,
       vedioPicPreviewUrl,
       vedioPicList
-      //loading
+      //loading,
     } = this.state;
     const {
-      mapdata: { histories, historiesSpot }
+      mapdata: { histories, historiesSpot },
+      project:{showProjectBigTable}
     } = this.props;
 
     return (
@@ -4032,7 +4032,9 @@ export default class RegionMap extends PureComponent {
           showVideoMonitor={v => this.VideoMonitor.show(v)}
           showProjectList={v => this.ProjectList.show(v)}
         />
-        <ProjectList link={t => (this.ProjectList = t)} />
+        {showProjectBigTable &&<ProjectList link={t => (this.ProjectList = t)} /> }
+        
+
         <SidebarDetail mapLocation={this.mapLocation} />
         <Tool link={t => (this.Tool = t)} />
         <Chart link={t => (this.Chart = t)} />
