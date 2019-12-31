@@ -109,7 +109,9 @@ export default {
         if (callback) callback(success);
         notification["error"]({
           message: `${payload.id ? "编辑" : "新建"}图斑失败：${
-            error.validationErrors ? error.validationErrors[0].message : ""
+            error.validationErrors
+              ? error.validationErrors[0].message
+              : error.message
           }`
         });
       }
