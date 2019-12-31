@@ -2060,7 +2060,7 @@ export default class siderbar extends PureComponent {
                 }}
                 onClick={() => {
                   if (projectEdit) {
-                    // submit
+                    // submit1
                     this.props.form.validateFields((err, v) => {
                       if (!err) {
                         console.log(v);
