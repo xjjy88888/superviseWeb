@@ -9,7 +9,7 @@ import {
   Modal,
   notification,
   Row,
-  Col,
+  Col
 } from "antd";
 import { createForm } from "rc-form";
 import Systems from "../../components/Systems";
@@ -365,6 +365,9 @@ export default class company extends PureComponent {
           pagination={pagination}
           loading={loading}
           onChange={this.handleTableChange}
+          footer={() => {
+            return <span>共{pagination.total}条数据。</span>;
+          }}
         />
         <Modal
           title="新建单位"

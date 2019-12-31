@@ -395,6 +395,9 @@ export default class branch extends PureComponent {
           pagination={pagination}
           loading={loading}
           onChange={this.handleTableChange}
+          footer={() => {
+            return <span>共{pagination.total}条数据。</span>;
+          }}
         />
         <Modal
           title="新建单位"

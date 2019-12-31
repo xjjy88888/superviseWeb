@@ -80,7 +80,8 @@ export default class Inspect extends PureComponent {
       proDepCPSignImgList: [],
       conDepCPSignImgList: [],
       monDepCPSignImgList: [],
-      supDepCPSignImgList: []
+      supDepCPSignImgList: [],
+      isEdit: false
     };
   }
 
@@ -103,7 +104,8 @@ export default class Inspect extends PureComponent {
       show: v.show,
       projectId: v.projectId,
       id: v.id,
-      attachmentId: 0
+      attachmentId: 0,
+      isEdit: false
     });
     if (v.show) {
       resetFields();
@@ -216,6 +218,12 @@ export default class Inspect extends PureComponent {
 
   render() {
     const {
+      dispatch,
+      form: { getFieldDecorator, validateFields },
+      inspect: { inspectForm, inspectInfo }
+    } = this.props;
+
+    const {
       show,
       id,
       projectId,
@@ -224,13 +232,9 @@ export default class Inspect extends PureComponent {
       attachmentId,
       previewImage,
       previewVisible_min,
-      previewVisible
+      previewVisible,
+      isEdit
     } = this.state;
-    const {
-      dispatch,
-      form: { getFieldDecorator, validateFields },
-      inspect: { inspectForm, inspectInfo }
-    } = this.props;
 
     return (
       <div
@@ -347,7 +351,7 @@ export default class Inspect extends PureComponent {
             }}
           />
           <Button
-            icon="check"
+            icon={isEdit ? "check" : "edit"}
             shape="circle"
             style={{
               color: "#1890ff",
@@ -355,74 +359,78 @@ export default class Inspect extends PureComponent {
             }}
             // 提交
             onClick={() => {
-              let data = [];
-              validateFields((error, v) => {
-                console.log(v);
-                if (!v.checkDate) {
-                  notification["warning"]({
-                    message: `请选择核查日期`,
-                    duration: 1
-                  });
-                  return;
-                }
-                if (!v.numberYear) {
-                  notification["warning"]({
-                    message: `请输入编号年份`,
-                    duration: 1
-                  });
-                  return;
-                }
-                if (!v.number) {
-                  notification["warning"]({
-                    message: `请输入编号序号`,
-                    duration: 1
-                  });
-                  return;
-                }
-                // if (!v.monitorCheckPeopleName) {
-                //   notification["warning"]({
-                //     message: `请输入监督检查人员`,
-                //     duration: 1
-                //   });
-                //   return;
-                // }
-                for (let i in v) {
-                  if (v[i]) {
-                    const type = i.split("_")[0];
-                    if (type === "checkbox") {
-                      data = data.concat(v[i]);
-                    } else if (type === "radio") {
-                      if (v[i].length !== 0) {
-                        data.push(v[i]);
+              if (isEdit) {
+                let data = [];
+                validateFields((error, v) => {
+                  console.log(v);
+                  if (!v.checkDate) {
+                    notification["warning"]({
+                      message: `请选择核查日期`,
+                      duration: 1
+                    });
+                    return;
+                  }
+                  if (!v.numberYear) {
+                    notification["warning"]({
+                      message: `请输入编号年份`,
+                      duration: 1
+                    });
+                    return;
+                  }
+                  if (!v.number) {
+                    notification["warning"]({
+                      message: `请输入编号序号`,
+                      duration: 1
+                    });
+                    return;
+                  }
+                  // if (!v.monitorCheckPeopleName) {
+                  //   notification["warning"]({
+                  //     message: `请输入监督检查人员`,
+                  //     duration: 1
+                  //   });
+                  //   return;
+                  // }
+                  for (let i in v) {
+                    if (v[i]) {
+                      const type = i.split("_")[0];
+                      if (type === "checkbox") {
+                        data = data.concat(v[i]);
+                      } else if (type === "radio") {
+                        if (v[i].length !== 0) {
+                          data.push(v[i]);
+                        }
                       }
                     }
                   }
-                }
-                const checkInfoLists = data.map(item => {
-                  return {
-                    checkInfoItemId: item
+                  const checkInfoLists = data.map(item => {
+                    return {
+                      checkInfoItemId: item
+                    };
+                  });
+                  const inspectCreateUpdateData = {
+                    id: id,
+                    projectId: projectId,
+                    attachmentId: attachmentId,
+                    numberYear: v.numberYear,
+                    number: v.number,
+                    monitorCheckPeopleName: v.monitorCheckPeopleName,
+                    description: v.description,
+                    checkDate: v.checkDate
+                      ? v.checkDate.format("YYYY-MM-DD")
+                      : "",
+                    checkInfoLists: checkInfoLists
                   };
+                  signatureList.map(item => {
+                    inspectCreateUpdateData[item.key + "Id"] = this.state[
+                      item.key + "Id"
+                    ];
+                  });
+                  this.inspectCreateUpdate(inspectCreateUpdateData);
                 });
-                const inspectCreateUpdateData = {
-                  id: id,
-                  projectId: projectId,
-                  attachmentId: attachmentId,
-                  numberYear: v.numberYear,
-                  number: v.number,
-                  monitorCheckPeopleName: v.monitorCheckPeopleName,
-                  description: v.description,
-                  checkDate: v.checkDate
-                    ? v.checkDate.format("YYYY-MM-DD")
-                    : "",
-                  checkInfoLists: checkInfoLists
-                };
-                signatureList.map(item => {
-                  inspectCreateUpdateData[item.key + "Id"] = this.state[
-                    item.key + "Id"
-                  ];
-                });
-                this.inspectCreateUpdate(inspectCreateUpdateData);
-              });
+              } else {
+                this.setState({ isEdit: true });
+              }
             }}
           />
           <Button
@@ -467,7 +475,7 @@ export default class Inspect extends PureComponent {
               initialValue: inspectInfo.checkDate
                 ? moment(inspectInfo.checkDate)
                 : ""
-            })(<DatePicker style={{ width: 240 }} />)}
+            })(<DatePicker style={{ width: 240 }} disabled={!isEdit} />)}
           </Form.Item>
           <Form.Item
             label={
@@ -479,7 +487,13 @@ export default class Inspect extends PureComponent {
           >
             {getFieldDecorator("numberYear", {
               initialValue: inspectInfo.numberYear
-            })(<Input style={{ width: 240 }} addonAfter={`年`} />)}
+            })(
+              <Input
+                style={{ width: 240 }}
+                addonAfter={`年`}
+                disabled={!isEdit}
+              />
+            )}
           </Form.Item>
           <Form.Item
             label={
@@ -490,7 +504,11 @@ export default class Inspect extends PureComponent {
             {...formItemLayout}
           >
             {getFieldDecorator("number", { initialValue: inspectInfo.number })(
-              <Input style={{ width: 240 }} addonAfter={`号`} />
+              <Input
+                style={{ width: 240 }}
+                addonAfter={`号`}
+                disabled={!isEdit}
+              />
             )}
           </Form.Item>
           {inspectForm.map((item, index) => (
@@ -505,7 +523,7 @@ export default class Inspect extends PureComponent {
                 ? getFieldDecorator(`radio_${item.key}`, {
                     initialValue: this.getInitialValue("radio", item.key)
                   })(
-                    <Radio.Group name="radiogroup">
+                    <Radio.Group name="radiogroup" disabled={!isEdit}>
                       {item.data.map((item, index) => (
                         <Radio value={item.value} key={index}>
                           {item.key}
@@ -518,6 +536,7 @@ export default class Inspect extends PureComponent {
                     initialValue: this.getInitialValue("checkbox", item.key)
                   })(
                     <Checkbox.Group
+                      disabled={!isEdit}
                       options={item.data.map(item => {
                         return {
                           label: item.key,
@@ -532,7 +551,7 @@ export default class Inspect extends PureComponent {
           <Form.Item label="备注" {...formItemLayout}>
             {getFieldDecorator("description", {
               initialValue: inspectInfo.description
-            })(<Input.TextArea autosize />)}
+            })(<Input.TextArea autosize disabled={!isEdit} />)}
           </Form.Item>
           {/* <div style={{ textAlign: 'center' }}>
             {signatureList.map((item, index) => (

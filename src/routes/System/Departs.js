@@ -1,10 +1,10 @@
 /* eslint-disable array-callback-return */
-import React, { PureComponent } from 'react';
-import { connect } from 'dva';
-import { createForm } from 'rc-form';
-import Systems from '../../components/Systems';
-import MustFill from '../../components/MustFill';
-import Highlighter from 'react-highlight-words';
+import React, { PureComponent } from "react";
+import { connect } from "dva";
+import { createForm } from "rc-form";
+import Systems from "../../components/Systems";
+import MustFill from "../../components/MustFill";
+import Highlighter from "react-highlight-words";
 import {
   Form,
   Icon,
@@ -18,7 +18,7 @@ import {
   Modal,
   notification,
   Cascader
-} from 'antd';
+} from "antd";
 
 const { Sider, Content } = Layout;
 const { Title } = Typography;
@@ -53,7 +53,7 @@ export default class departs extends PureComponent {
   districtTree = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'district/districtTree',
+      type: "district/districtTree",
       payload: {
         IsFilter: true
       }
@@ -85,7 +85,7 @@ export default class departs extends PureComponent {
   departsTree = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'departs/departsTree',
+      type: "departs/departsTree",
       payload: { IsFilter: true }
     });
   };
@@ -94,7 +94,7 @@ export default class departs extends PureComponent {
     const { dispatch } = this.props;
     this.setState({ loading: true });
     dispatch({
-      type: 'departs/departsList',
+      type: "departs/departsList",
       payload,
       callback: (success, error, result) => {
         const pagination = { ...this.state.pagination };
@@ -143,7 +143,7 @@ export default class departs extends PureComponent {
             setSelectedKeys(e.target.value ? [e.target.value] : [])
           }
           onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
-          style={{ width: 188, marginBottom: 8, display: 'block' }}
+          style={{ width: 188, marginBottom: 8, display: "block" }}
         />
         <Button
           type="primary"
@@ -164,7 +164,7 @@ export default class departs extends PureComponent {
       </div>
     ),
     filterIcon: filtered => (
-      <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
+      <Icon type="search" style={{ color: filtered ? "#1890ff" : undefined }} />
     ),
     onFilter: (value, record) =>
       record[dataIndex]
@@ -178,7 +178,7 @@ export default class departs extends PureComponent {
     },
     render: text => (
       <Highlighter
-        highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+        highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
         searchWords={[this.state.searchText]}
         autoEscape
         textToHighlight={text.toString()}
@@ -193,7 +193,7 @@ export default class departs extends PureComponent {
 
   handleReset = clearFilters => {
     clearFilters();
-    this.setState({ searchText: '' });
+    this.setState({ searchText: "" });
   };
   render() {
     const {
@@ -216,20 +216,20 @@ export default class departs extends PureComponent {
 
     const columns = [
       {
-        title: '部门名',
-        dataIndex: 'name',
+        title: "部门名",
+        dataIndex: "name",
         sorter: (a, b) => a.name.length - b.name.length,
-        ...this.getColumnSearchProps('name')
+        ...this.getColumnSearchProps("name")
       },
       {
-        title: '上级部门',
-        dataIndex: 'parentName',
+        title: "上级部门",
+        dataIndex: "parentName",
         sorter: (a, b) => a.name.length - b.name.length,
-        ...this.getColumnSearchProps('name')
+        ...this.getColumnSearchProps("name")
       },
       {
-        title: '操作',
-        key: 'operation',
+        title: "操作",
+        key: "operation",
         render: (item, record) => (
           <span>
             <a
@@ -259,14 +259,14 @@ export default class departs extends PureComponent {
             <a
               onClick={() => {
                 Modal.confirm({
-                  title: '删除',
-                  content: '是否确定要删除',
-                  okText: '是',
-                  cancelText: '否',
-                  okType: 'danger',
+                  title: "删除",
+                  content: "是否确定要删除",
+                  okText: "是",
+                  cancelText: "否",
+                  okType: "danger",
                   onOk() {
                     dispatch({
-                      type: 'departs/departsDelete',
+                      type: "departs/departsDelete",
                       payload: record.id,
                       callback: (success, error, result) => {
                         if (success) {
@@ -275,8 +275,8 @@ export default class departs extends PureComponent {
                           });
                           self.refresh();
                         }
-                        notification[success ? 'success' : 'error']({
-                          message: `删除${success ? '成功' : '失败'}`
+                        notification[success ? "success" : "error"]({
+                          message: `删除${success ? "成功" : "失败"}`
                         });
                       }
                     });
@@ -304,9 +304,9 @@ export default class departs extends PureComponent {
         <Layout>
           <Sider
             style={{
-              borderRadius: '10px 0 0 0',
+              borderRadius: "10px 0 0 0",
               height: window.innerHeight - 150,
-              overflow: 'auto'
+              overflow: "auto"
             }}
             width={400}
             theme="light"
@@ -316,8 +316,8 @@ export default class departs extends PureComponent {
               onSelect={(v, e) => {
                 // console.log(v[0], e.selectedNodes[0].props.districtCodeId);
                 const d = e.selectedNodes[0].props.districtCodeId;
-                console.log(`ParentCodeId`, d + '', districtTreeFilter);
-                console.log(this.find(d + '', districtTreeFilter));
+                console.log(`ParentCodeId`, d + "", districtTreeFilter);
+                console.log(this.find(d + "", districtTreeFilter));
                 this.setState({
                   ParentId: v[0],
                   ParentCodeId: d
@@ -373,8 +373,8 @@ export default class departs extends PureComponent {
           </Sider>
           <Content
             style={{
-              borderRadius: '0 10px 0 0',
-              background: '#fff'
+              borderRadius: "0 10px 0 0",
+              background: "#fff"
             }}
           >
             <Title level={4}>
@@ -400,18 +400,18 @@ export default class departs extends PureComponent {
                   onClick={() => {
                     const l = selectedRows.length;
                     if (l === 0) {
-                      message.warning('请选择需要删除的部门');
+                      message.warning("请选择需要删除的部门");
                       return;
                     }
                     Modal.confirm({
-                      title: '删除',
-                      content: '是否确定要删除',
-                      okText: '是',
-                      cancelText: '否',
-                      okType: 'danger',
+                      title: "删除",
+                      content: "是否确定要删除",
+                      okText: "是",
+                      cancelText: "否",
+                      okType: "danger",
                       onOk() {
                         dispatch({
-                          type: 'departs/departsDeleteMul',
+                          type: "departs/departsDeleteMul",
                           payload: { id: selectedRows.map(item => item.id) },
                           callback: (success, error, result) => {
                             if (success) {
@@ -421,10 +421,10 @@ export default class departs extends PureComponent {
                               });
                               self.refresh();
                             }
-                            notification[success ? 'success' : 'error']({
+                            notification[success ? "success" : "error"]({
                               message: `删除${l}条部门划数据${
-                                success ? '成功' : '失败'
-                              }${success ? '' : `：${error.message}`}`
+                                success ? "成功" : "失败"
+                              }${success ? "" : `：${error.message}`}`
                             });
                           }
                         });
@@ -454,18 +454,18 @@ export default class departs extends PureComponent {
               onOk={() => {
                 // submit
                 validateFields((err, v) => {
-                  console.log('新建编辑部门', v);
+                  console.log("新建编辑部门", v);
                   const d = v.districtCodeId;
                   if (!v.name) {
-                    message.warning('请填写部门名');
+                    message.warning("请填写部门名");
                     return;
                   }
                   if (!d) {
-                    message.warning('请选择行政区划');
+                    message.warning("请选择行政区划");
                     return;
                   }
                   dispatch({
-                    type: 'departs/departsCreateUpdate',
+                    type: "departs/departsCreateUpdate",
                     payload: {
                       ...v,
                       id: id,
@@ -491,7 +491,7 @@ export default class departs extends PureComponent {
             >
               <Form
                 onSubmit={this.handleSubmit}
-                style={{ textAlign: 'center', width: `100%`, height: `100%` }}
+                style={{ textAlign: "center", width: `100%`, height: `100%` }}
               >
                 <Form.Item
                   {...formItemLayout}
@@ -503,7 +503,7 @@ export default class departs extends PureComponent {
                   }
                   hasFeedback
                 >
-                  {getFieldDecorator('name', {})(<Input />)}
+                  {getFieldDecorator("name", {})(<Input />)}
                 </Form.Item>
                 <Form.Item
                   label={
@@ -514,10 +514,13 @@ export default class departs extends PureComponent {
                   }
                   {...formItemLayout}
                 >
-                  {getFieldDecorator('districtCodeId', {})(
+                  {getFieldDecorator(
+                    "districtCodeId",
+                    {}
+                  )(
                     <Cascader
                       showSearch
-                      options={this.find(ParentCodeId + '', districtTreeFilter)}
+                      options={this.find(ParentCodeId + "", districtTreeFilter)}
                       changeOnSelect
                       placeholder="请选择所在地区"
                     />
