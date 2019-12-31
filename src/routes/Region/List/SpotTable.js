@@ -1,28 +1,17 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
 import jQuery from "jquery";
-import {
-  Button,
-  Table,
-  Row,
-  Col,
-  Input,
-  Select,
-  PageHeader,
-  Icon,
-  Tooltip
-} from "antd";
+import { Button, Table, Input, Icon, Tooltip } from "antd";
 
 import styles from "./style/ProjectList.less";
 
-const { Option } = Select;
-
-@connect(({ project, spot, district }) => ({
+@connect(({ project, spot, district, user }) => ({
   ...project,
   ...spot,
-  ...district
+  ...district,
+  ...user
 }))
-export default class SpotTableList extends PureComponent {
+export default class SpotListTable extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -341,8 +330,28 @@ export default class SpotTableList extends PureComponent {
         title: "图斑所在省市县",
         dataIndex: "districtCodeId",
         key: "districtCodeId",
-        width: 220,
-        sorter: true
+        width: 220
+        // render: (v, record) => {
+        //   const { district } = this.props;
+        //   let districtValue = [];
+        //   district &&
+        //     district.length > 0 &&
+        //     district.map(item => {
+        //       const res = item.children.filter(it => it.value === v);
+        //       if (res.length) {
+        //         districtValue = item.label + "/" + res[0].label;
+        //       } else {
+        //         item.children.map(ite => {
+        //           const res = ite.children.filter(it => it.value === v);
+        //           if (res.length) {
+        //             districtValue =
+        //               item.label + "/" + ite.label + "/" + res[0].label;
+        //           }
+        //         });
+        //       }
+        //     });
+        //   return districtValue;
+        // }
       },
 
       {
@@ -411,6 +420,7 @@ export default class SpotTableList extends PureComponent {
     };
     return (
       <Table
+        id="spotTable"
         size="middle"
         rowSelection={rowSelection}
         rowKey={record => record.id}

@@ -1,16 +1,17 @@
-import { notification } from 'antd';
+import { notification } from "antd";
 import {
   districtTreeApi,
   districtCreateUpdateApi,
   districtDeleteApi,
   districtDeleteMulApi
-} from '../services/httpApi';
-import { treeToList } from '../utils/util';
+} from "../services/httpApi";
+import { treeToList } from "../utils/util";
 
 export default {
-  namespace: 'district',
+  namespace: "district",
 
   state: {
+    district: [],
     districtTree: [{ children: null, id: null, value: null }],
     districtTreeFilter: [{ children: null, id: null, value: null }],
     districtList: [],
@@ -28,19 +29,28 @@ export default {
         data: { success, error, result }
       } = yield call(districtTreeApi, payload);
       const districtList = treeToList(result);
+      const district = result.children.map(item => {
+        return {
+          ...item,
+          children: item.children.map(ite => {
+            return { ...ite, children: ite.children || [] };
+          })
+        };
+      });
       if (callback) callback(success, error, result);
       if (success) {
         yield put({
-          type: 'save',
+          type: "save",
           payload: payload.IsFilter
             ? { districtTreeFilter: [result], districtListFilter: districtList }
             : {
                 districtTree: [result],
-                districtList
+                districtList,
+                district
               }
         });
       } else {
-        notification['error']({
+        notification["error"]({
           message: `查询行政区划列表失败`
         });
       }

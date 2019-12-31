@@ -316,6 +316,7 @@ export default class siderbar extends PureComponent {
     this.setState({
       clientHeight: clientHeight
     });
+    this.saveCurrentPageInfo("project");
   }
 
   queryInfo = data => {

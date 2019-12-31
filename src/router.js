@@ -33,7 +33,7 @@ function RouterConfig({ history }) {
         <Route path="/system/district" component={District} exact />
         <Route path="/system/departs" component={Departs} exact />
         <Route path="/system/branch" component={Branch} exact />
-        <Route path="/project" exact component={ProjectList} />
+        {/* <Route path="/project" exact component={ProjectList} /> */}
         <Route path="/project/list" exact component={ProjectList} />
         <Route path="/project/map" exact component={ProjectMap} />
         <Route path="/project/cesiummap" exact component={CesiumMap} />

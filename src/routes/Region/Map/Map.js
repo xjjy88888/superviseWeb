@@ -198,9 +198,7 @@ export default class RegionMap extends PureComponent {
       showVedioPreview: false,
       showVedioPicPreview: false,
       vedioPicPreviewUrl: null,
-      vedioPicList: [
-        './img/loading.png',
-      ],
+      vedioPicList: ["./img/loading.png"]
       //loading: true
     };
     this.saveRef = v => {
@@ -3913,7 +3911,7 @@ export default class RegionMap extends PureComponent {
       success: function(data) {
         console.log("success", data);
         data = data.data;
-        var  vedioPicList = [];
+        var vedioPicList = [];
         if (data && data[params.name]) {
           data = data[params.name];
           for (var i = 0; i < data.length; i++) {
@@ -3939,7 +3937,7 @@ export default class RegionMap extends PureComponent {
           // jQuery("#m_pic").append(
           //   '<span style="line-height:118px;margin-left:230px;">设备获取图片异常,请联系管理员</span>'
           // );
-          vedioPicList.push('./img/error.png');
+          vedioPicList.push("./img/error.png");
         }
         me.setState({
           vedioPicList: vedioPicList
@@ -3970,9 +3968,9 @@ export default class RegionMap extends PureComponent {
     // eslint-disable-next-line no-undef
     var player = new ckplayer(videoObject);
   };
-  onClick_Img = (e) => {
+  onClick_Img = e => {
     // console.log(e.currentTarget.src);
-    if(e.currentTarget && e.currentTarget.src){
+    if (e.currentTarget && e.currentTarget.src) {
       this.setState({
         showVedioPicPreview: true,
         vedioPicPreviewUrl: e.currentTarget.src
@@ -4016,7 +4014,7 @@ export default class RegionMap extends PureComponent {
     } = this.state;
     const {
       mapdata: { histories, historiesSpot },
-      project:{showProjectBigTable}
+      project: { showProjectBigTable }
     } = this.props;
 
     return (
@@ -4032,8 +4030,9 @@ export default class RegionMap extends PureComponent {
           showVideoMonitor={v => this.VideoMonitor.show(v)}
           showProjectList={v => this.ProjectList.show(v)}
         />
-        {showProjectBigTable &&<ProjectList link={t => (this.ProjectList = t)} /> }
-        
+        {showProjectBigTable && (
+          <ProjectList link={t => (this.ProjectList = t)} />
+        )}
 
         <SidebarDetail mapLocation={this.mapLocation} />
         <Tool link={t => (this.Tool = t)} />
@@ -4081,23 +4080,24 @@ export default class RegionMap extends PureComponent {
               this.setState({ showVedioPreview: false });
             }}
           >
-           <div id="videoMoitor" style={{width:600}}>
-            <div id="m_video2" style={{width:600,height:400}}></div> 
-            {/* <div id="m_pic" style={{width:600,height:120}}></div> */}
-            <Carousel autoplay >
-              {vedioPicList.map((item, id) => {
-                // console.log(item)            
-                return(
-                <div>
-                  <img
-                    onClick={this.onClick_Img}
-                    alt="example"
-                    style={{ width: "100%" }}
-                    src={item}
-                  />
-                </div>
-              )})}
-            </Carousel>   
+            <div id="videoMoitor" style={{ width: 600 }}>
+              <div id="m_video2" style={{ width: 600, height: 400 }}></div>
+              {/* <div id="m_pic" style={{width:600,height:120}}></div> */}
+              <Carousel autoplay>
+                {vedioPicList.map((item, id) => {
+                  // console.log(item)
+                  return (
+                    <div>
+                      <img
+                        onClick={this.onClick_Img}
+                        alt="example"
+                        style={{ width: "100%" }}
+                        src={item}
+                      />
+                    </div>
+                  );
+                })}
+              </Carousel>
             </div>
           </Modal>
           {/* 视频监控图片放大预览 */}
@@ -4199,7 +4199,7 @@ export default class RegionMap extends PureComponent {
               }}
             >
               {histories.map((item, id) => (
-                <Select.Option key={id} value={item}>
+                <Select.Option key={id + "first"} value={item}>
                   {item}
                 </Select.Option>
               ))}
@@ -4262,14 +4262,14 @@ export default class RegionMap extends PureComponent {
               right: 120,
               height: 0,
               zIndex: 999,
-              background: "transparent",
+              background: "transparent"
             }}
           >
             <Switch
               checkedChildren="图表联动"
               unCheckedChildren="图表联动"
               style={{
-                width: 100,
+                width: 100
               }}
               onClick={(v, e) => {
                 e.stopPropagation();
@@ -4426,7 +4426,7 @@ export default class RegionMap extends PureComponent {
               }}
             >
               {histories.map((item, id) => (
-                <Select.Option key={id} value={item}>
+                <Select.Option key={id + "second"} value={item}>
                   {item}
                 </Select.Option>
               ))}
@@ -4449,7 +4449,7 @@ export default class RegionMap extends PureComponent {
               }}
             >
               {historiesSpot.map((item, id) => (
-                <Select.Option key={id} value={item.value}>
+                <Select.Option key={id + "spotFirst"} value={item.value}>
                   {item.id}
                 </Select.Option>
               ))}
@@ -4484,7 +4484,7 @@ export default class RegionMap extends PureComponent {
               }}
             >
               {histories.map((item, id) => (
-                <Select.Option key={id} value={item}>
+                <Select.Option key={id + "three"} value={item}>
                   {item}
                 </Select.Option>
               ))}
@@ -4507,7 +4507,7 @@ export default class RegionMap extends PureComponent {
               }}
             >
               {historiesSpot.map((item, id) => (
-                <Select.Option key={id} value={item.value}>
+                <Select.Option key={id + "spotSecond"} value={item.value}>
                   {item.id}
                 </Select.Option>
               ))}
