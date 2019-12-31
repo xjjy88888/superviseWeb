@@ -838,6 +838,10 @@ export default class RegionMap extends PureComponent {
         "项目红线"
       );
       userconfig.layersControl.addOverlay(userconfig.spotWmsLayer, "扰动图斑");
+      userconfig.layersControl.addOverlay(
+        userconfig.siteSpotWmsLayer,
+        "现场创建图斑"
+      );
     }
     //显示项目红线、扰动图斑图层
     if (userconfig.projectWmsLayer) {
@@ -845,6 +849,9 @@ export default class RegionMap extends PureComponent {
     }
     if (userconfig.spotWmsLayer) {
       userconfig.spotWmsLayer.setOpacity(1);
+    }
+    if (userconfig.siteSpotWmsLayer) {
+      userconfig.siteSpotWmsLayer.setOpacity(1);
     }
     if (userconfig.geoJsonLayer) {
       userconfig.geoJsonLayer.setStyle({ opacity: 1, fillOpacity: 0 });
@@ -893,6 +900,7 @@ export default class RegionMap extends PureComponent {
     if (userconfig.layersControl) {
       userconfig.layersControl.removeLayer(userconfig.projectWmsLayer);
       userconfig.layersControl.removeLayer(userconfig.spotWmsLayer);
+      userconfig.layersControl.removeLayer(userconfig.siteSpotWmsLayer);
     }
     //隐藏项目红线、扰动图斑图层
     if (userconfig.projectWmsLayer) {
@@ -900,6 +908,9 @@ export default class RegionMap extends PureComponent {
     }
     if (userconfig.spotWmsLayer) {
       userconfig.spotWmsLayer.setOpacity(0);
+    }
+    if (userconfig.siteSpotWmsLayer) {
+      userconfig.siteSpotWmsLayer.setOpacity(0);
     }
     if (userconfig.geoJsonLayer) {
       userconfig.geoJsonLayer.setStyle({ opacity: 0, fillOpacity: 0 });
@@ -2937,8 +2948,10 @@ export default class RegionMap extends PureComponent {
     if (!switchDataModal) {
       userconfig.projectWmsLayer.setOpacity(0);
       userconfig.spotWmsLayer.setOpacity(0);
+      userconfig.siteSpotWmsLayer.setOpacity(0);
       userconfig.layersControl.removeLayer(userconfig.projectWmsLayer);
       userconfig.layersControl.removeLayer(userconfig.spotWmsLayer);
+      userconfig.layersControl.removeLayer(userconfig.siteSpotWmsLayer);
       //项目监管
       this.switchXMJG();
     }
@@ -2969,10 +2982,20 @@ export default class RegionMap extends PureComponent {
           format: "image/png", //返回的数据格式
           transparent: true,
           maxZoom: config.mapInitParams.maxZoom,
-          // cql_filter: "map_num == 201808_450521_0515"
           cql_filter: userconfig.cql_filter
             ? userconfig.cql_filter
-            : "archive_time is null"
+            : "archive_time is null and create_type==0"
+        }
+      ).addTo(map);
+      //加载现场创建图斑图层wms
+      userconfig.siteSpotWmsLayer = LeaftWMS.overlay(
+        config.mapUrl.geoserverUrl + "/wms?",
+        {
+          layers: config.mapSpotLayerName, //需要加载的图层
+          format: "image/png", //返回的数据格式
+          transparent: true,
+          maxZoom: config.mapInitParams.maxZoom,
+          cql_filter: "archive_time is null and create_type==1"
         }
       ).addTo(map);
     } else {
@@ -2994,11 +3017,19 @@ export default class RegionMap extends PureComponent {
           format: "image/png", //返回的数据格式
           transparent: true,
           maxZoom: config.mapInitParams.maxZoom,
-          // cql_filter: "is_deleted == false"
-          // cql_filter: 'archive_time is null'
           cql_filter: userconfig.cql_filter
             ? userconfig.cql_filter
-            : "archive_time is null"
+            : "archive_time is null and create_type==0"
+        })
+        .addTo(map);
+      //加载现场创建图斑图层wms
+      userconfig.siteSpotWmsLayer = L.tileLayer
+        .wms(config.mapUrl.geoserverUrl + "/wms?", {
+          layers: config.mapSpotLayerName, //需要加载的图层
+          format: "image/png", //返回的数据格式
+          transparent: true,
+          maxZoom: config.mapInitParams.maxZoom,
+          cql_filter: "archive_time is null and create_type==1"
         })
         .addTo(map);
     }
@@ -3047,7 +3078,8 @@ export default class RegionMap extends PureComponent {
         "overlayMapsTile"
       )]: districtBoundLayer,
       项目红线: userconfig.projectWmsLayer,
-      扰动图斑: userconfig.spotWmsLayer
+      扰动图斑: userconfig.spotWmsLayer,
+      现场创建图斑: userconfig.siteSpotWmsLayer
     });
     //底图切换控件
     const layersControl = L.control
@@ -3634,7 +3666,7 @@ export default class RegionMap extends PureComponent {
           format: "image/png", //返回的数据格式
           transparent: true,
           maxZoom: config.mapInitParams.maxZoom,
-          cql_filter: "archive_time is null"
+          cql_filter: "archive_time is null and create_type==0"
         });
       } else {
         const leftspotIds = this.getSpotIdsByHistorySpots(
@@ -3647,7 +3679,6 @@ export default class RegionMap extends PureComponent {
           format: "image/png", //返回的数据格式
           transparent: true,
           maxZoom: config.mapInitParams.maxZoom,
-          //cql_filter: "archive_time >= " + selectSpotLeftV
           cql_filter:
             "spot_id in (" +
             leftspotIds +
@@ -3662,7 +3693,7 @@ export default class RegionMap extends PureComponent {
           format: "image/png", //返回的数据格式
           transparent: true,
           maxZoom: config.mapInitParams.maxZoom,
-          cql_filter: "archive_time is null"
+          cql_filter: "archive_time is null and create_type==0"
         });
       } else {
         const rightspotIds = this.getSpotIdsByHistorySpots(
@@ -3674,7 +3705,6 @@ export default class RegionMap extends PureComponent {
           format: "image/png", //返回的数据格式
           transparent: true,
           maxZoom: config.mapInitParams.maxZoom,
-          // cql_filter: 'archive_time >= ' + selectSpotRightV
           cql_filter:
             "spot_id in (" +
             rightspotIds +
@@ -3778,7 +3808,7 @@ export default class RegionMap extends PureComponent {
 
   switchInterpret = v => {
     console.log(`切换解译期次`, v);
-    userconfig.cql_filter = "archive_time is null";
+    userconfig.cql_filter = "";
     if (v) {
       const taskLevel = v.split("-")[0];
       let task_level = 3;
@@ -3792,11 +3822,14 @@ export default class RegionMap extends PureComponent {
         task_level = 3;
       }
       const inter_batch = v.split("-")[1];
-      // userconfig.cql_filter = 'archive_time is null and inter_batch = '+inter_batch+' and task_level = '+task_level;
       userconfig.cql_filter =
-        "inter_batch = " + inter_batch + " and task_level = " + task_level;
+        "inter_batch = " +
+        inter_batch +
+        " and task_level = " +
+        task_level +
+        " and create_type==0";
     } else {
-      userconfig.cql_filter = "archive_time is null";
+      userconfig.cql_filter = "archive_time is null and create_type==0";
     }
 
     if (userconfig.spotWmsLayer) {
@@ -4043,6 +4076,7 @@ export default class RegionMap extends PureComponent {
             this.Tool.queryInfo(v);
             this.Chart.queryInfo(v);
           }}
+          queryReset={() => this.ProjectList.queryReset()}
         />
         <Sparse />
         <Panorama />

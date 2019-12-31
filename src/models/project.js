@@ -49,6 +49,9 @@ export default {
   },
 
   effects: {
+    *projectSave({ payload, callback }, { call, put }) {
+      yield put({ type: "save", payload });
+    },
     // 项目列表---表格展示
     *getProjectTableList({ payload, callback }, { call, put }) {
       const {

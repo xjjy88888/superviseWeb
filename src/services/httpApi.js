@@ -1082,7 +1082,7 @@ export async function companyListApi(params) {
       params.isBuild
         ? "&DepTypes=1"
         : "&DepTypes=2&DepTypes=3&DepTypes=4&DepTypes=5&DepTypes=6&DepTypes=7"
-    }`,
+    }&IsGetProject=${Boolean(params.IsGetProject)}`,
     {
       method: "GET",
       headers: {
@@ -1130,7 +1130,7 @@ export async function companyDeleteMulApi(params) {
   });
 }
 
-// 行政部门_树状列表1
+// 行政部门_树状列表
 export async function departsTreeApi(params) {
   return request(`${config.url.departsTreeUrl}?IsFilter=${params.IsFilter}`, {
     method: "GET",

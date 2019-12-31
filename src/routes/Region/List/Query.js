@@ -101,8 +101,17 @@ export default class Query extends PureComponent {
     }
   };
 
+  projectSave = payload => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "project/projectSave",
+      payload
+    });
+  };
+
   render() {
     const {
+      queryReset,
       queryInfo,
       form: { getFieldDecorator, resetFields },
       district: { districtTreeFilter }
@@ -169,6 +178,7 @@ export default class Query extends PureComponent {
                 info: {},
                 ProjectShowArchive: false
               });
+              queryReset();
             }}
           >
             重置
@@ -182,31 +192,33 @@ export default class Query extends PureComponent {
                   console.log("筛选信息", v);
                   const d1 = v.ProjectDistrictCodes;
                   const d2 = v.SpotDistrictCodes;
+                  const queryParams = {
+                    ...v,
+                    ProjectDistrictCodes: d1[d1.length - 1],
+                    SpotDistrictCodes: d2[d2.length - 1],
+                    isNeedPlan: !v.isNeedPlan
+                      ? ""
+                      : v.isNeedPlan.length === 2
+                      ? ""
+                      : v.isNeedPlan.length === 1
+                      ? v.isNeedPlan[0]
+                      : "",
+                    isReply: !v.isReply
+                      ? ""
+                      : v.isReply.length === 2
+                      ? ""
+                      : v.isReply.length === 1
+                      ? v.isReply[0]
+                      : "",
+                    IsReview: v.IsReview.length === 1 ? v.IsReview[0] : "",
+                    interBatch: (v.interBatch1 || "") + (v.interBatch2 || "")
+                  };
                   const data = {
                     from: type,
-                    info: {
-                      ...v,
-                      ProjectDistrictCodes: d1[d1.length - 1],
-                      SpotDistrictCodes: d2[d2.length - 1],
-                      isNeedPlan: !v.isNeedPlan
-                        ? ""
-                        : v.isNeedPlan.length === 2
-                        ? ""
-                        : v.isNeedPlan.length === 1
-                        ? v.isNeedPlan[0]
-                        : "",
-                      isReply: !v.isReply
-                        ? ""
-                        : v.isReply.length === 2
-                        ? ""
-                        : v.isReply.length === 1
-                        ? v.isReply[0]
-                        : "",
-                      IsReview: v.IsReview.length === 1 ? v.IsReview[0] : "",
-                      interBatch: (v.interBatch1 || "") + (v.interBatch2 || "")
-                    }
+                    queryParams
                   };
                   queryInfo(data);
+                  this.projectSave({ queryParams });
                 }
               });
             }}

@@ -44,13 +44,18 @@ export default class company extends PureComponent {
   }
 
   companyList = (
-    params = { isBuild: true, SkipCount: 0, MaxResultCount: 10 }
+    payload = {
+      isBuild: true,
+      SkipCount: 0,
+      MaxResultCount: 10,
+      IsGetProject: true
+    }
   ) => {
     const { dispatch } = this.props;
     this.setState({ loading: true });
     dispatch({
       type: "company/companyList",
-      payload: params,
+      payload,
       callback: (success, error, result) => {
         const pagination = { ...this.state.pagination };
         pagination.total = result.totalCount;
@@ -79,7 +84,8 @@ export default class company extends PureComponent {
       isBuild: true,
       SkipCount: (pagination.current - 1) * pagination.pageSize,
       MaxResultCount: pagination.pageSize,
-      Name: filters.name
+      Name: filters.name,
+      IsGetProject: true,
     });
   };
 

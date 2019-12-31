@@ -225,8 +225,10 @@ export default class ProjectListTable extends PureComponent {
       }
     }
   });
+
   // 项目合并按钮
   mergeProject = () => {
+    console.log("筛选页面参数", this.props.queryParams);
     const { selectedRows } = this.state;
     if (selectedRows.length >= 2) {
       this.showModal(true);
@@ -244,6 +246,11 @@ export default class ProjectListTable extends PureComponent {
       modalVisible: status
     });
   };
+
+  queryReset = () => {
+    console.log("筛选页面重置");
+  };
+  
   render() {
     const {
       projectTableList,
