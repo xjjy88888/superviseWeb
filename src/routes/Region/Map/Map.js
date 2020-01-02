@@ -4065,12 +4065,12 @@ export default class RegionMap extends PureComponent {
           showVideoMonitor={v => this.VideoMonitor.show(v)}
           showProjectList={v => this.ProjectList.show(v)}
         />
-        {showProjectBigTable && (
+        {showProjectBigTable ? (
           <ProjectList
             link={t => (this.ProjectList = t)}
             showProjectDetail={v => this.Sidebar.showProjectDetail(v)}
           />
-        )}
+        ) : null}
 
         <SidebarDetail mapLocation={this.mapLocation} />
         <Tool link={t => (this.Tool = t)} />

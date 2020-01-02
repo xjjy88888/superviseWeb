@@ -1122,6 +1122,18 @@ export default class siderbar extends PureComponent {
       }
     });
   };
+  // 点击图标，展示项目列表表格页
+  async onShowProjectList() {
+    const { showProjectList } = this.props;
+    // await this.props.dispatch({
+    //   type: "project/save",
+    //   payload: {
+    //     showProjectBigTable: true
+    //   }
+    // });
+
+    await showProjectList();
+  }
 
   showProjectDetail = id => {
     this.setState({
@@ -1137,7 +1149,7 @@ export default class siderbar extends PureComponent {
 
   render() {
     const {
-      showProjectList,
+      // showProjectList,
       switchData,
       mapLocation,
       switchInterpret,
@@ -1453,13 +1465,7 @@ export default class siderbar extends PureComponent {
         <Icon
           type="right"
           className={styles["show-project-list"]}
-          onClick={() => {
-            // this.setState({
-            //   show: false
-            // });
-
-            showProjectList();
-          }}
+          onClick={this.onShowProjectList.bind(this)}
         />
         <Icon
           type={show ? "left" : "right"}

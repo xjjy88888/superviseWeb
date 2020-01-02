@@ -53,6 +53,15 @@ export default class ProjectListTable extends PureComponent {
 
     this.getProjectTableList({ MaxResultCount: 20 });
   }
+  componentDidUpdate(prevProps) {
+    const { queryParams } = this.props;
+    if (prevProps.queryParams !== queryParams) {
+      queryParams.ProjectLevel = queryParams.ProjectLevel.length
+        ? queryParams.ProjectLevel.join(",")
+        : ``;
+      this.getProjectTableList({ ...queryParams, MaxResultCount: 20 });
+    }
+  }
   componentWillUnmount() {
     this.onWindowResize &&
       window.removeEventListener("resize", this.onWindowResize);
@@ -69,10 +78,12 @@ export default class ProjectListTable extends PureComponent {
       callback: (success, res) => {
         if (success) {
           this.setState({
-            loading: false,
             pagination: { ...this.state.pagination, total: res.totalCount }
           });
         }
+        this.setState({
+          loading: false
+        });
       }
     });
   };
@@ -156,8 +167,11 @@ export default class ProjectListTable extends PureComponent {
     const { dispatch, queryParams } = this.props;
     let Sorting = ``;
     if (sorter.columnKey) {
+      console.log(sorter.columnKey === "projectName");
+      const key =
+        sorter.columnKey === "projectName" ? "Name" : sorter.columnKey;
       Sorting =
-        sorter.columnKey + (sorter.order === "descend" ? " desc" : " asc");
+        "ProjectBase." + key + (sorter.order === "descend" ? " desc" : " asc");
     }
     console.log(filters);
 
@@ -400,6 +414,7 @@ export default class ProjectListTable extends PureComponent {
         key: "productDepartmentName",
         width: 200,
         fixed: "left",
+        sorter: true,
         ...this.getColumnSearchProps("productDepartmentName")
       },
       {
@@ -407,6 +422,7 @@ export default class ProjectListTable extends PureComponent {
         dataIndex: "replyDepartmentName",
         key: "replyDepartmentName",
         width: 200,
+        sorter: true,
         ...this.getColumnSearchProps("replyDepartmentName")
       },
       {
