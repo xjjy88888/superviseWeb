@@ -4,7 +4,7 @@ const isLocal = l.hostname === "localhost";
 
 console.log(`%c当前版本：v2.0.38`, "color:green;font-size:30px");
 
-console.log(isLocal ? "本地环境" : isFormal ? "正式环境" : "测试环境");
+// console.log(isLocal ? "本地环境" : isFormal ? "正式环境" : "测试环境");
 
 const domain = isLocal
   ? "http://183.6.178.124:8001/stbct/"
@@ -120,6 +120,9 @@ const config = {
 
     // 项目编辑
     projectUpdateUrl: `${domainApi}Project/Update`,
+
+    // 项目查处
+    projectExamineUrl: `${domainApi}Project/Investigate`,
 
     // 项目删除
     projectDeleteUrl: `${domainApi}Project/Delete`,

@@ -25,7 +25,7 @@ export default {
         us_name: '请登录'
       }
     ],
-    dicList: [],
+    dictList: [],
     departSelectList: [],
     basinOrganList: [],
     departList: [],
@@ -83,13 +83,13 @@ export default {
         data: {
           success,
           error,
-          result: { items: dicList }
+          result: { items: dictList }
         }
       } = yield call(dictApi, payload);
       if (success) {
         yield put({
           type: 'save',
-          payload: { dicList }
+          payload: { dictList }
         });
       } else {
         notification['error']({

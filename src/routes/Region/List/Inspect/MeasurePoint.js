@@ -80,10 +80,10 @@ export default class measurePoint extends PureComponent {
   }
   dictList = type => {
     const {
-      user: { dicList }
+      user: { dictList }
     } = this.props;
     if (type) {
-      return dicList.filter(item => {
+      return dictList.filter(item => {
         return item.dictTypeName === type;
       });
     } else {

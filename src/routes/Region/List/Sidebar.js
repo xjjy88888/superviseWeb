@@ -795,7 +795,7 @@ export default class siderbar extends PureComponent {
   };
 
   hide = () => {
-    const { showInspect, showVideoMonitor } = this.props;
+    const { showInspect, showVideoMonitor, hideExamine } = this.props;
     emitter.emit("emptyPoint");
     emitter.emit("showSiderbarDetail", {
       show: false
@@ -830,6 +830,7 @@ export default class siderbar extends PureComponent {
     showVideoMonitor({
       show: false
     });
+    hideExamine();
   };
   // 保存当前活跃的menu的key等信息
   saveCurrentPageInfo = key => {
@@ -990,10 +991,10 @@ export default class siderbar extends PureComponent {
 
   getDictValue = id => {
     const {
-      user: { dicList }
+      user: { dictList }
     } = this.props;
     if (id) {
-      const filter = dicList.filter(item => {
+      const filter = dictList.filter(item => {
         return item.id === id;
       });
       return filter.map(item => item.dictTableValue).join(",");
@@ -1004,10 +1005,10 @@ export default class siderbar extends PureComponent {
 
   dictList = type => {
     const {
-      user: { dicList }
+      user: { dictList }
     } = this.props;
     if (type) {
-      return dicList.filter(item => {
+      return dictList.filter(item => {
         return item.dictTypeName === type;
       });
     } else {
@@ -1149,6 +1150,7 @@ export default class siderbar extends PureComponent {
 
   render() {
     const {
+      showExamine,
       // showProjectList,
       switchData,
       mapLocation,
@@ -1718,6 +1720,7 @@ export default class siderbar extends PureComponent {
               display: showPoint ? "none" : "inline"
             }}
             onClick={() => {
+              this.hide();
               const { key, showQuery } = this.state;
               this.setState({ showQuery: !showQuery });
               emitter.emit("showSiderbarDetail", {
@@ -2379,7 +2382,7 @@ export default class siderbar extends PureComponent {
                     header={
                       <b
                         onClick={() => {
-                          console.log("项目查处");
+                          showExamine(projectItem);
                         }}
                       >
                         项目查处

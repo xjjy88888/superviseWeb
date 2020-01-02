@@ -25,6 +25,7 @@ import ProblemPoint from "../List/Inspect/ProblemPoint";
 import MeasurePoint from "../List/Inspect/MeasurePoint";
 import ProjectDetail from "../List/ProjectDetail";
 import VideoMonitor from "../List/Expand/VideoMonitor";
+import Examine from "../List/Expand/Examine";
 import HistoryPlay from "./HistoryPlay";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -625,12 +626,12 @@ export default class RegionMap extends PureComponent {
 
   // 项目监管请求参数
   queryProjectFilter = payload => {
-    console.log("queryProjectFilter", payload);
+    // console.log("queryProjectFilter", payload);
     this.setState({
       payload: payload
     });
     const { switchDataModal } = this.state;
-    console.log("switchDataModal", switchDataModal);
+    // console.log("switchDataModal", switchDataModal);
     if (!switchDataModal) {
       const { projectSymbolValue } = this.state;
       if (map) {
@@ -840,7 +841,7 @@ export default class RegionMap extends PureComponent {
       userconfig.layersControl.addOverlay(userconfig.spotWmsLayer, "扰动图斑");
       userconfig.layersControl.addOverlay(
         userconfig.siteSpotWmsLayer,
-        "现场创建图斑"
+        "现场图斑"
       );
     }
     //显示项目红线、扰动图斑图层
@@ -2944,7 +2945,7 @@ export default class RegionMap extends PureComponent {
     measureControl.addTo(map);
     //判断地图初始化是否项目监管状态
     const { switchDataModal } = this.state;
-    console.log("switchDataModal2675", switchDataModal);
+    // console.log("switchDataModal2675", switchDataModal);
     if (!switchDataModal) {
       userconfig.projectWmsLayer.setOpacity(0);
       userconfig.spotWmsLayer.setOpacity(0);
@@ -3079,7 +3080,7 @@ export default class RegionMap extends PureComponent {
       )]: districtBoundLayer,
       项目红线: userconfig.projectWmsLayer,
       扰动图斑: userconfig.spotWmsLayer,
-      现场创建图斑: userconfig.siteSpotWmsLayer
+      现场图斑: userconfig.siteSpotWmsLayer
     });
     //底图切换控件
     const layersControl = L.control
@@ -4063,6 +4064,8 @@ export default class RegionMap extends PureComponent {
           showInspect={v => this.Inspect.show(v)}
           videoMonitorLocation={this.videoMonitorLocation}
           showVideoMonitor={v => this.VideoMonitor.show(v)}
+          showExamine={v => this.Examine.show(v)}
+          hideExamine={() => this.Examine.hide()}
           showProjectList={v => this.ProjectList.show(v)}
         />
         {showProjectBigTable ? (
@@ -4086,6 +4089,7 @@ export default class RegionMap extends PureComponent {
         <Sparse />
         <Panorama />
         <VideoMonitor link={t => (this.VideoMonitor = t)} />
+        <Examine link={t => (this.Examine = t)} />
         <ProjectDetail />
         <Inspect link={t => (this.Inspect = t)} />
         <ProblemPoint />

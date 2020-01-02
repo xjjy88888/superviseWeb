@@ -108,6 +108,18 @@ export async function projectCreateUpdateApi(params) {
   );
 }
 
+// 项目查处
+export async function projectExamineApi(params) {
+  return request(config.url.projectExamineUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify(params)
+  });
+}
+
 // 项目删除
 export async function projectDeleteApi(params) {
   return request(`${config.url.projectDeleteUrl}?id=${params.id}`, {

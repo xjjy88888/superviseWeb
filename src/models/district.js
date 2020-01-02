@@ -28,11 +28,12 @@ export default {
       const {
         data: { success, error, result }
       } = yield call(districtTreeApi, payload);
+      // console.log("result", result.children);
       const districtList = treeToList(result);
       const district = result.children.map(item => {
         return {
           ...item,
-          children: item.children.map(ite => {
+          children: (item.children || []).map(ite => {
             return { ...ite, children: ite.children || [] };
           })
         };

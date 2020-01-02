@@ -19,7 +19,8 @@ import {
   projectUnArchiveApi,
   projectUnbindSpotApi,
   projectArchiveApi,
-  projectSuperviseCreateUpdateApi
+  projectSuperviseCreateUpdateApi,
+  projectExamineApi
 } from "../services/httpApi";
 
 export default {
@@ -348,12 +349,22 @@ export default {
       });
       yield put({ type: "save", payload: { obj } });
       if (callback) callback(obj);
+    },
+
+    *projectExamine({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(projectExamineApi, payload);
+      notification[success ? "success" : "error"]({
+        message: success ? "项目查处成功" : "项目查处失败"
+      });
+      if (callback) callback(success);
     }
   },
 
   reducers: {
     save(state, action) {
-      console.log("...action.payload=========", action);
+      // console.log("...action.payload=========", action);
       return {
         ...state,
         ...action.payload

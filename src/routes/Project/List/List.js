@@ -264,11 +264,11 @@ export default class ProjectList extends PureComponent {
 
   getDictLabel = id => {
     const {
-      user: { dicList }
+      user: { dictList }
     } = this.props;
     let result = ``;
     if (id) {
-      const filter = dicList.filter(item => item.id === id);
+      const filter = dictList.filter(item => item.id === id);
       result = filter.map(item => item.dictTableValue).join(',');
     }
     return result;
@@ -276,9 +276,9 @@ export default class ProjectList extends PureComponent {
 
   getDictList = type => {
     const {
-      user: { dicList }
+      user: { dictList }
     } = this.props;
-    const filter = dicList.filter(item => item.dictTypeName === type);
+    const filter = dictList.filter(item => item.dictTypeName === type);
     const result = filter.map(i => {
       return {
         text: i.dictTableValue,

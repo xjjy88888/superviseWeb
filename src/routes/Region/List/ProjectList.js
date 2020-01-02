@@ -110,18 +110,18 @@ export default class ProjectListTable extends PureComponent {
     jQuery("#ProjectList").css({ left: 0 });
   }
   getDictLabel = id => {
-    const { dicList } = this.props;
+    const { dictList } = this.props;
     let result = ``;
     if (id) {
-      const filter = dicList.filter(item => item.id === id);
+      const filter = dictList.filter(item => item.id === id);
       result = filter.map(item => item.dictTableValue).join(",");
     }
     return result;
   };
 
   getDictList = type => {
-    const { dicList } = this.props;
-    const filter = dicList.filter(item => item.dictTypeName === type);
+    const { dictList } = this.props;
+    const filter = dictList.filter(item => item.dictTypeName === type);
     const result = filter.map(i => {
       return {
         text: i.dictTableValue,

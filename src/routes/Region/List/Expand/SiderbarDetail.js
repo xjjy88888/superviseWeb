@@ -1,6 +1,7 @@
 /* eslint-disable array-callback-return */
 import React, { PureComponent } from "react";
 import { createForm } from "rc-form";
+import moment from "moment";
 import { connect } from "dva";
 import {
   Icon,
@@ -17,11 +18,10 @@ import {
   message
 } from "antd";
 import locale from "antd/lib/date-picker/locale/zh_CN";
-import emitter from "../../../../utils/event";
-import config from "../../../../config";
-import { getFile, accessToken } from "../../../../utils/util";
-import moment from "moment";
 import Spins from "../../../../components/Spins";
+import config from "../../../../config";
+import emitter from "../../../../utils/event";
+import { getFile, accessToken } from "../../../../utils/util";
 
 let self;
 const { TextArea } = Input;
@@ -243,10 +243,10 @@ export default class siderbarDetail extends PureComponent {
 
   dictList = type => {
     const {
-      user: { dicList }
+      user: { dictList }
     } = this.props;
     if (type) {
-      return dicList.filter(item => {
+      return dictList.filter(item => {
         return item.dictTypeName === type;
       });
     } else {
@@ -256,10 +256,10 @@ export default class siderbarDetail extends PureComponent {
 
   getDictKey = (value, type) => {
     const {
-      user: { dicList }
+      user: { dictList }
     } = this.props;
     if (value) {
-      const filter = dicList.filter(item => {
+      const filter = dictList.filter(item => {
         return item.dictTypeName === type && item.dictTableValue === value;
       });
       return filter.map(item => item.id).join(",");

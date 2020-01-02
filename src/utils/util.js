@@ -1,6 +1,7 @@
 /* eslint-disable array-callback-return */
 import moment from "moment";
 import { EXIF } from "exif-js";
+import { message } from "antd";
 import emitter from "./event";
 import jQuery from "jquery";
 import bigInt from "big-integer";
@@ -224,6 +225,32 @@ const localStorageGet = name => {
   return result;
 };
 
+const getDictList = (v, list) => {
+  const filter = list.filter(item => item.dictTypeName === v);
+  const result = filter.map(i => {
+    return {
+      label: i.dictTableValue,
+      value: i.id
+    };
+  });
+  return result;
+};
+
+const getLabel = (v = "", list = [], label = "label", value = "value") => {
+  if (!v) {
+    return "";
+  }
+  const result = list.filter(i => i[value] === v);
+  // console.log(v, list, result);
+  return result.length ? result[0][label] : "";
+};
+
+const formErrorMsg = v => {
+  const list = Object.values(v);
+  // console.log(list);
+  message.warning(list[0].errors[0].message);
+};
+
 export {
   dateFormat,
   dateInitFormat,
@@ -236,5 +263,8 @@ export {
   inspectFormData,
   getUrl,
   localStorageSet,
-  localStorageGet
+  localStorageGet,
+  getDictList,
+  getLabel,
+  formErrorMsg
 };

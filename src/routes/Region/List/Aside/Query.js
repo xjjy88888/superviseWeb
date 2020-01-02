@@ -53,11 +53,11 @@ export default class Query extends PureComponent {
       yearList.push(i);
     }
     this.eventEmitter = emitter.addListener("showQuery", v => {
-      console.log(`showQuery`, v);
       this.setState({
         show: v.show
       });
       if (v.show) {
+        console.log(`showQuery`, v);
         this.setState({
           type: v.type,
           isProjectSupervise: v.isProjectSupervise
@@ -89,10 +89,10 @@ export default class Query extends PureComponent {
 
   getDictList = type => {
     const {
-      user: { dicList }
+      user: { dictList }
     } = this.props;
     if (type) {
-      const filter = dicList.filter(item => {
+      const filter = dictList.filter(item => {
         return item.dictTypeName === type;
       });
       return filter.map(item => item.dictTableValue);
