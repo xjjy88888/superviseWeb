@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 import { Icon, Button, Radio, notification, Spin } from "antd";
-import emitter from "../../../utils/event";
+import emitter from "../../../../utils/event";
 import "leaflet/dist/leaflet.css";
 import echarts from "echarts/lib/echarts";
 import "echarts";

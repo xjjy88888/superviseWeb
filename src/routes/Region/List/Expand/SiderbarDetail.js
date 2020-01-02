@@ -17,11 +17,11 @@ import {
   message
 } from "antd";
 import locale from "antd/lib/date-picker/locale/zh_CN";
-import emitter from "../../../utils/event";
-import config from "../../../config";
-import { getFile, accessToken } from "../../../utils/util";
+import emitter from "../../../../utils/event";
+import config from "../../../../config";
+import { getFile, accessToken } from "../../../../utils/util";
 import moment from "moment";
-import Spins from "../../../components/Spins";
+import Spins from "../../../../components/Spins";
 
 let self;
 const { TextArea } = Input;

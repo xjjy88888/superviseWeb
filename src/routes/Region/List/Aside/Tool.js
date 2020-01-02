@@ -11,11 +11,11 @@ import {
   Upload,
   Spin
 } from "antd";
-import emitter from "../../../utils/event";
+import emitter from "../../../../utils/event";
 import "leaflet/dist/leaflet.css";
 import "echarts";
-import config from "../../../config";
-import { accessToken, dateFormat } from "../../../utils/util";
+import config from "../../../../config";
+import { accessToken, dateFormat } from "../../../../utils/util";
 
 const url = config.download;
 

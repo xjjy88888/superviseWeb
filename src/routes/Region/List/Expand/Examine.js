@@ -3,9 +3,9 @@ import React, { PureComponent } from "react";
 import { createForm } from "rc-form";
 import { connect } from "dva";
 import { Icon, Button, Input, Form, Modal, Typography, message } from "antd";
-import emitter from "../../../utils/event";
+import emitter from "../../../../utils/event";
 import "leaflet/dist/leaflet.css";
-import Spins from "../../../components/Spins";
+import Spins from "../../../../components/Spins";
 
 let self;
 const { Text } = Typography;

@@ -2377,6 +2377,18 @@ export default class siderbar extends PureComponent {
                   </Collapse.Panel>
                   <Collapse.Panel
                     header={
+                      <b
+                        onClick={() => {
+                          console.log("项目查处");
+                        }}
+                      >
+                        项目查处
+                      </b>
+                    }
+                    key="9"
+                  ></Collapse.Panel>
+                  <Collapse.Panel
+                    header={
                       <b>
                         检查表：{inspectList.length}
                         <Icon
