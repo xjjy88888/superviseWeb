@@ -7,6 +7,10 @@ export default {
   state: {
     siderBarPageInfo: {
       activeMenu: ""
+    },
+    mergeProjectModalInfo: {
+      tableDataSource: [],
+      tableSelectedRowKeys: []
     }
   },
 

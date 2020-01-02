@@ -102,10 +102,10 @@ export default class Query extends PureComponent {
   };
 
   projectSave = payload => {
-    const { dispatch } = this.props;
+    const { dispatch, queryParams } = this.props;
     dispatch({
       type: "project/projectSave",
-      payload
+      payload: { queryParams: { ...queryParams, ...payload } }
     });
   };
 
@@ -218,7 +218,7 @@ export default class Query extends PureComponent {
                     queryParams
                   };
                   queryInfo(data);
-                  this.projectSave({ queryParams });
+                  this.projectSave(queryParams);
                 }
               });
             }}

@@ -26,6 +26,7 @@
     "esri-leaflet": "^2.3.0",
     "events": "^3.0.0",
     "exif-js": "^2.3.0",
+    "history": "^4.10.1",
     "jquery": "^3.4.1",
     "leaflet": "^1.4.0",
     "leaflet-area-select-npm": "^2.0.1",

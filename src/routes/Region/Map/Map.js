@@ -3144,7 +3144,9 @@ export default class RegionMap extends PureComponent {
       map.removeLayer(addGraphLayer);
       this.setState({ addGraphLayer: null });
     }
-    map.pm.disableDraw("Polygon");
+    if (map && map.pm && map.pm.disableDraw) {
+      map.pm.disableDraw("Polygon");
+    }
   };
   /*
    * 取消编辑图形
@@ -4064,7 +4066,10 @@ export default class RegionMap extends PureComponent {
           showProjectList={v => this.ProjectList.show(v)}
         />
         {showProjectBigTable && (
-          <ProjectList link={t => (this.ProjectList = t)} />
+          <ProjectList
+            link={t => (this.ProjectList = t)}
+            showProjectDetail={v => this.Sidebar.showProjectDetail(v)}
+          />
         )}
 
         <SidebarDetail mapLocation={this.mapLocation} />

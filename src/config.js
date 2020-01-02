@@ -104,7 +104,7 @@ const config = {
     loginUrl: `${domain}api/TokenAuth/Authenticate`,
 
     // 项目列表---表格展示
-    projectTableListUrl: `${domainApi}RegionalSupervisionPhone/GetProjectList`,
+    projectTableListUrl: `${domainApi}Project/GetListAll`,
 
     // 项目列表
     projectListUrl: `${domainApi}Project/GetAllByPost`,

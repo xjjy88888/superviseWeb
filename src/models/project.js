@@ -41,7 +41,8 @@ export default {
       }
     },
     departSelectList: [],
-    projectListAdd: []
+    projectListAdd: [],
+    queryParams: {}
   },
 
   subscriptions: {
@@ -352,7 +353,11 @@ export default {
 
   reducers: {
     save(state, action) {
-      return { ...state, ...action.payload };
+      console.log("...action.payload=========", action);
+      return {
+        ...state,
+        ...action.payload
+      };
     }
   }
 };

@@ -1123,6 +1123,18 @@ export default class siderbar extends PureComponent {
     });
   };
 
+  showProjectDetail = id => {
+    this.setState({
+      showProjectDetail: true,
+      projectEdit: false,
+      isProjectUpdate: true,
+      previewVisible_min_left: false,
+      projectFileList: []
+    });
+    this.queryProjectById(id);
+    this.queryProjectInfo(id);
+  };
+
   render() {
     const {
       showProjectList,
@@ -1328,15 +1340,7 @@ export default class siderbar extends PureComponent {
                   resetFields();
                   //编辑1
                   if (key === "project") {
-                    this.setState({
-                      showProjectDetail: true,
-                      projectEdit: false,
-                      isProjectUpdate: true,
-                      previewVisible_min_left: false,
-                      projectFileList: []
-                    });
-                    this.queryProjectById(item.id);
-                    this.queryProjectInfo(item.id);
+                    this.showProjectDetail(item.id);
                   } else {
                     emitter.emit("showSiderbarDetail", {
                       show: key !== "project",
