@@ -387,7 +387,7 @@ export default class ProjectListTable extends PureComponent {
         siderBarPageInfo: { ...siderBarPageInfo, currentProjectId: val }
       }
     });
-    jQuery("#ProjectList").css({ left: 350 });
+    jQuery("#ProjectList").css({ left: 400 });
     console.log(val);
   };
 

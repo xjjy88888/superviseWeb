@@ -161,16 +161,18 @@ export default class siderbar extends PureComponent {
     } else if (
       prevProps.commonModel.siderBarPageInfo.currentProjectId !==
         currentProjectId &&
-      currentProjectId !== "" &&
-      prevProps.commonModel.siderBarPageInfo.currentProjectId !== ""
+      currentProjectId !== ""
+      // &&
+      // prevProps.commonModel.siderBarPageInfo.currentProjectId !== ""
     ) {
       this.setState({ showProjectDetail: true, clickId: currentProjectId });
       this.queryProjectById(currentProjectId);
       this.queryProjectInfo(currentProjectId);
     } else if (
       prevProps.commonModel.siderBarPageInfo.currentSpotId !== currentSpotId &&
-      currentSpotId !== "" &&
-      prevProps.commonModel.siderBarPageInfo.currentSpotId !== ""
+      currentSpotId !== ""
+      // &&
+      // prevProps.commonModel.siderBarPageInfo.currentSpotId !== ""
     ) {
       emitter.emit("showSiderbarDetail", {
         show: true,
@@ -839,7 +841,23 @@ export default class siderbar extends PureComponent {
   };
 
   hide = () => {
-    const { showInspect, showVideoMonitor, hideExamine } = this.props;
+    const {
+      showInspect,
+      showVideoMonitor,
+      hideExamine,
+      dispatch,
+      commonModel: { siderBarPageInfo }
+    } = this.props;
+    dispatch({
+      type: "commonModel/save",
+      payload: {
+        siderBarPageInfo: {
+          ...siderBarPageInfo,
+          currentProjectId: "",
+          currentSpotId: ""
+        }
+      }
+    });
     emitter.emit("emptyPoint");
     emitter.emit("showSiderbarDetail", {
       show: false
@@ -878,11 +896,15 @@ export default class siderbar extends PureComponent {
   };
   // 保存当前活跃的menu的key等信息
   saveCurrentPageInfo = key => {
-    const { dispatch } = this.props;
+    const {
+      dispatch,
+      commonModel: { siderBarPageInfo }
+    } = this.props;
     dispatch({
       type: "commonModel/save",
       payload: {
         siderBarPageInfo: {
+          ...siderBarPageInfo,
           activeMenu: key
         }
       }
@@ -895,18 +917,12 @@ export default class siderbar extends PureComponent {
     this.saveCurrentPageInfo(k);
     if (k === "project") {
       this.queryProject({ SkipCount: 0 });
-      emitter.emit("showSiderbarDetail", {
-        show: false,
-        id: ""
-      });
     } else if (k === "spot") {
       this.querySpot({ SkipCount: 0 });
     } else {
       this.queryPoint({ SkipCount: 0 });
     }
     this.setState({
-      showProjectDetail: false,
-      // clickId:''
       showQuery: false,
       showCheck: false,
       ShowArchive: false,
@@ -1405,13 +1421,14 @@ export default class siderbar extends PureComponent {
                     dispatch
                   } = this.props;
                   this.setState({ clickId: item.id });
-                  if (key === "project") {
+                  if (key === "project" || key === "spot") {
                     dispatch({
                       type: "commonModel/save",
                       payload: {
                         siderBarPageInfo: {
                           ...siderBarPageInfo,
-                          currentProjectId: item.id
+                          currentProjectId: key === "project" ? item.id : "",
+                          currentSpotId: key === "spot" ? item.id : ""
                         }
                       }
                     });
@@ -1919,15 +1936,9 @@ export default class siderbar extends PureComponent {
               <Icon
                 type={"left"}
                 style={{
-                  fontSize: 30,
-                  position: "absolute",
-                  right: -50,
-                  top: "48%",
-                  backgroundColor: "rgba(0, 0, 0, 0.5)",
-                  borderRadius: "50%",
-                  padding: 10,
-                  cursor: "pointer"
+                  top: "48%"
                 }}
+                className={styles["show-project-list"]}
                 onClick={() => {
                   this.setState({ showProblem: false });
                   emitter.emit("showProblem", {

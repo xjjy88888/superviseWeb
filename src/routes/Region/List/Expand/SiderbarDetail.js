@@ -23,6 +23,8 @@ import config from "../../../../config";
 import emitter from "../../../../utils/event";
 import { getFile, accessToken } from "../../../../utils/util";
 
+import styles from "../style/sidebar.less";
+
 let self;
 const { TextArea } = Input;
 const formItemLayout = {
@@ -541,16 +543,10 @@ export default class siderbarDetail extends PureComponent {
         <Spins show={showSpin} />
         <Icon
           type="left"
+          className={styles["show-project-list"]}
           style={{
-            fontSize: 30,
             display: show ? "block" : "none",
-            position: `absolute`,
-            right: -50,
-            top: `48%`,
-            backgroundColor: `rgba(0, 0, 0, 0.5)`,
-            borderRadius: `50%`,
-            padding: 10,
-            cursor: `pointer`
+            top: `48%`
           }}
           onClick={() => {
             this.setState({ show: !show, showDetail: false });

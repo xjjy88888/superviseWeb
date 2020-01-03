@@ -1,13 +1,16 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
 import jQuery from "jquery";
-import { Button, Table, Input, Icon, Tooltip } from "antd";
+import { Button, Table, Input, Icon, Tooltip, DatePicker } from "antd";
 
 import styles from "./style/ProjectList.less";
 
-@connect(({ spot, commonModel }) => ({
+const { RangePicker } = DatePicker;
+
+@connect(({ spot, commonModel, user }) => ({
   ...spot,
-  ...commonModel
+  ...commonModel,
+  ...user
 }))
 export default class SpotListTable extends PureComponent {
   constructor(props) {
@@ -46,8 +49,30 @@ export default class SpotListTable extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: "spot/getSpotTableList",
-      payload: parmas
+      payload: parmas,
+      callback: (success, res) => {
+        if (success) {
+          this.setState({
+            pagination: { ...this.state.pagination, total: res.totalCount }
+          });
+        }
+        this.setState({
+          loading: false
+        });
+      }
     });
+  };
+  // 获取字典对应数据
+  getDictList = type => {
+    const { dictList } = this.props;
+    const filter = dictList.filter(item => item.dictTypeName === type);
+    const result = filter.map(i => {
+      return {
+        text: i.dictTableValue,
+        value: i.dictTableValue
+      };
+    });
+    return result;
   };
 
   // 清除过滤条件
@@ -78,16 +103,56 @@ export default class SpotListTable extends PureComponent {
 
     let Sorting = ``;
     if (sorter.columnKey) {
-      Sorting =
-        sorter.columnKey + (sorter.order === "descend" ? " desc" : " asc");
+      const key =
+        sorter.columnKey === "creationTime"
+          ? "CreationTime"
+          : sorter.columnKey === "lastModificationTime"
+          ? "LastModificationTime"
+          : sorter.columnKey;
+
+      Sorting = key + (sorter.order === "descend" ? " desc" : " asc");
     }
     // console.log(Sorting, sorter);
 
     let filterObj = {
       Sorting,
       SkipCount: (pagination.current - 1) * pagination.pageSize,
-      MaxResultCount: pagination.pageSize
+      MaxResultCount: pagination.pageSize,
+      mapNum: filters.mapNum && filters.mapNum.length ? filters.mapNum[0] : ``,
+      projectName:
+        filters.projectName && filters.projectName.length
+          ? filters.projectName[0]
+          : ``,
+      isReview:
+        filters.isReview && filters.isReview.length
+          ? filters.isReview.join(",")
+          : ``,
+      buildStatusValue:
+        filters.buildStatusValue && filters.buildStatusValue.length
+          ? filters.buildStatusValue.join(",")
+          : ``,
+      CreationTimeMin:
+        filters.creationTime && filters.creationTime.length
+          ? filters.creationTime[0]
+          : ``,
+      CreationTimeMax:
+        filters.creationTime && filters.creationTime.length > 1
+          ? filters.creationTime[1]
+          : ``,
+      LastModificationTimeMin:
+        filters.lastModificationTime && filters.lastModificationTime.length
+          ? filters.lastModificationTime[0]
+          : ``,
+      LastModificationTimeMax:
+        filters.lastModificationTime && filters.lastModificationTime.length > 1
+          ? filters.lastModificationTime[1]
+          : ``
     };
+    if (pagination && pagination.current > 1) {
+      filterObj.Count = pagination.total;
+    } else {
+      filterObj.Count && delete filterObj.Count;
+    }
     this.getSpotTableList(filterObj);
     this.setState({
       pagination,
@@ -95,6 +160,7 @@ export default class SpotListTable extends PureComponent {
       Sorting
     });
   };
+
   // 表头过滤筛选
   getColumnSearchProps = dataIndex => ({
     filterDropdown: ({
@@ -102,37 +168,68 @@ export default class SpotListTable extends PureComponent {
       selectedKeys,
       confirm,
       clearFilters
-    }) => (
-      <div style={{ padding: 8 }}>
-        <Input
-          ref={node => {
-            this.searchInput = node;
-          }}
-          value={selectedKeys[0]}
-          onChange={e =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
-          onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
-          style={{ width: 188, marginBottom: 8, display: "block" }}
-        />
-        <Button
-          type="primary"
-          onClick={() => this.handleSearch(selectedKeys, confirm)}
-          icon="search"
-          size="small"
-          style={{ width: 90, marginRight: 8 }}
-        >
-          确定
-        </Button>
-        <Button
-          onClick={() => this.handleReset(clearFilters)}
-          size="small"
-          style={{ width: 90 }}
-        >
-          重置
-        </Button>
-      </div>
-    ),
+    }) =>
+      dataIndex === "creationTime" || dataIndex === "lastModificationTime" ? (
+        <div style={{ padding: 8 }}>
+          <RangePicker
+            placeholder={["时间区间起", "时间区间止"]}
+            style={{ width: 225, display: "block" }}
+            ref={node => {
+              this.searchInput = node;
+            }}
+            onChange={(date, dateString) =>
+              setSelectedKeys(dateString ? dateString : [])
+            }
+            onPressEnter={() => confirm()}
+          />
+          <Button
+            type="primary"
+            onClick={() => confirm()}
+            icon="search"
+            size="small"
+            style={{ width: 90, marginRight: 8 }}
+          >
+            确定
+          </Button>
+          <Button
+            onClick={() => this.handleReset(clearFilters)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            重置
+          </Button>
+        </div>
+      ) : (
+        <div style={{ padding: 8 }}>
+          <Input
+            ref={node => {
+              this.searchInput = node;
+            }}
+            value={selectedKeys[0]}
+            onChange={e =>
+              setSelectedKeys(e.target.value ? [e.target.value] : [])
+            }
+            onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
+            style={{ width: 188, marginBottom: 8, display: "block" }}
+          />
+          <Button
+            type="primary"
+            onClick={() => this.handleSearch(selectedKeys, confirm)}
+            icon="search"
+            size="small"
+            style={{ width: 90, marginRight: 8 }}
+          >
+            确定
+          </Button>
+          <Button
+            onClick={() => this.handleReset(clearFilters)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            重置
+          </Button>
+        </div>
+      ),
     filterIcon: filtered => (
       <Icon type="search" style={{ color: filtered ? "#1890ff" : undefined }} />
     ),
@@ -147,7 +244,9 @@ export default class SpotListTable extends PureComponent {
     },
     onFilterDropdownVisibleChange: visible => {
       if (visible) {
-        setTimeout(() => this.searchInput.select());
+        dataIndex === "creationTime" || dataIndex === "lastModificationTime"
+          ? null
+          : setTimeout(() => this.searchInput.select());
       }
     }
   });
@@ -164,7 +263,7 @@ export default class SpotListTable extends PureComponent {
         siderBarPageInfo: { ...siderBarPageInfo, currentSpotId: val }
       }
     });
-    jQuery("#ProjectList").css({ left: 750 });
+    jQuery("#ProjectList").css({ left: 800 });
     console.log(val);
   };
   render() {
@@ -229,15 +328,15 @@ export default class SpotListTable extends PureComponent {
           }
         ]
       },
-      {
-        title: "重点监管",
-        dataIndex: "isFocus",
-        key: "isFocus",
-        width: 180
-        // fixed: "left",
-        // sorter: true,
-        // ...this.getColumnSearchProps("isFocus")
-      },
+      // {
+      //   title: "重点监管",
+      //   dataIndex: "isFocus",
+      //   key: "isFocus",
+      //   width: 180
+      //   // fixed: "left",
+      //   // sorter: true,
+      //   // ...this.getColumnSearchProps("isFocus")
+      // },
 
       {
         title: "关联项目",
@@ -291,7 +390,8 @@ export default class SpotListTable extends PureComponent {
         title: "扰动面积",
         dataIndex: "interferenceArea",
         key: "interferenceArea",
-        width: 200
+        width: 200,
+        sorter: true
       },
       {
         title: "超出防治责任范围面积（ha）",
@@ -303,25 +403,30 @@ export default class SpotListTable extends PureComponent {
         title: "建设状态",
         dataIndex: "buildStatusValue",
         key: "buildStatusValue",
-        width: 200
+        width: 200,
+        filters: this.getDictList(`建设状态`)
       },
-      {
-        title: "土壤侵蚀强度",
-        dataIndex: "soilErosionIntensity",
-        key: "soilErosionIntensity",
-        width: 200
-      },
+      // {
+      //   title: "土壤侵蚀强度",
+      //   dataIndex: "soilErosionIntensity",
+      //   key: "soilErosionIntensity",
+      //   width: 200
+      // },
       {
         title: "创建时间",
         dataIndex: "creationTime",
         key: "creationTime",
-        width: 200
+        width: 200,
+        sorter: true,
+        ...this.getColumnSearchProps("creationTime")
       },
       {
         title: "修改时间",
         dataIndex: "lastModificationTime",
         key: "lastModificationTime",
-        width: 200
+        width: 200,
+        sorter: true,
+        ...this.getColumnSearchProps("lastModificationTime")
       },
       {
         title: "问题",
@@ -362,7 +467,7 @@ export default class SpotListTable extends PureComponent {
         }
         columns={columns}
         scroll={{
-          x: 3320,
+          x: 2940,
           y: `calc(100vh - ${tableY})`
         }}
       />
