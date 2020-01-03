@@ -63,7 +63,8 @@ export default class company extends PureComponent {
           return {
             ...i,
             name: i.name || ``,
-            description: i.description || ``
+            description: i.description || ``,
+            projects: (i.project || []).map(i => i.name).join("，")
           };
         });
         this.setState({
@@ -85,7 +86,7 @@ export default class company extends PureComponent {
       SkipCount: (pagination.current - 1) * pagination.pageSize,
       MaxResultCount: pagination.pageSize,
       Name: filters.name,
-      IsGetProject: true,
+      IsGetProject: true
     });
   };
 
@@ -177,7 +178,13 @@ export default class company extends PureComponent {
       {
         title: "单位名",
         dataIndex: "name",
-        ...this.getColumnSearchProps("name")
+        ...this.getColumnSearchProps("name"),
+        width: 400
+      },
+      {
+        title: "关联项目",
+        dataIndex: "projects",
+        width: 400
       },
       {
         title: "单位资质",
@@ -202,10 +209,6 @@ export default class company extends PureComponent {
       {
         title: "传真",
         dataIndex: "fax"
-      },
-      {
-        title: "联系人id",
-        dataIndex: "contactId"
       },
       {
         title: "备注",

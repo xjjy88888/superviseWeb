@@ -59,7 +59,8 @@ export default class branch extends PureComponent {
           return {
             ...i,
             name: i.name || ``,
-            description: i.description || ``
+            description: i.description || ``,
+            projects: (i.project || []).map(i => i.name).join("，")
           };
         });
         this.setState({
@@ -172,7 +173,8 @@ export default class branch extends PureComponent {
       {
         title: "单位名",
         dataIndex: "name",
-        ...this.getColumnSearchProps("name")
+        ...this.getColumnSearchProps("name"),
+        width: 400
       },
       {
         title: "单位类型",
@@ -202,6 +204,11 @@ export default class branch extends PureComponent {
             : ""
       },
       {
+        title: "关联项目",
+        dataIndex: "projects",
+        width: 400
+      },
+      {
         title: "单位资质",
         dataIndex: "intelligence"
       },
@@ -224,10 +231,6 @@ export default class branch extends PureComponent {
       {
         title: "传真",
         dataIndex: "fax"
-      },
-      {
-        title: "联系人id",
-        dataIndex: "contactId"
       },
       {
         title: "备注",
