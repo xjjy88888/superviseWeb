@@ -59,6 +59,7 @@ export default {
       const {
         data: { success, error, result: projectTableList }
       } = yield call(projectTableListApi, payload);
+
       if (success) {
         const response = {
           items: projectTableList.items,
@@ -70,9 +71,10 @@ export default {
         notification["error"]({
           message: `查询项目列表失败：${error.message}`
         });
-        if (callback) callback(success);
+        if (callback) callback(success, projectTableList);
       }
     },
+    
     // 项目列表
     *queryProject({ payload, callback }, { call, put }) {
       const items_old = payload.items;

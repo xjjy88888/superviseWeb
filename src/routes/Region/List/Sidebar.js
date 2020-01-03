@@ -26,15 +26,18 @@ import {
   AutoComplete,
   Table,
   Collapse,
-  Typography
+  Typography,
+  Tooltip
 } from "antd";
 import locale from "antd/lib/date-picker/locale/zh_CN";
 import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
+
 import config from "../../../config";
 import { Link } from "dva/router";
 import data from "../../../data";
 import {
+  dateFormat,
   dateInitFormat,
   accessToken,
   getFile,
@@ -90,6 +93,8 @@ export default class siderbar extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
+      hover: false,
+      place: "",
       show: true,
       showCreateDepart: false,
       value: undefined,
@@ -257,7 +262,7 @@ export default class siderbar extends PureComponent {
     this.eventEmitter = emitter.addListener("projectInfoRefresh", v => {
       if (v.projectId) {
         this.queryProjectById(v.projectId);
-        this.queryProjectInfo(v.projectId,);
+        this.queryProjectInfo(v.projectId);
       }
     });
     this.eventEmitter = emitter.addListener("showCreateDepart", v => {
@@ -324,6 +329,7 @@ export default class siderbar extends PureComponent {
         });
       }
     });
+
     //search
     if (this.scrollDom) {
       this.scrollDom.addEventListener("scroll", () => {
@@ -365,12 +371,12 @@ export default class siderbar extends PureComponent {
       result: []
     });
     let queryHighlight = false;
-    for (let i in data.info) {
+    for (let i in data.queryParams) {
       if (
-        data.info[i] &&
-        (data.info[i].length ||
-          typeof data.info[i] === "number" ||
-          typeof data.info[i] === "boolean")
+        data.queryParams[i] &&
+        (data.queryParams[i].length ||
+          typeof data.queryParams[i] === "number" ||
+          typeof data.queryParams[i] === "boolean")
       ) {
         queryHighlight = true;
       }
@@ -379,7 +385,7 @@ export default class siderbar extends PureComponent {
       showCheck: false,
       sort_by: "",
       sort_key: "",
-      queryInfo: data.info,
+      queryInfo: data.queryParams,
       ShowArchive: data.ShowArchive,
       queryHighlight: queryHighlight
     });
@@ -388,21 +394,21 @@ export default class siderbar extends PureComponent {
         row_pro: 10
       });
       this.queryProject({
-        ...data.info,
+        ...data.queryParams,
         SkipCount: 0,
         ProjectName: query_pro
       });
     } else if (data.from === "spot") {
       this.setState({ row_spot: 10 });
       this.querySpot({
-        ...data.info,
+        ...data.queryParams,
         SkipCount: 0,
         MapNum: query_spot
       });
     } else {
       this.setState({ row_point: 10 });
       this.queryPoint({
-        ...data.info,
+        ...data.queryParams,
         SkipCount: 0,
         ProjectName: query_point
       });
@@ -465,6 +471,7 @@ export default class siderbar extends PureComponent {
     //   parseInt(scrollTop, 0) + 1,
     //   isBottom
     // );
+    console.log("queryInfo1", queryInfo);
     if (isBottom) {
       if (loading) {
         return;
@@ -620,6 +627,22 @@ export default class siderbar extends PureComponent {
     });
   };
 
+  dataFormat = v => {
+    console.log("dataFormat开始", v);
+    for (let i in v) {
+      if (Array.isArray(v[i])) {
+        if (i === "ReplyTime" && v[i].length) {
+          v.ReplyTimeBegin = dateFormat(v[i][0]);
+          v.ReplyTimeEnd = dateFormat(v[i][1]);
+        }
+        v[i] = v[i].join(",");
+      }
+    }
+    v.SkipCount = v.SkipCount || 0;
+    v.MaxResultCount = v.MaxResultCount || 10;
+    console.log("dataFormat结束", v);
+  };
+
   queryProject = items => {
     loading = true;
     const { polygon, key, showCheck, isProjectSupervise } = this.state;
@@ -627,6 +650,108 @@ export default class siderbar extends PureComponent {
       dispatch,
       project: { projectList }
     } = this.props;
+    // console.log("items=============", items);
+    this.dataFormat(items);
+    // eslint-disable-next-line no-unused-expressions
+    // (items.MaxResultCount = items.MaxResultCount || "10"),
+    //   (items.ReplyTimeBegin =
+    //     items.ReplyTime &&
+    //     Object.prototype.toString.call(items.ReplyTime) === "[object Array]" &&
+    //     items.ReplyTime.length > 1
+    //       ? dateFormat(items.ReplyTime[0]._d)
+    //       : ""),
+    //   (items.ReplyTimeEnd =
+    //     items.ReplyTime &&
+    //     Object.prototype.toString.call(items.ReplyTime) === "[object Array]" &&
+    //     items.ReplyTime.length > 1
+    //       ? dateFormat(items.ReplyTime[1]._d)
+    //       : ""),
+    //   (items.ProjectCate =
+    //     items.ProjectCate &&
+    //     Object.prototype.toString.call(items.ProjectCate) ===
+    //       "[object Array]" &&
+    //     items.ProjectCate.length
+    //       ? items.ProjectCate.join(",")
+    //       : items.ProjectCate && items.ProjectCate.length
+    //       ? items.ProjectCate
+    //       : ""),
+    //   (items.HasScopes =
+    //     items.HasScopes &&
+    //     Object.prototype.toString.call(items.HasScopes) === "[object Array]" &&
+    //     items.HasScopes.length
+    //       ? items.HasScopes.join(",")
+    //       : items.HasScopes && items.HasScopes.length
+    //       ? items.HasScopes
+    //       : ""),
+    //   (items.ProjectNat =
+    //     items.ProjectNat &&
+    //     Object.prototype.toString.call(items.ProjectNat) === "[object Array]" &&
+    //     items.ProjectNat.length
+    //       ? items.ProjectNat.join(",")
+    //       : items.ProjectNat && items.ProjectNat.length
+    //       ? items.ProjectNat
+    //       : ""),
+    //   (items.ProjectStatus =
+    //     items.ProjectStatus &&
+    //     Object.prototype.toString.call(items.ProjectStatus) ===
+    //       "[object Array]" &&
+    //     items.ProjectStatus.length
+    //       ? items.ProjectStatus.join(",")
+    //       : items.ProjectStatus && items.ProjectStatus.length
+    //       ? items.ProjectStatus
+    //       : ""),
+    //   (items.VecType =
+    //     items.VecType &&
+    //     Object.prototype.toString.call(items.VecType) === "[object Array]" &&
+    //     items.VecType.length
+    //       ? items.VecType.join(",")
+    //       : items.VecType && items.VecType.length
+    //       ? items.VecType
+    //       : ""),
+    //   (items.HasSpot =
+    //     items.HasSpot &&
+    //     Object.prototype.toString.call(items.HasSpot) === "[object Array]" &&
+    //     items.HasSpot.length
+    //       ? items.HasSpot.join(",")
+    //       : items.HasSpot && items.HasSpot.length
+    //       ? items.HasSpot
+    //       : ""),
+    //   (items.ProjectType =
+    //     items.ProjectType &&
+    //     Object.prototype.toString.call(items.ProjectType) ===
+    //       "[object Array]" &&
+    //     items.ProjectType.length
+    //       ? items.ProjectType.join(",")
+    //       : items.ProjectType && items.ProjectType.length
+    //       ? items.ProjectType
+    //       : ""),
+    //   (items.Compliance =
+    //     items.Compliance &&
+    //     Object.prototype.toString.call(items.Compliance) === "[object Array]" &&
+    //     items.Compliance.length
+    //       ? items.Compliance.join(",")
+    //       : items.Compliance && items.Compliance.length
+    //       ? items.Compliance
+    //       : ""),
+    //   (items.InterferenceCompliance =
+    //     items.InterferenceCompliance &&
+    //     Object.prototype.toString.call(items.InterferenceCompliance) ===
+    //       "[object Array]" &&
+    //     items.InterferenceCompliance.length
+    //       ? items.InterferenceCompliance.join(",")
+    //       : items.InterferenceCompliance && items.InterferenceCompliance.length
+    //       ? items.InterferenceCompliance
+    //       : ""),
+    //   (items.ProjectLevel =
+    //     items.ProjectLevel &&
+    //     Object.prototype.toString.call(items.ProjectLevel) ===
+    //       "[object Array]" &&
+    //     items.ProjectLevel.length
+    //       ? items.ProjectLevel.join(",")
+    //       : items.ProjectLevel && items.ProjectLevel.length
+    //       ? items.ProjectLevel
+    //       : "");
+    // console.log("new---items==============", items);
     if (isProjectSupervise) {
       this.queryProjectSupervise(items);
     } else {
@@ -839,7 +964,22 @@ export default class siderbar extends PureComponent {
       }
     });
   };
-
+  // 鼠标进入事件
+  onMouseEnter = (val, e) => {
+    // console.log("e==============", e);
+    this.setState({
+      hover: true,
+      place: val
+    });
+  };
+  // 鼠标离开事件
+  onMouseLeave = (val, e) => {
+    // console.log("e==============", e);
+    this.setState({
+      hover: false,
+      place: val
+    });
+  };
   hide = () => {
     const {
       showInspect,
@@ -1192,12 +1332,7 @@ export default class siderbar extends PureComponent {
   // 点击图标，展示项目列表表格页
   async onShowProjectList() {
     const { showProjectList } = this.props;
-    // await this.props.dispatch({
-    //   type: "project/save",
-    //   payload: {
-    //     showProjectBigTable: true
-    //   }
-    // });
+    this.setState({ hover: false });
 
     await showProjectList();
   }
@@ -1240,6 +1375,8 @@ export default class siderbar extends PureComponent {
     } = this.props;
 
     const {
+      hover,
+      place,
       show,
       showSpin,
       queryHighlight,
@@ -1548,27 +1685,43 @@ export default class siderbar extends PureComponent {
         className={styles.siderbar}
         ref={e => (this.refDom = e)}
       >
-        <Icon
-          type="right"
-          className={styles["show-project-list"]}
-          onClick={this.onShowProjectList.bind(this)}
-        />
-        <Icon
-          type={show ? "left" : "right"}
-          className={styles["show-project-list"]}
-          style={{
-            top: "48%"
-          }}
-          onClick={() => {
-            this.setState({
-              show: !show
-              //  showProjectDetail: false
-            });
-            emitter.emit("showSiderbar", {
-              show: !show
-            });
-          }}
-        />
+        <Tooltip title="展开列表">
+          <Icon
+            type="right"
+            className={`${styles["show-project-list"]} ${
+              hover && place === "top" ? styles.spec : null
+            }`}
+            style={{
+              top: hover && place === "top" ? "11%" : "12%"
+            }}
+            onMouseEnter={this.onMouseEnter.bind(this, "top")}
+            onMouseLeave={this.onMouseLeave.bind(this, "top")}
+            onClick={this.onShowProjectList.bind(this)}
+          />
+        </Tooltip>
+        <Tooltip title={`${show ? "收起" : "展开"}侧边栏`}>
+          <Icon
+            type={show ? "left" : "right"}
+            className={`${styles["show-project-list"]} ${
+              hover && place === "footer" ? styles.spec : null
+            }`}
+            style={{
+              top: hover && place === "footer" ? "47.5%" : "48.5%"
+            }}
+            onMouseEnter={this.onMouseEnter.bind(this, "footer")}
+            onMouseLeave={this.onMouseLeave.bind(this, "footer")}
+            onClick={() => {
+              this.setState({
+                show: !show,
+                hover: false
+                //  showProjectDetail: false
+              });
+              emitter.emit("showSiderbar", {
+                show: !show
+              });
+            }}
+          />
+        </Tooltip>
         <div
           style={{
             display: showProjectDetail ? "none" : "block",

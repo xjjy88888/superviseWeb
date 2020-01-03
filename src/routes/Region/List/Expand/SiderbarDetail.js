@@ -47,6 +47,7 @@ export default class siderbarDetail extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
+      hover: false,
       show: false,
       from: "spot",
       ParentId: 0,
@@ -350,7 +351,18 @@ export default class siderbarDetail extends PureComponent {
     });
     return result;
   };
-
+  // 鼠标进入事件
+  onMouseEnter = e => {
+    this.setState({
+      hover: true
+    });
+  };
+  // 鼠标离开事件
+  onMouseLeave = e => {
+    this.setState({
+      hover: false
+    });
+  };
   render() {
     const {
       mapLocation,
@@ -364,6 +376,7 @@ export default class siderbarDetail extends PureComponent {
     } = this.props;
 
     const {
+      hover,
       show,
       from,
       fromList,
@@ -534,7 +547,7 @@ export default class siderbarDetail extends PureComponent {
           backgroundColor: `#fff`,
           borderLeft: `solid 1px #ddd`,
           position: "absolute",
-          zIndex: 1000,
+          zIndex: 1001,
           top: 0,
           paddingTop: 46,
           height: "100%"
@@ -543,13 +556,17 @@ export default class siderbarDetail extends PureComponent {
         <Spins show={showSpin} />
         <Icon
           type="left"
-          className={styles["show-project-list"]}
+          className={`${styles["show-project-list"]} ${
+            hover ? styles.spec : null
+          }`}
           style={{
             display: show ? "block" : "none",
-            top: `48%`
+            top: hover ? "47.5%" : "48.5%"
           }}
+          onMouseEnter={this.onMouseEnter.bind(this)}
+          onMouseLeave={this.onMouseLeave.bind(this)}
           onClick={() => {
-            this.setState({ show: !show, showDetail: false });
+            this.setState({ show: !show, showDetail: false, hover: false });
           }}
         />
         <p

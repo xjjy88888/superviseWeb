@@ -2,6 +2,7 @@ import React, { PureComponent, ReactDOM } from "react";
 import { connect } from "dva";
 import { Link } from "dva/router";
 import jQuery from "jquery";
+import { dateFormat } from "../../../utils/util";
 import { Button, Table, PageHeader, Icon, Input, message } from "antd";
 import Spins from "../../../components/Spins";
 import SpotTable from "./SpotTable";
@@ -55,10 +56,103 @@ export default class ProjectListTable extends PureComponent {
   componentDidUpdate(prevProps) {
     const { queryParams } = this.props;
     if (prevProps.queryParams !== queryParams) {
-      queryParams.ProjectLevel = queryParams.ProjectLevel.length
-        ? queryParams.ProjectLevel.join(",")
-        : ``;
-      this.getProjectTableList({ ...queryParams, MaxResultCount: 20 });
+      console.log(queryParams);
+      (queryParams.ProjectLevel =
+        queryParams.ProjectLevel &&
+        Object.prototype.toString.call(queryParams.ProjectLevel) ===
+          "[object Array]" &&
+        queryParams.ProjectLevel.length
+          ? queryParams.ProjectLevel.join(",")
+          : queryParams.ProjectLevel
+          ? queryParams.ProjectLevel
+          : ""),
+        (queryParams.HasSpot =
+          queryParams.HasSpot &&
+          Object.prototype.toString.call(queryParams.HasSpot) ===
+            "[object Array]" &&
+          queryParams.HasSpot.length
+            ? queryParams.HasSpot.join(",")
+            : queryParams.HasSpot
+            ? queryParams.HasSpot
+            : ""),
+        (queryParams.ReplyTimeBegin =
+          queryParams.ReplyTime &&
+          Object.prototype.toString.call(queryParams.ReplyTime) ===
+            "[object Array]" &&
+          queryParams.ReplyTime.length > 1
+            ? dateFormat(queryParams.ReplyTime[0]._d)
+            : ""),
+        (queryParams.ReplyTimeEnd =
+          queryParams.ReplyTime &&
+          Object.prototype.toString.call(queryParams.ReplyTime) ===
+            "[object Array]" &&
+          queryParams.ReplyTime.length > 1
+            ? dateFormat(queryParams.ReplyTime[1]._d)
+            : ""),
+        (queryParams.ProjectCate =
+          queryParams.ProjectCate &&
+          Object.prototype.toString.call(queryParams.ProjectCate) ===
+            "[object Array]" &&
+          queryParams.ProjectCate.length
+            ? queryParams.ProjectCate.join(",")
+            : queryParams.ProjectCate
+            ? queryParams.ProjectCate
+            : ""),
+        (queryParams.HasScopes =
+          queryParams.HasScopes &&
+          Object.prototype.toString.call(queryParams.HasScopes) ===
+            "[object Array]" &&
+          queryParams.HasScopes.length
+            ? queryParams.HasScopes.join(",")
+            : queryParams.HasScopes
+            ? queryParams.HasScopes
+            : ""),
+        (queryParams.ProjectNat =
+          queryParams.ProjectNat &&
+          Object.prototype.toString.call(queryParams.ProjectNat) ===
+            "[object Array]" &&
+          queryParams.ProjectNat.length
+            ? queryParams.ProjectNat.join(",")
+            : queryParams.ProjectNat
+            ? queryParams.ProjectNat
+            : ""),
+        (queryParams.ProjectStatus =
+          queryParams.ProjectStatus &&
+          Object.prototype.toString.call(queryParams.ProjectStatus) ===
+            "[object Array]" &&
+          queryParams.ProjectStatus.length
+            ? queryParams.ProjectStatus.join(",")
+            : queryParams.ProjectStatus
+            ? queryParams.ProjectStatus
+            : ""),
+        (queryParams.VecType =
+          queryParams.VecType &&
+          Object.prototype.toString.call(queryParams.VecType) ===
+            "[object Array]" &&
+          queryParams.VecType.length
+            ? queryParams.VecType.join(",")
+            : queryParams.VecType
+            ? queryParams.VecType
+            : ""),
+        (queryParams.ProjectType =
+          queryParams.ProjectType &&
+          Object.prototype.toString.call(queryParams.ProjectType) ===
+            "[object Array]" &&
+          queryParams.ProjectType.length
+            ? queryParams.ProjectType.join(",")
+            : queryParams.ProjectType
+            ? queryParams.ProjectType
+            : ""),
+        (queryParams.Compliance =
+          queryParams.Compliance &&
+          Object.prototype.toString.call(queryParams.Compliance) ===
+            "[object Array]" &&
+          queryParams.Compliance.length
+            ? queryParams.Compliance.join(",")
+            : queryParams.Compliance
+            ? queryParams.Compliance
+            : ""),
+        this.getProjectTableList({ ...queryParams, MaxResultCount: 20 });
     }
   }
   componentWillUnmount() {
@@ -91,14 +185,14 @@ export default class ProjectListTable extends PureComponent {
       type: "project/getProjectTableList",
       payload: parmas,
       callback: (success, res) => {
+        this.setState({
+          loading: false
+        });
         if (success) {
           this.setState({
             pagination: { ...this.state.pagination, total: res.totalCount }
           });
         }
-        this.setState({
-          loading: false
-        });
       }
     });
   };
@@ -203,7 +297,7 @@ export default class ProjectListTable extends PureComponent {
       MaxResultCount: pagination.pageSize,
       ProjectStatus:
         filters.projectStatusId && filters.projectStatusId.length
-          ? filters.projectStatusId.map(v => v).join(",")
+          ? filters.projectStatusId.join(",")
           : "",
       ProjectName:
         filters.projectName && filters.projectName.length
@@ -264,15 +358,16 @@ export default class ProjectListTable extends PureComponent {
     }
     console.log("filterObj==========", filterObj);
     // 先将filterObj存到props中，供两表关联查询
-    dispatch({
-      type: "project/projectSave",
-      payload: { queryParams: { ...queryParams, ...filterObj } }
-    });
+
     this.getProjectTableList({ ...queryParams, ...filterObj });
     this.setState({
       pagination,
       filterObj,
       Sorting
+    });
+    dispatch({
+      type: "project/projectSave",
+      payload: { queryParams: { ...queryParams, ...filterObj } }
     });
   };
   // 表头过滤筛选
@@ -387,7 +482,7 @@ export default class ProjectListTable extends PureComponent {
         siderBarPageInfo: { ...siderBarPageInfo, currentProjectId: val }
       }
     });
-    jQuery("#ProjectList").css({ left: 400 });
+    jQuery("#ProjectList").css({ left: 350 });
     console.log(val);
   };
 

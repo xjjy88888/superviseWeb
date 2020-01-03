@@ -22,8 +22,8 @@ export async function loginApi(params) {
     body: JSON.stringify({ ...params, password: passwordMd5 })
   });
 }
-// 项目合并
 
+// 项目合并
 export async function mergeProjectApi(params) {
   // delete params.items;
   return request(`${config.url.mergeProjectUrl}?${stringify(params)}`, {
@@ -33,6 +33,7 @@ export async function mergeProjectApi(params) {
     }
   });
 }
+
 // 项目列表---表格展示
 export async function projectTableListApi(params) {
   // delete params.items;
@@ -43,6 +44,7 @@ export async function projectTableListApi(params) {
     }
   });
 }
+
 // 项目列表
 export async function projectListApi(params) {
   delete params.items;
@@ -54,41 +56,7 @@ export async function projectListApi(params) {
         Authorization: `Bearer ${accessToken()}`,
         "Content-Type": "application/json-patch+json"
       },
-      body: JSON.stringify({
-        ...params,
-        MaxResultCount: params.MaxResultCount || "10",
-        ReplyTimeBegin:
-          params.ReplyTime && params.ReplyTime.length
-            ? dateFormat(params.ReplyTime[0]._d)
-            : "",
-        ReplyTimeEnd:
-          params.ReplyTime && params.ReplyTime.length
-            ? dateFormat(params.ReplyTime[1]._d)
-            : "",
-        ProjectCate: params.ProjectCate
-          ? params.ProjectCate.map(v => v).join(",")
-          : "",
-        HasScopes: params.HasScopes
-          ? params.HasScopes.map(v => v).join(",")
-          : "",
-        ProjectNat: params.ProjectNat
-          ? params.ProjectNat.map(v => v).join(",")
-          : "",
-        ProjectStatus: params.ProjectStatus
-          ? params.ProjectStatus.map(v => v).join(",")
-          : "",
-        VecType: params.VecType ? params.VecType.map(v => v).join(",") : "",
-        HasSpot: params.HasSpot ? params.HasSpot.map(v => v).join(",") : "",
-        ProjectType: params.ProjectType
-          ? params.ProjectType.map(v => v).join(",")
-          : "",
-        Compliance: params.Compliance
-          ? params.Compliance.map(v => v).join(",")
-          : "",
-        ProjectLevel: params.ProjectLevel
-          ? params.ProjectLevel.map(v => v).join(",")
-          : ""
-      })
+      body: JSON.stringify(params)
     }
   );
 }
@@ -1446,39 +1414,39 @@ export async function projectSuperviseListApi(params) {
         "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify({
-        ...params,
-        MaxResultCount: params.MaxResultCount || "10",
-        ReplyTimeBegin:
-          params.ReplyTime && params.ReplyTime.length
-            ? dateFormat(params.ReplyTime[0]._d)
-            : "",
-        ReplyTimeEnd:
-          params.ReplyTime && params.ReplyTime.length
-            ? dateFormat(params.ReplyTime[1]._d)
-            : "",
-        ProjectCate: params.ProjectCate
-          ? params.ProjectCate.map(v => v).join(",")
-          : "",
-        HasScopes: params.HasScopes
-          ? params.HasScopes.map(v => v).join(",")
-          : "",
-        ProjectNat: params.ProjectNat
-          ? params.ProjectNat.map(v => v).join(",")
-          : "",
-        ProjectStatus: params.ProjectStatus
-          ? params.ProjectStatus.map(v => v).join(",")
-          : "",
-        VecType: params.VecType ? params.VecType.map(v => v).join(",") : "",
-        HasSpot: params.HasSpot ? params.HasSpot.map(v => v).join(",") : "",
-        ProjectType: params.ProjectType
-          ? params.ProjectType.map(v => v).join(",")
-          : "",
-        Compliance: params.Compliance
-          ? params.Compliance.map(v => v).join(",")
-          : "",
-        ProjectLevel: params.ProjectLevel
-          ? params.ProjectLevel.map(v => v).join(",")
-          : ""
+        ...params
+        // MaxResultCount: params.MaxResultCount || "10",
+        // ReplyTimeBegin:
+        //   params.ReplyTime && params.ReplyTime.length
+        //     ? dateFormat(params.ReplyTime[0]._d)
+        //     : "",
+        // ReplyTimeEnd:
+        //   params.ReplyTime && params.ReplyTime.length
+        //     ? dateFormat(params.ReplyTime[1]._d)
+        //     : "",
+        // ProjectCate: params.ProjectCate
+        //   ? params.ProjectCate.map(v => v).join(",")
+        //   : "",
+        // HasScopes: params.HasScopes
+        //   ? params.HasScopes.map(v => v).join(",")
+        //   : "",
+        // ProjectNat: params.ProjectNat
+        //   ? params.ProjectNat.map(v => v).join(",")
+        //   : "",
+        // ProjectStatus: params.ProjectStatus
+        //   ? params.ProjectStatus.map(v => v).join(",")
+        //   : "",
+        // VecType: params.VecType ? params.VecType.map(v => v).join(",") : "",
+        // HasSpot: params.HasSpot ? params.HasSpot.map(v => v).join(",") : "",
+        // ProjectType: params.ProjectType
+        //   ? params.ProjectType.map(v => v).join(",")
+        //   : "",
+        // Compliance: params.Compliance
+        //   ? params.Compliance.map(v => v).join(",")
+        //   : "",
+        // ProjectLevel: params.ProjectLevel
+        //   ? params.ProjectLevel.map(v => v).join(",")
+        //   : ""
       })
     }
   );
