@@ -2,7 +2,7 @@ const l = window.location;
 const isFormal = l.href.split("/")[3] === "stbcjg";
 const isLocal = l.hostname === "localhost";
 
-console.log(`%c当前版本：v2.0.38`, "color:green;font-size:30px");
+console.log(`%c当前版本：v2.0.39`, "color:green;font-size:30px");
 
 // console.log(isLocal ? "本地环境" : isFormal ? "正式环境" : "测试环境");
 
@@ -105,6 +105,8 @@ const config = {
 
     // 项目列表---表格展示
     projectTableListUrl: `${domainApi}Project/GetListAll`,
+    // 项目合并
+    mergeProjectUrl: `${domainApi}Project/Merge`,
 
     // 项目列表
     projectListUrl: `${domainApi}Project/GetAllByPost`,
@@ -143,7 +145,7 @@ const config = {
     projectUnbindSpotUrl: `${domainApi}Project/UnbindSpot`,
 
     // 图斑列表---表格展示
-    spotTableListUrl: `${domainApi}RegionalSupervisionPhone/GetSpotList`,
+    spotTableListUrl: `${domainApi}Spot/ListAll`,
 
     // 图斑列表
     spotListUrl: `${domainApi}Spot/GetAllByPost`,

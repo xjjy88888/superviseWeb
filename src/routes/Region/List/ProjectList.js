@@ -48,7 +48,6 @@ export default class ProjectListTable extends PureComponent {
   componentDidMount() {
     window.addEventListener("resize", this.onWindowResize);
     const { link, districtTree } = this.props;
-    console.log(districtTree);
     link(this);
 
     this.getProjectTableList({ MaxResultCount: 20 });
@@ -68,10 +67,26 @@ export default class ProjectListTable extends PureComponent {
   }
   // 获取项目列表
   getProjectTableList = parmas => {
+    const { dispatch } = this.props;
     this.setState({
       loading: true
     });
-    const { dispatch } = this.props;
+
+    parmas.ProjectNat === "" && delete parmas.ProjectNat;
+    parmas.ProjectCate === "" && delete parmas.ProjectCate;
+    parmas.ProjectType === "" && delete parmas.ProjectType;
+    parmas.ProjectLevel === "" && delete parmas.ProjectLevel;
+    parmas.HasScopes === "" && delete parmas.HasScopes;
+    parmas.SupDepartment === "" && delete parmas.SupDepartment;
+    parmas.ProjectDistrictCodes === "" && delete parmas.ProjectDistrictCodes;
+    parmas.Compliance === "" && delete parmas.Compliance;
+    parmas.ReplyNum === "" && delete parmas.ReplyNum;
+    parmas.ReplyDepartment === "" && delete parmas.ReplyDepartment;
+    parmas.ReplyDepartment === "" && delete parmas.ReplyDepartment;
+    parmas.ProductDepartment === "" && delete parmas.ProductDepartment;
+    parmas.ProjectName === "" && delete parmas.ProjectName;
+    parmas.ProjectStatus === "" && delete parmas.ProjectStatus;
+    parmas.Sorting === "" && delete parmas.Sorting;
     dispatch({
       type: "project/getProjectTableList",
       payload: parmas,
@@ -167,16 +182,22 @@ export default class ProjectListTable extends PureComponent {
     const { dispatch, queryParams } = this.props;
     let Sorting = ``;
     if (sorter.columnKey) {
-      console.log(sorter.columnKey === "projectName");
       const key =
-        sorter.columnKey === "projectName" ? "Name" : sorter.columnKey;
+        sorter.columnKey === "projectName"
+          ? "Name"
+          : sorter.columnKey === "productDepartmentName"
+          ? "ProductDepartmentName"
+          : sorter.columnKey === "replyDepartmentName"
+          ? "ReplyDepartmentName"
+          : sorter.columnKey === "replyTime"
+          ? "ReplyTime"
+          : sorter.columnKey;
+
       Sorting =
         "ProjectBase." + key + (sorter.order === "descend" ? " desc" : " asc");
     }
-    console.log(filters);
 
     let filterObj = {
-      Count: pagination.total,
       Sorting,
       SkipCount: (pagination.current - 1) * pagination.pageSize,
       MaxResultCount: pagination.pageSize,
@@ -236,13 +257,18 @@ export default class ProjectListTable extends PureComponent {
       //     ? filters.checkDate[0]
       //     : ``
     };
-    console.log(filterObj);
+    if (pagination && pagination.current > 1) {
+      filterObj.Count = pagination.total;
+    } else {
+      filterObj.Count && delete filterObj.Count;
+    }
+    console.log("filterObj==========", filterObj);
     // 先将filterObj存到props中，供两表关联查询
     dispatch({
       type: "project/projectSave",
       payload: { queryParams: { ...queryParams, ...filterObj } }
     });
-    this.getProjectTableList(filterObj);
+    this.getProjectTableList({ ...queryParams, ...filterObj });
     this.setState({
       pagination,
       filterObj,
@@ -250,81 +276,86 @@ export default class ProjectListTable extends PureComponent {
     });
   };
   // 表头过滤筛选
-  getColumnSearchProps = dataIndex => ({
-    filterDropdown: ({
-      setSelectedKeys,
-      selectedKeys,
-      confirm,
-      clearFilters
-    }) => (
-      <div style={{ padding: 8 }}>
-        <Input
-          ref={node => {
-            this.searchInput = node;
-          }}
-          value={selectedKeys[0]}
-          onChange={e =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
-          onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
-          style={{ width: 188, marginBottom: 8, display: "block" }}
-        />
-        <Button
-          type="primary"
-          onClick={() => this.handleSearch(selectedKeys, confirm)}
-          icon="search"
-          size="small"
-          style={{ width: 90, marginRight: 8 }}
-        >
-          确定
-        </Button>
-        <Button
-          onClick={() => this.handleReset(clearFilters)}
-          size="small"
-          style={{ width: 90 }}
-        >
-          重置
-        </Button>
-      </div>
-    ),
-    filterIcon: filtered => (
-      <Icon type="search" style={{ color: filtered ? "#1890ff" : undefined }} />
-    ),
-    onFilter: (value, record) => {
-      // console.log(value, dataIndex, record);
-      if (dataIndex === "checkDate") {
-        let v = false;
-        if (record.projectChecks.length > 0) {
-          record.projectChecks.map(item => {
-            if (
-              item[dataIndex] &&
-              item[dataIndex]
-                .toString()
-                .toLowerCase()
-                .includes(value.toLowerCase())
-            ) {
-              v = true;
+  getColumnSearchProps = dataIndex => {
+    // console.log("dataIndex==========", dataIndex);
+    return {
+      filterDropdown: ({
+        setSelectedKeys,
+        selectedKeys,
+        confirm,
+        clearFilters
+      }) => (
+        <div style={{ padding: 8 }}>
+          <Input
+            ref={node => {
+              this.searchInput = node;
+            }}
+            value={selectedKeys[0] ? selectedKeys[0] : ""}
+            onChange={e =>
+              setSelectedKeys(e.target.value ? [e.target.value] : [])
             }
-          });
-          return v;
+            onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
+            style={{ width: 188, marginBottom: 8, display: "block" }}
+          />
+          <Button
+            type="primary"
+            onClick={() => this.handleSearch(selectedKeys, confirm)}
+            icon="search"
+            size="small"
+            style={{ width: 90, marginRight: 8 }}
+          >
+            确定
+          </Button>
+          <Button
+            onClick={() => this.handleReset(clearFilters)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            重置
+          </Button>
+        </div>
+      ),
+      filterIcon: filtered => (
+        <Icon
+          type="search"
+          style={{ color: filtered ? "#1890ff" : undefined }}
+        />
+      ),
+      onFilter: (value, record) => {
+        // console.log(value, dataIndex, record);
+        if (dataIndex === "checkDate") {
+          let v = false;
+          if (record.projectChecks.length > 0) {
+            record.projectChecks.map(item => {
+              if (
+                item[dataIndex] &&
+                item[dataIndex]
+                  .toString()
+                  .toLowerCase()
+                  .includes(value.toLowerCase())
+              ) {
+                v = true;
+              }
+            });
+            return v;
+          }
+        } else {
+          return (
+            record[dataIndex] &&
+            record[dataIndex]
+              .toString()
+              .toLowerCase()
+              .includes(value.toLowerCase())
+          );
         }
-      } else {
-        console.log(6666);
-        return (
-          record[dataIndex] &&
-          record[dataIndex]
-            .toString()
-            .toLowerCase()
-            .includes(value.toLowerCase())
-        );
+      },
+      onFilterDropdownVisibleChange: visible => {
+        if (visible) {
+          setTimeout(() => this.searchInput.select());
+        }
       }
-    },
-    onFilterDropdownVisibleChange: visible => {
-      if (visible) {
-        setTimeout(() => this.searchInput.select());
-      }
-    }
-  });
+    };
+  };
 
   // 项目合并按钮
   mergeProject = () => {
@@ -348,10 +379,15 @@ export default class ProjectListTable extends PureComponent {
   };
   // 前往项目详情页面
   gotoProjectDetail = (val, e) => {
-    const { showProjectDetail } = this.props;
-    // e.preventDefault();
-    jQuery("#ProjectList").css({ left: 351 });
-    showProjectDetail(val.id);
+    e.preventDefault();
+    const { dispatch, siderBarPageInfo } = this.props;
+    dispatch({
+      type: "commonModel/save",
+      payload: {
+        siderBarPageInfo: { ...siderBarPageInfo, currentProjectId: val }
+      }
+    });
+    jQuery("#ProjectList").css({ left: 350 });
     console.log(val);
   };
 
@@ -362,15 +398,9 @@ export default class ProjectListTable extends PureComponent {
   render() {
     const {
       projectTableList,
-      siderBarPageInfo: { activeMenu }
+      siderBarPageInfo: { activeMenu, currentProjectId }
     } = this.props;
-    const {
-      loading,
-      tableHeight,
-      pagination,
-      modalVisible,
-      selectedRows
-    } = this.state;
+    const { loading, tableHeight, pagination, modalVisible } = this.state;
     let tableY =
       tableHeight >= 1100
         ? "30vh"
@@ -400,12 +430,15 @@ export default class ProjectListTable extends PureComponent {
         sorter: true,
         ...this.getColumnSearchProps("projectName"),
         render: (text, record) => (
+          // <Link to={"/region?from=project&id=" + record.id}>
           <a
-            // href="#"
-            onClick={this.gotoProjectDetail.bind(this, record)}
+            href="#"
+            onClick={this.gotoProjectDetail.bind(this, record.id)}
+            style={{ color: currentProjectId === record.id && "green" }}
           >
             {text}
           </a>
+          // </Link>
         )
       },
       {
@@ -652,14 +685,16 @@ export default class ProjectListTable extends PureComponent {
             <Button key="1" type="primary" onClick={this.reset.bind(this)}>
               重置
             </Button>,
-            <Button
-              key="3"
-              type="primary"
-              style={{ marginLeft: "10px" }}
-              onClick={this.mergeProject}
-            >
-              项目合并
-            </Button>
+            activeMenu === "project" ? (
+              <Button
+                key="3"
+                type="primary"
+                style={{ marginLeft: "10px" }}
+                onClick={this.mergeProject}
+              >
+                项目合并
+              </Button>
+            ) : null
           ]}
         />
         {activeMenu === "spot" ? (

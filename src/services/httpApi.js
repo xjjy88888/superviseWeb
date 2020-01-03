@@ -22,7 +22,17 @@ export async function loginApi(params) {
     body: JSON.stringify({ ...params, password: passwordMd5 })
   });
 }
+// 项目合并
 
+export async function mergeProjectApi(params) {
+  // delete params.items;
+  return request(`${config.url.mergeProjectUrl}?${stringify(params)}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
 // 项目列表---表格展示
 export async function projectTableListApi(params) {
   // delete params.items;
@@ -192,11 +202,15 @@ export async function projectUnbindSpotApi(params) {
 // 图斑列表---表格展示
 export async function spotTableListApi(params) {
   // delete params.items;
-  return request(`${config.url.spotTableListUrl}?${stringify(params)}`, {
-    method: "GET",
+  return request(`${config.url.spotTableListUrl}`, {
+    method: "POST",
     headers: {
-      Authorization: `Bearer ${accessToken()}`
-    }
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify({
+      ...params
+    })
   });
 }
 

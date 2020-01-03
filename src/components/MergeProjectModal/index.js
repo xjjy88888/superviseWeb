@@ -51,20 +51,44 @@ export default class MergeProjectModal extends PureComponent {
   // 下一步或确认
   handleOk = () => {
     const { current } = this.state;
-    const { showModal } = this.props;
+
     this.setState({
       loading: current >= 2 && true,
       current: current < 2 ? current + 1 : current
     });
-    setTimeout(() => {
-      if (current === 2) {
-        message.success("点击了确认合并项目按钮，等待后台将对应项目合并");
-        this.setState({ loading: false });
-        showModal(false);
-      }
-    }, 1000);
+    if (current === 2) {
+      this.sendMergeInfo();
+    }
   };
-
+  // 发送合并信息到后台
+  sendMergeInfo = () => {
+    const { selectedRowKeysForSave, selectedRows } = this.state;
+    const {
+      dispatch,
+      showModal,
+      mergeProjectModalInfo: { tableDataSource }
+    } = this.props;
+    const Rows = selectedRows.length ? selectedRows : tableDataSource;
+    const arr = Rows.map(item => item.id) || [];
+    if (arr.length <= 0) {
+      message.warn("请先选择要合并的项目！");
+      return;
+    }
+    console.log(arr);
+    dispatch({
+      type: "commonModel/mergeProject",
+      payload: { SaveId: selectedRowKeysForSave[0], MergeIds: arr },
+      callback: (success, err, res) => {
+        this.setState({ loading: false });
+        if (success) {
+          message.success("项目合并成功！");
+          showModal(false);
+        } else if (err) {
+          message.error("项目合并失败，原因是：", err);
+        }
+      }
+    });
+  };
   componentDidMount() {}
   componentDidUpdate(prevProps) {}
 
@@ -365,7 +389,7 @@ export default class MergeProjectModal extends PureComponent {
               rowKey={record => record.id}
               pagination={false}
               scroll={{
-                x: 3780,
+                x: 3720,
                 y: tableHeight / 2 - 130
               }}
             />

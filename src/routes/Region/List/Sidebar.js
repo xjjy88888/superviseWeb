@@ -149,7 +149,39 @@ export default class siderbar extends PureComponent {
     };
     this.map = null;
   }
-
+  componentDidUpdate(prevProps) {
+    const {
+      project: { queryParams },
+      commonModel: {
+        siderBarPageInfo: { currentProjectId, currentSpotId }
+      }
+    } = this.props;
+    if (prevProps.project.queryParams !== queryParams) {
+      this.queryProject({ ...queryParams });
+    } else if (
+      prevProps.commonModel.siderBarPageInfo.currentProjectId !==
+        currentProjectId &&
+      currentProjectId !== "" &&
+      prevProps.commonModel.siderBarPageInfo.currentProjectId !== ""
+    ) {
+      this.setState({ showProjectDetail: true, clickId: currentProjectId });
+      this.queryProjectById(currentProjectId);
+      this.queryProjectInfo(currentProjectId);
+    } else if (
+      prevProps.commonModel.siderBarPageInfo.currentSpotId !== currentSpotId &&
+      currentSpotId !== "" &&
+      prevProps.commonModel.siderBarPageInfo.currentSpotId !== ""
+    ) {
+      emitter.emit("showSiderbarDetail", {
+        show: true,
+        from: "spot",
+        id: currentSpotId,
+        edit: false,
+        fromList: true,
+        type: "edit"
+      });
+    }
+  }
   componentDidMount() {
     const { link } = this.props;
     link(this);
@@ -222,7 +254,8 @@ export default class siderbar extends PureComponent {
     });
     this.eventEmitter = emitter.addListener("projectInfoRefresh", v => {
       if (v.projectId) {
-        this.queryProjectInfo(v.projectId);
+        this.queryProjectById(v.projectId);
+        this.queryProjectInfo(v.projectId,);
       }
     });
     this.eventEmitter = emitter.addListener("showCreateDepart", v => {
@@ -383,6 +416,17 @@ export default class siderbar extends PureComponent {
   };
 
   componentWillUnmount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "commonModel/save",
+      payload: {
+        siderBarPageInfo: {
+          activeMenu: "",
+          currentProjectId: "",
+          currentSpotId: ""
+        }
+      }
+    });
     if (this.scrollDom) {
       this.scrollDom.removeEventListener("scroll", () => {
         this.onScroll(this);
@@ -851,12 +895,18 @@ export default class siderbar extends PureComponent {
     this.saveCurrentPageInfo(k);
     if (k === "project") {
       this.queryProject({ SkipCount: 0 });
+      emitter.emit("showSiderbarDetail", {
+        show: false,
+        id: ""
+      });
     } else if (k === "spot") {
       this.querySpot({ SkipCount: 0 });
     } else {
       this.queryPoint({ SkipCount: 0 });
     }
     this.setState({
+      showProjectDetail: false,
+      // clickId:''
       showQuery: false,
       showCheck: false,
       ShowArchive: false,
@@ -1169,8 +1219,8 @@ export default class siderbar extends PureComponent {
       inspect: { inspectList },
       panorama: { panoramaList },
       projectSupervise: { projectSuperviseList },
-      videoMonitor: { videoMonitorList },
-      showProjectTableList
+      videoMonitor: { videoMonitorList }
+      // showProjectTableList
     } = this.props;
 
     const {
@@ -1350,7 +1400,23 @@ export default class siderbar extends PureComponent {
               <span
                 style={{ cursor: "pointer" }}
                 onClick={() => {
+                  const {
+                    commonModel: { siderBarPageInfo },
+                    dispatch
+                  } = this.props;
                   this.setState({ clickId: item.id });
+                  if (key === "project") {
+                    dispatch({
+                      type: "commonModel/save",
+                      payload: {
+                        siderBarPageInfo: {
+                          ...siderBarPageInfo,
+                          currentProjectId: item.id
+                        }
+                      }
+                    });
+                  }
+
                   resetFields();
                   //编辑1
                   if (key === "project") {
@@ -1453,15 +1519,16 @@ export default class siderbar extends PureComponent {
     return (
       <div
         style={{
-          position: "absolute",
-          left: show ? 0 : "-350px",
-          top: 0,
-          zIndex: 1000,
-          width: 350,
-          height: "100%",
-          paddingTop: 46,
-          backgroundColor: "transparent"
+          // position: "absolute",
+          left: show ? 0 : "-350px"
+          // top: 0,
+          // zIndex: 1000,
+          // width: 350,
+          // height: "100%",
+          // paddingTop: 46,
+          // backgroundColor: "transparent"
         }}
+        className={styles.siderbar}
         ref={e => (this.refDom = e)}
       >
         <Icon

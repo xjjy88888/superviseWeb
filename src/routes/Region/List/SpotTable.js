@@ -5,11 +5,9 @@ import { Button, Table, Input, Icon, Tooltip } from "antd";
 
 import styles from "./style/ProjectList.less";
 
-@connect(({ project, spot, district, user }) => ({
-  ...project,
+@connect(({ spot, commonModel }) => ({
   ...spot,
-  ...district,
-  ...user
+  ...commonModel
 }))
 export default class SpotListTable extends PureComponent {
   constructor(props) {
@@ -22,7 +20,11 @@ export default class SpotListTable extends PureComponent {
         showQuickJumper: true,
         showSizeChanger: true,
         defaultPageSize: 20,
-        pageSizeOptions: ["20", "30", "40", "50"]
+        pageSizeOptions: ["20", "30", "40", "50"],
+        total: "",
+        showTotal: total => {
+          return `共 ${total} 条`;
+        }
       },
       filterObj: {},
       Sorting: "",
@@ -152,8 +154,24 @@ export default class SpotListTable extends PureComponent {
   componentWillUnmount() {
     window.removeEventListener("resize", this.onWindowResize);
   }
+  // 前往图斑详情页面
+  gotoSpotDetail = (val, e) => {
+    e.preventDefault();
+    const { dispatch, siderBarPageInfo } = this.props;
+    dispatch({
+      type: "commonModel/save",
+      payload: {
+        siderBarPageInfo: { ...siderBarPageInfo, currentSpotId: val }
+      }
+    });
+    jQuery("#ProjectList").css({ left: 750 });
+    console.log(val);
+  };
   render() {
-    const { spotTableList } = this.props;
+    const {
+      spotTableList,
+      siderBarPageInfo: { currentSpotId }
+    } = this.props;
     const { tableHeight, pagination } = this.state;
     // console.log(tableHeight);
     let tableY =
@@ -183,34 +201,16 @@ export default class SpotListTable extends PureComponent {
         width: 180,
         fixed: "left",
         sorter: true,
-        ...this.getColumnSearchProps("mapNum")
-      },
-      {
-        title: "创建方式",
-        dataIndex: "createType",
-        key: "createType",
-        width: 100,
-        fixed: "left",
-        sorter: true
-        // render: () => 1
-      },
-      {
-        // 点击出现列表面板
-        title: "图斑历史",
-        dataIndex: "spotReview",
-        key: "spotReview",
-        width: 100,
-        fixed: "left",
-        sorter: true
-        // render: () => 1
-      },
-      {
-        title: "所属项目",
-        dataIndex: "projectId",
-        key: "projectId",
-        width: 180,
-        fixed: "left",
-        ...this.getColumnSearchProps("mapNum")
+        ...this.getColumnSearchProps("mapNum"),
+        render: (text, record) => (
+          <a
+            href="#"
+            onClick={this.gotoSpotDetail.bind(this, record.id)}
+            style={{ color: currentSpotId === record.id && "green" }}
+          >
+            {text}
+          </a>
+        )
       },
       {
         title: "复核状态",
@@ -230,29 +230,68 @@ export default class SpotListTable extends PureComponent {
         ]
       },
       {
-        title: "扰动合规性",
-        dataIndex: "interferenceComplianceId",
-        key: "interferenceComplianceId",
-        width: 200
+        title: "重点监管",
+        dataIndex: "isFocus",
+        key: "isFocus",
+        width: 180
+        // fixed: "left",
+        // sorter: true,
+        // ...this.getColumnSearchProps("isFocus")
+      },
+
+      {
+        title: "关联项目",
+        dataIndex: "projectName",
+        key: "projectName",
+        width: 180,
+        ...this.getColumnSearchProps("projectName")
+      },
+
+      {
+        title: "项目监管单位",
+        dataIndex: "supDepartmentName",
+        key: "supDepartmentName",
+        width: 100
+        // sorter: true
+        // render: () => 1
       },
       {
-        title: "扰动类型",
-        dataIndex: "interferenceTypeId",
-        key: "interferenceTypeId",
+        title: "照片数量",
+        dataIndex: "photoCount",
+        key: "photoCount",
+        width: 100
+        // sorter: true
+        // render: () => 1
+      },
+      {
+        title: "涉及县",
+        dataIndex: "districtCodes",
+        key: "districtCodes",
+        width: 220
+      },
+      {
+        title: "扰动合规性",
+        dataIndex: "interferenceComplianceValue",
+        key: "interferenceComplianceValue",
         width: 200
       },
+      // {
+      //   title: "扰动类型",
+      //   dataIndex: "interferenceTypeId",
+      //   key: "interferenceTypeId",
+      //   width: 200
+      // },
       {
         title: "扰动变化类型",
-        dataIndex: "projectDepartmentId",
-        key: "projectDepartmentId",
+        dataIndex: "interferenceVaryTypeValue	",
+        key: "interferenceVaryTypeValue	",
         width: 200
       },
       {
         title: "扰动面积",
         dataIndex: "interferenceArea",
         key: "interferenceArea",
-        width: 200,
-        ...this.getColumnSearchProps("interferenceArea")
+        width: 200
       },
       {
         title: "超出防治责任范围面积（ha）",
@@ -261,56 +300,27 @@ export default class SpotListTable extends PureComponent {
         width: 200
       },
       {
-        title: "解译批次",
-        dataIndex: "interBatch",
-        key: "interBatch",
-        width: 200
-      },
-      {
-        title: "任务级别",
-        dataIndex: "taskLevel",
-        key: "taskLevel",
-        width: 200,
-        render: () => 1
-      },
-      {
-        title: "解译时间",
-        dataIndex: "interTime",
-        key: "interTime",
-        width: 200
-      },
-      {
-        title: "归档时间",
-        dataIndex: "archiveTime",
-        key: "archiveTime",
-        width: 200
-      },
-      {
-        title: "空间数据",
-        dataIndex: "geom",
-        key: "geom",
-        width: 300,
-        onCell: () => {
-          return {
-            style: {
-              maxWidth: 260,
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-              textOverflow: "ellipsis",
-              cursor: "pointer"
-            }
-          };
-        },
-        render: text => (
-          <Tooltip placement="topLeft" title={text}>
-            {text}
-          </Tooltip>
-        )
-      },
-      {
         title: "建设状态",
-        dataIndex: "buildStatusId",
-        key: "buildStatusId",
+        dataIndex: "buildStatusValue",
+        key: "buildStatusValue",
+        width: 200
+      },
+      {
+        title: "土壤侵蚀强度",
+        dataIndex: "soilErosionIntensity",
+        key: "soilErosionIntensity",
+        width: 200
+      },
+      {
+        title: "创建时间",
+        dataIndex: "creationTime",
+        key: "creationTime",
+        width: 200
+      },
+      {
+        title: "修改时间",
+        dataIndex: "lastModificationTime",
+        key: "lastModificationTime",
         width: 200
       },
       {
@@ -323,85 +333,6 @@ export default class SpotListTable extends PureComponent {
         title: "建议",
         dataIndex: "proposal",
         key: "proposal",
-        width: 200
-      },
-
-      {
-        title: "图斑所在省市县",
-        dataIndex: "districtCodeId",
-        key: "districtCodeId",
-        width: 220
-        // render: (v, record) => {
-        //   const { district } = this.props;
-        //   let districtValue = [];
-        //   district &&
-        //     district.length > 0 &&
-        //     district.map(item => {
-        //       const res = item.children.filter(it => it.value === v);
-        //       if (res.length) {
-        //         districtValue = item.label + "/" + res[0].label;
-        //       } else {
-        //         item.children.map(ite => {
-        //           const res = ite.children.filter(it => it.value === v);
-        //           if (res.length) {
-        //             districtValue =
-        //               item.label + "/" + ite.label + "/" + res[0].label;
-        //           }
-        //         });
-        //       }
-        //     });
-        //   return districtValue;
-        // }
-      },
-
-      {
-        title: "详细地址",
-        dataIndex: "addressInfo",
-        key: "addressInfo",
-        width: 200
-        // sorter: (a, b) => a.age - b.age,
-        // fixed: "left"
-        // filters: [1, 2, 3, 1, 1, 1, 1, 1]
-      },
-
-      {
-        title: "解译单位",
-        dataIndex: "interpretationDepartmentId",
-        key: "interpretationDepartmentId",
-        width: 200
-        // filters: [1, 2, 3, 1, 1, 1, 1, 1]
-      },
-      {
-        title: "解译影像分辨率",
-        dataIndex: "imgResolution",
-        key: "imgResolution",
-        width: 200
-        // filters: [1, 2, 3, 1, 1, 1, 1, 1]
-      },
-
-      {
-        title: "标记图斑是否结束",
-        dataIndex: "isEnd",
-        key: "isEnd",
-        width: 200
-      },
-
-      {
-        title: "未知项目简称",
-        dataIndex: "unknownProjectShortName",
-        key: "unknownProjectShortName",
-        width: 200
-      },
-      {
-        title: "未知项目所属行业",
-        dataIndex: "unknownProjectIndustry",
-        key: "unknownProjectIndustry",
-        width: 200
-      },
-      {
-        title: "未知项目所在地址",
-        dataIndex: "unknownProjectAddress",
-        key: "unknownProjectAddress",
         width: 200
       },
       {
@@ -426,18 +357,12 @@ export default class SpotListTable extends PureComponent {
         rowKey={record => record.id}
         onChange={this.handleTableChange}
         pagination={pagination}
-        title={() => (
-          <div>
-            <Icon type="plus" />
-            新增
-          </div>
-        )}
         dataSource={
           (spotTableList && spotTableList.items && spotTableList.items) || []
         }
         columns={columns}
         scroll={{
-          x: 5200,
+          x: 3320,
           y: `calc(100vh - ${tableY})`
         }}
       />

@@ -1,12 +1,14 @@
 import { notification } from "antd";
-import {} from "../services/httpApi";
+import { mergeProjectApi } from "../services/httpApi";
 
 export default {
   namespace: "commonModel",
 
   state: {
     siderBarPageInfo: {
-      activeMenu: ""
+      activeMenu: "",
+      currentProjectId: "",
+      currentSpotId: ""
     },
     mergeProjectModalInfo: {
       tableDataSource: [],
@@ -15,13 +17,13 @@ export default {
   },
 
   effects: {
-    // 行政区划批量删除
-    // *districtDeleteMul({ payload, callback }, { call, put }) {
-    //   const {
-    //     data: { success, error, result }
-    //   } = yield call(districtDeleteMulApi, payload);
-    //   if (callback) callback(success, error, result);
-    // }
+    // 项目合并请求
+    *mergeProject({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error, result }
+      } = yield call(mergeProjectApi, payload);
+      if (callback) callback(success, error, result);
+    }
   },
 
   reducers: {

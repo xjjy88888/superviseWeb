@@ -439,7 +439,7 @@ export default class Examine extends PureComponent {
                 placeholder=""
                 onChange={(value, label) => {
                   if (value.length) {
-                    console.log(label[1].label);
+                    // console.log(label[1].label);
                     const l = label[1].label;
                     if (l === "已编报方案") {
                       this.setState({ fileSource: "SchemeApprovalFile" });
@@ -498,7 +498,7 @@ export default class Examine extends PureComponent {
                         { label: "否", value: false }
                       ]}
                       onChange={v => {
-                        console.log(v.target.value);
+                        // console.log(v.target.value);
                         if (v.target.value) {
                         }
                         this.setState({
