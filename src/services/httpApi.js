@@ -61,9 +61,7 @@ export async function projectListApi(params) {
       body: JSON.stringify(params)
     }
   );
-}         
-
-
+}
 
 // 项目信息
 export async function projectByIdApi(id) {

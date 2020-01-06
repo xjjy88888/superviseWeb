@@ -58,7 +58,7 @@ export default class chart extends PureComponent {
   }
 
   queryInfo = v => {
-    console.log("图标筛选完成", v);
+    console.log("图表筛选完成", v);
     this.setState({
       queryInfo: v.info
     });
