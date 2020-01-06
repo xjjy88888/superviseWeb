@@ -1,4 +1,3 @@
-/* eslint-disable array-callback-return */
 import React, { PureComponent } from "react";
 import { connect } from "dva";
 import { createForm } from "rc-form";
@@ -1003,7 +1002,7 @@ export default class siderbar extends PureComponent {
     if (jQuery("#ProjectList").position().left >= 0) {
       jQuery("#ProjectList").animate({ left: -window.innerWidth });
     }
-    
+
     emitter.emit("emptyPoint");
     emitter.emit("showSiderbarDetail", {
       show: false
@@ -1379,6 +1378,9 @@ export default class siderbar extends PureComponent {
       videoMonitor: { videoMonitorList }
       // showProjectTableList
     } = this.props;
+
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userId = user && user.userId ? user.userId : null;
 
     const {
       hover,
@@ -2642,6 +2644,7 @@ export default class siderbar extends PureComponent {
                             e.stopPropagation();
                             showInspect({
                               show: true,
+                              isEdit: true,
                               id: null,
                               projectId: projectItem.id,
                               from: "add"
@@ -2656,11 +2659,14 @@ export default class siderbar extends PureComponent {
                     {inspectList.map((item, index) => (
                       <p
                         key={index}
-                        style={{ cursor: "pointer" }}
                         onClick={() => {
+                          if (userId !== item.creatorUserId) {
+                            return;
+                          }
                           this.hide();
                           showInspect({
                             show: true,
+                            isEdit: false,
                             id: item.id,
                             projectId: projectItem.id,
                             from: "edit"
@@ -2668,122 +2674,143 @@ export default class siderbar extends PureComponent {
                         }}
                       >
                         <p style={{ margin: 0 }}>
-                          〔{item.numberYear}〕第{item.number}号
-                          <Icon
-                            type="delete"
+                          <span
                             style={{
-                              float: "right",
-                              fontSize: 18,
-                              color: "#1890ff",
-                              marginLeft: 15
+                              cursor:
+                                userId === item.creatorUserId
+                                  ? "pointer"
+                                  : "no-drop"
                             }}
-                            onClick={e => {
-                              e.stopPropagation();
-                              Modal.confirm({
-                                title: "删除检查表",
-                                content: "是否确定要删除这条检查表？",
-                                okText: "确定",
-                                okType: "danger",
-                                cancelText: "取消",
-                                onOk() {
-                                  self.showSpin(true);
-                                  dispatch({
-                                    type: "inspect/inspectDelete",
-                                    payload: {
-                                      id: item.id
-                                    },
-                                    callback: success => {
-                                      self.showSpin(false);
-                                      if (success) {
-                                        self.hide();
-                                        emitter.emit("projectInfoRefresh", {
-                                          projectId: projectItem.id
-                                        });
+                          >
+                            〔{item.numberYear}〕第{item.number}号
+                          </span>
+                          <div
+                            style={{
+                              display:
+                                userId === item.creatorUserId
+                                  ? "inline-block"
+                                  : "none",
+                              position: "relative",
+                              top: 3,
+                              left: 5
+                            }}
+                          >
+                            <Icon
+                              type="delete"
+                              style={{
+                                float: "right",
+                                fontSize: 18,
+                                color: "#1890ff",
+                                marginLeft: 10
+                              }}
+                              onClick={e => {
+                                e.stopPropagation();
+                                Modal.confirm({
+                                  title: "删除检查表",
+                                  content: "是否确定要删除这条检查表？",
+                                  okText: "确定",
+                                  okType: "danger",
+                                  cancelText: "取消",
+                                  onOk() {
+                                    self.showSpin(true);
+                                    dispatch({
+                                      type: "inspect/inspectDelete",
+                                      payload: {
+                                        id: item.id
+                                      },
+                                      callback: success => {
+                                        self.showSpin(false);
+                                        if (success) {
+                                          self.hide();
+                                          emitter.emit("projectInfoRefresh", {
+                                            projectId: projectItem.id
+                                          });
+                                        }
                                       }
-                                    }
-                                  });
-                                },
-                                onCancel() {}
-                              });
-                            }}
-                          />
-                          <Icon
-                            type="environment"
-                            style={{
-                              display: item.problemPoints.length
-                                ? "block"
-                                : "none",
-                              float: "right",
-                              fontSize: 18,
-                              color: "#1890ff",
-                              marginLeft: 15
-                            }}
-                            onClick={e => {
-                              e.stopPropagation();
-                              if (item.problemPoints.length) {
-                                mapLocation({
-                                  item: item.problemPoints,
-                                  id: item.problemPoints[0].id,
-                                  key: "problemPoint"
+                                    });
+                                  },
+                                  onCancel() {}
                                 });
-                              }
-                            }}
-                          />
-                          <Icon
-                            type="picture"
-                            style={{
-                              display: item.attachment ? "block" : "none",
-                              float: "right",
-                              fontSize: 18,
-                              color: "#1890ff",
-                              marginLeft: 15
-                            }}
-                            onClick={e => {
-                              e.stopPropagation();
-                              emitter.emit("pictureLocation", {
-                                item: item.attachment.child
-                              });
-                            }}
-                          />
-                          <Icon
-                            type="plus"
-                            style={{
-                              color: `#13c2c2`, //措施
-                              float: "right",
-                              fontSize: 18,
-                              marginLeft: 15
-                            }}
-                            onClick={e => {
-                              e.stopPropagation();
-                              this.hide();
-                              emitter.emit("showMeasurePoint", {
-                                show: true,
-                                id: null,
-                                inspectId: item.id,
-                                projectId: projectItem.id,
-                                from: "add"
-                              });
-                            }}
-                          />
-                          <Icon
-                            type="plus"
-                            style={{
-                              color: `#eb2f96`, //问题
-                              float: "right",
-                              fontSize: 18
-                            }}
-                            onClick={e => {
-                              e.stopPropagation();
-                              this.hide();
-                              emitter.emit("showProblemPoint", {
-                                show: true,
-                                id: null,
-                                inspectId: item.id,
-                                projectId: projectItem.id,
-                                from: "add"
-                              });
-                            }}
-                          />
+                              }}
+                            />
+                            <Icon
+                              type="environment"
+                              style={{
+                                display: item.problemPoints.length
+                                  ? "block"
+                                  : "none",
+                                float: "right",
+                                fontSize: 18,
+                                color: "#1890ff",
+                                marginLeft: 10
+                              }}
+                              onClick={e => {
+                                e.stopPropagation();
+                                if (item.problemPoints.length) {
+                                  mapLocation({
+                                    item: item.problemPoints,
+                                    id: item.problemPoints[0].id,
+                                    key: "problemPoint"
+                                  });
+                                }
+                              }}
+                            />
+                            <Icon
+                              type="picture"
+                              style={{
+                                display: item.attachment ? "block" : "none",
+                                float: "right",
+                                fontSize: 18,
+                                color: "#1890ff",
+                                marginLeft: 10
+                              }}
+                              onClick={e => {
+                                e.stopPropagation();
+                                emitter.emit("pictureLocation", {
+                                  item: item.attachment.child
+                                });
+                              }}
+                            />
+                            <Icon
+                              type="plus"
+                              style={{
+                                color: `#13c2c2`, //措施
+                                float: "right",
+                                fontSize: 18,
+                                marginLeft: 10
+                              }}
+                              onClick={e => {
+                                e.stopPropagation();
+                                this.hide();
+                                emitter.emit("showMeasurePoint", {
+                                  show: true,
+                                  id: null,
+                                  inspectId: item.id,
+                                  projectId: projectItem.id,
+                                  from: "add"
+                                });
+                              }}
+                            />
+                            <Icon
+                              type="plus"
+                              style={{
+                                color: `#eb2f96`, //问题
+                                float: "right",
+                                fontSize: 18
+                              }}
+                              onClick={e => {
+                                e.stopPropagation();
+                                this.hide();
+                                emitter.emit("showProblemPoint", {
+                                  show: true,
+                                  id: null,
+                                  inspectId: item.id,
+                                  projectId: projectItem.id,
+                                  from: "add"
+                                });
+                              }}
+                            />
+                          </div>
                         </p>
                         {/* 问题点 */}
                         {item.problemPoints.map((ite, idx) => (

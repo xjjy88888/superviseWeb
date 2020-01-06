@@ -107,7 +107,7 @@ export default class Inspect extends PureComponent {
       projectId: v.projectId,
       id: v.id,
       attachmentId: 0,
-      isEdit: false
+      isEdit: v.isEdit
     });
     if (v.show) {
       resetFields();
