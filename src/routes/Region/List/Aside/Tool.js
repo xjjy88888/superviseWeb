@@ -73,33 +73,52 @@ export default class Tool extends PureComponent {
       });
     });
   }
+  
+  componentDidUpdate(prevProps) {
+    const {
+      project: { queryParams }
+    } = this.props;
+    if (prevProps.project.queryParams !== queryParams) {
+      console.log("queryParams---chart============", queryParams);
+      queryParams.from && delete queryParams.from;
+      this.dataFormat(queryParams);
+      this.setState({
+        queryInfo: queryParams
+      });
+      // if (queryParams.from && queryParams.from === "project") {
+      //   this.queryProject({ ...queryParams });
+      // }
+    }
+  }
 
-  queryInfo = data => {
-    console.log("工具筛选完成", data);
-    const queryInfo = { ...data.queryParams };
-    if (queryInfo.ReplyTime && queryInfo.ReplyTime.length) {
-      queryInfo.ReplyTimeBegin = dateFormat(queryInfo.ReplyTime[0]._d);
-      queryInfo.ReplyTimeEnd = dateFormat(queryInfo.ReplyTime[1]._d);
-    }
-    for (let i in queryInfo) {
-      if (Array.isArray(queryInfo[i])) {
-        queryInfo[i] = queryInfo[i].join(",");
-      }
-    }
-    console.log(queryInfo);
+  queryInfo = v => {
+    console.log("图表筛选完成", v);
+    this.dataFormat(v.queryParams);
     this.setState({
-      queryInfo: {
-        ...this.state.queryInfo,
-        ...queryInfo
-      }
+      queryInfo: v.queryParams
     });
   };
+
+  // 格式化查询数据
+  dataFormat = v => {
+    for (let i in v) {
+      if (Array.isArray(v[i])) {
+        if (i === "ReplyTime" && v[i].length) {
+          v.ReplyTimeBegin = dateFormat(v[i][0]);
+          v.ReplyTimeEnd = dateFormat(v[i][1]);
+        }
+        v[i] = v[i].join(",");
+      }
+    }
+  };
+
   // 鼠标进入事件
   onMouseEnter = e => {
     this.setState({
       hover: true
     });
   };
+
   // 鼠标离开事件
   onMouseLeave = e => {
     this.setState({

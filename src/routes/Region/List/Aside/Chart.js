@@ -57,6 +57,7 @@ export default class chart extends PureComponent {
       clientWidth: clientWidth
     });
   }
+  
   componentDidUpdate(prevProps) {
     const {
       project: { queryParams }
@@ -73,7 +74,15 @@ export default class chart extends PureComponent {
       // }
     }
   }
-  
+
+  queryInfo = v => {
+    console.log("图表筛选完成", v);
+    this.dataFormat(v.queryParams);
+    this.setState({
+      queryInfo: v.queryParams
+    });
+  };
+
   // 格式化查询数据
   dataFormat = v => {
     for (let i in v) {
@@ -85,14 +94,6 @@ export default class chart extends PureComponent {
         v[i] = v[i].join(",");
       }
     }
-  };
-
-  queryInfo = v => {
-    console.log("图表筛选完成", v);
-    this.dataFormat(v.queryParams);
-    this.setState({
-      queryInfo: v.queryParams
-    });
   };
 
   query = (v, t) => {
