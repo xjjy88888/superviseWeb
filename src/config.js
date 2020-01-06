@@ -104,7 +104,7 @@ const config = {
     loginUrl: `${domain}api/TokenAuth/Authenticate`,
 
     // 项目列表---表格展示
-    projectTableListUrl: `${domainApi}Project/GetListAll`,
+    projectTableListUrl: `${domainApi}Project/ListAll`,
     // 项目合并
     mergeProjectUrl: `${domainApi}Project/Merge`,
 

@@ -2,6 +2,7 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
 import { createForm } from "rc-form";
+import jQuery from "jquery";
 import {
   Menu,
   Icon,
@@ -187,6 +188,7 @@ export default class siderbar extends PureComponent {
         fromList: true,
         type: "edit"
       });
+      this.setState({ clickId: currentSpotId });
     }
   }
   componentDidMount() {
@@ -998,6 +1000,10 @@ export default class siderbar extends PureComponent {
         }
       }
     });
+    if (jQuery("#ProjectList").position().left >= 0) {
+      jQuery("#ProjectList").animate({ left: -window.innerWidth });
+    }
+    
     emitter.emit("emptyPoint");
     emitter.emit("showSiderbarDetail", {
       show: false

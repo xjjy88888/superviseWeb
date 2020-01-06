@@ -6,6 +6,7 @@ import { Icon, Button, Input, Form, Modal, Typography, message } from "antd";
 import emitter from "../../../../utils/event";
 import "leaflet/dist/leaflet.css";
 import Spins from "../../../../components/Spins";
+import styles from "../style/sidebar.less";
 
 let self;
 const { Text } = Typography;
@@ -23,6 +24,7 @@ export default class VideoMonitor extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
+      hover: false,
       show: false,
       id: null,
       projectId: null,
@@ -91,14 +93,25 @@ export default class VideoMonitor extends PureComponent {
       }
     });
   };
-
+  // 鼠标进入事件
+  onMouseEnter = e => {
+    this.setState({
+      hover: true
+    });
+  };
+  // 鼠标离开事件
+  onMouseLeave = e => {
+    this.setState({
+      hover: false
+    });
+  };
   render() {
     const {
       form: { getFieldDecorator, validateFields, getFieldValue },
       videoMonitor: { videoMonitorInfo }
     } = this.props;
 
-    const { show, id, loading, projectId } = this.state;
+    const { hover, show, id, loading, projectId } = this.state;
 
     return (
       <div
@@ -106,7 +119,7 @@ export default class VideoMonitor extends PureComponent {
           position: `absolute`,
           top: 0,
           left: show ? 350 : -1000,
-          zIndex: 1000,
+          zIndex: 1001,
           width: 500,
           height: `100%`,
           paddingTop: 60,
@@ -117,24 +130,25 @@ export default class VideoMonitor extends PureComponent {
       >
         <Spins show={loading} />
         <Icon
+          className={`${styles["show-project-list"]} ${
+            hover ? styles.spec : null
+          }`}
           type="left"
           style={{
-            fontSize: 30,
             display: show ? "block" : "none",
-            position: `absolute`,
-            right: -50,
-            top: `48%`,
-            backgroundColor: `rgba(0, 0, 0, 0.5)`,
-            borderRadius: `50%`,
-            padding: 10,
-            cursor: `pointer`
+            top: hover ? "47.5%" : "48.5%"
           }}
           onClick={() => {
-            this.setState({ show: false });
+            this.setState({
+              hover: false,
+              show: false
+            });
             emitter.emit("hideQuery", {
               hide: true
             });
           }}
+          onMouseEnter={this.onMouseEnter.bind(this)}
+          onMouseLeave={this.onMouseLeave.bind(this)}
         />
         <span
           style={{

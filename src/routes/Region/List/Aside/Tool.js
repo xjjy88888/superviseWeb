@@ -13,6 +13,7 @@ import {
 } from "antd";
 import emitter from "../../../../utils/event";
 import "leaflet/dist/leaflet.css";
+import styles from "../style/sidebar.less";
 import "echarts";
 import config from "../../../../config";
 import { accessToken, dateFormat } from "../../../../utils/util";
@@ -31,6 +32,7 @@ export default class Tool extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
+      hover: false,
       show: false,
       checkResult: [],
       showCheck: false,
@@ -92,11 +94,23 @@ export default class Tool extends PureComponent {
       }
     });
   };
-
+  // 鼠标进入事件
+  onMouseEnter = e => {
+    this.setState({
+      hover: true
+    });
+  };
+  // 鼠标离开事件
+  onMouseLeave = e => {
+    this.setState({
+      hover: false
+    });
+  };
   render() {
     const { dispatch } = this.props;
 
     const {
+      hover,
       show,
       type,
       key,
@@ -116,7 +130,7 @@ export default class Tool extends PureComponent {
           height: 610,
           backgroundColor: `#fff`,
           position: `absolute`,
-          zIndex: 1000,
+          zIndex: 1001,
           top: 410,
           borderRadius: `0px 10px 10px 0`,
           padding: `10px 10px 30px 20px`,
@@ -125,24 +139,25 @@ export default class Tool extends PureComponent {
         }}
       >
         <Icon
+          className={`${styles["show-project-list"]} ${
+            hover ? styles.spec : null
+          }`}
           type="left"
           style={{
-            fontSize: 30,
             display: show ? "block" : "none",
-            position: `absolute`,
-            right: -50,
-            top: `48%`,
-            backgroundColor: ` rgba(0, 0, 0, 0.5)`,
-            borderRadius: ` 50%`,
-            padding: 10,
-            cursor: `pointer`
+            top: hover ? "47.5%" : "48.5%"
           }}
           onClick={() => {
-            this.setState({ show: false });
+            this.setState({
+              show: false,
+              hover: false
+            });
             emitter.emit("showChart", {
               show: false
             });
           }}
+          onMouseEnter={this.onMouseEnter.bind(this)}
+          onMouseLeave={this.onMouseLeave.bind(this)}
         />
         <Spin
           size="large"

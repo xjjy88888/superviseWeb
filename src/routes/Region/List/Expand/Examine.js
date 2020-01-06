@@ -26,6 +26,7 @@ import {
   getLabel,
   formErrorMsg
 } from "../../../../utils/util";
+import styles from "../style/sidebar.less";
 
 let self;
 const { Text } = Typography;
@@ -75,6 +76,7 @@ export default class Examine extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
+      hover: false,
       show: false,
       loading: false,
       InvestigateFileId: 0,
@@ -309,7 +311,18 @@ export default class Examine extends PureComponent {
     );
     return [upId, id];
   };
-
+  // 鼠标进入事件
+  onMouseEnter = e => {
+    this.setState({
+      hover: true
+    });
+  };
+  // 鼠标离开事件
+  onMouseLeave = e => {
+    this.setState({
+      hover: false
+    });
+  };
   render() {
     const {
       dispatch,
@@ -317,7 +330,13 @@ export default class Examine extends PureComponent {
       user: { dictList }
     } = this.props;
 
-    const { record, loading, fileSource, InvestigateFileId } = this.state;
+    const {
+      record,
+      loading,
+      fileSource,
+      InvestigateFileId,
+      hover
+    } = this.state;
 
     const complianceOk = getDictList("查处结果-合规", dictList);
     const complianceNo = getDictList("查处结果-不合规", dictList);
@@ -334,7 +353,7 @@ export default class Examine extends PureComponent {
           position: `absolute`,
           top: 0,
           left: -500,
-          zIndex: 1000,
+          zIndex: 1001,
           width: 450,
           height: `100%`,
           paddingTop: 60,
@@ -344,22 +363,23 @@ export default class Examine extends PureComponent {
         ref={this.saveRef}
       >
         <Spins show={loading} />
+
         <Icon
+          className={`${styles["show-project-list"]} ${
+            hover ? styles.spec : null
+          }`}
           type="left"
           style={{
-            fontSize: 30,
-            // display: show ? "block" : "none",
-            position: `absolute`,
-            right: -50,
-            top: `48%`,
-            backgroundColor: `rgba(0, 0, 0, 0.5)`,
-            borderRadius: `50%`,
-            padding: 10,
-            cursor: `pointer`
+            top: hover ? "47.5%" : "48.5%"
           }}
           onClick={() => {
             this.hide();
+            this.setState({
+              hover: false
+            });
           }}
+          onMouseEnter={this.onMouseEnter.bind(this)}
+          onMouseLeave={this.onMouseLeave.bind(this)}
         />
         <span
           style={{
@@ -387,7 +407,7 @@ export default class Examine extends PureComponent {
                     ...v,
                     id: record.id,
                     investigationResultId: v.investigationResultId[1],
-                    InvestigateFileId,
+                    InvestigateFileId
                   };
                   this.submit(data);
                 }

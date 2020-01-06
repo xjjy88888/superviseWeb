@@ -36,6 +36,7 @@ export default class projectDetail extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
+      hover: false,
       show: false,
       edit: false,
       departList: [],
@@ -381,14 +382,25 @@ export default class projectDetail extends PureComponent {
       </div>
     );
   };
-
+  // 鼠标进入事件
+  onMouseEnter = e => {
+    this.setState({
+      hover: true
+    });
+  };
+  // 鼠标离开事件
+  onMouseLeave = e => {
+    this.setState({
+      hover: false
+    });
+  };
   render() {
     const {
       form: { getFieldDecorator, setFieldsValue },
       project: { projectInfo, departSelectList }
     } = this.props;
 
-    const { show, edit, departList, showSpin } = this.state;
+    const { show, edit, departList, showSpin, hover } = this.state;
 
     const projectItem = projectInfo;
     const departSelectListAll = unique(departSelectList.concat(departList));
@@ -411,22 +423,25 @@ export default class projectDetail extends PureComponent {
         >
           <Spins show={showSpin} />
           <Icon
-            className={styles["show-project-list"]}
+            className={`${styles["show-project-list"]} ${
+              hover ? styles.spec : null
+            }`}
             type="left"
             style={{
               display: show ? "block" : "none",
-              top: `48%`,
-              backgroundColor: "#db7c90",
-              zIndex: 1001
+              top: hover ? "47.5%" : "48.5%"
             }}
             onClick={() => {
               emitter.emit("hideProjectDetail", {
                 hide: true
               });
               this.setState({
-                show: false
+                show: false,
+                hover: false
               });
             }}
+            onMouseEnter={this.onMouseEnter.bind(this)}
+            onMouseLeave={this.onMouseLeave.bind(this)}
           />
           <div
             style={{

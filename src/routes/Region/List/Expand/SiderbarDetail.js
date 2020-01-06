@@ -3,6 +3,7 @@ import React, { PureComponent } from "react";
 import { createForm } from "rc-form";
 import moment from "moment";
 import { connect } from "dva";
+import jQuery from "jquery";
 import {
   Icon,
   Button,
@@ -566,6 +567,9 @@ export default class siderbarDetail extends PureComponent {
           onMouseEnter={this.onMouseEnter.bind(this)}
           onMouseLeave={this.onMouseLeave.bind(this)}
           onClick={() => {
+            if (jQuery("#ProjectList").position().left > 350) {
+              jQuery("#ProjectList").animate({ left: 0 });
+            }
             this.setState({ show: !show, showDetail: false, hover: false });
           }}
         />
@@ -593,6 +597,11 @@ export default class siderbarDetail extends PureComponent {
                     content: "",
                     onOk() {
                       self.setState({ show: false });
+                      if (jQuery("#ProjectList").position().left > 350) {
+                        jQuery("#ProjectList").animate({
+                          left: 0
+                        });
+                      }
                       emitter.emit("deleteDraw", {});
                     },
                     onCancel() {}

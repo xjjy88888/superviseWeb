@@ -53,106 +53,122 @@ export default class ProjectListTable extends PureComponent {
 
     this.getProjectTableList({ MaxResultCount: 20 });
   }
+  dataFormat = v => {
+    console.log("dataFormat开始", v);
+    for (let i in v) {
+      if (Array.isArray(v[i])) {
+        if (i === "ReplyTime" && v[i].length) {
+          v.ReplyTimeBegin = dateFormat(v[i][0]);
+          v.ReplyTimeEnd = dateFormat(v[i][1]);
+        }
+        v[i] = v[i].join(",");
+      }
+    }
+    // v.SkipCount = v.SkipCount || 0;
+    // v.MaxResultCount = v.MaxResultCount || 10;
+    console.log("dataFormat结束", v);
+  };
   componentDidUpdate(prevProps) {
     const { queryParams } = this.props;
     if (prevProps.queryParams !== queryParams) {
       console.log(queryParams);
-      (queryParams.ProjectLevel =
-        queryParams.ProjectLevel &&
-        Object.prototype.toString.call(queryParams.ProjectLevel) ===
-          "[object Array]" &&
-        queryParams.ProjectLevel.length
-          ? queryParams.ProjectLevel.join(",")
-          : queryParams.ProjectLevel
-          ? queryParams.ProjectLevel
-          : ""),
-        (queryParams.HasSpot =
-          queryParams.HasSpot &&
-          Object.prototype.toString.call(queryParams.HasSpot) ===
-            "[object Array]" &&
-          queryParams.HasSpot.length
-            ? queryParams.HasSpot.join(",")
-            : queryParams.HasSpot
-            ? queryParams.HasSpot
-            : ""),
-        (queryParams.ReplyTimeBegin =
-          queryParams.ReplyTime &&
-          Object.prototype.toString.call(queryParams.ReplyTime) ===
-            "[object Array]" &&
-          queryParams.ReplyTime.length > 1
-            ? dateFormat(queryParams.ReplyTime[0]._d)
-            : ""),
-        (queryParams.ReplyTimeEnd =
-          queryParams.ReplyTime &&
-          Object.prototype.toString.call(queryParams.ReplyTime) ===
-            "[object Array]" &&
-          queryParams.ReplyTime.length > 1
-            ? dateFormat(queryParams.ReplyTime[1]._d)
-            : ""),
-        (queryParams.ProjectCate =
-          queryParams.ProjectCate &&
-          Object.prototype.toString.call(queryParams.ProjectCate) ===
-            "[object Array]" &&
-          queryParams.ProjectCate.length
-            ? queryParams.ProjectCate.join(",")
-            : queryParams.ProjectCate
-            ? queryParams.ProjectCate
-            : ""),
-        (queryParams.HasScopes =
-          queryParams.HasScopes &&
-          Object.prototype.toString.call(queryParams.HasScopes) ===
-            "[object Array]" &&
-          queryParams.HasScopes.length
-            ? queryParams.HasScopes.join(",")
-            : queryParams.HasScopes
-            ? queryParams.HasScopes
-            : ""),
-        (queryParams.ProjectNat =
-          queryParams.ProjectNat &&
-          Object.prototype.toString.call(queryParams.ProjectNat) ===
-            "[object Array]" &&
-          queryParams.ProjectNat.length
-            ? queryParams.ProjectNat.join(",")
-            : queryParams.ProjectNat
-            ? queryParams.ProjectNat
-            : ""),
-        (queryParams.ProjectStatus =
-          queryParams.ProjectStatus &&
-          Object.prototype.toString.call(queryParams.ProjectStatus) ===
-            "[object Array]" &&
-          queryParams.ProjectStatus.length
-            ? queryParams.ProjectStatus.join(",")
-            : queryParams.ProjectStatus
-            ? queryParams.ProjectStatus
-            : ""),
-        (queryParams.VecType =
-          queryParams.VecType &&
-          Object.prototype.toString.call(queryParams.VecType) ===
-            "[object Array]" &&
-          queryParams.VecType.length
-            ? queryParams.VecType.join(",")
-            : queryParams.VecType
-            ? queryParams.VecType
-            : ""),
-        (queryParams.ProjectType =
-          queryParams.ProjectType &&
-          Object.prototype.toString.call(queryParams.ProjectType) ===
-            "[object Array]" &&
-          queryParams.ProjectType.length
-            ? queryParams.ProjectType.join(",")
-            : queryParams.ProjectType
-            ? queryParams.ProjectType
-            : ""),
-        (queryParams.Compliance =
-          queryParams.Compliance &&
-          Object.prototype.toString.call(queryParams.Compliance) ===
-            "[object Array]" &&
-          queryParams.Compliance.length
-            ? queryParams.Compliance.join(",")
-            : queryParams.Compliance
-            ? queryParams.Compliance
-            : ""),
-        this.getProjectTableList({ ...queryParams, MaxResultCount: 20 });
+      this.dataFormat(queryParams);
+      // (queryParams.ProjectLevel =
+      //   queryParams.ProjectLevel &&
+      //   Object.prototype.toString.call(queryParams.ProjectLevel) ===
+      //     "[object Array]" &&
+      //   queryParams.ProjectLevel.length
+      //     ? queryParams.ProjectLevel.join(",")
+      //     : queryParams.ProjectLevel
+      //     ? queryParams.ProjectLevel
+      //     : ""),
+      //   (queryParams.HasSpot =
+      //     queryParams.HasSpot &&
+      //     Object.prototype.toString.call(queryParams.HasSpot) ===
+      //       "[object Array]" &&
+      //     queryParams.HasSpot.length
+      //       ? queryParams.HasSpot.join(",")
+      //       : queryParams.HasSpot
+      //       ? queryParams.HasSpot
+      //       : ""),
+      //   (queryParams.ReplyTimeBegin =
+      //     queryParams.ReplyTime &&
+      //     Object.prototype.toString.call(queryParams.ReplyTime) ===
+      //       "[object Array]" &&
+      //     queryParams.ReplyTime.length > 1
+      //       ? dateFormat(queryParams.ReplyTime[0]._d)
+      //       : ""),
+      //   (queryParams.ReplyTimeEnd =
+      //     queryParams.ReplyTime &&
+      //     Object.prototype.toString.call(queryParams.ReplyTime) ===
+      //       "[object Array]" &&
+      //     queryParams.ReplyTime.length > 1
+      //       ? dateFormat(queryParams.ReplyTime[1]._d)
+      //       : ""),
+      //   (queryParams.ProjectCate =
+      //     queryParams.ProjectCate &&
+      //     Object.prototype.toString.call(queryParams.ProjectCate) ===
+      //       "[object Array]" &&
+      //     queryParams.ProjectCate.length
+      //       ? queryParams.ProjectCate.join(",")
+      //       : queryParams.ProjectCate
+      //       ? queryParams.ProjectCate
+      //       : ""),
+      //   (queryParams.HasScopes =
+      //     queryParams.HasScopes &&
+      //     Object.prototype.toString.call(queryParams.HasScopes) ===
+      //       "[object Array]" &&
+      //     queryParams.HasScopes.length
+      //       ? queryParams.HasScopes.join(",")
+      //       : queryParams.HasScopes
+      //       ? queryParams.HasScopes
+      //       : ""),
+      //   (queryParams.ProjectNat =
+      //     queryParams.ProjectNat &&
+      //     Object.prototype.toString.call(queryParams.ProjectNat) ===
+      //       "[object Array]" &&
+      //     queryParams.ProjectNat.length
+      //       ? queryParams.ProjectNat.join(",")
+      //       : queryParams.ProjectNat
+      //       ? queryParams.ProjectNat
+      //       : ""),
+      //   (queryParams.ProjectStatus =
+      //     queryParams.ProjectStatus &&
+      //     Object.prototype.toString.call(queryParams.ProjectStatus) ===
+      //       "[object Array]" &&
+      //     queryParams.ProjectStatus.length
+      //       ? queryParams.ProjectStatus.join(",")
+      //       : queryParams.ProjectStatus
+      //       ? queryParams.ProjectStatus
+      //       : ""),
+      //   (queryParams.VecType =
+      //     queryParams.VecType &&
+      //     Object.prototype.toString.call(queryParams.VecType) ===
+      //       "[object Array]" &&
+      //     queryParams.VecType.length
+      //       ? queryParams.VecType.join(",")
+      //       : queryParams.VecType
+      //       ? queryParams.VecType
+      //       : ""),
+      //   (queryParams.ProjectType =
+      //     queryParams.ProjectType &&
+      //     Object.prototype.toString.call(queryParams.ProjectType) ===
+      //       "[object Array]" &&
+      //     queryParams.ProjectType.length
+      //       ? queryParams.ProjectType.join(",")
+      //       : queryParams.ProjectType
+      //       ? queryParams.ProjectType
+      //       : ""),
+      //   (queryParams.Compliance =
+      //     queryParams.Compliance &&
+      //     Object.prototype.toString.call(queryParams.Compliance) ===
+      //       "[object Array]" &&
+      //     queryParams.Compliance.length
+      //       ? queryParams.Compliance.join(",")
+      //       : queryParams.Compliance
+      //       ? queryParams.Compliance
+      //       : ""),
+      this.getProjectTableList({ ...queryParams, MaxResultCount: 20 });
     }
   }
   componentWillUnmount() {

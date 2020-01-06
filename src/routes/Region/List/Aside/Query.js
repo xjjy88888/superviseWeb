@@ -15,6 +15,7 @@ import {
 } from "antd";
 import emitter from "../../../../utils/event";
 import "leaflet/dist/leaflet.css";
+import styles from "../style/sidebar.less";
 
 const { RangePicker } = DatePicker;
 const formItemLayout = {
@@ -36,6 +37,7 @@ export default class Query extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
+      hover: false,
       show: false,
       type: "project",
       dataSource: [],
@@ -108,7 +110,18 @@ export default class Query extends PureComponent {
       payload: { queryParams: { ...queryParams, ...payload } }
     });
   };
-
+  // 鼠标进入事件
+  onMouseEnter = e => {
+    this.setState({
+      hover: true
+    });
+  };
+  // 鼠标离开事件
+  onMouseLeave = e => {
+    this.setState({
+      hover: false
+    });
+  };
   render() {
     const {
       queryReset,
@@ -117,7 +130,7 @@ export default class Query extends PureComponent {
       district: { districtTreeFilter }
     } = this.props;
 
-    const { show, type, showVecType, isProjectSupervise } = this.state;
+    const { hover, show, type, showVecType, isProjectSupervise } = this.state;
 
     return (
       <div
@@ -125,7 +138,7 @@ export default class Query extends PureComponent {
           position: `absolute`,
           top: 0,
           left: show ? 350 : -550,
-          zIndex: 1000,
+          zIndex: 1001,
           width: 450,
           height: `100%`,
           paddingTop: 46,
@@ -135,24 +148,25 @@ export default class Query extends PureComponent {
         ref={this.saveRef}
       >
         <Icon
+          className={`${styles["show-project-list"]} ${
+            hover ? styles.spec : null
+          }`}
           type="left"
           style={{
-            fontSize: 30,
             display: show ? "block" : "none",
-            position: `absolute`,
-            right: -50,
-            top: `48%`,
-            backgroundColor: `rgba(0, 0, 0, 0.5)`,
-            borderRadius: `50%`,
-            padding: 10,
-            cursor: `pointer`
+            top: hover ? "47.5%" : "48.5%"
           }}
           onClick={() => {
-            this.setState({ show: false });
+            this.setState({
+              show: false,
+              hover: false
+            });
             emitter.emit("hideQuery", {
               hide: true
             });
           }}
+          onMouseEnter={this.onMouseEnter.bind(this)}
+          onMouseLeave={this.onMouseLeave.bind(this)}
         />
         <div
           style={{

@@ -204,7 +204,7 @@ export default class chart extends PureComponent {
           display: show && showTool && type === "control" ? "block" : "none",
           backgroundColor: "#fff",
           position: "absolute",
-          zIndex: 1000,
+          zIndex: 1001,
           borderRadius: 10,
           padding: "10px 00px 10px 30px",
           minWidth: 600,

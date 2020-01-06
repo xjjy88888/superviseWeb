@@ -37,11 +37,13 @@ export async function mergeProjectApi(params) {
 // 项目列表---表格展示
 export async function projectTableListApi(params) {
   // delete params.items;
-  return request(`${config.url.projectTableListUrl}?${stringify(params)}`, {
-    method: "GET",
+  return request(`${config.url.projectTableListUrl}`, {
+    method: "POST",
     headers: {
-      Authorization: `Bearer ${accessToken()}`
-    }
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify({ ...params })
   });
 }
 
@@ -59,7 +61,9 @@ export async function projectListApi(params) {
       body: JSON.stringify(params)
     }
   );
-}
+}         
+
+
 
 // 项目信息
 export async function projectByIdApi(id) {

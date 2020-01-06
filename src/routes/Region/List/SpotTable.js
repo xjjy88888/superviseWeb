@@ -263,7 +263,7 @@ export default class SpotListTable extends PureComponent {
         siderBarPageInfo: { ...siderBarPageInfo, currentSpotId: val }
       }
     });
-    jQuery("#ProjectList").css({ left: 800 });
+    jQuery("#ProjectList").css({ left: 750 });
     console.log(val);
   };
   render() {
@@ -467,7 +467,7 @@ export default class SpotListTable extends PureComponent {
         }
         columns={columns}
         scroll={{
-          x: 2940,
+          x: 3200,
           y: `calc(100vh - ${tableY})`
         }}
       />
