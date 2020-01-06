@@ -76,7 +76,7 @@ export default class Tool extends PureComponent {
 
   queryInfo = data => {
     console.log("工具筛选完成", data);
-    const queryInfo = { ...data.info };
+    const queryInfo = { ...data.queryParams };
     if (queryInfo.ReplyTime && queryInfo.ReplyTime.length) {
       queryInfo.ReplyTimeBegin = dateFormat(queryInfo.ReplyTime[0]._d);
       queryInfo.ReplyTimeEnd = dateFormat(queryInfo.ReplyTime[1]._d);

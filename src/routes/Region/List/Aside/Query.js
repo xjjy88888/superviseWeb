@@ -103,13 +103,19 @@ export default class Query extends PureComponent {
     }
   };
 
-  projectSave = payload => {
-    const { dispatch, queryParams } = this.props;
-    dispatch({
-      type: "project/projectSave",
-      payload: { queryParams: { ...queryParams, ...payload } }
-    });
-  };
+  // projectSave = payload => {
+  //   const { dispatch, queryParams } = this.props;
+  //   dispatch({
+  //     type: "project/projectSave",
+  //     payload: {
+  //       queryParams: {
+  //         ...queryParams,
+  //         ...payload.queryParams,
+  //         from: payload.from
+  //       }
+  //     }
+  //   });
+  // };
   // 鼠标进入事件
   onMouseEnter = e => {
     this.setState({
@@ -189,7 +195,7 @@ export default class Query extends PureComponent {
               resetFields();
               queryInfo({
                 from: type,
-                info: {},
+                queryParams: {},
                 ProjectShowArchive: false
               });
               queryReset();
@@ -232,7 +238,7 @@ export default class Query extends PureComponent {
                     queryParams
                   };
                   queryInfo(data);
-                  this.projectSave(queryParams);
+                  // this.projectSave(data);
                 }
               });
             }}

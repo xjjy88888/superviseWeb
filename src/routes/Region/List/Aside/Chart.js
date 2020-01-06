@@ -5,6 +5,7 @@ import "leaflet/dist/leaflet.css";
 import echarts from "echarts/lib/echarts";
 import "echarts";
 import { connect } from "dva";
+import { dateFormat } from "../../../../utils/util";
 
 let myChart;
 
@@ -56,11 +57,41 @@ export default class chart extends PureComponent {
       clientWidth: clientWidth
     });
   }
+  componentDidUpdate(prevProps) {
+    const {
+      project: { queryParams }
+    } = this.props;
+    if (prevProps.project.queryParams !== queryParams) {
+      console.log("queryParams---chart============", queryParams);
+      queryParams.from && delete queryParams.from;
+      this.dataFormat(queryParams);
+      this.setState({
+        queryInfo: queryParams
+      });
+      // if (queryParams.from && queryParams.from === "project") {
+      //   this.queryProject({ ...queryParams });
+      // }
+    }
+  }
+  
+  // 格式化查询数据
+  dataFormat = v => {
+    for (let i in v) {
+      if (Array.isArray(v[i])) {
+        if (i === "ReplyTime" && v[i].length) {
+          v.ReplyTimeBegin = dateFormat(v[i][0]);
+          v.ReplyTimeEnd = dateFormat(v[i][1]);
+        }
+        v[i] = v[i].join(",");
+      }
+    }
+  };
 
   queryInfo = v => {
     console.log("图表筛选完成", v);
+    this.dataFormat(v.queryParams);
     this.setState({
-      queryInfo: v.info
+      queryInfo: v.queryParams
     });
   };
 
@@ -68,6 +99,7 @@ export default class chart extends PureComponent {
     const { dispatch } = this.props;
     const { state, queryInfo } = this.state;
     this.setState({ showSpin: true });
+    console.log("chart---query================", queryInfo);
     dispatch({
       type: `${t}/${t}Chart`,
       payload: {

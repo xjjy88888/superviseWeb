@@ -162,8 +162,13 @@ export default class siderbar extends PureComponent {
       }
     } = this.props;
     if (prevProps.project.queryParams !== queryParams) {
-      this.queryProject({ ...queryParams });
-    } else if (
+      if (queryParams.from && queryParams.from === "project") {
+        this.queryProject({ ...queryParams });
+      } else if (queryParams.from && queryParams.from === "spot") {
+        this.querySpot({ ...queryParams });
+      }
+    }
+    if (
       prevProps.commonModel.siderBarPageInfo.currentProjectId !==
         currentProjectId &&
       currentProjectId !== ""
@@ -360,13 +365,30 @@ export default class siderbar extends PureComponent {
     });
     this.saveCurrentPageInfo("project");
   }
-
+  // 将筛选内容保存到props中
+  querySave = payload => {
+    const {
+      dispatch,
+      project: { queryParams }
+    } = this.props;
+    dispatch({
+      type: "project/projectSave",
+      payload: {
+        queryParams: {
+          ...queryParams,
+          ...payload.queryParams,
+          from: payload.from
+        }
+      }
+    });
+  };
   queryInfo = data => {
     console.log("列表筛选完成", data);
     if (this.scrollDom) {
       this.scrollDom.scrollTop = 0;
     }
     const { query_pro, query_spot, query_point } = this.state;
+
     emitter.emit("checkResult", {
       show: false,
       result: []
@@ -390,6 +412,9 @@ export default class siderbar extends PureComponent {
       ShowArchive: data.ShowArchive,
       queryHighlight: queryHighlight
     });
+    // 保存筛选数据到props
+    this.querySave(data);
+
     if (data.from === "project") {
       this.setState({
         row_pro: 10
@@ -485,23 +510,33 @@ export default class siderbar extends PureComponent {
           ? projectSuperviseList.totalCount
           : projectList.totalCount;
         if (pl < pt) {
-          this.queryProject({
+          const obj = {
             ...queryInfo,
             Count: pt,
             SkipCount: row_pro,
             Sorting: Sorting,
             ProjectName: query_pro
+          };
+          this.queryProject(obj);
+          this.querySave({
+            queryParams: obj,
+            from: "project"
           });
           this.setState({ row_pro: row_pro + 10 });
         }
       } else if (key === "spot") {
         if (spotList.items.length < spotList.totalCount) {
-          this.querySpot({
+          const obj = {
             ...queryInfo,
             Count: spotList.totalCount,
             SkipCount: row_spot,
             Sorting: Sorting,
             MapNum: query_spot
+          };
+          this.querySpot(obj);
+          this.querySave({
+            queryParams: obj,
+            from: "spot"
           });
           this.setState({ row_spot: row_spot + 10 });
         }
@@ -652,106 +687,8 @@ export default class siderbar extends PureComponent {
       project: { projectList }
     } = this.props;
     // console.log("items=============", items);
+    items.from && delete items.from;
     this.dataFormat(items);
-    // eslint-disable-next-line no-unused-expressions
-    // (items.MaxResultCount = items.MaxResultCount || "10"),
-    //   (items.ReplyTimeBegin =
-    //     items.ReplyTime &&
-    //     Object.prototype.toString.call(items.ReplyTime) === "[object Array]" &&
-    //     items.ReplyTime.length > 1
-    //       ? dateFormat(items.ReplyTime[0]._d)
-    //       : ""),
-    //   (items.ReplyTimeEnd =
-    //     items.ReplyTime &&
-    //     Object.prototype.toString.call(items.ReplyTime) === "[object Array]" &&
-    //     items.ReplyTime.length > 1
-    //       ? dateFormat(items.ReplyTime[1]._d)
-    //       : ""),
-    //   (items.ProjectCate =
-    //     items.ProjectCate &&
-    //     Object.prototype.toString.call(items.ProjectCate) ===
-    //       "[object Array]" &&
-    //     items.ProjectCate.length
-    //       ? items.ProjectCate.join(",")
-    //       : items.ProjectCate && items.ProjectCate.length
-    //       ? items.ProjectCate
-    //       : ""),
-    //   (items.HasScopes =
-    //     items.HasScopes &&
-    //     Object.prototype.toString.call(items.HasScopes) === "[object Array]" &&
-    //     items.HasScopes.length
-    //       ? items.HasScopes.join(",")
-    //       : items.HasScopes && items.HasScopes.length
-    //       ? items.HasScopes
-    //       : ""),
-    //   (items.ProjectNat =
-    //     items.ProjectNat &&
-    //     Object.prototype.toString.call(items.ProjectNat) === "[object Array]" &&
-    //     items.ProjectNat.length
-    //       ? items.ProjectNat.join(",")
-    //       : items.ProjectNat && items.ProjectNat.length
-    //       ? items.ProjectNat
-    //       : ""),
-    //   (items.ProjectStatus =
-    //     items.ProjectStatus &&
-    //     Object.prototype.toString.call(items.ProjectStatus) ===
-    //       "[object Array]" &&
-    //     items.ProjectStatus.length
-    //       ? items.ProjectStatus.join(",")
-    //       : items.ProjectStatus && items.ProjectStatus.length
-    //       ? items.ProjectStatus
-    //       : ""),
-    //   (items.VecType =
-    //     items.VecType &&
-    //     Object.prototype.toString.call(items.VecType) === "[object Array]" &&
-    //     items.VecType.length
-    //       ? items.VecType.join(",")
-    //       : items.VecType && items.VecType.length
-    //       ? items.VecType
-    //       : ""),
-    //   (items.HasSpot =
-    //     items.HasSpot &&
-    //     Object.prototype.toString.call(items.HasSpot) === "[object Array]" &&
-    //     items.HasSpot.length
-    //       ? items.HasSpot.join(",")
-    //       : items.HasSpot && items.HasSpot.length
-    //       ? items.HasSpot
-    //       : ""),
-    //   (items.ProjectType =
-    //     items.ProjectType &&
-    //     Object.prototype.toString.call(items.ProjectType) ===
-    //       "[object Array]" &&
-    //     items.ProjectType.length
-    //       ? items.ProjectType.join(",")
-    //       : items.ProjectType && items.ProjectType.length
-    //       ? items.ProjectType
-    //       : ""),
-    //   (items.Compliance =
-    //     items.Compliance &&
-    //     Object.prototype.toString.call(items.Compliance) === "[object Array]" &&
-    //     items.Compliance.length
-    //       ? items.Compliance.join(",")
-    //       : items.Compliance && items.Compliance.length
-    //       ? items.Compliance
-    //       : ""),
-    //   (items.InterferenceCompliance =
-    //     items.InterferenceCompliance &&
-    //     Object.prototype.toString.call(items.InterferenceCompliance) ===
-    //       "[object Array]" &&
-    //     items.InterferenceCompliance.length
-    //       ? items.InterferenceCompliance.join(",")
-    //       : items.InterferenceCompliance && items.InterferenceCompliance.length
-    //       ? items.InterferenceCompliance
-    //       : ""),
-    //   (items.ProjectLevel =
-    //     items.ProjectLevel &&
-    //     Object.prototype.toString.call(items.ProjectLevel) ===
-    //       "[object Array]" &&
-    //     items.ProjectLevel.length
-    //       ? items.ProjectLevel.join(",")
-    //       : items.ProjectLevel && items.ProjectLevel.length
-    //       ? items.ProjectLevel
-    //       : "");
     // console.log("new---items==============", items);
     if (isProjectSupervise) {
       this.queryProjectSupervise(items);
@@ -809,6 +746,7 @@ export default class siderbar extends PureComponent {
       spot: { spotList }
     } = this.props;
     this.showSpin(true);
+    items.from && delete items.from;
     dispatch({
       type: "spot/querySpot",
       payload: {
@@ -1056,6 +994,13 @@ export default class siderbar extends PureComponent {
     });
   };
   switchMenu = e => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "project/projectSave",
+      payload: {
+        queryParams: {}
+      }
+    });
     this.hide();
     this.scrollDom.scrollTop = 0;
     const k = e.key;
@@ -1299,20 +1244,30 @@ export default class siderbar extends PureComponent {
         query_pro: v,
         row_pro: 10
       });
-      this.queryProject({
+      const obj = {
         ...queryInfo,
         SkipCount: 0,
         ProjectName: v,
         from: "query"
+      };
+      this.querySave({
+        queryParams: obj,
+        from: "project"
       });
+      this.queryProject(obj);
     } else if (key === "spot") {
       this.setState({ query_spot: v, row_spot: 10 });
-      this.querySpot({
+      const obj = {
         ...queryInfo,
         SkipCount: 0,
         MapNum: v,
         from: "query"
+      };
+      this.querySave({
+        queryParams: obj,
+        from: "spot"
       });
+      this.querySpot(obj);
     } else {
       this.setState({ query_point: v, row_point: 10 });
       this.queryPoint({
@@ -1914,26 +1869,38 @@ export default class siderbar extends PureComponent {
                     Sorting: Sorting_new
                   });
                   this.scrollDom.scrollTop = 0;
+                  if (key === "project" || key === "spot") {
+                  }
                   if (key === "project") {
                     this.setState({
                       row_pro: 10
                     });
-                    this.queryProject({
+                    const obj = {
                       ...queryInfo,
                       Sorting: Sorting_new,
                       SkipCount: 0,
                       ProjectName: query_pro
+                    };
+                    this.querySave({
+                      queryParams: obj,
+                      from: "project"
                     });
+                    this.queryProject(obj);
                   } else if (key === "spot") {
                     this.setState({
                       row_spot: 10
                     });
-                    this.querySpot({
+                    const obj = {
                       ...queryInfo,
                       Sorting: Sorting_new,
                       SkipCount: 0,
                       ProjectName: query_spot
+                    };
+                    this.querySave({
+                      queryParams: obj,
+                      from: "spot"
                     });
+                    this.querySpot(obj);
                   } else {
                     this.setState({
                       row_point: 10

@@ -7,10 +7,11 @@ import styles from "./style/ProjectList.less";
 
 const { RangePicker } = DatePicker;
 
-@connect(({ spot, commonModel, user }) => ({
+@connect(({ spot, commonModel, user, project }) => ({
   ...spot,
   ...commonModel,
-  ...user
+  ...user,
+  ...project
 }))
 export default class SpotListTable extends PureComponent {
   constructor(props) {
@@ -40,9 +41,33 @@ export default class SpotListTable extends PureComponent {
       tableHeight: document.body.scrollHeight
     });
   };
+  // 格式化查询数据
+  dataFormat = v => {
+    for (let i in v) {
+      if (Array.isArray(v[i])) {
+        // if (i === "ReplyTime" && v[i].length) {
+        //   v.ReplyTimeBegin = dateFormat(v[i][0]);
+        //   v.ReplyTimeEnd = dateFormat(v[i][1]);
+        // }
+        v[i] = v[i].join(",");
+      }
+    }
+  };
   componentDidMount() {
     window.addEventListener("resize", this.onWindowResize);
     this.getSpotTableList({ MaxResultCount: 20 });
+  }
+  componentDidUpdate(prevProps) {
+    const { queryParams } = this.props;
+    if (
+      prevProps.queryParams !== queryParams &&
+      queryParams.from &&
+      queryParams.from === "spot"
+    ) {
+      console.log(queryParams);
+      this.dataFormat(queryParams);
+      this.getSpotTableList({ ...queryParams, MaxResultCount: 20 });
+    }
   }
   // 获取图斑列表
   getSpotTableList = parmas => {
@@ -99,7 +124,7 @@ export default class SpotListTable extends PureComponent {
   };
   // 表格筛选内容变化时触发
   handleTableChange = (pagination, filters, sorter) => {
-    // console.log(pagination);
+    const { dispatch, queryParams } = this.props;
 
     let Sorting = ``;
     if (sorter.columnKey) {
@@ -153,11 +178,17 @@ export default class SpotListTable extends PureComponent {
     } else {
       filterObj.Count && delete filterObj.Count;
     }
-    this.getSpotTableList(filterObj);
+    this.getSpotTableList({ ...queryParams, ...filterObj });
     this.setState({
       pagination,
       filterObj,
       Sorting
+    });
+    dispatch({
+      type: "project/projectSave",
+      payload: {
+        queryParams: { ...queryParams, ...filterObj, from: "spot" }
+      }
     });
   };
 
@@ -297,7 +328,7 @@ export default class SpotListTable extends PureComponent {
         title: "图斑编号",
         dataIndex: "mapNum",
         key: "mapNum",
-        width: 180,
+        width: 270,
         fixed: "left",
         sorter: true,
         ...this.getColumnSearchProps("mapNum"),
@@ -315,7 +346,7 @@ export default class SpotListTable extends PureComponent {
         title: "复核状态",
         dataIndex: "isReview",
         key: "isReview",
-        width: 100,
+        width: 120,
         fixed: "left",
         filters: [
           {
@@ -467,7 +498,7 @@ export default class SpotListTable extends PureComponent {
         }
         columns={columns}
         scroll={{
-          x: 3200,
+          x: 3050,
           y: `calc(100vh - ${tableY})`
         }}
       />
