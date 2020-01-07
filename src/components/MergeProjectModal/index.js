@@ -1,16 +1,6 @@
-import React, { PureComponent, Fragment } from "react";
+import React, { PureComponent } from "react";
 import { connect } from "dva";
-import jQuery from "jquery";
-import {
-  Modal,
-  Steps,
-  Button,
-  Table,
-  Input,
-  Icon,
-  Tooltip,
-  message
-} from "antd";
+import { Modal, Steps, Button, Table, message } from "antd";
 
 import styles from "./index.less";
 const { Step } = Steps;

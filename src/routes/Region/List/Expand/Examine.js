@@ -6,11 +6,9 @@ import jQuery from "jquery";
 import {
   Icon,
   Button,
-  Input,
   Form,
   Modal,
   Typography,
-  message,
   Upload,
   notification,
   Cascader,
@@ -325,7 +323,6 @@ export default class Examine extends PureComponent {
   };
   render() {
     const {
-      dispatch,
       form: { getFieldDecorator, validateFields },
       user: { dictList }
     } = this.props;

@@ -406,7 +406,7 @@ export default class projectDetail extends PureComponent {
     const departSelectListAll = unique(departSelectList.concat(departList));
 
     return (
-      <>
+      <div>
         <div
           style={{
             position: "absolute",
@@ -1466,7 +1466,7 @@ export default class projectDetail extends PureComponent {
             }}
           />
         ) : null}
-      </>
+      </div>
     );
   }
 }

@@ -1014,7 +1014,6 @@ export default class siderbar extends PureComponent {
     });
   };
   switchMenu = e => {
-    const { dispatch } = this.props;
     const { query_pro, query_spot } = this.state;
     this.hide();
     this.scrollDom.scrollTop = 0;
@@ -1229,6 +1228,7 @@ export default class siderbar extends PureComponent {
     if (!arr) {
       return;
     }
+    // eslint-disable-next-line array-callback-return
     arr.map(item => {
       if (item.value === v) {
         result = [item[key]];

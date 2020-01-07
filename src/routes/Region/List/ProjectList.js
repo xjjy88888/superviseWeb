@@ -1,6 +1,5 @@
-import React, { PureComponent, ReactDOM } from "react";
+import React, { PureComponent } from "react";
 import { connect } from "dva";
-import { Link } from "dva/router";
 import jQuery from "jquery";
 import { dateFormat } from "../../../utils/util";
 import { Button, Table, PageHeader, Icon, Input, message } from "antd";
@@ -48,7 +47,7 @@ export default class ProjectListTable extends PureComponent {
   };
   componentDidMount() {
     window.addEventListener("resize", this.onWindowResize);
-    const { link, districtTree } = this.props;
+    const { link } = this.props;
     link(this);
 
     this.getProjectTableList({ MaxResultCount: 20 });
@@ -355,6 +354,7 @@ export default class ProjectListTable extends PureComponent {
         if (dataIndex === "checkDate") {
           let v = false;
           if (record.projectChecks.length > 0) {
+            // eslint-disable-next-line array-callback-return
             record.projectChecks.map(item => {
               if (
                 item[dataIndex] &&
@@ -461,7 +461,7 @@ export default class ProjectListTable extends PureComponent {
         render: (text, record) => (
           // <Link to={"/region?from=project&id=" + record.id}>
           <a
-            href="#"
+            // href="#"
             onClick={this.gotoProjectDetail.bind(this, record.id)}
             style={{ color: currentProjectId === record.id && "green" }}
           >

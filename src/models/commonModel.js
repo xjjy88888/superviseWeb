@@ -1,4 +1,3 @@
-import { notification } from "antd";
 import { mergeProjectApi } from "../services/httpApi";
 
 export default {

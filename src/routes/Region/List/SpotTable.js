@@ -1,9 +1,9 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
 import jQuery from "jquery";
-import { Button, Table, Input, Icon, Tooltip, DatePicker } from "antd";
+import { Button, Table, Input, Icon, DatePicker } from "antd";
 
-import styles from "./style/ProjectList.less";
+// import styles from "./style/ProjectList.less";
 
 const { RangePicker } = DatePicker;
 
@@ -296,6 +296,7 @@ export default class SpotListTable extends PureComponent {
     },
     onFilterDropdownVisibleChange: visible => {
       if (visible) {
+        // eslint-disable-next-line no-unused-expressions
         dataIndex === "creationTime" || dataIndex === "lastModificationTime"
           ? null
           : setTimeout(() => this.searchInput.select());
@@ -356,7 +357,7 @@ export default class SpotListTable extends PureComponent {
         ...this.getColumnSearchProps("mapNum"),
         render: (text, record) => (
           <a
-            href="#"
+            // href="#"
             onClick={this.gotoSpotDetail.bind(this, record.id)}
             style={{ color: currentSpotId === record.id && "green" }}
           >

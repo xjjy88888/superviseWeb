@@ -74,7 +74,7 @@ export default {
         if (callback) callback(success, projectTableList);
       }
     },
-    
+
     // 项目列表
     *queryProject({ payload, callback }, { call, put }) {
       const items_old = payload.items;
@@ -355,7 +355,7 @@ export default {
 
     *projectExamine({ payload, callback }, { call, put }) {
       const {
-        data: { success, error, result }
+        data: { success }
       } = yield call(projectExamineApi, payload);
       notification[success ? "success" : "error"]({
         message: success ? "项目查处成功" : "项目查处失败"
