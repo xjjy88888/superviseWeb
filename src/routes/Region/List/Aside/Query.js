@@ -283,22 +283,22 @@ export default class Query extends PureComponent {
             </Form.Item>
             <Form.Item label="建设单位" {...formItemLayout}>
               {getFieldDecorator("ProductDepartment", { initialValue: "" })(
-                <Input allowClear />
+                <Input allowClear={true} />
               )}
             </Form.Item>
             <Form.Item label="监管单位" {...formItemLayout}>
               {getFieldDecorator("SupDepartment", { initialValue: "" })(
-                <Input allowClear />
+                <Input allowClear={true} />
               )}
             </Form.Item>
             <Form.Item label="批复机构" {...formItemLayout}>
               {getFieldDecorator("ReplyDepartment", { initialValue: "" })(
-                <Input allowClear />
+                <Input allowClear={true} />
               )}
             </Form.Item>
             <Form.Item label="批复文号" {...formItemLayout}>
               {getFieldDecorator("ReplyNum", { initialValue: "" })(
-                <Input allowClear />
+                <Input allowClear={true} />
               )}
             </Form.Item>
             <Form.Item label="项目类型" {...formItemLayout}>

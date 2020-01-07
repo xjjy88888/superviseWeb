@@ -196,20 +196,20 @@ export async function spotListApi(params) {
         "Content-Type": "application/json-patch+json"
       },
       body: JSON.stringify({
-        ...params,
-        MaxResultCount: params.MaxResultCount || "10",
-        InterferenceType: params.InterferenceType
-          ? params.InterferenceType.map(v => v).join(",")
-          : "",
-        InterferenceCompliance: params.InterferenceCompliance
-          ? params.InterferenceCompliance.map(v => v).join(",")
-          : "",
-        BuildStatus: params.BuildStatus
-          ? params.BuildStatus.map(v => v).join(",")
-          : "",
-        InterferenceVaryType: params.InterferenceVaryType
-          ? params.InterferenceVaryType.map(v => v).join(",")
-          : ""
+        ...params
+        // MaxResultCount: params.MaxResultCount || "10",
+        // InterferenceType: params.InterferenceType
+        //   ? params.InterferenceType.map(v => v).join(",")
+        //   : "",
+        // InterferenceCompliance: params.InterferenceCompliance
+        //   ? params.InterferenceCompliance.map(v => v).join(",")
+        //   : "",
+        // BuildStatus: params.BuildStatus
+        //   ? params.BuildStatus.map(v => v).join(",")
+        //   : "",
+        // InterferenceVaryType: params.InterferenceVaryType
+        //   ? params.InterferenceVaryType.map(v => v).join(",")
+        //   : ""
       })
     }
   );

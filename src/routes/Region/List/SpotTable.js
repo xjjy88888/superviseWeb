@@ -72,6 +72,7 @@ export default class SpotListTable extends PureComponent {
   // 获取图斑列表
   getSpotTableList = parmas => {
     const { dispatch } = this.props;
+    parmas.from && delete parmas.from;
     dispatch({
       type: "spot/getSpotTableList",
       payload: parmas,
@@ -143,16 +144,21 @@ export default class SpotListTable extends PureComponent {
       Sorting,
       SkipCount: (pagination.current - 1) * pagination.pageSize,
       MaxResultCount: pagination.pageSize,
-      mapNum: filters.mapNum && filters.mapNum.length ? filters.mapNum[0] : ``,
-      projectName:
+      MapNum:
+        filters.mapNum && filters.mapNum.length
+          ? filters.mapNum[0]
+          : queryParams.MapNum
+          ? queryParams.MapNum
+          : ``,
+      ProjectName:
         filters.projectName && filters.projectName.length
           ? filters.projectName[0]
           : ``,
-      isReview:
+      IsReview:
         filters.isReview && filters.isReview.length
           ? filters.isReview.join(",")
           : ``,
-      buildStatusValue:
+      BuildStatus:
         filters.buildStatusValue && filters.buildStatusValue.length
           ? filters.buildStatusValue.join(",")
           : ``,
@@ -213,22 +219,30 @@ export default class SpotListTable extends PureComponent {
             }
             onPressEnter={() => confirm()}
           />
-          <Button
-            type="primary"
-            onClick={() => confirm()}
-            icon="search"
-            size="small"
-            style={{ width: 90, marginRight: 8 }}
+          <div
+            style={{
+              width: "100%",
+              padding: "5px 12px 0",
+              textAlign: "center"
+            }}
           >
-            确定
-          </Button>
-          <Button
-            onClick={() => this.handleReset(clearFilters)}
-            size="small"
-            style={{ width: 90 }}
-          >
-            重置
-          </Button>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              icon="search"
+              size="small"
+              style={{ width: 90, marginRight: 8 }}
+            >
+              确定
+            </Button>
+            <Button
+              onClick={() => this.handleReset(clearFilters)}
+              size="small"
+              style={{ width: 90 }}
+            >
+              重置
+            </Button>
+          </div>
         </div>
       ) : (
         <div style={{ padding: 8 }}>
@@ -265,13 +279,20 @@ export default class SpotListTable extends PureComponent {
       <Icon type="search" style={{ color: filtered ? "#1890ff" : undefined }} />
     ),
     onFilter: (value, record) => {
-      return (
-        record[dataIndex] &&
-        record[dataIndex]
-          .toString()
-          .toLowerCase()
-          .includes(value.toLowerCase())
-      );
+      if (
+        dataIndex === "creationTime" ||
+        dataIndex === "lastModificationTime"
+      ) {
+        return true;
+      } else {
+        return (
+          record[dataIndex] &&
+          record[dataIndex]
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
+        );
+      }
     },
     onFilterDropdownVisibleChange: visible => {
       if (visible) {
@@ -281,6 +302,7 @@ export default class SpotListTable extends PureComponent {
       }
     }
   });
+
   componentWillUnmount() {
     window.removeEventListener("resize", this.onWindowResize);
   }
@@ -357,7 +379,9 @@ export default class SpotListTable extends PureComponent {
             text: "未复核",
             value: "false"
           }
-        ]
+        ],
+        render: text =>
+          text === true ? "已复核" : text === false ? "未复核" : ""
       },
       // {
       //   title: "重点监管",

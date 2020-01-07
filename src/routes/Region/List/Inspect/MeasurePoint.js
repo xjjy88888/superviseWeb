@@ -332,7 +332,7 @@ export default class measurePoint extends PureComponent {
           >
             {getFieldDecorator("name", {
               initialValue: measurePointInfo.name
-            })(<Input allowClear style={{ width: 240 }} />)}
+            })(<Input allowClear={true} style={{ width: 240 }} />)}
           </Form.Item>
           <Form.Item label="措施类型" {...formItemLayout}>
             {getFieldDecorator("measurePointTypeId", {
@@ -340,7 +340,7 @@ export default class measurePoint extends PureComponent {
             })(
               <Select
                 showSearch
-                allowClear
+                allowClear={true}
                 optionFilterProp="children"
                 style={{ width: 240 }}
               >
@@ -387,7 +387,13 @@ export default class measurePoint extends PureComponent {
           <Form.Item label="备注" {...formItemLayout}>
             {getFieldDecorator("description", {
               initialValue: measurePointInfo.description
-            })(<Input.TextArea allowClear autosize style={{ width: 240 }} />)}
+            })(
+              <Input.TextArea
+                allowClear={true}
+                autosize
+                style={{ width: 240 }}
+              />
+            )}
           </Form.Item>
           <div
             style={{ minHeight: fileList.length ? 120 : 0, margin: "0 30px" }}

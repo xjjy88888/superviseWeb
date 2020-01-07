@@ -686,7 +686,7 @@ export default class siderbarDetail extends PureComponent {
                 })(
                   <Select
                     showSearch
-                    allowClear
+                    allowClear={true}
                     disabled={!edit}
                     optionFilterProp="children"
                   >
@@ -714,7 +714,7 @@ export default class siderbarDetail extends PureComponent {
                 })(
                   <Select
                     showSearch
-                    allowClear
+                    allowClear={true}
                     disabled={!edit}
                     optionFilterProp="children"
                   >
@@ -904,7 +904,7 @@ export default class siderbarDetail extends PureComponent {
                   initialValue: spotItem.projectId
                 })(
                   <Select
-                    allowClear
+                    allowClear={true}
                     disabled={!edit}
                     showSearch
                     optionFilterProp="children"
@@ -941,7 +941,11 @@ export default class siderbarDetail extends PureComponent {
                       ? String(spotItem.interBatch).slice(0, 4)
                       : ""
                   })(
-                    <Select allowClear disabled={!edit} style={{ width: 80 }}>
+                    <Select
+                      allowClear={true}
+                      disabled={!edit}
+                      style={{ width: 80 }}
+                    >
                       {yearList.map(i => (
                         <Select.Option value={String(i)} key={i}>
                           {i}
@@ -954,7 +958,11 @@ export default class siderbarDetail extends PureComponent {
                       ? String(spotItem.interBatch).slice(4)
                       : ""
                   })(
-                    <Select allowClear disabled={!edit} style={{ width: 80 }}>
+                    <Select
+                      allowClear={true}
+                      disabled={!edit}
+                      style={{ width: 80 }}
+                    >
                       {[
                         "01",
                         "02",
@@ -983,7 +991,7 @@ export default class siderbarDetail extends PureComponent {
                 })(
                   <Select
                     showSearch
-                    allowClear
+                    allowClear={true}
                     disabled={!edit}
                     optionFilterProp="children"
                   >
@@ -1018,7 +1026,7 @@ export default class siderbarDetail extends PureComponent {
                 })(
                   <Select
                     showSearch
-                    allowClear
+                    allowClear={true}
                     disabled={!edit}
                     optionFilterProp="children"
                   >
@@ -1046,7 +1054,7 @@ export default class siderbarDetail extends PureComponent {
                 })(
                   <Select
                     showSearch
-                    allowClear
+                    allowClear={true}
                     disabled={!edit}
                     optionFilterProp="children"
                   >
@@ -1064,7 +1072,7 @@ export default class siderbarDetail extends PureComponent {
                 })(
                   <Select
                     showSearch
-                    allowClear
+                    allowClear={true}
                     disabled={!edit}
                     optionFilterProp="children"
                   >
@@ -1082,7 +1090,7 @@ export default class siderbarDetail extends PureComponent {
                 })(
                   <Select
                     showSearch
-                    allowClear
+                    allowClear={true}
                     disabled={!edit}
                     optionFilterProp="children"
                   >
@@ -1674,7 +1682,7 @@ export default class siderbarDetail extends PureComponent {
                   initialValue: item.pointX
                 })(
                   <Input
-                    allowClear
+                    allowClear={true}
                     placeholder="经度"
                     disabled={!edit}
                     style={{ width: 98 }}
@@ -1684,7 +1692,7 @@ export default class siderbarDetail extends PureComponent {
                   initialValue: item.pointY
                 })(
                   <Input
-                    allowClear
+                    allowClear={true}
                     placeholder="纬度"
                     disabled={!edit}
                     style={{ width: 135, position: "relative", top: -2 }}

@@ -87,6 +87,7 @@ export default class ProjectListTable extends PureComponent {
       loading: true
     });
     parmas.from && delete parmas.from;
+    parmas.MapNum && delete parmas.MapNum;
     parmas.ProjectNat === "" && delete parmas.ProjectNat;
     parmas.ProjectCate === "" && delete parmas.ProjectCate;
     parmas.ProjectType === "" && delete parmas.ProjectType;
@@ -123,7 +124,16 @@ export default class ProjectListTable extends PureComponent {
   };
   // 整个表格重置
   async reset() {
-    const { dispatch } = this.props;
+    const {
+      dispatch,
+      siderBarPageInfo: { activeMenu }
+    } = this.props;
+    dispatch({
+      type: "project/projectSave",
+      payload: {
+        queryParams: { from: activeMenu, SkipCount: 0 }
+      }
+    });
     await dispatch({
       type: "project/save",
       payload: {
@@ -199,17 +209,16 @@ export default class ProjectListTable extends PureComponent {
     if (sorter.columnKey) {
       const key =
         sorter.columnKey === "projectName"
-          ? "Name"
+          ? "ProjectBase.Name"
           : sorter.columnKey === "productDepartmentName"
-          ? "ProductDepartmentName"
+          ? "ProductDepartment"
           : sorter.columnKey === "replyDepartmentName"
-          ? "ReplyDepartmentName"
+          ? "ReplyDepartment"
           : sorter.columnKey === "replyTime"
           ? "ReplyTime"
           : sorter.columnKey;
 
-      Sorting =
-        "ProjectBase." + key + (sorter.order === "descend" ? " desc" : " asc");
+      Sorting = key + (sorter.order === "descend" ? " desc" : " asc");
     }
 
     let filterObj = {
@@ -223,6 +232,8 @@ export default class ProjectListTable extends PureComponent {
       ProjectName:
         filters.projectName && filters.projectName.length
           ? filters.projectName[0]
+          : queryParams.ProjectName
+          ? queryParams.ProjectName
           : ``,
       ProductDepartment:
         filters.productDepartmentName && filters.productDepartmentName.length
@@ -546,7 +557,6 @@ export default class ProjectListTable extends PureComponent {
         dataIndex: "disposalMethod",
         key: "disposalMethod",
         width: 200
-        // sorter: true
       },
 
       {
@@ -573,7 +583,8 @@ export default class ProjectListTable extends PureComponent {
         title: "批复时间",
         dataIndex: "replyTime",
         key: "replyTime",
-        width: 180
+        width: 180,
+        sorter: true
       },
       {
         title: "项目性质",
@@ -697,15 +708,15 @@ export default class ProjectListTable extends PureComponent {
             jQuery("#ProjectList").animate({ left: -window.innerWidth });
           }}
           extra={[
-            <Button key="2" type="primary">
-              查询
-            </Button>,
+            // <Button key="3" type="primary">
+            //   查询
+            // </Button>,
             <Button key="1" type="primary" onClick={this.reset.bind(this)}>
               重置
             </Button>,
             activeMenu === "project" ? (
               <Button
-                key="3"
+                key="2"
                 type="primary"
                 style={{ marginLeft: "10px" }}
                 onClick={this.mergeProject}

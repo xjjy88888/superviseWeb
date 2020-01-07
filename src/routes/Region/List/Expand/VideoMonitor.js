@@ -222,27 +222,39 @@ export default class VideoMonitor extends PureComponent {
           >
             {getFieldDecorator("name", {
               initialValue: videoMonitorInfo.name
-            })(<Input allowClear style={{ width: 240 }} />)}
+            })(<Input allowClear={true} style={{ width: 240 }} />)}
           </Form.Item>
           <Form.Item label="设备序列号" {...formItemLayout}>
             {getFieldDecorator("deviceSerial", {
               initialValue: videoMonitorInfo.deviceSerial
-            })(<Input allowClear style={{ width: 240 }} />)}
+            })(<Input allowClear={true} style={{ width: 240 }} />)}
           </Form.Item>
           <Form.Item label="视频接口" {...formItemLayout}>
             {getFieldDecorator("url", {
               initialValue: videoMonitorInfo.url
-            })(<Input.TextArea allowClear autosize style={{ width: 240 }} />)}
+            })(
+              <Input.TextArea
+                allowClear={true}
+                autosize
+                style={{ width: 240 }}
+              />
+            )}
           </Form.Item>
           <Form.Item label="坐标" {...formItemLayout}>
             {getFieldDecorator("pointX", {
               initialValue: videoMonitorInfo.pointX
-            })(<Input allowClear placeholder="经度" style={{ width: 103 }} />)}
+            })(
+              <Input
+                allowClear={true}
+                placeholder="经度"
+                style={{ width: 103 }}
+              />
+            )}
             {getFieldDecorator("pointY", {
               initialValue: videoMonitorInfo.pointY
             })(
               <Input
-                allowClear
+                allowClear={true}
                 placeholder="纬度"
                 style={{ width: 140, position: "relative", top: -2 }}
                 addonAfter={
@@ -269,7 +281,13 @@ export default class VideoMonitor extends PureComponent {
           <Form.Item label="备注" {...formItemLayout}>
             {getFieldDecorator("description", {
               initialValue: videoMonitorInfo.description
-            })(<Input.TextArea allowClear autosize style={{ width: 240 }} />)}
+            })(
+              <Input.TextArea
+                allowClear={true}
+                autosize
+                style={{ width: 240 }}
+              />
+            )}
           </Form.Item>
         </Form>
       </div>

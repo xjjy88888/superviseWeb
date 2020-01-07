@@ -23,7 +23,7 @@ export default class login extends PureComponent {
     localStorage.setItem("key", "");
     localStorage.removeItem("user");
     this.props.form.validateFields();
-    this.init()
+    this.init();
   }
 
   init = () => {
@@ -144,7 +144,7 @@ export default class login extends PureComponent {
             <Form.Item>
               {getFieldDecorator("remember", {
                 valuePropName: "checked",
-                initialValue: lastLogin ? lastLogin.remember : ""
+                initialValue: lastLogin ? lastLogin.remember : null
               })(<Checkbox>记住我</Checkbox>)}
               {getFieldDecorator("frequentEdit", {
                 valuePropName: "checked",

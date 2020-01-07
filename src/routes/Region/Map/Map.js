@@ -4130,7 +4130,7 @@ export default class RegionMap extends PureComponent {
                 {vedioPicList.map((item, id) => {
                   // console.log(item)
                   return (
-                    <div>
+                    <div key={id}>
                       <img
                         onClick={this.onClick_Img}
                         alt="example"
@@ -4167,7 +4167,7 @@ export default class RegionMap extends PureComponent {
               position: "absolute",
               bottom: 14,
               right: 400,
-              zIndex: 1001
+              zIndex: 1000
             }}
           >
             <img alt="loading1.gif" src="./img/loading1.gif" />
@@ -4178,8 +4178,8 @@ export default class RegionMap extends PureComponent {
               position: "absolute",
               bottom: 14,
               right: 450,
-              zIndex: 1001
-            }}
+              zIndex: 1000
+                        }}
           >
             <img alt="loading1.gif" src="./img/loading1.gif" />
           </div>
@@ -4189,7 +4189,7 @@ export default class RegionMap extends PureComponent {
               position: "absolute",
               bottom: 14,
               right: 500,
-              zIndex: 1001
+              zIndex: 1000
             }}
           >
             <img alt="loading1.gif" src="./img/loading1.gif" />
@@ -4201,7 +4201,7 @@ export default class RegionMap extends PureComponent {
               position: "absolute",
               bottom: 5,
               right: 150,
-              zIndex: 1001,
+              zIndex: 1000,
               background: "#fff"
             }}
           >
@@ -4222,7 +4222,7 @@ export default class RegionMap extends PureComponent {
               // left: 360,
               top: 58,
               right: 240,
-              zIndex: 1001,
+              zIndex: 1000,
               background: "#fff"
             }}
           >
@@ -4270,7 +4270,7 @@ export default class RegionMap extends PureComponent {
               position: "absolute",
               top: 65,
               right: 240,
-              zIndex: 1001
+              zIndex: 1000
             }}
           >
             <Button
@@ -4446,7 +4446,7 @@ export default class RegionMap extends PureComponent {
               position: "absolute",
               top: 65,
               left: 15,
-              zIndex: 1001,
+              zIndex: 1000,
               background: "#fff"
             }}
           >
@@ -4504,7 +4504,7 @@ export default class RegionMap extends PureComponent {
               position: "absolute",
               top: 65,
               right: 240,
-              zIndex: 1001,
+              zIndex: 1000,
               background: "#fff"
             }}
           >
@@ -4563,7 +4563,7 @@ export default class RegionMap extends PureComponent {
               position: "absolute",
               bottom: 40,
               right: 20,
-              zIndex: 1001,
+              zIndex: 1000,
               background: "#fff"
             }}
           >

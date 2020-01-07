@@ -475,7 +475,7 @@ export default class dict extends PureComponent {
           <Tabs.TabPane tab="字典数据" key="2">
             <Select
               showSearch
-              allowClear
+              allowClear={true}
               value={selectDefaultValue}
               optionFilterProp="children"
               style={{ width: 200, margin: 10 }}
@@ -623,7 +623,7 @@ export default class dict extends PureComponent {
                   })(
                     <Select
                       showSearch
-                      allowClear
+                      allowClear={true}
                       optionFilterProp="children"
                       disabled={isEdit}
                       style={{ width: 180 }}

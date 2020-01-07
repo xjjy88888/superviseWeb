@@ -529,7 +529,9 @@ export default class Inspect extends PureComponent {
           {inspectForm.map((item, index) => (
             <Form.Item label={item.title} {...formItemLayout} key={index}>
               {item.type === "input"
-                ? getFieldDecorator(`input_${item.key}`)(<Input allowClear />)
+                ? getFieldDecorator(`input_${item.key}`)(
+                    <Input allowClear={true} />
+                  )
                 : item.type === "textArea"
                 ? getFieldDecorator(`textArea_${item.key}`)(
                     <Input.TextArea autosize />

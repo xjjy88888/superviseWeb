@@ -712,7 +712,7 @@ export default class projectDetail extends PureComponent {
                       <Select
                         style={{ width: 150 }}
                         showSearch
-                        allowClear
+                        allowClear={true}
                         optionFilterProp="children"
                       >
                         {this.dictList("防治标准").map(item => (
@@ -816,7 +816,7 @@ export default class projectDetail extends PureComponent {
                       <Select
                         style={{ width: 150 }}
                         showSearch
-                        allowClear
+                        allowClear={true}
                         optionFilterProp="children"
                       >
                         {this.dictList("国家或省级防治区类型").map(item => (
@@ -836,7 +836,7 @@ export default class projectDetail extends PureComponent {
                       <Select
                         style={{ width: 150 }}
                         showSearch
-                        allowClear
+                        allowClear={true}
                         optionFilterProp="children"
                       >
                         {this.dictList("防治区级别").map(item => (
@@ -856,7 +856,7 @@ export default class projectDetail extends PureComponent {
                       <Select
                         style={{ width: 150 }}
                         showSearch
-                        allowClear
+                        allowClear={true}
                         optionFilterProp="children"
                       >
                         {this.dictList("地貌类型").map(item => (
@@ -876,7 +876,7 @@ export default class projectDetail extends PureComponent {
                       <Select
                         style={{ width: 150 }}
                         showSearch
-                        allowClear
+                        allowClear={true}
                         optionFilterProp="children"
                       >
                         {this.dictList("土壤类型").map(item => (
@@ -896,7 +896,7 @@ export default class projectDetail extends PureComponent {
                       <Select
                         style={{ width: 150 }}
                         showSearch
-                        allowClear
+                        allowClear={true}
                         optionFilterProp="children"
                       >
                         {this.dictList("植被类型").map(item => (
@@ -1104,7 +1104,7 @@ export default class projectDetail extends PureComponent {
                     })(
                       <Select
                         showSearch
-                        allowClear
+                        allowClear={true}
                         style={{ width: 220 }}
                         optionFilterProp="children"
                         filterOption={(input, option) =>
@@ -1161,7 +1161,7 @@ export default class projectDetail extends PureComponent {
                     })(
                       <Select
                         showSearch
-                        allowClear
+                        allowClear={true}
                         style={{ width: 220 }}
                         optionFilterProp="children"
                         filterOption={(input, option) =>
@@ -1218,7 +1218,7 @@ export default class projectDetail extends PureComponent {
                     })(
                       <Select
                         showSearch
-                        allowClear
+                        allowClear={true}
                         style={{ width: 220 }}
                         optionFilterProp="children"
                         filterOption={(input, option) =>
@@ -1275,7 +1275,7 @@ export default class projectDetail extends PureComponent {
                     })(
                       <Select
                         showSearch
-                        allowClear
+                        allowClear={true}
                         style={{ width: 220 }}
                         optionFilterProp="children"
                         filterOption={(input, option) =>
@@ -1332,7 +1332,7 @@ export default class projectDetail extends PureComponent {
                     })(
                       <Select
                         showSearch
-                        allowClear
+                        allowClear={true}
                         style={{ width: 220 }}
                         optionFilterProp="children"
                         filterOption={(input, option) =>
@@ -1389,7 +1389,7 @@ export default class projectDetail extends PureComponent {
                     })(
                       <Select
                         showSearch
-                        allowClear
+                        allowClear={true}
                         style={{ width: 220 }}
                         optionFilterProp="children"
                         filterOption={(input, option) =>

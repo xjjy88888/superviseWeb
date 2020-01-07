@@ -112,9 +112,9 @@ export default class siderbar extends PureComponent {
       isProjectUpdate: true,
       queryHighlight: false,
       ShowArchive: false,
-      row_pro: 10,
-      row_spot: 10,
-      row_point: 10,
+      row_pro: 20,
+      row_spot: 20,
+      row_point: 20,
       query_pro: "",
       query_spot: "",
       query_point: "",
@@ -371,14 +371,41 @@ export default class siderbar extends PureComponent {
       dispatch,
       project: { queryParams }
     } = this.props;
+    const { query_pro, query_spot } = this.state;
+    let obj = {};
+    if (
+      payload.from &&
+      payload.from === "project" &&
+      Object.keys(payload.queryParams).length === 0
+    ) {
+      obj = {
+        SkipCount: 0,
+        ProjectName: query_pro,
+        from: payload.from
+      };
+    } else if (
+      payload.from &&
+      payload.from === "spot" &&
+      Object.keys(payload.queryParams).length === 0
+    ) {
+      obj = {
+        SkipCount: 0,
+        MapNum: query_spot,
+        from: payload.from
+      };
+    }
+
     dispatch({
       type: "project/projectSave",
       payload: {
-        queryParams: {
-          ...queryParams,
-          ...payload.queryParams,
-          from: payload.from
-        }
+        queryParams:
+          Object.keys(obj).length === 0
+            ? {
+                ...queryParams,
+                ...payload.queryParams,
+                from: payload.from
+              }
+            : obj
       }
     });
   };
@@ -412,27 +439,28 @@ export default class siderbar extends PureComponent {
       ShowArchive: data.ShowArchive,
       queryHighlight: queryHighlight
     });
+
     // 保存筛选数据到props
     this.querySave(data);
-
     if (data.from === "project") {
       this.setState({
-        row_pro: 10
+        row_pro: 20
       });
+
       this.queryProject({
         ...data.queryParams,
         SkipCount: 0,
         ProjectName: query_pro
       });
     } else if (data.from === "spot") {
-      this.setState({ row_spot: 10 });
+      this.setState({ row_spot: 20 });
       this.querySpot({
         ...data.queryParams,
         SkipCount: 0,
         MapNum: query_spot
       });
     } else {
-      this.setState({ row_point: 10 });
+      this.setState({ row_point: 20 });
       this.queryPoint({
         ...data.queryParams,
         SkipCount: 0,
@@ -491,13 +519,6 @@ export default class siderbar extends PureComponent {
 
     const { clientHeight, scrollHeight, scrollTop } = this.scrollDom;
     const isBottom = clientHeight + parseInt(scrollTop, 0) + 1 >= scrollHeight;
-    // console.log(
-    //   clientHeight,
-    //   scrollHeight,
-    //   parseInt(scrollTop, 0) + 1,
-    //   isBottom
-    // );
-    console.log("queryInfo1", queryInfo);
     if (isBottom) {
       if (loading) {
         return;
@@ -522,7 +543,7 @@ export default class siderbar extends PureComponent {
             queryParams: obj,
             from: "project"
           });
-          this.setState({ row_pro: row_pro + 10 });
+          this.setState({ row_pro: row_pro + 20 });
         }
       } else if (key === "spot") {
         if (spotList.items.length < spotList.totalCount) {
@@ -538,7 +559,7 @@ export default class siderbar extends PureComponent {
             queryParams: obj,
             from: "spot"
           });
-          this.setState({ row_spot: row_spot + 10 });
+          this.setState({ row_spot: row_spot + 20 });
         }
       } else {
         if (pointList.items.length < pointList.totalCount) {
@@ -548,7 +569,7 @@ export default class siderbar extends PureComponent {
             Sorting: Sorting,
             MapNum: query_point
           });
-          this.setState({ row_point: row_point + 10 });
+          this.setState({ row_point: row_point + 20 });
         }
       }
     }
@@ -675,7 +696,7 @@ export default class siderbar extends PureComponent {
       }
     }
     v.SkipCount = v.SkipCount || 0;
-    v.MaxResultCount = v.MaxResultCount || 10;
+    v.MaxResultCount = v.MaxResultCount || 20;
     console.log("dataFormat结束", v);
   };
 
@@ -686,10 +707,8 @@ export default class siderbar extends PureComponent {
       dispatch,
       project: { projectList }
     } = this.props;
-    // console.log("items=============", items);
     items.from && delete items.from;
     this.dataFormat(items);
-    // console.log("new---items==============", items);
     if (isProjectSupervise) {
       this.queryProjectSupervise(items);
     } else {
@@ -747,6 +766,7 @@ export default class siderbar extends PureComponent {
     } = this.props;
     this.showSpin(true);
     items.from && delete items.from;
+    this.dataFormat(items);
     dispatch({
       type: "spot/querySpot",
       payload: {
@@ -995,20 +1015,21 @@ export default class siderbar extends PureComponent {
   };
   switchMenu = e => {
     const { dispatch } = this.props;
-    dispatch({
-      type: "project/projectSave",
-      payload: {
-        queryParams: {}
-      }
-    });
+    const { query_pro, query_spot } = this.state;
     this.hide();
     this.scrollDom.scrollTop = 0;
     const k = e.key;
+    let obj = { from: k, queryParams: {} };
+
     this.saveCurrentPageInfo(k);
     if (k === "project") {
-      this.queryProject({ SkipCount: 0 });
+      // 保存筛选数据到props
+      this.querySave(obj);
+      this.queryProject({ SkipCount: 0, ProjectName: query_pro });
     } else if (k === "spot") {
-      this.querySpot({ SkipCount: 0 });
+      // 保存筛选数据到props
+      this.querySave(obj);
+      this.querySpot({ SkipCount: 0, MapNum: query_spot });
     } else {
       this.queryPoint({ SkipCount: 0 });
     }
@@ -1242,7 +1263,7 @@ export default class siderbar extends PureComponent {
     if (key === "project") {
       this.setState({
         query_pro: v,
-        row_pro: 10
+        row_pro: 20
       });
       const obj = {
         ...queryInfo,
@@ -1256,7 +1277,7 @@ export default class siderbar extends PureComponent {
       });
       this.queryProject(obj);
     } else if (key === "spot") {
-      this.setState({ query_spot: v, row_spot: 10 });
+      this.setState({ query_spot: v, row_spot: 20 });
       const obj = {
         ...queryInfo,
         SkipCount: 0,
@@ -1269,7 +1290,7 @@ export default class siderbar extends PureComponent {
       });
       this.querySpot(obj);
     } else {
-      this.setState({ query_point: v, row_point: 10 });
+      this.setState({ query_point: v, row_point: 20 });
       this.queryPoint({
         ...queryInfo,
         SkipCount: 0,
@@ -1417,6 +1438,22 @@ export default class siderbar extends PureComponent {
         key: ["project"]
       }
     ];
+
+    // const fun = query_pro
+    // ? {
+    //     value: query_pro,
+    //     onChange: () => {
+    //       this.setState({ query_pro: "" });
+    //     }
+    //   }
+    // :query_spot
+    // ? {
+    //     value: query_spot,
+    //     onChange: () => {
+    //       this.setState({ query_spot: "" });
+    //     }
+    //   }
+    // : {};
 
     const list = isProjectSupervise
       ? projectSuperviseList.items
@@ -1743,13 +1780,14 @@ export default class siderbar extends PureComponent {
             ))}
           </Menu>
           <Input.Search
-            allowClear
+            allowClear={true}
             placeholder={`${placeholder}`}
             onSearch={v => {
               this.search(v);
             }}
             style={{ padding: 20, width: 300 }}
             enterButton
+            // {...fun}
           />
           {/* 新建 */}
           <Popover
@@ -1821,7 +1859,7 @@ export default class siderbar extends PureComponent {
           </Popover>
           {key === `spot` ? (
             <Select
-              allowClear
+              allowClear={true}
               value={TaskLevelAndInterBatch}
               placeholder="解译期次"
               style={{ margin: "0 20px 20px 20px", width: 260 }}
@@ -1873,7 +1911,7 @@ export default class siderbar extends PureComponent {
                   }
                   if (key === "project") {
                     this.setState({
-                      row_pro: 10
+                      row_pro: 20
                     });
                     const obj = {
                       ...queryInfo,
@@ -1888,7 +1926,7 @@ export default class siderbar extends PureComponent {
                     this.queryProject(obj);
                   } else if (key === "spot") {
                     this.setState({
-                      row_spot: 10
+                      row_spot: 20
                     });
                     const obj = {
                       ...queryInfo,
@@ -1903,7 +1941,7 @@ export default class siderbar extends PureComponent {
                     this.querySpot(obj);
                   } else {
                     this.setState({
-                      row_point: 10
+                      row_point: 20
                     });
                     this.queryPoint({
                       ...queryInfo,
@@ -3774,7 +3812,7 @@ export default class siderbar extends PureComponent {
                   })(
                     <Select
                       showSearch
-                      allowClear
+                      allowClear={true}
                       optionFilterProp="children"
                       addonBefore="Http://"
                       addonAfter={<Icon type="setting" />}
@@ -3811,7 +3849,7 @@ export default class siderbar extends PureComponent {
                   })(
                     <Select
                       showSearch
-                      allowClear
+                      allowClear={true}
                       optionFilterProp="children"
                       // filterOption={(input, option) =>
                       //   option.props.children
@@ -3843,7 +3881,11 @@ export default class siderbar extends PureComponent {
                       ? projectItem.riverBasinOU.id
                       : ""
                   })(
-                    <Select showSearch allowClear optionFilterProp="children">
+                    <Select
+                      showSearch
+                      allowClear={true}
+                      optionFilterProp="children"
+                    >
                       {basinOrganList.map(item => (
                         <Select.Option value={item.id} key={item.id}>
                           {item.name}
@@ -3875,7 +3917,7 @@ export default class siderbar extends PureComponent {
                       )
                     })(
                       <Select
-                        allowClear
+                        allowClear={true}
                         showSearch
                         optionFilterProp="children"
                         // filterOption={(input, option) =>
@@ -3921,7 +3963,11 @@ export default class siderbar extends PureComponent {
                     {getFieldDecorator("projectLevelId", {
                       initialValue: projectItem.projectLevelId
                     })(
-                      <Select showSearch allowClear optionFilterProp="children">
+                      <Select
+                        showSearch
+                        allowClear={true}
+                        optionFilterProp="children"
+                      >
                         {this.dictList("立项级别").map(item => (
                           <Select.Option value={item.id} key={item.id}>
                             {item.dictTableValue}
@@ -3937,7 +3983,7 @@ export default class siderbar extends PureComponent {
                   })(
                     <Select
                       showSearch
-                      allowClear
+                      allowClear={true}
                       optionFilterProp="children"
                       disabled={
                         projectInfoSpotList.items.length !== 0 &&
@@ -3958,7 +4004,11 @@ export default class siderbar extends PureComponent {
                   {getFieldDecorator("projectCateId", {
                     initialValue: projectItem.expand.projectCateId
                   })(
-                    <Select showSearch allowClear optionFilterProp="children">
+                    <Select
+                      showSearch
+                      allowClear={true}
+                      optionFilterProp="children"
+                    >
                       {this.dictList("项目类别").map(item => (
                         <Select.Option value={item.id} key={item.id}>
                           {item.dictTableValue}
@@ -3971,7 +4021,11 @@ export default class siderbar extends PureComponent {
                   {getFieldDecorator("projectTypeId", {
                     initialValue: projectItem.expand.projectTypeId
                   })(
-                    <Select showSearch allowClear optionFilterProp="children">
+                    <Select
+                      showSearch
+                      allowClear={true}
+                      optionFilterProp="children"
+                    >
                       {this.dictList("项目类型").map(item => (
                         <Select.Option value={item.id} key={item.id}>
                           {item.dictTableValue}
@@ -3984,7 +4038,11 @@ export default class siderbar extends PureComponent {
                   {getFieldDecorator("projectStatusId", {
                     initialValue: projectItem.projectStatusId
                   })(
-                    <Select showSearch allowClear optionFilterProp="children">
+                    <Select
+                      showSearch
+                      allowClear={true}
+                      optionFilterProp="children"
+                    >
                       {this.dictList("建设状态").map(item => (
                         <Select.Option value={item.id} key={item.id}>
                           {item.dictTableValue}
@@ -3997,7 +4055,11 @@ export default class siderbar extends PureComponent {
                   {getFieldDecorator("projectNatId", {
                     initialValue: projectItem.expand.projectNatId
                   })(
-                    <Select showSearch allowClear optionFilterProp="children">
+                    <Select
+                      showSearch
+                      allowClear={true}
+                      optionFilterProp="children"
+                    >
                       {this.dictList("项目性质").map(item => (
                         <Select.Option value={item.id} key={item.id}>
                           {item.dictTableValue}
@@ -4034,7 +4096,7 @@ export default class siderbar extends PureComponent {
                     // />
                     <TreeSelect
                       showSearch
-                      allowClear
+                      allowClear={true}
                       multiple
                       dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
                       filterTreeNode={(a, b) => {

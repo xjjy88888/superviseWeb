@@ -393,7 +393,7 @@ export default class problemPoint extends PureComponent {
           >
             {getFieldDecorator("name", {
               initialValue: problemPointInfo.name
-            })(<Input allowClear style={{ width: 240 }} />)}
+            })(<Input allowClear={true} style={{ width: 240 }} />)}
           </Form.Item>
           <Form.Item label={<span>问题类型</span>} {...formItemLayout}>
             {getFieldDecorator("problemId", {
