@@ -841,7 +841,8 @@ export default class siderbar extends PureComponent {
         });
 
         if (result.attachment) {
-          const list = result.attachment.child.map(item => {
+          const data = result.attachment.child.filter(i => !i.fileSource);
+          const list = data.map(item => {
             return {
               uid: item.id,
               name: item.fileName,
@@ -853,6 +854,7 @@ export default class siderbar extends PureComponent {
               status: "done"
             };
           });
+          console.log("1111", data);
           this.setState({ projectFileList: list });
         } else {
           this.setState({ projectFileList: [] });

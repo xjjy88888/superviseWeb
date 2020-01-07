@@ -111,7 +111,7 @@ export default class Examine extends PureComponent {
     jQuery("#Examine").animate({ left: 350 });
     resetFields();
     this.setState({ record });
-    const photo = record.expand.investigateFile;
+    const photo = record.attachment;
     let photoList = [];
     if (photo) {
       photoList = photo.child.map(item => {
