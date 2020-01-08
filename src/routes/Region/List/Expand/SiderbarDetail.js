@@ -13,23 +13,24 @@ import {
   Upload,
   notification,
   Modal,
-  Switch,
   DatePicker,
   Form,
-  message
+  message,
+  Collapse
 } from "antd";
 import locale from "antd/lib/date-picker/locale/zh_CN";
 import Spins from "../../../../components/Spins";
 import config from "../../../../config";
 import emitter from "../../../../utils/event";
 import { getFile, accessToken } from "../../../../utils/util";
-
 import styles from "../style/sidebar.less";
+
+const { Panel } = Collapse;
 
 let self;
 const { TextArea } = Input;
 const formItemLayout = {
-  labelCol: { span: 7 },
+  labelCol: { span: 8 },
   wrapperCol: { span: 16 }
 };
 let yearList = [];
@@ -860,290 +861,368 @@ export default class siderbarDetail extends PureComponent {
               display: from === "spot" ? "block" : "none"
             }}
           >
-            <Form>
-              <Form.Item
-                label={
-                  <span>
-                    <b style={{ color: "red" }}>*</b>
-                    图斑编号
-                  </span>
-                }
-                {...formItemLayout}
-                hasFeedback
-              >
-                {getFieldDecorator("mapNum", {
-                  initialValue: spotItem.mapNum,
-                  rules: [{ required: true, message: "图斑编号不能为空" }]
-                })(<Input disabled={!edit} />)}
-              </Form.Item>
-              <Form.Item
-                label={
-                  <a
-                    onClick={() => {
-                      if (spotItem.projectName) {
-                        emitter.emit("showProjectSpotInfo", {
-                          show: true,
-                          edit: type === "add",
-                          from: "project",
-                          state: type,
-                          id: spotItem.projectId
-                        });
-                      } else {
-                        notification["info"]({
-                          message: `关联项目为空`
-                        });
-                      }
-                    }}
-                  >
-                    关联项目
-                  </a>
-                }
-                {...formItemLayout}
-              >
-                {getFieldDecorator("projectIdSpot", {
-                  initialValue: spotItem.projectId
-                })(
-                  <Select
-                    allowClear={true}
-                    disabled={!edit}
-                    showSearch
-                    optionFilterProp="children"
-                    filterOption={(input, option) =>
-                      option.props.children
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
+            <Form
+              style={{
+                marginBottom: 20
+              }}
+            >
+              <Collapse defaultActiveKey={["1"]}>
+                <Panel header={<b>基本信息</b>} key="1">
+                  <Form.Item
+                    label={
+                      <span>
+                        <b style={{ color: "red" }}>*</b>
+                        图斑编号
+                      </span>
                     }
-                    onSearch={v => {
-                      dispatch({
-                        type: "spot/queryProjectSelect",
-                        payload: {
-                          ProjectName: v,
-                          MaxResultCount: 5
+                    {...formItemLayout}
+                    hasFeedback
+                  >
+                    {getFieldDecorator("mapNum", {
+                      initialValue: spotItem.mapNum,
+                      rules: [{ required: true, message: "图斑编号不能为空" }]
+                    })(<Input disabled={!edit} />)}
+                  </Form.Item>
+                  <Form.Item
+                    label={
+                      <a
+                        onClick={() => {
+                          if (spotItem.projectName) {
+                            emitter.emit("showProjectSpotInfo", {
+                              show: true,
+                              edit: type === "add",
+                              from: "project",
+                              state: type,
+                              id: spotItem.projectId
+                            });
+                          } else {
+                            notification["info"]({
+                              message: `关联项目为空`
+                            });
+                          }
+                        }}
+                      >
+                        关联项目
+                      </a>
+                    }
+                    {...formItemLayout}
+                  >
+                    {getFieldDecorator("projectIdSpot", {
+                      initialValue: spotItem.projectId
+                    })(
+                      <Select
+                        allowClear={true}
+                        disabled={!edit}
+                        showSearch
+                        optionFilterProp="children"
+                        filterOption={(input, option) =>
+                          option.props.children
+                            .toLowerCase()
+                            .indexOf(input.toLowerCase()) >= 0
                         }
-                      });
-                    }}
-                  >
-                    {(relateProject
-                      ? relateProject.concat(projectSelectListAll)
-                      : projectSelectListAll
-                    ).map(item => (
-                      <Select.Option value={item.value} key={item.value}>
-                        {item.label}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                )}
-              </Form.Item>
-              <Form.Item label="解译期次" {...formItemLayout}>
-                <Input.Group compact>
-                  {getFieldDecorator("interBatch1", {
-                    initialValue: spotItem.interBatch
-                      ? String(spotItem.interBatch).slice(0, 4)
-                      : ""
-                  })(
-                    <Select
-                      allowClear={true}
-                      disabled={!edit}
-                      style={{ width: 80 }}
-                    >
-                      {yearList.map(i => (
-                        <Select.Option value={String(i)} key={i}>
-                          {i}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  )}
-                  {getFieldDecorator("interBatch2", {
-                    initialValue: spotItem.interBatch
-                      ? String(spotItem.interBatch).slice(4)
-                      : ""
-                  })(
-                    <Select
-                      allowClear={true}
-                      disabled={!edit}
-                      style={{ width: 80 }}
-                    >
-                      {[
-                        "01",
-                        "02",
-                        "03",
-                        "04",
-                        "05",
-                        "06",
-                        "07",
-                        "08",
-                        "09",
-                        "10",
-                        "11",
-                        "12"
-                      ].map(i => (
-                        <Select.Option value={i} key={i}>
-                          {i}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  )}
-                </Input.Group>
-              </Form.Item>
-              <Form.Item label="任务级别" {...formItemLayout}>
-                {getFieldDecorator("taskLevel", {
-                  initialValue: spotItem.taskLevel
-                })(
-                  <Select
-                    showSearch
-                    allowClear={true}
-                    disabled={!edit}
-                    optionFilterProp="children"
-                  >
-                    {[
-                      {
-                        label: "部级",
-                        value: 0
-                      },
-                      {
-                        label: "省级",
-                        value: 1
-                      },
-                      {
-                        label: "市级",
-                        value: 2
-                      },
-                      {
-                        label: "县级",
-                        value: 3
-                      }
-                    ].map(item => (
-                      <Select.Option value={item.value} key={item.value}>
-                        {item.label}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                )}
-              </Form.Item>
-              <Form.Item label="扰动类型" {...formItemLayout}>
-                {getFieldDecorator("interferenceTypeId", {
-                  initialValue: spotItem.interferenceTypeId
-                })(
-                  <Select
-                    showSearch
-                    allowClear={true}
-                    disabled={!edit}
-                    optionFilterProp="children"
-                  >
-                    {this.dictList("扰动类型").map(item => (
-                      <Select.Option value={item.id} key={item.id}>
-                        {item.dictTableValue}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                )}
-              </Form.Item>
-              <Form.Item label="扰动面积" {...formItemLayout}>
-                {getFieldDecorator("interferenceArea", {
-                  initialValue: spotItem.interferenceArea
-                })(<Input disabled={!edit} addonAfter="公顷" />)}
-              </Form.Item>
-              <Form.Item label="扰动超出面积" {...formItemLayout}>
-                {getFieldDecorator("overAreaOfRes", {
-                  initialValue: spotItem.overAreaOfRes
-                })(<Input disabled={!edit} addonAfter="公顷" />)}
-              </Form.Item>
-              <Form.Item label="扰动合规性" {...formItemLayout}>
-                {getFieldDecorator("interferenceComplianceId", {
-                  initialValue: spotItem.interferenceComplianceId
-                })(
-                  <Select
-                    showSearch
-                    allowClear={true}
-                    disabled={!edit}
-                    optionFilterProp="children"
-                  >
-                    {this.dictList("扰动合规性").map(item => (
-                      <Select.Option value={item.id} key={item.id}>
-                        {item.dictTableValue}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                )}
-              </Form.Item>
-              <Form.Item label="扰动变化类型" {...formItemLayout}>
-                {getFieldDecorator("interferenceVaryTypeId", {
-                  initialValue: spotItem.interferenceVaryTypeId
-                })(
-                  <Select
-                    showSearch
-                    allowClear={true}
-                    disabled={!edit}
-                    optionFilterProp="children"
-                  >
-                    {this.dictList("扰动变化类型").map(item => (
-                      <Select.Option value={item.id} key={item.id}>
-                        {item.dictTableValue}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                )}
-              </Form.Item>
-              <Form.Item label="建设状态" {...formItemLayout}>
-                {getFieldDecorator("buildStatusId", {
-                  initialValue: spotItem.buildStatusId
-                })(
-                  <Select
-                    showSearch
-                    allowClear={true}
-                    disabled={!edit}
-                    optionFilterProp="children"
-                  >
-                    {this.dictList("建设状态").map(item => (
-                      <Select.Option value={item.id} key={item.id}>
-                        {item.dictTableValue}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                )}
-              </Form.Item>
-              <Form.Item label="是否复核" {...formItemLayout}>
-                {getFieldDecorator("isReview", {
-                  valuePropName: "checked",
-                  initialValue: spotItem.isReview ? true : false
-                })(<Switch disabled={!edit} />)}
-              </Form.Item>
-              <Form.Item label="所在地区" {...formItemLayout}>
-                {getFieldDecorator("districtCodeId", {
-                  initialValue: this.find(
-                    districtTree,
-                    String(spotItem.districtCodeId),
-                    "value"
-                  )
-                })(
-                  <Cascader
-                    disabled={!edit}
-                    placeholder="请选择所在地区"
-                    options={districtTree}
-                    changeOnSelect
-                  />
-                )}
-              </Form.Item>
-              <Form.Item label="详细地址" {...formItemLayout}>
-                {getFieldDecorator("addressInfo", {
-                  initialValue: spotItem.addressInfo
-                })(<Input disabled={!edit} />)}
-              </Form.Item>
-              <Form.Item label="问题" {...formItemLayout}>
-                {getFieldDecorator("problem", {
-                  initialValue: spotItem.problem
-                })(<TextArea autosize={true} disabled={!edit} />)}
-              </Form.Item>
-              <Form.Item label="建议" {...formItemLayout}>
-                {getFieldDecorator("proposal", {
-                  initialValue: spotItem.proposal
-                })(<TextArea autosize={true} disabled={!edit} />)}
-              </Form.Item>
-              <Form.Item label="备注" {...formItemLayout}>
-                {getFieldDecorator("description_spot", {
-                  initialValue: spotItem.description
-                })(<TextArea autosize={true} disabled={!edit} />)}
-              </Form.Item>
+                        onSearch={v => {
+                          dispatch({
+                            type: "spot/queryProjectSelect",
+                            payload: {
+                              ProjectName: v,
+                              MaxResultCount: 5
+                            }
+                          });
+                        }}
+                      >
+                        {(relateProject
+                          ? relateProject.concat(projectSelectListAll)
+                          : projectSelectListAll
+                        ).map(item => (
+                          <Select.Option value={item.value} key={item.value}>
+                            {item.label}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Form.Item>
+                  <Form.Item label="所在地区" {...formItemLayout}>
+                    {getFieldDecorator("districtCodeId", {
+                      initialValue: this.find(
+                        districtTree,
+                        String(spotItem.districtCodeId),
+                        "value"
+                      )
+                    })(
+                      <Cascader
+                        disabled={!edit}
+                        placeholder="请选择所在地区"
+                        options={districtTree}
+                        changeOnSelect
+                      />
+                    )}
+                  </Form.Item>
+                  <Form.Item label="详细地址" {...formItemLayout}>
+                    {getFieldDecorator("addressInfo", {
+                      initialValue: spotItem.addressInfo
+                    })(<Input disabled={!edit} />)}
+                  </Form.Item>
+                  <Form.Item label="扰动面积" {...formItemLayout}>
+                    {getFieldDecorator("interferenceArea", {
+                      initialValue: spotItem.interferenceArea
+                    })(<Input disabled={!edit} addonAfter="公顷" />)}
+                  </Form.Item>
+                  <Form.Item label="扰动超出面积" {...formItemLayout}>
+                    {getFieldDecorator("overAreaOfRes", {
+                      initialValue: spotItem.overAreaOfRes
+                    })(<Input disabled={!edit} addonAfter="公顷" />)}
+                  </Form.Item>
+                  <Form.Item label="备注" {...formItemLayout}>
+                    {getFieldDecorator("description_spot", {
+                      initialValue: spotItem.description
+                    })(<TextArea autosize={true} disabled={!edit} />)}
+                  </Form.Item>
+                  <Form.Item label="问题" {...formItemLayout}>
+                    {getFieldDecorator("problem", {
+                      initialValue: spotItem.problem
+                    })(<TextArea autosize={true} disabled={!edit} />)}
+                  </Form.Item>
+                  <Form.Item label="建议" {...formItemLayout}>
+                    {getFieldDecorator("proposal", {
+                      initialValue: spotItem.proposal
+                    })(<TextArea autosize={true} disabled={!edit} />)}
+                  </Form.Item>
+                </Panel>
+                <Panel header={<b>解译信息</b>} key="2">
+                  <Form.Item label="解译期次" {...formItemLayout}>
+                    <Input.Group compact>
+                      {getFieldDecorator("interBatch1", {
+                        initialValue: spotItem.interBatch
+                          ? String(spotItem.interBatch).slice(0, 4)
+                          : ""
+                      })(
+                        <Select
+                          allowClear={true}
+                          disabled={!edit}
+                          style={{ width: 80 }}
+                        >
+                          {yearList.map(i => (
+                            <Select.Option value={String(i)} key={i}>
+                              {i}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      )}
+                      {getFieldDecorator("interBatch2", {
+                        initialValue: spotItem.interBatch
+                          ? String(spotItem.interBatch).slice(4)
+                          : ""
+                      })(
+                        <Select
+                          allowClear={true}
+                          disabled={!edit}
+                          style={{ width: 80 }}
+                        >
+                          {[
+                            "01",
+                            "02",
+                            "03",
+                            "04",
+                            "05",
+                            "06",
+                            "07",
+                            "08",
+                            "09",
+                            "10",
+                            "11",
+                            "12"
+                          ].map(i => (
+                            <Select.Option value={i} key={i}>
+                              {i}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Input.Group>
+                  </Form.Item>
+                  <Form.Item label="任务级别" {...formItemLayout}>
+                    {getFieldDecorator("taskLevel", {
+                      initialValue: spotItem.taskLevel
+                    })(
+                      <Select
+                        showSearch
+                        allowClear={true}
+                        disabled={!edit}
+                        optionFilterProp="children"
+                      >
+                        {[
+                          {
+                            label: "部级",
+                            value: 0
+                          },
+                          {
+                            label: "省级",
+                            value: 1
+                          },
+                          {
+                            label: "市级",
+                            value: 2
+                          },
+                          {
+                            label: "县级",
+                            value: 3
+                          }
+                        ].map(item => (
+                          <Select.Option value={item.value} key={item.value}>
+                            {item.label}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Form.Item>
+                  <Form.Item label="扰动类型" {...formItemLayout}>
+                    {getFieldDecorator("interferenceTypeId", {
+                      initialValue: spotItem.interferenceTypeId
+                    })(
+                      <Select
+                        showSearch
+                        allowClear={true}
+                        disabled={!edit}
+                        optionFilterProp="children"
+                      >
+                        {this.dictList("扰动类型").map(item => (
+                          <Select.Option value={item.id} key={item.id}>
+                            {item.dictTableValue}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Form.Item>
+                  <Form.Item label="扰动变化类型" {...formItemLayout}>
+                    {getFieldDecorator("interferenceVaryTypeId", {
+                      initialValue: spotItem.interferenceVaryTypeId
+                    })(
+                      <Select
+                        showSearch
+                        allowClear={true}
+                        disabled={!edit}
+                        optionFilterProp="children"
+                      >
+                        {this.dictList("扰动变化类型").map(item => (
+                          <Select.Option value={item.id} key={item.id}>
+                            {item.dictTableValue}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Form.Item>
+                  <Form.Item label="扰动合规性" {...formItemLayout}>
+                    {getFieldDecorator("interferenceComplianceId", {
+                      initialValue: spotItem.interferenceComplianceId
+                    })(
+                      <Select
+                        showSearch
+                        allowClear={true}
+                        disabled={!edit}
+                        optionFilterProp="children"
+                      >
+                        {this.dictList("扰动合规性").map(item => (
+                          <Select.Option value={item.id} key={item.id}>
+                            {item.dictTableValue}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Form.Item>
+                  <Form.Item label="建设状态" {...formItemLayout}>
+                    {getFieldDecorator("buildStatusId", {
+                      initialValue: spotItem.buildStatusId
+                    })(
+                      <Select
+                        showSearch
+                        allowClear={true}
+                        disabled={!edit}
+                        optionFilterProp="children"
+                      >
+                        {this.dictList("建设状态").map(item => (
+                          <Select.Option value={item.id} key={item.id}>
+                            {item.dictTableValue}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Form.Item>
+                </Panel>
+                <Panel header={<b>复核信息</b>} key="3">
+                  <Form.Item label="扰动类型" {...formItemLayout}>
+                    {getFieldDecorator("interferenceTypeId", {
+                      initialValue: spotItem.interferenceTypeId
+                    })(
+                      <Select
+                        showSearch
+                        allowClear={true}
+                        disabled={!edit}
+                        optionFilterProp="children"
+                      >
+                        {this.dictList("扰动类型").map(item => (
+                          <Select.Option value={item.id} key={item.id}>
+                            {item.dictTableValue}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Form.Item>
+                  <Form.Item label="扰动变化类型" {...formItemLayout}>
+                    {getFieldDecorator("interferenceVaryTypeId", {
+                      initialValue: spotItem.interferenceVaryTypeId
+                    })(
+                      <Select
+                        showSearch
+                        allowClear={true}
+                        disabled={!edit}
+                        optionFilterProp="children"
+                      >
+                        {this.dictList("扰动变化类型").map(item => (
+                          <Select.Option value={item.id} key={item.id}>
+                            {item.dictTableValue}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Form.Item>
+                  <Form.Item label="扰动合规性" {...formItemLayout}>
+                    {getFieldDecorator("interferenceComplianceId", {
+                      initialValue: spotItem.interferenceComplianceId
+                    })(
+                      <Select
+                        showSearch
+                        allowClear={true}
+                        disabled={!edit}
+                        optionFilterProp="children"
+                      >
+                        {this.dictList("扰动合规性").map(item => (
+                          <Select.Option value={item.id} key={item.id}>
+                            {item.dictTableValue}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Form.Item>
+                  <Form.Item label="建设状态" {...formItemLayout}>
+                    {getFieldDecorator("buildStatusId", {
+                      initialValue: spotItem.buildStatusId
+                    })(
+                      <Select
+                        showSearch
+                        allowClear={true}
+                        disabled={!edit}
+                        optionFilterProp="children"
+                      >
+                        {this.dictList("建设状态").map(item => (
+                          <Select.Option value={item.id} key={item.id}>
+                            {item.dictTableValue}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Form.Item>
+                </Panel>
+              </Collapse>
             </Form>
             {domUpload}
             {edit ? (
@@ -1250,7 +1329,7 @@ export default class siderbarDetail extends PureComponent {
                     }
                   }}
                 >
-                  历史查看
+                  历史查看：{spotHistoryList.length}
                 </Button>
                 <Button
                   icon="play-square"
