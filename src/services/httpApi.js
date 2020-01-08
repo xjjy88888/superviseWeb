@@ -315,6 +315,31 @@ export async function spotOldImgApi(params) {
   });
 }
 
+// 图斑复核-新建编辑
+export async function spotReviewCreateUpdateApi(params) {
+  return request(
+    `${config.url.spotReviewCreateUpdateUrl}${params.id ? "Update" : "Create"}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        "Content-Type": "application/json-patch+json"
+      },
+      body: JSON.stringify(params)
+    }
+  );
+}
+
+// 图斑复核-删除
+export async function spotReviewDeleteApi(id) {
+  return request(`${config.url.spotReviewDeleteUrl}?id=${id}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`
+    }
+  });
+}
+
 // 标注点列表
 export async function pointListApi(params) {
   return request(

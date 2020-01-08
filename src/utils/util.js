@@ -1,10 +1,11 @@
 /* eslint-disable array-callback-return */
 import moment from "moment";
 import { EXIF } from "exif-js";
-import { message } from "antd";
+import { message, notification } from "antd";
 import emitter from "./event";
 import jQuery from "jquery";
 import bigInt from "big-integer";
+import config from "../config";
 
 const dateFormat = v => {
   return v ? moment(new Date(v).getTime()).format("YYYY-MM-DD") : null;
@@ -251,6 +252,39 @@ const formErrorMsg = v => {
   message.warning(list[0].errors[0].message);
 };
 
+const messages = (success, error, info) => {
+  console.log(info);
+  const result = success
+    ? "成功"
+    : `失败：${
+        error.validationErrors
+          ? error.validationErrors[0].message
+          : error.message
+      }`;
+  return notification[success ? "success" : "error"]({
+    message: info + result
+  });
+};
+
+const photoFormat = v => {
+  if (!v) {
+    return [];
+  }
+  const result = v.child.map(item => {
+    return {
+      uid: item.id,
+      name: item.fileName,
+      fileExtend: item.fileExtend,
+      url: config.url.annexPreviewUrl + item.id,
+      latitude: item.latitude,
+      longitude: item.longitude,
+      azimuth: item.azimuth,
+      status: "done"
+    };
+  });
+  return result;
+};
+
 export {
   dateFormat,
   dateInitFormat,
@@ -266,5 +300,7 @@ export {
   localStorageGet,
   getDictList,
   getLabel,
-  formErrorMsg
+  formErrorMsg,
+  messages,
+  photoFormat
 };

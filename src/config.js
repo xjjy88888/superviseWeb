@@ -2,7 +2,7 @@ const l = window.location;
 const isFormal = l.href.split("/")[3] === "stbcjg";
 const isLocal = l.hostname === "localhost";
 
-console.log(`%c当前版本：v2.0.44`, "color:green;font-size:30px");
+console.log(`%c当前版本：v2.0.45`, "color:green;font-size:30px");
 
 // console.log(isLocal ? "本地环境" : isFormal ? "正式环境" : "测试环境");
 
@@ -182,6 +182,12 @@ const config = {
 
     // 图斑同步旧系统附件
     spotOldImgUrl: `${domainApi}File/ImgSyn`,
+
+    // 图斑复核-新建编辑
+    spotReviewCreateUpdateUrl: `${domainApi}SpotReview/`,
+
+    // 图斑复核-删除
+    spotReviewDeleteUrl: `${domainApi}SpotReview/Delete`,
 
     // 标注点列表
     pointListUrl: `${domainApi}MarkingPoint/GetAll`,

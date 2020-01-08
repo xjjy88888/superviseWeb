@@ -16,13 +16,20 @@ import {
   DatePicker,
   Form,
   message,
-  Collapse
+  Collapse,
+  Tag,
+  List
 } from "antd";
 import locale from "antd/lib/date-picker/locale/zh_CN";
 import Spins from "../../../../components/Spins";
 import config from "../../../../config";
 import emitter from "../../../../utils/event";
-import { getFile, accessToken } from "../../../../utils/util";
+import {
+  getFile,
+  accessToken,
+  dateFormat,
+  photoFormat
+} from "../../../../utils/util";
 import styles from "../style/sidebar.less";
 
 const { Panel } = Collapse;
@@ -62,7 +69,10 @@ export default class siderbarDetail extends PureComponent {
       showSpotHistory: false,
       spotHistoryId: "",
       panoramaUrlConfig: "",
-      showSpin: false
+      loading: false,
+      showSpotReview: false,
+      spotReviewId: null,
+      spotReviewPhotoList: []
     };
     this.map = null;
   }
@@ -111,7 +121,9 @@ export default class siderbarDetail extends PureComponent {
         type: data.type, //add  edit
         previewVisible_min: false,
         fromList: data.fromList,
-        panoramaUrlConfig: data.from === "panorama" ? data.item.urlConfig : ""
+        panoramaUrlConfig: data.from === "panorama" ? data.item.urlConfig : "",
+        showSpotReview: false,
+        spotReviewId: null
       });
       if (data.projectId && data.projectName) {
         this.setState({
@@ -207,6 +219,63 @@ export default class siderbarDetail extends PureComponent {
     }
   };
 
+  spotReviewCreateUpdate = payload => {
+    const {
+      dispatch,
+      spot: { spotInfo }
+    } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: "spot/spotReviewCreateUpdate",
+      payload,
+      callback: success => {
+        this.setState({ loading: false });
+        if (success) {
+          this.setState({ showSpotReview: false });
+          this.querySpotById(spotInfo.id);
+        }
+      }
+    });
+  };
+
+  spotReviewDelete = payload => {
+    const {
+      dispatch,
+      spot: { spotInfo }
+    } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: "spot/spotReviewDelete",
+      payload,
+      callback: success => {
+        this.setState({ loading: false });
+        if (success) {
+          this.setState({ showSpotReview: false });
+          this.querySpotById(spotInfo.id);
+        }
+      }
+    });
+  };
+
+  spotReviewCreateUpdate = payload => {
+    const {
+      dispatch,
+      spot: { spotInfo }
+    } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: "spot/spotReviewCreateUpdate",
+      payload,
+      callback: success => {
+        this.setState({ loading: false });
+        if (success) {
+          this.setState({ showSpotReview: false });
+          this.querySpotById(spotInfo.id);
+        }
+      }
+    });
+  };
+
   queryPointById = id => {
     this.queryDetail(id, "point/queryPointById");
   };
@@ -217,6 +286,7 @@ export default class siderbarDetail extends PureComponent {
 
   queryDetail = (id, url) => {
     const { dispatch } = this.props;
+    this.setState({ loading: true });
     dispatch({
       type: url,
       payload: {
@@ -224,7 +294,10 @@ export default class siderbarDetail extends PureComponent {
         refresh: true
       },
       callback: v => {
-        this.setState({ ParentId: v.attachment ? v.attachment.id : 0 });
+        this.setState({
+          loading: false,
+          ParentId: v.attachment ? v.attachment.id : 0
+        });
         if (v.attachment) {
           const list = v.attachment.child.map(item => {
             return {
@@ -353,23 +426,134 @@ export default class siderbarDetail extends PureComponent {
     });
     return result;
   };
+
   // 鼠标进入事件
   onMouseEnter = e => {
     this.setState({
       hover: true
     });
   };
+
   // 鼠标离开事件
   onMouseLeave = e => {
     this.setState({
       hover: false
     });
   };
+
+  domUpload = fileListKey => {
+    const { dispatch } = this.props;
+    const { ParentId, edit } = this.state;
+    const photoList = this.state[fileListKey];
+    return (
+      <Upload
+        action={config.url.annexUploadUrl}
+        headers={{ Authorization: `Bearer ${accessToken()}` }}
+        data={{ Id: ParentId }}
+        listType="picture-card"
+        fileList={photoList}
+        onSuccess={v => {
+          const item = v.result.child[0];
+          const obj = {
+            uid: item.id,
+            name: item.fileName,
+            url: config.url.annexPreviewUrl + item.id,
+            latitude: item.latitude,
+            longitude: item.longitude,
+            azimuth: item.azimuth,
+            fileExtend: item.fileExtend,
+            status: "done"
+          };
+          this.setState({
+            ParentId: v.result.id,
+            [fileListKey]: [...photoList, obj]
+          });
+        }}
+        onError={(v, response) => {
+          notification["error"]({
+            message: `附件上传失败：${response.error.message}`
+          });
+        }}
+        onPreview={file => {
+          console.log(file.fileExtend, file);
+          switch (file.fileExtend) {
+            case "pdf":
+              window.open(file.url);
+              break;
+            case "doc":
+            case "docx":
+            case "xls":
+            case "xlsx":
+            case "ppt":
+            case "pptx":
+              window.open(file.url + "&isDown=true");
+              break;
+            default:
+              this.setState({
+                previewImage: file.url || file.thumbUrl,
+                previewVisible_min: true
+              });
+              if (file.latitude || file.longitude) {
+                emitter.emit("imgLocation", {
+                  Latitude: file.latitude,
+                  Longitude: file.longitude,
+                  direction: file.azimuth,
+                  show: true
+                });
+              } else {
+                getFile(file.url);
+              }
+              break;
+          }
+        }}
+        onChange={({ fileList }) => {
+          const data = fileList.map(item => {
+            return {
+              ...item,
+              status: "done"
+            };
+          });
+          this.setState({ [fileListKey]: data });
+        }}
+        onRemove={file => {
+          return new Promise((resolve, reject) => {
+            dispatch({
+              type: "annex/annexDelete",
+              payload: {
+                FileId: file.uid,
+                Id: ParentId
+              },
+              callback: success => {
+                if (success) {
+                  resolve();
+                } else {
+                  reject();
+                }
+              }
+            });
+          });
+        }}
+      >
+        <div className="ant-upload-text">
+          <Button type="div" icon="plus">
+            上传文件
+          </Button>
+        </div>
+      </Upload>
+    );
+  };
+
   render() {
     const {
       mapLocation,
       dispatch,
-      form: { getFieldDecorator, resetFields, validateFields, getFieldValue },
+      form: {
+        getFieldDecorator,
+        resetFields,
+        validateFields,
+        getFieldValue,
+        setFieldsValue
+      },
       district: { districtTree },
       project: { departSelectList },
       spot: { spotInfo, projectSelectListSpot, spotHistoryList },
@@ -397,7 +581,10 @@ export default class siderbarDetail extends PureComponent {
       spotHistoryId,
       item,
       panoramaUrlConfig,
-      showSpin
+      loading,
+      showSpotReview,
+      spotReviewId,
+      spotReviewPhotoList
     } = this.state;
 
     const projectSelectListAll = [
@@ -412,7 +599,11 @@ export default class siderbarDetail extends PureComponent {
 
     const spotItem = isSpotUpdate
       ? spotInfo
-      : { mapNum: "", provinceCityDistrict: [null, null, null] };
+      : {
+          mapNum: "",
+          provinceCityDistrict: [null, null, null],
+          spotReviews: []
+        };
 
     const pointItem = isSpotUpdate ? pointInfo : {};
 
@@ -555,7 +746,7 @@ export default class siderbarDetail extends PureComponent {
           height: "100%"
         }}
       >
-        <Spins show={showSpin} />
+        <Spins show={loading} />
         <Icon
           type="left"
           className={`${styles["show-project-list"]} ${
@@ -866,7 +1057,7 @@ export default class siderbarDetail extends PureComponent {
                 marginBottom: 20
               }}
             >
-              <Collapse defaultActiveKey={["1"]}>
+              <Collapse defaultActiveKey={["3"]}>
                 <Panel header={<b>基本信息</b>} key="1">
                   <Form.Item
                     label={
@@ -1148,79 +1339,197 @@ export default class siderbarDetail extends PureComponent {
                     )}
                   </Form.Item>
                 </Panel>
-                <Panel header={<b>复核信息</b>} key="3">
-                  <Form.Item label="扰动类型" {...formItemLayout}>
-                    {getFieldDecorator("interferenceTypeId", {
-                      initialValue: spotItem.interferenceTypeId
-                    })(
-                      <Select
-                        showSearch
-                        allowClear={true}
-                        disabled={!edit}
-                        optionFilterProp="children"
+                <Panel
+                  header={
+                    <b>
+                      复核信息：{spotItem.spotReviews.length}
+                      <Icon
+                        type="plus"
+                        style={{
+                          marginLeft: 20,
+                          fontSize: 16,
+                          color: "#1890ff"
+                        }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          this.setState({
+                            showSpotReview: true,
+                            edit: true,
+                            spotReviewId: null,
+                            spotReviewPhotoList: [],
+                            ParentId: 0
+                          });
+                          resetFields();
+                          setFieldsValue({
+                            reviewTime: moment(new Date())
+                          });
+                        }}
+                      />
+                      <Icon
+                        type="check"
+                        style={{
+                          display: showSpotReview ? "inline-block" : "none",
+                          marginLeft: 20,
+                          fontSize: 16,
+                          color: "#1890ff"
+                        }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          this.setState({ showSpotReview: true, edit: true });
+                          validateFields((error, v) => {
+                            console.log("图斑复核编辑", v);
+                            const data = {
+                              id: spotReviewId,
+                              spotId: spotInfo.id,
+                              interferenceTypeId: v.review_interferenceTypeId,
+                              interferenceVaryTypeId:
+                                v.review_interferenceVaryTypeId,
+                              interferenceComplianceId:
+                                v.review_interferenceComplianceId,
+                              buildStatusId: v.review_buildStatusId,
+                              reviewTime: dateFormat(v.reviewTime),
+                              reviewDepartment: v.reviewDepartment,
+                              photoId: ParentId
+                            };
+                            this.spotReviewCreateUpdate(data);
+                          });
+                        }}
+                      />
+                    </b>
+                  }
+                  key="3"
+                >
+                  <List
+                    size="small"
+                    bordered
+                    dataSource={spotItem.spotReviews}
+                    renderItem={(item, index) => (
+                      <List.Item
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          this.setState({
+                            showSpotReview: true,
+                            edit: true,
+                            spotReviewId: item.id,
+                            ParentId: item.photo ? item.photo.id : 0,
+                            spotReviewPhotoList: photoFormat(item.photo)
+                          });
+                          setFieldsValue({
+                            review_interferenceTypeId: item.interferenceTypeId,
+                            review_interferenceVaryTypeId:
+                              item.interferenceVaryTypeId,
+                            review_interferenceComplianceId:
+                              item.interferenceComplianceId,
+                            review_buildStatusId: item.buildStatusId,
+                            reviewTime: moment(item.reviewTime),
+                            reviewDepartment: item.reviewDepartment
+                          });
+                        }}
                       >
-                        {this.dictList("扰动类型").map(item => (
-                          <Select.Option value={item.id} key={item.id}>
-                            {item.dictTableValue}
-                          </Select.Option>
-                        ))}
-                      </Select>
+                        {index + 1}、<Tag color="cyan">{item.reviewTime}</Tag>
+                        {item.reviewDepartment}
+                        <Icon
+                          type="delete"
+                          style={{
+                            marginLeft: 20,
+                            fontSize: 16,
+                            color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            Modal.confirm({
+                              title: "删除",
+                              content: "确定要删除这条图斑复核吗？",
+                              okText: "确定",
+                              cancelText: "取消",
+                              okType: "danger",
+                              onOk: () => this.spotReviewDelete(item.id)
+                            });
+                          }}
+                        />
+                      </List.Item>
                     )}
-                  </Form.Item>
-                  <Form.Item label="扰动变化类型" {...formItemLayout}>
-                    {getFieldDecorator("interferenceVaryTypeId", {
-                      initialValue: spotItem.interferenceVaryTypeId
-                    })(
-                      <Select
-                        showSearch
-                        allowClear={true}
-                        disabled={!edit}
-                        optionFilterProp="children"
-                      >
-                        {this.dictList("扰动变化类型").map(item => (
-                          <Select.Option value={item.id} key={item.id}>
-                            {item.dictTableValue}
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    )}
-                  </Form.Item>
-                  <Form.Item label="扰动合规性" {...formItemLayout}>
-                    {getFieldDecorator("interferenceComplianceId", {
-                      initialValue: spotItem.interferenceComplianceId
-                    })(
-                      <Select
-                        showSearch
-                        allowClear={true}
-                        disabled={!edit}
-                        optionFilterProp="children"
-                      >
-                        {this.dictList("扰动合规性").map(item => (
-                          <Select.Option value={item.id} key={item.id}>
-                            {item.dictTableValue}
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    )}
-                  </Form.Item>
-                  <Form.Item label="建设状态" {...formItemLayout}>
-                    {getFieldDecorator("buildStatusId", {
-                      initialValue: spotItem.buildStatusId
-                    })(
-                      <Select
-                        showSearch
-                        allowClear={true}
-                        disabled={!edit}
-                        optionFilterProp="children"
-                      >
-                        {this.dictList("建设状态").map(item => (
-                          <Select.Option value={item.id} key={item.id}>
-                            {item.dictTableValue}
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    )}
-                  </Form.Item>
+                  />
+                  <div
+                    style={{
+                      display: showSpotReview ? "block" : "none",
+                      marginTop: 20
+                    }}
+                  >
+                    <Form.Item label="扰动类型" {...formItemLayout}>
+                      {getFieldDecorator("review_interferenceTypeId")(
+                        <Select
+                          showSearch
+                          allowClear={true}
+                          disabled={!edit}
+                          optionFilterProp="children"
+                        >
+                          {this.dictList("扰动类型").map(item => (
+                            <Select.Option value={item.id} key={item.id}>
+                              {item.dictTableValue}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Form.Item>
+                    <Form.Item label="扰动变化类型" {...formItemLayout}>
+                      {getFieldDecorator("review_interferenceVaryTypeId")(
+                        <Select
+                          showSearch
+                          allowClear={true}
+                          disabled={!edit}
+                          optionFilterProp="children"
+                        >
+                          {this.dictList("扰动变化类型").map(item => (
+                            <Select.Option value={item.id} key={item.id}>
+                              {item.dictTableValue}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Form.Item>
+                    <Form.Item label="扰动合规性" {...formItemLayout}>
+                      {getFieldDecorator("review_interferenceComplianceId")(
+                        <Select
+                          showSearch
+                          allowClear={true}
+                          disabled={!edit}
+                          optionFilterProp="children"
+                        >
+                          {this.dictList("扰动合规性").map(item => (
+                            <Select.Option value={item.id} key={item.id}>
+                              {item.dictTableValue}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Form.Item>
+                    <Form.Item label="建设状态" {...formItemLayout}>
+                      {getFieldDecorator("review_buildStatusId")(
+                        <Select
+                          showSearch
+                          allowClear={true}
+                          disabled={!edit}
+                          optionFilterProp="children"
+                        >
+                          {this.dictList("建设状态").map(item => (
+                            <Select.Option value={item.id} key={item.id}>
+                              {item.dictTableValue}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Form.Item>
+                    <Form.Item label="复核日期" {...formItemLayout}>
+                      {getFieldDecorator("reviewTime")(<DatePicker />)}
+                    </Form.Item>
+                    <Form.Item label="复核单位" {...formItemLayout}>
+                      {getFieldDecorator("reviewDepartment")(
+                        <Input allowClear />
+                      )}
+                    </Form.Item>
+                    {this.domUpload("spotReviewPhotoList")}
+                  </div>
                 </Panel>
               </Collapse>
             </Form>
@@ -1806,17 +2115,17 @@ export default class siderbarDetail extends PureComponent {
                 fileList={fileList}
                 beforeUpload={() => {
                   console.log("beforeUpload");
-                  this.setState({ showSpin: true });
+                  this.setState({ loading: true });
                 }}
                 onSuccess={v => {
                   this.setState({
                     panoramaUrlConfig: v.result,
-                    showSpin: false
+                    loading: false
                   });
                 }}
                 onError={(v, response) => {
                   this.setState({
-                    showSpin: false
+                    loading: false
                   });
                   notification["error"]({
                     message: `全景图上传失败：${response.error.message}`
@@ -1895,7 +2204,7 @@ export default class siderbarDetail extends PureComponent {
                       message.warning(`请上传全景图`);
                       return;
                     }
-                    this.setState({ showSpin: true });
+                    this.setState({ loading: true });
                     dispatch({
                       type: "panorama/panoramaCreateUpdate",
                       payload: {
@@ -1907,7 +2216,7 @@ export default class siderbarDetail extends PureComponent {
                         pointY: v.pointY_pano
                       },
                       callback: (success, response) => {
-                        this.setState({ showSpin: false });
+                        this.setState({ loading: false });
                         if (success) {
                           emitter.emit("projectInfoRefresh", {
                             projectId

@@ -168,6 +168,13 @@ export default class siderbar extends PureComponent {
         this.querySpot({ ...queryParams });
       }
     }
+    // console.log(
+    //   "componentDidUpdate",
+    //   prevProps.commonModel.siderBarPageInfo.currentProjectId !==
+    //     currentProjectId,
+    //   prevProps.commonModel.siderBarPageInfo.currentProjectId,
+    //   currentProjectId
+    // );
     if (
       prevProps.commonModel.siderBarPageInfo.currentProjectId !==
         currentProjectId &&
@@ -213,6 +220,7 @@ export default class siderbar extends PureComponent {
     }
 
     this.queryProject({ SkipCount: 0 });
+    // this.querySpot({ SkipCount: 0 });
     this.queryProjectSupervise({ SkipCount: 0 });
     // this.querySpot({ SkipCount: 0 });
     // this.queryPoint({ SkipCount: 0 });
@@ -685,7 +693,7 @@ export default class siderbar extends PureComponent {
   };
 
   dataFormat = v => {
-    console.log("dataFormat开始", v);
+    // console.log("dataFormat开始", v);
     for (let i in v) {
       if (Array.isArray(v[i])) {
         if (i === "ReplyTime" && v[i].length) {
@@ -697,7 +705,7 @@ export default class siderbar extends PureComponent {
     }
     v.SkipCount = v.SkipCount || 0;
     v.MaxResultCount = v.MaxResultCount || 20;
-    console.log("dataFormat结束", v);
+    // console.log("dataFormat结束", v);
   };
 
   queryProject = items => {
@@ -854,7 +862,6 @@ export default class siderbar extends PureComponent {
               status: "done"
             };
           });
-          console.log("1111", data);
           this.setState({ projectFileList: list });
         } else {
           this.setState({ projectFileList: [] });
@@ -1960,7 +1967,7 @@ export default class siderbar extends PureComponent {
                   style={{
                     display:
                       sort_key === item.key && sort_by ? "inherit  " : "none",
-                    fontSize: 5
+                    fontSize: 12
                   }}
                 />
               </Button>

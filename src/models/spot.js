@@ -12,8 +12,11 @@ import {
   spotDeleteMulApi,
   spotHistoryApi,
   spotOldImgApi,
-  interpretListApi
+  interpretListApi,
+  spotReviewCreateUpdateApi,
+  spotReviewDeleteApi
 } from "../services/httpApi";
+import { messages } from "../utils/util";
 
 export default {
   namespace: "spot",
@@ -22,7 +25,11 @@ export default {
     spotTableList: { totalCount: 0, items: [] },
     spotList: { totalCount: 0, items: [] },
     projectInfoSpotList: { totalCount: 0, items: [] },
-    spotInfo: { mapNum: "", provinceCityDistrict: [null, null, null] },
+    spotInfo: {
+      mapNum: "",
+      provinceCityDistrict: [null, null, null],
+      spotReviews: []
+    },
     projectSelectListSpot: [],
     spotHistoryList: [],
     interpretList: []
@@ -115,6 +122,24 @@ export default {
           }`
         });
       }
+    },
+
+    // 图斑复核-新建编辑
+    *spotReviewCreateUpdate({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error }
+      } = yield call(spotReviewCreateUpdateApi, payload);
+      if (callback) callback(success);
+      messages(success, error, `${payload.id ? "编辑" : "新建"}图斑复核`);
+    },
+
+    // 图斑复核-删除
+    *spotReviewDelete({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error }
+      } = yield call(spotReviewDeleteApi, payload);
+      if (callback) callback(success);
+      messages(success, error, `删除图斑复核`);
     },
 
     // 图斑删除
