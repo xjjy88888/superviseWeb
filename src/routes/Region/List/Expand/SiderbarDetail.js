@@ -1354,7 +1354,6 @@ export default class siderbarDetail extends PureComponent {
                           e.stopPropagation();
                           this.setState({
                             showSpotReview: true,
-                            edit: true,
                             spotReviewId: null,
                             spotReviewPhotoList: [],
                             ParentId: 0
@@ -1409,7 +1408,6 @@ export default class siderbarDetail extends PureComponent {
                         onClick={() => {
                           this.setState({
                             showSpotReview: true,
-                            edit: true,
                             spotReviewId: item.id,
                             ParentId: item.photo ? item.photo.id : 0,
                             spotReviewPhotoList: photoFormat(item.photo)
@@ -1421,7 +1419,9 @@ export default class siderbarDetail extends PureComponent {
                             review_interferenceComplianceId:
                               item.interferenceComplianceId,
                             review_buildStatusId: item.buildStatusId,
-                            reviewTime: moment(item.reviewTime),
+                            reviewTime: item.reviewTime
+                              ? moment(item.reviewTime)
+                              : "",
                             reviewDepartment: item.reviewDepartment
                           });
                         }}
@@ -1461,7 +1461,6 @@ export default class siderbarDetail extends PureComponent {
                         <Select
                           showSearch
                           allowClear={true}
-                          disabled={!edit}
                           optionFilterProp="children"
                         >
                           {this.dictList("扰动类型").map(item => (
@@ -1477,7 +1476,6 @@ export default class siderbarDetail extends PureComponent {
                         <Select
                           showSearch
                           allowClear={true}
-                          disabled={!edit}
                           optionFilterProp="children"
                         >
                           {this.dictList("扰动变化类型").map(item => (
@@ -1493,7 +1491,6 @@ export default class siderbarDetail extends PureComponent {
                         <Select
                           showSearch
                           allowClear={true}
-                          disabled={!edit}
                           optionFilterProp="children"
                         >
                           {this.dictList("扰动合规性").map(item => (
@@ -1509,7 +1506,6 @@ export default class siderbarDetail extends PureComponent {
                         <Select
                           showSearch
                           allowClear={true}
-                          disabled={!edit}
                           optionFilterProp="children"
                         >
                           {this.dictList("建设状态").map(item => (
