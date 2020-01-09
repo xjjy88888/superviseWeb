@@ -9,7 +9,8 @@ import {
   Alert,
   Modal,
   Upload,
-  Spin
+  Spin,
+  message
 } from "antd";
 import emitter from "../../../../utils/event";
 import "leaflet/dist/leaflet.css";
@@ -19,6 +20,7 @@ import config from "../../../../config";
 import { accessToken, dateFormat } from "../../../../utils/util";
 
 const url = config.download;
+let self;
 
 @connect(({ project, spot, point, other, user }) => ({
   project,
@@ -38,7 +40,7 @@ export default class Tool extends PureComponent {
       showCheck: false,
       ShowArchive: false,
       key: "project",
-      showSpin: false,
+      loading: false,
       queryInfo: {}
     };
     this.charRef = ref => {
@@ -49,6 +51,8 @@ export default class Tool extends PureComponent {
   componentDidMount() {
     const { link } = this.props;
     link(this);
+
+    self = this;
 
     this.eventEmitter = emitter.addListener("showTool", data => {
       this.setState({
@@ -73,7 +77,7 @@ export default class Tool extends PureComponent {
       });
     });
   }
-  
+
   componentDidUpdate(prevProps) {
     const {
       project: { queryParams }
@@ -125,6 +129,25 @@ export default class Tool extends PureComponent {
       hover: false
     });
   };
+
+  projectExamine = (url, payload) => {
+    const { dispatch } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: `project/${url}`,
+      payload,
+      callback: success => {
+        this.setState({ loading: false });
+        if (success) {
+          this.setState({ showCheck: false });
+          emitter.emit("showCheck", {
+            show: false
+          });
+        }
+      }
+    });
+  };
+
   render() {
     const { dispatch } = this.props;
 
@@ -138,15 +161,15 @@ export default class Tool extends PureComponent {
       funcType,
       funcTypeText,
       ShowArchive,
-      showSpin,
+      loading,
       queryInfo
     } = this.state;
+
     return (
       <div
         style={{
           left: show ? 350 : -350,
           width: 240,
-          height: 610,
           backgroundColor: `#fff`,
           position: `absolute`,
           zIndex: 1001,
@@ -181,7 +204,7 @@ export default class Tool extends PureComponent {
         <Spin
           size="large"
           style={{
-            display: showSpin ? "block" : "none",
+            display: loading ? "block" : "none",
             position: "absolute",
             top: 300,
             left: 100,
@@ -194,9 +217,8 @@ export default class Tool extends PureComponent {
             已选中{checkResult.length}条数据
           </span>
           {config.toolbox.map((item, index) =>
-            key === "spot" &&
-            (item.key === "upload_excel" ||
-              item.key === "download_excel") ? null : (
+            (key === "spot" || !showCheck) &&
+            (item.key === "isExamine" || item.key === "noExamine") ? null : (
               <div key={index}>
                 <Button
                   style={{ margin: `15px 10px 0 10px` }}
@@ -256,17 +278,6 @@ export default class Tool extends PureComponent {
                           funcTypeText: item.label
                         });
                         break;
-                      // 模板下载(Excel)
-                      // case "download_excel":
-                      //   window.open(
-                      //     `${url}Excel/项目红线范围（无图形）.xlsx`,
-                      //     "_blank"
-                      //   );
-                      //   notification["success"]({
-                      //     message: `下载项目模板(Excel)成功`
-                      //   });
-                      //   break;
-                      // 模板说明
                       case "template_description":
                         window.open(config.templateDescription, "_blank");
                         notification["success"]({
@@ -275,11 +286,38 @@ export default class Tool extends PureComponent {
                           }模板说明成功`
                         });
                         break;
-                      //数据抽稀
+                      // 数据抽稀
                       case "data_sparse":
                         emitter.emit("showSparse", {
                           show: true
                         });
+                        break;
+                      // 设置待查处
+                      case "isExamine":
+                      case "noExamine":
+                        const is = item.key === "isExamine";
+                        if (checkResult.length) {
+                          Modal.confirm({
+                            title: `${is ? "设置" : "取消"}待查处`,
+                            content: `确定要${is ? "设置" : "取消"}这 ${
+                              checkResult.length
+                            } 个项目为待查处吗？`,
+                            okText: "确定",
+                            cancelText: "取消",
+                            okType: "danger",
+                            onOk() {
+                              const ids = checkResult.map(i => i.id);
+                              self.projectExamine(
+                                is
+                                  ? "projectSetExamine"
+                                  : "projectCancelExamine",
+                                ids
+                              );
+                            }
+                          });
+                        } else {
+                          message.warning("至少选择一个项目！");
+                        }
                         break;
                       default:
                         break;
@@ -415,11 +453,11 @@ export default class Tool extends PureComponent {
             }
             headers={{ Authorization: `Bearer ${accessToken()}` }}
             beforeUpload={() => {
-              this.setState({ showSpin: true });
+              this.setState({ loading: true });
             }}
             onSuccess={v => {
               console.log("onSuccess");
-              this.setState({ showSpin: false });
+              this.setState({ loading: false });
               if (v.success && v.result.length === 0) {
                 notification["success"]({
                   message: `${key === "project" ? "项目" : "图斑"}附件上传成功`
@@ -442,7 +480,7 @@ export default class Tool extends PureComponent {
             }}
             onError={(response, v) => {
               console.log("onError", v);
-              this.setState({ showSpin: false });
+              this.setState({ loading: false });
               notification["error"]({
                 message: `${key === "project" ? "项目" : "图斑"}附件上传失败：${
                   v.error.message

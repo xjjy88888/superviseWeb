@@ -419,6 +419,14 @@ export default class Query extends PureComponent {
                 />
               )}
             </Form.Item>
+            <Form.Item label="是否待查处" {...formItemLayoutlong}>
+              {getFieldDecorator("isWaitInvestigate", {
+                valuePropName: "checked",
+                initialValue: false
+              })(
+                <Switch checkedChildren="待查处" unCheckedChildren="已查处" />
+              )}
+            </Form.Item>
             <Form.Item
               label="回收站数据"
               {...formItemLayoutlong}

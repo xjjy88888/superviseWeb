@@ -20,8 +20,11 @@ import {
   projectUnbindSpotApi,
   projectArchiveApi,
   projectSuperviseCreateUpdateApi,
-  projectExamineApi
+  projectExamineApi,
+  projectSetExamineApi,
+  projectCancelExamineApi
 } from "../services/httpApi";
+import { messages } from "../utils/util";
 
 export default {
   namespace: "project",
@@ -361,6 +364,22 @@ export default {
         message: success ? "项目查处成功" : "项目查处失败"
       });
       if (callback) callback(success);
+    },
+
+    *projectSetExamine({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error }
+      } = yield call(projectSetExamineApi, payload);
+      if (callback) callback(success);
+      messages(success, error, "设置待查处");
+    },
+
+    *projectCancelExamine({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error }
+      } = yield call(projectCancelExamineApi, payload);
+      if (callback) callback(success);
+      messages(success, error, "取消待查处");
     }
   },
 

@@ -169,6 +169,30 @@ export async function projectUnbindSpotApi(params) {
   );
 }
 
+// 项目-设置待查处
+export async function projectSetExamineApi(params) {
+  return request(`${config.url.projectSetExamineUrl}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify(params)
+  });
+}
+
+// 项目-取消待查处
+export async function projectCancelExamineApi(params) {
+  return request(`${config.url.projectCancelExamineUrl}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify(params)
+  });
+}
+
 // 图斑列表---表格展示
 export async function spotTableListApi(params) {
   // delete params.items;

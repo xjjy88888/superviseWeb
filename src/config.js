@@ -144,6 +144,12 @@ const config = {
     // 项目取消关联图斑
     projectUnbindSpotUrl: `${domainApi}Project/UnbindSpot`,
 
+    // 项目-设置待查处
+    projectSetExamineUrl: `${domainApi}Project/SetWaitInvestigate`,
+
+    // 项目-取消待查处
+    projectCancelExamineUrl: `${domainApi}Project/CancelWaitInvestigate`,
+
     // 图斑列表---表格展示
     spotTableListUrl: `${domainApi}Spot/ListAll`,
 
@@ -521,20 +527,20 @@ const config = {
       key: "template_description",
       icon: "question-circle"
     },
-    // {
-    //   label: "批量上传(GeoJSON)",
-    //   key: "upload_shapfile",
-    //   icon: "upload"
-    // },
-    // {
-    //   label: "批量上传(Excel)",
-    //   key: "upload_excel",
-    //   icon: "upload"
-    // },
     {
       label: "数据抽稀",
       key: "data_sparse",
       icon: "font-size"
+    },
+    {
+      label: "设置待查处",
+      key: "isExamine",
+      icon: "eye"
+    },
+    {
+      label: "取消待查处",
+      key: "noExamine",
+      icon: "eye-invisible"
     }
   ],
 
