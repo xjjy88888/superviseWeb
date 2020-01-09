@@ -311,6 +311,12 @@ export default class RegionMap extends PureComponent {
         }
       });
     };
+
+    //分割图斑
+    window.divideSpot = obj => {
+      console.log("分割图斑", obj);
+    };
+
     this.eventEmitter = emitter.addListener("deleteDraw", () => {
       this.clearPlotGraphic();
       this.reDrawWMSLayers();
@@ -2762,7 +2768,9 @@ export default class RegionMap extends PureComponent {
             obj
           )})'>图形编辑</a>  <a onclick='goDeleteGraphic(${JSON.stringify(
             obj
-          )})' style='display:none'>图形删除</a></div>`
+          )})' style='display:none'>图形删除</a><a onclick='divideSpot(${JSON.stringify(
+            obj
+          )})'>分割图斑</a></div>`
         )
       : jQuery(
           `<div>项目:${properties.project_name}</br>
@@ -4179,7 +4187,7 @@ export default class RegionMap extends PureComponent {
               bottom: 14,
               right: 450,
               zIndex: 1000
-                        }}
+            }}
           >
             <img alt="loading1.gif" src="./img/loading1.gif" />
           </div>
