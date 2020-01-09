@@ -1057,7 +1057,7 @@ export default class siderbarDetail extends PureComponent {
                 marginBottom: 20
               }}
             >
-              <Collapse defaultActiveKey={["3"]}>
+              <Collapse defaultActiveKey={["1"]}>
                 <Panel header={<b>基本信息</b>} key="1">
                   <Form.Item
                     label={
