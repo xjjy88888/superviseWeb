@@ -688,7 +688,6 @@ export default class siderbar extends PureComponent {
           });
           switchInterpret(TaskLevelAndInterBatch);
         } else {
-          console.log(1111111);
           switchInterpret(null);
         }
       }

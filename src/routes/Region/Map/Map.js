@@ -3963,7 +3963,6 @@ export default class RegionMap extends PureComponent {
     } else {
       userconfig.cql_filter += " and archive_time is null";
     }
-    console.log(userconfig.cql_filter);
     if (userconfig.spotWmsLayer) {
       userconfig.spotWmsLayer.setParams({
         cql_filter: userconfig.cql_filter
