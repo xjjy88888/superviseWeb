@@ -154,54 +154,7 @@ export default class siderbar extends PureComponent {
     };
     this.map = null;
   }
-  componentDidUpdate(prevProps) {
-    const {
-      project: { queryParams },
-      commonModel: {
-        siderBarPageInfo: { currentProjectId, currentSpotId }
-      }
-    } = this.props;
-    if (prevProps.project.queryParams !== queryParams) {
-      if (queryParams.from && queryParams.from === "project") {
-        this.queryProject({ ...queryParams });
-      } else if (queryParams.from && queryParams.from === "spot") {
-        this.querySpot({ ...queryParams });
-      }
-    }
-    // console.log(
-    //   "componentDidUpdate",
-    //   prevProps.commonModel.siderBarPageInfo.currentProjectId !==
-    //     currentProjectId,
-    //   prevProps.commonModel.siderBarPageInfo.currentProjectId,
-    //   currentProjectId
-    // );
-    if (
-      prevProps.commonModel.siderBarPageInfo.currentProjectId !==
-        currentProjectId &&
-      currentProjectId !== ""
-      // &&
-      // prevProps.commonModel.siderBarPageInfo.currentProjectId !== ""
-    ) {
-      this.setState({ showProjectDetail: true, clickId: currentProjectId });
-      this.queryProjectById(currentProjectId);
-      this.queryProjectInfo(currentProjectId);
-    } else if (
-      prevProps.commonModel.siderBarPageInfo.currentSpotId !== currentSpotId &&
-      currentSpotId !== ""
-      // &&
-      // prevProps.commonModel.siderBarPageInfo.currentSpotId !== ""
-    ) {
-      emitter.emit("showSiderbarDetail", {
-        show: true,
-        from: "spot",
-        id: currentSpotId,
-        edit: false,
-        fromList: true,
-        type: "edit"
-      });
-      this.setState({ clickId: currentSpotId });
-    }
-  }
+  
   componentDidMount() {
     const { link } = this.props;
     link(this);
@@ -220,7 +173,6 @@ export default class siderbar extends PureComponent {
     }
 
     this.queryProject({ SkipCount: 0 });
-    // this.querySpot({ SkipCount: 0 });
     this.queryProjectSupervise({ SkipCount: 0 });
     // this.querySpot({ SkipCount: 0 });
     // this.queryPoint({ SkipCount: 0 });
@@ -373,6 +325,60 @@ export default class siderbar extends PureComponent {
     });
     this.saveCurrentPageInfo("project");
   }
+  
+  componentDidUpdate(prevProps) {
+    const {
+      project: { queryParams },
+      commonModel: {
+        siderBarPageInfo: { currentProjectId, currentSpotId }
+      }
+    } = this.props;
+    if (prevProps.project.queryParams !== queryParams) {
+      if (queryParams.from && queryParams.from === "project") {
+        this.queryProject({ ...queryParams });
+      } else if (queryParams.from && queryParams.from === "spot") {
+        this.querySpot({ ...queryParams });
+      }
+    }
+    // console.log(
+    //   "componentDidUpdate",
+    //   prevProps.commonModel.siderBarPageInfo.currentProjectId !==
+    //     currentProjectId,
+    //   prevProps.commonModel.siderBarPageInfo.currentProjectId,
+    //   currentProjectId
+    // );
+    if (
+      prevProps.commonModel.siderBarPageInfo.currentProjectId !==
+        currentProjectId &&
+      currentProjectId !== ""
+      // &&
+      // prevProps.commonModel.siderBarPageInfo.currentProjectId !== ""
+    ) {
+      this.setState({ showProjectDetail: true, clickId: currentProjectId });
+      this.queryProjectById(currentProjectId);
+      this.queryProjectInfo(currentProjectId);
+    } else if (
+      prevProps.commonModel.siderBarPageInfo.currentSpotId !== currentSpotId &&
+      currentSpotId !== ""
+      // &&
+      // prevProps.commonModel.siderBarPageInfo.currentSpotId !== ""
+    ) {
+      emitter.emit("showSiderbarDetail", {
+        show: true,
+        from: "spot",
+        id: currentSpotId,
+        edit: false,
+        fromList: true,
+        type: "edit"
+      });
+      this.setState({ clickId: currentSpotId });
+    }
+  }
+
+  refreshSpotList = () => {
+    this.querySpot({ SkipCount: 0 });
+  };
+
   // 将筛选内容保存到props中
   querySave = payload => {
     const {
@@ -417,6 +423,7 @@ export default class siderbar extends PureComponent {
       }
     });
   };
+
   queryInfo = data => {
     console.log("列表筛选完成", data);
     if (this.scrollDom) {

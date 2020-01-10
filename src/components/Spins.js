@@ -17,7 +17,7 @@ export default class spins extends PureComponent {
           position: "absolute",
           top: "50%",
           left: "50%",
-          zIndex: 1
+          zIndex: 1000
         }}
       />
     );

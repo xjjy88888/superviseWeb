@@ -195,6 +195,9 @@ const config = {
     // 图斑复核-删除
     spotReviewDeleteUrl: `${domainApi}SpotReview/Delete`,
 
+    // 图斑-分割
+    spotDivideUrl: `${domainApi}Spot/SplitSpot`,
+
     // 标注点列表
     pointListUrl: `${domainApi}MarkingPoint/GetAll`,
 

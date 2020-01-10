@@ -58,10 +58,10 @@ import emitter from "../../../utils/event";
 import jQuery from "jquery";
 // import { validateId } from "@turf/helpers";
 import Layouts from "../../../components/Layouts";
-// import Spins from "../../../components/Spins";
+import Spins from "../../../components/Spins";
 import "./index.less";
 import Contrast from "./Contrast";
-import { getUrl } from "../../../utils/util";
+import { getUrl, polygonClipByLine } from "../../../utils/util";
 import { nonsense } from "antd-mobile/lib/picker";
 
 let userconfig = {};
@@ -83,6 +83,11 @@ let radius = null; //画圆圈半径大小
 let RegionCenterData = [];
 let RegionPieData = [];
 let ProjectPointsData = null;
+
+let clipSpotLayer = null; //分割图斑临时图层
+let clipSpotData = null;
+let clipResultLayer = null;
+let colorList = ["#00FF66", "#66CCFF", "#6600FF", "#FF9933", "#FF3333"];
 
 const DISTRICT_FILL_COLOR = "rgba(230,0,0,0)";
 // const DISTRICT_COLOR = '#bfbfbf';
@@ -150,6 +155,14 @@ const ZSGeoJsonHLightStyle = {
   fillColor: "#FF0000",
   fillOpacity: 0.3
 };
+//绘制分割图斑样式符号style
+const clipSpotStyle = {
+  stroke: true,
+  color: "#3388ff",
+  opacity: 1,
+  weight: 3,
+  dashArray: "5,5"
+};
 
 @connect(
   ({ user, mapdata, project, spot, projectSupervise, videoMonitor }) => ({
@@ -165,7 +178,7 @@ export default class RegionMap extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      //loading: false,
+      loading: false,
       showButton: false,
       showHistoryContrast: false,
       showQYJGPanel: true,
@@ -199,7 +212,8 @@ export default class RegionMap extends PureComponent {
       showVedioPreview: false,
       showVedioPicPreview: false,
       vedioPicPreviewUrl: null,
-      vedioPicList: ["./img/loading.png"]
+      vedioPicList: ["./img/loading.png"],
+      showClipSpot: false
       //loading: true
     };
     this.saveRef = v => {
@@ -216,6 +230,9 @@ export default class RegionMap extends PureComponent {
     picLayerGroup = null;
     problemPointLayer = L.layerGroup([]);
     measurePointLayer = L.layerGroup([]);
+    clipSpotLayer = null; //分割图斑临时图层
+    clipSpotData = null;
+    clipResultLayer = null;
     /*-------------------------------------项目监管部分-------------------------------------*/
     regiongeojsonLayer = null; //行政区划矢量图层
     ZSgeojsonLayer = null; //区域统计图层
@@ -313,8 +330,52 @@ export default class RegionMap extends PureComponent {
     };
 
     //分割图斑
-    window.divideSpot = obj => {
-      console.log("分割图斑", obj);
+    window.divideSpot = v => {
+      console.log("分割图斑", v);
+      const me = this;
+      clipSpotData = v;
+      me.setState({
+        showClipSpot: true
+      });
+      map.off("click");
+      me.clearPlotGraphic();
+      map.off("pm:create");
+      if (clipResultLayer) clipResultLayer.clearLayers();
+      map.closePopup();
+      let geojsondata = {
+        type: "FeatureCollection",
+        features: []
+      };
+      geojsondata.features.push(clipSpotLayer);
+      me.clearGeojsonLayer();
+      me.loadGeojsonLayer(geojsondata, geoJsonStyle);
+      map.pm.enableDraw("Line", {
+        finishOn: "dblclick",
+        allowSelfIntersection: false,
+        tooltips: false
+      });
+      map.on("pm:create", e => {
+        if (clipResultLayer) clipResultLayer.clearLayers();
+        e.layer.setStyle(clipSpotStyle);
+        me.setState({ addGraphLayer: e.layer });
+        if (clipSpotLayer) {
+          var clipLine = L.polyline(e.layer._latlngs);
+          try {
+            var clippedPolygon = polygonClipByLine(
+              clipSpotLayer,
+              clipLine.toGeoJSON()
+            );
+            for (var i = 0; i < clippedPolygon.features.length; i++) {
+              var newLayer = L.Proj.geoJson(clippedPolygon.features[i], {
+                style: { color: colorList[i] }
+              });
+              clipResultLayer.addLayer(newLayer);
+            }
+          } catch (error) {
+            message.warning(error.state + ":" + error.message, 2);
+          }
+        }
+      });
     };
 
     this.eventEmitter = emitter.addListener("deleteDraw", () => {
@@ -567,6 +628,7 @@ export default class RegionMap extends PureComponent {
           me.setState({ addGraphLayer: null });
         }
         //绘制图形之前
+        map.off("pm:create");
         map.on("pm:drawstart", ({ workingLayer }) => {
           workingLayer.on("pm:vertexadded", e => {
             let turfpoint = turf.point([e.latlng.lng, e.latlng.lat]);
@@ -629,6 +691,60 @@ export default class RegionMap extends PureComponent {
       });
     });
   }
+
+  /*
+   * 取消分割图斑
+   */
+  cancelClipGraphic = () => {
+    this.setState({ showClipSpot: false });
+    map.on("click", this.onClickMap);
+    const { addGraphLayer } = this.state;
+    if (addGraphLayer) {
+      addGraphLayer.pm.disable();
+      map.removeLayer(addGraphLayer);
+      this.setState({ addGraphLayer: null });
+    }
+    map.pm.disableDraw("Line");
+    if (clipResultLayer) clipResultLayer.clearLayers();
+    this.clearGeojsonLayer();
+    clipSpotLayer = null;
+  };
+
+  /*
+   * 保存分割图形
+   */
+  saveClipGraphic = () => {
+    const me = this;
+    map.on("click", me.onClickMap);
+    const { addGraphLayer } = me.state;
+    if (addGraphLayer) {
+      me.setState({ showDrawSpot: false });
+      addGraphLayer.pm.disable();
+      map.removeLayer(addGraphLayer);
+      me.clearGeojsonLayer();
+      clipSpotLayer = null;
+      me.setState({ addGraphLayer: null });
+      let list = [];
+      clipResultLayer.eachLayer(function(layer) {
+        if (layer) {
+          let geojson = layer.toGeoJSON();
+          geojson = geojson.features[0];
+          let geom = me.geojson2Multipolygon(geojson, 1);
+          console.log("geom", geom);
+          list.push(geom);
+        }
+      });
+      console.log("分割图斑完成", list, clipSpotData);
+      const data = {
+        id: clipSpotData.id,
+        polygon1: list[0],
+        polygon2: list[1]
+      };
+      this.spotDivide(data);
+    } else {
+      message.warning("请绘制分割图形", 2);
+    }
+  };
 
   // 项目监管请求参数
   queryProjectFilter = payload => {
@@ -1950,6 +2066,8 @@ export default class RegionMap extends PureComponent {
         let content = "";
         for (let i = 0; i < data.features.length; i++) {
           let feature = data.features[i];
+          //判断是不是分割图斑
+          if (feature.properties.map_num) clipSpotLayer = feature;
           if (i === data.features.length - 1) {
             me.getWinContent(feature.properties, data => {
               content += data[0].innerHTML;
@@ -2027,6 +2145,8 @@ export default class RegionMap extends PureComponent {
           //过滤历史图斑记录
           if (!feature.properties.archive_time) {
             geojsondata.features.push(feature);
+            //判断是不是分割图斑
+            if (feature.properties.map_num) clipSpotLayer = feature;
             if (i === data.features.length - 1) {
               me.getWinContent(feature.properties, data => {
                 content += data[0].innerHTML;
@@ -2229,6 +2349,8 @@ export default class RegionMap extends PureComponent {
     map.pm.addControls(options);
     //检查照片列表
     picLayerGroup = L.featureGroup().addTo(map);
+    //临时分割图斑图层
+    clipResultLayer = L.Proj.geoJson(null, {}).addTo(map);
 
     // 监听地图点击事件
     map.on("click", me.onClickMap);
@@ -3819,7 +3941,7 @@ export default class RegionMap extends PureComponent {
 
   switchInterpret = v => {
     console.log(`切换解译期次`, v);
-    userconfig.cql_filter = "";
+    userconfig.cql_filter = "archive_time is null";
     if (v) {
       const taskLevel = v.split("-")[0];
       let task_level = 3;
@@ -3833,14 +3955,15 @@ export default class RegionMap extends PureComponent {
         task_level = 3;
       }
       const inter_batch = v.split("-")[1];
-      userconfig.cql_filter =
-        "inter_batch = " +
+      const sql =
+        " and inter_batch = " +
         inter_batch +
         " and task_level = " +
         task_level +
         " and create_type==0";
+      userconfig.cql_filter += sql;
     } else {
-      userconfig.cql_filter = "archive_time is null and create_type==0";
+      userconfig.cql_filter += " and create_type==0";
     }
 
     if (userconfig.spotWmsLayer) {
@@ -4022,6 +4145,21 @@ export default class RegionMap extends PureComponent {
     }
   };
 
+  spotDivide = payload => {
+    const { dispatch } = this.props;
+    this.setState({ loading: true });
+    dispatch({
+      type: "spot/spotDivide",
+      payload,
+      callback: success => {
+        this.setState({ loading: false, });
+        if (success) {
+          this.Sidebar.refreshSpotList();
+        }
+      }
+    });
+  };
+
   render() {
     const radioStyle = {
       display: "block",
@@ -4053,8 +4191,9 @@ export default class RegionMap extends PureComponent {
       showVedioPreview,
       showVedioPicPreview,
       vedioPicPreviewUrl,
-      vedioPicList
-      //loading,
+      vedioPicList,
+      showClipSpot,
+      loading
     } = this.state;
     const {
       mapdata: { histories, historiesSpot },
@@ -4303,6 +4442,29 @@ export default class RegionMap extends PureComponent {
                 }
               />
             </Popover>
+          </div>
+          {/* 分割图斑面板 */}
+          <div
+            style={{
+              display: showClipSpot ? "block" : "none",
+              position: "absolute",
+              top: 65,
+              right: 240,
+              zIndex: 1000
+            }}
+          >
+            <Button
+              icon="rollback"
+              onClick={() => {
+                this.cancelClipGraphic();
+              }}
+            />
+            <Button
+              icon="arrow-right"
+              onClick={() => {
+                this.saveClipGraphic();
+              }}
+            />
           </div>
           {/*图标联动按钮 */}
           <div
@@ -4645,6 +4807,7 @@ export default class RegionMap extends PureComponent {
             </Popover>
           </div>
         </div>
+        <Spins show={loading} />
       </Layouts>
     );
   }

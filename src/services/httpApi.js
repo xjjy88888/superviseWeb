@@ -364,6 +364,18 @@ export async function spotReviewDeleteApi(id) {
   });
 }
 
+// 图斑-分割
+export async function spotDivideApi(params) {
+  return request(config.url.spotDivideUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken()}`,
+      "Content-Type": "application/json-patch+json"
+    },
+    body: JSON.stringify(params)
+  });
+}
+
 // 标注点列表
 export async function pointListApi(params) {
   return request(

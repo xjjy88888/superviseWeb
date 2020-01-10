@@ -14,7 +14,8 @@ import {
   spotOldImgApi,
   interpretListApi,
   spotReviewCreateUpdateApi,
-  spotReviewDeleteApi
+  spotReviewDeleteApi,
+  spotDivideApi
 } from "../services/httpApi";
 import { messages } from "../utils/util";
 
@@ -288,6 +289,14 @@ export default {
           payload: { interpretList: result }
         });
       }
+    },
+
+    *spotDivide({ payload, callback }, { call, put }) {
+      const {
+        data: { success, error }
+      } = yield call(spotDivideApi, payload);
+      if (callback) callback(success);
+      messages(success, error, `图斑分割`);
     }
   },
 
