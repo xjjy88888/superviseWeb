@@ -721,9 +721,9 @@ export default class RegionMap extends PureComponent {
       me.setState({ showDrawSpot: false });
       addGraphLayer.pm.disable();
       map.removeLayer(addGraphLayer);
-      me.clearGeojsonLayer();
-      clipSpotLayer = null;
       me.setState({ addGraphLayer: null });
+      // me.clearGeojsonLayer();
+      // clipSpotLayer = null;
       let list = [];
       clipResultLayer.eachLayer(function(layer) {
         if (layer) {
@@ -3941,7 +3941,8 @@ export default class RegionMap extends PureComponent {
 
   switchInterpret = v => {
     console.log(`切换解译期次`, v);
-    userconfig.cql_filter = "archive_time is null";
+    //userconfig.cql_filter = "archive_time is null";
+    userconfig.cql_filter = "create_type==0";
     if (v) {
       const taskLevel = v.split("-")[0];
       let task_level = 3;
@@ -3956,16 +3957,13 @@ export default class RegionMap extends PureComponent {
       }
       const inter_batch = v.split("-")[1];
       const sql =
-        " and inter_batch = " +
-        inter_batch +
-        " and task_level = " +
-        task_level +
-        " and create_type==0";
+        " and inter_batch = " + inter_batch + " and task_level = " + task_level;
+      // " and create_type==0";
       userconfig.cql_filter += sql;
     } else {
-      userconfig.cql_filter += " and create_type==0";
+      userconfig.cql_filter += " and archive_time is null";
     }
-
+    console.log(userconfig.cql_filter);
     if (userconfig.spotWmsLayer) {
       userconfig.spotWmsLayer.setParams({
         cql_filter: userconfig.cql_filter
@@ -4152,9 +4150,19 @@ export default class RegionMap extends PureComponent {
       type: "spot/spotDivide",
       payload,
       callback: success => {
-        this.setState({ loading: false, });
+        this.setState({ loading: false });
         if (success) {
           this.Sidebar.refreshSpotList();
+          this.setState({ showClipSpot: false });
+          if (clipResultLayer) clipResultLayer.clearLayers();
+          this.clearGeojsonLayer();
+          clipSpotLayer = null;
+          //刷新图斑图层
+          if (userconfig.spotWmsLayer) {
+            userconfig.spotWmsLayer.setParams({
+              cql_filter: userconfig.cql_filter
+            });
+          }
         }
       }
     });

@@ -154,7 +154,7 @@ export default class siderbar extends PureComponent {
     };
     this.map = null;
   }
-  
+
   componentDidMount() {
     const { link } = this.props;
     link(this);
@@ -325,7 +325,7 @@ export default class siderbar extends PureComponent {
     });
     this.saveCurrentPageInfo("project");
   }
-  
+
   componentDidUpdate(prevProps) {
     const {
       project: { queryParams },
@@ -687,6 +687,9 @@ export default class siderbar extends PureComponent {
             TaskLevelAndInterBatch
           });
           switchInterpret(TaskLevelAndInterBatch);
+        } else {
+          console.log(1111111);
+          switchInterpret(null);
         }
       }
     });

@@ -66,7 +66,6 @@ export default class siderbarDetail extends PureComponent {
       item: { project_id: "" },
       fileList: [],
       fromList: false,
-      showSpotHistory: false,
       spotHistoryId: "",
       panoramaUrlConfig: "",
       loading: false,
@@ -443,7 +442,7 @@ export default class siderbarDetail extends PureComponent {
 
   domUpload = fileListKey => {
     const { dispatch } = this.props;
-    const { ParentId, edit } = this.state;
+    const { ParentId } = this.state;
     const photoList = this.state[fileListKey];
     return (
       <Upload
@@ -577,14 +576,12 @@ export default class siderbarDetail extends PureComponent {
       previewImage,
       previewVisible_min,
       relateProject,
-      showSpotHistory,
       spotHistoryId,
       item,
       panoramaUrlConfig,
       loading,
       showSpotReview,
-      spotReviewId,
-      spotReviewPhotoList
+      spotReviewId
     } = this.state;
 
     const projectSelectListAll = [
@@ -1527,6 +1524,121 @@ export default class siderbarDetail extends PureComponent {
                     {this.domUpload("spotReviewPhotoList")}
                   </div>
                 </Panel>
+                <Panel
+                  header={<b>历史查看：{spotHistoryList.length}</b>}
+                  key="4"
+                >
+                  <List
+                    size="small"
+                    bordered
+                    dataSource={spotHistoryList}
+                    renderItem={(item, index) => (
+                      <List.Item
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          this.querySpotById(item.id, true);
+                        }}
+                      >
+                        {index + 1}、<Tag color="cyan">{item.archiveTime}</Tag>
+                        {item.mapNum}
+                        <Icon
+                          type="environment"
+                          style={{
+                            fontSize: 16,
+                            cursor: "point",
+                            color: "#1890ff",
+                            position: "absolute",
+                            top: 11,
+                            right: 10
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            mapLocation({
+                              item: item,
+                              key: "spot"
+                            });
+                          }}
+                        />
+                      </List.Item>
+                    )}
+                  />
+                  <div
+                    style={{
+                      display: showSpotReview ? "block" : "none",
+                      marginTop: 20
+                    }}
+                  >
+                    <Form.Item label="扰动类型" {...formItemLayout}>
+                      {getFieldDecorator("review_interferenceTypeId")(
+                        <Select
+                          showSearch
+                          allowClear={true}
+                          optionFilterProp="children"
+                        >
+                          {this.dictList("扰动类型").map(item => (
+                            <Select.Option value={item.id} key={item.id}>
+                              {item.dictTableValue}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Form.Item>
+                    <Form.Item label="扰动变化类型" {...formItemLayout}>
+                      {getFieldDecorator("review_interferenceVaryTypeId")(
+                        <Select
+                          showSearch
+                          allowClear={true}
+                          optionFilterProp="children"
+                        >
+                          {this.dictList("扰动变化类型").map(item => (
+                            <Select.Option value={item.id} key={item.id}>
+                              {item.dictTableValue}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Form.Item>
+                    <Form.Item label="扰动合规性" {...formItemLayout}>
+                      {getFieldDecorator("review_interferenceComplianceId")(
+                        <Select
+                          showSearch
+                          allowClear={true}
+                          optionFilterProp="children"
+                        >
+                          {this.dictList("扰动合规性").map(item => (
+                            <Select.Option value={item.id} key={item.id}>
+                              {item.dictTableValue}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Form.Item>
+                    <Form.Item label="建设状态" {...formItemLayout}>
+                      {getFieldDecorator("review_buildStatusId")(
+                        <Select
+                          showSearch
+                          allowClear={true}
+                          optionFilterProp="children"
+                        >
+                          {this.dictList("建设状态").map(item => (
+                            <Select.Option value={item.id} key={item.id}>
+                              {item.dictTableValue}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Form.Item>
+                    <Form.Item label="复核日期" {...formItemLayout}>
+                      {getFieldDecorator("reviewTime")(<DatePicker />)}
+                    </Form.Item>
+                    <Form.Item label="复核单位" {...formItemLayout}>
+                      {getFieldDecorator("reviewDepartment")(
+                        <Input allowClear />
+                      )}
+                    </Form.Item>
+                    {this.domUpload("spotReviewPhotoList")}
+                  </div>
+                </Panel>
               </Collapse>
             </Form>
             {domUpload}
@@ -1624,18 +1736,6 @@ export default class siderbarDetail extends PureComponent {
               </span>
             ) : (
               <span>
-                <Button
-                  icon="ordered-list"
-                  style={{ marginRight: 15 }}
-                  onClick={() => {
-                    this.setState({ showSpotHistory: !showSpotHistory });
-                    if (showSpotHistory) {
-                      this.querySpotById(spotHistoryId, true);
-                    }
-                  }}
-                >
-                  历史查看：{spotHistoryList.length}
-                </Button>
                 <Button
                   icon="play-square"
                   style={{ marginRight: 15 }}
@@ -1816,42 +1916,6 @@ export default class siderbarDetail extends PureComponent {
                 </Button>
               </span>
             )}
-            <div
-              style={{
-                display: showSpotHistory && !edit ? "block" : "none",
-                marginTop: 20
-              }}
-            >
-              {spotHistoryList.map((item, index) => (
-                <p
-                  key={index}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => {
-                    this.querySpotById(item.id, true);
-                  }}
-                >
-                  {item.mapNum}
-                  <span style={{ marginLeft: 20 }}>{item.archiveTime}</span>
-                  <Icon
-                    type="environment"
-                    style={{
-                      float: "right",
-                      fontSize: 16,
-                      cursor: "point",
-                      color: "#1890ff",
-                      marginRight: 10
-                    }}
-                    onClick={e => {
-                      e.stopPropagation();
-                      mapLocation({
-                        item: item,
-                        key: "spot"
-                      });
-                    }}
-                  />
-                </p>
-              ))}
-            </div>
           </div>
           <div
             style={{
