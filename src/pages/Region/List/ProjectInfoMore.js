@@ -70,7 +70,7 @@ export default class projectDetail extends PureComponent {
       console.log(v);
       setFieldsValue({ [v.key]: v.id });
     });
-    this.eventEmitter = emitter.addListener("showProjectDetail", data => {
+    this.eventEmitter = emitter.addListener("showProjectInfo", data => {
       resetFields();
       this.setState({
         show: data.show,
@@ -105,7 +105,7 @@ export default class projectDetail extends PureComponent {
   }
 
   projectCreateUpdate = payload => {
-    const { dispatch } = this.props;
+    const { returnList, dispatch } = this.props;
     const { isHttp } = this.state;
     if (isHttp) {
       return;
@@ -119,6 +119,7 @@ export default class projectDetail extends PureComponent {
         if (success) {
           emitter.emit("deleteSuccess", {});
           this.setState({ show: false });
+          returnList();
         }
       }
     });

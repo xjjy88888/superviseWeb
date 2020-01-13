@@ -12,7 +12,9 @@ import {
   Radio,
   Carousel
 } from "antd";
-import Sidebar from "../List/Sidebar";
+import List from "../List/List";
+import ProjectInfo from "../List/ProjectInfo";
+import ProjectInfoMore from "../List/ProjectInfoMore";
 import ProjectList from "../List/ProjectList";
 import SidebarDetail from "../List/Expand/SiderbarDetail";
 import Tool from "../List/Aside/Tool";
@@ -23,7 +25,6 @@ import Query from "../List/Aside/Query";
 import Inspect from "../List/Inspect/Edit";
 import ProblemPoint from "../List/Inspect/ProblemPoint";
 import MeasurePoint from "../List/Inspect/MeasurePoint";
-import ProjectDetail from "../List/ProjectInfoMore";
 import VideoMonitor from "../List/Expand/VideoMonitor";
 import Examine from "../List/Expand/Examine";
 import HistoryPlay from "./HistoryPlay";
@@ -745,7 +746,7 @@ export default class RegionMap extends PureComponent {
       // let flag = turf.booleanCrosses(turf.polygonToLine(poly1), turf.polygonToLine(poly2));
       // if(flag){
       //   message.warning("拓扑错误:分割图形自相交", 2);
-      //   return;  
+      //   return;
       // }
 
       const data = {
@@ -4222,26 +4223,34 @@ export default class RegionMap extends PureComponent {
 
     return (
       <Layouts>
-        <Sidebar
+        <List
           link={t => (this.Sidebar = t)}
           queryProjectFilter={this.queryProjectFilter}
           switchData={this.switchData}
           mapLocation={this.mapLocation}
           switchInterpret={this.switchInterpret}
           showInspect={v => this.Inspect.show(v)}
-          videoMonitorLocation={this.videoMonitorLocation}
           showVideoMonitor={v => this.VideoMonitor.show(v)}
-          showExamine={v => this.Examine.show(v)}
           hideExamine={() => this.Examine.hide()}
+          videoMonitorLocation={this.videoMonitorLocation}
           showProjectList={v => this.ProjectList.show(v)}
+          showProjectInfo={v => this.ProjectInfo.show(v)}
         />
+        <ProjectInfo
+          link={t => (this.ProjectInfo = t)}
+          showList={v => this.Sidebar.show(v)}
+          showInspect={v => this.Inspect.show(v)}
+          showVideoMonitor={v => this.VideoMonitor.show(v)}
+          hideExamine={() => this.Examine.hide()}
+          showExamine={v => this.Examine.show(v)}//项目查处
+        />
+        <ProjectInfoMore returnList={v => this.ProjectInfo.returnList(v)} />
         {showProjectBigTable ? (
           <ProjectList
             link={t => (this.ProjectList = t)}
-            showProjectDetail={v => this.Sidebar.showProjectDetail(v)}
+            showProjectInfo={v => this.Sidebar.showProjectInfo(v)}
           />
         ) : null}
-
         <SidebarDetail mapLocation={this.mapLocation} />
         <Tool link={t => (this.Tool = t)} />
         <Chart link={t => (this.Chart = t)} />
@@ -4257,7 +4266,6 @@ export default class RegionMap extends PureComponent {
         <Panorama />
         <VideoMonitor link={t => (this.VideoMonitor = t)} />
         <Examine link={t => (this.Examine = t)} />
-        <ProjectDetail />
         <Inspect link={t => (this.Inspect = t)} />
         <ProblemPoint />
         <MeasurePoint />
@@ -4283,9 +4291,7 @@ export default class RegionMap extends PureComponent {
           />
           {/* 视频监控图片轮播 */}
           <Modal
-            visi  
-            
-            
+            visi
             ble={showVedioPreview}
             footer={null}
             width={660}

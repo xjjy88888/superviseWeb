@@ -127,7 +127,7 @@ export default class siderbar extends PureComponent {
       select: [],
       departList: [],
       problem: { title: "", records: [] },
-      placeholder: "项目名称",
+      placeholder: "项目名称1",
       sort: [
         {
           value: "名称",
