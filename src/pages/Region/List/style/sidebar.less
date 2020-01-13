@@ -1,0 +1,45 @@
+.show-project-list {
+  position: absolute;
+  font-size: 20px;
+  height: 28px;
+  line-height: 32px;
+  color: palevioletred;
+  background-color: rgba(0, 0, 0, 0.5);
+  right: -20px;
+  border-radius: none;
+  cursor: pointer;
+  z-index: 1002;
+}
+.spec {
+  font-size: 30px;
+  right: -50px;
+  padding: 10px;
+  border-radius: 50%;
+  height: 50px;
+  line-height: none;
+  z-index: 1002;
+  transition: background-color 1s linear, color 1s linear;
+  -webkit-transition: background-color 1s linear, color 1s linear;
+  -moz-transition: background-color 1s linear, color 1s linear;
+  -o-transition: background-color 1s linear, color 1s linear;
+  &:hover {
+    background-color: #ff3d67;
+    color: white;
+  }
+}
+
+.siderbar {
+  position: absolute;
+  top: 0;
+  z-index: 1001;
+  width: 350px;
+  height: 100%;
+  padding-top: 46px;
+  background-color: transparent;
+}
+:global {
+  .ant-modal-mask,
+  .ant-modal-wrap {
+    z-index: 1002 !important;
+  }
+}

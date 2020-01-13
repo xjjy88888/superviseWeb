@@ -16,7 +16,8 @@ require("./models").default.forEach(key => {
 });
 
 // 4. Router
-app.router(require("./router").default);
+// app.router(require("./router").default);
+app.router(require("./page").default);
 // app.router(props => <App {...props} />);
 
 // 5. Start
