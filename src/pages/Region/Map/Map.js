@@ -4231,7 +4231,6 @@ export default class RegionMap extends PureComponent {
           switchData={this.switchData}
           mapLocation={this.mapLocation}
           switchInterpret={this.switchInterpret}
-          showInspect={v => this.Inspect.show(v)}
           showVideoMonitor={v => this.VideoMonitor.show(v)}
           hideExamine={() => this.Examine.hide()}
           videoMonitorLocation={this.videoMonitorLocation}
@@ -4250,6 +4249,7 @@ export default class RegionMap extends PureComponent {
           spotRelate={v => this.spotRelate(v)} //关联图斑
           showProjectInfoMore={v => this.ProjectInfoMore.show(v)}
           hideProjectInfoMore={() => this.ProjectInfoMore.hide()}
+          mapLocation={this.mapLocation}
         />
         <ProjectInfoMore
           link={t => (this.ProjectInfoMore = t)}

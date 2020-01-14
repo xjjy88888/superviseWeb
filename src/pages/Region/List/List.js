@@ -627,9 +627,6 @@ export default class siderbar extends PureComponent {
   hide = () => {
     const {
       hideProjectInfoMore,
-      showInspect,
-      showVideoMonitor,
-      hideExamine,
       dispatch,
       commonModel: { siderBarPageInfo }
     } = this.props;
@@ -672,13 +669,6 @@ export default class siderbar extends PureComponent {
       show: false
     });
     hideProjectInfoMore();
-    showInspect({
-      show: false
-    });
-    showVideoMonitor({
-      show: false
-    });
-    hideExamine();
   };
 
   // 保存当前活跃的menu的key等信息

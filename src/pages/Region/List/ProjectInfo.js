@@ -1392,11 +1392,13 @@ export default class siderbar extends PureComponent {
                           showExamine(projectItem);
                         }}
                       >
-                        项目查处
+                        项目查处：
+                        {projectItem.expand.investigationResultId ? 1 : 0}
                       </b>
                     }
                     key="2"
-                  ></Collapse.Panel>
+                  >
+                  </Collapse.Panel>
                   <Collapse.Panel
                     header={
                       <b>
