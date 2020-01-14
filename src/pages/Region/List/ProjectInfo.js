@@ -1,9 +1,7 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
 import { createForm } from "rc-form";
-import jQuery from "jquery";
 import {
-  Menu,
   Icon,
   Tag,
   Tree,
@@ -11,7 +9,6 @@ import {
   Row,
   Col,
   notification,
-  Popover,
   Input,
   Radio,
   List,
@@ -24,17 +21,15 @@ import {
   Switch,
   DatePicker,
   AutoComplete,
-  Table,
   Collapse,
   Typography,
-  Tooltip
+  message
 } from "antd";
 import locale from "antd/lib/date-picker/locale/zh_CN";
 import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
 
 import config from "../../../config";
-import { Link } from "dva/router";
 import data from "../../../data";
 import {
   dateFormat,
@@ -48,7 +43,6 @@ import Spins from "../../../components/Spins";
 import styles from "./style/sidebar.less";
 
 let self;
-let loading = false;
 const { TreeNode } = Tree;
 const formItemLayout = {
   labelCol: { span: 7 },
@@ -98,7 +92,7 @@ export default class siderbar extends PureComponent {
       show: false,
       showCreateDepart: false,
       value: undefined,
-      projectEdit: false,
+      isEdit: false,
       showProjectAllInfo: false,
       showCompany: false,
       showProblem: false,
@@ -107,17 +101,13 @@ export default class siderbar extends PureComponent {
       showCheck: false,
       checked: false,
       ParentId: 0,
-      showSpin: true,
-      isProjectUpdate: true,
+      loading: false,
+      isAdd: false,
       queryHighlight: false,
       ShowArchive: false,
       row_pro: 20,
       row_spot: 20,
       row_point: 20,
-      query_pro: "",
-      query_spot: "",
-      query_point: "",
-      key: "project",
       createDepartKey: "",
       sort_by: "",
       sort_key: "",
@@ -126,16 +116,13 @@ export default class siderbar extends PureComponent {
       select: [],
       departList: [],
       problem: { title: "", records: [] },
-      placeholder: "项目名称",
-      listData: [],
       previewVisible: false,
       previewImage: "",
       fileList: [],
       projectFileList: [],
       showPlan: false,
       clickId: null,
-      isProjectSupervise: false,
-      TaskLevelAndInterBatch: null
+      isProjectSupervise: false
     };
     this.map = null;
   }
@@ -149,8 +136,7 @@ export default class siderbar extends PureComponent {
     const urlId = getUrl(`id`);
     const urlIsProject = getUrl(`isProject`);
     if (urlFrom === `project` && urlId) {
-      this.queryProjectById(urlId);
-      this.queryProjectInfo(urlId);
+      this.projectInfo(urlId);
     }
     if (urlFrom === `project` && urlIsProject === `true`) {
       this.setState({ isProjectSupervise: true });
@@ -191,8 +177,7 @@ export default class siderbar extends PureComponent {
     });
     this.eventEmitter = emitter.addListener("projectInfoRefresh", v => {
       if (v.projectId) {
-        this.queryProjectById(v.projectId);
-        this.queryProjectInfo(v.projectId);
+        this.projectInfo(v.projectId);
       }
     });
     this.eventEmitter = emitter.addListener("showCreateDepart", v => {
@@ -240,8 +225,7 @@ export default class siderbar extends PureComponent {
       // prevProps.commonModel.siderBarPageInfo.currentProjectId !== ""
     ) {
       this.setState({ clickId: currentProjectId });
-      this.queryProjectById(currentProjectId);
-      this.queryProjectInfo(currentProjectId);
+      this.projectInfo(currentProjectId);
     } else if (
       prevProps.commonModel.siderBarPageInfo.currentSpotId !== currentSpotId &&
       currentSpotId !== ""
@@ -279,21 +263,27 @@ export default class siderbar extends PureComponent {
     }
   }
 
-  show = id => {
-    console.log("显示项目详情", id);
+  show = v => {
+    console.log("显示项目详情", v);
+    const {
+      form: { resetFields }
+    } = this.props;
+    resetFields();
     this.setState({
       show: true,
-      projectEdit: false,
-      isProjectUpdate: true,
+      isAdd: !Boolean(v.id), // 1新建 2查看编辑
+      isEdit: v.isEdit, // 1查看 2编辑
       previewVisible_min_left: false,
       projectFileList: []
     });
-    this.queryProjectById(id);
-    this.queryProjectInfo(id);
+    if (v.id) {
+      this.projectInfo(v.id);
+    }
   };
 
   hide = () => {
     const {
+      hideProjectInfoMore,
       showInspect,
       showVideoMonitor,
       hideExamine,
@@ -324,10 +314,7 @@ export default class siderbar extends PureComponent {
     emitter.emit("showMeasurePoint", {
       show: false
     });
-    emitter.emit("showProjectInfo", {
-      show: false,
-      edit: false
-    });
+    hideProjectInfoMore();
     showInspect({
       show: false
     });
@@ -335,6 +322,15 @@ export default class siderbar extends PureComponent {
       show: false
     });
     hideExamine();
+  };
+
+  projectInfo = id => {
+    this.queryProjectById(id);
+    this.spotList(id);
+    this.redLineList(id);
+    this.inspectList(id);
+    this.panoramaList(id);
+    this.videoMonitorList(id);
   };
 
   returnList = () => {
@@ -348,14 +344,6 @@ export default class siderbar extends PureComponent {
 
   refreshSpotList = () => {
     this.querySpot({ SkipCount: 0 });
-  };
-
-  queryProjectInfo = id => {
-    this.querySpotByProjectId(id);
-    this.queryRedLineList(id);
-    this.inspectList(id);
-    this.panoramaList(id);
-    this.videoMonitorList(id);
   };
 
   annexUploadBase64 = v => {
@@ -410,14 +398,14 @@ export default class siderbar extends PureComponent {
           notification["success"]({
             message: `关联扰动图斑成功`
           });
-          this.querySpotByProjectId(projectId);
+          this.spotList(projectId);
         }
       }
     });
   };
 
-  showSpin = state => {
-    this.setState({ showSpin: state });
+  loading = state => {
+    this.setState({ loading: state });
   };
 
   queryDistrict = () => {
@@ -469,8 +457,7 @@ export default class siderbar extends PureComponent {
   queryProjectById = id => {
     const { dispatch } = this.props;
     const { departList } = this.state;
-    this.showSpin(true);
-    this.setState({ isProjectUpdate: false });
+    this.loading(true);
     dispatch({
       type: "project/queryProjectById",
       payload: {
@@ -478,7 +465,7 @@ export default class siderbar extends PureComponent {
         refresh: true
       },
       callback: (result, success) => {
-        this.showSpin(false);
+        this.loading(false);
         let arr = [];
         if (result.productDepartment) {
           arr.push(result.productDepartment);
@@ -491,7 +478,6 @@ export default class siderbar extends PureComponent {
         }
 
         this.setState({
-          isProjectUpdate: true,
           departList: [...departList, ...arr],
           ParentId: result.attachment ? result.attachment.id : 0,
           showPlan: result.isNeedPlan ? true : false
@@ -519,11 +505,11 @@ export default class siderbar extends PureComponent {
     });
   };
 
-  querySpotByProjectId = id => {
+  spotList = id => {
     const { dispatch } = this.props;
-    this.showSpin(true);
+    this.loading(true);
     dispatch({
-      type: "spot/querySpotByProjectId",
+      type: "spot/projectInfoSpotList",
       payload: {
         ProjectId: id,
         MaxResultCount: 1000,
@@ -531,21 +517,21 @@ export default class siderbar extends PureComponent {
         ShowArchive: this.state.isArchivalSpot
       },
       callback: success => {
-        this.showSpin(false);
+        this.loading(false);
       }
     });
   };
 
-  queryRedLineList = id => {
+  redLineList = id => {
     const { dispatch } = this.props;
-    this.showSpin(true);
+    this.loading(true);
     dispatch({
-      type: "redLine/queryRedLineList",
+      type: "redLine/redLineList",
       payload: {
         ProjectId: id
       },
       callback: success => {
-        this.showSpin(false);
+        this.loading(false);
       }
     });
   };
@@ -641,7 +627,6 @@ export default class siderbar extends PureComponent {
     } = this.props;
     const { departSearch } = this.state;
 
-    // const isAdd = key !== "supDepartmentId" && key !== "replyDepartmentId";
     if (departSearch) {
       dispatch({
         type: "user/departVaild",
@@ -655,20 +640,6 @@ export default class siderbar extends PureComponent {
             });
             setFieldsValue({ [key]: data.id });
           } else {
-            // Modal.confirm({
-            //   title: `查不到该单位，${isAdd ? "是否去新建单位" : "请重新输入"}`,
-            //   content: "",
-            //   onOk() {
-            //     if (isAdd) {
-            //       self.setState({
-            //         showCreateDepart: true,
-            //         createDepartKey: key
-            //       });
-            //     }
-            //     setFieldsValue({ [key]: "" });
-            //   },
-            //   onCancel() {}
-            // });
           }
         }
       });
@@ -712,7 +683,7 @@ export default class siderbar extends PureComponent {
 
   //删除
   projectDelete = id => {
-    const { dispatch } = this.props;
+    const { dispatch, hideProjectInfoMore } = this.props;
     dispatch({
       type: "project/projectDelete",
       payload: {
@@ -723,10 +694,7 @@ export default class siderbar extends PureComponent {
           emitter.emit("deleteSuccess", {
             success: true
           });
-          emitter.emit("showProjectInfo", {
-            show: false,
-            edit: false
-          });
+          hideProjectInfoMore();
         }
       }
     });
@@ -771,6 +739,9 @@ export default class siderbar extends PureComponent {
 
   render() {
     const {
+      showProjectInfoMore,
+      hideProjectInfoMore,
+      spotRelate,
       showList,
       showExamine,
       // showProjectList,
@@ -799,52 +770,34 @@ export default class siderbar extends PureComponent {
     const userId = user && user.userId ? user.userId : null;
 
     const {
-      hover,
-      place,
       show,
-      showSpin,
-      queryHighlight,
+      loading,
       previewVisible_min,
       previewVisible_min_left,
-      query_pro,
-      query_spot,
       ParentId,
-      query_point,
       showCompany,
-      placeholder,
-      sort,
-      showProjectInfo,
-      isProjectUpdate,
+      isAdd,
       key,
-      projectEdit,
-      clientHeight,
+      isEdit,
       previewVisible,
       previewImage,
       showCreateDepart,
-      showCheck,
       showProblem,
       createDepartKey,
       showProjectAllInfo,
       fileList,
       problem,
-      queryInfo,
       isArchivalSpot,
-      sort_by,
-      ShowArchive,
-      sort_key,
       projectFileList,
       departList,
       showPlan,
-      clickId,
-      isProjectSupervise,
-      TaskLevelAndInterBatch
+      isProjectSupervise
     } = this.state;
 
     const departSelectListAll = unique(departSelectList.concat(departList));
 
-    const projectItem = isProjectUpdate
-      ? projectInfo
-      : {
+    const projectItem = isAdd
+      ? {
           projectBase: {},
           productDepartment: { name: "", id: "" },
           expand: {
@@ -853,7 +806,8 @@ export default class siderbar extends PureComponent {
             actStartTime: "",
             actCompTime: ""
           }
-        };
+        }
+      : projectInfo;
 
     return (
       <div
@@ -1114,7 +1068,7 @@ export default class siderbar extends PureComponent {
               display: showCompany ? "none" : "block"
             }}
           >
-            <Spins show={showSpin} />
+            <Spins show={loading} />
             <p
               style={{
                 width: 150,
@@ -1136,8 +1090,8 @@ export default class siderbar extends PureComponent {
                 }}
                 onClick={() => {
                   emitter.emit("deleteDraw");
-                  const { projectEdit } = this.state;
-                  if (projectEdit) {
+                  const { isEdit } = this.state;
+                  if (isEdit) {
                     Modal.confirm({
                       title: `确定放弃填写的内容？`,
                       content: "",
@@ -1148,22 +1102,19 @@ export default class siderbar extends PureComponent {
                     });
                   } else {
                     this.setState({
-                      projectEdit: false
+                      isEdit: false
                     });
                     emitter.emit("showSiderbarDetail", {
                       show: false,
                       from: "spot"
                     });
-                    emitter.emit("showProjectInfo", {
-                      show: false,
-                      edit: false
-                    });
+                    hideProjectInfoMore();
                     self.returnList();
                   }
                 }}
               />
               <Button
-                icon={projectEdit ? "check" : "edit"}
+                icon={isEdit ? "check" : "edit"}
                 shape="circle"
                 style={{
                   float: "right",
@@ -1172,7 +1123,7 @@ export default class siderbar extends PureComponent {
                   zIndex: 1
                 }}
                 onClick={() => {
-                  if (projectEdit) {
+                  if (isEdit) {
                     // submit
                     this.props.form.validateFields((err, v) => {
                       if (!err) {
@@ -1191,7 +1142,7 @@ export default class siderbar extends PureComponent {
                             v.districtCodeId && v.districtCodeId.length
                               ? v.districtCodeId.pop()
                               : "",
-                          id: isProjectUpdate ? projectItem.id : "",
+                          id: isAdd ? "" : projectItem.id,
                           isNeedPlan: v.isNeedPlan ? true : false,
                           isReply: v.isReply ? true : false,
                           isProjectSupervise
@@ -1205,12 +1156,11 @@ export default class siderbar extends PureComponent {
                     });
                   } else {
                     this.setState({
-                      projectEdit: !projectEdit
+                      isEdit: !isEdit
                     });
-                    emitter.emit("showProjectInfo", {
-                      show: true,
-                      edit: true,
-                      id: projectItem.id
+                    showProjectInfoMore({
+                      id: projectItem.id,
+                      isEdit: true
                     });
                   }
                 }}
@@ -1256,7 +1206,7 @@ export default class siderbar extends PureComponent {
             </div>
             <div
               style={{
-                display: projectEdit ? "none" : "block"
+                display: isEdit ? "none" : "block"
               }}
             >
               <p>
@@ -1442,18 +1392,21 @@ export default class siderbar extends PureComponent {
                           this.setState({
                             showProjectAllInfo: !showProjectAllInfo
                           });
-                          emitter.emit("showProjectInfo", {
-                            show: !showProjectAllInfo,
-                            edit: false,
-                            id: projectItem.id
-                          });
+                          if (showProjectAllInfo) {
+                            hideProjectInfoMore();
+                          } else {
+                            showProjectInfoMore({
+                              id: projectItem.id,
+                              isEdit: false
+                            });
+                          }
                         }}
                       >
                         详情
                       </a>
                       <a
                         style={{
-                          display: isProjectUpdate ? "inherit" : "none",
+                          display: isAdd ? "none" : "inherit",
                           position: "absolute",
                           right: 0,
                           bottom: 0,
@@ -1573,14 +1526,14 @@ export default class siderbar extends PureComponent {
                                   okType: "danger",
                                   cancelText: "取消",
                                   onOk() {
-                                    self.showSpin(true);
+                                    self.loading(true);
                                     dispatch({
                                       type: "inspect/inspectDelete",
                                       payload: {
                                         id: item.id
                                       },
                                       callback: success => {
-                                        self.showSpin(false);
+                                        self.loading(false);
                                         if (success) {
                                           self.hide();
                                           emitter.emit("projectInfoRefresh", {
@@ -1755,14 +1708,14 @@ export default class siderbar extends PureComponent {
                                     okType: "danger",
                                     cancelText: "取消",
                                     onOk() {
-                                      self.showSpin(true);
+                                      self.loading(true);
                                       dispatch({
                                         type: "problemPoint/problemPointDelete",
                                         payload: {
                                           id: ite.id
                                         },
                                         callback: success => {
-                                          self.showSpin(false);
+                                          self.loading(false);
                                           if (success) {
                                             self.hide();
                                             emitter.emit("projectInfoRefresh", {
@@ -1866,14 +1819,14 @@ export default class siderbar extends PureComponent {
                                   okType: "danger",
                                   cancelText: "取消",
                                   onOk() {
-                                    self.showSpin(true);
+                                    self.loading(true);
                                     dispatch({
                                       type: "measurePoint/measurePointDelete",
                                       payload: {
                                         id: ite.id
                                       },
                                       callback: success => {
-                                        self.showSpin(false);
+                                        self.loading(false);
                                         if (success) {
                                           self.hide();
                                           emitter.emit("projectInfoRefresh", {
@@ -1934,8 +1887,9 @@ export default class siderbar extends PureComponent {
                           }}
                           onClick={e => {
                             e.stopPropagation();
+                            message.info("请在地图点选图斑进行关联");
                             //图斑关联
-                            emitter.emit("spotRelate", {
+                            spotRelate({
                               status: "start", //start：开始，end：结束
                               spotId: "",
                               projectId: projectItem.id
@@ -1950,7 +1904,7 @@ export default class siderbar extends PureComponent {
                             e.stopPropagation();
                             this.setState({ isArchivalSpot: v });
                             setTimeout(() => {
-                              this.querySpotByProjectId(projectItem.id);
+                              this.spotList(projectItem.id);
                             }, 100);
                           }}
                         />
@@ -2000,7 +1954,7 @@ export default class siderbar extends PureComponent {
                                   }${success ? "" : `：${error.message}`}`
                                 });
                                 if (success) {
-                                  this.querySpotByProjectId(projectItem.id);
+                                  this.spotList(projectItem.id);
                                 }
                               }
                             });
@@ -2330,7 +2284,7 @@ export default class siderbar extends PureComponent {
             </div>
             <div
               style={{
-                display: projectEdit ? "block" : "none",
+                display: isEdit ? "block" : "none",
                 paddingTop: 30
               }}
             >
@@ -2655,12 +2609,6 @@ export default class siderbar extends PureComponent {
                       showSearch
                       allowClear={true}
                       optionFilterProp="children"
-                      disabled={
-                        projectInfoSpotList.items.length !== 0 &&
-                        isProjectUpdate
-                          ? true
-                          : false
-                      }
                     >
                       {this.dictList("扰动合规性").map(item => (
                         <Select.Option value={item.id} key={item.id}>
@@ -2828,18 +2776,21 @@ export default class siderbar extends PureComponent {
                     this.setState({
                       showProjectAllInfo: !showProjectAllInfo
                     });
-                    emitter.emit("showProjectInfo", {
-                      show: !showProjectAllInfo,
-                      edit: true,
-                      id: projectItem.id
-                    });
+                    if (showProjectAllInfo) {
+                      hideProjectInfoMore();
+                    } else {
+                      showProjectInfoMore({
+                        id: projectItem.id,
+                        isEdit: true
+                      });
+                    }
                   }}
                 >
                   详情
                 </a>
                 <a
                   style={{
-                    display: isProjectUpdate ? "inherit" : "none",
+                    display: isAdd ? "none" : "inherit",
                     position: "absolute",
                     right: 0,
                     bottom: 0,
@@ -2949,7 +2900,7 @@ export default class siderbar extends PureComponent {
                 onRemove={file => {
                   console.log("onRemove", file);
                   return new Promise((resolve, reject) => {
-                    if (projectEdit) {
+                    if (isEdit) {
                       dispatch({
                         type: "annex/annexDelete",
                         payload: {
@@ -2975,7 +2926,7 @@ export default class siderbar extends PureComponent {
                   });
                 }}
               >
-                {projectEdit ? (
+                {isEdit ? (
                   <div>
                     <div className="ant-upload-text">
                       <Button type="div" icon="plus">
@@ -3011,8 +2962,7 @@ export default class siderbar extends PureComponent {
               <Button
                 icon="cloud-download"
                 style={{
-                  display:
-                    projectItem.isArchive || projectEdit ? "none" : "block",
+                  display: projectItem.isArchive || isEdit ? "none" : "block",
                   marginTop: 20
                 }}
                 onClick={() => {
@@ -3070,8 +3020,7 @@ export default class siderbar extends PureComponent {
               <Button
                 icon="rollback"
                 style={{
-                  display:
-                    projectItem.isArchive || projectEdit ? "block" : "none",
+                  display: projectItem.isArchive || isEdit ? "block" : "none",
                   marginLeft: 20
                 }}
                 onClick={() => {

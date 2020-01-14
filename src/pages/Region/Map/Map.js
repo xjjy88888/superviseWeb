@@ -683,14 +683,16 @@ export default class RegionMap extends PureComponent {
         showProblem: data.show
       });
     });
-    //图斑关联
-    this.eventEmitter = emitter.addListener("spotRelate", data => {
-      this.setState({
-        spotStatus: data.status, //start：开始，end：结束
-        spotRelateProjectId: data.projectId
-      });
-    });
   }
+
+  //图斑关联
+  spotRelate = data => {
+    console.log("开始图斑关联", data);
+    this.setState({
+      spotStatus: data.status, //start：开始，end：结束
+      spotRelateProjectId: data.projectId
+    });
+  };
 
   /*
    * 取消分割图斑
@@ -4235,6 +4237,8 @@ export default class RegionMap extends PureComponent {
           videoMonitorLocation={this.videoMonitorLocation}
           showProjectList={v => this.ProjectList.show(v)}
           showProjectInfo={v => this.ProjectInfo.show(v)}
+          showProjectInfoMore={v => this.ProjectInfoMore.show(v)}
+          hideProjectInfoMore={() => this.ProjectInfoMore.hide()}
         />
         <ProjectInfo
           link={t => (this.ProjectInfo = t)}
@@ -4242,9 +4246,15 @@ export default class RegionMap extends PureComponent {
           showInspect={v => this.Inspect.show(v)}
           showVideoMonitor={v => this.VideoMonitor.show(v)}
           hideExamine={() => this.Examine.hide()}
-          showExamine={v => this.Examine.show(v)}//项目查处
+          showExamine={v => this.Examine.show(v)} //项目查处
+          spotRelate={v => this.spotRelate(v)} //关联图斑
+          showProjectInfoMore={v => this.ProjectInfoMore.show(v)}
+          hideProjectInfoMore={() => this.ProjectInfoMore.hide()}
         />
-        <ProjectInfoMore returnList={v => this.ProjectInfo.returnList(v)} />
+        <ProjectInfoMore
+          link={t => (this.ProjectInfoMore = t)}
+          returnList={v => this.ProjectInfo.returnList(v)}
+        />
         {showProjectBigTable ? (
           <ProjectList
             link={t => (this.ProjectList = t)}

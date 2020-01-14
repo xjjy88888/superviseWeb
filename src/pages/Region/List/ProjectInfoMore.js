@@ -38,14 +38,15 @@ export default class projectDetail extends PureComponent {
     this.state = {
       hover: false,
       show: false,
-      edit: false,
+      isEdit: false,
       departList: [],
       expandFileList: [],
       changeFileList: [],
       expandParentId: 0,
       changeParentId: 0,
       showSpin: false,
-      isHttp: false
+      isHttp: false,
+      isAdd: false
     };
     this.map = null;
     this.saveRef = ref => {
@@ -55,8 +56,10 @@ export default class projectDetail extends PureComponent {
 
   componentDidMount() {
     const {
+      link,
       form: { resetFields, setFieldsValue }
     } = this.props;
+    link(this);
     self = this;
     const { dispatch } = this.props;
     const maxYear = new Date().getFullYear();
@@ -69,16 +72,6 @@ export default class projectDetail extends PureComponent {
     this.eventEmitter = emitter.addListener("departNameReset", v => {
       console.log(v);
       setFieldsValue({ [v.key]: v.id });
-    });
-    this.eventEmitter = emitter.addListener("showProjectInfo", data => {
-      resetFields();
-      this.setState({
-        show: data.show,
-        edit: data.edit
-      });
-      if (data.id) {
-        this.queryProjectById(data.id);
-      }
     });
     this.eventEmitter = emitter.addListener("projectCreateUpdate", data => {
       const { expandParentId, changeParentId } = this.state;
@@ -103,6 +96,26 @@ export default class projectDetail extends PureComponent {
       });
     });
   }
+
+  show = v => {
+    console.log("显示项目更多详情", v);
+    const {
+      form: { resetFields, setFieldsValue }
+    } = this.props;
+    resetFields();
+    this.setState({
+      show: true,
+      isEdit: v.isEdit,
+      isAdd: !Boolean(v.id)
+    });
+    if (v.id) {
+      this.queryProjectById(v.id);
+    }
+  };
+
+  hide = () => {
+    this.setState({ show: false });
+  };
 
   projectCreateUpdate = payload => {
     const { returnList, dispatch } = this.props;
@@ -289,7 +302,7 @@ export default class projectDetail extends PureComponent {
       changeFileList,
       changeParentId,
       expandParentId,
-      edit
+      isEdit
     } = this.state;
     const projectItem = projectInfo;
     const fileList = isChange ? changeFileList : expandFileList;
@@ -345,7 +358,7 @@ export default class projectDetail extends PureComponent {
           }}
           onRemove={(file, is) => {
             return new Promise((resolve, reject) => {
-              if (edit) {
+              if (isEdit) {
                 dispatch({
                   type: "annex/annexDelete",
                   payload: {
@@ -371,7 +384,7 @@ export default class projectDetail extends PureComponent {
             });
           }}
         >
-          {edit ? (
+          {isEdit ? (
             <div>
               <Icon type="plus" />
               <div className="ant-upload-text">
@@ -401,9 +414,9 @@ export default class projectDetail extends PureComponent {
       project: { projectInfo, departSelectList }
     } = this.props;
 
-    const { show, edit, departList, showSpin, hover } = this.state;
+    const { show, isEdit, departList, showSpin, hover, isAdd } = this.state;
 
-    const projectItem = projectInfo;
+    const projectItem = isAdd ? { expand: {} } : projectInfo;
     const departSelectListAll = unique(departSelectList.concat(departList));
 
     return (
@@ -447,7 +460,7 @@ export default class projectDetail extends PureComponent {
           <div
             style={{
               padding: 30,
-              display: edit ? "none" : "block",
+              display: isEdit ? "none" : "block",
               overflow: "auto",
               height: "100%"
             }}
@@ -693,7 +706,7 @@ export default class projectDetail extends PureComponent {
           </div>
           <div
             style={{
-              display: edit ? "block" : "none",
+              display: isEdit ? "block" : "none",
               height: "100%",
               padding: 30,
               overflow: "auto"

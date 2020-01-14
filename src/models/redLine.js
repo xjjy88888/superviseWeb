@@ -22,7 +22,7 @@ export default {
 
   effects: {
     // 项目红线列表
-    *queryRedLineList({ payload, callback }, { call, put }) {
+    *redLineList({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result: redLineList }
       } = yield call(redLineListApi, payload.ProjectId);

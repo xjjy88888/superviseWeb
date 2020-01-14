@@ -249,13 +249,6 @@ export default class siderbar extends PureComponent {
         this.querySpot({ ...queryParams });
       }
     }
-    // console.log(
-    //   "componentDidUpdate",
-    //   prevProps.commonModel.siderBarPageInfo.currentProjectId !==
-    //     currentProjectId,
-    //   prevProps.commonModel.siderBarPageInfo.currentProjectId,
-    //   currentProjectId
-    // );
     if (
       prevProps.commonModel.siderBarPageInfo.currentProjectId !==
         currentProjectId &&
@@ -689,6 +682,7 @@ export default class siderbar extends PureComponent {
 
   hide = () => {
     const {
+      hideProjectInfoMore,
       showInspect,
       showVideoMonitor,
       hideExamine,
@@ -733,10 +727,7 @@ export default class siderbar extends PureComponent {
     emitter.emit("showMeasurePoint", {
       show: false
     });
-    emitter.emit("showProjectInfo", {
-      show: false,
-      edit: false
-    });
+    hideProjectInfoMore();
     showInspect({
       show: false
     });
@@ -938,7 +929,7 @@ export default class siderbar extends PureComponent {
 
   //删除
   projectDelete = id => {
-    const { dispatch } = this.props;
+    const { dispatch, hideProjectInfoMore } = this.props;
     dispatch({
       type: "project/projectDelete",
       payload: {
@@ -949,10 +940,7 @@ export default class siderbar extends PureComponent {
           emitter.emit("deleteSuccess", {
             success: true
           });
-          emitter.emit("showProjectInfo", {
-            show: false,
-            edit: false
-          });
+          hideProjectInfoMore();
         }
       }
     });
@@ -1056,6 +1044,7 @@ export default class siderbar extends PureComponent {
   render() {
     const {
       showProjectInfo,
+      showProjectInfoMore,
       showExamine,
       // showProjectList,
       switchData,
@@ -1293,10 +1282,12 @@ export default class siderbar extends PureComponent {
                   }
 
                   resetFields();
-                  //编辑1
+                  //编辑
                   if (key === "project") {
-                    console.log("查看项目详情");
-                    showProjectInfo(item.id);
+                    showProjectInfo({
+                      id: item.id,
+                      isEdit: false
+                    });
                     this.setState({ show: false });
                   } else {
                     emitter.emit("showSiderbarDetail", {
@@ -1548,11 +1539,10 @@ export default class siderbar extends PureComponent {
                     ParentId: 0
                   });
                   resetFields();
-                  emitter.emit("showProjectInfo", {
-                    show: true,
-                    edit: true,
-                    id: ""
+                  showProjectInfo({
+                    isEdit: true
                   });
+                  showProjectInfoMore({ isEdit: true });
                 } else if (key === "spot") {
                   emitter.emit("drawGraphics", {
                     draw: true,

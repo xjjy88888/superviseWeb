@@ -196,7 +196,7 @@ export default {
     },
 
     // 项目id查图斑列表
-    *querySpotByProjectId({ payload, callback }, { call, put }) {
+    *projectInfoSpotList({ payload, callback }, { call, put }) {
       const {
         data: { success, error, result: projectInfoSpotList }
       } = yield call(spotListApi, payload);
