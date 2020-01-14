@@ -69,13 +69,13 @@ export default class Tool extends PureComponent {
         checkResult: data.result
       });
     });
-    this.eventEmitter = emitter.addListener("sidebarQuery", v => {
-      console.log("siderQuery", v);
-      const queryInfo = { ...this.state.queryInfo, ...v };
-      this.setState({
-        queryInfo
-      });
-    });
+    // this.eventEmitter = emitter.addListener("sidebarQuery", v => {
+    //   console.log("siderQuery", v);
+    //   const queryInfo = { ...this.state.queryInfo, ...v };
+    //   this.setState({
+    //     queryInfo
+    //   });
+    // });
   }
 
   componentDidUpdate(prevProps) {

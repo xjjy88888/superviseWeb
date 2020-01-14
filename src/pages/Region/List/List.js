@@ -1,59 +1,27 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
 import { createForm } from "rc-form";
+import { Link } from "dva/router";
 import jQuery from "jquery";
 import {
   Menu,
   Icon,
   Tag,
-  Tree,
   Button,
-  Row,
-  Col,
-  notification,
   Popover,
   Input,
-  Radio,
-  List,
   Select,
-  Upload,
-  Modal,
-  TreeSelect,
-  Cascader,
-  Form,
-  Switch,
-  DatePicker,
-  AutoComplete,
   Table,
-  Collapse,
-  Typography,
   Tooltip
 } from "antd";
-import locale from "antd/lib/date-picker/locale/zh_CN";
-import "leaflet/dist/leaflet.css";
-import emitter from "../../../utils/event";
-
-import config from "../../../config";
-import { Link } from "dva/router";
 import data from "../../../data";
-import {
-  dateFormat,
-  dateInitFormat,
-  accessToken,
-  getFile,
-  unique,
-  getUrl
-} from "../../../utils/util";
 import Spins from "../../../components/Spins";
+import emitter from "../../../utils/event";
+import { dateFormat, getUrl } from "../../../utils/util";
 import styles from "./style/sidebar.less";
 
 let self;
 let loading = false;
-const { TreeNode } = Tree;
-const formItemLayout = {
-  labelCol: { span: 7 },
-  wrapperCol: { span: 16 }
-};
 
 @connect(
   ({
@@ -160,17 +128,15 @@ export default class siderbar extends PureComponent {
     const urlFrom = getUrl(`from`);
     const urlId = getUrl(`id`);
     const urlIsProject = getUrl(`isProject`);
+    if (urlFrom === `project` && urlId) {
+      this.setState({ show: false });
+    }
     if (urlFrom === `project` && urlIsProject === `true`) {
       this.setState({ isProjectSupervise: true });
     }
 
     this.queryProject({ SkipCount: 0 });
     this.queryProjectSupervise({ SkipCount: 0 });
-    // this.querySpot({ SkipCount: 0 });
-    // this.queryPoint({ SkipCount: 0 });
-    this.queryDistrict();
-    this.queryDict();
-    this.queryBasinOrgan();
     this.interpretList();
     this.eventEmitter = emitter.addListener("deleteSuccess", () => {
       const { key, query_pro, query_spot, query_point } = this.state;
@@ -196,6 +162,7 @@ export default class siderbar extends PureComponent {
         showQuery: !data.hide
       });
     });
+
     // 图表联动
     this.eventEmitter = emitter.addListener("chartLinkage", data => {
       if (this.scrollDom) {
@@ -237,6 +204,7 @@ export default class siderbar extends PureComponent {
 
   componentDidUpdate(prevProps) {
     const {
+      showProjectInfo,
       project: { queryParams },
       commonModel: {
         siderBarPageInfo: { currentProjectId, currentSpotId }
@@ -256,6 +224,12 @@ export default class siderbar extends PureComponent {
       // &&
       // prevProps.commonModel.siderBarPageInfo.currentProjectId !== ""
     ) {
+      console.log("componentDidUpdate,showProjectInfo");
+      showProjectInfo({
+        id: currentProjectId,
+        isEdit: false,
+        isProjectSupervise: false
+      });
     } else if (
       prevProps.commonModel.siderBarPageInfo.currentSpotId !== currentSpotId &&
       currentSpotId !== ""
@@ -490,29 +464,6 @@ export default class siderbar extends PureComponent {
     this.setState({ showSpin: state });
   };
 
-  queryDistrict = () => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: "district/districtTree",
-      payload: {
-        IsFilter: false
-      }
-    });
-    dispatch({
-      type: "district/districtTree",
-      payload: {
-        IsFilter: true
-      }
-    });
-  };
-
-  queryDict = () => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: "user/queryDict"
-    });
-  };
-
   interpretList = () => {
     const { switchInterpret, dispatch } = this.props;
     dispatch({
@@ -521,21 +472,14 @@ export default class siderbar extends PureComponent {
         if (success && result.length) {
           const TaskLevelAndInterBatch = result[0];
           this.setState({ TaskLevelAndInterBatch });
-          emitter.emit("sidebarQuery", {
-            TaskLevelAndInterBatch
-          });
+          // emitter.emit("sidebarQuery", {
+          //   TaskLevelAndInterBatch
+          // });
           switchInterpret(TaskLevelAndInterBatch);
         } else {
           switchInterpret(null);
         }
       }
-    });
-  };
-
-  queryBasinOrgan = () => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: "user/basinOrgan"
     });
   };
 
@@ -872,7 +816,6 @@ export default class siderbar extends PureComponent {
     } = this.props;
     const { departSearch } = this.state;
 
-    // const isAdd = key !== "supDepartmentId" && key !== "replyDepartmentId";
     if (departSearch) {
       dispatch({
         type: "user/departVaild",
@@ -889,33 +832,6 @@ export default class siderbar extends PureComponent {
           }
         }
       });
-    }
-  };
-
-  getDictValue = id => {
-    const {
-      user: { dictList }
-    } = this.props;
-    if (id) {
-      const filter = dictList.filter(item => {
-        return item.id === id;
-      });
-      return filter.map(item => item.dictTableValue).join(",");
-    } else {
-      return "";
-    }
-  };
-
-  dictList = type => {
-    const {
-      user: { dictList }
-    } = this.props;
-    if (type) {
-      return dictList.filter(item => {
-        return item.dictTypeName === type;
-      });
-    } else {
-      return [];
     }
   };
 
@@ -980,9 +896,9 @@ export default class siderbar extends PureComponent {
       sort_by: "",
       sort_key: ""
     });
-    emitter.emit("sidebarQuery", {
-      [key === "project" ? `projectName` : `mapNum`]: v
-    });
+    // emitter.emit("sidebarQuery", {
+    //   [key === "project" ? `projectName` : `mapNum`]: v
+    // });
     if (key === "project") {
       this.setState({
         query_pro: v,
@@ -1033,6 +949,7 @@ export default class siderbar extends PureComponent {
       }
     });
   };
+
   // 点击图标，展示项目列表表格页
   async onShowProjectList() {
     const { showProjectList } = this.props;
@@ -1045,31 +962,16 @@ export default class siderbar extends PureComponent {
     const {
       showProjectInfo,
       showProjectInfoMore,
-      showExamine,
-      // showProjectList,
       switchData,
       mapLocation,
       switchInterpret,
-      showInspect,
-      videoMonitorLocation,
-      showVideoMonitor,
       dispatch,
-      form: { getFieldDecorator, resetFields, setFieldsValue, getFieldValue },
-      district: { districtTree, districtTreeFilter },
-      user: { basinOrganList },
-      project: { projectList, projectInfo, projectListAdd, departSelectList },
-      spot: { spotList, projectInfoSpotList, interpretList },
+      form: { resetFields },
+      project: { projectList },
+      spot: { spotList, interpretList },
       point: { pointList },
-      redLine: { redLineList },
-      inspect: { inspectList },
-      panorama: { panoramaList },
-      projectSupervise: { projectSuperviseList },
-      videoMonitor: { videoMonitorList }
-      // showProjectTableList
+      projectSupervise: { projectSuperviseList }
     } = this.props;
-
-    const user = JSON.parse(localStorage.getItem("user"));
-    const userId = user && user.userId ? user.userId : null;
 
     const {
       hover,
@@ -1077,53 +979,22 @@ export default class siderbar extends PureComponent {
       show,
       showSpin,
       queryHighlight,
-      previewVisible_min,
-      previewVisible_min_left,
       query_pro,
       query_spot,
-      ParentId,
       query_point,
-      showCompany,
       placeholder,
       sort,
-      isProjectUpdate,
       key,
-      projectEdit,
       clientHeight,
-      previewVisible,
-      previewImage,
       showCheck,
-      showProblem,
-      showProjectAllInfo,
-      fileList,
-      problem,
       queryInfo,
-      isArchivalSpot,
       sort_by,
       ShowArchive,
       sort_key,
-      projectFileList,
-      departList,
-      showPlan,
       clickId,
       isProjectSupervise,
       TaskLevelAndInterBatch
     } = this.state;
-
-    const departSelectListAll = unique(departSelectList.concat(departList));
-
-    const projectItem = isProjectUpdate
-      ? projectInfo
-      : {
-          projectBase: {},
-          productDepartment: { name: "", id: "" },
-          expand: {
-            designStartTime: "",
-            designCompTime: "",
-            actStartTime: "",
-            actCompTime: ""
-          }
-        };
 
     const showPoint = key === "point";
 
@@ -1148,22 +1019,6 @@ export default class siderbar extends PureComponent {
         key: ["project"]
       }
     ];
-
-    // const fun = query_pro
-    // ? {
-    //     value: query_pro,
-    //     onChange: () => {
-    //       this.setState({ query_pro: "" });
-    //     }
-    //   }
-    // :query_spot
-    // ? {
-    //     value: query_spot,
-    //     onChange: () => {
-    //       this.setState({ query_spot: "" });
-    //     }
-    //   }
-    // : {};
 
     const list = isProjectSupervise
       ? projectSuperviseList.items
@@ -1236,7 +1091,6 @@ export default class siderbar extends PureComponent {
               </Button>
               <Button
                 icon={showCheck ? "dashboard" : ""}
-                // style={{ float: "right" }}
                 onClick={() => {
                   emitter.emit("showSiderbarDetail", {
                     show: false
@@ -1286,7 +1140,8 @@ export default class siderbar extends PureComponent {
                   if (key === "project") {
                     showProjectInfo({
                       id: item.id,
-                      isEdit: false
+                      isEdit: false,
+                      isProjectSupervise
                     });
                     this.setState({ show: false });
                   } else {
@@ -1312,7 +1167,6 @@ export default class siderbar extends PureComponent {
                     item.id === clickId
                       ? {
                           color: "green"
-                          // fontSize: 20
                         }
                       : {}
                   }
@@ -1388,14 +1242,7 @@ export default class siderbar extends PureComponent {
       <div
         id="List"
         style={{
-          // position: "absolute",
           left: show ? 0 : "-350px"
-          // top: 0,
-          // zIndex: 1000,
-          // width: 350,
-          // height: "100%",
-          // paddingTop: 46,
-          // backgroundColor: "transparent"
         }}
         className={styles.siderbar}
         ref={e => (this.refDom = e)}
@@ -1500,9 +1347,7 @@ export default class siderbar extends PureComponent {
             }}
             style={{ padding: 20, width: 300 }}
             enterButton
-            // {...fun}
           />
-          {/* 新建 */}
           <Popover
             content={
               key === "project"
@@ -1540,7 +1385,8 @@ export default class siderbar extends PureComponent {
                   });
                   resetFields();
                   showProjectInfo({
-                    isEdit: true
+                    isEdit: true,
+                    isProjectSupervise
                   });
                   showProjectInfoMore({ isEdit: true });
                 } else if (key === "spot") {
@@ -1584,9 +1430,9 @@ export default class siderbar extends PureComponent {
                   from: "query",
                   TaskLevelAndInterBatch
                 });
-                emitter.emit("sidebarQuery", {
-                  TaskLevelAndInterBatch
-                });
+                // emitter.emit("sidebarQuery", {
+                //   TaskLevelAndInterBatch
+                // });
               }}
             >
               {interpretList.map(item => (

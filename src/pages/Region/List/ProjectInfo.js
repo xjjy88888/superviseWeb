@@ -1,6 +1,7 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
 import { createForm } from "rc-form";
+import locale from "antd/lib/date-picker/locale/zh_CN";
 import {
   Icon,
   Tag,
@@ -25,12 +26,10 @@ import {
   Typography,
   message
 } from "antd";
-import locale from "antd/lib/date-picker/locale/zh_CN";
-import "leaflet/dist/leaflet.css";
-import emitter from "../../../utils/event";
-
+import Spins from "../../../components/Spins";
 import config from "../../../config";
 import data from "../../../data";
+import emitter from "../../../utils/event";
 import {
   dateFormat,
   dateInitFormat,
@@ -39,7 +38,6 @@ import {
   unique,
   getUrl
 } from "../../../utils/util";
-import Spins from "../../../components/Spins";
 import styles from "./style/sidebar.less";
 
 let self;
@@ -87,6 +85,7 @@ export default class siderbar extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
+      isProjectSupervise: false,
       hover: false,
       place: "",
       show: false,
@@ -121,8 +120,7 @@ export default class siderbar extends PureComponent {
       fileList: [],
       projectFileList: [],
       showPlan: false,
-      clickId: null,
-      isProjectSupervise: false
+      clickId: null
     };
     this.map = null;
   }
@@ -131,18 +129,14 @@ export default class siderbar extends PureComponent {
     const { link } = this.props;
     link(this);
     self = this;
-
     const urlFrom = getUrl(`from`);
     const urlId = getUrl(`id`);
-    const urlIsProject = getUrl(`isProject`);
     if (urlFrom === `project` && urlId) {
-      this.projectInfo(urlId);
+      console.log("componentDidMount");
+      this.show({ id: urlId, isEdit: false, isProjectSupervise: true });
     }
-    if (urlFrom === `project` && urlIsProject === `true`) {
-      this.setState({ isProjectSupervise: true });
-    }
-    this.queryDistrict();
     this.queryDict();
+    this.queryDistrict();
     this.queryBasinOrgan();
     this.eventEmitter = emitter.addListener("spotRelate", v => {
       const len = v.spotId.length;
@@ -210,40 +204,6 @@ export default class siderbar extends PureComponent {
     });
   }
 
-  componentDidUpdate(prevProps) {
-    const {
-      project: { queryParams },
-      commonModel: {
-        siderBarPageInfo: { currentProjectId, currentSpotId }
-      }
-    } = this.props;
-    if (
-      prevProps.commonModel.siderBarPageInfo.currentProjectId !==
-        currentProjectId &&
-      currentProjectId !== ""
-      // &&
-      // prevProps.commonModel.siderBarPageInfo.currentProjectId !== ""
-    ) {
-      this.setState({ clickId: currentProjectId });
-      this.projectInfo(currentProjectId);
-    } else if (
-      prevProps.commonModel.siderBarPageInfo.currentSpotId !== currentSpotId &&
-      currentSpotId !== ""
-      // &&
-      // prevProps.commonModel.siderBarPageInfo.currentSpotId !== ""
-    ) {
-      emitter.emit("showSiderbarDetail", {
-        show: true,
-        from: "spot",
-        id: currentSpotId,
-        edit: false,
-        fromList: true,
-        type: "edit"
-      });
-      this.setState({ clickId: currentSpotId });
-    }
-  }
-
   componentWillUnmount() {
     const { dispatch } = this.props;
     dispatch({
@@ -273,6 +233,7 @@ export default class siderbar extends PureComponent {
       show: true,
       isAdd: !Boolean(v.id), // 1新建 2查看编辑
       isEdit: v.isEdit, // 1查看 2编辑
+      isProjectSupervise: v.isProjectSupervise,
       previewVisible_min_left: false,
       projectFileList: []
     });
@@ -286,8 +247,7 @@ export default class siderbar extends PureComponent {
       hideProjectInfoMore,
       showInspect,
       showVideoMonitor,
-      hideExamine,
-      commonModel: { siderBarPageInfo }
+      hideExamine
     } = this.props;
 
     emitter.emit("emptyPoint");
@@ -325,6 +285,7 @@ export default class siderbar extends PureComponent {
   };
 
   projectInfo = id => {
+    // console.log("projectInfo", id);
     this.queryProjectById(id);
     this.spotList(id);
     this.redLineList(id);
@@ -742,28 +703,21 @@ export default class siderbar extends PureComponent {
       showProjectInfoMore,
       hideProjectInfoMore,
       spotRelate,
-      showList,
       showExamine,
-      // showProjectList,
-      switchData,
       mapLocation,
-      switchInterpret,
       showInspect,
       videoMonitorLocation,
       showVideoMonitor,
       dispatch,
-      form: { getFieldDecorator, resetFields, setFieldsValue, getFieldValue },
+      form: { getFieldDecorator, setFieldsValue, getFieldValue },
       district: { districtTree, districtTreeFilter },
       user: { basinOrganList },
-      project: { projectList, projectInfo, projectListAdd, departSelectList },
-      spot: { spotList, projectInfoSpotList, interpretList },
-      point: { pointList },
+      project: { projectInfo, projectListAdd, departSelectList },
+      spot: { projectInfoSpotList },
       redLine: { redLineList },
       inspect: { inspectList },
       panorama: { panoramaList },
-      projectSupervise: { projectSuperviseList },
       videoMonitor: { videoMonitorList }
-      // showProjectTableList
     } = this.props;
 
     const user = JSON.parse(localStorage.getItem("user"));

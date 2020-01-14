@@ -13,8 +13,6 @@ import Dict from "./pages/System/Dict.js";
 import Branch from "./pages/System/Branch.js";
 import Company from "./pages/System/Company.js";
 import ProjectList from "./pages/Project/List/List";
-import ProjectMap from "./pages/Project/Map/Map";
-import CesiumMap from "./pages/Project/Map/CesiumMap";
 
 function RouterConfig({ history }) {
   return (
@@ -23,6 +21,7 @@ function RouterConfig({ history }) {
         <Route path="/login" exact component={Login} />
         <Route path="/index" exact component={Home} />
         <Route path="/region" exact component={RegionMap} />
+        <Route path="/project" exact component={ProjectList} />
         <Route path="/system" exact component={Review} />
         <Route path="/system/user/review" component={Review} exact />
         <Route path="/system/user/society" component={Society} exact />
@@ -33,10 +32,6 @@ function RouterConfig({ history }) {
         <Route path="/system/district" component={District} exact />
         <Route path="/system/departs" component={Departs} exact />
         <Route path="/system/branch" component={Branch} exact />
-        {/* <Route path="/project" exact component={ProjectList} /> */}
-        <Route path="/project/list" exact component={ProjectList} />
-        <Route path="/project/map" exact component={ProjectMap} />
-        <Route path="/project/cesiummap" exact component={CesiumMap} />
         <Route path="/" component={Login} />
       </Switch>
     </Router>

@@ -15,28 +15,26 @@ const menuList = [
     subMenu: []
   },
   {
-    title: "区域监管",
-    icon: "radar-chart",
-    key: "/region",
-    subMenu: []
-  },
-  {
-    title: "项目监管",
-    icon: "book",
-    key: "/project",
+    title: "日常监管",
+    icon: "project",
+    key: "/supervise",
     subMenu: [
       {
-        title: "项目列表",
-        key: "/project/list"
+        title: "区域监管",
+        key: "/region"
       },
       {
-        title: "二维地图",
-        key: "/project/map"
-      },
-      {
-        title: "三维地图",
-        key: "/project/cesiummap"
+        title: "项目监管",
+        key: "/project"
       }
+      // {
+      //   title: "二维地图",
+      //   key: "/project/map"
+      // },
+      // {
+      //   title: "三维地图",
+      //   key: "/project/cesiummap"
+      // }
     ]
   },
   {
