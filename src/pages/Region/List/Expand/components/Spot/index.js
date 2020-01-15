@@ -405,9 +405,7 @@ export default class Spot extends PureComponent {
               notification["success"]({
                 message: `${type === "edit" ? "编辑" : "新建"}图斑成功`
               });
-              emitter.emit("showSiderbarDetail", {
-                show: false
-              });
+
               if (fromList) {
                 emitter.emit("deleteSuccess", {
                   success: true
@@ -418,6 +416,9 @@ export default class Spot extends PureComponent {
                   projectId: projectId
                 });
               }
+              emitter.emit("showSiderbarDetail", {
+                show: false
+              });
             }
           }
         });

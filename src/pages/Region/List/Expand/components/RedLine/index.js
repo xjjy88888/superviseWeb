@@ -172,7 +172,7 @@ export default class RedLine extends PureComponent {
       spotItem
     } = this.props;
     const { fileList } = this.state;
-    const redLineItem = redLineInfo;
+    const redLineItem = (type !== "add" && redLineInfo && redLineInfo) || {};
 
     const domUpload = (
       <div style={{ minHeight: fileList.length ? 120 : 0 }}>
@@ -431,6 +431,9 @@ export default class RedLine extends PureComponent {
                         }项目红线成功`
                       });
                       emitter.emit("deleteDraw", {});
+                      emitter.emit("showSiderbarDetail", {
+                        show: false
+                      });
                     }
                   }
                 });

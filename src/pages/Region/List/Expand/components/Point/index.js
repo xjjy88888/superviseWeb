@@ -159,14 +159,12 @@ export default class Point extends PureComponent {
       edit,
       form: { getFieldDecorator, validateFields, getFieldValue, resetFields },
       pointInfo,
-      // projectSelectListPoint,
-      // pointItem,
       projectSelectListAll,
       ParentId,
       spotItem
     } = this.props;
     const { fileList } = this.state;
-    const pointItem = (pointInfo && pointInfo) || {};
+    const pointItem = (type !== "add" && pointInfo && pointInfo) || {};
 
     const domUpload = (
       <div style={{ minHeight: fileList.length ? 120 : 0 }}>
@@ -428,6 +426,9 @@ export default class Point extends PureComponent {
                         success: true
                       });
                       emitter.emit("deleteDraw", {});
+                      emitter.emit("showSiderbarDetail", {
+                        show: false
+                      });
                     }
                   }
                 });

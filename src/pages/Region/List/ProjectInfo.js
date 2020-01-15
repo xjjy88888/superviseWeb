@@ -138,37 +138,6 @@ export default class siderbar extends PureComponent {
     this.queryDict();
     this.queryDistrict();
     this.queryBasinOrgan();
-    this.eventEmitter = emitter.addListener("spotRelate", v => {
-      const len = v.spotId.length;
-      if (v.status === "end" && len !== 0) {
-        console.log(v);
-        if (len === 1) {
-          if (v.spotId[0].projectId && v.spotId[0].projectId === v.projectId) {
-            notification["warning"]({
-              message: `该图斑已关联该项目`
-            });
-          } else if (v.spotId[0].projectId) {
-            Modal.confirm({
-              title: "关联图斑",
-              content: "该图斑已关联项目，是否确定更改关联项目？",
-              okText: "确定",
-              okType: "danger",
-              cancelText: "取消",
-              onOk() {
-                self.spotRelate(v.spotId[0].spotId, v.projectId);
-              },
-              onCancel() {}
-            });
-          } else {
-            this.spotRelate(v.spotId[0].spotId, v.projectId);
-          }
-        } else {
-          notification["warning"]({
-            message: `每次只能关联1个图斑，请重新选择`
-          });
-        }
-      }
-    });
     this.eventEmitter = emitter.addListener("projectInfoRefresh", v => {
       if (v.projectId) {
         this.projectInfo(v.projectId);
@@ -257,10 +226,22 @@ export default class siderbar extends PureComponent {
       hideExamine
     } = this.props;
 
-    emitter.emit("emptyPoint");
+    // 项目查处
+    hideExamine();
+
+    // 检查表
+    showInspect({
+      show: false
+    });
+
+    //扰动图斑
+    //防治责任范围
+    //全景图
     emitter.emit("showSiderbarDetail", {
       show: false
     });
+
+    emitter.emit("emptyPoint");
     emitter.emit("showQuery", {
       show: false
     });
@@ -282,13 +263,35 @@ export default class siderbar extends PureComponent {
       show: false
     });
     hideProjectInfoMore();
-    showInspect({
-      show: false
-    });
     showVideoMonitor({
       show: false
     });
-    hideExamine();
+  };
+
+  spotRelateEnd = v => {
+    console.log("图斑关联结束");
+    const len = v.spotIds.length;
+    if (len > 1) {
+      message.warning("每次只能关联1个图斑，请重新选择");
+    } else if (len === 1) {
+      if (v.spotIds[0].projectId && v.spotIds[0].projectId === v.projectId) {
+        message.warning("该图斑已关联该项目");
+      } else if (v.spotIds[0].projectId) {
+        Modal.confirm({
+          title: "关联图斑",
+          content: "该图斑已关联项目，是否确定更改关联项目？",
+          okText: "确定",
+          okType: "danger",
+          cancelText: "取消",
+          onOk() {
+            self.spotRelate(v.spotIds[0].spotId, v.projectId);
+          },
+          onCancel() {}
+        });
+      } else {
+        this.spotRelate(v.spotIds[0].spotId, v.projectId);
+      }
+    }
   };
 
   projectInfo = id => {
@@ -704,6 +707,19 @@ export default class siderbar extends PureComponent {
 
     await showProjectList();
   }
+
+  projectUnRelateSpot = payload => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "project/projectUnRelateSpot",
+      payload,
+      callback: success => {
+        if (success) {
+          self.spotList(payload.projectId);
+        }
+      }
+    });
+  };
 
   render() {
     const {
@@ -1424,6 +1440,7 @@ export default class siderbar extends PureComponent {
                           }}
                           onClick={e => {
                             e.stopPropagation();
+                            this.hide();
                             showInspect({
                               show: true,
                               isEdit: true,
@@ -1603,7 +1620,8 @@ export default class siderbar extends PureComponent {
                               margin: "5px 0 5px 15px",
                               overflow: "hidden",
                               border: "dashed 1px #dedede",
-                              borderRadius: 5
+                              borderRadius: 5,
+                              cursor: "pointer"
                             }}
                           >
                             <span>
@@ -1716,7 +1734,8 @@ export default class siderbar extends PureComponent {
                               margin: "5px 0 5px 15px",
                               overflow: "hidden",
                               border: "dashed 1px #dedede",
-                              borderRadius: 5
+                              borderRadius: 5,
+                              cursor: "pointer"
                             }}
                           >
                             <span
@@ -1897,8 +1916,10 @@ export default class siderbar extends PureComponent {
                           });
                         }}
                       >
-                        {item.mapNum}
-                        {isArchivalSpot ? item.archiveTime.slice(0, 10) : ""}
+                        {item.mapNum || item.id}
+                        {isArchivalSpot && item.archiveTime
+                          ? item.archiveTime.slice(0, 10)
+                          : ""}
                         <Icon
                           type="disconnect"
                           style={{
@@ -1909,21 +1930,15 @@ export default class siderbar extends PureComponent {
                           }}
                           onClick={e => {
                             e.stopPropagation();
-                            dispatch({
-                              type: "project/projectUnbindSpotApi",
-                              payload: {
-                                projectId: projectItem.id,
-                                spotId: item.id
-                              },
-                              callback: (success, error, result) => {
-                                notification[success ? "success" : "error"]({
-                                  message: `取消关联扰动图斑${
-                                    success ? "成功" : "失败"
-                                  }${success ? "" : `：${error.message}`}`
-                                });
-                                if (success) {
-                                  this.spotList(projectItem.id);
-                                }
+                            Modal.confirm({
+                              title: "取消关联",
+                              content: "确定要取消关联该扰动图斑吗？",
+                              onOk() {
+                                const params = {
+                                  projectId: projectItem.id,
+                                  spotId: item.id
+                                };
+                                self.projectUnRelateSpot(params);
                               }
                             });
                           }}

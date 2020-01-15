@@ -47,7 +47,7 @@ export default {
     departSelectList: [],
     projectListAdd: [],
     queryParams: {},
-    projectInfoMoreLeftShow:false
+    projectInfoMoreLeftShow: false
   },
 
   subscriptions: {
@@ -242,11 +242,12 @@ export default {
     },
 
     // 项目取消关联图斑
-    *projectUnbindSpotApi({ payload, callback }, { call, put }) {
+    *projectUnRelateSpot({ payload, callback }, { call, put }) {
       const {
-        data: { success, error, result }
+        data: { success, error }
       } = yield call(projectUnbindSpotApi, payload);
-      if (callback) callback(success, error, result);
+      if (callback) callback(success);
+      messages(success, error, "取消关联图斑");
     },
 
     // 单位列表

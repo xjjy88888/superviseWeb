@@ -90,8 +90,8 @@ export default class siderbarDetail extends PureComponent {
         from: data.from, //spot  point
         item: data.item || {},
         type: data.type, //add  edit
-        previewVisible_min: false
-        // currentFromId: data.id
+        previewVisible_min: false,
+        currentFromId: data.type === "add" ? "" : data.id
       });
       if (data.show && data.type !== "add" && data.id) {
         if (data.from === "spot") {
@@ -124,7 +124,7 @@ export default class siderbarDetail extends PureComponent {
       panoramaUrlConfig: data.from === "panorama" ? data.item.urlConfig : "",
       showSpotReview: false,
       spotReviewId: null,
-      currentFromId: data.id
+      currentFromId: data.type === "add" ? "" : data.id
     });
     if (data.projectId && data.projectName) {
       this.setState({
@@ -446,7 +446,7 @@ export default class siderbarDetail extends PureComponent {
           ) : null}
 
           {/* 拆解--标注点 */}
-          {from === "point" ? (
+          {from === "point" && show ? (
             <Point
               // pointItem={pointItem}
               spotItem={spotItem}
@@ -459,7 +459,7 @@ export default class siderbarDetail extends PureComponent {
           ) : null}
 
           {/* 拆解--全景图 */}
-          {from === "panorama" ? (
+          {from === "panorama" && show ? (
             <Panorama
               item={item}
               type={type}

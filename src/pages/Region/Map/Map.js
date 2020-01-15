@@ -193,7 +193,7 @@ export default class RegionMap extends PureComponent {
       selectSpotLeftV: "",
       selectRightV: "",
       selectSpotRightV: "",
-      spotStatus: "",
+      isSpotRelate: false,
       projectId: null, //针对新建图形的项目红线id
       addGraphLayer: null, //针对新建图形的图层
       showPhotoPreview: false,
@@ -688,9 +688,9 @@ export default class RegionMap extends PureComponent {
 
   //图斑关联
   spotRelate = data => {
-    console.log("开始图斑关联", data);
+    console.log("图斑关联开始", data);
     this.setState({
-      spotStatus: data.status, //start：开始，end：结束
+      isSpotRelate: true, //start：开始，end：结束
       spotRelateProjectId: data.projectId
     });
   };
@@ -2228,29 +2228,28 @@ export default class RegionMap extends PureComponent {
       me.clearGeojsonLayer();
       me.loadGeojsonLayer(data, geoJsonStyle);
       me.setState({
-        spotStatus: "end" //start：开始，end：结束
+        isSpotRelate: false
       });
+      let spotIds = [];
       if (data.features.length > 0) {
-        let spotIds = [];
         for (let i = 0; i < data.features.length; i++) {
           let item = data.features[i];
           let spotId = item.properties.id ? item.properties.id : "";
           let project_id = item.properties.project_id
             ? item.properties.project_id
             : "";
-          spotIds.push({ spotId: spotId, projectId: project_id });
+          spotIds.push({ spotId, projectId: project_id });
         }
         //图斑关联
-        emitter.emit("spotRelate", {
-          status: "end", //start：开始，end：结束
-          spotId: spotIds,
+        this.ProjectInfo.spotRelateEnd({
+          spotIds,
           projectId: me.state.spotRelateProjectId
         });
       } else {
         //图斑关联
-        emitter.emit("spotRelate", {
-          status: "end", //start：开始，end：结束
-          spotId: []
+        this.ProjectInfo.spotRelateEnd({
+          spotIds,
+          projectId: me.state.spotRelateProjectId
         });
       }
     } else {
@@ -2514,9 +2513,9 @@ export default class RegionMap extends PureComponent {
       /*-------------------------------------区域监管部分-------------------------------------*/
       //点查WMS图层
       let point = { x: e.latlng.lng, y: e.latlng.lat };
-      //图斑关联判断spotStatus
-      const { spotStatus } = me.state;
-      if (spotStatus === "start") {
+      //图斑关联判断isSpotRelate
+      const { isSpotRelate } = me.state;
+      if (isSpotRelate) {
         //图斑关联点查
         me.queryWFSServiceByPoint(
           point,

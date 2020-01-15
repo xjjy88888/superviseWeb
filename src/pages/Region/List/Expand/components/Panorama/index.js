@@ -235,7 +235,9 @@ export default class Panorama extends PureComponent {
                       emitter.emit("projectInfoRefresh", {
                         projectId
                       });
-                      // this.setState({ show: false });
+                      emitter.emit("showSiderbarDetail", {
+                        show: false
+                      });
                     }
                   }
                 });
