@@ -1372,9 +1372,16 @@ export default class siderbar extends PureComponent {
                           userSelect: "none"
                         }}
                         onClick={() => {
+                          this.props.dispatch({
+                            type: "project/save",
+                            payload: {
+                              projectInfoMoreLeftShow: true
+                            }
+                          });
                           this.setState({
                             showProjectAllInfo: !showProjectAllInfo
                           });
+
                           if (showProjectAllInfo) {
                             hideProjectInfoMore();
                           } else {
@@ -2765,6 +2772,12 @@ export default class siderbar extends PureComponent {
                     userSelect: "none"
                   }}
                   onClick={() => {
+                    this.props.dispatch({
+                      type: "project/save",
+                      payload: {
+                        projectInfoMoreLeftShow: true
+                      }
+                    });
                     this.setState({
                       showProjectAllInfo: !showProjectAllInfo
                     });

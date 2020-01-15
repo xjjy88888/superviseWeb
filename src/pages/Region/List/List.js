@@ -121,7 +121,7 @@ export default class siderbar extends PureComponent {
   }
 
   componentDidMount() {
-    const { link, showProjectInfo } = this.props;
+    const { link } = this.props;
     link(this);
     self = this;
 
@@ -706,7 +706,6 @@ export default class siderbar extends PureComponent {
   };
 
   switchMenu = e => {
-    const { query_pro, query_spot } = this.state;
     this.hide();
     this.scrollDom.scrollTop = 0;
     const k = e.key;
@@ -1390,6 +1389,12 @@ export default class siderbar extends PureComponent {
                 color: "#1890ff"
               }}
               onClick={() => {
+                this.props.dispatch({
+                  type: "project/save",
+                  payload: {
+                    projectInfoMoreLeftShow: true
+                  }
+                });
                 if (key === "project") {
                   this.setState({
                     projectEdit: true,

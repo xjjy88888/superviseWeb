@@ -62,7 +62,7 @@ import Layouts from "../../../components/Layouts";
 import Spins from "../../../components/Spins";
 import "./index.less";
 import Contrast from "./Contrast";
-import { getUrl, polygonClipByLine } from "../../../utils/util";
+import { getUrl, polygonClipByLine, messages } from "../../../utils/util";
 
 let userconfig = {};
 let map = null;
@@ -4090,6 +4090,9 @@ export default class RegionMap extends PureComponent {
       data: { emcd: params.name, size: 16 },
       success: function(data) {
         console.log("success", data);
+        if (data.code === 0 && data.msg) {
+          message.error(data.msg);
+        }
         data = data.data;
         var vedioPicList = [];
         if (data && data[params.name]) {

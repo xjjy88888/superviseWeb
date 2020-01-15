@@ -1,22 +1,11 @@
 import React, { PureComponent } from "react";
-import {
-  Icon,
-  Button,
-  Input,
-  notification,
-  Form,
-  Select,
-  Upload,
-  Modal
-} from "antd";
+import { Button, Input, notification, Form, Select, Upload, Modal } from "antd";
 import { connect } from "dva";
 import { createForm } from "rc-form";
 
 import config from "@/config";
 import emitter from "../../../../../../utils/event";
 import { getFile, accessToken } from "../../../../../../utils/util";
-
-const { TextArea } = Input;
 
 const formItemLayout = {
   labelCol: { span: 8 },

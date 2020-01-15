@@ -77,7 +77,7 @@ export default class Spot extends PureComponent {
       type,
       currentFromId,
       projectId,
-      form: { setFieldsValue, resetFields }
+      form: { setFieldsValue }
     } = this.props;
     const year = new Date().getFullYear();
     if (projectId) {
@@ -347,6 +347,7 @@ export default class Spot extends PureComponent {
     if (!arr) {
       return;
     }
+    // eslint-disable-next-line array-callback-return
     arr.map(item => {
       if (item.value === v) {
         result = [item[key]];
@@ -438,7 +439,6 @@ export default class Spot extends PureComponent {
       form: { getFieldDecorator, validateFields, resetFields, setFieldsValue },
       projectSelectListAll,
       ParentId,
-      // spotItem,
       querySpotById,
       relateProject,
       spotInfo,
@@ -451,7 +451,6 @@ export default class Spot extends PureComponent {
       archiveTime,
       showSpotReview,
       spotReviewId,
-      archiveTimeSpot,
       spotHistoryId,
       fileList
     } = this.state;

@@ -61,9 +61,6 @@ export default class siderbarDetail extends PureComponent {
   }
   componentDidMount() {
     self = this;
-    const {
-      form: { resetFields, setFieldsValue }
-    } = this.props;
     this.eventEmitter = emitter.addListener(
       "showSiderbarDetail",
       this.showSiderbarDetail
@@ -195,19 +192,10 @@ export default class siderbarDetail extends PureComponent {
   render() {
     const {
       mapLocation,
-      dispatch,
-      form: {
-        getFieldDecorator,
-        resetFields,
-        validateFields,
-        getFieldValue,
-        setFieldsValue
-      },
-      district: { districtTree },
       project: { departSelectList },
-      spot: { spotInfo, projectSelectListSpot, spotHistoryList },
-      point: { pointInfo, projectSelectListPoint },
-      redLine: { redLineInfo, projectSelectListRedLine }
+      spot: { spotInfo, projectSelectListSpot },
+      point: { projectSelectListPoint },
+      redLine: { projectSelectListRedLine }
     } = this.props;
 
     const {
@@ -220,18 +208,13 @@ export default class siderbarDetail extends PureComponent {
       type,
       projectId,
       edit,
-      // fileList,
-      isSpotUpdate,
       previewVisible,
       previewImage,
       previewVisible_min,
       relateProject,
-      // spotHistoryId,
       item,
       panoramaUrlConfig,
       loading,
-      // showSpotReview,
-      // spotReviewId,
       currentFromId
     } = this.state;
 
