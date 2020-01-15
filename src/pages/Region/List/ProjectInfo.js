@@ -96,7 +96,7 @@ export default class siderbar extends PureComponent {
       showCompany: false,
       showProblem: false,
       showQuery: false,
-      isArchivalSpot: false,
+      SpotShowArchive: false,
       showCheck: false,
       checked: false,
       ParentId: 0,
@@ -478,6 +478,7 @@ export default class siderbar extends PureComponent {
 
   spotList = id => {
     const { dispatch } = this.props;
+    const { SpotShowArchive } = this.state;
     this.loading(true);
     dispatch({
       type: "spot/projectInfoSpotList",
@@ -485,7 +486,7 @@ export default class siderbar extends PureComponent {
         ProjectId: id,
         MaxResultCount: 1000,
         SkipCount: 0,
-        ShowArchive: this.state.isArchivalSpot
+        SpotShowArchive
       },
       callback: success => {
         this.loading(false);
@@ -766,7 +767,7 @@ export default class siderbar extends PureComponent {
       showProjectAllInfo,
       fileList,
       problem,
-      isArchivalSpot,
+      SpotShowArchive,
       projectFileList,
       departList,
       showPlan,
@@ -1898,7 +1899,7 @@ export default class siderbar extends PureComponent {
                           style={{ position: "relative", left: 10, top: -2 }}
                           onChange={(v, e) => {
                             e.stopPropagation();
-                            this.setState({ isArchivalSpot: v });
+                            this.setState({ SpotShowArchive: v });
                             setTimeout(() => {
                               this.spotList(projectItem.id);
                             }, 100);
@@ -1926,7 +1927,7 @@ export default class siderbar extends PureComponent {
                         }}
                       >
                         {item.mapNum || item.id}
-                        {isArchivalSpot && item.archiveTime
+                        {SpotShowArchive && item.archiveTime
                           ? item.archiveTime.slice(0, 10)
                           : ""}
                         <Icon
@@ -1959,7 +1960,7 @@ export default class siderbar extends PureComponent {
                             fontSize: 16,
                             cursor: "point",
                             color: "#1890ff",
-                            marginRight: isArchivalSpot ? 0 : 10
+                            marginRight: SpotShowArchive ? 0 : 10
                           }}
                           onClick={e => {
                             e.stopPropagation();
