@@ -124,7 +124,29 @@ export default class siderbar extends PureComponent {
     };
     this.map = null;
   }
-
+  // componentDidUpdate(prevProps) {
+  //   const {
+  //     dispatch,
+  //     showProjectInfoMore,
+  //     project: { projectInfo }
+  //   } = this.props;
+  //   if (
+  //     prevProps.project.projectInfo.projectBase.pointX !== "" &&
+  //     prevProps.project.projectInfo.projectBase.pointX !==
+  //       projectInfo.projectBase.pointX
+  //   ) {
+  //     dispatch({
+  //       type: "projec/save",
+  //       payload: {
+  //         projectInfoMoreLeftShow: true
+  //       }
+  //     });
+  //     showProjectInfoMore({
+  //       id: projectInfo.id,
+  //       isEdit: true
+  //     });
+  //   }
+  // }
   componentDidMount() {
     const { link } = this.props;
     link(this);

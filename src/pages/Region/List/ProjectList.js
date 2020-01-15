@@ -68,7 +68,8 @@ export default class ProjectListTable extends PureComponent {
     if (
       prevProps.queryParams !== queryParams &&
       queryParams.from &&
-      queryParams.from === "project"
+      queryParams.from === "project" &&
+      queryParams.queryParamsChangeBy !== "table"
     ) {
       console.log(queryParams);
       this.dataFormat(queryParams);
@@ -85,6 +86,7 @@ export default class ProjectListTable extends PureComponent {
     this.setState({
       loading: true
     });
+    parmas.queryParamsChangeBy && delete parmas.queryParamsChangeBy;
     parmas.from && delete parmas.from;
     parmas.MapNum && delete parmas.MapNum;
     parmas.ProjectNat === "" && delete parmas.ProjectNat;
@@ -130,7 +132,11 @@ export default class ProjectListTable extends PureComponent {
     dispatch({
       type: "project/projectSave",
       payload: {
-        queryParams: { from: activeMenu, SkipCount: 0 }
+        queryParams: {
+          from: activeMenu,
+          SkipCount: 0,
+          queryParamsChangeBy: "table"
+        }
       }
     });
     await dispatch({
@@ -289,7 +295,7 @@ export default class ProjectListTable extends PureComponent {
     }
     console.log("filterObj==========", filterObj);
     // 先将filterObj存到props中，供两表关联查询
-
+    queryParams.queryParamsChangeBy = "table";
     this.getProjectTableList({ ...queryParams, ...filterObj });
     this.setState({
       pagination,

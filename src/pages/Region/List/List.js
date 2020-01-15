@@ -121,7 +121,7 @@ export default class siderbar extends PureComponent {
   }
 
   componentDidMount() {
-    const { link } = this.props;
+    const { link, dispatch } = this.props;
     link(this);
     self = this;
 
@@ -208,6 +208,13 @@ export default class siderbar extends PureComponent {
       } else {
       }
     });
+    // 组件首次生成先清除queryParmas
+    dispatch({
+      type: "project/projectSave",
+      payload: {
+        queryParams: {}
+      }
+    });
   }
 
   componentDidUpdate(prevProps) {
@@ -218,7 +225,10 @@ export default class siderbar extends PureComponent {
         siderBarPageInfo: { currentProjectId, currentSpotId }
       }
     } = this.props;
-    if (prevProps.project.queryParams !== queryParams) {
+    if (
+      prevProps.project.queryParams !== queryParams &&
+      queryParams.queryParamsChangeBy !== "sideBar"
+    ) {
       if (queryParams.from && queryParams.from === "project") {
         this.queryProject({ ...queryParams });
       } else if (queryParams.from && queryParams.from === "spot") {
@@ -281,7 +291,8 @@ export default class siderbar extends PureComponent {
       obj = {
         SkipCount: 0,
         ProjectName: query_pro,
-        from: payload.from
+        from: payload.from,
+        queryParamsChangeBy: "sideBar"
       };
     } else if (
       payload.from &&
@@ -292,7 +303,8 @@ export default class siderbar extends PureComponent {
         SkipCount: 0,
         MapNum: query_spot,
         TaskLevelAndInterBatch,
-        from: payload.from
+        from: payload.from,
+        queryParamsChangeBy: "sideBar"
       };
     }
 
@@ -304,7 +316,8 @@ export default class siderbar extends PureComponent {
             ? {
                 ...queryParams,
                 ...payload.queryParams,
-                from: payload.from
+                from: payload.from,
+                queryParamsChangeBy: "sideBar"
               }
             : obj
       }
@@ -517,6 +530,7 @@ export default class siderbar extends PureComponent {
   };
 
   queryProject = items => {
+    items.queryParamsChangeBy && delete items.queryParamsChangeBy;
     loading = true;
     const { polygon, key, showCheck, isProjectSupervise } = this.state;
     const {
@@ -574,6 +588,7 @@ export default class siderbar extends PureComponent {
   };
 
   querySpot = items => {
+    items.queryParamsChangeBy && delete items.queryParamsChangeBy;
     loading = true;
     const { polygon, key, showCheck, TaskLevelAndInterBatch } = this.state;
     const {
@@ -605,6 +620,7 @@ export default class siderbar extends PureComponent {
   };
 
   queryPoint = items => {
+    items.queryParamsChangeBy && delete items.queryParamsChangeBy;
     loading = true;
     const {
       dispatch,
@@ -762,7 +778,7 @@ export default class siderbar extends PureComponent {
               },
               {
                 value: "操作时间",
-                key: "ModifyTime"
+                key: "LastModificationTime"
               },
               {
                 value: "复核状态",
@@ -935,7 +951,8 @@ export default class siderbar extends PureComponent {
         ...queryInfo,
         SkipCount: 0,
         MapNum: v,
-        from: "query"
+        from: "query",
+        Sorting: ""
       };
       this.querySave({
         queryParams: obj,

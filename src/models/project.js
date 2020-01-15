@@ -49,7 +49,6 @@ export default {
     queryParams: {},
     projectInfoMoreLeftShow: false
   },
-
   subscriptions: {
     setup({ dispatch, history }) {}
   },

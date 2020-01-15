@@ -276,9 +276,11 @@ export default class siderbarDetail extends PureComponent {
           style={{
             float: "right",
             position: "absolute",
-            right: 25,
-            top: 56,
-            zIndex: 1
+            top: 46,
+            zIndex: 1,
+            width: "100%",
+            height: 40,
+            backgroundColor: "white"
           }}
         >
           <Button
@@ -286,7 +288,10 @@ export default class siderbarDetail extends PureComponent {
             shape="circle"
             style={{
               float: "right",
-              color: "#1890ff"
+              color: "#1890ff",
+              top: 5,
+              right: 18,
+              marginLeft: 3
             }}
             onClick={() => {
               if (edit || type === "add") {
@@ -324,7 +329,9 @@ export default class siderbarDetail extends PureComponent {
               shape="circle"
               style={{
                 float: "right",
-                color: "#1890ff"
+                color: "#1890ff",
+                top: 5,
+                right: 18
               }}
               onClick={() => {
                 if (type === "edit" && edit) {
@@ -342,7 +349,7 @@ export default class siderbarDetail extends PureComponent {
           style={{
             height: "100%",
             overflow: `auto`,
-            padding: 23
+            padding: "46px 12px"
           }}
         >
           <div

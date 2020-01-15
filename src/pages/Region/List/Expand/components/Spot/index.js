@@ -64,7 +64,7 @@ export default class Spot extends PureComponent {
   componentDidUpdate(prevProps, prevState) {
     const { type, currentFromId } = this.props;
     if (
-      prevProps.currentFromId !== "" &&
+      // prevProps.currentFromId !== "" &&
       currentFromId !== prevProps.currentFromId &&
       type === "edit"
     ) {
