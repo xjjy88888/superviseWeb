@@ -263,7 +263,7 @@ export default class siderbar extends PureComponent {
       dispatch,
       project: { queryParams }
     } = this.props;
-    const { query_pro, query_spot } = this.state;
+    const { query_pro, query_spot, TaskLevelAndInterBatch } = this.state;
     let obj = {};
     if (
       payload.from &&
@@ -283,6 +283,7 @@ export default class siderbar extends PureComponent {
       obj = {
         SkipCount: 0,
         MapNum: query_spot,
+        TaskLevelAndInterBatch,
         from: payload.from
       };
     }
@@ -465,16 +466,24 @@ export default class siderbar extends PureComponent {
   };
 
   interpretList = () => {
-    const { switchInterpret, dispatch } = this.props;
+    const {
+      switchInterpret,
+      dispatch,
+      project: { queryParams }
+    } = this.props;
+    const { key } = this.state;
     dispatch({
       type: "spot/interpretList",
       callback: (success, result) => {
         if (success && result.length) {
           const TaskLevelAndInterBatch = result[0];
-          this.setState({ TaskLevelAndInterBatch });
+          this.setState({ TaskLevelAndInterBatch }, () => {
+            this.querySave({ from: key, queryParams: { ...queryParams } });
+          });
           // emitter.emit("sidebarQuery", {
           //   TaskLevelAndInterBatch
           // });
+
           switchInterpret(TaskLevelAndInterBatch);
         } else {
           switchInterpret(null);
@@ -699,15 +708,23 @@ export default class siderbar extends PureComponent {
     if (k === "project") {
       // 保存筛选数据到props
       this.querySave(obj);
-      this.queryProject({ SkipCount: 0, ProjectName: query_pro });
+      this.queryProject({
+        SkipCount: 0
+        // ProjectName: query_pro
+      });
     } else if (k === "spot") {
       // 保存筛选数据到props
       this.querySave(obj);
-      this.querySpot({ SkipCount: 0, MapNum: query_spot });
+      this.querySpot({
+        SkipCount: 0
+        // MapNum: query_spot
+      });
     } else {
       this.queryPoint({ SkipCount: 0 });
     }
     this.setState({
+      ProjectName: "",
+      MapNum: "",
       showQuery: false,
       showCheck: false,
       ShowArchive: false,
@@ -957,7 +974,7 @@ export default class siderbar extends PureComponent {
       switchInterpret,
       dispatch,
       form: { resetFields },
-      project: { projectList },
+      project: { projectList, queryParams },
       spot: { spotList, interpretList },
       point: { pointList },
       projectSupervise: { projectSuperviseList }
@@ -1389,14 +1406,14 @@ export default class siderbar extends PureComponent {
                   });
                   emitter.emit("showSiderbarDetail", {
                     show: false,
-                    edit: true,
+                    edit: false,
                     from: key,
                     type: "add"
                   });
                 } else {
                   emitter.emit("showSiderbarDetail", {
                     show: key !== "project",
-                    edit: true,
+                    edit: false,
                     from: key,
                     type: "add"
                   });
@@ -1412,7 +1429,12 @@ export default class siderbar extends PureComponent {
               style={{ margin: "0 20px 20px 20px", width: 260 }}
               onChange={TaskLevelAndInterBatch => {
                 switchInterpret(TaskLevelAndInterBatch);
-                this.setState({ TaskLevelAndInterBatch });
+                this.setState({ TaskLevelAndInterBatch }, () => {
+                  this.querySave({
+                    from: key,
+                    queryParams: { ...queryParams }
+                  });
+                });
                 this.querySpot({
                   ...queryInfo,
                   SkipCount: 0,

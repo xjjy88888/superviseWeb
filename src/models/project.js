@@ -46,7 +46,8 @@ export default {
     },
     departSelectList: [],
     projectListAdd: [],
-    queryParams: {}
+    queryParams: {},
+    projectInfoMoreLeftShow:false
   },
 
   subscriptions: {

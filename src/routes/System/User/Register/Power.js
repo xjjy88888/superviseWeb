@@ -245,7 +245,7 @@ class Power extends PureComponent {
         render: (item, record) => (
           <span>
             {getFieldDecorator(record.displayName + "_endTime", {
-              initialValue: record.endTime ? moment(record.endTime) : null
+              initialValue: record.endTime ? moment(record.endTime) : ""
             })(
               <DatePicker
                 onChange={v => {

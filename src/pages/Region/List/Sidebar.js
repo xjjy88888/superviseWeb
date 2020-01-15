@@ -1,8 +1,9 @@
 import React, { PureComponent } from "react";
 import { connect } from "dva";
 import { createForm } from "rc-form";
-import locale from "antd/lib/date-picker/locale/zh_CN";
+import jQuery from "jquery";
 import {
+  Menu,
   Icon,
   Tag,
   Tree,
@@ -10,6 +11,7 @@ import {
   Row,
   Col,
   notification,
+  Popover,
   Input,
   Radio,
   List,
@@ -22,14 +24,18 @@ import {
   Switch,
   DatePicker,
   AutoComplete,
+  Table,
   Collapse,
   Typography,
-  message
+  Tooltip
 } from "antd";
-import Spins from "../../../components/Spins";
-import config from "../../../config";
-import data from "../../../data";
+import locale from "antd/lib/date-picker/locale/zh_CN";
+import "leaflet/dist/leaflet.css";
 import emitter from "../../../utils/event";
+
+import config from "../../../config";
+import { Link } from "dva/router";
+import data from "../../../data";
 import {
   dateFormat,
   dateInitFormat,
@@ -38,9 +44,11 @@ import {
   unique,
   getUrl
 } from "../../../utils/util";
+import Spins from "../../../components/Spins";
 import styles from "./style/sidebar.less";
 
 let self;
+let loading = false;
 const { TreeNode } = Tree;
 const formItemLayout = {
   labelCol: { span: 7 },
@@ -85,13 +93,13 @@ export default class siderbar extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      isProjectSupervise: false,
       hover: false,
       place: "",
-      show: false,
+      show: true,
       showCreateDepart: false,
       value: undefined,
-      isEdit: false,
+      showProjectDetail: false,
+      projectEdit: false,
       showProjectAllInfo: false,
       showCompany: false,
       showProblem: false,
@@ -100,13 +108,17 @@ export default class siderbar extends PureComponent {
       showCheck: false,
       checked: false,
       ParentId: 0,
-      loading: false,
-      isAdd: false,
+      showSpin: true,
+      isProjectUpdate: true,
       queryHighlight: false,
       ShowArchive: false,
       row_pro: 20,
       row_spot: 20,
       row_point: 20,
+      query_pro: "",
+      query_spot: "",
+      query_point: "",
+      key: "project",
       createDepartKey: "",
       sort_by: "",
       sort_key: "",
@@ -115,12 +127,30 @@ export default class siderbar extends PureComponent {
       select: [],
       departList: [],
       problem: { title: "", records: [] },
+      placeholder: "项目名称",
+      sort: [
+        {
+          value: "名称",
+          key: "ProjectBase.Name"
+        },
+        {
+          value: "操作时间",
+          key: "ProjectBase.ModifyTime"
+        },
+        {
+          value: "立项级别",
+          key: "ProjectLevel.Key"
+        }
+      ],
+      listData: [],
       previewVisible: false,
       previewImage: "",
       fileList: [],
       projectFileList: [],
       showPlan: false,
-      clickId: null
+      clickId: null,
+      isProjectSupervise: false,
+      TaskLevelAndInterBatch: null
     };
     this.map = null;
   }
@@ -129,15 +159,41 @@ export default class siderbar extends PureComponent {
     const { link } = this.props;
     link(this);
     self = this;
+
     const urlFrom = getUrl(`from`);
     const urlId = getUrl(`id`);
+    const urlIsProject = getUrl(`isProject`);
     if (urlFrom === `project` && urlId) {
-      console.log("componentDidMount");
-      this.show({ id: urlId, isEdit: false, isProjectSupervise: true });
+      this.setState({ showProjectDetail: true });
+      this.queryProjectById(urlId);
+      this.queryProjectInfo(urlId);
     }
-    this.queryDict();
+    if (urlFrom === `project` && urlIsProject === `true`) {
+      this.setState({ isProjectSupervise: true });
+    }
+
+    this.queryProject({ SkipCount: 0 });
+    this.queryProjectSupervise({ SkipCount: 0 });
+    // this.querySpot({ SkipCount: 0 });
+    // this.queryPoint({ SkipCount: 0 });
     this.queryDistrict();
+    this.queryDict();
     this.queryBasinOrgan();
+    this.interpretList();
+    this.eventEmitter = emitter.addListener("deleteSuccess", () => {
+      const { key, query_pro, query_spot, query_point } = this.state;
+      const v =
+        key === "project"
+          ? query_pro
+          : key === "spot"
+          ? query_spot
+          : query_point;
+      this.setState({
+        showProjectDetail: false
+      });
+      this.search(v);
+      this.interpretList();
+    });
     this.eventEmitter = emitter.addListener("spotRelate", v => {
       const len = v.spotId.length;
       if (v.status === "end" && len !== 0) {
@@ -171,7 +227,8 @@ export default class siderbar extends PureComponent {
     });
     this.eventEmitter = emitter.addListener("projectInfoRefresh", v => {
       if (v.projectId) {
-        this.projectInfo(v.projectId);
+        this.queryProjectById(v.projectId);
+        this.queryProjectInfo(v.projectId);
       }
     });
     this.eventEmitter = emitter.addListener("showCreateDepart", v => {
@@ -181,10 +238,26 @@ export default class siderbar extends PureComponent {
         createDepartKey: v.key
       });
     });
+    this.eventEmitter = emitter.addListener("projectCreateUpdateBack", () => {
+      this.hide();
+      this.setState({
+        showProjectDetail: false
+      });
+    });
     this.eventEmitter = emitter.addListener("siteLocationBack", data => {
       this.props.form.setFieldsValue({
         pointX: data.longitude, //经度
         pointY: data.latitude //维度
+      });
+    });
+    this.eventEmitter = emitter.addListener("showSiderbar", data => {
+      this.setState({
+        show: data.show
+      });
+    });
+    this.eventEmitter = emitter.addListener("hideQuery", data => {
+      this.setState({
+        showQuery: !data.hide
       });
     });
     this.eventEmitter = emitter.addListener("hideProjectDetail", data => {
@@ -202,7 +275,222 @@ export default class siderbar extends PureComponent {
         });
       }
     });
+    // 图表联动
+    this.eventEmitter = emitter.addListener("chartLinkage", data => {
+      if (this.scrollDom) {
+        this.scrollDom.scrollTop = 0;
+      }
+      this.setState({
+        polygon: data.polygon
+      });
+      if (self.state.key === "spot") {
+        this.querySpot({
+          SkipCount: 0,
+          polygon: data.polygon
+        });
+      } else {
+        this.queryProject({
+          SkipCount: 0,
+          polygon: data.polygon
+        });
+      }
+    });
+
+    //search
+    if (this.scrollDom) {
+      this.scrollDom.addEventListener("scroll", () => {
+        this.onScroll(this);
+      });
+    }
+    this.eventEmitter = emitter.addListener("showCheck", data => {
+      this.setState({
+        showCheck: data.show
+      });
+    });
+    this.eventEmitter = emitter.addListener("showProjectSpotInfo", data => {
+      if (data.from === "project") {
+        this.setState({
+          showProjectDetail: data.show, //地图跳转到项目详情
+          projectEdit: data.edit
+        });
+        this.queryProjectById(data.id);
+        this.queryProjectInfo(data.id);
+      } else if (data.from === "spot") {
+      } else {
+      }
+    });
+    const { clientHeight } = this.refDom;
+    this.setState({
+      clientHeight: clientHeight
+    });
+    this.saveCurrentPageInfo("project");
   }
+
+  componentDidUpdate(prevProps) {
+    const {
+      project: { queryParams },
+      commonModel: {
+        siderBarPageInfo: { currentProjectId, currentSpotId }
+      }
+    } = this.props;
+    if (prevProps.project.queryParams !== queryParams) {
+      if (queryParams.from && queryParams.from === "project") {
+        this.queryProject({ ...queryParams });
+      } else if (queryParams.from && queryParams.from === "spot") {
+        this.querySpot({ ...queryParams });
+      }
+    }
+    // console.log(
+    //   "componentDidUpdate",
+    //   prevProps.commonModel.siderBarPageInfo.currentProjectId !==
+    //     currentProjectId,
+    //   prevProps.commonModel.siderBarPageInfo.currentProjectId,
+    //   currentProjectId
+    // );
+    if (
+      prevProps.commonModel.siderBarPageInfo.currentProjectId !==
+        currentProjectId &&
+      currentProjectId !== ""
+      // &&
+      // prevProps.commonModel.siderBarPageInfo.currentProjectId !== ""
+    ) {
+      this.setState({ showProjectDetail: true, clickId: currentProjectId });
+      this.queryProjectById(currentProjectId);
+      this.queryProjectInfo(currentProjectId);
+    } else if (
+      prevProps.commonModel.siderBarPageInfo.currentSpotId !== currentSpotId &&
+      currentSpotId !== ""
+      // &&
+      // prevProps.commonModel.siderBarPageInfo.currentSpotId !== ""
+    ) {
+      emitter.emit("showSiderbarDetail", {
+        show: true,
+        from: "spot",
+        id: currentSpotId,
+        edit: false,
+        fromList: true,
+        type: "edit"
+      });
+      this.setState({ clickId: currentSpotId });
+    }
+  }
+
+  refreshSpotList = () => {
+    this.querySpot({ SkipCount: 0 });
+  };
+
+  // 将筛选内容保存到props中
+  querySave = payload => {
+    const {
+      dispatch,
+      project: { queryParams }
+    } = this.props;
+    const { query_pro, query_spot } = this.state;
+    let obj = {};
+    if (
+      payload.from &&
+      payload.from === "project" &&
+      Object.keys(payload.queryParams).length === 0
+    ) {
+      obj = {
+        SkipCount: 0,
+        ProjectName: query_pro,
+        from: payload.from
+      };
+    } else if (
+      payload.from &&
+      payload.from === "spot" &&
+      Object.keys(payload.queryParams).length === 0
+    ) {
+      obj = {
+        SkipCount: 0,
+        MapNum: query_spot,
+        from: payload.from
+      };
+    }
+
+    dispatch({
+      type: "project/projectSave",
+      payload: {
+        queryParams:
+          Object.keys(obj).length === 0
+            ? {
+                ...queryParams,
+                ...payload.queryParams,
+                from: payload.from
+              }
+            : obj
+      }
+    });
+  };
+
+  queryInfo = data => {
+    console.log("列表筛选完成", data);
+    if (this.scrollDom) {
+      this.scrollDom.scrollTop = 0;
+    }
+    const { query_pro, query_spot, query_point } = this.state;
+
+    emitter.emit("checkResult", {
+      show: false,
+      result: []
+    });
+    let queryHighlight = false;
+    for (let i in data.queryParams) {
+      if (
+        data.queryParams[i] &&
+        (data.queryParams[i].length ||
+          typeof data.queryParams[i] === "number" ||
+          typeof data.queryParams[i] === "boolean")
+      ) {
+        queryHighlight = true;
+      }
+    }
+    this.setState({
+      showCheck: false,
+      sort_by: "",
+      sort_key: "",
+      queryInfo: data.queryParams,
+      ShowArchive: data.ShowArchive,
+      queryHighlight: queryHighlight
+    });
+
+    // 保存筛选数据到props
+    this.querySave(data);
+    if (data.from === "project") {
+      this.setState({
+        row_pro: 20
+      });
+
+      this.queryProject({
+        ...data.queryParams,
+        SkipCount: 0,
+        ProjectName: query_pro
+      });
+    } else if (data.from === "spot") {
+      this.setState({ row_spot: 20 });
+      this.querySpot({
+        ...data.queryParams,
+        SkipCount: 0,
+        MapNum: query_spot
+      });
+    } else {
+      this.setState({ row_point: 20 });
+      this.queryPoint({
+        ...data.queryParams,
+        SkipCount: 0,
+        ProjectName: query_point
+      });
+    }
+  };
+
+  queryProjectInfo = id => {
+    this.querySpotByProjectId(id);
+    this.queryRedLineList(id);
+    this.inspectList(id);
+    this.panoramaList(id);
+    this.videoMonitorList(id);
+  };
 
   componentWillUnmount() {
     const { dispatch } = this.props;
@@ -223,89 +511,84 @@ export default class siderbar extends PureComponent {
     }
   }
 
-  show = v => {
-    console.log("显示项目详情", v);
+  onScroll() {
     const {
-      form: { resetFields }
+      project: { projectList },
+      spot: { spotList },
+      point: { pointList },
+      projectSupervise: { projectSuperviseList }
     } = this.props;
-    resetFields();
-    this.setState({
-      show: true,
-      isAdd: !Boolean(v.id), // 1新建 2查看编辑
-      isEdit: v.isEdit, // 1查看 2编辑
-      isProjectSupervise: v.isProjectSupervise,
-      previewVisible_min_left: false,
-      projectFileList: []
-    });
-    if (v.id) {
-      this.projectInfo(v.id);
+
+    const {
+      row_pro,
+      row_spot,
+      row_point,
+      query_pro,
+      query_spot,
+      query_point,
+      key,
+      Sorting,
+      queryInfo,
+      isProjectSupervise
+    } = this.state;
+
+    const { clientHeight, scrollHeight, scrollTop } = this.scrollDom;
+    const isBottom = clientHeight + parseInt(scrollTop, 0) + 1 >= scrollHeight;
+    if (isBottom) {
+      if (loading) {
+        return;
+      }
+      if (key === "project") {
+        const pl = isProjectSupervise
+          ? projectSuperviseList.items.length
+          : projectList.items.length;
+        const pt = isProjectSupervise
+          ? projectSuperviseList.totalCount
+          : projectList.totalCount;
+        if (pl < pt) {
+          const obj = {
+            ...queryInfo,
+            Count: pt,
+            SkipCount: row_pro,
+            Sorting: Sorting,
+            ProjectName: query_pro
+          };
+          this.queryProject(obj);
+          this.querySave({
+            queryParams: obj,
+            from: "project"
+          });
+          this.setState({ row_pro: row_pro + 20 });
+        }
+      } else if (key === "spot") {
+        if (spotList.items.length < spotList.totalCount) {
+          const obj = {
+            ...queryInfo,
+            Count: spotList.totalCount,
+            SkipCount: row_spot,
+            Sorting: Sorting,
+            MapNum: query_spot
+          };
+          this.querySpot(obj);
+          this.querySave({
+            queryParams: obj,
+            from: "spot"
+          });
+          this.setState({ row_spot: row_spot + 20 });
+        }
+      } else {
+        if (pointList.items.length < pointList.totalCount) {
+          this.queryPoint({
+            ...queryInfo,
+            SkipCount: row_point,
+            Sorting: Sorting,
+            MapNum: query_point
+          });
+          this.setState({ row_point: row_point + 20 });
+        }
+      }
     }
-  };
-
-  hide = () => {
-    const {
-      hideProjectInfoMore,
-      showInspect,
-      showVideoMonitor,
-      hideExamine
-    } = this.props;
-
-    emitter.emit("emptyPoint");
-    emitter.emit("showSiderbarDetail", {
-      show: false
-    });
-    emitter.emit("showQuery", {
-      show: false
-    });
-    emitter.emit("showTool", {
-      show: false,
-      type: "control"
-    });
-    emitter.emit("showChart", {
-      show: false
-    });
-    emitter.emit("checkResult", {
-      show: false,
-      result: []
-    });
-    emitter.emit("showProblemPoint", {
-      show: false
-    });
-    emitter.emit("showMeasurePoint", {
-      show: false
-    });
-    hideProjectInfoMore();
-    showInspect({
-      show: false
-    });
-    showVideoMonitor({
-      show: false
-    });
-    hideExamine();
-  };
-
-  projectInfo = id => {
-    // console.log("projectInfo", id);
-    this.queryProjectById(id);
-    this.spotList(id);
-    this.redLineList(id);
-    this.inspectList(id);
-    this.panoramaList(id);
-    this.videoMonitorList(id);
-  };
-
-  returnList = () => {
-    const { showList } = this.props;
-    this.hide();
-    this.setState({
-      show: false
-    });
-    showList();
-  };
-
-  refreshSpotList = () => {
-    this.querySpot({ SkipCount: 0 });
-  };
+  }
 
   annexUploadBase64 = v => {
     const { dispatch } = this.props;
@@ -359,14 +642,14 @@ export default class siderbar extends PureComponent {
           notification["success"]({
             message: `关联扰动图斑成功`
           });
-          this.spotList(projectId);
+          this.querySpotByProjectId(projectId);
         }
       }
     });
   };
 
-  loading = state => {
-    this.setState({ loading: state });
+  showSpin = state => {
+    this.setState({ showSpin: state });
   };
 
   queryDistrict = () => {
@@ -389,6 +672,25 @@ export default class siderbar extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: "user/queryDict"
+    });
+  };
+
+  interpretList = () => {
+    const { switchInterpret, dispatch } = this.props;
+    dispatch({
+      type: "spot/interpretList",
+      callback: (success, result) => {
+        if (success && result.length) {
+          const TaskLevelAndInterBatch = result[0];
+          this.setState({ TaskLevelAndInterBatch });
+          emitter.emit("sidebarQuery", {
+            TaskLevelAndInterBatch
+          });
+          switchInterpret(TaskLevelAndInterBatch);
+        } else {
+          switchInterpret(null);
+        }
+      }
     });
   };
 
@@ -415,10 +717,119 @@ export default class siderbar extends PureComponent {
     // console.log("dataFormat结束", v);
   };
 
+  queryProject = items => {
+    loading = true;
+    const { polygon, key, showCheck, isProjectSupervise } = this.state;
+    const {
+      dispatch,
+      project: { projectList }
+    } = this.props;
+    items.from && delete items.from;
+    this.dataFormat(items);
+    if (isProjectSupervise) {
+      this.queryProjectSupervise(items);
+    } else {
+      this.showSpin(true);
+      dispatch({
+        type: "project/queryProject",
+        payload: {
+          ...items,
+          polygon: polygon,
+          items: items.SkipCount === 0 ? [] : projectList.items
+        },
+        callback: (success, response) => {
+          loading = false;
+          this.showSpin(false);
+          if (!showCheck && success && key === "project") {
+            emitter.emit("checkResult", {
+              show: false,
+              result: response.items
+            });
+          }
+        }
+      });
+    }
+  };
+
+  queryProjectSupervise = items => {
+    const {
+      queryProjectFilter,
+      dispatch,
+      projectSupervise: { projectSuperviseList }
+    } = this.props;
+    this.showSpin(true);
+    const payload = {
+      ...items,
+      IsExclusive: true,
+      IsShared: true,
+      items: items.SkipCount === 0 ? [] : projectSuperviseList.items
+    };
+    dispatch({
+      type: "projectSupervise/queryProjectSupervise",
+      payload,
+      callback: (success, response) => {
+        this.showSpin(false);
+        queryProjectFilter(payload);
+      }
+    });
+  };
+
+  querySpot = items => {
+    loading = true;
+    const { polygon, key, showCheck, TaskLevelAndInterBatch } = this.state;
+    const {
+      dispatch,
+      spot: { spotList }
+    } = this.props;
+    this.showSpin(true);
+    items.from && delete items.from;
+    this.dataFormat(items);
+    dispatch({
+      type: "spot/querySpot",
+      payload: {
+        TaskLevelAndInterBatch,
+        polygon: polygon,
+        ...items,
+        items: items.SkipCount === 0 ? [] : spotList.items
+      },
+      callback: (success, response) => {
+        loading = false;
+        this.showSpin(false);
+        if (!showCheck && success && key === "spot") {
+          emitter.emit("checkResult", {
+            show: false,
+            result: response.items
+          });
+        }
+      }
+    });
+  };
+
+  queryPoint = items => {
+    loading = true;
+    const {
+      dispatch,
+      point: { pointList }
+    } = this.props;
+    this.showSpin(true);
+    dispatch({
+      type: "point/queryPoint",
+      payload: {
+        ...items,
+        items: items.SkipCount === 0 ? [] : pointList.items
+      },
+      callback: (success, response) => {
+        loading = false;
+        this.showSpin(false);
+      }
+    });
+  };
+
   queryProjectById = id => {
     const { dispatch } = this.props;
     const { departList } = this.state;
-    this.loading(true);
+    this.showSpin(true);
+    this.setState({ isProjectUpdate: false });
     dispatch({
       type: "project/queryProjectById",
       payload: {
@@ -426,7 +837,7 @@ export default class siderbar extends PureComponent {
         refresh: true
       },
       callback: (result, success) => {
-        this.loading(false);
+        this.showSpin(false);
         let arr = [];
         if (result.productDepartment) {
           arr.push(result.productDepartment);
@@ -439,6 +850,8 @@ export default class siderbar extends PureComponent {
         }
 
         this.setState({
+          isProjectUpdate: true,
+          showProjectDetail: success,
           departList: [...departList, ...arr],
           ParentId: result.attachment ? result.attachment.id : 0,
           showPlan: result.isNeedPlan ? true : false
@@ -466,11 +879,11 @@ export default class siderbar extends PureComponent {
     });
   };
 
-  spotList = id => {
+  querySpotByProjectId = id => {
     const { dispatch } = this.props;
-    this.loading(true);
+    this.showSpin(true);
     dispatch({
-      type: "spot/projectInfoSpotList",
+      type: "spot/querySpotByProjectId",
       payload: {
         ProjectId: id,
         MaxResultCount: 1000,
@@ -478,21 +891,21 @@ export default class siderbar extends PureComponent {
         ShowArchive: this.state.isArchivalSpot
       },
       callback: success => {
-        this.loading(false);
+        this.showSpin(false);
       }
     });
   };
 
-  redLineList = id => {
+  queryRedLineList = id => {
     const { dispatch } = this.props;
-    this.loading(true);
+    this.showSpin(true);
     dispatch({
-      type: "redLine/redLineList",
+      type: "redLine/queryRedLineList",
       payload: {
         ProjectId: id
       },
       callback: success => {
-        this.loading(false);
+        this.showSpin(false);
       }
     });
   };
@@ -544,6 +957,154 @@ export default class siderbar extends PureComponent {
       place: val
     });
   };
+  hide = () => {
+    const {
+      showInspect,
+      showVideoMonitor,
+      hideExamine,
+      dispatch,
+      commonModel: { siderBarPageInfo }
+    } = this.props;
+    dispatch({
+      type: "commonModel/save",
+      payload: {
+        siderBarPageInfo: {
+          ...siderBarPageInfo,
+          currentProjectId: "",
+          currentSpotId: ""
+        }
+      }
+    });
+    if (jQuery("#ProjectList").position().left >= 0) {
+      jQuery("#ProjectList").animate({ left: -window.innerWidth });
+    }
+
+    emitter.emit("emptyPoint");
+    emitter.emit("showSiderbarDetail", {
+      show: false
+    });
+    emitter.emit("showQuery", {
+      show: false
+    });
+    emitter.emit("showTool", {
+      show: false,
+      type: "control"
+    });
+    emitter.emit("showChart", {
+      show: false
+    });
+    emitter.emit("checkResult", {
+      show: false,
+      result: []
+    });
+    emitter.emit("showProblemPoint", {
+      show: false
+    });
+    emitter.emit("showMeasurePoint", {
+      show: false
+    });
+    emitter.emit("showProjectDetail", {
+      show: false,
+      edit: false
+    });
+    showInspect({
+      show: false
+    });
+    showVideoMonitor({
+      show: false
+    });
+    hideExamine();
+  };
+  // 保存当前活跃的menu的key等信息
+  saveCurrentPageInfo = key => {
+    const {
+      dispatch,
+      commonModel: { siderBarPageInfo }
+    } = this.props;
+    dispatch({
+      type: "commonModel/save",
+      payload: {
+        siderBarPageInfo: {
+          ...siderBarPageInfo,
+          activeMenu: key
+        }
+      }
+    });
+  };
+  switchMenu = e => {
+    const { query_pro, query_spot } = this.state;
+    this.hide();
+    this.scrollDom.scrollTop = 0;
+    const k = e.key;
+    let obj = { from: k, queryParams: {} };
+
+    this.saveCurrentPageInfo(k);
+    if (k === "project") {
+      // 保存筛选数据到props
+      this.querySave(obj);
+      this.queryProject({ SkipCount: 0, ProjectName: query_pro });
+    } else if (k === "spot") {
+      // 保存筛选数据到props
+      this.querySave(obj);
+      this.querySpot({ SkipCount: 0, MapNum: query_spot });
+    } else {
+      this.queryPoint({ SkipCount: 0 });
+    }
+    this.setState({
+      showQuery: false,
+      showCheck: false,
+      ShowArchive: false,
+      key: k,
+      placeholder:
+        k === "project" ? "项目名称" : k === "spot" ? "图斑编号" : "关联项目",
+      sort:
+        k === "project"
+          ? [
+              {
+                value: "名称",
+                key: "ProjectBase.Name"
+              },
+              {
+                value: "操作时间",
+                key: "ProjectBase.ModifyTime"
+              },
+              {
+                value: "立项级别",
+                key: "ProjectLevel.Key"
+              }
+            ]
+          : k === "spot"
+          ? [
+              {
+                value: "编号",
+                key: "MapNum"
+              },
+              {
+                value: "操作时间",
+                key: "ModifyTime"
+              },
+              {
+                value: "复核状态",
+                key: "IsReview"
+              }
+            ]
+          : [
+              {
+                value: "描述",
+                key: "Description"
+              },
+              {
+                value: "标注时间",
+                key: "CreateTime"
+              },
+              {
+                value: "关联项目",
+                key: "Project.Id"
+              }
+            ]
+    });
+  };
+
   TreeOnSelect = e => {
     if (e.length) {
       const isRoot = isNaN(e[0].slice(0, 1));
@@ -588,6 +1149,7 @@ export default class siderbar extends PureComponent {
     } = this.props;
     const { departSearch } = this.state;
 
+    // const isAdd = key !== "supDepartmentId" && key !== "replyDepartmentId";
     if (departSearch) {
       dispatch({
         type: "user/departVaild",
@@ -601,6 +1163,20 @@ export default class siderbar extends PureComponent {
             });
             setFieldsValue({ [key]: data.id });
           } else {
+            // Modal.confirm({
+            //   title: `查不到该单位，${isAdd ? "是否去新建单位" : "请重新输入"}`,
+            //   content: "",
+            //   onOk() {
+            //     if (isAdd) {
+            //       self.setState({
+            //         showCreateDepart: true,
+            //         createDepartKey: key
+            //       });
+            //     }
+            //     setFieldsValue({ [key]: "" });
+            //   },
+            //   onCancel() {}
+            // });
           }
         }
       });
@@ -644,7 +1220,7 @@ export default class siderbar extends PureComponent {
 
   //删除
   projectDelete = id => {
-    const { dispatch, hideProjectInfoMore } = this.props;
+    const { dispatch } = this.props;
     dispatch({
       type: "project/projectDelete",
       payload: {
@@ -652,10 +1228,14 @@ export default class siderbar extends PureComponent {
       },
       callback: success => {
         if (success) {
+          this.setState({ showProjectDetail: false });
           emitter.emit("deleteSuccess", {
             success: true
           });
-          hideProjectInfoMore();
+          emitter.emit("showProjectDetail", {
+            show: false,
+            edit: false
+          });
         }
       }
     });
@@ -680,6 +1260,64 @@ export default class siderbar extends PureComponent {
     return result;
   };
 
+  //search
+  search = v => {
+    const { key, queryInfo } = this.state;
+    if (this.scrollDom) {
+      this.scrollDom.scrollTop = 0;
+    }
+    emitter.emit("checkResult", {
+      show: false,
+      result: []
+    });
+    this.setState({
+      showCheck: false,
+      sort_by: "",
+      sort_key: ""
+    });
+    emitter.emit("sidebarQuery", {
+      [key === "project" ? `projectName` : `mapNum`]: v
+    });
+    if (key === "project") {
+      this.setState({
+        query_pro: v,
+        row_pro: 20
+      });
+      const obj = {
+        ...queryInfo,
+        SkipCount: 0,
+        ProjectName: v,
+        from: "query"
+      };
+      this.querySave({
+        queryParams: obj,
+        from: "project"
+      });
+      this.queryProject(obj);
+    } else if (key === "spot") {
+      this.setState({ query_spot: v, row_spot: 20 });
+      const obj = {
+        ...queryInfo,
+        SkipCount: 0,
+        MapNum: v,
+        from: "query"
+      };
+      this.querySave({
+        queryParams: obj,
+        from: "spot"
+      });
+      this.querySpot(obj);
+    } else {
+      this.setState({ query_point: v, row_point: 20 });
+      this.queryPoint({
+        ...queryInfo,
+        SkipCount: 0,
+        ProjectName: v,
+        from: "query"
+      });
+    }
+  };
+
   queryDepartList = (v, t) => {
     const { dispatch } = this.props;
     dispatch({
@@ -698,60 +1336,93 @@ export default class siderbar extends PureComponent {
     await showProjectList();
   }
 
+  showProjectDetail = id => {
+    this.setState({
+      showProjectDetail: true,
+      projectEdit: false,
+      isProjectUpdate: true,
+      previewVisible_min_left: false,
+      projectFileList: []
+    });
+    this.queryProjectById(id);
+    this.queryProjectInfo(id);
+  };
+
   render() {
     const {
-      showProjectInfoMore,
-      hideProjectInfoMore,
-      spotRelate,
       showExamine,
+      // showProjectList,
+      switchData,
       mapLocation,
+      switchInterpret,
       showInspect,
       videoMonitorLocation,
       showVideoMonitor,
       dispatch,
-      form: { getFieldDecorator, setFieldsValue, getFieldValue },
+      form: { getFieldDecorator, resetFields, setFieldsValue, getFieldValue },
       district: { districtTree, districtTreeFilter },
       user: { basinOrganList },
-      project: { projectInfo, projectListAdd, departSelectList },
-      spot: { projectInfoSpotList },
+      project: { projectList, projectInfo, projectListAdd, departSelectList },
+      spot: { spotList, projectInfoSpotList, interpretList },
+      point: { pointList },
       redLine: { redLineList },
       inspect: { inspectList },
       panorama: { panoramaList },
+      projectSupervise: { projectSuperviseList },
       videoMonitor: { videoMonitorList }
+      // showProjectTableList
     } = this.props;
 
     const user = JSON.parse(localStorage.getItem("user"));
     const userId = user && user.userId ? user.userId : null;
 
     const {
+      hover,
+      place,
       show,
-      loading,
+      showSpin,
+      queryHighlight,
       previewVisible_min,
       previewVisible_min_left,
+      query_pro,
+      query_spot,
       ParentId,
+      query_point,
       showCompany,
-      isAdd,
+      placeholder,
+      sort,
+      showProjectDetail,
+      isProjectUpdate,
       key,
-      isEdit,
+      projectEdit,
+      clientHeight,
       previewVisible,
       previewImage,
       showCreateDepart,
+      showCheck,
       showProblem,
       createDepartKey,
       showProjectAllInfo,
       fileList,
       problem,
+      queryInfo,
       isArchivalSpot,
+      sort_by,
+      ShowArchive,
+      sort_key,
       projectFileList,
       departList,
       showPlan,
-      isProjectSupervise
+      clickId,
+      isProjectSupervise,
+      TaskLevelAndInterBatch
     } = this.state;
 
     const departSelectListAll = unique(departSelectList.concat(departList));
 
-    const projectItem = isAdd
-      ? {
+    const projectItem = isProjectUpdate
+      ? projectInfo
+      : {
           projectBase: {},
           productDepartment: { name: "", id: "" },
           expand: {
@@ -760,21 +1431,603 @@ export default class siderbar extends PureComponent {
             actStartTime: "",
             actCompTime: ""
           }
-        }
-      : projectInfo;
+        };
+
+    const showPoint = key === "point";
+
+    const tabs = [
+      {
+        title: "项目",
+        key: ["project"]
+      },
+      {
+        title: "图斑",
+        key: ["spot"]
+      },
+      {
+        title: "标注点",
+        key: ["point"]
+      }
+    ];
+
+    const tabsProject = [
+      {
+        title: "项目",
+        key: ["project"]
+      }
+    ];
+
+    // const fun = query_pro
+    // ? {
+    //     value: query_pro,
+    //     onChange: () => {
+    //       this.setState({ query_pro: "" });
+    //     }
+    //   }
+    // :query_spot
+    // ? {
+    //     value: query_spot,
+    //     onChange: () => {
+    //       this.setState({ query_spot: "" });
+    //     }
+    //   }
+    // : {};
+
+    const list = isProjectSupervise
+      ? projectSuperviseList.items
+      : key === "project"
+      ? projectList.items
+      : key === "spot"
+      ? spotList.items
+      : pointList.items;
+
+    const dataSourceTable = list.map((item, index) => {
+      return {
+        ...item,
+        key: index
+      };
+    });
+
+    const columnsTable = [
+      {
+        title: (
+          <span>
+            <span>
+              共有
+              {isProjectSupervise
+                ? projectSuperviseList.items.length
+                : key === "project"
+                ? projectList.items.length
+                : key === "spot"
+                ? spotList.items.length
+                : pointList.items.length}
+              /
+              {isProjectSupervise
+                ? projectSuperviseList.totalCount
+                : key === "project"
+                ? projectList.totalCount
+                : key === "spot"
+                ? spotList.totalCount
+                : pointList.totalCount}
+              条
+            </span>
+            <span
+              style={{
+                display: key !== "point" ? "inherit" : "none"
+              }}
+            >
+              <Button
+                icon={showCheck ? "shopping" : ""}
+                style={{ marginLeft: 20 }}
+                onClick={() => {
+                  emitter.emit("showSiderbarDetail", {
+                    show: false
+                  });
+                  emitter.emit("showTool", {
+                    show: true,
+                    type: "tool",
+                    key: key,
+                    ShowArchive: ShowArchive,
+                    checkResult:
+                      key === "project"
+                        ? projectList.items
+                        : key === "spot"
+                        ? spotList.items
+                        : pointList.items
+                  });
+                  emitter.emit("showQuery", {
+                    show: false
+                  });
+                }}
+              >
+                {showCheck ? "" : "工具箱"}
+              </Button>
+              <Button
+                icon={showCheck ? "dashboard" : ""}
+                // style={{ float: "right" }}
+                onClick={() => {
+                  emitter.emit("showSiderbarDetail", {
+                    show: false
+                  });
+                  emitter.emit("showTool", {
+                    show: true,
+                    type: "control",
+                    key: key
+                  });
+                  emitter.emit("showQuery", {
+                    show: false
+                  });
+                }}
+              >
+                {showCheck ? "" : "仪表盘"}
+              </Button>
+            </span>
+          </span>
+        ),
+        dataIndex: "name",
+        render: (v, item) => (
+          <span>
+            <p>
+              <span
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  const {
+                    commonModel: { siderBarPageInfo },
+                    dispatch
+                  } = this.props;
+                  this.setState({ clickId: item.id });
+                  if (key === "project" || key === "spot") {
+                    dispatch({
+                      type: "commonModel/save",
+                      payload: {
+                        siderBarPageInfo: {
+                          ...siderBarPageInfo,
+                          currentProjectId: key === "project" ? item.id : "",
+                          currentSpotId: key === "spot" ? item.id : ""
+                        }
+                      }
+                    });
+                  }
+
+                  resetFields();
+                  //编辑1
+                  if (key === "project") {
+                    this.showProjectDetail(item.id);
+                  } else {
+                    emitter.emit("showSiderbarDetail", {
+                      show: key !== "project",
+                      from: key,
+                      id: item.id,
+                      edit: false,
+                      fromList: true,
+                      type: "edit"
+                    });
+                  }
+                  emitter.emit("showTool", {
+                    show: false
+                  });
+                  emitter.emit("showQuery", {
+                    show: false
+                  });
+                }}
+              >
+                <b
+                  style={
+                    item.id === clickId
+                      ? {
+                          color: "green"
+                          // fontSize: 20
+                        }
+                      : {}
+                  }
+                >
+                  {key === "project" || isProjectSupervise
+                    ? item.projectName
+                    : key === "spot"
+                    ? item.mapNum
+                    : item.createTime + "  " + item.name}
+                </b>
+              </span>
+              <Icon
+                type="environment"
+                style={{
+                  float: "right",
+                  fontSize: 18,
+                  cursor: "point",
+                  color: "#1890ff"
+                }}
+                onClick={e => {
+                  e.stopPropagation();
+                  if (key === "point") {
+                    dispatch({
+                      type: "point/queryPointById",
+                      payload: { id: item.id },
+                      callback: v => {
+                        mapLocation({
+                          item: v,
+                          key: key
+                        });
+                      }
+                    });
+                  } else {
+                    mapLocation({
+                      item,
+                      key: key
+                    });
+                  }
+                }}
+              />
+            </p>
+            <span>
+              {key === "project"
+                ? `建设单位：${item.productDepartmentName || ""}`
+                : key === "spot"
+                ? `关联项目：${item.projectName || ""}`
+                : `关联项目：${item.projectName || ""}`}
+            </span>
+            <br />
+            <span>
+              {key === "project"
+                ? `批复机构：${item.replyDepartmentName || ""}`
+                : key === "spot"
+                ? `扰动合规性：${item.interferenceCompliance || ""}`
+                : `描述：${item.description || ""}`}
+            </span>
+          </span>
+        )
+      }
+    ];
+
+    const rowSelectionTable = {
+      onChange: (selectedRowKeys, selectedRows) => {
+        console.log(selectedRows);
+        emitter.emit("checkResult", {
+          show: true,
+          result: selectedRows
+        });
+      }
+    };
 
     return (
       <div
-        id="ProjectInfo"
         style={{
-          left: show ? 0 : -350,
-          zIndex: 1002
+          // position: "absolute",
+          left: show ? 0 : "-350px"
+          // top: 0,
+          // zIndex: 1000,
+          // width: 350,
+          // height: "100%",
+          // paddingTop: 46,
+          // backgroundColor: "transparent"
         }}
         className={styles.siderbar}
         ref={e => (this.refDom = e)}
       >
+        <Tooltip title="展开列表">
+          <Icon
+            type="right"
+            className={`${styles["show-project-list"]} ${
+              hover && place === "top" ? styles.spec : null
+            }`}
+            style={{
+              top: hover && place === "top" ? "11%" : "12%"
+            }}
+            onMouseEnter={this.onMouseEnter.bind(this, "top")}
+            onMouseLeave={this.onMouseLeave.bind(this, "top")}
+            onClick={this.onShowProjectList.bind(this)}
+          />
+        </Tooltip>
+        <Tooltip title={`${show ? "收起" : "展开"}侧边栏`}>
+          <Icon
+            type={show ? "left" : "right"}
+            className={`${styles["show-project-list"]} ${
+              hover && place === "footer" ? styles.spec : null
+            }`}
+            style={{
+              top: hover && place === "footer" ? "47.5%" : "48.5%"
+            }}
+            onMouseEnter={this.onMouseEnter.bind(this, "footer")}
+            onMouseLeave={this.onMouseLeave.bind(this, "footer")}
+            onClick={() => {
+              this.setState({
+                show: !show,
+                hover: false
+                //  showProjectDetail: false
+              });
+              emitter.emit("showSiderbar", {
+                show: !show
+              });
+            }}
+          />
+        </Tooltip>
         <div
           style={{
+            display: showProjectDetail ? "none" : "block",
+            height: "100%",
+            overflow: "hidden",
+            backgroundColor: "#fff"
+          }}
+        >
+          <Link to="/project">
+            <Icon
+              type="menu-unfold"
+              style={{
+                display: isProjectSupervise ? "block" : "none",
+                position: "absolute",
+                right: 64,
+                top: 60,
+                fontSize: 20,
+                color: "#1890ff"
+              }}
+            />
+          </Link>
+          <Tag
+            color={isProjectSupervise ? "volcano" : "cyan"}
+            style={{
+              position: "absolute",
+              right: 0,
+              top: 49,
+              userSelect: "none",
+              cursor: "pointer"
+            }}
+            onClick={() => {
+              this.hide();
+              this.scrollDom.scrollTop = 0;
+              this.setState({
+                isProjectSupervise: !isProjectSupervise,
+                key: `project`
+              });
+              switchData({
+                state: isProjectSupervise
+              });
+            }}
+          >
+            {isProjectSupervise ? `区域` : `项目`}
+            <br />
+            监管
+          </Tag>
+          <Menu
+            mode="horizontal"
+            defaultSelectedKeys={["project"]}
+            selectedKeys={[key]}
+          >
+            {(isProjectSupervise ? tabsProject : tabs).map(item => (
+              <Menu.Item key={item.key} onClick={this.switchMenu}>
+                {item.title}
+              </Menu.Item>
+            ))}
+          </Menu>
+          <Input.Search
+            allowClear={true}
+            placeholder={`${placeholder}`}
+            onSearch={v => {
+              this.search(v);
+            }}
+            style={{ padding: 20, width: 300 }}
+            enterButton
+            // {...fun}
+          />
+          {/* 新建 */}
+          <Popover
+            content={
+              key === "project"
+                ? "新建项目"
+                : key === "spot"
+                ? "新建图斑，第一步：绘制图形"
+                : "新建标注点"
+            }
+            title=""
+            trigger="hover"
+          >
+            <Icon
+              type={
+                key === "project"
+                  ? "plus"
+                  : key === "spot"
+                  ? "border-inner"
+                  : "compass"
+              }
+              style={{
+                fontSize: 20,
+                position: "relative",
+                top: 23,
+                cursor: "pointer",
+                color: "#1890ff"
+              }}
+              onClick={() => {
+                
+                if (key === "project") {
+                  this.setState({
+                    showProjectDetail: true,
+                    projectEdit: true,
+                    isProjectUpdate: false,
+                    previewVisible_min_left: false,
+                    projectFileList: [],
+                    ParentId: 0
+                  });
+                  resetFields();
+                  emitter.emit("showProjectDetail", {
+                    show: true,
+                    edit: false,
+                    id: ""
+                  });
+                } else if (key === "spot") {
+                  emitter.emit("drawGraphics", {
+                    draw: true,
+                    state: "add",
+                    type: "spot",
+                    projectId: "",
+                    fromList: true
+                  });
+                  emitter.emit("showSiderbarDetail", {
+                    show: false,
+                    edit: false,
+                    from: key,
+                    type: "add"
+                  });
+                } else {
+                  emitter.emit("showSiderbarDetail", {
+                    show: key !== "project",
+                    edit: false,
+                    from: key,
+                    type: "add"
+                  });
+                }
+              }}
+            />
+          </Popover>
+          {key === `spot` ? (
+            <Select
+              allowClear={true}
+              value={TaskLevelAndInterBatch}
+              placeholder="解译期次"
+              style={{ margin: "0 20px 20px 20px", width: 260 }}
+              onChange={TaskLevelAndInterBatch => {
+                switchInterpret(TaskLevelAndInterBatch);
+                this.setState({ TaskLevelAndInterBatch });
+                this.querySpot({
+                  ...queryInfo,
+                  SkipCount: 0,
+                  MapNum: query_spot,
+                  from: "query",
+                  TaskLevelAndInterBatch
+                });
+                emitter.emit("sidebarQuery", {
+                  TaskLevelAndInterBatch
+                });
+              }}
+            >
+              {interpretList.map(item => (
+                <Select.Option key={item}>{item}</Select.Option>
+              ))}
+            </Select>
+          ) : null}
+          <Button.Group buttonstyle="solid" style={{ padding: "0px 15px" }}>
+            {sort.map((item, index) => (
+              <Button
+                style={{
+                  userSelect: "none",
+                  border: "rgb(217, 217, 217) 1px solid",
+                  color: sort_key === item.key && sort_by ? "#fff" : "#000",
+                  backgroundColor:
+                    sort_key === item.key && sort_by ? "#1890ff" : "#fff"
+                }}
+                key={item.key}
+                value={item.key}
+                onClick={() => {
+                  const by =
+                    item.key === sort_key && sort_by && sort_by === "Desc"
+                      ? "Asc"
+                      : "Desc";
+                  const Sorting_new = `${item.key} ${by}`;
+                  this.setState({
+                    sort_key: item.key,
+                    sort_by: by,
+                    Sorting: Sorting_new
+                  });
+                  this.scrollDom.scrollTop = 0;
+                  if (key === "project" || key === "spot") {
+                  }
+                  if (key === "project") {
+                    this.setState({
+                      row_pro: 20
+                    });
+                    const obj = {
+                      ...queryInfo,
+                      Sorting: Sorting_new,
+                      SkipCount: 0,
+                      ProjectName: query_pro
+                    };
+                    this.querySave({
+                      queryParams: obj,
+                      from: "project"
+                    });
+                    this.queryProject(obj);
+                  } else if (key === "spot") {
+                    this.setState({
+                      row_spot: 20
+                    });
+                    const obj = {
+                      ...queryInfo,
+                      Sorting: Sorting_new,
+                      SkipCount: 0,
+                      ProjectName: query_spot
+                    };
+                    this.querySave({
+                      queryParams: obj,
+                      from: "spot"
+                    });
+                    this.querySpot(obj);
+                  } else {
+                    this.setState({
+                      row_point: 20
+                    });
+                    this.queryPoint({
+                      ...queryInfo,
+                      Sorting: Sorting_new,
+                      SkipCount: 0,
+                      ProjectName: query_point
+                    });
+                  }
+                }}
+              >
+                {item.value}
+                <Icon
+                  type={sort_by === "Desc" ? "caret-down" : "caret-up"}
+                  style={{
+                    display:
+                      sort_key === item.key && sort_by ? "inherit  " : "none",
+                    fontSize: 12
+                  }}
+                />
+              </Button>
+            ))}
+          </Button.Group>
+          <Button
+            type={queryHighlight ? "primary" : ""}
+            style={{
+              display: showPoint ? "none" : "inline"
+            }}
+            onClick={() => {
+              this.hide();
+              const { key, showQuery } = this.state;
+              this.setState({ showQuery: !showQuery });
+              emitter.emit("showSiderbarDetail", {
+                show: false
+              });
+              emitter.emit("showTool", {
+                show: false,
+                type: "tool"
+              });
+              emitter.emit("showQuery", {
+                show: !showQuery,
+                type: key,
+                isProjectSupervise
+              });
+            }}
+          >
+            筛选
+          </Button>
+          <Spins show={showSpin} />
+          <div
+            ref={e => (this.scrollDom = e)}
+            style={{
+              overflow: "auto",
+              height: clientHeight ? clientHeight - 202 : 500,
+              width: 350
+            }}
+          >
+            <Table
+              rowSelection={showCheck ? rowSelectionTable : null}
+              columns={columnsTable}
+              dataSource={dataSourceTable}
+              pagination={false}
+            />
+          </div>
+        </div>
+        <div
+          style={{
+            display: showProjectDetail ? "block" : "none",
             overflow: "auto",
             padding: 20,
             height: "100%",
@@ -1022,7 +2275,7 @@ export default class siderbar extends PureComponent {
               display: showCompany ? "none" : "block"
             }}
           >
-            <Spins show={loading} />
+            <Spins show={showSpin} />
             <p
               style={{
                 width: 150,
@@ -1044,31 +2297,36 @@ export default class siderbar extends PureComponent {
                 }}
                 onClick={() => {
                   emitter.emit("deleteDraw");
-                  const { isEdit } = this.state;
-                  if (isEdit) {
+                  const { projectEdit } = this.state;
+                  if (projectEdit) {
                     Modal.confirm({
                       title: `确定放弃填写的内容？`,
                       content: "",
                       onOk() {
-                        self.returnList();
+                        self.setState({ showProjectDetail: false });
+                        self.hide();
                       },
                       onCancel() {}
                     });
                   } else {
                     this.setState({
-                      isEdit: false
+                      showProjectDetail: false,
+                      projectEdit: false
                     });
                     emitter.emit("showSiderbarDetail", {
                       show: false,
                       from: "spot"
                     });
-                    hideProjectInfoMore();
-                    self.returnList();
+                    emitter.emit("showProjectDetail", {
+                      show: false,
+                      edit: false
+                    });
+                    self.hide();
                   }
                 }}
               />
               <Button
-                icon={isEdit ? "check" : "edit"}
+                icon={projectEdit ? "check" : "edit"}
                 shape="circle"
                 style={{
                   float: "right",
@@ -1077,7 +2335,7 @@ export default class siderbar extends PureComponent {
                   zIndex: 1
                 }}
                 onClick={() => {
-                  if (isEdit) {
+                  if (projectEdit) {
                     // submit
                     this.props.form.validateFields((err, v) => {
                       if (!err) {
@@ -1096,7 +2354,7 @@ export default class siderbar extends PureComponent {
                             v.districtCodeId && v.districtCodeId.length
                               ? v.districtCodeId.pop()
                               : "",
-                          id: isAdd ? "" : projectItem.id,
+                          id: isProjectUpdate ? projectItem.id : "",
                           isNeedPlan: v.isNeedPlan ? true : false,
                           isReply: v.isReply ? true : false,
                           isProjectSupervise
@@ -1110,17 +2368,12 @@ export default class siderbar extends PureComponent {
                     });
                   } else {
                     this.setState({
-                      isEdit: !isEdit
+                      projectEdit: !projectEdit
                     });
-                    showProjectInfoMore({
-                      id: projectItem.id,
-                      isEdit: true
-                    });
-                    this.props.dispatch({
-                      type: "project/save",
-                      payload: {
-                        projectInfoMoreLeftShow: true
-                      }
+                    emitter.emit("showProjectDetail", {
+                      show: true,
+                      edit: true,
+                      id: projectItem.id
                     });
                   }
                 }}
@@ -1166,7 +2419,7 @@ export default class siderbar extends PureComponent {
             </div>
             <div
               style={{
-                display: isEdit ? "none" : "block"
+                display: projectEdit ? "none" : "block"
               }}
             >
               <p>
@@ -1352,21 +2605,18 @@ export default class siderbar extends PureComponent {
                           this.setState({
                             showProjectAllInfo: !showProjectAllInfo
                           });
-                          if (showProjectAllInfo) {
-                            hideProjectInfoMore();
-                          } else {
-                            showProjectInfoMore({
-                              id: projectItem.id,
-                              isEdit: false
-                            });
-                          }
+                          emitter.emit("showProjectDetail", {
+                            show: !showProjectAllInfo,
+                            edit: false,
+                            id: projectItem.id
+                          });
                         }}
                       >
                         详情
                       </a>
                       <a
                         style={{
-                          display: isAdd ? "none" : "inherit",
+                          display: isProjectUpdate ? "inherit" : "none",
                           position: "absolute",
                           right: 0,
                           bottom: 0,
@@ -1398,13 +2648,11 @@ export default class siderbar extends PureComponent {
                           showExamine(projectItem);
                         }}
                       >
-                        项目查处：
-                        {projectItem.expand.investigationResultId ? 1 : 0}
+                        项目查处
                       </b>
                     }
-                    key="2"
-                  >
-                  </Collapse.Panel>
+                    key="9"
+                  ></Collapse.Panel>
                   <Collapse.Panel
                     header={
                       <b>
@@ -1429,7 +2677,7 @@ export default class siderbar extends PureComponent {
                         />
                       </b>
                     }
-                    key="3"
+                    key="2"
                   >
                     {/* 检查表 */}
                     {inspectList.map((item, index) => (
@@ -1488,14 +2736,14 @@ export default class siderbar extends PureComponent {
                                   okType: "danger",
                                   cancelText: "取消",
                                   onOk() {
-                                    self.loading(true);
+                                    self.showSpin(true);
                                     dispatch({
                                       type: "inspect/inspectDelete",
                                       payload: {
                                         id: item.id
                                       },
                                       callback: success => {
-                                        self.loading(false);
+                                        self.showSpin(false);
                                         if (success) {
                                           self.hide();
                                           emitter.emit("projectInfoRefresh", {
@@ -1670,14 +2918,14 @@ export default class siderbar extends PureComponent {
                                     okType: "danger",
                                     cancelText: "取消",
                                     onOk() {
-                                      self.loading(true);
+                                      self.showSpin(true);
                                       dispatch({
                                         type: "problemPoint/problemPointDelete",
                                         payload: {
                                           id: ite.id
                                         },
                                         callback: success => {
-                                          self.loading(false);
+                                          self.showSpin(false);
                                           if (success) {
                                             self.hide();
                                             emitter.emit("projectInfoRefresh", {
@@ -1781,14 +3029,14 @@ export default class siderbar extends PureComponent {
                                   okType: "danger",
                                   cancelText: "取消",
                                   onOk() {
-                                    self.loading(true);
+                                    self.showSpin(true);
                                     dispatch({
                                       type: "measurePoint/measurePointDelete",
                                       payload: {
                                         id: ite.id
                                       },
                                       callback: success => {
-                                        self.loading(false);
+                                        self.showSpin(false);
                                         if (success) {
                                           self.hide();
                                           emitter.emit("projectInfoRefresh", {
@@ -1810,6 +3058,109 @@ export default class siderbar extends PureComponent {
                         ))}
                       </p>
                     ))}
+                  </Collapse.Panel>
+                  <Collapse.Panel
+                    header={
+                      <b>
+                        监督执法记录：2
+                        <Icon
+                          type="plus"
+                          style={{
+                            marginLeft: 10,
+                            fontSize: 16,
+                            color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            notification["info"]({
+                              message: "新建监督执法记录"
+                            });
+                          }}
+                        />
+                      </b>
+                    }
+                    key="3"
+                  >
+                    <p
+                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        this.setState({ showCompany: true });
+                        this.hide();
+                      }}
+                    >
+                      2019/3/22 监督执法记录
+                      <Icon
+                        type="delete"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          notification["info"]({
+                            message: "删除监督执法记录"
+                          });
+                        }}
+                      />
+                      <Icon
+                        type="file-text"
+                        style={{
+                          float: "right",
+                          fontSize: 16,
+                          cursor: "point",
+                          color: "#1890ff",
+                          marginRight: 10
+                        }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          notification["info"]({
+                            message: "查看监督执法记录报告"
+                          });
+                        }}
+                      />
+                    </p>
+                    <p
+                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        this.setState({ showCompany: true });
+                        this.hide();
+                      }}
+                    >
+                      2019/3/22 监督执法记录
+                      <Icon
+                        type="delete"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          notification["info"]({
+                            message: "删除监督执法记录"
+                          });
+                        }}
+                      />
+                      <Icon
+                        type="file-text"
+                        style={{
+                          float: "right",
+                          fontSize: 16,
+                          cursor: "point",
+                          color: "#1890ff",
+                          marginRight: 10
+                        }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          notification["info"]({
+                            message: "查看监督执法记录报告"
+                          });
+                        }}
+                      />
+                    </p>
                   </Collapse.Panel>
                   <Collapse.Panel
                     header={
@@ -1849,9 +3200,8 @@ export default class siderbar extends PureComponent {
                           }}
                           onClick={e => {
                             e.stopPropagation();
-                            message.info("请在地图点选图斑进行关联");
                             //图斑关联
-                            spotRelate({
+                            emitter.emit("spotRelate", {
                               status: "start", //start：开始，end：结束
                               spotId: "",
                               projectId: projectItem.id
@@ -1866,7 +3216,7 @@ export default class siderbar extends PureComponent {
                             e.stopPropagation();
                             this.setState({ isArchivalSpot: v });
                             setTimeout(() => {
-                              this.spotList(projectItem.id);
+                              this.querySpotByProjectId(projectItem.id);
                             }, 100);
                           }}
                         />
@@ -1916,7 +3266,7 @@ export default class siderbar extends PureComponent {
                                   }${success ? "" : `：${error.message}`}`
                                 });
                                 if (success) {
-                                  this.spotList(projectItem.id);
+                                  this.querySpotByProjectId(projectItem.id);
                                 }
                               }
                             });
@@ -1965,7 +3315,7 @@ export default class siderbar extends PureComponent {
                             });
                             emitter.emit("showSiderbarDetail", {
                               show: false,
-                              edit: false,
+                              edit: true,
                               from: key,
                               type: "add"
                             });
@@ -2050,6 +3400,89 @@ export default class siderbar extends PureComponent {
                   <Collapse.Panel
                     header={
                       <b>
+                        责任点：5
+                        <Icon
+                          type="plus"
+                          style={{
+                            marginLeft: 10,
+                            fontSize: 16,
+                            color: "#1890ff"
+                          }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            notification["info"]({
+                              message: "新建责任点"
+                            });
+                          }}
+                        />
+                      </b>
+                    }
+                    key="6"
+                  >
+                    <p>
+                      某渣场坡面
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      某大型坡面
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      施工区东北侧
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      临时道路
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                    <p>
+                      隧道出口
+                      <Icon
+                        type="environment"
+                        style={{
+                          float: "right",
+                          fontSize: 18,
+                          cursor: "point",
+                          color: "#1890ff"
+                        }}
+                      />
+                    </p>
+                  </Collapse.Panel>
+                  <Collapse.Panel
+                    header={
+                      <b>
                         全景图：{panoramaList.totalCount}
                         <Icon
                           type="plus"
@@ -2064,7 +3497,7 @@ export default class siderbar extends PureComponent {
                             emitter.emit("showSiderbarDetail", {
                               from: "panorama",
                               show: true,
-                              edit: true,
+                              edit: false,
                               type: "add",
                               id: null,
                               projectId: projectItem.id,
@@ -2074,7 +3507,7 @@ export default class siderbar extends PureComponent {
                         />
                       </b>
                     }
-                    key="6"
+                    key="7"
                   >
                     {panoramaList.items.map((item, index) => (
                       <p
@@ -2172,7 +3605,7 @@ export default class siderbar extends PureComponent {
                         />
                       </b>
                     }
-                    key="7"
+                    key="8"
                   >
                     {videoMonitorList.items.map((item, index) => (
                       <p
@@ -2246,7 +3679,7 @@ export default class siderbar extends PureComponent {
             </div>
             <div
               style={{
-                display: isEdit ? "block" : "none",
+                display: projectEdit ? "block" : "none",
                 paddingTop: 30
               }}
             >
@@ -2357,15 +3790,6 @@ export default class siderbar extends PureComponent {
                           onClick={() => {
                             const x = getFieldValue("pointX");
                             const y = getFieldValue("pointY");
-                            emitter.emit("hideProjectDetail", {
-                              hide: true
-                            });
-                            this.props.dispatch({
-                              type: "project/save",
-                              payload: {
-                                projectInfoMoreLeftShow: false
-                              }
-                            });
                             emitter.emit("siteLocation", {
                               state: "position",
                               Longitude: x,
@@ -2580,6 +4004,12 @@ export default class siderbar extends PureComponent {
                       showSearch
                       allowClear={true}
                       optionFilterProp="children"
+                      disabled={
+                        projectInfoSpotList.items.length !== 0 &&
+                        isProjectUpdate
+                          ? true
+                          : false
+                      }
                     >
                       {this.dictList("扰动合规性").map(item => (
                         <Select.Option value={item.id} key={item.id}>
@@ -2747,21 +4177,18 @@ export default class siderbar extends PureComponent {
                     this.setState({
                       showProjectAllInfo: !showProjectAllInfo
                     });
-                    if (showProjectAllInfo) {
-                      hideProjectInfoMore();
-                    } else {
-                      showProjectInfoMore({
-                        id: projectItem.id,
-                        isEdit: true
-                      });
-                    }
+                    emitter.emit("showProjectDetail", {
+                      show: !showProjectAllInfo,
+                      edit: true,
+                      id: projectItem.id
+                    });
                   }}
                 >
                   详情
                 </a>
                 <a
                   style={{
-                    display: isAdd ? "none" : "inherit",
+                    display: isProjectUpdate ? "inherit" : "none",
                     position: "absolute",
                     right: 0,
                     bottom: 0,
@@ -2871,7 +4298,7 @@ export default class siderbar extends PureComponent {
                 onRemove={file => {
                   console.log("onRemove", file);
                   return new Promise((resolve, reject) => {
-                    if (isEdit) {
+                    if (projectEdit) {
                       dispatch({
                         type: "annex/annexDelete",
                         payload: {
@@ -2897,7 +4324,7 @@ export default class siderbar extends PureComponent {
                   });
                 }}
               >
-                {isEdit ? (
+                {projectEdit ? (
                   <div>
                     <div className="ant-upload-text">
                       <Button type="div" icon="plus">
@@ -2933,7 +4360,8 @@ export default class siderbar extends PureComponent {
               <Button
                 icon="cloud-download"
                 style={{
-                  display: projectItem.isArchive || isEdit ? "none" : "block",
+                  display:
+                    projectItem.isArchive || projectEdit ? "none" : "block",
                   marginTop: 20
                 }}
                 onClick={() => {
@@ -2970,6 +4398,7 @@ export default class siderbar extends PureComponent {
                             },
                             callback: success => {
                               if (success) {
+                                self.setState({ showProjectDetail: false });
                                 emitter.emit("deleteSuccess");
                               }
                             }
@@ -2991,7 +4420,8 @@ export default class siderbar extends PureComponent {
               <Button
                 icon="rollback"
                 style={{
-                  display: projectItem.isArchive || isEdit ? "block" : "none",
+                  display:
+                    projectItem.isArchive || projectEdit ? "block" : "none",
                   marginLeft: 20
                 }}
                 onClick={() => {
@@ -3002,6 +4432,7 @@ export default class siderbar extends PureComponent {
                     },
                     callback: success => {
                       if (success) {
+                        self.setState({ showProjectDetail: false });
                         emitter.emit("deleteSuccess");
                       }
                     }

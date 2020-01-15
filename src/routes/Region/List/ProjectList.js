@@ -41,7 +41,6 @@ export default class ProjectListTable extends PureComponent {
   }
   onWindowResize = () => {
     this.setState({
-      // tableWidth: document.body.scrollWidth,
       tableHeight: document.body.scrollHeight
     });
   };

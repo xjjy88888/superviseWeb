@@ -94,7 +94,9 @@ export default class Tool extends PureComponent {
       // }
     }
   }
-
+  componentWillUnmount() {
+    // this.eventEmitter && emitter.removeListener(this.eventEmitter);
+  }
   queryInfo = v => {
     console.log("图表筛选完成", v);
     this.dataFormat(v.queryParams);

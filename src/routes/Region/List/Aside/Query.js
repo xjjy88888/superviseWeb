@@ -67,7 +67,9 @@ export default class Query extends PureComponent {
       }
     });
   }
-
+  componentWillUnmount() {
+    // this.eventEmitter && emitter.removeListener(this.eventEmitter);
+  }
   getRandomInt = (max, min = 0) => {
     return Math.floor(Math.random() * (max - min + 1)) + min; // eslint-disable-line no-mixed-operators
   };
@@ -320,7 +322,7 @@ export default class Query extends PureComponent {
               )}
             </Form.Item>
             <Form.Item label="批复时间" {...formItemLayout}>
-              {getFieldDecorator("ReplyTime", { initialValue: [] })(
+              {getFieldDecorator("ReplyTime", { initialValue: "" })(
                 <RangePicker style={{ width: "100%" }} />
               )}
             </Form.Item>

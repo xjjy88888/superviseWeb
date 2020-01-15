@@ -89,7 +89,7 @@ const formItemLayout = {
   })
 )
 @createForm()
-export default class siderbar extends PureComponent {
+export default class SiderBar extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -153,6 +153,7 @@ export default class siderbar extends PureComponent {
       TaskLevelAndInterBatch: null
     };
     this.map = null;
+    this.onScroll = this.onScroll.bind(this);
   }
 
   componentDidMount() {
@@ -325,6 +326,10 @@ export default class siderbar extends PureComponent {
     });
     this.saveCurrentPageInfo("project");
   }
+  componentWillUnmount() {
+    // this.eventEmitter && emitter.removeListener(this.eventEmitter);
+    this.onScroll && window.removeEventListener(this.onScroll);
+  }
 
   componentDidUpdate(prevProps) {
     const {
@@ -340,19 +345,11 @@ export default class siderbar extends PureComponent {
         this.querySpot({ ...queryParams });
       }
     }
-    // console.log(
-    //   "componentDidUpdate",
-    //   prevProps.commonModel.siderBarPageInfo.currentProjectId !==
-    //     currentProjectId,
-    //   prevProps.commonModel.siderBarPageInfo.currentProjectId,
-    //   currentProjectId
-    // );
+
     if (
       prevProps.commonModel.siderBarPageInfo.currentProjectId !==
         currentProjectId &&
       currentProjectId !== ""
-      // &&
-      // prevProps.commonModel.siderBarPageInfo.currentProjectId !== ""
     ) {
       this.setState({ showProjectDetail: true, clickId: currentProjectId });
       this.queryProjectById(currentProjectId);
@@ -360,8 +357,6 @@ export default class siderbar extends PureComponent {
     } else if (
       prevProps.commonModel.siderBarPageInfo.currentSpotId !== currentSpotId &&
       currentSpotId !== ""
-      // &&
-      // prevProps.commonModel.siderBarPageInfo.currentSpotId !== ""
     ) {
       emitter.emit("showSiderbarDetail", {
         show: true,
@@ -943,7 +938,6 @@ export default class siderbar extends PureComponent {
   };
   // 鼠标进入事件
   onMouseEnter = (val, e) => {
-    // console.log("e==============", e);
     this.setState({
       hover: true,
       place: val
@@ -951,7 +945,6 @@ export default class siderbar extends PureComponent {
   };
   // 鼠标离开事件
   onMouseLeave = (val, e) => {
-    // console.log("e==============", e);
     this.setState({
       hover: false,
       place: val
@@ -1351,7 +1344,6 @@ export default class siderbar extends PureComponent {
   render() {
     const {
       showExamine,
-      // showProjectList,
       switchData,
       mapLocation,
       switchInterpret,
@@ -1370,7 +1362,6 @@ export default class siderbar extends PureComponent {
       panorama: { panoramaList },
       projectSupervise: { projectSuperviseList },
       videoMonitor: { videoMonitorList }
-      // showProjectTableList
     } = this.props;
 
     const user = JSON.parse(localStorage.getItem("user"));
@@ -1456,22 +1447,6 @@ export default class siderbar extends PureComponent {
         key: ["project"]
       }
     ];
-
-    // const fun = query_pro
-    // ? {
-    //     value: query_pro,
-    //     onChange: () => {
-    //       this.setState({ query_pro: "" });
-    //     }
-    //   }
-    // :query_spot
-    // ? {
-    //     value: query_spot,
-    //     onChange: () => {
-    //       this.setState({ query_spot: "" });
-    //     }
-    //   }
-    // : {};
 
     const list = isProjectSupervise
       ? projectSuperviseList.items
@@ -1616,7 +1591,6 @@ export default class siderbar extends PureComponent {
                     item.id === clickId
                       ? {
                           color: "green"
-                          // fontSize: 20
                         }
                       : {}
                   }
@@ -1691,14 +1665,7 @@ export default class siderbar extends PureComponent {
     return (
       <div
         style={{
-          // position: "absolute",
           left: show ? 0 : "-350px"
-          // top: 0,
-          // zIndex: 1000,
-          // width: 350,
-          // height: "100%",
-          // paddingTop: 46,
-          // backgroundColor: "transparent"
         }}
         className={styles.siderbar}
         ref={e => (this.refDom = e)}
@@ -1732,7 +1699,6 @@ export default class siderbar extends PureComponent {
               this.setState({
                 show: !show,
                 hover: false
-                //  showProjectDetail: false
               });
               emitter.emit("showSiderbar", {
                 show: !show
@@ -1805,7 +1771,6 @@ export default class siderbar extends PureComponent {
             }}
             style={{ padding: 20, width: 300 }}
             enterButton
-            // {...fun}
           />
           {/* 新建 */}
           <Popover
@@ -1835,6 +1800,7 @@ export default class siderbar extends PureComponent {
                 color: "#1890ff"
               }}
               onClick={() => {
+                console.log("key=============", key);
                 if (key === "project") {
                   this.setState({
                     showProjectDetail: true,
@@ -1858,6 +1824,7 @@ export default class siderbar extends PureComponent {
                     projectId: "",
                     fromList: true
                   });
+
                   emitter.emit("showSiderbarDetail", {
                     show: false,
                     edit: true,
@@ -2429,8 +2396,6 @@ export default class siderbar extends PureComponent {
                   position: "relative",
                   left: 10,
                   marginTop: 10
-                  // borderBottom: "solid 1px #dedede",
-                  // paddingBottom: 10
                 }}
               >
                 <span>位置：</span>
@@ -2470,8 +2435,6 @@ export default class siderbar extends PureComponent {
                   <Collapse.Panel header={<b>基本信息</b>} key="1">
                     <div
                       style={{
-                        // borderBottom: "solid 1px #dedede",
-                        // paddingBottom: 10,
                         position: "relative"
                       }}
                     >
@@ -3834,11 +3797,6 @@ export default class siderbar extends PureComponent {
                       optionFilterProp="children"
                       addonBefore="Http://"
                       addonAfter={<Icon type="setting" />}
-                      // filterOption={(input, option) =>
-                      //   option.props.children
-                      //     .toLowerCase()
-                      //     .indexOf(input.toLowerCase()) >= 0
-                      // }
                       onSearch={v => {
                         this.setState({ departSearch: v, isSelect: false });
                         this.queryDepartList(v, 2);
@@ -3869,11 +3827,6 @@ export default class siderbar extends PureComponent {
                       showSearch
                       allowClear={true}
                       optionFilterProp="children"
-                      // filterOption={(input, option) =>
-                      //   option.props.children
-                      //     .toLowerCase()
-                      //     .indexOf(input.toLowerCase()) >= 0
-                      // }
                       onSearch={v => {
                         this.setState({ departSearch: v, isSelect: false });
                         this.queryDepartList(v, 1);
@@ -3938,11 +3891,6 @@ export default class siderbar extends PureComponent {
                         allowClear={true}
                         showSearch
                         optionFilterProp="children"
-                        // filterOption={(input, option) =>
-                        //   option.props.children
-                        //     .toLowerCase()
-                        //     .indexOf(input.toLowerCase()) >= 0
-                        // }
                         onSearch={v => {
                           this.setState({ departSearch: v, isSelect: false });
                           this.queryDepartList(v, 1);
@@ -3969,7 +3917,9 @@ export default class siderbar extends PureComponent {
                   </Form.Item>
                   <Form.Item label="批复时间" {...formItemLayout}>
                     {getFieldDecorator("replyTime", {
-                      initialValue: dateInitFormat(projectItem.replyTime)
+                      initialValue: projectItem.replyTime
+                        ? dateInitFormat(projectItem.replyTime)
+                        : ""
                     })(<DatePicker />)}
                   </Form.Item>
                   <Form.Item label="责任面积" {...formItemLayout}>
@@ -4103,15 +4053,6 @@ export default class siderbar extends PureComponent {
                         )
                       : [districtTree[0].value]
                   })(
-                    // <TreeSelect
-                    //   treeData={districtTree}
-                    //   multiple
-                    //   filterTreeNode={(a, b) => {
-                    //     if (b.props.label.indexOf(a) > -1) {
-                    //       return true;
-                    //     }
-                    //   }}
-                    // />
                     <TreeSelect
                       showSearch
                       allowClear={true}

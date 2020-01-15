@@ -611,6 +611,7 @@ export default class RegionMap extends PureComponent {
     });
     //绘制图形-新建
     this.eventEmitter = emitter.addListener("drawGraphics", data => {
+      console.log("drawGraphics-data==============", data);
       if (data.draw) {
         me.setState({
           drawState: data.state,
@@ -3367,7 +3368,7 @@ export default class RegionMap extends PureComponent {
         show: true,
         type: drawState,
         from: drawType,
-        edit: true,
+        edit: false,
         projectId: projectId,
         projectName: projectName,
         fromList: fromList,

@@ -2115,9 +2115,7 @@ export default class siderbarDetail extends PureComponent {
               </Form.Item>
               <Form.Item label="拍摄日期" {...formItemLayout}>
                 {getFieldDecorator("filmingTime", {
-                  initialValue: item.filmingTime
-                    ? moment(item.filmingTime)
-                    : null
+                  initialValue: item.filmingTime ? moment(item.filmingTime) : ""
                 })(<DatePicker disabled={!edit} />)}
               </Form.Item>
               <Form.Item label="描述" {...formItemLayout}>
