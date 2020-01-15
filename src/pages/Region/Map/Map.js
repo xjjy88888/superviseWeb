@@ -4170,7 +4170,7 @@ export default class RegionMap extends PureComponent {
       callback: success => {
         this.setState({ loading: false });
         if (success) {
-          this.Sidebar.refreshSpotList();
+          this.List.refreshSpotList();
           this.setState({ showClipSpot: false });
           if (clipResultLayer) clipResultLayer.clearLayers();
           this.clearGeojsonLayer();
@@ -4229,7 +4229,7 @@ export default class RegionMap extends PureComponent {
     return (
       <Layouts>
         <List
-          link={t => (this.Sidebar = t)}
+          link={t => (this.List = t)}
           queryProjectFilter={this.queryProjectFilter}
           switchData={this.switchData}
           mapLocation={this.mapLocation}
@@ -4243,7 +4243,7 @@ export default class RegionMap extends PureComponent {
         />
         <ProjectInfo
           link={t => (this.ProjectInfo = t)}
-          showList={v => this.Sidebar.show(v)}
+          showList={v => this.List.show(v)}
           showInspect={v => this.Inspect.show(v)}
           showVideoMonitor={v => this.VideoMonitor.show(v)}
           hideExamine={() => this.Examine.hide()}
@@ -4261,7 +4261,7 @@ export default class RegionMap extends PureComponent {
         {showProjectBigTable ? (
           <ProjectList
             link={t => (this.ProjectList = t)}
-            showProjectInfo={v => this.Sidebar.showProjectInfo(v)}
+            showProjectInfo={v => this.List.showProjectInfo(v)}
           />
         ) : null}
         <SidebarDetail mapLocation={this.mapLocation} />
@@ -4269,7 +4269,7 @@ export default class RegionMap extends PureComponent {
         <Chart link={t => (this.Chart = t)} />
         <Query
           queryInfo={v => {
-            this.Sidebar.queryInfo(v);
+            this.List.queryInfo(v);
             this.Tool.queryInfo(v);
             this.Chart.queryInfo(v);
           }}

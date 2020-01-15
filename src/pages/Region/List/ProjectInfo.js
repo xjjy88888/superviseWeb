@@ -665,7 +665,9 @@ export default class siderbar extends PureComponent {
           emitter.emit("deleteSuccess", {
             success: true
           });
+          this.setState({ show: false });
           hideProjectInfoMore();
+          this.returnList();
         }
       }
     });
