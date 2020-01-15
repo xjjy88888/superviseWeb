@@ -73,14 +73,20 @@ export default class Spot extends PureComponent {
   }
   componentDidMount() {
     self = this;
-    console.log(this.props);
-    const { type, currentFromId } = this.props;
+    const {
+      type,
+      currentFromId,
+      projectId,
+      form: { setFieldsValue, resetFields }
+    } = this.props;
     const year = new Date().getFullYear();
-
+    if (projectId) {
+      setFieldsValue({ projectIdSpot: projectId });
+    }
     for (let i = 2015; i <= year; i++) {
       yearList.push(i);
     }
-    if (type === "edit") {
+    if (type !== "add" && currentFromId) {
       this.querySpotById(currentFromId);
     }
 
@@ -104,6 +110,7 @@ export default class Spot extends PureComponent {
   componentWillUnmount() {
     // this.eventEmitter && emitter.removeAllListeners();
   }
+
   annexUploadBase64 = v => {
     const { dispatch } = this.props;
     const { ParentId, fileList } = this.state;
@@ -253,7 +260,6 @@ export default class Spot extends PureComponent {
         refresh: true
       },
       callback: v => {
-        console.log("6666666666666666666666666====", v);
         this.setState({
           loading: false,
           ParentId: v.attachment ? v.attachment.id : 0

@@ -41,6 +41,10 @@ export default class RedLine extends PureComponent {
   }
   componentDidMount() {
     self = this;
+    const { type, currentFromId } = this.props;
+    if (type !== "add" && currentFromId) {
+      this.queryRedLineById(currentFromId);
+    }
     this.eventEmitter = emitter.addListener("screenshotBack", v => {
       console.log("屏幕截图", v);
       if (v.img) {

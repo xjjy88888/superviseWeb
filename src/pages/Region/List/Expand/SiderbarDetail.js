@@ -1,25 +1,9 @@
 /* eslint-disable array-callback-return */
 import React, { PureComponent } from "react";
 import { createForm } from "rc-form";
-import moment from "moment";
 import { connect } from "dva";
 import jQuery from "jquery";
-import {
-  Icon,
-  Button,
-  Input,
-  Cascader,
-  Select,
-  Upload,
-  notification,
-  Modal,
-  DatePicker,
-  Form,
-  Collapse,
-  Tag,
-  List
-} from "antd";
-import locale from "antd/lib/date-picker/locale/zh_CN";
+import { Icon, Button, Modal } from "antd";
 import Spins from "../../../../components/Spins";
 // 全景图
 import Panorama from "./components/Panorama";
@@ -29,25 +13,11 @@ import Point from "./components/Point";
 import Spot from "./components/Spot";
 // 红线---防治范围
 import RedLine from "./components/RedLine";
-import config from "@/config";
 import emitter from "../../../../utils/event";
-import {
-  getFile,
-  accessToken,
-  dateFormat,
-  photoFormat
-} from "../../../../utils/util";
+
 import styles from "../style/sidebar.less";
 
-const { Panel } = Collapse;
-
 let self;
-const { TextArea } = Input;
-const formItemLayout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 }
-};
-let yearList = [];
 
 @connect(({ project, spot, point, user, annex, redLine, district }) => ({
   project,
@@ -83,100 +53,85 @@ export default class siderbarDetail extends PureComponent {
     };
     this.map = null;
   }
-
+  componentWillUnmount() {
+    this.eventEmitter &&
+      emitter.removeListener("showSiderbarDetail", this.showSiderbarDetail);
+    this.eventEmitter &&
+      emitter.removeListener("showProjectSpotInfo", this.showProjectSpotInfo);
+  }
   componentDidMount() {
     self = this;
-
-    const year = new Date().getFullYear();
-
-    for (let i = 2015; i <= year; i++) {
-      yearList.push(i);
-    }
     const {
       form: { resetFields, setFieldsValue }
     } = this.props;
-    // this.eventEmitter = emitter.addListener("screenshotBack", v => {
-    //   console.log("屏幕截图", v);
-    //   if (v.img) {
-    //     this.annexUploadBase64(v);
-    //   } else {
-    //     notification["warning"]({
-    //       message: `未获取到数据，请重新截图`
-    //     });
-    //   }
-    // });
-    // this.eventEmitter = emitter.addListener("siteLocationBack", data => {
-    //   this.props.form.setFieldsValue({
-    //     pointX: data.longitude, //经度
-    //     pointX_pano: data.longitude, //经度
-    //     pointY: data.latitude, //维度
-    //     pointY_pano: data.latitude //维度
-    //   });
-    // });
-    this.eventEmitter = emitter.addListener("showSiderbarDetail", data => {
-      console.log("showSiderbarDetail---data===============", data);
+    this.eventEmitter = emitter.addListener(
+      "showSiderbarDetail",
+      this.showSiderbarDetail
+    );
+    this.eventEmitter = emitter.addListener(
+      "showProjectSpotInfo",
+      this.showProjectSpotInfo
+    );
+  }
+  showProjectSpotInfo = data => {
+    const {
+      form: { resetFields }
+    } = this.props;
+    console.log("showProjectSpotInfo=============", data);
+    emitter.emit("showSiderbar", {
+      show: true
+    });
+    if (data.from !== "project") {
       resetFields();
       this.setState({
-        ParentId: 0,
-        fileList: [],
-        polygon: data.polygon,
         show: data.show,
         edit: data.edit,
-        projectId: data.projectId,
         isSpotUpdate: data.type === "edit",
         from: data.from, //spot  point
         item: data.item || {},
         type: data.type, //add  edit
-        previewVisible_min: false,
-        fromList: data.fromList,
-        panoramaUrlConfig: data.from === "panorama" ? data.item.urlConfig : "",
-        showSpotReview: false,
-        spotReviewId: null,
-        currentFromId: data.id
+        previewVisible_min: false
+        // currentFromId: data.id
       });
-      if (data.projectId && data.projectName) {
-        this.setState({
-          relateProject: [{ label: data.projectName, value: data.projectId }]
-        });
-        setFieldsValue({ projectIdSpot: data.projectId });
-      }
-      if (data.type !== "add" && data.id) {
+      if (data.show && data.type !== "add" && data.id) {
         if (data.from === "spot") {
           // this.querySpotById(data.id);
         } else if (data.from === "point") {
           // this.queryPointById(data.id);
-        } else if (data.from === "redLine") {
-          // this.queryRedLineById(data.id);
         }
       }
+    }
+  };
+  showSiderbarDetail = data => {
+    const {
+      form: { resetFields }
+    } = this.props;
+    console.log("showSiderbarDetail---data===============", data);
+    resetFields();
+    this.setState({
+      ParentId: 0,
+      fileList: [],
+      polygon: data.polygon,
+      show: data.show,
+      edit: data.edit,
+      projectId: data.projectId,
+      isSpotUpdate: data.type === "edit",
+      from: data.from, //spot  point
+      item: data.item || {},
+      type: data.type, //add  edit
+      previewVisible_min: false,
+      fromList: data.fromList,
+      panoramaUrlConfig: data.from === "panorama" ? data.item.urlConfig : "",
+      showSpotReview: false,
+      spotReviewId: null,
+      currentFromId: data.id
     });
-    this.eventEmitter = emitter.addListener("showProjectSpotInfo", data => {
-      console.log("showProjectSpotInfo=============", data);
-      emitter.emit("showSiderbar", {
-        show: true
+    if (data.projectId && data.projectName) {
+      this.setState({
+        relateProject: [{ label: data.projectName, value: data.projectId }]
       });
-      if (data.from !== "project") {
-        resetFields();
-        this.setState({
-          show: data.show,
-          edit: data.edit,
-          isSpotUpdate: data.type === "edit",
-          from: data.from, //spot  point
-          item: data.item || {},
-          type: data.type, //add  edit
-          previewVisible_min: false,
-          currentFromId: data.id
-        });
-        if (data.show && data.type !== "add" && data.id) {
-          if (data.from === "spot") {
-            // this.querySpotById(data.id);
-          } else if (data.from === "point") {
-            // this.queryPointById(data.id);
-          }
-        }
-      }
-    });
-  }
+    }
+  };
 
   dictList = type => {
     const {

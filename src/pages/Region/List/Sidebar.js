@@ -307,18 +307,6 @@ export default class siderbar extends PureComponent {
         showCheck: data.show
       });
     });
-    this.eventEmitter = emitter.addListener("showProjectSpotInfo", data => {
-      if (data.from === "project") {
-        this.setState({
-          showProjectDetail: data.show, //地图跳转到项目详情
-          projectEdit: data.edit
-        });
-        this.queryProjectById(data.id);
-        this.queryProjectInfo(data.id);
-      } else if (data.from === "spot") {
-      } else {
-      }
-    });
     const { clientHeight } = this.refDom;
     this.setState({
       clientHeight: clientHeight

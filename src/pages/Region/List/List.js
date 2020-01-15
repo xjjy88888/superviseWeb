@@ -121,7 +121,7 @@ export default class siderbar extends PureComponent {
   }
 
   componentDidMount() {
-    const { link } = this.props;
+    const { link, showProjectInfo } = this.props;
     link(this);
     self = this;
 
@@ -200,6 +200,14 @@ export default class siderbar extends PureComponent {
       clientHeight: clientHeight
     });
     this.saveCurrentPageInfo("project");
+
+    this.eventEmitter = emitter.addListener("showProjectSpotInfo", data => {
+      if (data.from === "project") {
+        this.setState({ show: false });
+      } else if (data.from === "spot") {
+      } else {
+      }
+    });
   }
 
   componentDidUpdate(prevProps) {

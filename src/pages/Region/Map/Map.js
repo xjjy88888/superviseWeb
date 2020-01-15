@@ -4234,7 +4234,6 @@ export default class RegionMap extends PureComponent {
           switchInterpret={this.switchInterpret}
           showVideoMonitor={v => this.VideoMonitor.show(v)}
           hideExamine={() => this.Examine.hide()}
-          videoMonitorLocation={this.videoMonitorLocation}
           showProjectList={v => this.ProjectList.show(v)}
           showProjectInfo={v => this.ProjectInfo.show(v)}
           showProjectInfoMore={v => this.ProjectInfoMore.show(v)}
@@ -4251,6 +4250,7 @@ export default class RegionMap extends PureComponent {
           showProjectInfoMore={v => this.ProjectInfoMore.show(v)}
           hideProjectInfoMore={() => this.ProjectInfoMore.hide()}
           mapLocation={this.mapLocation}
+          videoMonitorLocation={this.videoMonitorLocation}
         />
         <ProjectInfoMore
           link={t => (this.ProjectInfoMore = t)}

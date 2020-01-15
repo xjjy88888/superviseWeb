@@ -202,6 +202,13 @@ export default class siderbar extends PureComponent {
         });
       }
     });
+    this.eventEmitter = emitter.addListener("showProjectSpotInfo", v => {
+      if (v.from === "project") {
+        this.show({ id: v.id, isEdit: false, isProjectSupervise: false });
+      } else if (data.from === "spot") {
+      } else {
+      }
+    });
   }
 
   componentWillUnmount() {
@@ -1403,8 +1410,7 @@ export default class siderbar extends PureComponent {
                       </b>
                     }
                     key="2"
-                  >
-                  </Collapse.Panel>
+                  ></Collapse.Panel>
                   <Collapse.Panel
                     header={
                       <b>
@@ -1834,7 +1840,7 @@ export default class siderbar extends PureComponent {
                             });
                             emitter.emit("showSiderbarDetail", {
                               show: false,
-                              edit: true,
+                              edit: false,
                               from: key,
                               type: "add"
                             });
@@ -2064,7 +2070,7 @@ export default class siderbar extends PureComponent {
                             emitter.emit("showSiderbarDetail", {
                               from: "panorama",
                               show: true,
-                              edit: true,
+                              edit: false,
                               type: "add",
                               id: null,
                               projectId: projectItem.id,

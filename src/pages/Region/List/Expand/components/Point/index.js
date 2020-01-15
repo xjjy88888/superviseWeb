@@ -303,13 +303,14 @@ export default class Point extends PureComponent {
             label={
               <a
                 onClick={() => {
-                  if (pointItem.projectName) {
+                  console.log(pointItem, 1);
+                  if (pointItem.project) {
                     emitter.emit("showProjectSpotInfo", {
                       show: true,
                       edit: type === "add",
                       from: "project",
                       state: type,
-                      id: pointItem.projectId
+                      id: pointItem.project.id
                     });
                   } else {
                     notification["info"]({

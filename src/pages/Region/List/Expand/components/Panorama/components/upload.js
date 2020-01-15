@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import React, { PureComponent } from "react";
 import { Button, Upload, notification } from "antd";
 
