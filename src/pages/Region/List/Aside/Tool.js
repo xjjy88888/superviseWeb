@@ -78,22 +78,22 @@ export default class Tool extends PureComponent {
     // });
   }
 
-  componentDidUpdate(prevProps) {
-    const {
-      project: { queryParams }
-    } = this.props;
-    if (prevProps.project.queryParams !== queryParams) {
-      console.log("queryParams---chart============", queryParams);
-      queryParams.from && delete queryParams.from;
-      this.dataFormat(queryParams);
-      this.setState({
-        queryInfo: queryParams
-      });
-      // if (queryParams.from && queryParams.from === "project") {
-      //   this.queryProject({ ...queryParams });
-      // }
-    }
-  }
+  // componentDidUpdate(prevProps) {
+  //   const {
+  //     project: { queryParams }
+  //   } = this.props;
+  //   if (prevProps.project.queryParams !== queryParams) {
+  //     console.log("queryParams---chart============", queryParams);
+  //     queryParams.from && delete queryParams.from;
+  //     this.dataFormat(queryParams);
+  //     this.setState({
+  //       queryInfo: queryParams
+  //     });
+  //     // if (queryParams.from && queryParams.from === "project") {
+  //     //   this.queryProject({ ...queryParams });
+  //     // }
+  //   }
+  // }
 
   queryInfo = v => {
     console.log("图表筛选完成", v);

@@ -229,6 +229,10 @@ export default class siderbar extends PureComponent {
       prevProps.project.queryParams !== queryParams &&
       queryParams.queryParamsChangeBy !== "sideBar"
     ) {
+      console.log(
+        "componentDidUpdate--queryParams================",
+        queryParams
+      );
       if (queryParams.from && queryParams.from === "project") {
         this.queryProject({ ...queryParams });
       } else if (queryParams.from && queryParams.from === "spot") {
@@ -307,7 +311,6 @@ export default class siderbar extends PureComponent {
         queryParamsChangeBy: "sideBar"
       };
     }
-
     dispatch({
       type: "project/projectSave",
       payload: {
@@ -316,8 +319,8 @@ export default class siderbar extends PureComponent {
             ? {
                 ...queryParams,
                 ...payload.queryParams,
-                from: payload.from,
-                queryParamsChangeBy: "sideBar"
+                queryParamsChangeBy: "sideBar",
+                from: payload.from
               }
             : obj
       }
@@ -1406,13 +1409,13 @@ export default class siderbar extends PureComponent {
                 color: "#1890ff"
               }}
               onClick={() => {
-                this.props.dispatch({
-                  type: "project/save",
-                  payload: {
-                    projectInfoMoreLeftShow: true
-                  }
-                });
                 if (key === "project") {
+                  this.props.dispatch({
+                    type: "project/save",
+                    payload: {
+                      projectInfoMoreLeftShow: true
+                    }
+                  });
                   this.setState({
                     projectEdit: true,
                     isProjectUpdate: false,

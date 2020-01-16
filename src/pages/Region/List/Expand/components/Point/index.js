@@ -383,16 +383,20 @@ export default class Point extends PureComponent {
                     style={{
                       color: "#1890ff"
                     }}
-                    onClick={() => {
-                      const x = getFieldValue("pointX");
-                      const y = getFieldValue("pointY");
-                      emitter.emit("siteLocation", {
-                        state: "position",
-                        Longitude: x,
-                        Latitude: y,
-                        type: "point"
-                      });
-                    }}
+                    onClick={
+                      type === "edit" && !edit
+                        ? null
+                        : () => {
+                            const x = getFieldValue("pointX");
+                            const y = getFieldValue("pointY");
+                            emitter.emit("siteLocation", {
+                              state: "position",
+                              Longitude: x,
+                              Latitude: y,
+                              type: "point"
+                            });
+                          }
+                    }
                   />
                 }
               />

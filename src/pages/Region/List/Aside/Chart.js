@@ -57,14 +57,15 @@ export default class chart extends PureComponent {
       clientWidth: clientWidth
     });
   }
-  
+
   componentDidUpdate(prevProps) {
     const {
       project: { queryParams }
     } = this.props;
     if (prevProps.project.queryParams !== queryParams) {
       console.log("queryParams---chart============", queryParams);
-      queryParams.from && delete queryParams.from;
+      // queryParams.from && delete queryParams.from;
+      // queryParams.queryParamsChangeBy && delete queryParams.queryParamsChangeBy;
       this.dataFormat(queryParams);
       this.setState({
         queryInfo: queryParams
