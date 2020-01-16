@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Layout, Menu, Icon } from 'antd';
 import Layouts from './Layouts';
-import Register from '../routes/System/User/Register';
+import Register from '../pages/System/User/Register';
 import { Link } from 'dva/router';
 
 let lowPowerList = [
