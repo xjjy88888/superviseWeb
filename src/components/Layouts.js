@@ -104,15 +104,17 @@ export default class layouts extends PureComponent {
               position: "relative",
               height: 47,
               zIndex: 1003,
-              backgroundColor: themeColor
+              backgroundColor: themeColor,
+              padding: "0 0 0 16px"
             }}
           >
             <span
               style={{
-                lineHeight: "43px",
+                lineHeight: "46px",
                 // margin: "0 30px",
                 float: "left",
-                height: "100%"
+                height: "100%",
+                fontSize: 16
               }}
             >
               <Avatar src="./img/logo.png" />
@@ -131,7 +133,8 @@ export default class layouts extends PureComponent {
               theme="dark"
               style={{
                 backgroundColor: themeColor,
-                width: "100%"
+                width: "100%",
+                fontSize: 16
               }}
               selectedKeys={[this.state.current]}
             >
@@ -175,7 +178,7 @@ export default class layouts extends PureComponent {
             <span
               // className={styles.right}
               style={{
-                margin: "0 20px",
+                margin: "0 12px",
                 position: "absolute",
                 right: 0,
                 top: -10,

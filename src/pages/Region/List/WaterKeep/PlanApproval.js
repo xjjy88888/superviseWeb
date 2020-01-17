@@ -1,8 +1,13 @@
 import React, { PureComponent } from "react";
+import { connect } from "dva";
+
 import { Button } from "antd";
 
 // 水土保持方案
-export default class Plan extends PureComponent {
+@connect(({ waterConserManage }) => ({
+  waterConserManage
+}))
+export default class PlanApproval extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -10,27 +15,24 @@ export default class Plan extends PureComponent {
     };
   }
 
-  componentDidMount() {
-    const { link } = this.props;
-    link(this);
-  }
-
-  show = v => {
-    console.log("显示水土保持方案", v);
-    this.setState({ show: true });
-  };
+  componentDidMount() {}
 
   hide = () => {
-    this.setState({ show: false });
+    const { dispatch } = this.props;
+    dispatch({
+      type: "waterConserManage/save",
+      payload: {
+        showWaterConserPage: ""
+      }
+    });
   };
 
   render() {
-    const { show } = this.state;
     return (
       <div
         style={{
           position: "absolute",
-          left: show ? 350 : window.innerWidth * -1,
+          left: 350,
           top: 46,
           zIndex: 1002,
           width: window.innerWidth - 350,
@@ -46,11 +48,9 @@ export default class Plan extends PureComponent {
             float: "right",
             color: "#1890ff"
           }}
-          onClick={() => {
-            this.hide();
-          }}
+          onClick={this.hide}
         />
-        <div>水土保持方案</div>
+        <div>方案报批</div>
       </div>
     );
   }

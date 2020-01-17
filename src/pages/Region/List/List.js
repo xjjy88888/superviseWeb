@@ -1072,7 +1072,7 @@ export default class siderbar extends PureComponent {
         title: (
           <span>
             <span>
-              共有
+              共有&ensp;
               {isProjectSupervise
                 ? projectSuperviseList.items.length
                 : key === "project"
@@ -1088,7 +1088,7 @@ export default class siderbar extends PureComponent {
                 : key === "spot"
                 ? spotList.totalCount
                 : pointList.totalCount}
-              条
+              &ensp;条
             </span>
             <span
               style={{
@@ -1097,7 +1097,7 @@ export default class siderbar extends PureComponent {
             >
               <Button
                 icon={showCheck ? "shopping" : ""}
-                style={{ marginLeft: 20 }}
+                style={{ margin: "0 12px 0 20px" }}
                 onClick={() => {
                   emitter.emit("showSiderbarDetail", {
                     show: false
@@ -1145,9 +1145,9 @@ export default class siderbar extends PureComponent {
         dataIndex: "name",
         render: (v, item) => (
           <span>
-            <p>
+            <p style={{ marginBottom: "0.3em" }}>
               <span
-                style={{ cursor: "pointer" }}
+                style={{ cursor: "pointer", fontSize: 16 }}
                 onClick={() => {
                   const {
                     commonModel: { siderBarPageInfo },
@@ -1240,7 +1240,7 @@ export default class siderbar extends PureComponent {
                 }}
               />
             </p>
-            <span>
+            <span style={{ width: "90%", display: "inline-block" }}>
               {key === "project"
                 ? `建设单位：${item.productDepartmentName || ""}`
                 : key === "spot"
@@ -1364,6 +1364,7 @@ export default class siderbar extends PureComponent {
             mode="horizontal"
             defaultSelectedKeys={["project"]}
             selectedKeys={[key]}
+            style={{ fontSize: 15, color: "black" }}
           >
             {(isProjectSupervise ? tabsProject : tabs).map(item => (
               <Menu.Item key={item.key} onClick={this.switchMenu}>
@@ -1377,7 +1378,7 @@ export default class siderbar extends PureComponent {
             onSearch={v => {
               this.search(v);
             }}
-            style={{ padding: 20, width: 300 }}
+            style={{ padding: 15, width: 300 }}
             enterButton
           />
           <Popover
@@ -1400,9 +1401,9 @@ export default class siderbar extends PureComponent {
                   : "compass"
               }
               style={{
-                fontSize: 20,
+                fontSize: 25,
                 position: "relative",
-                top: 23,
+                top: 19,
                 cursor: "pointer",
                 color: "#1890ff"
               }}
@@ -1483,7 +1484,7 @@ export default class siderbar extends PureComponent {
               ))}
             </Select>
           ) : null}
-          <Button.Group buttonstyle="solid" style={{ padding: "0px 15px" }}>
+          <Button.Group buttonstyle="solid" style={{ padding: "0px 15px 5px" }}>
             {sort.map((item, index) => (
               <Button
                 style={{

@@ -27,7 +27,7 @@ import {
   message
 } from "antd";
 import Spins from "../../../components/Spins";
-import WaterKeepPlan from "./WaterKeep/Plan";
+import PlanApproval from "./WaterKeep/PlanApproval";
 import config from "../../../config";
 import data from "../../../data";
 import emitter from "../../../utils/event";
@@ -74,7 +74,8 @@ const formItemLayout = {
     panorama,
     projectSupervise,
     videoMonitor,
-    commonModel
+    commonModel,
+    waterConserManage
   }) => ({
     project,
     spot,
@@ -89,7 +90,8 @@ const formItemLayout = {
     panorama,
     projectSupervise,
     videoMonitor,
-    commonModel
+    commonModel,
+    waterConserManage
   })
 )
 @createForm()
@@ -138,24 +140,14 @@ export default class siderbar extends PureComponent {
   }
   // componentDidUpdate(prevProps) {
   //   const {
-  //     dispatch,
-  //     showProjectInfoMore,
-  //     project: { projectInfo }
+  //     waterConserManage: { showWaterConserPage }
   //   } = this.props;
   //   if (
-  //     prevProps.project.projectInfo.projectBase.pointX !== "" &&
-  //     prevProps.project.projectInfo.projectBase.pointX !==
-  //       projectInfo.projectBase.pointX
+  //     prevProps.waterConserManage.showWaterConserPage !== showWaterConserPage
   //   ) {
-  //     dispatch({
-  //       type: "projec/save",
-  //       payload: {
-  //         projectInfoMoreLeftShow: true
-  //       }
-  //     });
-  //     showProjectInfoMore({
-  //       id: projectInfo.id,
-  //       isEdit: true
+  //     console.log(this.state.showWaterConserPage);
+  //     this.setState({ showWaterConserPage }, () => {
+  //       console.log(this.state.showWaterConserPage);
   //     });
   //   }
   // }
@@ -762,7 +754,16 @@ export default class siderbar extends PureComponent {
       }
     });
   };
-
+  // 水土保持管理对应组件展示、隐藏
+  showWaterConservePage = (key, e) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "waterConserManage/save",
+      payload: {
+        showWaterConserPage: key
+      }
+    });
+  };
   render() {
     const {
       showProjectInfoMore,
@@ -782,7 +783,8 @@ export default class siderbar extends PureComponent {
       redLine: { redLineList },
       inspect: { inspectList },
       panorama: { panoramaList },
-      videoMonitor: { videoMonitorList }
+      videoMonitor: { videoMonitorList },
+      waterConserManage: { showWaterConserPage }
     } = this.props;
 
     const user = JSON.parse(localStorage.getItem("user"));
@@ -1468,11 +1470,12 @@ export default class siderbar extends PureComponent {
                     key="9"
                   >
                     <p
-                      onClick={() => {
-                        this.WaterKeepPlan.show(123);
-                      }}
+                      onClick={this.showWaterConservePage.bind(
+                        this,
+                        "PlanApproval"
+                      )}
                     >
-                      1、水保方案
+                      1、方案报批
                     </p>
                     <p>2、收费管理</p>
                     <p>3、监测报告</p>
@@ -3220,7 +3223,7 @@ export default class siderbar extends PureComponent {
             </Modal>
           </div>
         </div>
-        <WaterKeepPlan link={t => (this.WaterKeepPlan = t)} />
+        {showWaterConserPage === "PlanApproval" ? <PlanApproval /> : null}
       </div>
     );
   }
