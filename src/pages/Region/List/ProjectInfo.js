@@ -153,10 +153,12 @@ export default class siderbar extends PureComponent {
     self = this;
     const urlFrom = getUrl(`from`);
     const urlId = getUrl(`id`);
+
+    // 项目监管-列表 跳转到项目详情
     if (urlFrom === `project` && urlId) {
-      console.log("componentDidMount");
       this.show({ id: urlId, isEdit: false, isProjectSupervise: true });
     }
+
     this.queryDict();
     this.queryDistrict();
     this.queryBasinOrgan();
@@ -193,6 +195,8 @@ export default class siderbar extends PureComponent {
         });
       }
     });
+
+    // 图斑/标注点详情-关联项目 跳转到项目详情
     this.eventEmitter = emitter.addListener("showProjectSpotInfo", v => {
       if (v.from === "project") {
         this.show({ id: v.id, isEdit: false, isProjectSupervise: false });
