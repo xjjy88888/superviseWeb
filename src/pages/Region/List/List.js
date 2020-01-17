@@ -230,7 +230,7 @@ export default class siderbar extends PureComponent {
       queryParams.queryParamsChangeBy !== "sideBar"
     ) {
       console.log(
-        "componentDidUpdate--queryParams================",
+        "sideBar----componentDidUpdate--queryParams================",
         queryParams
       );
       if (queryParams.from && queryParams.from === "project") {
@@ -242,9 +242,8 @@ export default class siderbar extends PureComponent {
     if (
       prevProps.commonModel.siderBarPageInfo.currentProjectId !==
         currentProjectId &&
-      currentProjectId !== ""
-      // &&
-      // prevProps.commonModel.siderBarPageInfo.currentProjectId !== ""
+      currentProjectId &&
+      prevProps.commonModel.siderBarPageInfo.currentProjectId
     ) {
       console.log("componentDidUpdate,showProjectInfo");
       showProjectInfo({
@@ -254,9 +253,8 @@ export default class siderbar extends PureComponent {
       });
     } else if (
       prevProps.commonModel.siderBarPageInfo.currentSpotId !== currentSpotId &&
-      currentSpotId !== ""
-      // &&
-      // prevProps.commonModel.siderBarPageInfo.currentSpotId !== ""
+      currentSpotId &&
+      prevProps.commonModel.siderBarPageInfo.currentSpotId
     ) {
       emitter.emit("showSiderbarDetail", {
         show: true,

@@ -27,6 +27,7 @@ import {
   message
 } from "antd";
 import Spins from "../../../components/Spins";
+import WaterKeepPlan from "./WaterKeep/Plan";
 import config from "../../../config";
 import data from "../../../data";
 import emitter from "../../../utils/event";
@@ -39,6 +40,17 @@ import {
   getUrl
 } from "../../../utils/util";
 import styles from "./style/sidebar.less";
+
+// Collapse
+// 8 附件
+// 1 基本信息
+// 9 水土保持管理
+// 2 项目查处
+// 3 检查表
+// 4 扰动图斑
+// 5 防治责任范围
+// 6 全景图
+// 7 视频监控
 
 let self;
 const { TreeNode } = Tree;
@@ -198,6 +210,7 @@ export default class siderbar extends PureComponent {
 
     // 图斑/标注点详情-关联项目 跳转到项目详情
     this.eventEmitter = emitter.addListener("showProjectSpotInfo", v => {
+      console.log("showProjectSpotInfo---v===========================", v);
       if (v.from === "project") {
         this.show({ id: v.id, isEdit: false, isProjectSupervise: false });
       } else if (data.from === "spot") {
@@ -1266,7 +1279,7 @@ export default class siderbar extends PureComponent {
                   paddingRight: 30
                 }}
               >
-                <Collapse bordered={false} defaultActiveKey={["1", "2"]}>
+                <Collapse bordered={false} defaultActiveKey={["1", "9"]}>
                   <Collapse.Panel header={<b>基本信息</b>} key="1">
                     <div
                       style={{
@@ -1449,6 +1462,23 @@ export default class siderbar extends PureComponent {
                         删除
                       </a>
                     </div>
+                  </Collapse.Panel>
+                  <Collapse.Panel
+                    header={<b onClick={() => {}}>水土保持管理</b>}
+                    key="9"
+                  >
+                    <p
+                      onClick={() => {
+                        this.WaterKeepPlan.show(123);
+                      }}
+                    >
+                      1、水保方案
+                    </p>
+                    <p>2、收费管理</p>
+                    <p>3、监测报告</p>
+                    <p>4、监理报告</p>
+                    <p>5、监督检查</p>
+                    <p>6、验收备案</p>
                   </Collapse.Panel>
                   <Collapse.Panel
                     header={
@@ -3190,6 +3220,7 @@ export default class siderbar extends PureComponent {
             </Modal>
           </div>
         </div>
+        <WaterKeepPlan link={t => (this.WaterKeepPlan = t)} />
       </div>
     );
   }

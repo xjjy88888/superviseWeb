@@ -41,7 +41,8 @@ export default class Point extends PureComponent {
   componentDidUpdate(prevProps, prevState) {
     const { type, currentFromId } = this.props;
     if (
-      prevProps.currentFromId !== "" &&
+      currentFromId &&
+      prevProps.currentFromId &&
       currentFromId !== prevProps.currentFromId &&
       type === "edit"
     ) {
@@ -118,6 +119,7 @@ export default class Point extends PureComponent {
   };
 
   queryDetail = (id, url) => {
+    console.log("queryDetail--------------------------------");
     const { dispatch } = this.props;
     this.setState({ loading: true });
     dispatch({
