@@ -28,6 +28,12 @@ import {
 } from "antd";
 import Spins from "../../../components/Spins";
 import PlanApproval from "./WaterKeep/PlanApproval";
+import Charge from "./WaterKeep/Charge";
+import MonitorReport from "./WaterKeep/MonitorReport";
+import InspectReport from "./WaterKeep/InspectReport";
+import Supervise from "./WaterKeep/Supervise";
+import AcceptanceFiling from "./WaterKeep/AcceptanceFiling";
+
 import config from "../../../config";
 import data from "../../../data";
 import emitter from "../../../utils/event";
@@ -138,19 +144,7 @@ export default class siderbar extends PureComponent {
     };
     this.map = null;
   }
-  // componentDidUpdate(prevProps) {
-  //   const {
-  //     waterConserManage: { showWaterConserPage }
-  //   } = this.props;
-  //   if (
-  //     prevProps.waterConserManage.showWaterConserPage !== showWaterConserPage
-  //   ) {
-  //     console.log(this.state.showWaterConserPage);
-  //     this.setState({ showWaterConserPage }, () => {
-  //       console.log(this.state.showWaterConserPage);
-  //     });
-  //   }
-  // }
+  componentDidUpdate(prevProps) {}
   componentDidMount() {
     const { link } = this.props;
     link(this);
@@ -212,6 +206,10 @@ export default class siderbar extends PureComponent {
   }
 
   componentWillUnmount() {
+    this.cleanPropsAndListen();
+  }
+  // 组件卸载时清理状态
+  cleanPropsAndListen = () => {
     const { dispatch } = this.props;
     dispatch({
       type: "commonModel/save",
@@ -223,13 +221,18 @@ export default class siderbar extends PureComponent {
         }
       }
     });
+    dispatch({
+      type: "waterConserManage/save",
+      payload: {
+        showWaterConserPage: ""
+      }
+    });
     if (this.scrollDom) {
       this.scrollDom.removeEventListener("scroll", () => {
         this.onScroll(this);
       });
     }
-  }
-
+  };
   show = v => {
     console.log("显示项目详情", v);
     const {
@@ -1468,6 +1471,7 @@ export default class siderbar extends PureComponent {
                   <Collapse.Panel
                     header={<b onClick={() => {}}>水土保持管理</b>}
                     key="9"
+                    className={styles["water-conserve-panel"]}
                   >
                     <p
                       onClick={this.showWaterConservePage.bind(
@@ -1475,13 +1479,51 @@ export default class siderbar extends PureComponent {
                         "PlanApproval"
                       )}
                     >
-                      1、方案报批
+                      方案报批&ensp;
+                      <Icon type="right" />
                     </p>
-                    <p>2、收费管理</p>
-                    <p>3、监测报告</p>
-                    <p>4、监理报告</p>
-                    <p>5、监督检查</p>
-                    <p>6、验收备案</p>
+                    <p
+                      onClick={this.showWaterConservePage.bind(this, "Charge")}
+                    >
+                      收费管理&ensp;
+                      <Icon type="right" />
+                    </p>
+                    <p
+                      onClick={this.showWaterConservePage.bind(
+                        this,
+                        "MonitorReport"
+                      )}
+                    >
+                      监测报告&ensp;
+                      <Icon type="right" />
+                    </p>
+                    <p
+                      onClick={this.showWaterConservePage.bind(
+                        this,
+                        "InspectReport"
+                      )}
+                    >
+                      监理报告&ensp;
+                      <Icon type="right" />
+                    </p>
+                    <p
+                      onClick={this.showWaterConservePage.bind(
+                        this,
+                        "Supervise"
+                      )}
+                    >
+                      监督检查&ensp;
+                      <Icon type="right" />
+                    </p>
+                    <p
+                      onClick={this.showWaterConservePage.bind(
+                        this,
+                        "AcceptanceFiling"
+                      )}
+                    >
+                      验收备案&ensp;
+                      <Icon type="right" />
+                    </p>
                   </Collapse.Panel>
                   <Collapse.Panel
                     header={
@@ -3224,6 +3266,13 @@ export default class siderbar extends PureComponent {
           </div>
         </div>
         {showWaterConserPage === "PlanApproval" ? <PlanApproval /> : null}
+        {showWaterConserPage === "Charge" ? <Charge /> : null}
+        {showWaterConserPage === "MonitorReport" ? <MonitorReport /> : null}
+        {showWaterConserPage === "InspectReport" ? <InspectReport /> : null}
+        {showWaterConserPage === "Supervise" ? <Supervise /> : null}
+        {showWaterConserPage === "AcceptanceFiling" ? (
+          <AcceptanceFiling />
+        ) : null}
       </div>
     );
   }

@@ -1,56 +1,103 @@
 import React, { PureComponent } from "react";
-import { Button } from "antd";
+import { connect } from "dva";
+import MyCarousel from "@/components/Carousel";
+import MySteps from "@/components/Steps";
+
+import Add from "./components/SuperviseAdd";
+import Detail from "./components/SuperviseDetail";
+
+import { Button, Badge, Icon } from "antd";
+
+import styles from "./styles/AcceptanceFiling.less";
+
+const list = [
+  {
+    id: 0,
+    text: "2019年12月12日验收备案整改意见答复时间还剩2天！",
+    icon: "warn"
+  },
+  {
+    id: 0,
+    text: "2020年12月12日验收备案整改意见答复时间还剩2天！",
+    icon: "warn"
+  },
+  {
+    id: 0,
+    text: "2021年12月12日验收备案整改意见答复时间还剩2天！",
+    icon: "warn"
+  },
+  {
+    id: 0,
+    text: "2022年12月12日验收备案整改意见答复时间还剩2天！",
+    icon: "warn"
+  },
+  {
+    id: 0,
+    text: "2023年12月12日验收备案整改意见答复时间还剩2天！",
+    icon: "warn"
+  },
+  {
+    id: 0,
+    text: "2019年12月12日验收备案整改意见答复时间还剩2天！",
+    icon: "warn"
+  },
+  {
+    id: 0,
+    text: "2019年12月12日验收备案整改意见答复时间还剩2天！",
+    icon: "warn"
+  }
+];
 
 // 验收备案
-export default class AcceptanceFiling extends PureComponent {
+@connect(({ waterConserManage }) => ({
+  waterConserManage
+}))
+export default class Supervise extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      show: false
+      showAddComponent: false
     };
   }
 
-  componentDidMount() {
-    const { link } = this.props;
-    link(this);
-  }
-
-  show = v => {
-    console.log("显示验收备案", v);
-    this.setState({ show: true });
+  componentDidMount() {}
+  // 新增一个验收备案项
+  addNewAccept = status => {
+    this.setState({ showAddComponent: status });
   };
 
   hide = () => {
-    this.setState({ show: false });
+    const { dispatch } = this.props;
+    dispatch({
+      type: "waterConserManage/save",
+      payload: {
+        showWaterConserPage: ""
+      }
+    });
   };
 
   render() {
-    const { show } = this.state;
+    const { showAddComponent } = this.state;
     return (
       <div
-        style={{
-          position: "absolute",
-          left: show ? 350 : window.innerWidth * -1,
-          top: 46,
-          zIndex: 1002,
-          width: window.innerWidth - 350,
-          height: "100%",
-          backgroundColor: `#fff`,
-          padding: 20
-        }}
+        className={styles["accept-panel"]}
+        style={{ width: window.innerWidth - 350 }}
       >
-        <Button
-          icon="close"
-          shape="circle"
-          style={{
-            float: "right",
-            color: "#1890ff"
-          }}
-          onClick={() => {
-            this.hide();
-          }}
-        />
-        <div>验收备案</div>
+        <div className={styles.header}>
+          <Icon type="left" onClick={this.hide} />
+          <div className={styles.title}>
+            验收备案<span>5</span>
+          </div>
+          <Button type="primary" onClick={this.addNewAccept.bind(this, true)}>
+            新增
+          </Button>
+        </div>
+        <div className={styles.container}>
+          {/* {showAddComponent ? <Add addNewAccept={this.addNewAccept} /> : null} */}
+          {list && list.length ? <MyCarousel list={list} /> : null}
+          <MySteps />
+          <Detail list={list} />
+        </div>
       </div>
     );
   }

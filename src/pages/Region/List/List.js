@@ -1147,7 +1147,7 @@ export default class siderbar extends PureComponent {
           <span>
             <p style={{ marginBottom: "0.3em" }}>
               <span
-                style={{ cursor: "pointer", fontSize: 16 }}
+                style={{ cursor: "pointer" }}
                 onClick={() => {
                   const {
                     commonModel: { siderBarPageInfo },
