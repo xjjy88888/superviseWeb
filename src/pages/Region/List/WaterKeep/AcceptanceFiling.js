@@ -49,8 +49,8 @@ const list = [
 ];
 
 // 验收备案
-@connect(({ waterConserManage }) => ({
-  waterConserManage
+@connect(({ waterKeep }) => ({
+  waterKeep
 }))
 export default class Supervise extends PureComponent {
   constructor(props) {
@@ -69,9 +69,9 @@ export default class Supervise extends PureComponent {
   hide = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: "waterConserManage/save",
+      type: "waterKeep/save",
       payload: {
-        showWaterConserPage: ""
+        showwaterKeepPage: ""
       }
     });
   };

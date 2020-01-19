@@ -3,14 +3,16 @@ import { connect } from "dva";
 
 import { Button } from "antd";
 
-// 监测报告
-@connect(({ waterConserManage }) => ({
-  waterConserManage
+// 水土保持方案
+@connect(({ waterKeep }) => ({
+  waterKeep
 }))
-export default class MonitorReport extends PureComponent {
+export default class Plan extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      show: false
+    };
   }
 
   componentDidMount() {}
@@ -18,9 +20,9 @@ export default class MonitorReport extends PureComponent {
   hide = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: "waterConserManage/save",
+      type: "waterKeep/save",
       payload: {
-        showWaterConserPage: ""
+        showwaterKeepPage: ""
       }
     });
   };
@@ -48,7 +50,7 @@ export default class MonitorReport extends PureComponent {
           }}
           onClick={this.hide}
         />
-        <div>监测报告</div>
+        <div>方案报批</div>
       </div>
     );
   }

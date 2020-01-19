@@ -4,10 +4,10 @@ import { connect } from "dva";
 import { Button } from "antd";
 
 // 监理报告
-@connect(({ waterConserManage }) => ({
-  waterConserManage
+@connect(({ waterKeep }) => ({
+  waterKeep
 }))
-export default class InspectReport extends PureComponent {
+export default class Inspect extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -20,9 +20,9 @@ export default class InspectReport extends PureComponent {
   hide = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: "waterConserManage/save",
+      type: "waterKeep/save",
       payload: {
-        showWaterConserPage: ""
+        showwaterKeepPage: ""
       }
     });
   };

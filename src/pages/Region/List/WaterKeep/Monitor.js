@@ -1,36 +1,36 @@
 import React, { PureComponent } from "react";
+import { connect } from "dva";
+
 import { Button } from "antd";
 
-// 项目监测
+// 监测报告
+@connect(({ waterKeep }) => ({
+  waterKeep
+}))
 export default class Monitor extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = {
-      show: false
-    };
+    this.state = {};
   }
 
-  componentDidMount() {
-    const { link } = this.props;
-    link(this);
-  }
-
-  show = v => {
-    console.log("显示项目监测", v);
-    this.setState({ show: true });
-  };
+  componentDidMount() {}
 
   hide = () => {
-    this.setState({ show: false });
+    const { dispatch } = this.props;
+    dispatch({
+      type: "waterKeep/save",
+      payload: {
+        showwaterKeepPage: ""
+      }
+    });
   };
 
   render() {
-    const { show } = this.state;
     return (
       <div
         style={{
           position: "absolute",
-          left: show ? 350 : window.innerWidth * -1,
+          left: 350,
           top: 46,
           zIndex: 1002,
           width: window.innerWidth - 350,
@@ -46,11 +46,9 @@ export default class Monitor extends PureComponent {
             float: "right",
             color: "#1890ff"
           }}
-          onClick={() => {
-            this.hide();
-          }}
+          onClick={this.hide}
         />
-        <div>项目监测</div>
+        <div>监测报告</div>
       </div>
     );
   }

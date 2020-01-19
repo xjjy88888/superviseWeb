@@ -1,10 +1,10 @@
 import {} from "../services/httpApi";
 
 export default {
-  namespace: "waterConserManage",
+  namespace: "waterKeep",
 
   state: {
-    showWaterConserPage: ""
+    showwaterKeepPage: ""
   },
 
   effects: {

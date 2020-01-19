@@ -4,8 +4,8 @@ import { connect } from "dva";
 import { Button } from "antd";
 
 // 收费管理
-@connect(({ waterConserManage }) => ({
-  waterConserManage
+@connect(({ waterKeep }) => ({
+  waterKeep
 }))
 export default class Charge extends PureComponent {
   constructor(props) {
@@ -20,9 +20,9 @@ export default class Charge extends PureComponent {
   hide = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: "waterConserManage/save",
+      type: "waterKeep/save",
       payload: {
-        showWaterConserPage: ""
+        showwaterKeepPage: ""
       }
     });
   };
